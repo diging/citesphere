@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+<tiles-definitions>
+
+	<!-- Base definitions -->
+	<definition name="base.definition" template="/WEB-INF/tiles/skeleton.jsp">
+		<put-attribute name="title" value="" />
+		<put-attribute name="navigation" value="" />
+		<put-attribute name="content" value="" />
+		<put-attribute name="header" value="" />
+		<put-attribute name="pageName" value="" />
+		<put-attribute name="currentPage" value="home" />
+	</definition>
+	
+	<definition name="home" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/home.jsp" />	
+	</definition>
+	
+	<definition name="register" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/register.jsp" />	
+	</definition>
+	
+	<!-- Users -->
+	<definition name="admin/user/list" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/user/list.jsp" />	
+	</definition>	
+	
+</tiles-definitions>
