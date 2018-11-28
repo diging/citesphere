@@ -5,6 +5,6 @@ import edu.asu.diging.citesphere.core.model.IZoteroToken;
 
 public interface IZoteroTokenFactory {
 
-    IZoteroToken createZoteroToken(String token, String userId, IUser user);
+    IZoteroToken createZoteroToken(String token, String secret, String userId, IUser user);
 
 }

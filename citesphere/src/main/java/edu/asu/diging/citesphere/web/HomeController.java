@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.service.IZoteroManager;
 import edu.asu.diging.citesphere.core.service.IZoteroTokenManager;
 
 @Controller
@@ -15,12 +16,19 @@ public class HomeController {
     @Autowired
     private IZoteroTokenManager tokenManager;
     
+    @Autowired
+    private IZoteroManager zoteroManager;
+    
     @RequestMapping(value = "/")
     public String home(Authentication authentication, Model model) {
         if (authentication != null && authentication.isAuthenticated()) {
             IUser user = (IUser) authentication.getPrincipal();
-            model.addAttribute("isZoteroConnected", tokenManager.getToken(user) != null);
+            boolean isConnected = tokenManager.getToken(user) != null;
+            model.addAttribute("isZoteroConnected", isConnected);
             model.addAttribute("user", user);
+            if (isConnected) {
+                model.addAttribute("groups", zoteroManager.getGroupItems(user));
+            }
         }
         
         return "home";

@@ -14,4 +14,8 @@ public interface IZoteroToken {
 
     void setUser(IUser user);
 
+    void setSecret(String secret);
+
+    String getSecret();
+
 }

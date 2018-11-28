@@ -23,6 +23,7 @@ public class ZoteroToken implements IZoteroToken {
     private String id;
     private String userId;
     private String token;
+    private String secret;
     @OneToOne(targetEntity=User.class)
     private IUser user;
     
@@ -54,6 +55,14 @@ public class ZoteroToken implements IZoteroToken {
     @Override
     public void setToken(String token) {
         this.token = token;
+    }
+    @Override
+    public String getSecret() {
+        return secret;
+    }
+    @Override
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.impl.IZoteroToken#getUser()

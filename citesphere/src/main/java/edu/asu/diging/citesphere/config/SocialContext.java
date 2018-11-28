@@ -1,7 +1,5 @@
 package edu.asu.diging.citesphere.config;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +10,6 @@ import org.springframework.social.config.annotation.EnableSocial;
 import org.springframework.social.config.annotation.SocialConfigurer;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.mem.InMemoryUsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
@@ -25,9 +22,6 @@ import edu.asu.diging.citesphere.core.user.IUserHelper;
 @Configuration
 @EnableSocial
 public class SocialContext implements SocialConfigurer {
-
-    @Autowired
-    private DataSource dataSource;
 
     @Autowired
     private IUserHelper userHelper;

@@ -14,11 +14,12 @@ public class ZoteroTokenFactory implements IZoteroTokenFactory {
      * @see edu.asu.diging.citesphere.core.factory.impl.IZoteroTokenFactory#createZoteroToken(java.lang.String, java.lang.String, edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
-    public IZoteroToken createZoteroToken(String token, String userId, IUser user) {
+    public IZoteroToken createZoteroToken(String token, String secret, String userId, IUser user) {
         IZoteroToken zoteroToken = new ZoteroToken();
         zoteroToken.setToken(token);
         zoteroToken.setUserId(userId);
         zoteroToken.setUser(user);
+        zoteroToken.setSecret(secret);
         return zoteroToken;
     }
 }

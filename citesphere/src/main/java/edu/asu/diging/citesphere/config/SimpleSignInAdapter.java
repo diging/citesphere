@@ -32,10 +32,11 @@ public final class SimpleSignInAdapter implements SignInAdapter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             String accessToken = connection.createData().getAccessToken();
+            String secret = connection.createData().getSecret();
             String zoteroUserId = ((Zotero)connection.getApi()).getUserId();
             IUser user = (IUser) authentication.getPrincipal();
             
-            IZoteroToken token = tokenFactory.createZoteroToken(accessToken, zoteroUserId, user);
+            IZoteroToken token = tokenFactory.createZoteroToken(accessToken, secret, zoteroUserId, user);
             tokenManager.store(token);
         }
         

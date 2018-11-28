@@ -19,6 +19,7 @@
 
 		<zotero.client.key></zotero.client.key>
 		<zotero.client.secret></zotero.client.secret>
+		
 
 		<db.driver>com.mysql.jdbc.Driver</db.driver>
 		<db.database.url></db.database.url>
