@@ -8,6 +8,7 @@ import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.Zotero;
+import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
 import org.springframework.stereotype.Component;
 
@@ -33,14 +34,14 @@ public class ZoteroConnector implements IZoteroConnector {
      */
     @Override
     @Cacheable(value="groupItems", key="#user.username + '_' + #groupId + '_' + #page")
-    public Item[] getGroupItems(IUser user, String groupId, int page) {
+    public ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page) {
         Zotero zotero = getApi(user);
         if (page < 1) {
             page = 0;
         } else  {
             page = page-1;
         }
-        return zotero.getGroupsOperations().getGroupItemsTop(groupId, page*zoteroPageSize, zoteroPageSize);   
+        return zotero.getGroupsOperations().getGroupItemsTop(groupId, page*zoteroPageSize, zoteroPageSize);          
     }
     
     /* (non-Javadoc)

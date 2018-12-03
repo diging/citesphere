@@ -4,7 +4,27 @@
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
+<script src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>
+
+<script>
+$(function() {
+	$('#pagination-top').twbsPagination({
+	    totalPages: ${totalPages},
+	    startPage: ${currentPage},
+	    prev: "«",
+	    next: "»",
+	    visiblePages: 10,
+	    initiateStartPageClick: false,
+	    onPageClick: function (event, page) {
+	    	window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items" />?page=" + page;
+	    }
+	});
+});
+</script>
+
 <h2>Items in Group ${zoteroGroupId}</h2>
+
+<ul id="pagination-top" class="pagination-sm"></ul>
 
 <ul class="list-group">
 <c:forEach items="${items}" var="entry">
