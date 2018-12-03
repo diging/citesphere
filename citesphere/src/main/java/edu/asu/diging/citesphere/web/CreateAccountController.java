@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import edu.asu.diging.citesphere.core.exceptions.UserAlreadyExistsException;
 import edu.asu.diging.citesphere.core.factory.IUserFactory;
 import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.service.IUserManager;
+import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.web.forms.UserForm;
 
 @Controller

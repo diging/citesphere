@@ -27,4 +27,9 @@
 		<put-attribute name="content" value="/WEB-INF/views/admin/user/list.jsp" />	
 	</definition>	
 	
+	<!-- zotero -->
+	<definition name="auth/group/items" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/auth/group/items.jsp" />	
+	</definition>	
+	
 </tiles-definitions>

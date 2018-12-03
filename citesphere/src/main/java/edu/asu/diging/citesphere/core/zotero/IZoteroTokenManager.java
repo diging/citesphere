@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.core.service;
+package edu.asu.diging.citesphere.core.zotero;
 
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;

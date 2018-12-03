@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.core.service.impl;
+package edu.asu.diging.citesphere.core.user.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,7 +23,7 @@ import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.Role;
 import edu.asu.diging.citesphere.core.model.impl.User;
 import edu.asu.diging.citesphere.core.repository.UserRepository;
-import edu.asu.diging.citesphere.core.service.IUserManager;
+import edu.asu.diging.citesphere.core.user.IUserManager;
 
 
 @Transactional

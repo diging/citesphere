@@ -1,0 +1,64 @@
+package edu.asu.diging.citesphere.core.model.bib;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+
+public interface ICitation {
+
+    String getKey();
+
+    void setKey(String key);
+
+    String getTitle();
+
+    void setTitle(String title);
+
+    List<IPerson> getAuthors();
+
+    void setAuthors(List<IPerson> authors);
+
+    List<IPerson> getEditors();
+
+    void setEditors(List<IPerson> editors);
+
+    ItemType getItemType();
+
+    void setItemType(ItemType itemType);
+
+    String getPublicationTitle();
+
+    void setPublicationTitle(String publicationTitle);
+
+    String getVolume();
+
+    void setVolume(String volume);
+
+    String getIssue();
+
+    void setIssue(String issue);
+
+    String getPages();
+
+    void setPages(String pages);
+
+    OffsetDateTime getDate();
+
+    void setDate(OffsetDateTime date);
+
+    String getSeries();
+
+    void setSeries(String series);
+
+    String getSeriesTitle();
+
+    void setSeriesTitle(String seriesTitle);
+
+    void setDateFreetext(String dateFreetext);
+
+    String getDateFreetext();
+
+    void setUrl(String url);
+
+    String getUrl();
+
+}

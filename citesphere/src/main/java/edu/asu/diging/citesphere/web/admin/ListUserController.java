@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import edu.asu.diging.citesphere.core.service.IUserManager;
+import edu.asu.diging.citesphere.core.user.IUserManager;
 
 @Controller
 public class ListUserController {

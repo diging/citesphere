@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.core.service;
+package edu.asu.diging.citesphere.core.user;
 
 import java.util.List;
 

@@ -7,8 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.service.IZoteroManager;
-import edu.asu.diging.citesphere.core.service.IZoteroTokenManager;
+import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.core.zotero.IZoteroTokenManager;
 
 @Controller
 public class HomeController {
@@ -27,7 +27,7 @@ public class HomeController {
             model.addAttribute("isZoteroConnected", isConnected);
             model.addAttribute("user", user);
             if (isConnected) {
-                model.addAttribute("groups", zoteroManager.getGroupItems(user));
+                model.addAttribute("groups", zoteroManager.getGroups(user));
             }
         }
         

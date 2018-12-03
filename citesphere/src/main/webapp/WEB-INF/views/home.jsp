@@ -15,6 +15,7 @@ If you try and take a cat apart to see how it works, the first thing you have on
 <sec:authorize access="isAuthenticated()">
 
 <c:if test="${not isZoteroConnected}">
+
 <div class="jumbotron col-md-12">
 <center>
 <h2>Please connect your Zotero account before continuing!</h2>
@@ -30,13 +31,13 @@ If you try and take a cat apart to see how it works, the first thing you have on
 </c:if>
 
 <c:if test="${isZoteroConnected}">
-<div class="jumbotron col-md-12">
+<div class="jumbotron col-md-12"  style="margin-bottom: 20px;">
 <h2>Welcome back, ${user.firstName}!</h2>
 </div>
 <c:forEach items="${groups}" var="group">
 <div class="panel panel-default">
   <div class="panel-body">
-    ${group.data.name} (${group.meta.numItems})
+    <a href="<c:url value="/auth/group/${group.id}/items" />">${group.data.name} (${group.meta.numItems})</a>
   </div>
 </div>
 </c:forEach>

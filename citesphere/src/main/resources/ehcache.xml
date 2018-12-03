@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xmlns:jsr107='http://www.ehcache.org/v3/jsr107'
+    xmlns='http://www.ehcache.org/v3'
+    xsi:schemaLocation="
+        http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.5.xsd
+        http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.5.xsd">
+
+  <service>
+    <jsr107:defaults enable-management="false" enable-statistics="true"/>
+  </service>
+
+  <cache alias="groups">
+    <resources>
+      <heap unit="entries">2000</heap>
+    </resources>
+  </cache>
+  <cache alias="groupItems">
+    <resources>
+      <heap unit="entries">2000</heap>
+    </resources>
+  </cache>
+</config>
