@@ -42,5 +42,11 @@ public class ZoteroManager implements IZoteroManager {
         return zoteroConnector.getGroups(user);
     }
     
+    @Override
+    public ICitation getGroupItem(IUser user, String groupId, String itemKey) {
+        Item item = zoteroConnector.getItem(user, groupId, itemKey);
+        return citationFactory.createCitation(item);
+    }
+    
     
 }

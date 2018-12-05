@@ -55,6 +55,13 @@ public class ZoteroConnector implements IZoteroConnector {
         return info;
     }
     
+    @Override
+    @Cacheable(value="itemInGroup", key="#user.username + '_' + #groupId + '_' + #itemKey")
+    public Item getItem(IUser user, String groupId, String itemKey) {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().getGroupItem(groupId, itemKey);
+    }
+    
     private Zotero getApi(IUser user) {
         IZoteroToken token = tokenManager.getToken(user);
         Zotero zotero = zoteroFactory.createConnection(new OAuthToken(token.getToken(), token.getSecret())).getApi();

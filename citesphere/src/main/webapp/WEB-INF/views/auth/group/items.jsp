@@ -19,6 +19,12 @@ $(function() {
 	    	window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items" />?page=" + page;
 	    }
 	});
+	
+	$(".bib-entry").click(function() {
+		var key = $(this).data("key");
+		window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+	});
+	
 });
 </script>
 
@@ -28,7 +34,7 @@ $(function() {
 
 <ul class="list-group">
 <c:forEach items="${items}" var="entry">
-	<li class="list-group-item clearfix">
+	<li class="list-group-item clearfix bib-entry" data-key="${entry.key}">
  	  <c:forEach items="${entry.authors}" var="author" varStatus="status">
  	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
  	  </c:forEach>

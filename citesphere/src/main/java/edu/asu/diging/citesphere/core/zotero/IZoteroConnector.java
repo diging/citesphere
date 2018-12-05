@@ -12,4 +12,6 @@ public interface IZoteroConnector {
 
     Group[] getGroups(IUser user);
 
+    Item getItem(IUser user, String groupId, String itemKey);
+
 }

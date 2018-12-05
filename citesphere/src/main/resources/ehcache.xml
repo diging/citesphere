@@ -21,4 +21,9 @@
       <heap unit="entries">2000</heap>
     </resources>
   </cache>
+  <cache alias="itemInGroup">
+    <resources>
+      <heap unit="entries">2000</heap>
+    </resources>
+  </cache>
 </config>
