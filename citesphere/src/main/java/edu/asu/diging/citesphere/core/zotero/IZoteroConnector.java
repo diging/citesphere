@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.zotero;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ZoteroResponse;
@@ -10,8 +11,12 @@ public interface IZoteroConnector {
 
     ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page);
 
-    Group[] getGroups(IUser user);
+    ZoteroResponse<Group> getGroups(IUser user);
 
     Item getItem(IUser user, String groupId, String itemKey);
+
+    ZoteroResponse<Group> getGroupsVersions(IUser user);
+
+    ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit);
 
 }

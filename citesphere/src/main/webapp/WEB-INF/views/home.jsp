@@ -34,12 +34,14 @@ If you try and take a cat apart to see how it works, the first thing you have on
 <div class="jumbotron col-md-12"  style="margin-bottom: 20px;">
 <h2>Welcome back, ${user.firstName}!</h2>
 </div>
+<div class="col-md-12">
 <c:forEach items="${groups}" var="group">
 <div class="panel panel-default">
   <div class="panel-body">
-    <a href="<c:url value="/auth/group/${group.id}/items" />">${group.data.name} (${group.meta.numItems})</a>
+    <a href="<c:url value="/auth/group/${group.id}/items" />">${group.name} (${group.numItems})</a>
   </div>
 </div>
 </c:forEach>
+</div>
 </c:if>
 </sec:authorize>

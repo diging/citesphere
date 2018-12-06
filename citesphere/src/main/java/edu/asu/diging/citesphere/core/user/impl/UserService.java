@@ -104,7 +104,7 @@ public class UserService implements UserDetailsService, IUserManager {
         if (user.getNotes() == null) {
             user.setNotes("");
         }
-        user.setNotes(user.getNotes() + String.format("Approved by %s.", approver));
+        user.setNotes(user.getNotes() + String.format("Approved by %s. ", approver));
         if (((IUser)user).getRoles() == null) {
             ((IUser)user).setRoles(new HashSet<>());
         }
@@ -116,14 +116,14 @@ public class UserService implements UserDetailsService, IUserManager {
     public void disableUser(String username, String initiator) {
         IUser user = findByUsername(username);
         user.setEnabled(false);
-        user.setNotes(user.getNotes() + String.format("Disabled by %s.", initiator));
+        user.setNotes(user.getNotes() + String.format("Disabled by %s. ", initiator));
         userRepository.save((User)user);
     }
     
     @Override
     public void addRole(String username, String initiator, String role) {
         IUser user = findByUsername(username);
-        user.setNotes(user.getNotes() + String.format("%s added role %s.", initiator, role));
+        user.setNotes(user.getNotes() + String.format("User %s added role %s. ", initiator, role));
         if (((IUser)user).getRoles() == null) {
             ((IUser)user).setRoles(new HashSet<>());
         }
@@ -134,7 +134,7 @@ public class UserService implements UserDetailsService, IUserManager {
     @Override
     public void removeRole(String username, String initiator, String role) {
         IUser user = findByUsername(username);
-        user.setNotes(user.getNotes() + String.format("%s removed role %s.", initiator, role));
+        user.setNotes(user.getNotes() + String.format("User %s removed role %s. ", initiator, role));
         if (user.getRoles() == null) {
             return;
         }

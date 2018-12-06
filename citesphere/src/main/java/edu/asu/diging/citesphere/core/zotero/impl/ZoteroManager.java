@@ -10,8 +10,10 @@ import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
+import edu.asu.diging.citesphere.core.factory.IGroupFactory;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
@@ -24,6 +26,9 @@ public class ZoteroManager implements IZoteroManager {
     
     @Autowired
     private ICitationFactory citationFactory;
+    
+    @Autowired
+    private IGroupFactory groupFactory;
         
     public CitationResults getGroupItems(IUser user, String groupId, int page) {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page);
@@ -38,8 +43,16 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public Group[] getGroups(IUser user) {
-        return zoteroConnector.getGroups(user);
+    public List<ICitationGroup> getGroups(IUser user) {
+        ZoteroResponse<Group> response = zoteroConnector.getGroups(user);
+        List<ICitationGroup> groups = new ArrayList<>();
+        for (Group group : response.getResults()) {
+            ICitationGroup citGroup = groupFactory.createGroup(group);
+            ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1);
+            citGroup.setNumItems(groupItems.getTotalResults());
+            groups.add(citGroup);
+        }
+        return groups;
     }
     
     @Override

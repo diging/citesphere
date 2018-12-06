@@ -3,15 +3,34 @@ package edu.asu.diging.citesphere.core.model.bib.impl;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 
+@Entity
 public class Citation implements ICitation {
 
+    @Id
+    @Column(name="citationKey")
     private String key;
+    
+    @ManyToOne(targetEntity=CitationGroup.class)
+    @JoinColumn(name="groupId")
+    private ICitationGroup group;
+    
+    private long version;
     private String title;
+    @OneToMany(targetEntity=Person.class, mappedBy="citation")
     private List<IPerson> authors;
+    @OneToMany(targetEntity=Person.class, mappedBy="citation")
     private List<IPerson> editors;
     private ItemType itemType;
     private String publicationTitle;
@@ -50,6 +69,18 @@ public class Citation implements ICitation {
     @Override
     public void setKey(String key) {
         this.key = key;
+    }
+    public ICitationGroup getGroup() {
+        return group;
+    }
+    public void setGroup(ICitationGroup group) {
+        this.group = group;
+    }
+    public long getVersion() {
+        return version;
+    }
+    public void setVersion(long version) {
+        this.version = version;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getTitle()

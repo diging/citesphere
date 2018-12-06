@@ -12,13 +12,13 @@ import edu.asu.diging.citesphere.core.zotero.IZoteroTokenManager;
 
 @Controller
 public class HomeController {
-    
+
     @Autowired
     private IZoteroTokenManager tokenManager;
-    
+
     @Autowired
     private IZoteroManager zoteroManager;
-    
+
     @RequestMapping(value = "/")
     public String home(Authentication authentication, Model model) {
         if (authentication != null && authentication.isAuthenticated()) {
@@ -30,7 +30,7 @@ public class HomeController {
                 model.addAttribute("groups", zoteroManager.getGroups(user));
             }
         }
-        
+
         return "home";
     }
 }

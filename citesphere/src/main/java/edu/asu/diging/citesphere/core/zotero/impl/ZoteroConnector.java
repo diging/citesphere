@@ -44,15 +44,30 @@ public class ZoteroConnector implements IZoteroConnector {
         return zotero.getGroupsOperations().getGroupItemsTop(groupId, page*zoteroPageSize, zoteroPageSize);          
     }
     
+    @Override
+    @Cacheable(value="groupItemsLimit", key="#user.username + '_' + #groupId + '_' + #limit")
+    public ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit) {
+        Zotero zotero = getApi(user);
+        if (limit < 1) {
+            limit = 1;
+        }
+        return zotero.getGroupsOperations().getGroupItemsTop(groupId, 0 , 1);          
+    }
+    
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.impl.IZoteroConnector#getGroups(edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
     @Cacheable(value="groups", key="#user.username")
-    public Group[] getGroups(IUser user) {
+    public ZoteroResponse<Group> getGroups(IUser user) {
         Zotero zotero = getApi(user);
-        Group[] info = zotero.getGroupsOperations().getGroups();
-        return info;
+        return zotero.getGroupsOperations().getGroups();
+    }
+    
+    @Override
+    public ZoteroResponse<Group> getGroupsVersions(IUser user) {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().getGroupsVersions();
     }
     
     @Override
