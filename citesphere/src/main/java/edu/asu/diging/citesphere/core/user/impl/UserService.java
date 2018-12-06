@@ -111,4 +111,44 @@ public class UserService implements UserDetailsService, IUserManager {
         ((IUser)user).getRoles().add(new SimpleGrantedAuthority(Role.USER));
         userRepository.save((User)user);
     }
+    
+    @Override
+    public void disableUser(String username, String initiator) {
+        IUser user = findByUsername(username);
+        user.setEnabled(false);
+        user.setNotes(user.getNotes() + String.format("Disabled by %s.", initiator));
+        userRepository.save((User)user);
+    }
+    
+    @Override
+    public void addRole(String username, String initiator, String role) {
+        IUser user = findByUsername(username);
+        user.setNotes(user.getNotes() + String.format("%s added role %s.", initiator, role));
+        if (((IUser)user).getRoles() == null) {
+            ((IUser)user).setRoles(new HashSet<>());
+        }
+        ((IUser)user).getRoles().add(new SimpleGrantedAuthority(role));
+        userRepository.save((User)user);
+    }
+    
+    @Override
+    public void removeRole(String username, String initiator, String role) {
+        IUser user = findByUsername(username);
+        user.setNotes(user.getNotes() + String.format("%s removed role %s.", initiator, role));
+        if (user.getRoles() == null) {
+            return;
+        }
+        SimpleGrantedAuthority roleToBeRemoved = null;
+        for (SimpleGrantedAuthority authority : user.getRoles()) {
+            if (authority.getAuthority().equals(role)) {
+                roleToBeRemoved = authority;
+                break;
+            }
+        }
+        
+        if (roleToBeRemoved != null) {
+            user.getRoles().remove(roleToBeRemoved);
+            userRepository.save((User)user);
+        }
+    }
 }

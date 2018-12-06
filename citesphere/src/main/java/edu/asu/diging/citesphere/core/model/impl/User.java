@@ -7,6 +7,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -15,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.Role;
 
 @Entity
 public class User implements UserDetails, IUser {
@@ -38,7 +40,22 @@ public class User implements UserDetails, IUser {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
+    @Lob
     private String notes;
+    
+    public boolean isAdmin() {
+        if (roles == null) {
+            return false;
+        }
+        
+        for (SimpleGrantedAuthority role : roles) {
+            if (role.getAuthority().equals(Role.ADMIN)) {
+                return true;
+            }
+        };
+        
+        return false;
+    }
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.impl.IUser#getUsername()

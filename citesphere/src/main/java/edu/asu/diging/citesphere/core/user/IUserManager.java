@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.core.exceptions.UserAlreadyExistsException;
 import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.Role;
 
 public interface IUserManager {
 
@@ -14,5 +15,17 @@ public interface IUserManager {
     List<IUser> findAll();
 
     void approveAccount(String username, String approver);
+
+    /**
+     * Adds given role to a user. 
+     * @param username Username of user to be changed.
+     * @param initiator Username of user initiating the changne.
+     * @param role Name of role to be added. Use roles defined in {@link Role}.
+     */
+    void addRole(String username, String initiator, String role);
+
+    void removeRole(String username, String initiator, String role);
+
+    void disableUser(String username, String initiator);
 
 }
