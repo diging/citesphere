@@ -65,6 +65,14 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
+    @Cacheable(value="groupCache", key="#user.username + '_' + #groupId")
+    public Group getGroup(IUser user, String groupId) {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().getGroup(groupId);
+    }
+    
+    @Override
+    @Cacheable(value="groupVersions", key="#user.username")
     public ZoteroResponse<Group> getGroupsVersions(IUser user) {
         Zotero zotero = getApi(user);
         return zotero.getGroupsOperations().getGroupsVersions();

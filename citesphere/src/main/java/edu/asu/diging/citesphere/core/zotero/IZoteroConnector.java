@@ -19,4 +19,6 @@ public interface IZoteroConnector {
 
     ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit);
 
+    Group getGroup(IUser user, String groupId);
+
 }

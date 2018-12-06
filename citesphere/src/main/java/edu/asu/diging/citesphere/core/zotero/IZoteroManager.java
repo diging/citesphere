@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
+import java.util.Map;
 
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
@@ -14,5 +15,9 @@ public interface IZoteroManager {
     CitationResults getGroupItems(IUser user, String groupId, int page);
 
     ICitation getGroupItem(IUser user, String groupId, String itemKey);
+
+    Map<Long, Long> getGroupsVersion(IUser user);
+
+    ICitationGroup getGroup(IUser user, String groupId);
 
 }

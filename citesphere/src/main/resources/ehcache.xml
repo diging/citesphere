@@ -16,6 +16,16 @@
       <heap unit="entries">2000</heap>
     </resources>
   </cache>
+  <cache alias="groupCache">
+    <resources>
+      <heap unit="entries">2000</heap>
+    </resources>
+  </cache>
+  <cache alias="groupVersions">
+    <resources>
+      <heap unit="entries">2000</heap>
+    </resources>
+  </cache>
   <cache alias="groupItems">
     <resources>
       <heap unit="entries">2000</heap>
