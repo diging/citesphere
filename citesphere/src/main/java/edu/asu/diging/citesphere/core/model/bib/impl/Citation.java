@@ -23,6 +23,19 @@ public class Citation implements ICitation {
     private String series;
     private String seriesTitle;
     private String url;
+    private String abstractNote;
+    
+    private String seriesText;
+    private String journalAbbreviation;
+    private String language;
+    private String doi;
+    private String issn;
+    private String shortTitle;
+    private String archive;
+    private String archiveLocation;
+    private String libraryCatalog;
+    private String callNumber;
+    private String rights;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getKey()
@@ -207,5 +220,101 @@ public class Citation implements ICitation {
     @Override
     public void setUrl(String url) {
         this.url = url;
+    }
+    @Override
+    public String getAbstractNote() {
+        return abstractNote;
+    }
+    @Override
+    public void setAbstractNote(String abstractNote) {
+        this.abstractNote = abstractNote;
+    }
+    @Override
+    public String getSeriesText() {
+        return seriesText;
+    }
+    @Override
+    public void setSeriesText(String seriesText) {
+        this.seriesText = seriesText;
+    }
+    @Override
+    public String getJournalAbbreviation() {
+        return journalAbbreviation;
+    }
+    @Override
+    public void setJournalAbbreviation(String journalAbbreviation) {
+        this.journalAbbreviation = journalAbbreviation;
+    }
+    @Override
+    public String getLanguage() {
+        return language;
+    }
+    @Override
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+    @Override
+    public String getDoi() {
+        return doi;
+    }
+    @Override
+    public void setDoi(String doi) {
+        this.doi = doi;
+    }
+    @Override
+    public String getIssn() {
+        return issn;
+    }
+    @Override
+    public void setIssn(String issn) {
+        this.issn = issn;
+    }
+    @Override
+    public String getShortTitle() {
+        return shortTitle;
+    }
+    @Override
+    public void setShortTitle(String shortTitle) {
+        this.shortTitle = shortTitle;
+    }
+    @Override
+    public String getArchive() {
+        return archive;
+    }
+    @Override
+    public void setArchive(String archive) {
+        this.archive = archive;
+    }
+    @Override
+    public String getArchiveLocation() {
+        return archiveLocation;
+    }
+    @Override
+    public void setArchiveLocation(String archiveLocation) {
+        this.archiveLocation = archiveLocation;
+    }
+    @Override
+    public String getLibraryCatalog() {
+        return libraryCatalog;
+    }
+    @Override
+    public void setLibraryCatalog(String libraryCatalog) {
+        this.libraryCatalog = libraryCatalog;
+    }
+    @Override
+    public String getCallNumber() {
+        return callNumber;
+    }
+    @Override
+    public void setCallNumber(String callNumber) {
+        this.callNumber = callNumber;
+    }
+    @Override
+    public String getRights() {
+        return rights;
+    }
+    @Override
+    public void setRights(String rights) {
+        this.rights = rights;
     }
 }

@@ -71,8 +71,7 @@
          
         </nav>
         
-        <h1><a class="appName" href="<c:url value="/" />">Citesphere</a></h1>
-        <p class="lead">This is awesome.</p>   
+        <h1><a class="appName" href="<c:url value="/" />">Citesphere</a></h1>  
       </div>
       
       

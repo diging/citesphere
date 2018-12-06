@@ -61,4 +61,52 @@ public interface ICitation {
 
     String getUrl();
 
+    void setRights(String rights);
+
+    String getRights();
+
+    void setCallNumber(String callNumber);
+
+    String getCallNumber();
+
+    void setLibraryCatalog(String libraryCatalog);
+
+    String getLibraryCatalog();
+
+    void setArchiveLocation(String archiveLocation);
+
+    String getArchiveLocation();
+
+    void setArchive(String archive);
+
+    String getArchive();
+
+    void setShortTitle(String shortTitle);
+
+    String getShortTitle();
+
+    void setIssn(String issn);
+
+    String getIssn();
+
+    void setDoi(String doi);
+
+    String getDoi();
+
+    void setLanguage(String language);
+
+    String getLanguage();
+
+    void setJournalAbbreviation(String journalAbbreviation);
+
+    String getJournalAbbreviation();
+
+    void setSeriesText(String seriesText);
+
+    String getSeriesText();
+
+    void setAbstractNote(String abstractNote);
+
+    String getAbstractNote();
+
 }

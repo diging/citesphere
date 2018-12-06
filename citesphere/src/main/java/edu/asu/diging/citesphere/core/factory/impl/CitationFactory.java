@@ -58,6 +58,19 @@ public class CitationFactory implements ICitationFactory {
             citation.setDate(dateParser.parse(item.getData().getDate()));
         }
         citation.setUrl(item.getData().getUrl());
+        
+        citation.setAbstractNote(item.getData().getAbstractNote());
+        citation.setArchive(item.getData().getArchive());
+        citation.setArchiveLocation(item.getData().getArchiveLocation());
+        citation.setCallNumber(item.getData().getCallNumber());
+        citation.setDoi(item.getData().getDoi());
+        citation.setIssn(item.getData().getIssn());
+        citation.setJournalAbbreviation(item.getData().getJournalAbbreviation());
+        citation.setLanguage(item.getData().getLanguage());
+        citation.setLibraryCatalog(item.getData().getLibraryCatalog());
+        citation.setRights(item.getData().getRights());
+        citation.setSeriesText(item.getData().getSeriesText());
+        citation.setShortTitle(item.getData().getShortTitle());
         return citation;
     }
     

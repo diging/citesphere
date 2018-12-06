@@ -20,6 +20,7 @@ public class ItemController {
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) {
         ICitation citation = zoteroManager.getGroupItem((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+        model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("citation", citation);
         return "auth/group/items/item";
     }
