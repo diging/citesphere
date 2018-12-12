@@ -3,21 +3,18 @@ package edu.asu.diging.citesphere.core.model.bib.impl;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 
 @Entity
 public class Person implements IPerson {
 
     @Id
-    @GeneratedValue(generator = "person-id-generator")
-    @GenericGenerator(name = "person-id-generator",    
+    @GeneratedValue(generator = "person_id_generator")
+    @GenericGenerator(name = "person_id_generator",    
                     parameters = @Parameter(name = "prefix", value = "PE"), 
                     strategy = "edu.asu.diging.citesphere.core.repository.IdGenerator"
             )
@@ -26,10 +23,6 @@ public class Person implements IPerson {
     private String uri;
     private String firstName;
     private String lastName;
-    
-    @ManyToOne(targetEntity=Citation.class)
-    @JoinColumn(name = "citation_id")
-    private ICitation citation;
     
     public String getId() {
         return id;
@@ -92,12 +85,6 @@ public class Person implements IPerson {
     @Override
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-    public ICitation getCitation() {
-        return citation;
-    }
-    public void setCitation(ICitation citation) {
-        this.citation = citation;
     }
     
 }

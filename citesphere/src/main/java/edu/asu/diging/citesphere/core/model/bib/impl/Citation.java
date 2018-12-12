@@ -1,12 +1,15 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -23,15 +26,17 @@ public class Citation implements ICitation {
     private String key;
     
     @ManyToOne(targetEntity=CitationGroup.class)
-    @JoinColumn(name="groupId")
+    @JoinColumn(name="group_id")
     private ICitationGroup group;
     
     private long version;
     private String title;
-    @OneToMany(targetEntity=Person.class, mappedBy="citation")
-    private List<IPerson> authors;
-    @OneToMany(targetEntity=Person.class, mappedBy="citation")
-    private List<IPerson> editors;
+    @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL)
+    @JoinTable(name="Citation_Author")
+    private Set<IPerson> authors;
+    @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL)
+    @JoinTable(name="Citation_Editor")
+    private Set<IPerson> editors;
     private ItemType itemType;
     private String publicationTitle;
     private String volume;
@@ -42,6 +47,7 @@ public class Citation implements ICitation {
     private String series;
     private String seriesTitle;
     private String url;
+    @Lob
     private String abstractNote;
     
     private String seriesText;
@@ -100,28 +106,28 @@ public class Citation implements ICitation {
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getAuthors()
      */
     @Override
-    public List<IPerson> getAuthors() {
+    public Set<IPerson> getAuthors() {
         return authors;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setAuthors(java.util.List)
      */
     @Override
-    public void setAuthors(List<IPerson> authors) {
+    public void setAuthors(Set<IPerson> authors) {
         this.authors = authors;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getEditors()
      */
     @Override
-    public List<IPerson> getEditors() {
+    public Set<IPerson> getEditors() {
         return editors;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setEditors(java.util.List)
      */
     @Override
-    public void setEditors(List<IPerson> editors) {
+    public void setEditors(Set<IPerson> editors) {
         this.editors = editors;
     }
     /* (non-Javadoc)

@@ -74,8 +74,8 @@ public class ZoteroManager implements IZoteroManager {
     }
     
     @Override
-    public ICitationGroup getGroup(IUser user, String groupId) {
-        Group group = zoteroConnector.getGroup(user, groupId);
+    public ICitationGroup getGroup(IUser user, String groupId, boolean forceRefresh) {
+        Group group = zoteroConnector.getGroup(user, groupId, forceRefresh);
         ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1);
         ICitationGroup citGroup = groupFactory.createGroup(group);
         citGroup.setNumItems(groupItems.getTotalResults());

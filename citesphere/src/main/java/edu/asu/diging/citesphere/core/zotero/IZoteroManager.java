@@ -18,6 +18,6 @@ public interface IZoteroManager {
 
     Map<Long, Long> getGroupsVersion(IUser user);
 
-    ICitationGroup getGroup(IUser user, String groupId);
+    ICitationGroup getGroup(IUser user, String groupId, boolean refresh);
 
 }

@@ -1,7 +1,7 @@
 package edu.asu.diging.citesphere.core.model.bib;
 
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Set;
 
 public interface ICitation {
 
@@ -13,13 +13,13 @@ public interface ICitation {
 
     void setTitle(String title);
 
-    List<IPerson> getAuthors();
+    Set<IPerson> getAuthors();
 
-    void setAuthors(List<IPerson> authors);
+    void setAuthors(Set<IPerson> authors);
 
-    List<IPerson> getEditors();
+    Set<IPerson> getEditors();
 
-    void setEditors(List<IPerson> editors);
+    void setEditors(Set<IPerson> editors);
 
     ItemType getItemType();
 

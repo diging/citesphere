@@ -15,8 +15,8 @@ import edu.asu.diging.citesphere.core.model.IZoteroToken;
 public class ZoteroToken implements IZoteroToken {
 
     @Id
-    @GeneratedValue(generator = "token-id-generator")
-    @GenericGenerator(name = "token-id-generator",    
+    @GeneratedValue(generator = "token_id_generator")
+    @GenericGenerator(name = "token_id_generator",    
                     parameters = @Parameter(name = "prefix", value = "TO"), 
                     strategy = "edu.asu.diging.citesphere.core.repository.IdGenerator"
             )

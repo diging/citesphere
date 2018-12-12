@@ -10,25 +10,27 @@ import org.hibernate.MappingException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.id.enhanced.SequenceStyleGenerator;
+import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.service.ServiceRegistry;
+import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 
-public class IdGenerator implements IdentifierGenerator, Configurable {
+public class IdGenerator extends SequenceStyleGenerator implements IdentifierGenerator, Configurable {
 	
 	private String prefix;
+	private String numberFormat;
 
 	@Override
 	public void configure(Type type, Properties properties, ServiceRegistry sr) throws MappingException {
+		super.configure(LongType.INSTANCE, properties, sr);
 		prefix = properties.getProperty("prefix");
+        numberFormat = "%d";
 	}
 
 	@Override
 	public Serializable generate(SharedSessionContractImplementor session, Object obj) throws HibernateException {
-		Entity entityAnnotation = obj.getClass().getAnnotation(Entity.class);
-		String tableName = entityAnnotation.name().isEmpty() ? obj.getClass().getSimpleName() : entityAnnotation.name();
-		String query = String.format("select count(*) from %s", tableName);
-        long count = (Long) session.createQuery(query).uniqueResult();
-		return prefix + (count + 1);
+	    return prefix + String.format(numberFormat, super.generate(session, obj));
 	}
 
 }

@@ -1,7 +1,9 @@
 package edu.asu.diging.citesphere.core.factory.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.zotero.api.Creator;
@@ -40,8 +42,8 @@ public class CitationFactory implements ICitationFactory {
         citation.setTitle(data.getTitle());
         citation.setVolume(data.getVolume());
         
-        List<IPerson> authors = new ArrayList<>();
-        List<IPerson> editors = new ArrayList<>();
+        Set<IPerson> authors = new HashSet<>();
+        Set<IPerson> editors = new HashSet<>();
         if (data.getCreators() != null) {
             data.getCreators().forEach(c -> {
                 if (c.getCreatorType().equals(AUTHOR)) {
