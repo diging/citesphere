@@ -18,4 +18,8 @@ public interface IPerson {
 
     void setLastName(String lastName);
 
+    int getPositionInList();
+
+    void setPositionInList(int order);
+
 }

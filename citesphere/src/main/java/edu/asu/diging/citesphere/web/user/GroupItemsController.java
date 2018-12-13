@@ -22,9 +22,9 @@ import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 @Controller
 @PropertySource("classpath:/config.properties")
 public class GroupItemsController {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
 
@@ -33,22 +33,24 @@ public class GroupItemsController {
 
     @RequestMapping("/auth/group/{zoteroGroupId}/items")
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") String page) throws GroupDoesNotExistException {
+            @RequestParam(defaultValue = "1", required = false, value = "page") String page,
+            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort)
+            throws GroupDoesNotExistException {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
         }
-        
+
         IUser user = (IUser) authentication.getPrincipal();
-        CitationResults results = citationManager.getGroupItems(user, groupId, pageInt);
-        model.addAttribute("items",results.getCitations());
+        CitationResults results = citationManager.getGroupItems(user, groupId, pageInt, sort);
+        model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
-        model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults())/new Float(zoteroPageSize)));
+        model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", groupId);
-        
+
         return "auth/group/items";
     }
 }

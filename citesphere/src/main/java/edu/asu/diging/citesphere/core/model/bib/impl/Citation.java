@@ -1,7 +1,11 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
 import java.time.OffsetDateTime;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,6 +16,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
@@ -33,9 +38,11 @@ public class Citation implements ICitation {
     private String title;
     @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL)
     @JoinTable(name="Citation_Author")
+    @OrderBy("positionInList")
     private Set<IPerson> authors;
     @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL)
     @JoinTable(name="Citation_Editor")
+    @OrderBy("positionInList")
     private Set<IPerson> editors;
     private ItemType itemType;
     private String publicationTitle;

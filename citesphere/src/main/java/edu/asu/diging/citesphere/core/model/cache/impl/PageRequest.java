@@ -1,10 +1,7 @@
 package edu.asu.diging.citesphere.core.model.cache.impl;
 
 import java.util.List;
-import java.util.Set;
 
-import javax.inject.Named;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -57,8 +54,9 @@ public class PageRequest implements IPageRequest {
     private IUser user;
     private String objectId;
     private long version;
-    @ManyToMany(targetEntity=Citation.class, cascade=CascadeType.ALL)
+    @ManyToMany(targetEntity=Citation.class)
     private List<ICitation> citations;
+    private String sortBy;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.IPageRequest#getId()
@@ -165,6 +163,14 @@ public class PageRequest implements IPageRequest {
     @Override
     public void setCitations(List<ICitation> citations) {
         this.citations = citations;
+    }
+    @Override
+    public String getSortBy() {
+        return sortBy;
+    }
+    @Override
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
     }
     
 }

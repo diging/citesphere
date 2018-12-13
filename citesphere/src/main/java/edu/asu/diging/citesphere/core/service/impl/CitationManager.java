@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -19,11 +18,13 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ZoteroObjectType;
+import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
 import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
 import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.core.repository.bib.CitationRepository;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
@@ -41,6 +42,9 @@ public class CitationManager implements ICitationManager {
     
     @Autowired
     private CitationGroupRepository groupRepository;
+    
+    @Autowired
+    private CitationRepository citationRepository;
     
     @Autowired
     private PageRequestRepository pageRequestRepository;
@@ -73,12 +77,11 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public CitationResults getGroupItems(IUser user, String groupId, int page) throws GroupDoesNotExistException {
+    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy) throws GroupDoesNotExistException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (groupOptional.isPresent()) {
             CitationGroup group = groupOptional.get();
-            List<PageRequest> requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectType(user, groupId, page, ZoteroObjectType.GROUP);
-//            List<PageRequest> requests = pageRequestRepository.findPageRequestWithCitations(user, groupId, page, ZoteroObjectType.GROUP);
+            List<PageRequest> requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortBy(user, groupId, page, ZoteroObjectType.GROUP, sortBy);
             if(requests.size() > 0) {
                 // there should be just one
                 IPageRequest request = requests.get(0);
@@ -93,7 +96,7 @@ public class CitationManager implements ICitationManager {
                 pageRequestRepository.deleteAll(requests);
             } 
             
-            CitationResults results = zoteroManager.getGroupItems(user, groupId, page);
+            CitationResults results = zoteroManager.getGroupItems(user, groupId, page, sortBy);
             PageRequest request = new PageRequest();
             request.setCitations(results.getCitations());
             request.setObjectId(groupId);
@@ -102,6 +105,8 @@ public class CitationManager implements ICitationManager {
             request.setUser(user);
             request.setVersion(group.getVersion());
             request.setZoteroObjectType(ZoteroObjectType.GROUP);
+            
+            results.getCitations().forEach(c -> citationRepository.save((Citation)c));
             pageRequestRepository.save(request);
             return results;
         }

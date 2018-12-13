@@ -40,4 +40,8 @@ public interface IPageRequest {
 
     List<ICitation> getCitations();
 
+    void setSortBy(String sortBy);
+
+    String getSortBy();
+
 }

@@ -12,7 +12,7 @@ public interface IZoteroManager {
 
     List<ICitationGroup> getGroups(IUser user);
 
-    CitationResults getGroupItems(IUser user, String groupId, int page);
+    CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy);
 
     ICitation getGroupItem(IUser user, String groupId, String itemKey);
 

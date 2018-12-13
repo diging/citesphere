@@ -8,7 +8,7 @@ import edu.asu.diging.citesphere.core.model.IUser;
 
 public interface IZoteroConnector {
 
-    ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page);
+    ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page, String sortBy);
 
     ZoteroResponse<Group> getGroups(IUser user);
 
@@ -16,7 +16,7 @@ public interface IZoteroConnector {
 
     ZoteroResponse<Group> getGroupsVersions(IUser user);
 
-    ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit);
+    ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit, String sortBy);
 
     Group getGroup(IUser user, String groupId, boolean forceRefresh);
 

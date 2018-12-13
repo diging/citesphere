@@ -10,7 +10,7 @@ import org.hibernate.annotations.Parameter;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 
 @Entity
-public class Person implements IPerson {
+public class Person implements IPerson, Comparable<Person> {
 
     @Id
     @GeneratedValue(generator = "person_id_generator")
@@ -23,6 +23,7 @@ public class Person implements IPerson {
     private String uri;
     private String firstName;
     private String lastName;
+    private int positionInList;
     
     public String getId() {
         return id;
@@ -85,6 +86,18 @@ public class Person implements IPerson {
     @Override
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    @Override
+    public int getPositionInList() {
+        return positionInList;
+    }
+    @Override
+    public void setPositionInList(int order) {
+        this.positionInList = order;
+    }
+    @Override
+    public int compareTo(Person o) {
+        return getPositionInList() - o.getPositionInList();
     }
     
 }

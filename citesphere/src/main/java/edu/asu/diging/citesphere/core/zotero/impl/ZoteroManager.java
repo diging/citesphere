@@ -32,8 +32,8 @@ public class ZoteroManager implements IZoteroManager {
     @Autowired
     private IGroupFactory groupFactory;
         
-    public CitationResults getGroupItems(IUser user, String groupId, int page) {
-        ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page);
+    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy) {
+        ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page, sortBy);
         List<ICitation> citations = new ArrayList<>();
         for (Item item : response.getResults()) {
             citations.add(citationFactory.createCitation(item));
@@ -50,7 +50,7 @@ public class ZoteroManager implements IZoteroManager {
         List<ICitationGroup> groups = new ArrayList<>();
         for (Group group : response.getResults()) {
             ICitationGroup citGroup = groupFactory.createGroup(group);
-            ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1);
+            ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1, null);
             citGroup.setNumItems(groupItems.getTotalResults());
             groups.add(citGroup);
         }
@@ -76,7 +76,7 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public ICitationGroup getGroup(IUser user, String groupId, boolean forceRefresh) {
         Group group = zoteroConnector.getGroup(user, groupId, forceRefresh);
-        ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1);
+        ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1, null);
         ICitationGroup citGroup = groupFactory.createGroup(group);
         citGroup.setNumItems(groupItems.getTotalResults());
         return citGroup;

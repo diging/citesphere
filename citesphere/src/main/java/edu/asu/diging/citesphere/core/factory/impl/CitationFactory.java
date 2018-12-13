@@ -1,9 +1,8 @@
 package edu.asu.diging.citesphere.core.factory.impl;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.zotero.api.Creator;
@@ -42,16 +41,20 @@ public class CitationFactory implements ICitationFactory {
         citation.setTitle(data.getTitle());
         citation.setVolume(data.getVolume());
         
-        Set<IPerson> authors = new HashSet<>();
-        Set<IPerson> editors = new HashSet<>();
+        Set<IPerson> authors = new TreeSet<>();
+        Set<IPerson> editors = new TreeSet<>();
         if (data.getCreators() != null) {
-            data.getCreators().forEach(c -> {
+            int authorPos = 0;
+            int editorPos = 0;
+            for (Creator c : data.getCreators()) {
                 if (c.getCreatorType().equals(AUTHOR)) {
-                    authors.add(createPerson(c));
+                    authors.add(createPerson(c, authorPos));
+                    authorPos++;
                 } else if (c.getCreatorType().equals(EDITOR)) {
-                    editors.add(createPerson(c));
+                    editors.add(createPerson(c, editorPos));
+                    editorPos++;
                 }
-            });
+            }
         }
         citation.setAuthors(authors);
         citation.setEditors(editors);
@@ -76,11 +79,12 @@ public class CitationFactory implements ICitationFactory {
         return citation;
     }
     
-    private IPerson createPerson(Creator creator) {
+    private IPerson createPerson(Creator creator, int index) {
         IPerson person = new Person();
         person.setFirstName(creator.getFirstName());
         person.setLastName(creator.getLastName());
         person.setName(String.join(" ", creator.getFirstName(), creator.getLastName()));
+        person.setPositionInList(index);
         return person;
     }
     
