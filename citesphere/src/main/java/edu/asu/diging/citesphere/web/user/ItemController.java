@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.core.service.ICitationManager;
 
 @Controller
 public class ItemController {
 
     @Autowired
-    private IZoteroManager zoteroManager;
+    private ICitationManager citationManager;
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) {
-        ICitation citation = zoteroManager.getGroupItem((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("citation", citation);
         return "auth/group/items/item";

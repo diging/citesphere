@@ -2,11 +2,17 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ZoteroObjectType;
 import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
@@ -48,6 +55,28 @@ public class CitationManager implements ICitationManager {
     
     @Autowired
     private PageRequestRepository pageRequestRepository;
+    
+    private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
+    
+    @PostConstruct
+    public void init() {
+        sortFunctions = new HashMap<>();
+        sortFunctions.put("title", ((o1, o2) -> {
+            if (o1 == null || o2 == null) { 
+                return o1.getTitle().compareTo(o2.getTitle());
+            }
+            return o1.getTitle().toLowerCase().compareTo(o2.getTitle().toLowerCase());
+        }));
+    }
+    
+    @Override
+    public ICitation getCitation(IUser user, String groupId, String key) {
+        Optional<Citation> optional = citationRepository.findById(key);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        return zoteroManager.getGroupItem(user, groupId, key);
+    }
 
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.impl.ICitationManager#getGroups(edu.asu.diging.citesphere.core.model.IUser)
@@ -89,6 +118,12 @@ public class CitationManager implements ICitationManager {
                 if (request.getVersion() == group.getVersion()) {
                     CitationResults results = new CitationResults();
                     results.setCitations(request.getCitations().stream().distinct().collect(Collectors.toList()));
+                    results.getCitations().sort(new Comparator<ICitation>() {
+                        @Override
+                        public int compare(ICitation o1, ICitation o2) {
+                            return sortFunctions.get(sortBy).apply(o1, o2);
+                        }
+                    });
                     results.setTotalResults(group.getNumItems());
                     return results;
                 }
@@ -105,6 +140,7 @@ public class CitationManager implements ICitationManager {
             request.setUser(user);
             request.setVersion(group.getVersion());
             request.setZoteroObjectType(ZoteroObjectType.GROUP);
+            request.setSortBy(sortBy);
             
             results.getCitations().forEach(c -> citationRepository.save((Citation)c));
             pageRequestRepository.save(request);

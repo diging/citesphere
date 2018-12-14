@@ -2,6 +2,10 @@ body, p, table, div, input {
 	font-family: 'Fira Sans', sans-serif;
 }
 
+.bib-entry {
+	cursor: pointer;
+}
+
 h4 {
 	margin-top: 25px;
 }

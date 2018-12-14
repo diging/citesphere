@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 
@@ -12,5 +13,7 @@ public interface ICitationManager {
     List<ICitationGroup> getGroups(IUser user);
 
     CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy) throws GroupDoesNotExistException;
+
+    ICitation getCitation(IUser user, String groupId, String key);
 
 }

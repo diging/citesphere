@@ -32,22 +32,18 @@ $(function() {
 
 <ul id="pagination-top" class="pagination-sm"></ul>
 
-<ul class="list-group">
+<table class="table table-striped table-bordered">
+<tr>
+	<th>Type</th>
+	<th>Authors</th>
+	<th>Title</th>
+	<th>Date</th>
+	<th>URL</th>
+</tr>
 <c:forEach items="${items}" var="entry">
-	<li class="list-group-item clearfix bib-entry" data-key="${entry.key}" style="cursor: pointer;">
- 	  <c:forEach items="${entry.authors}" var="author" varStatus="status">
- 	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
- 	  </c:forEach>
-	  <c:if test="${not empty entry.dateFreetext}">
- 	  (${entry.dateFreetext})
- 	  </c:if>
- 	  <em>${entry.title}</em>.
- 	  <br><c:if test="${not empty entry.url}">
- 	  URL: <a href="${entry.url}" target="_blank">${entry.url}</a>
- 	  </c:if>
- 	  
- 	  <div class="pull-right">
- 	  <span class="text-warning">
+<tr>
+	<td>
+	  <span class="text-warning">
 	  	<spring:eval expression="@iconsResource.getProperty(entry.itemType + '_icon')"  var="iconClass" />
 		<spring:eval expression="@iconsResource.getProperty(entry.itemType + '_label')"  var="iconLabel" />
 		<c:if test="${empty iconClass}">
@@ -58,7 +54,24 @@ $(function() {
 		</c:if>
 		<i class="${iconClass}" title="${iconLabel}"></i> ${iconLabel}
 	  </span>
-	  </div>
-	</li>
+	</td>
+	<td class="bib-entry" data-key="${entry.key}">
+	 <c:forEach items="${entry.authors}" var="author" varStatus="status">
+ 	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
+ 	 </c:forEach>
+ 	</td>
+ 	<td class="bib-entry" data-key="${entry.key}">
+ 		<em>${entry.title}</em>
+ 	</td>
+ 	<td class="bib-entry" data-key="${entry.key}">
+ 		${entry.dateFreetext}
+ 	</td>
+ 	<td>
+ 		<c:if test="${not empty entry.url}">
+ 		<a href="${entry.url}" target="_blank" title="${entry.url}"><i class="fas fa-globe-americas"></i></a>
+ 		</c:if>
+ 	</td>
+</tr>
 </c:forEach>
-</ul>
+</table>
+
