@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.core.model.bib;
 
+import java.util.Set;
+
 public interface IPerson {
 
     String getName();
@@ -22,4 +24,7 @@ public interface IPerson {
 
     void setPositionInList(int order);
 
+    void setAffiliations(Set<IAffiliation> affiliations);
+
+    Set<IAffiliation> getAffiliations();
 }

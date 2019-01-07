@@ -1,11 +1,7 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
 import java.time.OffsetDateTime;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -68,6 +64,9 @@ public class Citation implements ICitation {
     private String libraryCatalog;
     private String callNumber;
     private String rights;
+    
+    @Lob
+    private String extra;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getKey()
@@ -360,5 +359,13 @@ public class Citation implements ICitation {
     @Override
     public void setRights(String rights) {
         this.rights = rights;
+    }
+    @Override
+    public String getExtra() {
+        return extra;
+    }
+    @Override
+    public void setExtra(String extra) {
+        this.extra = extra;
     }
 }

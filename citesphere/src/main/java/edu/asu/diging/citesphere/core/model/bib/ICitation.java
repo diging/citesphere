@@ -109,4 +109,8 @@ public interface ICitation {
 
     String getAbstractNote();
 
+    void setExtra(String extra);
+
+    String getExtra();
+
 }

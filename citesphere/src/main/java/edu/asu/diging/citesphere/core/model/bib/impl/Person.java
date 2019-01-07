@@ -1,12 +1,18 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 
 @Entity
@@ -24,6 +30,11 @@ public class Person implements IPerson, Comparable<Person> {
     private String firstName;
     private String lastName;
     private int positionInList;
+    
+    @OneToMany(targetEntity=Affiliation.class, cascade=CascadeType.ALL)
+    @JoinTable(name="Person_Affiliation")
+    private Set<IAffiliation> affiliations;
+   
     
     public String getId() {
         return id;
@@ -96,8 +107,21 @@ public class Person implements IPerson, Comparable<Person> {
         this.positionInList = order;
     }
     @Override
+    public Set<IAffiliation> getAffiliations() {
+        return affiliations;
+    }
+    @Override
+    public void setAffiliations(Set<IAffiliation> affiliations) {
+        this.affiliations = affiliations;
+    }
+    
+    @Override
     public int compareTo(Person o) {
-        return getPositionInList() - o.getPositionInList();
+        int compared = getPositionInList() - o.getPositionInList();
+        if (compared == 0) {
+            return getName().compareTo(o.getName());
+        }
+        return compared;
     }
     
 }

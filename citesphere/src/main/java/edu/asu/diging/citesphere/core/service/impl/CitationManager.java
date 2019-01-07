@@ -13,11 +13,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -40,6 +44,8 @@ import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 @PropertySource("classpath:/config.properties")
 @Transactional
 public class CitationManager implements ICitationManager {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
@@ -75,7 +81,9 @@ public class CitationManager implements ICitationManager {
         if (optional.isPresent()) {
             return optional.get();
         }
-        return zoteroManager.getGroupItem(user, groupId, key);
+        ICitation citation = zoteroManager.getGroupItem(user, groupId, key); 
+        citationRepository.save((Citation)citation);
+        return citation;
     }
 
     /* (non-Javadoc)
@@ -110,8 +118,13 @@ public class CitationManager implements ICitationManager {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (groupOptional.isPresent()) {
             CitationGroup group = groupOptional.get();
-            List<PageRequest> requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortBy(user, groupId, page, ZoteroObjectType.GROUP, sortBy);
-            if(requests.size() > 0) {
+            List<PageRequest> requests = null;
+            try {
+                requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortBy(user, groupId, page, ZoteroObjectType.GROUP, sortBy);
+            } catch (JpaObjectRetrievalFailureException ex) {
+                logger.warn("Could not retrieve page request.", ex);
+            }
+            if(requests != null && requests.size() > 0) {
                 // there should be just one
                 IPageRequest request = requests.get(0);
                 // if we have the current version locally

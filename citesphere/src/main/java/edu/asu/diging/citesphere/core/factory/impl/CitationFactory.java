@@ -1,8 +1,13 @@
 package edu.asu.diging.citesphere.core.factory.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.zotero.api.Creator;
@@ -10,12 +15,19 @@ import org.springframework.social.zotero.api.Data;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
+import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
 import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
+import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.util.IDateParser;
 
 @Component
@@ -76,6 +88,7 @@ public class CitationFactory implements ICitationFactory {
         citation.setRights(item.getData().getRights());
         citation.setSeriesText(item.getData().getSeriesText());
         citation.setShortTitle(item.getData().getShortTitle());
+        parseExtra(data, citation);
         return citation;
     }
     
@@ -88,4 +101,49 @@ public class CitationFactory implements ICitationFactory {
         return person;
     }
     
+    private void parseExtra(Data data, ICitation citation) {
+        if (data.getExtra() == null) {
+            return;
+        }
+        
+        String extra = data.getExtra();
+        String citespherePattern = "(?s)(?m).*?^" + ExtraData.CITESPHERE_PREFIX + " ?(\\{.*\\}).*";
+        Pattern pattern = Pattern.compile(citespherePattern);
+        Matcher match = pattern.matcher(extra);
+        if (match.matches()) {
+            String extraMatch = match.group(1);
+            JsonParser parser = new JsonParser();
+            JsonObject jObj = parser.parse(extraMatch).getAsJsonObject();
+            JsonArray authors = jObj.get("authors").getAsJsonArray();
+            
+            List<Person> extraAuthors = new ArrayList<>();
+            List<String> authorNames = new ArrayList<>();
+            authors.forEach(a -> {
+                Person person = new Person();
+                person.setName(a.getAsJsonObject().get("name").getAsString());
+                person.setFirstName(a.getAsJsonObject().get("firstName").getAsString());
+                person.setLastName(a.getAsJsonObject().get("lastName").getAsString());
+                authorNames.add(person.getFirstName() + person.getLastName());
+                person.setAffiliations(new HashSet<>());
+                JsonElement affiliations = a.getAsJsonObject().get("affiliations");
+                if (affiliations instanceof JsonArray) {
+                    affiliations.getAsJsonArray().forEach(af -> {
+                        Affiliation affiliation = new Affiliation();
+                        affiliation.setName(af.getAsJsonObject().get("name").getAsString());
+                        affiliation.setUri(af.getAsJsonObject().get("uri").getAsString());
+                        person.getAffiliations().add(affiliation);
+                    });
+                }
+                extraAuthors.add(person);
+            });
+            
+            for (Iterator<IPerson> iterator = citation.getAuthors().iterator(); iterator.hasNext();) {
+                IPerson author = iterator.next();
+                if (authorNames.contains(author.getFirstName() + author.getLastName())) {
+                    iterator.remove();
+                }
+            }
+            extraAuthors.forEach(a -> citation.getAuthors().add(a));
+        }
+    }
 }

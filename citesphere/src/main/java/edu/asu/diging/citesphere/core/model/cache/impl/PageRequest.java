@@ -32,7 +32,13 @@ import edu.asu.diging.citesphere.core.model.impl.User;
                 subgraphs={
                         @NamedSubgraph(
                                 name="requestCitations",
-                                attributeNodes={@NamedAttributeNode("authors")}
+                                attributeNodes={
+                                        @NamedAttributeNode(value="authors", subgraph="authorAffiliations"),
+                                }                                
+                        ),
+                        @NamedSubgraph(
+                                name="authorAffiliations",
+                                attributeNodes={@NamedAttributeNode("affiliations")}
                         )
                 }
           )
