@@ -21,6 +21,10 @@
  	  
 </h2>
 
+<div style="margin-bottom: 20px;">
+<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />"><i class="far fa-edit" title="Edit"></i></a>
+</div>
+
 <table class="table table-striped">
 <tr>
 <td width="20%">Item Key</td>

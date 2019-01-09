@@ -34,5 +34,8 @@
 	<definition name="auth/group/items/item" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/auth/group/item.jsp" />	
 	</definition>	
+	<definition name="auth/group/items/item/edit" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/auth/group/editItem.jsp" />	
+	</definition>	
 	
 </tiles-definitions>

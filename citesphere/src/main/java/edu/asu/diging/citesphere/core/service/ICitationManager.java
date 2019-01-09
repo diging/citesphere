@@ -16,4 +16,6 @@ public interface ICitationManager {
 
     ICitation getCitation(IUser user, String groupId, String key);
 
+    void updateCitation(ICitation citation);
+
 }

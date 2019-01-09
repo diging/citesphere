@@ -85,6 +85,11 @@ public class CitationManager implements ICitationManager {
         citationRepository.save((Citation)citation);
         return citation;
     }
+    
+    @Override
+    public void updateCitation(ICitation citation) {
+        citationRepository.save((Citation)citation);
+    }
 
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.impl.ICitationManager#getGroups(edu.asu.diging.citesphere.core.model.IUser)
