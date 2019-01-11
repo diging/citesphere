@@ -7,13 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -22,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
+import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -87,8 +85,10 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public void updateCitation(ICitation citation) {
-        citationRepository.save((Citation)citation);
+    public void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException {
+        ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
+        // save updated info
+        citationRepository.save((Citation)updatedCitation);
     }
 
     /* (non-Javadoc)

@@ -2,6 +2,8 @@ package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
 
+import org.springframework.social.zotero.exception.ZoteroConnectionException;
+
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
@@ -16,6 +18,6 @@ public interface ICitationManager {
 
     ICitation getCitation(IUser user, String groupId, String key);
 
-    void updateCitation(ICitation citation);
+    void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException;
 
 }

@@ -32,11 +32,11 @@ public class Citation implements ICitation {
     
     private long version;
     private String title;
-    @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL)
+    @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Citation_Author")
     @OrderBy("positionInList")
     private Set<IPerson> authors;
-    @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL)
+    @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Citation_Editor")
     @OrderBy("positionInList")
     private Set<IPerson> editors;
@@ -52,6 +52,7 @@ public class Citation implements ICitation {
     private String url;
     @Lob
     private String abstractNote;
+    private String accessDate;
     
     private String seriesText;
     private String journalAbbreviation;
@@ -64,6 +65,9 @@ public class Citation implements ICitation {
     private String libraryCatalog;
     private String callNumber;
     private String rights;
+    
+    private String dateAdded;
+    private String dateModified;
     
     @Lob
     private String extra;
@@ -82,15 +86,19 @@ public class Citation implements ICitation {
     public void setKey(String key) {
         this.key = key;
     }
+    @Override
     public ICitationGroup getGroup() {
         return group;
     }
+    @Override
     public void setGroup(ICitationGroup group) {
         this.group = group;
     }
+    @Override
     public long getVersion() {
         return version;
     }
+    @Override
     public void setVersion(long version) {
         this.version = version;
     }
@@ -273,6 +281,14 @@ public class Citation implements ICitation {
         this.abstractNote = abstractNote;
     }
     @Override
+    public String getAccessDate() {
+        return accessDate;
+    }
+    @Override
+    public void setAccessDate(String accessDate) {
+        this.accessDate = accessDate;
+    }
+    @Override
     public String getSeriesText() {
         return seriesText;
     }
@@ -359,6 +375,22 @@ public class Citation implements ICitation {
     @Override
     public void setRights(String rights) {
         this.rights = rights;
+    }
+    @Override
+    public String getDateAdded() {
+        return dateAdded;
+    }
+    @Override
+    public void setDateAdded(String dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+    @Override
+    public String getDateModified() {
+        return dateModified;
+    }
+    @Override
+    public void setDateModified(String dateModified) {
+        this.dateModified = dateModified;
     }
     @Override
     public String getExtra() {

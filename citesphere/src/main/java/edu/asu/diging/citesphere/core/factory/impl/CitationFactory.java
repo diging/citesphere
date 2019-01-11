@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
+import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
@@ -52,6 +53,7 @@ public class CitationFactory implements ICitationFactory {
         citation.setSeriesTitle(data.getSeriesTitle());
         citation.setTitle(data.getTitle());
         citation.setVolume(data.getVolume());
+        citation.setVersion(data.getVersion());
         
         Set<IPerson> authors = new TreeSet<>();
         Set<IPerson> editors = new TreeSet<>();
@@ -59,10 +61,10 @@ public class CitationFactory implements ICitationFactory {
             int authorPos = 0;
             int editorPos = 0;
             for (Creator c : data.getCreators()) {
-                if (c.getCreatorType().equals(AUTHOR)) {
+                if (c.getCreatorType().equals(ZoteroConstants.CREATOR_TYPE_AUTHOR)) {
                     authors.add(createPerson(c, authorPos));
                     authorPos++;
-                } else if (c.getCreatorType().equals(EDITOR)) {
+                } else if (c.getCreatorType().equals(ZoteroConstants.CREATOR_TYPE_EDITOR)) {
                     editors.add(createPerson(c, editorPos));
                     editorPos++;
                 }
@@ -77,6 +79,7 @@ public class CitationFactory implements ICitationFactory {
         citation.setUrl(item.getData().getUrl());
         
         citation.setAbstractNote(item.getData().getAbstractNote());
+        citation.setAccessDate(item.getData().getAccessDate());
         citation.setArchive(item.getData().getArchive());
         citation.setArchiveLocation(item.getData().getArchiveLocation());
         citation.setCallNumber(item.getData().getCallNumber());
@@ -88,6 +91,9 @@ public class CitationFactory implements ICitationFactory {
         citation.setRights(item.getData().getRights());
         citation.setSeriesText(item.getData().getSeriesText());
         citation.setShortTitle(item.getData().getShortTitle());
+        
+        citation.setDateAdded(item.getData().getDateAdded());
+        
         parseExtra(data, citation);
         return citation;
     }
@@ -107,10 +113,11 @@ public class CitationFactory implements ICitationFactory {
         }
         
         String extra = data.getExtra();
-        String citespherePattern = "(?s)(?m).*?^" + ExtraData.CITESPHERE_PREFIX + " ?(\\{.*\\}).*";
+        citation.setExtra(extra);
+        String citespherePattern = ExtraData.CITESPHERE_PATTERN;
         Pattern pattern = Pattern.compile(citespherePattern);
         Matcher match = pattern.matcher(extra);
-        if (match.matches()) {
+        if (match.find()) {
             String extraMatch = match.group(1);
             JsonParser parser = new JsonParser();
             JsonObject jObj = parser.parse(extraMatch).getAsJsonObject();
@@ -120,17 +127,17 @@ public class CitationFactory implements ICitationFactory {
             List<String> authorNames = new ArrayList<>();
             authors.forEach(a -> {
                 Person person = new Person();
-                person.setName(a.getAsJsonObject().get("name").getAsString());
-                person.setFirstName(a.getAsJsonObject().get("firstName").getAsString());
-                person.setLastName(a.getAsJsonObject().get("lastName").getAsString());
+                person.setName(a.getAsJsonObject().get("name") != null ? a.getAsJsonObject().get("name").getAsString() : "");
+                person.setFirstName(a.getAsJsonObject().get("firstName") != null ? a.getAsJsonObject().get("firstName").getAsString() : "");
+                person.setLastName(a.getAsJsonObject().get("lastName") != null ? a.getAsJsonObject().get("lastName").getAsString() : "");
                 authorNames.add(person.getFirstName() + person.getLastName());
                 person.setAffiliations(new HashSet<>());
                 JsonElement affiliations = a.getAsJsonObject().get("affiliations");
                 if (affiliations instanceof JsonArray) {
                     affiliations.getAsJsonArray().forEach(af -> {
                         Affiliation affiliation = new Affiliation();
-                        affiliation.setName(af.getAsJsonObject().get("name").getAsString());
-                        affiliation.setUri(af.getAsJsonObject().get("uri").getAsString());
+                        affiliation.setName(af.getAsJsonObject().get("name") != null ? af.getAsJsonObject().get("name").getAsString() : "");
+                        affiliation.setUri(af.getAsJsonObject().get("uri") != null ? af.getAsJsonObject().get("uri").getAsString() : "");
                         person.getAffiliations().add(affiliation);
                     });
                 }

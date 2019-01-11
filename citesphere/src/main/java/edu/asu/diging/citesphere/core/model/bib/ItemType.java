@@ -58,4 +58,8 @@ public enum ItemType {
     public static ItemType getByZoteroKey(String key) {
         return index.get(key);
     }
+    
+    public String getZoteroKey() {
+        return zoteroKey;
+    }
 }

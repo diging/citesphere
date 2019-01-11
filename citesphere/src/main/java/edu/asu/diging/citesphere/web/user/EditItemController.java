@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.web.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
+import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,10 +36,10 @@ public class EditItemController {
     }
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
-    public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) {
+    public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws ZoteroConnectionException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         citationHelper.updateCitation(citation, form);
-        citationManager.updateCitation(citation);
+        citationManager.updateCitation((IUser)authentication.getPrincipal(), zoteroGroupId, citation);
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
     }
 }

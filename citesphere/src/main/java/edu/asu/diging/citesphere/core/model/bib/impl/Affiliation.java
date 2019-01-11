@@ -7,6 +7,8 @@ import javax.persistence.Id;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
 
 @Entity
@@ -18,6 +20,7 @@ public class Affiliation implements IAffiliation {
                     parameters = @Parameter(name = "prefix", value = "AF"), 
                     strategy = "edu.asu.diging.citesphere.core.repository.IdGenerator"
             )
+    @JsonIgnore
     private String id;
     private String name;
     private String uri;

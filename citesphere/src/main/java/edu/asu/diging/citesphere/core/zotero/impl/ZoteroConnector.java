@@ -1,15 +1,19 @@
 package edu.asu.diging.citesphere.core.zotero.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.oauth1.OAuthToken;
+import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
+import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.model.IUser;
@@ -83,6 +87,19 @@ public class ZoteroConnector implements IZoteroConnector {
     public Item getItem(IUser user, String groupId, String itemKey) {
         Zotero zotero = getApi(user);
         return zotero.getGroupsOperations().getGroupItem(groupId, itemKey);
+    }
+    
+    @Override
+    public Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException {
+        Zotero zotero = getApi(user);
+        zotero.getGroupsOperations().updateItem(groupId, item, ignoreFields);
+        return zotero.getGroupsOperations().getGroupItem(groupId, item.getKey());
+    }
+    
+    @Override
+    @Cacheable(value="itemTypeFields", key="#itemType")
+    public FieldInfo[] getFields(IUser user, String itemType) {
+        return getApi(user).getItemTypesOperations().getFields(itemType);
     }
     
     private Zotero getApi(IUser user) {

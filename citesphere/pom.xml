@@ -16,7 +16,7 @@
 		<spring.version>5.1.2.RELEASE</spring.version>
 		<spring-data.version>Lovelace-RELEASE</spring-data.version>
 		<javers.version>5.0.0</javers.version>
-		
+
 		<admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
 		<zotero.client.key></zotero.client.key>
@@ -297,30 +297,30 @@
 		</dependency>
 
 		<!-- Javers -->
-        <!-- https://mvnrepository.com/artifact/org.javers/javers-core -->
-        <dependency>
-            <groupId>org.javers</groupId>
-            <artifactId>javers-core</artifactId>
-            <version>${javers.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.javers/javers-spring -->
-        <dependency>
-            <groupId>org.javers</groupId>
-            <artifactId>javers-spring</artifactId>
-            <version>${javers.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.javers/javers-spring-jpa -->
-        <dependency>
-            <groupId>org.javers</groupId>
-            <artifactId>javers-spring-jpa</artifactId>
-            <version>${javers.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.javers/javers-persistence-sql -->
-        <dependency>
-            <groupId>org.javers</groupId>
-            <artifactId>javers-persistence-sql</artifactId>
-            <version>${javers.version}</version>
-        </dependency>
+		<!-- https://mvnrepository.com/artifact/org.javers/javers-core -->
+		<dependency>
+			<groupId>org.javers</groupId>
+			<artifactId>javers-core</artifactId>
+			<version>${javers.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.javers/javers-spring -->
+		<dependency>
+			<groupId>org.javers</groupId>
+			<artifactId>javers-spring</artifactId>
+			<version>${javers.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.javers/javers-spring-jpa -->
+		<dependency>
+			<groupId>org.javers</groupId>
+			<artifactId>javers-spring-jpa</artifactId>
+			<version>${javers.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.javers/javers-persistence-sql -->
+		<dependency>
+			<groupId>org.javers</groupId>
+			<artifactId>javers-persistence-sql</artifactId>
+			<version>${javers.version}</version>
+		</dependency>
 
 	</dependencies>
 

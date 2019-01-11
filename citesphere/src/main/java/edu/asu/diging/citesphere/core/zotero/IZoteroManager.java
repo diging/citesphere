@@ -3,6 +3,8 @@ package edu.asu.diging.citesphere.core.zotero;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.social.zotero.exception.ZoteroConnectionException;
+
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
@@ -19,5 +21,7 @@ public interface IZoteroManager {
     Map<Long, Long> getGroupsVersion(IUser user);
 
     ICitationGroup getGroup(IUser user, String groupId, boolean refresh);
+
+    ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException;
 
 }

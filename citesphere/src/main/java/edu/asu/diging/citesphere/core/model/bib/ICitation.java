@@ -113,4 +113,24 @@ public interface ICitation {
 
     String getExtra();
 
+    void setAccessDate(String accessDate);
+
+    String getAccessDate();
+
+    void setDateAdded(String dateAdded);
+
+    String getDateAdded();
+
+    void setDateModified(String dateModified);
+
+    String getDateModified();
+
+    void setVersion(long version);
+
+    long getVersion();
+
+    void setGroup(ICitationGroup group);
+
+    ICitationGroup getGroup();
+
 }
