@@ -113,6 +113,7 @@ public class ZoteroManager implements IZoteroManager {
         List<String> itemTypeFields = new ArrayList<>();
         // add fields that need to be submitted
         itemTypeFields.add(ZoteroFields.VERSION);
+        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
         
         // add fields of item type
         for (FieldInfo info : fieldInfos) {
