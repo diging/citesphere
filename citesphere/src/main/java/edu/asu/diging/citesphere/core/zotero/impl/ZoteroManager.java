@@ -21,6 +21,8 @@ import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.ItemType;
+import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
@@ -89,6 +91,16 @@ public class ZoteroManager implements IZoteroManager {
         ICitationGroup citGroup = groupFactory.createGroup(group);
         citGroup.setNumItems(groupItems.getTotalResults());
         return citGroup;
+    }
+    
+    @Override
+    public List<BibField> getFields(IUser user, ItemType itemType) {
+        FieldInfo[] fieldInfos = zoteroConnector.getFields(user, itemType.getZoteroKey());
+        List<BibField> bibFields = new ArrayList<>();
+        for (FieldInfo info : fieldInfos) {
+            bibFields.add(new BibField(info.getField(), info.getLocalized()));
+        }
+        return bibFields;
     }
     
     @Override

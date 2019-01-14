@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.oauth1.OAuthToken;
@@ -83,7 +84,6 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    @Cacheable(value="itemInGroup", key="#user.username + '_' + #groupId + '_' + #itemKey")
     public Item getItem(IUser user, String groupId, String itemKey) {
         Zotero zotero = getApi(user);
         return zotero.getGroupsOperations().getGroupItem(groupId, itemKey);
@@ -93,7 +93,7 @@ public class ZoteroConnector implements IZoteroConnector {
     public Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException {
         Zotero zotero = getApi(user);
         zotero.getGroupsOperations().updateItem(groupId, item, ignoreFields);
-        return zotero.getGroupsOperations().getGroupItem(groupId, item.getKey());
+        return getItem(user, groupId, item.getKey());
     }
     
     @Override

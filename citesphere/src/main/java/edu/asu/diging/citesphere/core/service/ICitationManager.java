@@ -8,6 +8,8 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.ItemType;
+import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 
 public interface ICitationManager {
@@ -19,5 +21,7 @@ public interface ICitationManager {
     ICitation getCitation(IUser user, String groupId, String key);
 
     void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException;
+
+    List<BibField> getItemTypeFields(IUser user, ItemType itemType);
 
 }

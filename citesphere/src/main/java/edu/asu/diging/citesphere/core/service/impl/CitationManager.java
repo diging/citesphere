@@ -26,7 +26,9 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.ZoteroObjectType;
+import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
@@ -165,5 +167,10 @@ public class CitationManager implements ICitationManager {
             return results;
         }
         throw new GroupDoesNotExistException("There is no group with id " + groupId);
+    }
+    
+    @Override
+    public List<BibField> getItemTypeFields(IUser user, ItemType itemType) {
+        return zoteroManager.getFields(user, itemType);
     }
 }

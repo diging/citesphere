@@ -44,18 +44,24 @@
 <i class="${iconClass}" title="${iconLabel}"></i> ${iconLabel}
 </td>
 </tr>
+<c:if test="${fn:contains(fields, 'title') }">
 <tr>
 <td>Title</td>
 <td>${citation.title}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'shortTitle') }">
 <tr>
 <td>Short Title</td>
 <td>${citation.shortTitle}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'dateFreetext') }">
 <tr>
 <td>Date</td>
 <td>${citation.dateFreetext}</td>
 </tr>
+</c:if>
 <tr>
 <td>Authors</td>
 <td>
@@ -72,72 +78,106 @@
 </c:forEach>
 </td>
 </tr>
+<c:if test="${fn:contains(fields, 'publicationTitle') }">
 <tr>
 <td>Publication Title</td>
 <td>${citation.publicationTitle}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'journalAbbreviation') }">
 <tr>
 <td>Journal Abbreviation</td>
 <td>${citation.journalAbbreviation}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'volume') }">
 <tr>
 <td>Volume</td>
 <td>${citation.volume}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'issue') }">
 <tr>
 <td>Issue</td>
 <td>${citation.issue}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'pages') }">
 <tr>
 <td>Pages</td>
 <td>${citation.pages}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'series') }">
 <tr>
 <td>Series</td>
 <td>${citation.series}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'seriesTitle') }">
 <tr>
 <td>Series Title</td>
 <td>${citation.seriesTitle}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'seriesText') }">
 <tr>
 <td>Series Text</td>
 <td>${citation.seriesText}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'url') }">
 <tr>
 <td>URL</td>
 <td><a href="${citation.url}">${citation.url}</a></td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'language') }">
 <tr>
 <td>Language</td>
 <td>${citation.language}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'doi') }">
 <tr>
 <td>DOI</td>
 <td>${citation.doi}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'issn') }">
 <tr>
 <td>ISSN</td>
 <td>${citation.issn}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'archive') }">
 <tr>
 <td>Archive</td>
 <td>${citation.archive}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'archiveLocation') }">
 <tr>
 <td>Archive Location</td>
 <td>${citation.archiveLocation}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'libraryCatalog') }">
 <tr>
 <td>Library Catalog</td>
 <td>${citation.libraryCatalog}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'callNumber') }">
 <tr>
 <td>Call Number</td>
 <td>${citation.callNumber}</td>
 </tr>
+</c:if>
+<c:if test="${fn:contains(fields, 'rights') }">
 <tr>
 <td>Rights</td>
 <td>${citation.rights}</td>
 </tr>
+</c:if>
 </table>
