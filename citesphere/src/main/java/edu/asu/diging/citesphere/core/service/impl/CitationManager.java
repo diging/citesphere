@@ -22,6 +22,7 @@ import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
@@ -36,6 +37,7 @@ import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
 import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
 import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.repository.bib.CitationRepository;
+import edu.asu.diging.citesphere.core.repository.bib.CustomCitationRepository;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
@@ -60,6 +62,9 @@ public class CitationManager implements ICitationManager {
     private CitationRepository citationRepository;
     
     @Autowired
+    private CustomCitationRepository customCitationRepository;
+    
+    @Autowired
     private PageRequestRepository pageRequestRepository;
     
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
@@ -81,16 +86,50 @@ public class CitationManager implements ICitationManager {
         if (optional.isPresent()) {
             return optional.get();
         }
-        ICitation citation = zoteroManager.getGroupItem(user, groupId, key); 
-        citationRepository.save((Citation)citation);
-        return citation;
+        return updateCitationFromZotero(user, groupId, key);
+    }
+    
+    /**
+     * Retrieve a citation from Zotero bypassing the database cache. This method also
+     * does not store the retrieved citation in the database cache. 
+     * Use {@link getCitation(IUser, String, String) getCitation} method instead if you 
+     * want to make use of the database cache.
+     * @param user User who is accessing Zotero.
+     * @param groupId Group id of the group a citation is in.
+     * @param key The key of the citation to be retrieved.
+     * @return The retrieved citation.
+     */
+    @Override
+    public ICitation getCitationFromZotero(IUser user, String groupId, String key) {
+        return zoteroManager.getGroupItem(user, groupId, key);
     }
     
     @Override
-    public void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException {
+    public void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, CitationIsOutdatedException {
+        long citationVersion = zoteroManager.getGroupItemVersion(user, groupId, citation.getKey());
+        Optional<Citation> storedCitationOptional = citationRepository.findById(citation.getKey());
+        if (storedCitationOptional.isPresent()) {
+            ICitation storedCitation = storedCitationOptional.get();
+            if (storedCitation.getVersion() != citationVersion) {
+                throw new CitationIsOutdatedException();
+            }
+        }
+        citation = customCitationRepository.mergeCitation(citation);
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         // save updated info
         citationRepository.save((Citation)updatedCitation);
+    }
+    
+    @Override
+    public void detachCitation(ICitation citation) {
+        customCitationRepository.detachCitation(citation);
+    }
+    
+    @Override
+    public ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey) {
+        ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey); 
+        citationRepository.save((Citation)citation);
+        return citation;
     }
 
     /* (non-Javadoc)

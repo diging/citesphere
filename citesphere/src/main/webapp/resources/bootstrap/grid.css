@@ -86,3 +86,7 @@ a.appName:hover {
   -moz-hyphens: auto;
   hyphens: auto;
 }
+
+tr.changed>td {
+	background-color: #f7e8bf;
+}

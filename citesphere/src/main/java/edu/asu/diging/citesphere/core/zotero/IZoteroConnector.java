@@ -28,4 +28,6 @@ public interface IZoteroConnector {
 
     FieldInfo[] getFields(IUser user, String itemType);
 
+    long getItemVersion(IUser user, String groupId, String itemKey);
+
 }

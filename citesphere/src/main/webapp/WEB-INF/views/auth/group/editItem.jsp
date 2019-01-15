@@ -27,6 +27,7 @@
 <tr>
 <td width="20%">Item Key</td>
 <td>${citation.key}</td>
+<form:hidden path="key" value="${citation.key}"/>
 </tr>
 <tr>
 <td>Citation Type</td>

@@ -1,10 +1,12 @@
 package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.oauth1.OAuthToken;
@@ -24,6 +26,8 @@ import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 @Component
 @PropertySource("classpath:/config.properties")
 public class ZoteroConnector implements IZoteroConnector {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
@@ -93,7 +97,21 @@ public class ZoteroConnector implements IZoteroConnector {
     public Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException {
         Zotero zotero = getApi(user);
         zotero.getGroupsOperations().updateItem(groupId, item, ignoreFields);
+        // it seems like Zotero needs a minute to process the submitted data
+        // so let's wait a second before retrieving updated data
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not sleep.", e);
+            // well if something goes wrong here, let's just ignore it
+        }
         return getItem(user, groupId, item.getKey());
+    }
+    
+    @Override
+    public long getItemVersion(IUser user, String groupId, String itemKey) {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().getGroupItemVersion(groupId, itemKey);
     }
     
     @Override

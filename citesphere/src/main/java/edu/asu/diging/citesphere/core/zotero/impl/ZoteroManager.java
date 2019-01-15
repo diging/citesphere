@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.IGroupFactory;
-import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
@@ -82,6 +81,11 @@ public class ZoteroManager implements IZoteroManager {
     public ICitation getGroupItem(IUser user, String groupId, String itemKey) {
         Item item = zoteroConnector.getItem(user, groupId, itemKey);
         return citationFactory.createCitation(item);
+    }
+    
+    @Override
+    public long getGroupItemVersion(IUser user, String groupId, String itemKey) {
+        return zoteroConnector.getItemVersion(user, groupId, itemKey);
     }
     
     @Override

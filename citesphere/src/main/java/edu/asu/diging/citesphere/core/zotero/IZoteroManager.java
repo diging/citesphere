@@ -28,4 +28,6 @@ public interface IZoteroManager {
 
     List<BibField> getFields(IUser user, ItemType itemType);
 
+    long getGroupItemVersion(IUser user, String groupId, String itemKey);
+
 }
