@@ -5,6 +5,66 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
+<script>
+//@ sourceURL=submit.js
+$(function() {
+	$("#submitForm").click(function() {
+		$(".author-item").each(function(idx, author) {
+			var authorIdField = $("<input>");
+			authorIdField.attr("type", "hidden");
+			authorIdField.attr("id", "authors" + idx + ".id");
+			authorIdField.attr("name", "authors[" + idx + "].id");
+			authorIdField.attr("value", $(author).data("author-id"));
+			$("#editForm").append(authorIdField);
+			
+			var authorFirstNameField = $("<input>");
+			authorFirstNameField.attr("type", "hidden");
+			authorFirstNameField.attr("id", "authors" + idx + ".firstName");
+			authorFirstNameField.attr("name", "authors[" + idx + "].firstName");
+			authorFirstNameField.attr("value", $(author).data("author-firstname"));
+			$("#editForm").append(authorFirstNameField);
+			
+			var authorLastNameField = $("<input>");
+			authorLastNameField.attr("type", "hidden");
+			authorLastNameField.attr("id", "authors" + idx + ".lastName");
+			authorLastNameField.attr("name", "authors[" + idx + "].lastName");
+			authorLastNameField.attr("value", $(author).data("author-lastname"));
+			$("#editForm").append(authorLastNameField);
+		});
+	});
+	
+	$("#addAuthorButton").click(function() {
+		var firstname = $("#firstNameAuthor").val();
+		var lastname = $("#lastNameAuthor").val();
+		var authorSpan = $("<span>");
+		authorSpan.attr("class", "label label-primary author-item");
+		authorSpan.attr("data-author-firstname", firstname);
+		authorSpan.attr("data-author-lastname", lastname);
+		authorSpan.html(lastname + ', ' + firstname + '&nbsp;&nbsp;');
+		var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
+		deleteIcon.click(removeAuthor);
+		authorSpan.append(deleteIcon);
+		$("#authorList").append(authorSpan);
+		$("#authorList").append("&nbsp;&nbsp;")
+		
+		$("#authorModal").modal('hide');
+		$("#firstNameAuthor").val("");
+		$("#lastNameAuthor").val("");
+	});
+	
+	$(".remove-author").click(removeAuthor);
+	$(".remove-author").css('cursor', 'pointer');
+	
+});
+
+let removeAuthor = function removeAuthor(e) {
+	var deleteIcon = e.currentTarget;
+	var author = $(deleteIcon).parent();
+	author.remove();
+}
+
+</script>
+
 <ol class="breadcrumb">
   <li><a href="<c:url value="/" />">Home</a></li>
   <li><a href="<c:url value="/auth/group/${zoteroGroupId}/items" />">Group</a></li>
@@ -22,7 +82,7 @@
 </h2>
 
 <c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" var="editUrl" />
-<form:form action="${editUrl}" modelAttribute="form" method="POST">
+<form:form action="${editUrl}" modelAttribute="form" method="POST" id="editForm">
 <table class="table table-striped">
 <tr>
 <td width="20%">Item Key</td>
@@ -60,10 +120,17 @@
 </tr>
 <tr>
 <td>Authors</td>
-<td>
+<td id="authorList">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
- ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach><c:if test="${!status.last}">; </c:if>
+<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}">
+${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
+&nbsp;&nbsp;
+<i class="fas fa-times remove-author"></i>
+</span>
+&nbsp;&nbsp;
 </c:forEach>
+
+<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="fas fa-plus-circle"></i> Add Author</a></div>
 </td>
 </tr>
 <tr>
@@ -144,5 +211,31 @@
 </tr>
 </table>
 
-<button class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
+<button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
 </form:form>
+
+<!-- Author Modal -->
+<div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="authorLabel">Enter Author Information</h4>
+      </div>
+      <div class="modal-body">
+          <div class="form-group">
+		    <label for="firstName">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastName">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
+		  </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -49,32 +49,32 @@ public class EditItemController {
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
     public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws ZoteroConnectionException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-        citationManager.detachCitation(citation);
-        citationHelper.updateCitation(citation, form);
-        try {
-            citationManager.updateCitation((IUser)authentication.getPrincipal(), zoteroGroupId, citation);
-        } catch (CitationIsOutdatedException e) {
-            citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-            ICitation currentCitation = citationManager.getCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-            model.addAttribute("outdatedCitation", citation);
-            model.addAttribute("currentCitation", currentCitation);
-            model.addAttribute("form", form);
-            model.addAttribute("zoteroGroupId", zoteroGroupId);
-            
-            List<String> outdatedCitationFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> outdatedCitationFields.add(f.getFilename()));
-            model.addAttribute("outdatedCitationFields", outdatedCitationFields);
-            
-            List<String> currentCitationFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), currentCitation.getItemType()).forEach(f -> currentCitationFields.add(f.getFilename()));
-            model.addAttribute("currentCitationFields", currentCitationFields);
-            
-            List<String> formFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), form.getItemType()).forEach(f -> formFields.add(f.getFilename()));
-            model.addAttribute("formFields", formFields);
-            
-            return "auth/group/items/item/edit/conflict";
-        }
+//        citationManager.detachCitation(citation);
+//        citationHelper.updateCitation(citation, form);
+//        try {
+//            citationManager.updateCitation((IUser)authentication.getPrincipal(), zoteroGroupId, citation);
+//        } catch (CitationIsOutdatedException e) {
+//            citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+//            ICitation currentCitation = citationManager.getCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+//            model.addAttribute("outdatedCitation", citation);
+//            model.addAttribute("currentCitation", currentCitation);
+//            model.addAttribute("form", form);
+//            model.addAttribute("zoteroGroupId", zoteroGroupId);
+//            
+//            List<String> outdatedCitationFields = new ArrayList<>();
+//            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> outdatedCitationFields.add(f.getFilename()));
+//            model.addAttribute("outdatedCitationFields", outdatedCitationFields);
+//            
+//            List<String> currentCitationFields = new ArrayList<>();
+//            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), currentCitation.getItemType()).forEach(f -> currentCitationFields.add(f.getFilename()));
+//            model.addAttribute("currentCitationFields", currentCitationFields);
+//            
+//            List<String> formFields = new ArrayList<>();
+//            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), form.getItemType()).forEach(f -> formFields.add(f.getFilename()));
+//            model.addAttribute("formFields", formFields);
+//            
+//            return "auth/group/items/item/edit/conflict";
+//        }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
     }
     
