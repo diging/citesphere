@@ -30,17 +30,50 @@ $(function() {
 			authorLastNameField.attr("name", "authors[" + idx + "].lastName");
 			authorLastNameField.attr("value", $(author).data("author-lastname"));
 			$("#editForm").append(authorLastNameField);
+			
+			$(author).children("span").each(function(idx2, affiliation) {
+				var affiliationField = $("<input>");
+				affiliationField.attr("type", "hidden");
+				affiliationField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".name");
+				affiliationField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].name");
+				affiliationField.attr("value", $(affiliation).data("affiliation-name"));
+				$("#editForm").append(affiliationField);
+				
+				var affiliationIdField = $("<input>");
+				affiliationIdField.attr("type", "hidden");
+				affiliationIdField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".id");
+				affiliationIdField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].id");
+				affiliationIdField.attr("value", $(affiliation).data("affiliation-id"));
+				$("#editForm").append(affiliationIdField);
+			});
 		});
 	});
 	
 	$("#addAuthorButton").click(function() {
 		var firstname = $("#firstNameAuthor").val();
 		var lastname = $("#lastNameAuthor").val();
+		
 		var authorSpan = $("<span>");
 		authorSpan.attr("class", "label label-primary author-item");
 		authorSpan.attr("data-author-firstname", firstname);
 		authorSpan.attr("data-author-lastname", lastname);
-		authorSpan.html(lastname + ', ' + firstname + '&nbsp;&nbsp; ');
+		
+		var affiliationsList = [];
+		var affSpan = $("<span>");
+		$("#affiliations").children().each(function(idx, elem) {
+			var affSpan = $("<span>");
+			var input = $(elem).find("input");
+			affSpan.attr("data-affiliation-name", input.val());
+			affiliationsList.push(input.val());
+			authorSpan.append(affSpan);
+		});
+		
+		var affiliationString = "";
+		if (affiliationsList) {
+			affiliationString = " (" + affiliationsList.join(", ") + ")";
+		}
+		
+		authorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
 		var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
 		deleteIcon.click(removeAuthor);
 		authorSpan.append(deleteIcon);
@@ -50,11 +83,18 @@ $(function() {
 		$("#authorModal").modal('hide');
 		$("#firstNameAuthor").val("");
 		$("#lastNameAuthor").val("");
+		$("#affiliationTemplate").find("input").val("");
 	});
 	
 	$(".remove-author").click(removeAuthor);
 	$(".remove-author").css('cursor', 'pointer');
 	
+	$("#addAffiliation").click(function() {
+		var affiliationCopy = $("#affiliationTemplate").clone();
+		affiliationCopy.removeAttr("id");
+		affiliationCopy.find("input").val("");
+		$("#affiliations").append(affiliationCopy);
+	});
 });
 
 let removeAuthor = function removeAuthor(e) {
@@ -124,6 +164,7 @@ let removeAuthor = function removeAuthor(e) {
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
 <span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}">
+<c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;&nbsp;
 <i class="fas fa-times remove-author"></i>
@@ -225,14 +266,24 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
       </div>
       <div class="modal-body">
           <div class="form-group">
-		    <label for="firstName">First Name:</label>
+		    <label for="firstNameAuthor">First Name:</label>
 		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
 		  </div>
 		  <div class="form-group">
-		    <label for="lastName">Last Name:</label>
+		    <label for="lastNameAuthor">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
 		  </div>
+		  <div id="affiliations">
+		  <div id="affiliationTemplate" class="form-group">
+		    <label for="affiliationAuthor">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
       </div>
+      
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>

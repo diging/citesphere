@@ -1,11 +1,15 @@
 package edu.asu.diging.citesphere.web.forms;
 
+import java.util.List;
+
 public class PersonForm {
 
     private String id;
     private String firstName;
     private String lastName;
     private int position;
+    
+    private List<AffiliationForm> affiliations;
     
     public String getId() {
         return id;
@@ -30,5 +34,11 @@ public class PersonForm {
     }
     public void setPosition(int position) {
         this.position = position;
+    }
+    public List<AffiliationForm> getAffiliations() {
+        return affiliations;
+    }
+    public void setAffiliations(List<AffiliationForm> affiliations) {
+        this.affiliations = affiliations;
     }    
 }
