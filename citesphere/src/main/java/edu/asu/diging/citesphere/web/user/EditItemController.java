@@ -43,6 +43,11 @@ public class EditItemController {
         if (!model.containsAttribute("form")) {
             model.addAttribute("form", form);
         }
+        List<String> fields = new ArrayList<>();
+        citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
+        model.addAttribute("fields", fields);
+        System.out.println(citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()));
+        System.out.println(fields.size());
         return "auth/group/items/item/edit";
     }
     
