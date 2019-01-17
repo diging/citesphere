@@ -1,10 +1,17 @@
 package edu.asu.diging.citesphere.core.util.model.impl;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.IPerson;
+import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
+import edu.asu.diging.citesphere.web.forms.PersonForm;
 
 @Component
 public class CitationHelper implements ICitationHelper {
@@ -36,5 +43,21 @@ public class CitationHelper implements ICitationHelper {
         citation.setTitle(form.getTitle());
         citation.setUrl(form.getUrl());
         citation.setVolume(form.getVolume());
+        
+        Map<String, IPerson> authorMap = new HashMap<>();
+        citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
+        citation.setAuthors(new HashSet<>());
+        for (PersonForm author : form.getAuthors()) {
+            IPerson person;
+            if (author.getId() != null && !author.getId().isEmpty()) {
+                person = authorMap.get(author.getId());
+            } else {
+                person = new Person();
+            }
+            person.setFirstName(author.getFirstName());
+            person.setLastName(author.getLastName());
+            person.setName(String.join(" ", author.getFirstName(), author.getLastName()));
+            citation.getAuthors().add(person);
+        }
     }
 }

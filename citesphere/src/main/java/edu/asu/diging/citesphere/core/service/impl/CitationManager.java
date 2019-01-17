@@ -117,6 +117,7 @@ public class CitationManager implements ICitationManager {
         citation = customCitationRepository.mergeCitation(citation);
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         // save updated info
+        citationRepository.delete((Citation)citation);
         citationRepository.save((Citation)updatedCitation);
     }
     
