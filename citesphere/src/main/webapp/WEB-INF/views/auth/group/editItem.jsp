@@ -40,12 +40,12 @@ $(function() {
 		authorSpan.attr("class", "label label-primary author-item");
 		authorSpan.attr("data-author-firstname", firstname);
 		authorSpan.attr("data-author-lastname", lastname);
-		authorSpan.html(lastname + ', ' + firstname + '&nbsp;&nbsp;');
+		authorSpan.html(lastname + ', ' + firstname + '&nbsp;&nbsp; ');
 		var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
 		deleteIcon.click(removeAuthor);
 		authorSpan.append(deleteIcon);
 		$("#authorList").append(authorSpan);
-		$("#authorList").append("&nbsp;&nbsp;")
+		$("#authorList").append("&nbsp;&nbsp; ")
 		
 		$("#authorModal").modal('hide');
 		$("#firstNameAuthor").val("");
@@ -120,7 +120,8 @@ let removeAuthor = function removeAuthor(e) {
 </tr>
 <tr>
 <td>Authors</td>
-<td id="authorList">
+<td>
+<span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
 <span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}">
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
@@ -129,7 +130,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 </span>
 &nbsp;&nbsp;
 </c:forEach>
-
+</span>
 <div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="fas fa-plus-circle"></i> Add Author</a></div>
 </td>
 </tr>
