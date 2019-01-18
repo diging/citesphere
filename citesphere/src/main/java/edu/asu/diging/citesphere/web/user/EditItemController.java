@@ -40,7 +40,9 @@ public class EditItemController {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("citation", citation);
-        if (!model.containsAttribute("form")) {
+        if (model.containsAttribute("resolvedForm")) {
+            model.addAttribute("form", model.asMap().get("resolvedForm"));
+        } else {
             model.addAttribute("form", form);
         }
         return "auth/group/items/item/edit";
@@ -87,7 +89,7 @@ public class EditItemController {
         ICitation citation = citationManager.updateCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         updateForm(citation, form, changedFields);
         
-        redirectAttrs.addFlashAttribute("form", form);
+        redirectAttrs.addFlashAttribute("resolvedForm", form);
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}/edit";
     }
     
@@ -97,9 +99,11 @@ public class EditItemController {
         for (Field field : fields) {
             String fieldname = field.getName();
             try {
-                String formValue = field.get(form).toString();
+                field.setAccessible(true);
+                String formValue = field.get(form) != null ? field.get(form).toString() : "";
                 Field citationField = citation.getClass().getDeclaredField(fieldname);
-                String citationValue = citationField.get(citation).toString();
+                citationField.setAccessible(true);
+                String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
                 // if values are the same, continue
                 formValue = formValue != null ? formValue : "";
                 citationValue = citationValue != null ? citationValue : "";
@@ -123,7 +127,9 @@ public class EditItemController {
             if (!changedFields.contains(fieldName)) {
                 try {
                     Field citationField = citation.getClass().getDeclaredField(fieldName);
-                    String citationValue = citationField.get(citation).toString();
+                    citationField.setAccessible(true);
+                    String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
+                    field.setAccessible(true);
                     field.set(form, citationValue);
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
                     logger.error("Could ont access field.", e);
