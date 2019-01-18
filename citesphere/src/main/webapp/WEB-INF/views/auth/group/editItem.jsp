@@ -340,7 +340,7 @@ $(document).ready(function() {
 		$.ajax({
 			url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/editItem" />',
 			type : 'GET',
-			data: { 'itemTypeOnChange' : itemType },
+			data: { 'itemType' : itemType },
 			success: function(changedFields){
 				$('form input').parent().closest('tr').hide();
 				var i = 0;

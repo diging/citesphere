@@ -54,9 +54,13 @@ public class EditItemController {
         return "auth/group/items/item/edit";
     }
 
+    
+    /**
+     * Method to retrieve all fields filtered by item type.
+     */
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/editItem")
     public ResponseEntity<List<String>> updateItemType(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @RequestParam(value = "itemTypeOnChange") ItemType itemTypeOnChange) {
+            @RequestParam(value = "itemType") ItemType itemType) {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("citation", citation);
@@ -64,9 +68,8 @@ public class EditItemController {
             model.addAttribute("form", form);
         }
         List<String> changedFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemTypeOnChange)
+            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemType)
                 .forEach(f -> changedFields.add(f.getFilename()));
-        //return changedFields;
         return new ResponseEntity<List<String>>(changedFields, HttpStatus.OK);
     }
     
