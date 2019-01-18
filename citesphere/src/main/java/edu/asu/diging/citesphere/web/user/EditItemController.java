@@ -15,85 +15,124 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller
 public class EditItemController {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ICitationManager citationManager;
-    
+
     @Autowired
     private ICitationHelper citationHelper;
-    
+
+    /**
+     * @param authentication
+     * @param model
+     * @param form
+     * @param zoteroGroupId
+     * @param itemId
+     * @param itemTypeOnReload required when edit page is reloaded.
+     * @return
+     */
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/edit")
-    public String showPage(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) {
-        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+    public String showPage(Authentication authentication, Model model, CitationForm form,
+            @PathVariable("zoteroGroupId") String zoteroGroupId,
+            @PathVariable("itemId") String itemId,
+            @RequestParam(value = "itemTypeOnReload", required = false) ItemType itemTypeOnReload) {
+        ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(),
+                zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("citation", citation);
         if (!model.containsAttribute("form")) {
             model.addAttribute("form", form);
         }
         List<String> fields = new ArrayList<>();
-        citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
+        if (itemTypeOnReload == null) {
+            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(),
+                    citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
+        } else {
+            citationManager
+                    .getItemTypeFields((IUser) authentication.getPrincipal(), itemTypeOnReload)
+                    .forEach(f -> fields.add(f.getFilename()));
+        }
         model.addAttribute("fields", fields);
-        System.out.println(citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()));
-        System.out.println(fields.size());
         return "auth/group/items/item/edit";
     }
-    
-    @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
-    public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws ZoteroConnectionException {
-        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/edit",
+            method = RequestMethod.POST)
+    public String storeItem(@ModelAttribute CitationForm form, Authentication authentication,
+            Model model, @PathVariable("zoteroGroupId") String zoteroGroupId,
+            @PathVariable("itemId") String itemId) throws ZoteroConnectionException {
+        ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(),
+                zoteroGroupId, itemId);
         citationManager.detachCitation(citation);
         citationHelper.updateCitation(citation, form);
         try {
-            citationManager.updateCitation((IUser)authentication.getPrincipal(), zoteroGroupId, citation);
+            citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
+                    citation);
         } catch (CitationIsOutdatedException e) {
-            citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-            ICitation currentCitation = citationManager.getCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+            citation = citationManager.getCitation((IUser) authentication.getPrincipal(),
+                    zoteroGroupId, itemId);
+            ICitation currentCitation = citationManager.getCitationFromZotero(
+                    (IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
             model.addAttribute("outdatedCitation", citation);
             model.addAttribute("currentCitation", currentCitation);
             model.addAttribute("form", form);
             model.addAttribute("zoteroGroupId", zoteroGroupId);
-            
+
             List<String> outdatedCitationFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> outdatedCitationFields.add(f.getFilename()));
+            citationManager
+                    .getItemTypeFields((IUser) authentication.getPrincipal(),
+                            citation.getItemType())
+                    .forEach(f -> outdatedCitationFields.add(f.getFilename()));
             model.addAttribute("outdatedCitationFields", outdatedCitationFields);
-            
+
             List<String> currentCitationFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), currentCitation.getItemType()).forEach(f -> currentCitationFields.add(f.getFilename()));
+            citationManager
+                    .getItemTypeFields((IUser) authentication.getPrincipal(),
+                            currentCitation.getItemType())
+                    .forEach(f -> currentCitationFields.add(f.getFilename()));
             model.addAttribute("currentCitationFields", currentCitationFields);
-            
+
             List<String> formFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), form.getItemType()).forEach(f -> formFields.add(f.getFilename()));
+            citationManager
+                    .getItemTypeFields((IUser) authentication.getPrincipal(), form.getItemType())
+                    .forEach(f -> formFields.add(f.getFilename()));
             model.addAttribute("formFields", formFields);
-            
+
             return "auth/group/items/item/edit/conflict";
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
     }
-    
-    @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/conflict/resolve", method = RequestMethod.POST)
-    public String resolveConflict(@ModelAttribute CitationForm form, Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, RedirectAttributes redirectAttrs) {
-        ICitation outdatedCitation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/conflict/resolve",
+            method = RequestMethod.POST)
+    public String resolveConflict(@ModelAttribute CitationForm form, Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId,
+            @PathVariable("itemId") String itemId, RedirectAttributes redirectAttrs) {
+        ICitation outdatedCitation = citationManager
+                .getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         List<String> changedFields = compare(outdatedCitation, form);
-        ICitation citation = citationManager.updateCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+        ICitation citation = citationManager.updateCitationFromZotero(
+                (IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         updateForm(citation, form, changedFields);
-        
         redirectAttrs.addFlashAttribute("form", form);
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}/edit";
     }
-    
+
     private List<String> compare(ICitation citation, CitationForm form) {
         List<String> changedFields = new ArrayList<>();
         Field[] fields = form.getClass().getDeclaredFields();
@@ -106,19 +145,20 @@ public class EditItemController {
                 // if values are the same, continue
                 formValue = formValue != null ? formValue : "";
                 citationValue = citationValue != null ? citationValue : "";
-                
+
                 if (!formValue.equals(citationValue)) {
-                    changedFields.add(fieldname);                
+                    changedFields.add(fieldname);
                 }
-                
-            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+
+            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
+                    | SecurityException e) {
                 logger.error("Could ont access field.", e);
                 // let's ignore that for nonw
             }
         }
         return changedFields;
     }
-    
+
     private void updateForm(ICitation citation, CitationForm form, List<String> changedFields) {
         Field[] allFields = form.getClass().getDeclaredFields();
         for (Field field : allFields) {
@@ -128,7 +168,8 @@ public class EditItemController {
                     Field citationField = citation.getClass().getDeclaredField(fieldName);
                     String citationValue = citationField.get(citation).toString();
                     field.set(form, citationValue);
-                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                        | IllegalAccessException e) {
                     logger.error("Could ont access field.", e);
                     // let's ignore that for nonw
                 }

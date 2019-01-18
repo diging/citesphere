@@ -21,6 +21,8 @@
  	  </c:if> 
 </h2>
 
+<div id="errorDiv" class="alert-danger row"></div>
+
 <c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" var="editUrl" />
 <form:form action="${editUrl}" modelAttribute="form" method="POST">
 <table class="table table-striped">
@@ -187,14 +189,21 @@
 <button class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
 </form:form>
 <script>
-	$(document).ready(function() {
-		$('#itemType').on("change", function(){
-			$.ajax({
-				url : '<c:url value="/auth/group/{zoteroGroupId}/items/{${citation.key}/edit" />',
-				type : 'GET',
-				success: console.log("success");
-				error: console.log("error");
-			});
-		})
-	});
+$(document).ready(function() {
+	$('#itemType').on("change", function(){
+		var itemType = $('#itemType option:selected').val()
+		$.ajax({
+			url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit/ff" />',
+			type : 'GET',
+			data: { 'itemTypeOnReload' : itemType },
+			success: function(){},
+			error: function(){
+				$('#errorDiv').replaceWith("<div id='errorDiv' class='alert-danger row'>" +
+					"<i class='glyphicon glyphicon-remove-sign'></i>" +
+						"Error loading the form fields</div>");
+				$('#errorDiv').delay(2000).fadeOut();
+			}
+		});
+	})
+});
 </script>
