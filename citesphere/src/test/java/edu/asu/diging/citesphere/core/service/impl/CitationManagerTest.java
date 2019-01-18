@@ -194,4 +194,25 @@ public class CitationManagerTest {
         Assert.assertEquals(expected, actual);
         Mockito.verify(groupRepository).save((CitationGroup)updatedGroup);
     }
+    
+    @Test
+    public void test_getGroups_notInDb() {
+        Long group3Id = new Long(3);
+        ICitationGroup group3 = new CitationGroup();
+        group3.setId(group3Id);
+        group3.setVersion(new Long(20));
+        
+        Map<Long, Long> groupVersions = new HashMap<>();
+        groupVersions.put(group3Id, new Long(20));
+        Mockito.when(zoteroManager.getGroupsVersion(user)).thenReturn(groupVersions);
+        Mockito.when(groupRepository.findById(group3Id)).thenReturn(Optional.empty());
+        Mockito.when(zoteroManager.getGroup(user, group3Id.toString(), false)).thenReturn(group3);
+        
+        List<ICitationGroup> expected = new ArrayList<>();
+        expected.add(group3);
+        
+        List<ICitationGroup> actual = managerToTest.getGroups(user);
+        Assert.assertEquals(expected, actual);
+        Mockito.verify(groupRepository).save((CitationGroup)group3);
+    }
 }
