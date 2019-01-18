@@ -66,8 +66,11 @@
 <td>Authors</td>
 <td>
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
- ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach><c:if test="${!status.last}">; </c:if>
-</c:forEach>
+ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if>
+ <c:if test="${not empty author.affiliations}">
+ (<c:forEach items="${author.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
+ </c:if>
+ </c:forEach>
 </td>
 </tr>
 <tr>
