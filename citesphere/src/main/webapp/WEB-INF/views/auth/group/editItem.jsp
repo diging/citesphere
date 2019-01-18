@@ -193,7 +193,7 @@ $(document).ready(function() {
 	$('#itemType').on("change", function(){
 		var itemType = $('#itemType option:selected').val()
 		$.ajax({
-			url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit/ff" />',
+			url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />',
 			type : 'GET',
 			data: { 'itemTypeOnReload' : itemType },
 			success: function(){},
