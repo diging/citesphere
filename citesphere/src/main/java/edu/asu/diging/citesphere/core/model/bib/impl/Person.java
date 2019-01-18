@@ -39,9 +39,11 @@ public class Person implements IPerson, Comparable<Person> {
     private Set<IAffiliation> affiliations;
    
     
+    @Override
     public String getId() {
         return id;
     }
+    @Override
     public void setId(String id) {
         this.id = id;
     }

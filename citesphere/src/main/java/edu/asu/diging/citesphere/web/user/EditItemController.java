@@ -70,6 +70,8 @@ public class EditItemController {
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
     public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws ZoteroConnectionException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+        // load authors before detaching
+        citation.getAuthors().forEach(a -> a.getAffiliations().size());
         citationManager.detachCitation(citation);
         citationHelper.updateCitation(citation, form);
         try {
