@@ -57,16 +57,13 @@ public class EditItemController {
         }
         List<String> fields = new ArrayList<>();
         if (itemTypeOnReload == null) {
-            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(),
-                    citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
+            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
+                .forEach(f -> fields.add(f.getFilename()));
         } else {
-            citationManager
-                    .getItemTypeFields((IUser) authentication.getPrincipal(), itemTypeOnReload)
-                    .forEach(f -> fields.add(f.getFilename()));
+            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemTypeOnReload)
+                .forEach(f -> fields.add(f.getFilename()));
         }
         model.addAttribute("fields", fields);
-        System.out.println(citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()));
-        System.out.println(fields.size());
         return "auth/group/items/item/edit";
     }
     
