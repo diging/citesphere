@@ -297,6 +297,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
 </form:form>
+
 <!-- Author Modal -->
 <div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
   <div class="modal-dialog" role="document">
@@ -337,10 +338,16 @@ $(document).ready(function() {
 	$('#itemType').on("change", function(){
 		var itemType = $('#itemType option:selected').val()
 		$.ajax({
-			url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />',
+			url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/editItem" />',
 			type : 'GET',
-			data: { 'itemTypeOnReload' : itemType },
-			success: function(){},
+			data: { 'itemTypeOnChange' : itemType },
+			success: function(changedFields){
+				$('form input').parent().closest('tr').hide();
+				var i = 0;
+				for(;i<changedFields.length;i++){
+					$('form input#'+changedFields[i]).parent().closest('tr').show();
+				}
+			},
 			error: function(){
 				$('#errorDiv').replaceWith("<div id='errorDiv' class='alert-danger row'>" +
 					"<i class='glyphicon glyphicon-remove-sign'></i>" +

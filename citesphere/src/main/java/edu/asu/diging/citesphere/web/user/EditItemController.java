@@ -7,6 +7,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -37,18 +39,8 @@ public class EditItemController {
     @Autowired
     private ICitationHelper citationHelper;
     
-    /**
-     * @param authentication
-     * @param model
-     * @param form
-     * @param zoteroGroupId
-     * @param itemId
-     * @param itemTypeOnReload required when edit page is reloaded.
-     * @return
-     */
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/edit")
-    public String showPage(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @RequestParam(value = "itemTypeOnReload", required = false) ItemType itemTypeOnReload) {
+    public String showPage(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("citation", citation);
@@ -56,15 +48,26 @@ public class EditItemController {
             model.addAttribute("form", form);
         }
         List<String> fields = new ArrayList<>();
-        if (itemTypeOnReload == null) {
-            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
-                .forEach(f -> fields.add(f.getFilename()));
-        } else {
-            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemTypeOnReload)
-                .forEach(f -> fields.add(f.getFilename()));
-        }
+        citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
+            .forEach(f -> fields.add(f.getFilename()));
         model.addAttribute("fields", fields);
         return "auth/group/items/item/edit";
+    }
+
+    @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/editItem")
+    public ResponseEntity<List<String>> updateItemType(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
+            @RequestParam(value = "itemTypeOnChange") ItemType itemTypeOnChange) {
+        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+        model.addAttribute("zoteroGroupId", zoteroGroupId);
+        model.addAttribute("citation", citation);
+        if (!model.containsAttribute("form")) {
+            model.addAttribute("form", form);
+        }
+        List<String> changedFields = new ArrayList<>();
+            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemTypeOnChange)
+                .forEach(f -> changedFields.add(f.getFilename()));
+        //return changedFields;
+        return new ResponseEntity<List<String>>(changedFields, HttpStatus.OK);
     }
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
@@ -100,7 +103,7 @@ public class EditItemController {
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
     }
-    
+
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/conflict/resolve", method = RequestMethod.POST)
     public String resolveConflict(@ModelAttribute CitationForm form, Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, RedirectAttributes redirectAttrs) {
         ICitation outdatedCitation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
