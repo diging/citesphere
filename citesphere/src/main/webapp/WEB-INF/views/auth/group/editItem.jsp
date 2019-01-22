@@ -47,6 +47,44 @@ $(function() {
 				$("#editForm").append(affiliationIdField);
 			});
 		});
+		$(".editor-item").each(function(idx, editor) {
+			var editorIdField = $("<input>");
+			editorIdField.attr("type", "hidden");
+			editorIdField.attr("id", "editors" + idx + ".id");
+			editorIdField.attr("name", "editors[" + idx + "].id");
+			editorIdField.attr("value", $(editor).data("editor-id"));
+			$("#editForm").append(editorIdField);
+			
+			var editorFirstNameField = $("<input>");
+			editorFirstNameField.attr("type", "hidden");
+			editorFirstNameField.attr("id", "editors" + idx + ".firstName");
+			editorFirstNameField.attr("name", "editors[" + idx + "].firstName");
+			editorFirstNameField.attr("value", $(editor).data("editor-firstname"));
+			$("#editForm").append(editorFirstNameField);
+			
+			var editorLastNameField = $("<input>");
+			editorLastNameField.attr("type", "hidden");
+			editorLastNameField.attr("id", "editors" + idx + ".lastName");
+			editorLastNameField.attr("name", "editors[" + idx + "].lastName");
+			editorLastNameField.attr("value", $(editor).data("editor-lastname"));
+			$("#editForm").append(editorLastNameField);
+			
+			$(editor).children("span").each(function(idx2, affiliation) {
+				var affiliationField = $("<input>");
+				affiliationField.attr("type", "hidden");
+				affiliationField.attr("id", "editors" + idx + ".affiliations" + idx2 + ".name");
+				affiliationField.attr("name", "editors[" + idx + "].affiliations[" + idx2 + "].name");
+				affiliationField.attr("value", $(affiliation).data("affiliation-name"));
+				$("#editForm").append(affiliationField);
+				
+				var affiliationIdField = $("<input>");
+				affiliationIdField.attr("type", "hidden");
+				affiliationIdField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".id");
+				affiliationIdField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].id");
+				affiliationIdField.attr("value", $(affiliation).data("affiliation-id"));
+				$("#editForm").append(affiliationIdField);
+			});
+		});
 	});
 	
 	$("#addAuthorButton").click(function() {
@@ -86,6 +124,43 @@ $(function() {
 		$("#affiliationTemplate").find("input").val("");
 	});
 	
+	$("#addEditorButton").click(function() {
+		var firstname = $("#firstNameEditor").val();
+		var lastname = $("#lastNameEditor").val();
+		
+		var editorSpan = $("<span>");
+		editorSpan.attr("class", "label label-info editor-item");
+		editorSpan.attr("data-editor-firstname", firstname);
+		editorSpan.attr("data-editor-lastname", lastname);
+		
+		var affiliationsList = [];
+		var affSpan = $("<span>");
+		$("#editorAffiliations").children().each(function(idx, elem) {
+			var affSpan = $("<span>");
+			var input = $(elem).find("input");
+			affSpan.attr("data-affiliation-name", input.val());
+			affiliationsList.push(input.val());
+			editorSpan.append(affSpan);
+		});
+		
+		var affiliationString = "";
+		if (affiliationsList) {
+			affiliationString = " (" + affiliationsList.join(", ") + ")";
+		}
+		
+		editorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
+		var deleteIcon = $('<i class="fas fa-times remove-editor"></i>');
+		deleteIcon.click(removeEditor);
+		editorSpan.append(deleteIcon);
+		$("#editorList").append(editorSpan);
+		$("#editorList").append("&nbsp;&nbsp; ")
+		
+		$("#editorModal").modal('hide');
+		$("#firstNameEditor").val("");
+		$("#lastNameEditor").val("");
+		$("#editorAffiliationTemplate").find("input").val("");
+	});
+
 	$(".remove-author").click(removeAuthor);
 	$(".remove-author").css('cursor', 'pointer');
 	
@@ -95,12 +170,28 @@ $(function() {
 		affiliationCopy.find("input").val("");
 		$("#affiliations").append(affiliationCopy);
 	});
+	
+	$(".remove-editor").click(removeEditor);
+	$(".remove-editor").css('cursor', 'pointer');
+
+	$("#addEditorAffiliation").click(function() {
+		var affiliationCopy = $("#editorAffiliationTemplate").clone();
+		affiliationCopy.removeAttr("id");
+		affiliationCopy.find("input").val("");
+		$("#editorAffiliations").append(affiliationCopy);
+	});
 });
 
 let removeAuthor = function removeAuthor(e) {
 	var deleteIcon = e.currentTarget;
 	var author = $(deleteIcon).parent();
 	author.remove();
+}
+
+let removeEditor = function removeEditor(e) {
+	var deleteIcon = e.currentTarget;
+	var editor = $(deleteIcon).parent();
+	editor.remove();
 }
 
 </script>
@@ -178,9 +269,18 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <tr>
 <td>Editors</td>
 <td>
+<span id="editorList" style="font-size: 18px">
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
- ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>
+<span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}">
+<c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
+&nbsp;&nbsp;
+<i class="fas fa-times remove-editor"></i>
+</span>
+&nbsp;&nbsp;
 </c:forEach>
+</span>
+<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
 </td>
 </tr>
 <tr>
@@ -287,6 +387,42 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Editor Modal -->
+<div class="modal fade" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="editorLabel">Enter Editor Information</h4>
+      </div>
+      <div class="modal-body">
+          <div class="form-group">
+		    <label for="firstNameEditor">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameEditor" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameEditor">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameEditor" placeholder="Last Name">
+		  </div>
+		  <div id="editorAffiliations">
+		  <div id="editorAffiliationTemplate" class="form-group">
+		    <label for="editorAffiliation">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addEditorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="addEditorButton" type="button" class="btn btn-primary">Add Editor</button>
       </div>
     </div>
   </div>
