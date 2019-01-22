@@ -79,8 +79,8 @@ $(function() {
 				
 				var affiliationIdField = $("<input>");
 				affiliationIdField.attr("type", "hidden");
-				affiliationIdField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".id");
-				affiliationIdField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].id");
+				affiliationIdField.attr("id", "editors" + idx + ".affiliations" + idx2 + ".id");
+				affiliationIdField.attr("name", "editors[" + idx + "].affiliations[" + idx2 + "].id");
 				affiliationIdField.attr("value", $(affiliation).data("affiliation-id"));
 				$("#editForm").append(affiliationIdField);
 			});
