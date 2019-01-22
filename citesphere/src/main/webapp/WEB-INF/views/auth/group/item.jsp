@@ -77,7 +77,10 @@
 <td>Editors</td>
 <td>
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
- ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>
+ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if>
+ <c:if test="${not empty editor.affiliations}">
+ (<c:forEach items="${editor.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
+ </c:if>
 </c:forEach>
 </td>
 </tr>

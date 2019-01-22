@@ -76,7 +76,7 @@ public class ItemFactory implements IItemFactory {
             creator.setCreatorType(ZoteroConstants.CREATOR_TYPE_EDITOR);
             data.getCreators().add(creator);
         });
-        
+        System.out.println(data);
         try {
             writeExtraData(citation, data);
         } catch (JsonProcessingException e1) {
@@ -91,6 +91,7 @@ public class ItemFactory implements IItemFactory {
         
         ExtraDataObject extraDataObject = new ExtraDataObject();
         extraDataObject.setAuthors(citation.getAuthors());
+        extraDataObject.setEditors(citation.getEditors());
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
         
