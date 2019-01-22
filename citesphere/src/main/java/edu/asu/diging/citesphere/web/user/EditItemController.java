@@ -58,19 +58,12 @@ public class EditItemController {
     /**
      * Method to retrieve all fields filtered by item type.
      */
-    @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/editItem")
-    public ResponseEntity<List<String>> updateItemType(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @RequestParam(value = "itemType") ItemType itemType) {
-        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-        model.addAttribute("zoteroGroupId", zoteroGroupId);
-        model.addAttribute("citation", citation);
-        if (!model.containsAttribute("form")) {
-            model.addAttribute("form", form);
-        }
-        List<String> changedFields = new ArrayList<>();
+    @RequestMapping("/auth/items/fields")
+    public ResponseEntity<List<String>> getFieldsByItemType(Authentication authentication, @RequestParam(value = "itemType") ItemType itemType) {
+        List<String> fields = new ArrayList<>();
             citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemType)
-                .forEach(f -> changedFields.add(f.getFilename()));
-        return new ResponseEntity<List<String>>(changedFields, HttpStatus.OK);
+                .forEach(f -> fields.add(f.getFilename()));
+        return new ResponseEntity<List<String>>(fields, HttpStatus.OK);
     }
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)

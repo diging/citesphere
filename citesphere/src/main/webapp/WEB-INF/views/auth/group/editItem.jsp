@@ -338,10 +338,11 @@ $(document).ready(function() {
 	$('#itemType').on("change", function(){
 		var itemType = $('#itemType option:selected').val()
 		$.ajax({
-			url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/editItem" />',
+			url : '<c:url value="/auth/items/fields" />',
 			type : 'GET',
 			data: { 'itemType' : itemType },
 			success: function(changedFields){
+				console.log(changedFields);
 				$('form input').parent().closest('tr').hide();
 				var i = 0;
 				for(;i<changedFields.length;i++){
