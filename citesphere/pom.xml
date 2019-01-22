@@ -27,6 +27,10 @@
 		<db.database.url></db.database.url>
 		<db.user></db.user>
 		<db.password></db.password>
+        
+        <tomcat.deploy.path></tomcat.deploy.path>
+        <tomcat.app.name>citesphere</tomcat.app.name>
+        <tomcat.server.id>TomcatServer</tomcat.server.id>
 
 		<log.level>debug</log.level>
 	</properties>
@@ -384,6 +388,16 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <url>${tomcat.deploy.path}</url>
+                    <server>${tomcat.server.id}</server>
+                    <path>/${tomcat.app.name}</path>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 
