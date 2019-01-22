@@ -342,7 +342,6 @@ $(document).ready(function() {
 			type : 'GET',
 			data: { 'itemType' : itemType },
 			success: function(changedFields){
-				console.log(changedFields);
 				$('form input').parent().closest('tr').hide();
 				var i = 0;
 				for(;i<changedFields.length;i++){
