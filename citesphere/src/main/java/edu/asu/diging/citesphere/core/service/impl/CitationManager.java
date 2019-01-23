@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
@@ -119,6 +120,13 @@ public class CitationManager implements ICitationManager {
         // save updated info
         citationRepository.delete((Citation)citation);
         citationRepository.save((Citation)updatedCitation);
+    }
+    
+    @Override
+    public ICitation createCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+        ICitation newCitation = zoteroManager.createCitation(user, groupId, citation);
+        citationRepository.save((Citation) newCitation);
+        return newCitation;
     }
     
     @Override
