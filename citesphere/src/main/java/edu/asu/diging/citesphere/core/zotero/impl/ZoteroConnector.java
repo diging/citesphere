@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -13,12 +14,14 @@ import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
+import org.springframework.social.zotero.api.ItemCreationResponse;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Component;
 
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
@@ -106,6 +109,28 @@ public class ZoteroConnector implements IZoteroConnector {
             // well if something goes wrong here, let's just ignore it
         }
         return getItem(user, groupId, item.getKey());
+    }
+    
+    @Override
+    public Item createItem(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+        Zotero zotero = getApi(user);
+        ItemCreationResponse response = zotero.getGroupsOperations().createItem(groupId, item, ignoreFields);
+        
+        // let's give Zotero a minute to process
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not sleep.", e);
+            // well if something goes wrong here, let's just ignore it
+        }
+        
+        Map<String, String> success = response.getSuccess();
+        if (success.isEmpty()) {
+            throw new ZoteroItemCreationFailedException(response.getFailed().toString());
+        }
+        
+        // since we only submitted one item, there should only be one in the map
+        return getItem(user, groupId, success.values().iterator().next());
     }
     
     @Override

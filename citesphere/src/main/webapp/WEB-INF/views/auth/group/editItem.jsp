@@ -121,14 +121,22 @@ let removeAuthor = function removeAuthor(e) {
  	  </c:if> 
 </h2>
 
-<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" var="editUrl" />
-<form:form action="${editUrl}" modelAttribute="form" method="POST" id="editForm">
+<c:if test="${not empty citation.key}" >
+<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" var="processingUrl" />
+</c:if>
+<c:if test="${empty citation.key}" >
+<c:url value="/auth/group/${zoteroGroupId}/items/create" var="processingUrl" />
+</c:if>
+
+<form:form action="${processingUrl}" modelAttribute="form" method="POST" id="editForm">
 <table class="table table-striped">
+<c:if test="${not empty citation.key}" >
 <tr>
 <td width="20%">Item Key</td>
 <td>${citation.key}</td>
 <form:hidden path="key" value="${citation.key}"/>
 </tr>
+</c:if>
 <tr>
 <td>Citation Type</td>
 <td>

@@ -6,14 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.social.zotero.api.Data;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
+import org.springframework.social.zotero.api.ZoteroFields;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.IGroupFactory;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
@@ -25,10 +30,11 @@ import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
-import edu.asu.diging.citesphere.core.zotero.ZoteroFields;
 
 @Service
 public class ZoteroManager implements IZoteroManager {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Autowired
     private IZoteroConnector zoteroConnector;
@@ -110,6 +116,32 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException {
         Item item = itemFactory.createItem(citation);
+        
+        List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
+        // add fields that need to be submitted
+        itemTypeFields.add(ZoteroFields.VERSION);
+        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
+        
+        List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, false);
+        
+        Item updatedItem = zoteroConnector.updateItem(user, item, groupId, ignoreFields);
+        return citationFactory.createCitation(updatedItem);
+    }
+    
+    @Override
+    public ICitation createCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+        Item item = itemFactory.createItem(citation);
+        
+        List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
+        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
+        
+        List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, true);
+        
+        Item newItem = zoteroConnector.createItem(user, item, groupId, ignoreFields);
+        return citationFactory.createCitation(newItem);
+    }
+    
+    private List<String> createIgnoreFields(List<String> itemTypeFields, Item item, boolean ignoreEmpty) {
         List<String> ignoreFields = new ArrayList<>();
         // general fields to ignore for the moment
         ignoreFields.add("tags");
@@ -125,27 +157,44 @@ public class ZoteroManager implements IZoteroManager {
         ignoreFields.add("mtime");
         ignoreFields.add("dateModified");
         
-        FieldInfo[] fieldInfos = zoteroConnector.getFields(user, citation.getItemType().getZoteroKey());
+        Field[] fields = Data.class.getDeclaredFields();
+        for (Field field : fields) {
+            String fieldName = field.getName();
+            
+            // already ignored
+            if (ignoreFields.contains(fieldName)) {
+                continue;
+            }
+            
+            if (!itemTypeFields.contains(fieldName)) {
+                ignoreFields.add(fieldName);
+            }
+            if (ignoreEmpty) {
+                field.setAccessible(true);
+                try {
+                    Object value = field.get(item.getData());
+                    if (value == null || (value instanceof String && value.toString().isEmpty())) {
+                        ignoreFields.add(fieldName);
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    logger.error("Could not access field to retrive ignore fields.", e);
+                }
+            }
+        }
+        
+        
+        return ignoreFields;
+    }
+    
+    private List<String> getItemTypeFields(IUser user, ItemType itemType) {
+        FieldInfo[] fieldInfos = zoteroConnector.getFields(user, itemType.getZoteroKey());
         List<String> itemTypeFields = new ArrayList<>();
-        // add fields that need to be submitted
-        itemTypeFields.add(ZoteroFields.VERSION);
-        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
         
         // add fields of item type
         for (FieldInfo info : fieldInfos) {
             itemTypeFields.add(info.getField());
         }
         
-        Field[] fields = item.getData().getClass().getDeclaredFields();
-        for (Field field : fields) {
-            String fieldName = field.getName();
-            if (!itemTypeFields.contains(fieldName) && !ignoreFields.contains(fieldName)) {
-                ignoreFields.add(fieldName);
-            }
-        }
-        
-        Item updatedItem = zoteroConnector.updateItem(user, item, groupId, ignoreFields);
-        return citationFactory.createCitation(updatedItem);
+        return itemTypeFields;
     }
-    
 }

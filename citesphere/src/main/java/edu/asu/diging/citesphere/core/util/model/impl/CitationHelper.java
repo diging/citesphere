@@ -49,7 +49,9 @@ public class CitationHelper implements ICitationHelper {
         citation.setVolume(form.getVolume());
         
         Map<String, IPerson> authorMap = new HashMap<>();
-        citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
+        if (citation.getAuthors() != null) {
+            citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
+        }
         citation.setAuthors(new HashSet<>());
         for (PersonForm personForm : form.getAuthors()) {
             IPerson person;
