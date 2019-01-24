@@ -20,8 +20,13 @@ import edu.asu.diging.citesphere.web.forms.PersonForm;
 @Component
 public class CitationHelper implements ICitationHelper {
 
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.util.model.impl.ICitationHelper#updateCitation(edu.asu.diging.citesphere.core.model.bib.ICitation, edu.asu.diging.citesphere.web.forms.CitationForm)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.util.model.impl.ICitationHelper#updateCitation
+     * (edu.asu.diging.citesphere.core.model.bib.ICitation,
+     * edu.asu.diging.citesphere.web.forms.CitationForm)
      */
     @Override
     public void updateCitation(ICitation citation, CitationForm form) {
@@ -47,42 +52,44 @@ public class CitationHelper implements ICitationHelper {
         citation.setTitle(form.getTitle());
         citation.setUrl(form.getUrl());
         citation.setVolume(form.getVolume());
-        
+
         Map<String, IPerson> authorMap = new HashMap<>();
         if (citation.getAuthors() != null) {
             citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
         }
         citation.setAuthors(new HashSet<>());
-        for (PersonForm personForm : form.getAuthors()) {
-            IPerson person;
-            if (personForm.getId() != null && !personForm.getId().isEmpty()) {
-                person = authorMap.get(personForm.getId());
-            } else {
-                person = new Person();
-            }
-            person.setFirstName(personForm.getFirstName());
-            person.setLastName(personForm.getLastName());
-            person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
-            
-            Map<String, IAffiliation> affiliationMap = new HashMap<>();
-            if (person.getAffiliations() != null) {
-                person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
-            }
-            person.setAffiliations(new HashSet<>());
-            if (personForm.getAffiliations() != null) {
-                for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
-                    IAffiliation affiliation;
-                    if (affiliationForm.getId() != null && !affiliationForm.getId().isEmpty()) {
-                        affiliation = affiliationMap.get(affiliationForm.getId());
-                    } else {
-                        affiliation = new Affiliation();
-                    }
-                    affiliation.setName(affiliationForm.getName());
-                    person.getAffiliations().add(affiliation);
+        if (form.getAuthors() != null) {
+            for (PersonForm personForm : form.getAuthors()) {
+                IPerson person;
+                if (personForm.getId() != null && !personForm.getId().isEmpty()) {
+                    person = authorMap.get(personForm.getId());
+                } else {
+                    person = new Person();
                 }
+                person.setFirstName(personForm.getFirstName());
+                person.setLastName(personForm.getLastName());
+                person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
+
+                Map<String, IAffiliation> affiliationMap = new HashMap<>();
+                if (person.getAffiliations() != null) {
+                    person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
+                }
+                person.setAffiliations(new HashSet<>());
+                if (personForm.getAffiliations() != null) {
+                    for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
+                        IAffiliation affiliation;
+                        if (affiliationForm.getId() != null && !affiliationForm.getId().isEmpty()) {
+                            affiliation = affiliationMap.get(affiliationForm.getId());
+                        } else {
+                            affiliation = new Affiliation();
+                        }
+                        affiliation.setName(affiliationForm.getName());
+                        person.getAffiliations().add(affiliation);
+                    }
+                }
+
+                citation.getAuthors().add(person);
             }
-            
-            citation.getAuthors().add(person);
         }
         
         Map<String, IPerson> editorMap = new HashMap<>();

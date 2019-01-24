@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.oauth1.OAuthToken;
+import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
@@ -97,10 +98,9 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    public Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException {
+    public Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields, List<String> validCreatorTypes) throws ZoteroConnectionException {
         Zotero zotero = getApi(user);
-        System.out.println(item.getData().getCreators().size());
-        zotero.getGroupsOperations().updateItem(groupId, item, ignoreFields);
+        zotero.getGroupsOperations().updateItem(groupId, item, ignoreFields, validCreatorTypes);
         // it seems like Zotero needs a minute to process the submitted data
         // so let's wait a second before retrieving updated data
         try {
@@ -113,9 +113,9 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    public Item createItem(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+    public Item createItem(IUser user, Item item, String groupId, List<String> ignoreFields, List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException {
         Zotero zotero = getApi(user);
-        ItemCreationResponse response = zotero.getGroupsOperations().createItem(groupId, item, ignoreFields);
+        ItemCreationResponse response = zotero.getGroupsOperations().createItem(groupId, item, ignoreFields, validCreatorTypes);
         
         // let's give Zotero a minute to process
         try {
@@ -144,6 +144,12 @@ public class ZoteroConnector implements IZoteroConnector {
     @Cacheable(value="itemTypeFields", key="#itemType")
     public FieldInfo[] getFields(IUser user, String itemType) {
         return getApi(user).getItemTypesOperations().getFields(itemType);
+    }
+    
+    @Override
+    @Cacheable(value="itemTypeCreatorTypes", key="#itemType")
+    public CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType) {
+        return getApi(user).getItemTypesOperations().getCreatorTypes(itemType);
     }
     
     private Zotero getApi(IUser user) {
