@@ -53,8 +53,10 @@ public class ZoteroManager implements IZoteroManager {
     public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page, sortBy, lastGroupVersion);
         List<ICitation> citations = new ArrayList<>();
-        for (Item item : response.getResults()) {
-            citations.add(citationFactory.createCitation(item));
+        if (response.getResults() != null) {
+            for (Item item : response.getResults()) {
+                citations.add(citationFactory.createCitation(item));
+            }
         }
         CitationResults results = new CitationResults();
         results.setTotalResults(response.getTotalResults());
