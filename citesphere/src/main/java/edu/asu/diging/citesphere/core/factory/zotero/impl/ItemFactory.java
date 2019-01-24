@@ -87,7 +87,6 @@ public class ItemFactory implements IItemFactory {
             // FIXME: hadnle this
             logger.error("Could not serialize extra data.", e1);
         }
-        
         return item;
     }
     
@@ -114,6 +113,6 @@ public class ItemFactory implements IItemFactory {
             // if there is no extra data
             extraData = citesphereData;
         }
-        
+        data.setExtra(extraData);
     }
 }

@@ -88,35 +88,37 @@ public class CitationHelper implements ICitationHelper {
         Map<String, IPerson> editorMap = new HashMap<>();
         citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
         citation.setEditors(new HashSet<>());
-        for (PersonForm personForm : form.getEditors()) {
-            IPerson person;
-            if (personForm.getId() != null && !personForm.getId().isEmpty()) {
-                person = editorMap.get(personForm.getId());
-            } else {
-                person = new Person();
-            }
-            person.setFirstName(personForm.getFirstName());
-            person.setLastName(personForm.getLastName());
-            person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
-            
-            Map<String, IAffiliation> affiliationMap = new HashMap<>();
-            if (person.getAffiliations() != null) {
-                person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
-            }
-            person.setAffiliations(new HashSet<>());
-            if (personForm.getAffiliations() != null) {
-                for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
-                    IAffiliation affiliation;
-                    if (affiliationForm.getId() != null && !affiliationForm.getId().isEmpty()) {
-                        affiliation = affiliationMap.get(affiliationForm.getId());
-                    } else {
-                        affiliation = new Affiliation();
-                    }
-                    affiliation.setName(affiliationForm.getName());
-                    person.getAffiliations().add(affiliation);
+        if(form.getEditors()!=null) {
+            for (PersonForm personForm : form.getEditors()) {
+                IPerson person;
+                if (personForm.getId() != null && !personForm.getId().isEmpty()) {
+                    person = editorMap.get(personForm.getId());
+                } else {
+                    person = new Person();
                 }
+                person.setFirstName(personForm.getFirstName());
+                person.setLastName(personForm.getLastName());
+                person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
+                
+                Map<String, IAffiliation> affiliationMap = new HashMap<>();
+                if (person.getAffiliations() != null) {
+                    person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
+                }
+                person.setAffiliations(new HashSet<>());
+                if (personForm.getAffiliations() != null) {
+                    for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
+                        IAffiliation affiliation;
+                        if (affiliationForm.getId() != null && !affiliationForm.getId().isEmpty()) {
+                            affiliation = affiliationMap.get(affiliationForm.getId());
+                        } else {
+                            affiliation = new Affiliation();
+                        }
+                        affiliation.setName(affiliationForm.getName());
+                        person.getAffiliations().add(affiliation);
+                    }
+                }
+                citation.getEditors().add(person);
             }
-            citation.getEditors().add(person);
         }
     }
 }

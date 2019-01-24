@@ -99,6 +99,7 @@ public class ZoteroConnector implements IZoteroConnector {
     @Override
     public Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException {
         Zotero zotero = getApi(user);
+        System.out.println(item.getData().getCreators().size());
         zotero.getGroupsOperations().updateItem(groupId, item, ignoreFields);
         // it seems like Zotero needs a minute to process the submitted data
         // so let's wait a second before retrieving updated data

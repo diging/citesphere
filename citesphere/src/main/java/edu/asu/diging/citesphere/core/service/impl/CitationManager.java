@@ -116,8 +116,10 @@ public class CitationManager implements ICitationManager {
             }
         }
         citation = customCitationRepository.mergeCitation(citation);
+        System.out.println("in update "+citation.getEditors());
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         // save updated info
+        System.out.println("after update "+updatedCitation.getEditors());
         citationRepository.delete((Citation)citation);
         citationRepository.save((Citation)updatedCitation);
     }
