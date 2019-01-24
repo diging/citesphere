@@ -206,16 +206,9 @@ let removeEditor = function removeEditor(e) {
 	 <c:forEach items="${citation.authors}" var="author" varStatus="status">
 	 	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
 	 </c:forEach>
-	  <em>${citation.title}</em>
-	  <c:if test="${not empty citation.dateFreetext}">
- 	  (${citation.dateFreetext})
- 	  </c:if> 
-</h2>
-
-<h2>
 	 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
 	 	  <strong>${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
-	 </c:forEach>
+	 </c:forEach> 
 	  <em>${citation.title}</em>
 	  <c:if test="${not empty citation.dateFreetext}">
  	  (${citation.dateFreetext})

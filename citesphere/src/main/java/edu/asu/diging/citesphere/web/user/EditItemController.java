@@ -52,7 +52,6 @@ public class EditItemController {
         // load authors before detaching
         citation.getAuthors().forEach(a -> a.getAffiliations().size());
         citation.getEditors().size();
-        System.out.println(citation.getEditors());
         //citation.getEditors().forEach(e -> e.getAffiliations().size());
         citationManager.detachCitation(citation);
         citationHelper.updateCitation(citation, form);
