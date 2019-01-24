@@ -93,7 +93,6 @@ public class ItemFactory implements IItemFactory {
         extraDataObject.setAuthors(citation.getAuthors());
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
-        
         String extraData = citation.getExtra() != null ? citation.getExtra() : "";
         extraData = extraData.replaceAll(ExtraData.CITESPHERE_PATTERN, ExtraData.CITESPHERE_PREFIX + " " + extraDataAsJson + "\n");
         data.setExtra(extraData);
