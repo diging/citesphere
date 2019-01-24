@@ -31,6 +31,13 @@ $(function() {
 			authorLastNameField.attr("value", $(author).data("author-lastname"));
 			$("#editForm").append(authorLastNameField);
 			
+			var authorUriField = $("<input>");
+			authorUriField.attr("type", "hidden");
+			authorUriField.attr("id", "authors" + idx + ".uri");
+			authorUriField.attr("name", "authors[" + idx + "].uri");
+			authorUriField.attr("value", $(author).data("author-uri"));
+			$("#editForm").append(authorUriField);
+			
 			$(author).children("span").each(function(idx2, affiliation) {
 				var affiliationField = $("<input>");
 				affiliationField.attr("type", "hidden");
@@ -52,11 +59,13 @@ $(function() {
 	$("#addAuthorButton").click(function() {
 		var firstname = $("#firstNameAuthor").val();
 		var lastname = $("#lastNameAuthor").val();
+		var uri = $("#uriAuthor").val();
 		
 		var authorSpan = $("<span>");
 		authorSpan.attr("class", "label label-primary author-item");
 		authorSpan.attr("data-author-firstname", firstname);
 		authorSpan.attr("data-author-lastname", lastname);
+		authorSpan.attr("data-author-uri", uri);
 		
 		var affiliationsList = [];
 		var affSpan = $("<span>");
@@ -172,7 +181,7 @@ let removeAuthor = function removeAuthor(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}">
+<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}">
 <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;&nbsp;
@@ -281,6 +290,10 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 		  <div class="form-group">
 		    <label for="lastNameAuthor">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="uriAuthor">URI:</label>
+		    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
 		  </div>
 		  <div id="affiliations">
 		  <div id="affiliationTemplate" class="form-group">
