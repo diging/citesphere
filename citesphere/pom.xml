@@ -27,6 +27,10 @@
 		<db.database.url></db.database.url>
 		<db.user></db.user>
 		<db.password></db.password>
+        
+        <tomcat.deploy.path></tomcat.deploy.path>
+        <tomcat.app.name>citesphere</tomcat.app.name>
+        <tomcat.server.id>TomcatServer</tomcat.server.id>
 
 		<log.level>debug</log.level>
 	</properties>
@@ -321,6 +325,23 @@
 			<artifactId>javers-persistence-sql</artifactId>
 			<version>${javers.version}</version>
 		</dependency>
+		
+		<!-- Testing -->
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
 
 	</dependencies>
 
@@ -367,6 +388,16 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <url>${tomcat.deploy.path}</url>
+                    <server>${tomcat.server.id}</server>
+                    <path>/${tomcat.app.name}</path>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 

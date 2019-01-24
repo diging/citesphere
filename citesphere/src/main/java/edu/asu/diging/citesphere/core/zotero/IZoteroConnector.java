@@ -8,6 +8,7 @@ import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 
 public interface IZoteroConnector {
@@ -29,5 +30,8 @@ public interface IZoteroConnector {
     FieldInfo[] getFields(IUser user, String itemType);
 
     long getItemVersion(IUser user, String groupId, String itemKey);
+
+    Item createItem(IUser user, Item item, String groupId, List<String> ignoreFields)
+            throws ZoteroConnectionException, ZoteroItemCreationFailedException;
 
 }
