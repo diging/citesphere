@@ -53,6 +53,9 @@ public class CitationManager implements ICitationManager {
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
     
+    @Value("${_sync_frequency}")
+    private Integer syncFrequencey;
+    
     @Autowired
     private IZoteroManager zoteroManager;
     
@@ -123,9 +126,18 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public ICitation createCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+    public ICitation createCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException {
+        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
+        
         ICitation newCitation = zoteroManager.createCitation(user, groupId, citation);
         citationRepository.save((Citation) newCitation);
+        
+        // mark group outdated, so it'll be updated on the next loading
+        groupOptional.get().setMarkedOutOfDate(true);
+        
         return newCitation;
     }
     
@@ -173,19 +185,29 @@ public class CitationManager implements ICitationManager {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (groupOptional.isPresent()) {
             CitationGroup group = groupOptional.get();
+            
+            OffsetDateTime updatedOn = group.getUpdatedOn();
+            if (updatedOn.plusMinutes(syncFrequencey).isBefore(OffsetDateTime.now())) {
+                group.setMarkedOutOfDate(true);
+            }
+            
             List<PageRequest> requests = null;
             try {
                 requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortBy(user, groupId, page, ZoteroObjectType.GROUP, sortBy);
             } catch (JpaObjectRetrievalFailureException ex) {
                 logger.warn("Could not retrieve page request.", ex);
             }
-            if(requests != null && requests.size() > 0) {
-                // there should be just one
-                IPageRequest request = requests.get(0);
+            
+            Long localVersion = null;
+            // there should be just one
+            PageRequest localPageRequest = requests.get(0);
+            if(!group.isMarkedOutOfDate() && requests != null && requests.size() > 0) {
+                localVersion = group.getVersion();
+                
                 // if we have the current version locally
-                if (request.getVersion() == group.getVersion()) {
+                if (localPageRequest.getVersion() == group.getVersion()) {
                     CitationResults results = new CitationResults();
-                    results.setCitations(request.getCitations().stream().distinct().collect(Collectors.toList()));
+                    results.setCitations(localPageRequest.getCitations().stream().distinct().collect(Collectors.toList()));
                     results.getCitations().sort(new Comparator<ICitation>() {
                         @Override
                         public int compare(ICitation o1, ICitation o2) {
@@ -195,23 +217,29 @@ public class CitationManager implements ICitationManager {
                     results.setTotalResults(group.getNumItems());
                     return results;
                 }
-                // if we don't have the current version locally
-                pageRequestRepository.deleteAll(requests);
             } 
             
-            CitationResults results = zoteroManager.getGroupItems(user, groupId, page, sortBy);
-            PageRequest request = new PageRequest();
-            request.setCitations(results.getCitations());
-            request.setObjectId(groupId);
-            request.setPageNumber(page);
-            request.setPageSize(zoteroPageSize);
-            request.setUser(user);
-            request.setVersion(group.getVersion());
-            request.setZoteroObjectType(ZoteroObjectType.GROUP);
-            request.setSortBy(sortBy);
+            CitationResults results = zoteroManager.getGroupItems(user, groupId, page, sortBy, localVersion);
+            if (!results.isNotModified()) {
+                // if we don't have the current version locally
+                pageRequestRepository.deleteAll(requests);
+                PageRequest request = new PageRequest();
+                request.setCitations(results.getCitations());
+                request.setObjectId(groupId);
+                request.setPageNumber(page);
+                request.setPageSize(zoteroPageSize);
+                request.setUser(user);
+                request.setVersion(group.getVersion());
+                request.setZoteroObjectType(ZoteroObjectType.GROUP);
+                request.setSortBy(sortBy);
+                results.getCitations().forEach(c -> citationRepository.save((Citation)c));
+                pageRequestRepository.save(request);
+            } else {
+                results.setCitations(localPageRequest.getCitations());
+            }
             
-            results.getCitations().forEach(c -> citationRepository.save((Citation)c));
-            pageRequestRepository.save(request);
+            group.setUpdatedOn(OffsetDateTime.now());
+            group.setMarkedOutOfDate(false);
             return results;
         }
         throw new GroupDoesNotExistException("There is no group with id " + groupId);

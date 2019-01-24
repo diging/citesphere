@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
@@ -218,7 +219,7 @@ public class CitationManagerTest {
     }
     
     @Test
-    public void test_createCitation_success() throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+    public void test_createCitation_success() throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException {
         ICitation newCitation = new Citation();
         ICitation createdCitation = new Citation();
         createdCitation.setKey("KEY");
@@ -230,7 +231,7 @@ public class CitationManagerTest {
     }
     
     @Test(expected=ZoteroItemCreationFailedException.class)
-    public void test_createCitation_failure() throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+    public void test_createCitation_failure() throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException {
         ICitation newCitation = new Citation();
         Mockito.when(zoteroManager.createCitation(user, GROUP_ID, newCitation)).thenThrow(new ZoteroItemCreationFailedException());
         

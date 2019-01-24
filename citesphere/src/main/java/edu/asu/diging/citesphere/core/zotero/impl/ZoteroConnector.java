@@ -46,25 +46,25 @@ public class ZoteroConnector implements IZoteroConnector {
      * @see edu.asu.diging.citesphere.core.service.impl.IZoteroConnector#getGroupItems(edu.asu.diging.citesphere.core.model.IUser, java.lang.String, int)
      */
     @Override
-    @Cacheable(value="groupItems", key="#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy")
-    public ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page, String sortBy) {
+    @Cacheable(value="groupItems", key="#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
+    public ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
         Zotero zotero = getApi(user);
         if (page < 1) {
             page = 0;
         } else  {
             page = page-1;
         }
-        return zotero.getGroupsOperations().getGroupItemsTop(groupId, page*zoteroPageSize, zoteroPageSize, sortBy);          
+        return zotero.getGroupsOperations().getGroupItemsTop(groupId, page*zoteroPageSize, zoteroPageSize, sortBy, lastGroupVersion);          
     }
     
     @Override
     @Cacheable(value="groupItemsLimit", key="#user.username + '_' + #groupId + '_' + #limit + '_' + #sortBy")
-    public ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit, String sortBy) {
+    public ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit, String sortBy, Long lastGroupVersion) {
         Zotero zotero = getApi(user);
         if (limit < 1) {
             limit = 1;
         }
-        return zotero.getGroupsOperations().getGroupItemsTop(groupId, 0 , 1, sortBy);          
+        return zotero.getGroupsOperations().getGroupItemsTop(groupId, 0 , 1, sortBy, lastGroupVersion);          
     }
     
     /* (non-Javadoc)
@@ -127,7 +127,8 @@ public class ZoteroConnector implements IZoteroConnector {
         
         Map<String, String> success = response.getSuccess();
         if (success.isEmpty()) {
-            throw new ZoteroItemCreationFailedException(response.getFailed().toString());
+            logger.error("Could not create item: " + response.getFailed().get("0"));
+            throw new ZoteroItemCreationFailedException(response);
         }
         
         // since we only submitted one item, there should only be one in the map

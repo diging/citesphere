@@ -30,6 +30,7 @@ public class CitationGroup implements ICitationGroup {
     private String fileEditing;
     
     private OffsetDateTime updatedOn;
+    private boolean markedOutOfDate;
     
     @OneToMany(targetEntity=Citation.class, mappedBy="group")
     private List<ICitation> citations;
@@ -218,5 +219,13 @@ public class CitationGroup implements ICitationGroup {
     @Override
     public void setUpdatedOn(OffsetDateTime updatedOn) {
         this.updatedOn = updatedOn;
+    }
+
+    public boolean isMarkedOutOfDate() {
+        return markedOutOfDate;
+    }
+
+    public void setMarkedOutOfDate(boolean markedOutOfDate) {
+        this.markedOutOfDate = markedOutOfDate;
     }
 }

@@ -33,6 +33,6 @@ public interface ICitationManager {
     ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey);
 
     ICitation createCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, ZoteroItemCreationFailedException;
+            throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException;
 
 }
