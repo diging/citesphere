@@ -30,6 +30,7 @@ public class CitationGroup implements ICitationGroup {
     private String fileEditing;
     
     private OffsetDateTime updatedOn;
+    private OffsetDateTime lastLocallyModifiedOn;
     
     @OneToMany(targetEntity=Citation.class, mappedBy="group")
     private List<ICitation> citations;
@@ -219,4 +220,15 @@ public class CitationGroup implements ICitationGroup {
     public void setUpdatedOn(OffsetDateTime updatedOn) {
         this.updatedOn = updatedOn;
     }
+
+    @Override
+    public OffsetDateTime getLastLocallyModifiedOn() {
+        return lastLocallyModifiedOn;
+    }
+
+    @Override
+    public void setLastLocallyModifiedOn(OffsetDateTime lastLocallyModifiedOn) {
+        this.lastLocallyModifiedOn = lastLocallyModifiedOn;
+    }
+
 }

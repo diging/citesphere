@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
@@ -15,7 +14,7 @@ import edu.asu.diging.citesphere.core.model.IUser;
 
 public interface IZoteroConnector {
 
-    ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page, String sortBy);
+    ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion);
 
     ZoteroResponse<Group> getGroups(IUser user);
 
@@ -23,7 +22,7 @@ public interface IZoteroConnector {
 
     ZoteroResponse<Group> getGroupsVersions(IUser user);
 
-    ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit, String sortBy);
+    ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit, String sortBy, Long lastGroupVersion);
 
     Group getGroup(IUser user, String groupId, boolean forceRefresh);
 
