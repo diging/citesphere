@@ -2,6 +2,8 @@ package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
@@ -25,13 +27,15 @@ public interface IZoteroConnector {
 
     Group getGroup(IUser user, String groupId, boolean forceRefresh);
 
-    Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException;
+    Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields, List<String> validCreatorTypes) throws ZoteroConnectionException;
 
     FieldInfo[] getFields(IUser user, String itemType);
 
     long getItemVersion(IUser user, String groupId, String itemKey);
 
-    Item createItem(IUser user, Item item, String groupId, List<String> ignoreFields)
+    Item createItem(IUser user, Item item, String groupId, List<String> ignoreFields, List<String> validCreatorTypes)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException;
+
+    CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType);
 
 }

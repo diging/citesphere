@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.Data;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
@@ -121,10 +122,12 @@ public class ZoteroManager implements IZoteroManager {
         // add fields that need to be submitted
         itemTypeFields.add(ZoteroFields.VERSION);
         itemTypeFields.add(ZoteroFields.ITEM_TYPE);
+        itemTypeFields.add(ZoteroFields.CREATOR);
         
         List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, false);
+        List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
         
-        Item updatedItem = zoteroConnector.updateItem(user, item, groupId, ignoreFields);
+        Item updatedItem = zoteroConnector.updateItem(user, item, groupId, ignoreFields, validCreatorTypes);
         return citationFactory.createCitation(updatedItem);
     }
     
@@ -134,10 +137,12 @@ public class ZoteroManager implements IZoteroManager {
         
         List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
         itemTypeFields.add(ZoteroFields.ITEM_TYPE);
+        itemTypeFields.add(ZoteroFields.CREATOR);
         
         List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, true);
+        List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
         
-        Item newItem = zoteroConnector.createItem(user, item, groupId, ignoreFields);
+        Item newItem = zoteroConnector.createItem(user, item, groupId, ignoreFields, validCreatorTypes);
         return citationFactory.createCitation(newItem);
     }
     
@@ -196,5 +201,14 @@ public class ZoteroManager implements IZoteroManager {
         }
         
         return itemTypeFields;
+    }
+    
+    private List<String> getValidCreatorTypes(IUser user, ItemType itemType) {
+        CreatorType[] creatorTypes = zoteroConnector.getItemTypeCreatorTypes(user, itemType.getZoteroKey());
+        List<String> validTypes = new ArrayList<>();
+        for (CreatorType type : creatorTypes) {
+            validTypes.add(type.getCreatorType());
+        }
+        return validTypes;
     }
 }
