@@ -7,7 +7,7 @@
 
 <style>
 .popover {
-	min-width: 150px;
+	min-width: 200px;
 }
 </style>
 <script>
@@ -130,11 +130,25 @@ $(function() {
 	    	getAuthority(uri);
 	    }, 1000);
 	});
+	
+	$("#iconContainer").on('click', ".popover #createAuthority", function() {
+		var uri = $("#uriLoadingFound").data('authority-uri');
+		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
+			$("#createAuthority").hide();
+			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+		});
+	});
 });
+
 
 function getAuthority(uri) {
 	$.get('<c:url value="/auth/authority/get?uri=" />' + uri, function(data) {
-		$("#uriLoadingFound").attr("data-content", "We found the following information:<br><b>Name: </b> " + data['name'] + "<br><b>URI: </b>" + data['uri']);
+		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
+		$("#uriLoadingFound").attr("data-content", "We found the following information:<br><b>Name: </b> " 
+				+ data['name'] + "<br><b>URI: </b>" + data['uri'] + 
+				"<br><br>Do you want to create a managed authority entry?<br>" +
+						'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes!</b></button></span>');
+		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
 		$("#uriLoadingFound").show();
 		$("#uriLoadingFound").popover('show');
 	})
@@ -336,7 +350,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
-			    <div class="input-group-addon" style="min-width: 35px;">
+			    <div id="iconContainer" class="input-group-addon" style="min-width: 35px;">
 			    	<i id="uriLoadingSpinner" class="fas fa-spinner fa-spin text-info"></i>
 			    	<i id="uriLoadingFound" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
 			    	<i id="uriLoadingFailure" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>

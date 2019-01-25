@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.authority.impl;
+package edu.asu.diging.citesphere.core.authority.impl;
 
 import java.util.List;
 import java.util.Map;

@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.core.model.authority.impl;
 
+import java.time.OffsetDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -21,6 +23,9 @@ public class AuthorityEntry implements IAuthorityEntry {
     private String id;
     private String name;
     private String uri;
+    private String importerId;
+    private String username;
+    private OffsetDateTime createdOn;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.authority.impl.IAuthorityEntry#getId()
@@ -63,5 +68,29 @@ public class AuthorityEntry implements IAuthorityEntry {
     @Override
     public void setUri(String uri) {
         this.uri = uri;
+    }
+    @Override
+    public String getImporterId() {
+        return importerId;
+    }
+    @Override
+    public void setImporterId(String importerId) {
+        this.importerId = importerId;
+    }
+    @Override
+    public String getUsername() {
+        return username;
+    }
+    @Override
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    @Override
+    public OffsetDateTime getCreatedOn() {
+        return createdOn;
+    }
+    @Override
+    public void setCreatedOn(OffsetDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 }

@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.authority.impl;
+package edu.asu.diging.citesphere.core.authority.impl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -10,6 +10,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,13 +21,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import edu.asu.diging.citesphere.authority.IImportedAuthority;
-import edu.asu.diging.citesphere.authority.impl.ViafResponse.Data;
+import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
+import edu.asu.diging.citesphere.core.authority.impl.ViafResponse.Data;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 
 @Component
 @PropertySource(value="classpath:/config.properties")
 public class ViafAuthorityImporter extends BaseAuthorityImporter {
+    
+    private final String ID = "authority.importer.viaf";
 
     @Value("${_viaf_url_regex}")
     private String viafUrlRegex;
@@ -50,6 +53,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
      * @see edu.asu.diging.citesphere.authority.impl.AuthorityImporter#retrieveAuthorityData(java.lang.String)
      */
     @Override
+    @Cacheable("viafAuthorities")
     public IImportedAuthority retrieveAuthorityData(String uri) throws URISyntaxException, AuthorityServiceConnectionException {
         RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -81,5 +85,10 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
             }
         }
         return null;
+    }
+    
+    @Override
+    public String getId() {
+        return ID;
     }
 }

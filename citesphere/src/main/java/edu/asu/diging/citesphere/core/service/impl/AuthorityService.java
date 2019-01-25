@@ -1,24 +1,30 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
 import java.net.URISyntaxException;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 
-import edu.asu.diging.citesphere.authority.AuthorityImporter;
-import edu.asu.diging.citesphere.authority.IImportedAuthority;
+import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
+import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
+import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.core.model.authority.impl.AuthorityEntry;
+import edu.asu.diging.citesphere.core.repository.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 
 @Service
 public class AuthorityService implements IAuthorityService {
 
+    @Autowired
+    private AuthorityEntryRepository entryRepository;
+    
     private Set<AuthorityImporter> importers;
     
     @PostConstruct
@@ -49,9 +55,17 @@ public class AuthorityService implements IAuthorityService {
                 IAuthorityEntry entry = new AuthorityEntry();
                 entry.setName(importedAuthority.getName());
                 entry.setUri(importedAuthority.getUri());
+                entry.setImporterId(importer.getId());
                 return entry;
             }
         }
         return null;
+    }
+    
+    @Override
+    public IAuthorityEntry save(IAuthorityEntry entry, IUser user) {
+        entry.setUsername(user.getUsername());
+        entry.setCreatedOn(OffsetDateTime.now());
+        return (IAuthorityEntry) entryRepository.save((AuthorityEntry)entry);
     }
 }
