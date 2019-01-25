@@ -2,10 +2,8 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +54,11 @@ public class AuthorityService implements IAuthorityService {
             }
         }
         return null;
+    }
+    
+    @Override
+    public List<IAuthorityEntry> getAll(IUser user) {
+        return entryRepository.findByUsernameOrderByName(user.getUsername());
     }
     
     @Override
