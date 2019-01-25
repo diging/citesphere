@@ -18,10 +18,4 @@ public abstract class BaseAuthorityImporter implements AuthorityImporter {
     public RestTemplate getRestTemplate() {
         return restTemplate;
     }
-
-    @Override
-    public String getId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }
