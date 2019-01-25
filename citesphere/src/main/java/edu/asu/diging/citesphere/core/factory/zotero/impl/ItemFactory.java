@@ -87,7 +87,7 @@ public class ItemFactory implements IItemFactory {
             // FIXME: hadnle this
             logger.error("Could not serialize extra data.", e1);
         }
-
+        
         return item;
     }
     
@@ -98,7 +98,7 @@ public class ItemFactory implements IItemFactory {
         extraDataObject.setEditors(citation.getEditors());
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
-
+        
         String extraData = "";
         String citesphereData = ExtraData.CITESPHERE_PREFIX + " " + extraDataAsJson + "\n";
         if (citation.getExtra() != null && !citation.getExtra().trim().isEmpty()) {
@@ -116,7 +116,7 @@ public class ItemFactory implements IItemFactory {
             // if there is no extra data
             extraData = citesphereData;
         }
-
+        
         data.setExtra(extraData);
     }
 }

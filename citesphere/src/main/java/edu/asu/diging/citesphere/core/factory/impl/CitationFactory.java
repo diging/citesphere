@@ -93,7 +93,7 @@ public class CitationFactory implements ICitationFactory {
         citation.setShortTitle(item.getData().getShortTitle());
         
         citation.setDateAdded(item.getData().getDateAdded());
-
+        
         parseExtra(data, citation);
         return citation;
     }
@@ -175,7 +175,6 @@ public class CitationFactory implements ICitationFactory {
                             person.getAffiliations().add(affiliation);
                         });
                     }
-                    person.getAffiliations().forEach(aff -> {System.out.println("person "+aff.getName());});
                     extraEditors.add(person);
                 });
 

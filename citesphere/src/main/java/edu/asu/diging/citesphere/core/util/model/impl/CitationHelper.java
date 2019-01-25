@@ -23,7 +23,7 @@ public class CitationHelper implements ICitationHelper {
     /*
      * (non-Javadoc)
      * 
-     * @see 
+     * @see
      * edu.asu.diging.citesphere.core.util.model.impl.ICitationHelper#updateCitation
      * (edu.asu.diging.citesphere.core.model.bib.ICitation,
      * edu.asu.diging.citesphere.web.forms.CitationForm)
