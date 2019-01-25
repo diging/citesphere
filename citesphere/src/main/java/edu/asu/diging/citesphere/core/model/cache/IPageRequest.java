@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.model.cache;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import edu.asu.diging.citesphere.core.model.IUser;
@@ -43,5 +44,9 @@ public interface IPageRequest {
     void setSortBy(String sortBy);
 
     String getSortBy();
+
+    void setLastUpdated(OffsetDateTime lastUpdated);
+
+    OffsetDateTime getLastUpdated();
 
 }

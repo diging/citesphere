@@ -17,7 +17,7 @@ public interface IZoteroManager {
 
     List<ICitationGroup> getGroups(IUser user);
 
-    CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy);
+    CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion);
 
     ICitation getGroupItem(IUser user, String groupId, String itemKey);
 

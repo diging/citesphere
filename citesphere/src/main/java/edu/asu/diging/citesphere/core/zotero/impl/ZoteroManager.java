@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.lang.reflect.Field;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,15 +50,21 @@ public class ZoteroManager implements IZoteroManager {
     @Autowired
     private IItemFactory itemFactory;
         
-    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy) {
-        ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page, sortBy);
+    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
+        ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page, sortBy, lastGroupVersion);
         List<ICitation> citations = new ArrayList<>();
-        for (Item item : response.getResults()) {
-            citations.add(citationFactory.createCitation(item));
+        if (response.getResults() != null) {
+            for (Item item : response.getResults()) {
+                citations.add(citationFactory.createCitation(item));
+            }
         }
         CitationResults results = new CitationResults();
-        results.setCitations(citations);
         results.setTotalResults(response.getTotalResults());
+        if (response.getNotModified() != null && response.getNotModified()) {
+            results.setNotModified(true);
+            return results;
+        }
+        results.setCitations(citations);
         return results;
     }
 
@@ -67,7 +74,7 @@ public class ZoteroManager implements IZoteroManager {
         List<ICitationGroup> groups = new ArrayList<>();
         for (Group group : response.getResults()) {
             ICitationGroup citGroup = groupFactory.createGroup(group);
-            ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1, null);
+            ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1, null, null);
             citGroup.setNumItems(groupItems.getTotalResults());
             groups.add(citGroup);
         }
@@ -98,7 +105,7 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public ICitationGroup getGroup(IUser user, String groupId, boolean forceRefresh) {
         Group group = zoteroConnector.getGroup(user, groupId, forceRefresh);
-        ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1, null);
+        ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, group.getId() + "", 1, null, null);
         ICitationGroup citGroup = groupFactory.createGroup(group);
         citGroup.setNumItems(groupItems.getTotalResults());
         return citGroup;
