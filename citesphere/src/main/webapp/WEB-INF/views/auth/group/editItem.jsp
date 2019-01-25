@@ -203,6 +203,8 @@ $(function() {
 		affiliationCopy.removeAttr("id");
 		affiliationCopy.find("input").val("");
 		$("#editorAffiliations").append(affiliationCopy);
+	});
+	
 	var timer = null;
 	$("#uriAuthor").change(function() {
 		resetAuthorAuthorityCreation();

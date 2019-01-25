@@ -121,8 +121,6 @@ public class CitationFactory implements ICitationFactory {
             String extraMatch = match.group(1);
             JsonParser parser = new JsonParser();
             JsonObject jObj = parser.parse(extraMatch).getAsJsonObject();
-<<<<<<< HEAD
-
             if (jObj.has("authors") && !jObj.get("authors").isJsonNull()) {
                 JsonArray authors = jObj.get("authors").getAsJsonArray();
                 mapPersonFields(authors, citation, "author");
