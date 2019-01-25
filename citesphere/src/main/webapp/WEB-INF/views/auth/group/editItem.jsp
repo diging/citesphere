@@ -5,9 +5,21 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
+<style>
+.popover {
+	min-width: 150px;
+}
+</style>
 <script>
 //@ sourceURL=submit.js
 $(function() {
+	$("#uriLoadingSpinner").hide();
+	$("#uriLoadingFailure").hide();
+	$("#uriLoadingFound").hide();
+	
+	$("#uriLoadingFound").popover();
+	$("#uriLoadingFailure").popover();
+	
 	$("#submitForm").click(function() {
 		$(".author-item").each(function(idx, author) {
 			var authorIdField = $("<input>");
@@ -104,7 +116,36 @@ $(function() {
 		affiliationCopy.find("input").val("");
 		$("#affiliations").append(affiliationCopy);
 	});
+	
+	var timer = null;
+	$("#uriAuthor").change(function() {
+		$("#uriLoadingFound").hide();
+		$("#uriLoadingFailure").hide();
+		$("#uriLoadingSpinner").show();
+		$("#uriLoadingFound").popover('hide');
+		$("#uriLoadingFailure").popover('hide');
+		var uri = $("#uriAuthor").val();
+		clearTimeout(timer); 
+	    timer = setTimeout(function() {
+	    	getAuthority(uri);
+	    }, 1000);
+	});
 });
+
+function getAuthority(uri) {
+	$.get('<c:url value="/auth/authority/get?uri=" />' + uri, function(data) {
+		$("#uriLoadingFound").attr("data-content", "We found the following information:<br><b>Name: </b> " + data['name'] + "<br><b>URI: </b>" + data['uri']);
+		$("#uriLoadingFound").show();
+		$("#uriLoadingFound").popover('show');
+	})
+	.fail(function() {
+		$("#uriLoadingFailure").show();
+	 })
+    .always(function() {
+    	$("#uriLoadingSpinner").hide();
+	 });
+
+}
 
 let removeAuthor = function removeAuthor(e) {
 	var deleteIcon = e.currentTarget;
@@ -293,7 +334,14 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 		  </div>
 		  <div class="form-group">
 		    <label for="uriAuthor">URI:</label>
-		    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
+			    <div class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinner" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFound" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailure" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+		    </div>
 		  </div>
 		  <div id="affiliations">
 		  <div id="affiliationTemplate" class="form-group">
