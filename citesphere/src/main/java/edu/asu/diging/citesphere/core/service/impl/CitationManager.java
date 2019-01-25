@@ -28,6 +28,7 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedExcepti
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.ZoteroObjectType;
 import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
@@ -119,10 +120,8 @@ public class CitationManager implements ICitationManager {
             }
         }
         citation = customCitationRepository.mergeCitation(citation);
-        System.out.println("in update "+citation.getEditors());
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         // save updated info
-        System.out.println("after update "+updatedCitation.getEditors());
         citationRepository.delete((Citation)citation);
         citationRepository.save((Citation)updatedCitation);
     }
