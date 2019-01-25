@@ -122,70 +122,58 @@ public class CitationFactory implements ICitationFactory {
             JsonParser parser = new JsonParser();
             JsonObject jObj = parser.parse(extraMatch).getAsJsonObject();
 
-            if(jObj.has("authors") && !jObj.get("authors").isJsonNull()) {
-                
-                List<Person> extraAuthors = new ArrayList<>();
-                List<String> authorNames = new ArrayList<>();
+            if (jObj.has("authors") && !jObj.get("authors").isJsonNull()) {
                 JsonArray authors = jObj.get("authors").getAsJsonArray();
-                
-                authors.forEach(a -> {
-                    Person person = new Person();
-                    person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
-                    person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
-                    person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
-                    authorNames.add(person.getFirstName() + person.getLastName());
-                    person.setAffiliations(new HashSet<>());
-                    JsonElement affiliations = a.getAsJsonObject().get("affiliations");
-                    if (affiliations instanceof JsonArray) {
-                        affiliations.getAsJsonArray().forEach(af -> {
-                            Affiliation affiliation = new Affiliation();
-                            affiliation.setName(af.getAsJsonObject().get("name") != null && !af.getAsJsonObject().get("name").isJsonNull() ? af.getAsJsonObject().get("name").getAsString() : "");
-                            affiliation.setUri(af.getAsJsonObject().get("uri") != null && !af.getAsJsonObject().get("uri").isJsonNull() ? af.getAsJsonObject().get("uri").getAsString() : "");
-                            person.getAffiliations().add(affiliation);
-                        });
-                    }
-                    extraAuthors.add(person);
-                });
-                for (Iterator<IPerson> iterator = citation.getAuthors().iterator(); iterator.hasNext();) {
-                    IPerson author = iterator.next();
-                    if (authorNames.contains(author.getFirstName() + author.getLastName())) {
-                        iterator.remove();
-                    }
-                }
-                extraAuthors.forEach(a -> citation.getAuthors().add(a));
+                mapPersonFields(authors, citation, "author");
             }
-            
-            if(jObj.has("editors") && !jObj.get("editors").isJsonNull()) {
-                List<Person> extraEditors = new ArrayList<>();
-                List<String> editorNames = new ArrayList<>();
-                JsonArray editors = jObj.get("editors").getAsJsonArray();
-                editors.forEach(a -> {
-                    Person person = new Person();
-                    person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
-                    person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
-                    person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
-                    editorNames.add(person.getFirstName() + person.getLastName());
-                    person.setAffiliations(new HashSet<>());
-                    JsonElement affiliations = a.getAsJsonObject().get("affiliations");
-                    if (affiliations instanceof JsonArray) {
-                        affiliations.getAsJsonArray().forEach(af -> {
-                            Affiliation affiliation = new Affiliation();
-                            affiliation.setName(af.getAsJsonObject().get("name") != null && !af.getAsJsonObject().get("name").isJsonNull() ? af.getAsJsonObject().get("name").getAsString() : "");
-                            affiliation.setUri(af.getAsJsonObject().get("uri") != null && !af.getAsJsonObject().get("uri").isJsonNull() ? af.getAsJsonObject().get("uri").getAsString() : "");
-                            person.getAffiliations().add(affiliation);
-                        });
-                    }
-                    extraEditors.add(person);
-                });
 
-                for (Iterator<IPerson> iterator = citation.getEditors().iterator(); iterator.hasNext();) {
-                    IPerson editor = iterator.next();
-                    if (editorNames.contains(editor.getFirstName() + editor.getLastName())) {
-                        iterator.remove();
-                    }
-                }
-                extraEditors.forEach(a -> citation.getEditors().add(a));
+            if (jObj.has("editors") && !jObj.get("editors").isJsonNull()) {
+                JsonArray editors = jObj.get("editors").getAsJsonArray();
+                mapPersonFields(editors, citation, "editor");
             }
+        }
+    }
+
+    private void mapPersonFields(JsonArray personList, ICitation citation, String personType) {
+        List<Person> extraPersonList = new ArrayList<>();
+        List<String> personNames = new ArrayList<>();
+        personList.forEach(a -> {
+            Person person = new Person();
+            person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
+            person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
+            person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
+            personNames.add(person.getFirstName() + person.getLastName());
+            person.setAffiliations(new HashSet<>());
+            JsonElement affiliations = a.getAsJsonObject().get("affiliations");
+            if (affiliations instanceof JsonArray) {
+                affiliations.getAsJsonArray().forEach(af -> {
+                    Affiliation affiliation = new Affiliation();
+                    affiliation.setName(af.getAsJsonObject().get("name") != null && !af.getAsJsonObject().get("name").isJsonNull() ? af.getAsJsonObject().get("name").getAsString() : "");
+                    affiliation.setUri(af.getAsJsonObject().get("uri") != null && !af.getAsJsonObject().get("uri").isJsonNull() ? af.getAsJsonObject().get("uri").getAsString() : "");
+                    person.getAffiliations().add(affiliation);
+                });
+            }
+            extraPersonList.add(person);
+        });
+
+        if (personType.equals("author")) {
+            for (Iterator<IPerson> iterator = citation.getAuthors().iterator(); iterator
+                    .hasNext();) {
+                IPerson author = iterator.next();
+                if (personNames.contains(author.getFirstName() + author.getLastName())) {
+                    iterator.remove();
+                }
+            }
+            extraPersonList.forEach(a -> citation.getAuthors().add(a));
+        } else if (personType.equals("editor")) {
+            for (Iterator<IPerson> iterator = citation.getEditors().iterator(); iterator
+                    .hasNext();) {
+                IPerson editor = iterator.next();
+                if (personNames.contains(editor.getFirstName() + editor.getLastName())) {
+                    iterator.remove();
+                }
+            }
+            extraPersonList.forEach(a -> citation.getEditors().add(a));
         }
     }
 }
