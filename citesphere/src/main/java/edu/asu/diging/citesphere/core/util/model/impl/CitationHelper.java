@@ -23,8 +23,7 @@ public class CitationHelper implements ICitationHelper {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * edu.asu.diging.citesphere.core.util.model.impl.ICitationHelper#updateCitation
+     * @see edu.asu.diging.citesphere.core.util.model.impl.ICitationHelper#updateCitation
      * (edu.asu.diging.citesphere.core.model.bib.ICitation,
      * edu.asu.diging.citesphere.web.forms.CitationForm)
      */
@@ -68,7 +67,8 @@ public class CitationHelper implements ICitationHelper {
                 }
                 person.setFirstName(personForm.getFirstName());
                 person.setLastName(personForm.getLastName());
-                person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
+                person.setName(
+                        String.join(" ", personForm.getFirstName(), personForm.getLastName()));
 
                 Map<String, IAffiliation> affiliationMap = new HashMap<>();
                 if (person.getAffiliations() != null) {
@@ -91,11 +91,11 @@ public class CitationHelper implements ICitationHelper {
                 citation.getAuthors().add(person);
             }
         }
-        
+
         Map<String, IPerson> editorMap = new HashMap<>();
         citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
         citation.setEditors(new HashSet<>());
-        if(form.getEditors()!=null) {
+        if (form.getEditors() != null) {
             for (PersonForm personForm : form.getEditors()) {
                 IPerson person;
                 if (personForm.getId() != null && !personForm.getId().isEmpty()) {
@@ -105,8 +105,9 @@ public class CitationHelper implements ICitationHelper {
                 }
                 person.setFirstName(personForm.getFirstName());
                 person.setLastName(personForm.getLastName());
-                person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
-                
+                person.setName(
+                        String.join(" ", personForm.getFirstName(), personForm.getLastName()));
+
                 Map<String, IAffiliation> affiliationMap = new HashMap<>();
                 if (person.getAffiliations() != null) {
                     person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
