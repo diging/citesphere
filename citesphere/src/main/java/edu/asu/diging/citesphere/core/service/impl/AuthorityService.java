@@ -25,12 +25,8 @@ public class AuthorityService implements IAuthorityService {
     @Autowired
     private AuthorityEntryRepository entryRepository;
     
+    @Autowired
     private Set<AuthorityImporter> importers;
-    
-    @PostConstruct
-    public void init() {
-        importers = new HashSet<>();
-    }
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.impl.IAuthorityService#register(edu.asu.diging.citesphere.authority.AuthorityImporter)

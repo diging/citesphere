@@ -102,9 +102,12 @@ $(function() {
 		$("#authorList").append("&nbsp;&nbsp; ")
 		
 		$("#authorModal").modal('hide');
-		$("#firstNameAuthor").val("");
-		$("#lastNameAuthor").val("");
-		$("#affiliationTemplate").find("input").val("");
+		resetAuthorCreationModal();
+	});
+	
+	$("#addAuthorModalCancel").click(function() {
+		$("#authorModal").modal('hide');
+		resetAuthorCreationModal();
 	});
 	
 	$(".remove-author").click(removeAuthor);
@@ -119,11 +122,8 @@ $(function() {
 	
 	var timer = null;
 	$("#uriAuthor").change(function() {
-		$("#uriLoadingFound").hide();
-		$("#uriLoadingFailure").hide();
+		resetAuthorAuthorityCreation();
 		$("#uriLoadingSpinner").show();
-		$("#uriLoadingFound").popover('hide');
-		$("#uriLoadingFailure").popover('hide');
 		var uri = $("#uriAuthor").val();
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
@@ -140,6 +140,21 @@ $(function() {
 	});
 });
 
+function resetAuthorCreationModal() {
+	$("#firstNameAuthor").val("");
+	$("#lastNameAuthor").val("");
+	$("#affiliationTemplate").find("input").val("");
+	$("#uriAuthor").val("");
+	resetAuthorAuthorityCreation();
+}
+
+function resetAuthorAuthorityCreation() {
+	$("#uriLoadingFound").hide();
+	$("#uriLoadingFailure").hide();
+	$("#uriLoadingSpinner").hide();
+	$("#uriLoadingFound").popover('hide');
+	$("#uriLoadingFailure").popover('hide');
+}
 
 function getAuthority(uri) {
 	$.get('<c:url value="/auth/authority/get?uri=" />' + uri, function(data) {
@@ -369,7 +384,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
       </div>
       
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default" id="addAuthorModalCancel">Close</button>
         <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
       </div>
     </div>
