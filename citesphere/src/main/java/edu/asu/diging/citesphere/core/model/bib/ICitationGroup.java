@@ -65,4 +65,8 @@ public interface ICitationGroup {
 
     OffsetDateTime getUpdatedOn();
 
+    void setLastLocallyModifiedOn(OffsetDateTime lastLocallyModifiedOn);
+
+    OffsetDateTime getLastLocallyModifiedOn();
+
 }

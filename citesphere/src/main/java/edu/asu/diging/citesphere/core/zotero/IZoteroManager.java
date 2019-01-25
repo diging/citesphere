@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
@@ -16,7 +17,7 @@ public interface IZoteroManager {
 
     List<ICitationGroup> getGroups(IUser user);
 
-    CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy);
+    CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion);
 
     ICitation getGroupItem(IUser user, String groupId, String itemKey);
 
@@ -29,5 +30,8 @@ public interface IZoteroManager {
     List<BibField> getFields(IUser user, ItemType itemType);
 
     long getGroupItemVersion(IUser user, String groupId, String itemKey);
+
+    ICitation createCitation(IUser user, String groupId, ICitation citation)
+            throws ZoteroConnectionException, ZoteroItemCreationFailedException;
 
 }

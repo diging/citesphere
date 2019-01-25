@@ -6,6 +6,7 @@ import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
@@ -30,5 +31,8 @@ public interface ICitationManager {
     void detachCitation(ICitation citation);
 
     ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey);
+
+    ICitation createCitation(IUser user, String groupId, ICitation citation)
+            throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException;
 
 }

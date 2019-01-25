@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.model.cache.impl;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -63,6 +64,8 @@ public class PageRequest implements IPageRequest {
     @ManyToMany(targetEntity=Citation.class)
     private List<ICitation> citations;
     private String sortBy;
+    
+    private OffsetDateTime lastUpdated;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.IPageRequest#getId()
@@ -177,6 +180,14 @@ public class PageRequest implements IPageRequest {
     @Override
     public void setSortBy(String sortBy) {
         this.sortBy = sortBy;
+    }
+    @Override
+    public OffsetDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+    @Override
+    public void setLastUpdated(OffsetDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
     
 }

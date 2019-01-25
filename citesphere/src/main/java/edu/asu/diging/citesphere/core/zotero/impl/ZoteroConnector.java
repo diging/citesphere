@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -10,15 +11,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.oauth1.OAuthToken;
+import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
+import org.springframework.social.zotero.api.ItemCreationResponse;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Component;
 
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
@@ -42,25 +46,25 @@ public class ZoteroConnector implements IZoteroConnector {
      * @see edu.asu.diging.citesphere.core.service.impl.IZoteroConnector#getGroupItems(edu.asu.diging.citesphere.core.model.IUser, java.lang.String, int)
      */
     @Override
-    @Cacheable(value="groupItems", key="#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy")
-    public ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page, String sortBy) {
+    @Cacheable(value="groupItems", key="#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
+    public ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
         Zotero zotero = getApi(user);
         if (page < 1) {
             page = 0;
         } else  {
             page = page-1;
         }
-        return zotero.getGroupsOperations().getGroupItemsTop(groupId, page*zoteroPageSize, zoteroPageSize, sortBy);          
+        return zotero.getGroupsOperations().getGroupItemsTop(groupId, page*zoteroPageSize, zoteroPageSize, sortBy, lastGroupVersion);          
     }
     
     @Override
     @Cacheable(value="groupItemsLimit", key="#user.username + '_' + #groupId + '_' + #limit + '_' + #sortBy")
-    public ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit, String sortBy) {
+    public ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit, String sortBy, Long lastGroupVersion) {
         Zotero zotero = getApi(user);
         if (limit < 1) {
             limit = 1;
         }
-        return zotero.getGroupsOperations().getGroupItemsTop(groupId, 0 , 1, sortBy);          
+        return zotero.getGroupsOperations().getGroupItemsTop(groupId, 0 , 1, sortBy, lastGroupVersion);          
     }
     
     /* (non-Javadoc)
@@ -94,9 +98,9 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    public Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException {
+    public Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields, List<String> validCreatorTypes) throws ZoteroConnectionException {
         Zotero zotero = getApi(user);
-        zotero.getGroupsOperations().updateItem(groupId, item, ignoreFields);
+        zotero.getGroupsOperations().updateItem(groupId, item, ignoreFields, validCreatorTypes);
         // it seems like Zotero needs a minute to process the submitted data
         // so let's wait a second before retrieving updated data
         try {
@@ -109,6 +113,29 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
+    public Item createItem(IUser user, Item item, String groupId, List<String> ignoreFields, List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+        Zotero zotero = getApi(user);
+        ItemCreationResponse response = zotero.getGroupsOperations().createItem(groupId, item, ignoreFields, validCreatorTypes);
+        
+        // let's give Zotero a minute to process
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not sleep.", e);
+            // well if something goes wrong here, let's just ignore it
+        }
+        
+        Map<String, String> success = response.getSuccess();
+        if (success.isEmpty()) {
+            logger.error("Could not create item: " + response.getFailed().get("0"));
+            throw new ZoteroItemCreationFailedException(response);
+        }
+        
+        // since we only submitted one item, there should only be one in the map
+        return getItem(user, groupId, success.values().iterator().next());
+    }
+    
+    @Override
     public long getItemVersion(IUser user, String groupId, String itemKey) {
         Zotero zotero = getApi(user);
         return zotero.getGroupsOperations().getGroupItemVersion(groupId, itemKey);
@@ -118,6 +145,12 @@ public class ZoteroConnector implements IZoteroConnector {
     @Cacheable(value="itemTypeFields", key="#itemType")
     public FieldInfo[] getFields(IUser user, String itemType) {
         return getApi(user).getItemTypesOperations().getFields(itemType);
+    }
+    
+    @Override
+    @Cacheable(value="itemTypeCreatorTypes", key="#itemType")
+    public CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType) {
+        return getApi(user).getItemTypesOperations().getCreatorTypes(itemType);
     }
     
     private Zotero getApi(IUser user) {
