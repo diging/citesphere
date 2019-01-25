@@ -94,6 +94,7 @@ public class ItemFactory implements IItemFactory {
         
         ExtraDataObject extraDataObject = new ExtraDataObject();
         extraDataObject.setAuthors(citation.getAuthors());
+        extraDataObject.setEditors(citation.getEditors());
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
         String extraData = "";
