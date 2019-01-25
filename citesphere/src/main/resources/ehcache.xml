@@ -51,4 +51,9 @@
       <heap unit="entries">500</heap>
     </resources>
   </cache>
+  <cache alias="viafAuthorities">
+    <resources>
+      <heap unit="entries">2000</heap>
+    </resources>
+  </cache>
 </config>

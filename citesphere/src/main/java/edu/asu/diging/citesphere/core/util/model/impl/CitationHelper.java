@@ -69,7 +69,8 @@ public class CitationHelper implements ICitationHelper {
                 person.setFirstName(personForm.getFirstName());
                 person.setLastName(personForm.getLastName());
                 person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
-
+                person.setUri(personForm.getUri());
+                
                 Map<String, IAffiliation> affiliationMap = new HashMap<>();
                 if (person.getAffiliations() != null) {
                     person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
