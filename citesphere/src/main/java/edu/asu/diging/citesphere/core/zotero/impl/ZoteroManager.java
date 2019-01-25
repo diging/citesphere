@@ -124,7 +124,6 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException {
         Item item = itemFactory.createItem(citation);
-        
         List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
         // add fields that need to be submitted
         itemTypeFields.add(ZoteroFields.VERSION);

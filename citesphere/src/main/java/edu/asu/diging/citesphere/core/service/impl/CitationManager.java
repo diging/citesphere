@@ -28,6 +28,7 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedExcepti
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.ZoteroObjectType;
 import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
