@@ -93,6 +93,7 @@ public class CitationFactory implements ICitationFactory {
         citation.setShortTitle(item.getData().getShortTitle());
         
         citation.setDateAdded(item.getData().getDateAdded());
+
         parseExtra(data, citation);
         return citation;
     }
@@ -121,9 +122,10 @@ public class CitationFactory implements ICitationFactory {
             JsonParser parser = new JsonParser();
             JsonObject jObj = parser.parse(extraMatch).getAsJsonObject();
 
-            List<Person> extraAuthors = new ArrayList<>();
-            List<String> authorNames = new ArrayList<>();
             if(jObj.has("authors") && !jObj.get("authors").isJsonNull()) {
+                
+                List<Person> extraAuthors = new ArrayList<>();
+                List<String> authorNames = new ArrayList<>();
                 JsonArray authors = jObj.get("authors").getAsJsonArray();
                 
                 authors.forEach(a -> {
@@ -144,18 +146,18 @@ public class CitationFactory implements ICitationFactory {
                     }
                     extraAuthors.add(person);
                 });
-            }
-            for (Iterator<IPerson> iterator = citation.getAuthors().iterator(); iterator.hasNext();) {
-                IPerson author = iterator.next();
-                if (authorNames.contains(author.getFirstName() + author.getLastName())) {
-                    iterator.remove();
+                for (Iterator<IPerson> iterator = citation.getAuthors().iterator(); iterator.hasNext();) {
+                    IPerson author = iterator.next();
+                    if (authorNames.contains(author.getFirstName() + author.getLastName())) {
+                        iterator.remove();
+                    }
                 }
+                extraAuthors.forEach(a -> citation.getAuthors().add(a));
             }
-            extraAuthors.forEach(a -> citation.getAuthors().add(a));
-
-            List<Person> extraEditors = new ArrayList<>();
-            List<String> editorNames = new ArrayList<>();
+            
             if(jObj.has("editors") && !jObj.get("editors").isJsonNull()) {
+                List<Person> extraEditors = new ArrayList<>();
+                List<String> editorNames = new ArrayList<>();
                 JsonArray editors = jObj.get("editors").getAsJsonArray();
                 editors.forEach(a -> {
                     Person person = new Person();
@@ -176,7 +178,7 @@ public class CitationFactory implements ICitationFactory {
                     person.getAffiliations().forEach(aff -> {System.out.println("person "+aff.getName());});
                     extraEditors.add(person);
                 });
-            }
+
                 for (Iterator<IPerson> iterator = citation.getEditors().iterator(); iterator.hasNext();) {
                     IPerson editor = iterator.next();
                     if (editorNames.contains(editor.getFirstName() + editor.getLastName())) {
@@ -184,6 +186,7 @@ public class CitationFactory implements ICitationFactory {
                     }
                 }
                 extraEditors.forEach(a -> citation.getEditors().add(a));
+            }
         }
     }
 }

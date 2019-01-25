@@ -23,7 +23,8 @@ public class CitationHelper implements ICitationHelper {
     /*
      * (non-Javadoc)
      * 
-     * @see edu.asu.diging.citesphere.core.util.model.impl.ICitationHelper#updateCitation
+     * @see 
+     * edu.asu.diging.citesphere.core.util.model.impl.ICitationHelper#updateCitation
      * (edu.asu.diging.citesphere.core.model.bib.ICitation,
      * edu.asu.diging.citesphere.web.forms.CitationForm)
      */
@@ -67,8 +68,7 @@ public class CitationHelper implements ICitationHelper {
                 }
                 person.setFirstName(personForm.getFirstName());
                 person.setLastName(personForm.getLastName());
-                person.setName(
-                        String.join(" ", personForm.getFirstName(), personForm.getLastName()));
+                person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
 
                 Map<String, IAffiliation> affiliationMap = new HashMap<>();
                 if (person.getAffiliations() != null) {
@@ -105,8 +105,7 @@ public class CitationHelper implements ICitationHelper {
                 }
                 person.setFirstName(personForm.getFirstName());
                 person.setLastName(personForm.getLastName());
-                person.setName(
-                        String.join(" ", personForm.getFirstName(), personForm.getLastName()));
+                person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
 
                 Map<String, IAffiliation> affiliationMap = new HashMap<>();
                 if (person.getAffiliations() != null) {
