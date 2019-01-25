@@ -70,6 +70,9 @@
  <c:if test="${not empty author.affiliations}">
  (<c:forEach items="${author.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
  </c:if>
+ <c:if test="${not empty author.uri}">
+ <a href="${author.uri}" target="_blank"><i class="fas fa-link"></i></a>
+ </c:if>
  </c:forEach>
 </td>
 </tr>

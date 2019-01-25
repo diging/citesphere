@@ -5,9 +5,21 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
+<style>
+.popover {
+	min-width: 200px;
+}
+</style>
 <script>
 //@ sourceURL=submit.js
 $(function() {
+	$("#uriLoadingSpinner").hide();
+	$("#uriLoadingFailure").hide();
+	$("#uriLoadingFound").hide();
+	
+	$("#uriLoadingFound").popover();
+	$("#uriLoadingFailure").popover();
+	
 	$("#submitForm").click(function() {
 		$(".author-item").each(function(idx, author) {
 			var authorIdField = $("<input>");
@@ -30,6 +42,13 @@ $(function() {
 			authorLastNameField.attr("name", "authors[" + idx + "].lastName");
 			authorLastNameField.attr("value", $(author).data("author-lastname"));
 			$("#editForm").append(authorLastNameField);
+			
+			var authorUriField = $("<input>");
+			authorUriField.attr("type", "hidden");
+			authorUriField.attr("id", "authors" + idx + ".uri");
+			authorUriField.attr("name", "authors[" + idx + "].uri");
+			authorUriField.attr("value", $(author).data("author-uri"));
+			$("#editForm").append(authorUriField);
 			
 			$(author).children("span").each(function(idx2, affiliation) {
 				var affiliationField = $("<input>");
@@ -90,11 +109,13 @@ $(function() {
 	$("#addAuthorButton").click(function() {
 		var firstname = $("#firstNameAuthor").val();
 		var lastname = $("#lastNameAuthor").val();
+		var uri = $("#uriAuthor").val();
 		
 		var authorSpan = $("<span>");
 		authorSpan.attr("class", "label label-primary author-item");
 		authorSpan.attr("data-author-firstname", firstname);
 		authorSpan.attr("data-author-lastname", lastname);
+		authorSpan.attr("data-author-uri", uri);
 		
 		var affiliationsList = [];
 		var affSpan = $("<span>");
@@ -119,9 +140,12 @@ $(function() {
 		$("#authorList").append("&nbsp;&nbsp; ")
 		
 		$("#authorModal").modal('hide');
-		$("#firstNameAuthor").val("");
-		$("#lastNameAuthor").val("");
-		$("#affiliationTemplate").find("input").val("");
+		resetAuthorCreationModal();
+	});
+	
+	$("#addAuthorModalCancel").click(function() {
+		$("#authorModal").modal('hide');
+		resetAuthorCreationModal();
 	});
 	
 	$("#addEditorButton").click(function() {
@@ -179,8 +203,61 @@ $(function() {
 		affiliationCopy.removeAttr("id");
 		affiliationCopy.find("input").val("");
 		$("#editorAffiliations").append(affiliationCopy);
+	var timer = null;
+	$("#uriAuthor").change(function() {
+		resetAuthorAuthorityCreation();
+		$("#uriLoadingSpinner").show();
+		var uri = $("#uriAuthor").val();
+		clearTimeout(timer); 
+	    timer = setTimeout(function() {
+	    	getAuthority(uri);
+	    }, 1000);
+	});
+	
+	$("#iconContainer").on('click', ".popover #createAuthority", function() {
+		var uri = $("#uriLoadingFound").data('authority-uri');
+		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
+			$("#createAuthority").hide();
+			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+		});
 	});
 });
+
+function resetAuthorCreationModal() {
+	$("#firstNameAuthor").val("");
+	$("#lastNameAuthor").val("");
+	$("#affiliationTemplate").find("input").val("");
+	$("#uriAuthor").val("");
+	resetAuthorAuthorityCreation();
+}
+
+function resetAuthorAuthorityCreation() {
+	$("#uriLoadingFound").hide();
+	$("#uriLoadingFailure").hide();
+	$("#uriLoadingSpinner").hide();
+	$("#uriLoadingFound").popover('hide');
+	$("#uriLoadingFailure").popover('hide');
+}
+
+function getAuthority(uri) {
+	$.get('<c:url value="/auth/authority/get?uri=" />' + uri, function(data) {
+		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
+		$("#uriLoadingFound").attr("data-content", "We found the following information:<br><b>Name: </b> " 
+				+ data['name'] + "<br><b>URI: </b>" + data['uri'] + 
+				"<br><br>Do you want to create a managed authority entry?<br>" +
+						'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes!</b></button></span>');
+		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
+		$("#uriLoadingFound").show();
+		$("#uriLoadingFound").popover('show');
+	})
+	.fail(function() {
+		$("#uriLoadingFailure").show();
+	 })
+    .always(function() {
+    	$("#uriLoadingSpinner").hide();
+	 });
+
+}
 
 let removeAuthor = function removeAuthor(e) {
 	var deleteIcon = e.currentTarget;
@@ -266,7 +343,7 @@ let removeEditor = function removeEditor(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}">
+<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}">
 <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;&nbsp;
@@ -385,6 +462,17 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		    <label for="lastNameAuthor">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
 		  </div>
+		  <div class="form-group">
+		    <label for="uriAuthor">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
+			    <div id="iconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinner" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFound" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailure" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+		    </div>
+		  </div>
 		  <div id="affiliations">
 		  <div id="affiliationTemplate" class="form-group">
 		    <label for="affiliationAuthor">Affiliation:</label>
@@ -397,7 +485,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
       </div>
       
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default" id="addAuthorModalCancel">Close</button>
         <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
       </div>
     </div>

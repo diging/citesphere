@@ -7,6 +7,7 @@ public class PersonForm {
     private String id;
     private String firstName;
     private String lastName;
+    private String uri;
     private int position;
     
     private List<AffiliationForm> affiliations;
@@ -28,6 +29,12 @@ public class PersonForm {
     }
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    public String getUri() {
+        return uri;
+    }
+    public void setUri(String uri) {
+        this.uri = uri;
     }
     public int getPosition() {
         return position;

@@ -60,6 +60,7 @@ public class CitationHelper implements ICitationHelper {
         }
         citation.setAuthors(new HashSet<>());
         if (form.getAuthors() != null) {
+<<<<<<< HEAD
             mapPersonFields(citation, authorMap, form.getAuthors(), "author");
         }
 
