@@ -60,11 +60,11 @@ public class EditItemController {
     /**
      * Method to retrieve all fields filtered by item type.
      */
-    @RequestMapping("/auth/items/fields")
-    public ResponseEntity<List<String>> getFieldsByItemType(Authentication authentication, @RequestParam(value = "itemType") ItemType itemType) {
+    @RequestMapping("/auth/items/{itemType}/fields")
+    public ResponseEntity<List<String>> getFieldsByItemType(Authentication authentication, @PathVariable("itemType") ItemType itemType) {
         List<String> fields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemType)
-                .forEach(f -> fields.add(f.getFilename()));
+        citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemType)
+            .forEach(f -> fields.add(f.getFilename()));
         return new ResponseEntity<List<String>>(fields, HttpStatus.OK);
     }
     
