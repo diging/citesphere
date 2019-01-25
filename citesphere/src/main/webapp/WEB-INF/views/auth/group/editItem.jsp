@@ -78,7 +78,7 @@ $(function() {
 		deleteIcon.click(removeAuthor);
 		authorSpan.append(deleteIcon);
 		$("#authorList").append(authorSpan);
-		$("#authorList").append("&nbsp;&nbsp; ");
+		$("#authorList").append("&nbsp;&nbsp; ")
 		
 		$("#authorModal").modal('hide');
 		$("#firstNameAuthor").val("");
@@ -348,7 +348,8 @@ $(document).ready(function() {
 	$('#items').on("change", function(e){
 		var itemType = $('#items option:selected').val()
 		$('#displayMessage').replaceWith("<div id='displayMessage' class='alert-info row'>"+
-				"<span class='glyphicon glyphicon-refresh spinning'></span> Loading fields... </div>");
+			"<span class='glyphicon glyphicon-refresh spinning'></span>"+
+				"Loading fields... </div>");
 		$('#displayMessage').show();
 		$.ajax({
 			url : '<c:url value="/auth/items/'+itemType+'/fields" />',
