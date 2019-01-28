@@ -13,12 +13,19 @@
 $(function() {
 	$(".delete-link").click(function(event) {
 		var id = $(this).data('authority-id');
-		var link = $(this);
+		$("#delete-authority-button").attr("data-authority-id", id);
+		$("#confirm-authority-entry-name").text($(this).data('authority-name'));
+		$("#confirm-authority-entry-uri").text($(this).data('authority-uri'));
+		$('#authority-delete-confirmation').modal("show");	
+		event.preventDefault();
+	});
+	$("#delete-authority-button").click(function() {
+		var id = $(this).data("authority-id");
 		$.ajax({
 			'url': '<c:url value="/auth/authority/" />' + id + "?${_csrf.parameterName}=${_csrf.token}",
 			'type': "DELETE",
 			'success': function(data) {
-				link.closest("tr").hide();
+				$("#tr-" + id).remove();
 				$.notify('<i class="fas fa-check-circle"></i> Authority successfully deleted!', {
 					type: 'success',
 					offset: {
@@ -45,6 +52,7 @@ $(function() {
 				});
 			}
 		});
+		$('#authority-delete-confirmation').modal("hide");
 		event.preventDefault();
 	});
 });
@@ -60,11 +68,30 @@ $(function() {
 <th></th>
 </tr>
 <c:forEach items="${authorities}" var="authority">
-<tr>
+<tr id="tr-${authority.id}">
 <td>${authority.uri}</td>
 <td>${authority.name}</td>
 <td><span class="date">${authority.createdOn}</span></td>
-<td><a class="delete-link" href="" data-authority-id="${authority.id}"><i class="fas fa-trash-alt"></i></a></td>
+<td><a class="delete-link" href="" data-authority-id="${authority.id}" data-authority-name="${authority.name}" data-authority-uri="${authority.uri}"><i class="fas fa-trash-alt"></i></a></td>
 </tr>
 </c:forEach>
 </table>
+
+<div class="modal fade" id="authority-delete-confirmation" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Delete Authority</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the authority entry "<i><span id="confirm-authority-entry-name"></span></i>" with URI <i><span id="confirm-authority-entry-uri"></span></i>?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
+        <button id="delete-authority-button" data-authority-id="" type="button" class="btn btn-primary">Yes, delete!</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
