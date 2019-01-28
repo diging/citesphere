@@ -42,6 +42,9 @@
  	<script src="<c:url value="/resources/bootstrap/js/bootstrap.min.js" />"></script>
 	<script src="<c:url value="/resources/bootstrap/js/main.js" />"></script>
 	
+	<script src="<c:url value="/resources/dateFormatting/dateFormat.min.js" />"></script>
+	<script src="<c:url value="/resources/dateFormatting/jquery-dateformat.min.js" />"></script>
+	
   </head>
 
   <body>

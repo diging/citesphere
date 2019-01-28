@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -22,6 +23,8 @@ public class AuthorityEntry implements IAuthorityEntry {
             )
     private String id;
     private String name;
+    @Lob
+    private String description;
     private String uri;
     private String importerId;
     private String username;
@@ -54,6 +57,14 @@ public class AuthorityEntry implements IAuthorityEntry {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+    @Override
+    public String getDescription() {
+        return description;
+    }
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.authority.impl.IAuthorityEntry#getUri()

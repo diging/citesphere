@@ -18,4 +18,8 @@ public interface IAuthorityService {
 
     List<IAuthorityEntry> getAll(IUser user);
 
+    boolean deleteAuthority(String id);
+
+    IAuthorityEntry find(String id);
+
 }
