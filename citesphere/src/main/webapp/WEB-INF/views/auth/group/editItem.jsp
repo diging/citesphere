@@ -121,13 +121,10 @@ let removeAuthor = function removeAuthor(e) {
  	  </c:if> 
 </h2>
 
-<div class="modal fade" id="displayMessage" tabindex="-1" role="dialog">
-	<div class="modal-dialog" role="document">
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
 		<div class="modal-content">
-			<div class="modal-body">
-				<span class='glyphicon glyphicon-refresh spinning'></span>
-				Loading fields... 
-			</div>
+			<div id="displayMessage" class="modal-body"></div>
 		</div>
 	</div>
 </div>
@@ -355,9 +352,9 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 $(document).ready(function() {
 	$('#items').on("change", function(e){
 		var itemType = $('#items option:selected').val()
-		document.getElementById('#displayMessage').innerHTML = "<i class='glyphicon glyphicon-remove-sign'></i>" +
-				"Error loading the form fields";
-		$("#displayMessage").modal('show');
+		$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+				"Reloading form fields");
+		$("#messageModal").modal('show');
 		$.ajax({
 			url : '<c:url value="/auth/items/'+itemType+'/fields" />',
 			type : 'GET',
@@ -366,12 +363,17 @@ $(document).ready(function() {
 				for(i=0;i<changedFields.length;i++){
 					$('form input#'+changedFields[i]).parent().closest('tr').show();
 				}
-				$('#displayMessage').modal('hide');
+				$('#messageModal').modal('hide');
+				
 			},
 			error: function(){
-				document.getElementById('#displayMessage').innerHTML = "<i class='glyphicon glyphicon-remove-sign'></i>" +
-				"Error loading the form fields";
-				$('#displayMessage').delay(2000).fadeOut();
+				$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+				"Error loading the form fields. Try again later.");
+				$('#messageModal').modal('show');
+				setTimeout(function() {
+					$('#messageModal').modal('hide');
+			  	}, 3000);
+				
 			}
 		});
 	})
