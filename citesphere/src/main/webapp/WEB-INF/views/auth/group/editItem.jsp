@@ -138,6 +138,16 @@ $(function() {
 			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
 		});
 	});
+	
+	$(".author-item").on("click", function(e){
+		var authorItem = $(this);
+		$("#firstNameAuthor").val(authorItem.data("author-firstname"));
+		$("#lastNameAuthor").val(authorItem.data("author-lastname"));
+		$("#uriAuthor").val(authorItem.data("author-uri"));
+		$("#addAuthorButton").replaceWith("<button id='editAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
+		
+		$("#authorModal").modal('show');
+	});
 });
 
 function resetAuthorCreationModal() {
@@ -146,6 +156,11 @@ function resetAuthorCreationModal() {
 	$("#affiliationTemplate").find("input").val("");
 	$("#uriAuthor").val("");
 	resetAuthorAuthorityCreation();
+	console.log($("#addAuthorButton"))
+	if($("#addAuthorButton") == null){
+		$("#addAuthorModalCancel").parent().append("<button id='addAuthorButton' type='button' class='btn btn-primary'>Add Author</button>")
+	}
+	$("editAuthorButton").remove();
 }
 
 function resetAuthorAuthorityCreation() {
