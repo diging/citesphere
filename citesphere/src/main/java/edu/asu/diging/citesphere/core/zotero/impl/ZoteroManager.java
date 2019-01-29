@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.lang.reflect.Field;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

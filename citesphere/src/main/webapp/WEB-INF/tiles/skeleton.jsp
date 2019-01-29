@@ -42,6 +42,9 @@
  	<script src="<c:url value="/resources/bootstrap/js/bootstrap.min.js" />"></script>
 	<script src="<c:url value="/resources/bootstrap/js/main.js" />"></script>
 	
+	<script src="<c:url value="/resources/dateFormatting/dateFormat.min.js" />"></script>
+	<script src="<c:url value="/resources/dateFormatting/jquery-dateformat.min.js" />"></script>
+	
   </head>
 
   <body>
@@ -61,6 +64,9 @@
           	</sec:authorize>
           	
           	<sec:authorize access="isAuthenticated()">
+          	<li role="presentation">
+          		<a href="<c:url value="/auth/authority/list" />" >Managed Authority Entries</a>
+          	</li>
           	<li role="presentation">
          	 	<form action="<c:url value="/logout" />" method="POST">
          	 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
