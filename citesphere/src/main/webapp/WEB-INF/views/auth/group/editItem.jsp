@@ -352,8 +352,8 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 $(document).ready(function() {
 	$('#items').on("change", function(e){
 		var itemType = $('#items option:selected').val()
-		$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
-				"Reloading form fields");
+		$("#displayMessage").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+			"Reloading form fields");
 		$("#messageModal").modal('show');
 		$.ajax({
 			url : '<c:url value="/auth/items/'+itemType+'/fields" />',
