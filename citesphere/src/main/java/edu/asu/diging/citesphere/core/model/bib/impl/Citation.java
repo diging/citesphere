@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -16,6 +17,7 @@ import javax.persistence.OrderBy;
 
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 
@@ -40,6 +42,12 @@ public class Citation implements ICitation {
     @JoinTable(name="Citation_Editor")
     @OrderBy("positionInList")
     private Set<IPerson> editors;
+    
+    @OneToMany(targetEntity=Creator.class, cascade=CascadeType.ALL, orphanRemoval=true)
+    @JoinTable(name="Citation_Creator")
+    @OrderBy("role, positionInList")
+    private Set<ICreator> otherCreators;
+    
     private ItemType itemType;
     private String publicationTitle;
     private String volume;
@@ -143,6 +151,14 @@ public class Citation implements ICitation {
     @Override
     public void setEditors(Set<IPerson> editors) {
         this.editors = editors;
+    }
+    @Override
+    public Set<ICreator> getOtherCreators() {
+        return otherCreators;
+    }
+    @Override
+    public void setOtherCreators(Set<ICreator> otherCreators) {
+        this.otherCreators = otherCreators;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getItemType()
@@ -399,5 +415,27 @@ public class Citation implements ICitation {
     @Override
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+    
+    @Override
+    public Set<String> getOtherCreatorRoles(){
+        Set<String> roles = new HashSet<>();
+        if (otherCreators != null) {
+            otherCreators.forEach(c -> roles.add(c.getRole()));
+        }
+        return roles;
+    }
+    
+    @Override
+    public Set<ICreator> getOtherCreators(String role) {
+        Set<ICreator> creators = new HashSet<>();
+        if (otherCreators != null) {
+            otherCreators.forEach(c -> {
+                if (c.getRole().equals(role)) {
+                    creators.add(c);
+                }
+            });
+        }
+        return creators;
     }
 }
