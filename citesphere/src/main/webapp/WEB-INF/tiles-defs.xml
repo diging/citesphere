@@ -48,5 +48,8 @@
     <definition name="auth/authorities/list" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/authorities/list.jsp" />    
     </definition>
+     <definition name="auth/authority" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/authorities/show.jsp" />    
+    </definition>
 	
 </tiles-definitions>
