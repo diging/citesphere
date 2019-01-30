@@ -7,6 +7,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
@@ -45,7 +48,23 @@ public class EditItemController {
         } else {
             model.addAttribute("form", form);
         }
+        List<String> fields = new ArrayList<>();
+        citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
+            .forEach(f -> fields.add(f.getFilename()));
+        model.addAttribute("fields", fields);
         return "auth/group/items/item/edit";
+    }
+
+    
+    /**
+     * Method to retrieve all fields filtered by item type.
+     */
+    @RequestMapping("/auth/items/{itemType}/fields")
+    public ResponseEntity<List<String>> getFieldsByItemType(Authentication authentication, @PathVariable("itemType") ItemType itemType) {
+        List<String> fields = new ArrayList<>();
+        citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemType)
+            .forEach(f -> fields.add(f.getFilename()));
+        return new ResponseEntity<List<String>>(fields, HttpStatus.OK);
     }
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
