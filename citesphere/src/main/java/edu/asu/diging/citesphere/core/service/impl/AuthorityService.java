@@ -85,7 +85,14 @@ public class AuthorityService implements IAuthorityService {
     
     @Override
     public List<IAuthorityEntry> findByUri(IUser user, String uri) {
-        return entryRepository.findByUsernameAndUriOrderByName(user.getUsername(), uri);
+        List<IAuthorityEntry> results = entryRepository.findByUsernameAndUriOrderByName(user.getUsername(), uri);
+        if (uri.endsWith("/")) {
+            uri = uri.substring(0, uri.length() - 1);
+        } else {
+            uri = uri + "/";
+        }
+        results.addAll(entryRepository.findByUsernameAndUriOrderByName(user.getUsername(), uri));
+        return results;
     }
     
     @Override

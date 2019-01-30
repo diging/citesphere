@@ -7,7 +7,7 @@
 
 <style>
 .popover {
-	min-width: 200px;
+	min-width: 300px;
 }
 </style>
 <script>
@@ -145,8 +145,18 @@ $(function() {
 		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
 			$("#createAuthority").hide();
 			$("#uriAuthorLocalId").val(data['id']);
+			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
 			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			$("#uriLoadingFound").popover('hide');
 		});
+	});
+	
+	$("#iconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).data('authority-id');
+		$("#uriAuthorLocalId").val(authId);
+		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).data('authority-name') + "</i>.");
+		$("#uriLoadingFound").popover('hide');
+		event.preventDefault();
 	});
 });
 
@@ -170,11 +180,28 @@ function getAuthority(uri) {
 	$.get('<c:url value="/auth/authority/get?uri=" />' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
 		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
 		var content = "Authority <b>" + uri + "</b>";
-		if (data['userAuthorityEntries'] != null) {
-			content += "<br><br>This authority entry has already been imported!"
-		}	
+		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by you:";
+			content += "<ul>"
+			data['userAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
+		if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by someone else for this dataset:";
+			content += '<ul class="foundAuthorities">';
+			data['datasetAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
 		content += "<br><br>Do you want to create a managed authority entry?<br>" +
-					'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes!</b></button></span>';
+					'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
 		$("#uriLoadingFound").attr("data-content", content);
 		$("#uriLoadingFound").attr("data-authority-uri", uri);
 		$("#uriLoadingFound").show();
@@ -433,6 +460,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 			    </div>
 			    <input type="hidden" id="uriAuthorLocalId" />
 		    </div>
+		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
 		  </div>
 		  <div id="affiliations">
 		  <div id="affiliationTemplate" class="form-group">
