@@ -180,11 +180,14 @@ $(function() {
 		$("#editorList").append("&nbsp;&nbsp; ")
 		
 		$("#editorModal").modal('hide');
-		$("#firstNameEditor").val("");
-		$("#lastNameEditor").val("");
-		$("#editorAffiliationTemplate").find("input").val("");
+		resetEditorCreationModal();
 	});
 
+	$("#addEditorModalCancel").click(function() {
+		$("#editorModal").modal('hide');
+		resetEditorCreationModal();
+	});
+	
 	$(".remove-author").click(removeAuthor);
 	$(".remove-author").css('cursor', 'pointer');
 	
@@ -259,6 +262,12 @@ function getAuthority(uri) {
     	$("#uriLoadingSpinner").hide();
 	 });
 
+}
+
+function resetEditorCreationModal() {
+	$("#firstNameEditor").val("");
+	$("#lastNameEditor").val("");
+	$("#editorAffiliationTemplate").find("input").val("");
 }
 
 let removeAuthor = function removeAuthor(e) {
@@ -541,7 +550,6 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
     </div>
   </div>
 </div>
-<<<<<<< HEAD
 
 <!-- Editor Modal -->
 <div class="modal fade" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
@@ -572,13 +580,12 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
       </div>
       
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" id="addEditorModalCancel" class="btn btn-default" data-dismiss="modal">Close</button>
         <button id="addEditorButton" type="button" class="btn btn-primary">Add Editor</button>
       </div>
     </div>
   </div>
 </div>
-=======
 <script>
 $(document).ready(function() {
 	$('#items').on("change", function(e){
@@ -610,4 +617,3 @@ $(document).ready(function() {
 	})
 });
 </script>
->>>>>>> refs/remotes/origin/develop
