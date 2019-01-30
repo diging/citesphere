@@ -28,4 +28,8 @@ public interface IAuthorityEntry {
 
     OffsetDateTime getCreatedOn();
 
+    void setDescription(String description);
+
+    String getDescription();
+
 }
