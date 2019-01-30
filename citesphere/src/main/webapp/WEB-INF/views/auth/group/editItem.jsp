@@ -68,7 +68,7 @@ $(function() {
 		});
 	});
 	
-	$("#addAuthorButton").click(function() {
+	$(document).on('click', '#addAuthorButton', function() {
 		var firstname = $("#firstNameAuthor").val();
 		var lastname = $("#lastNameAuthor").val();
 		var uri = $("#uriAuthor").val();
@@ -101,6 +101,43 @@ $(function() {
 		$("#authorList").append(authorSpan);
 		$("#authorList").append("&nbsp;&nbsp; ")
 		
+		$("#authorModal").modal('hide');
+		resetAuthorCreationModal();
+	});
+	
+	$(document).on('click', '#editAuthorButton', function() {
+		
+		var firstname = $("#firstNameAuthor").val();
+		var lastname = $("#lastNameAuthor").val();
+		var uri = $("#uriAuthor").val();
+		
+		var authorSpan = $("span[data-author-id='"+$("#idAuthor").val()+"']");
+		authorSpan.attr("class", "label label-primary author-item");
+		authorSpan.attr("data-author-firstname", firstname);
+		authorSpan.attr("data-author-lastname", lastname);
+		authorSpan.attr("data-author-uri", uri);
+		authorSpan.attr("data-author-id", $("#idAuthor").val());
+		var affiliationsList = [];
+		var affSpan = $("<span>");
+		$("#affiliations").children().each(function(idx, elem) {
+			var affSpan = $("<span>");
+			var input = $(elem).find("input");
+			affSpan.attr("data-affiliation-name", input.val());
+			affiliationsList.push(input.val());
+			authorSpan.append(affSpan);
+		});
+		
+		var affiliationString = "";
+		if (affiliationsList) {
+			affiliationString = " (" + affiliationsList.join(", ") + ")";
+		}
+		authorSpan.html("");
+		authorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
+		var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
+		deleteIcon.click(removeAuthor);
+		authorSpan.append(deleteIcon);
+		$("#authorList").append(authorSpan);
+		$("#authorList").append("&nbsp;&nbsp; ")
 		$("#authorModal").modal('hide');
 		resetAuthorCreationModal();
 	});
@@ -139,13 +176,15 @@ $(function() {
 		});
 	});
 	
-	$(".author-item").on("click", function(e){
+	$(".author-item").on("click", function(){
 		var authorItem = $(this);
 		$("#firstNameAuthor").val(authorItem.data("author-firstname"));
 		$("#lastNameAuthor").val(authorItem.data("author-lastname"));
 		$("#uriAuthor").val(authorItem.data("author-uri"));
-		$("#addAuthorButton").replaceWith("<button id='editAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
-		
+		$("#idAuthor").val(authorItem.data("author-id"));
+		if($("#editAuthorButton").length == 0){
+			$("#addAuthorButton").replaceWith("<button id='editAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
+		}
 		$("#authorModal").modal('show');
 	});
 });
@@ -156,11 +195,10 @@ function resetAuthorCreationModal() {
 	$("#affiliationTemplate").find("input").val("");
 	$("#uriAuthor").val("");
 	resetAuthorAuthorityCreation();
-	console.log($("#addAuthorButton"))
-	if($("#addAuthorButton") == null){
+	if($("#addAuthorButton").length == 0){
 		$("#addAuthorModalCancel").parent().append("<button id='addAuthorButton' type='button' class='btn btn-primary'>Add Author</button>")
 	}
-	$("editAuthorButton").remove();
+	$("#editAuthorButton").remove();
 }
 
 function resetAuthorAuthorityCreation() {
@@ -416,6 +454,9 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
         <h4 class="modal-title" id="authorLabel">Enter Author Information</h4>
       </div>
       <div class="modal-body">
+      	  <div class="form-group">
+		    <input type="hidden" class="form-control" id="idAuthor">
+		  </div>
           <div class="form-group">
 		    <label for="firstNameAuthor">First Name:</label>
 		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
