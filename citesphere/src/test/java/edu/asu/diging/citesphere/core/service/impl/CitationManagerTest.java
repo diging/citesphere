@@ -55,7 +55,7 @@ public class CitationManagerTest {
     Long currentVersion = new Long(1);
     
     private final String ZOTERO_CITATION_ID = "ZOTERO";
-    private final Citation zoteroCitation = new Citation();
+    private final ICitation zoteroCitation = new Citation();
     
     private final String GROUP_ID = "12";
     private IUser user;
