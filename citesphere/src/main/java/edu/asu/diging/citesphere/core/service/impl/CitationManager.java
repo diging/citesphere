@@ -245,7 +245,10 @@ public class CitationManager implements ICitationManager {
         request.setVersion(group.getVersion());
         request.setZoteroObjectType(ZoteroObjectType.GROUP);
         request.setSortBy(sortBy);
-        results.getCitations().forEach(c -> citationRepository.save((Citation)c));
+        results.getCitations().forEach(c -> {
+            c.setGroup(group);
+            citationRepository.save((Citation)c);
+        });
         request.setLastUpdated(OffsetDateTime.now());
         return request;
     }

@@ -24,6 +24,7 @@ public class Affiliation implements IAffiliation {
     private String id;
     private String name;
     private String uri;
+    private String localAuthorityId;
      
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.IAffiliation#getId()
@@ -66,5 +67,13 @@ public class Affiliation implements IAffiliation {
     @Override
     public void setUri(String uri) {
         this.uri = uri;
+    }
+    @Override
+    public String getLocalAuthorityId() {
+        return localAuthorityId;
+    }
+    @Override
+    public void setLocalAuthorityId(String localAuthorityId) {
+        this.localAuthorityId = localAuthorityId;
     }
 }
