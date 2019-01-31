@@ -26,21 +26,21 @@ $(function() {
 			authorIdField.attr("type", "hidden");
 			authorIdField.attr("id", "authors" + idx + ".id");
 			authorIdField.attr("name", "authors[" + idx + "].id");
-			authorIdField.attr("value", $(author).data("author-id"));
+			authorIdField.attr("value", $(author).attr("data-author-id"));
 			$("#editForm").append(authorIdField);
 			
 			var authorFirstNameField = $("<input>");
 			authorFirstNameField.attr("type", "hidden");
 			authorFirstNameField.attr("id", "authors" + idx + ".firstName");
 			authorFirstNameField.attr("name", "authors[" + idx + "].firstName");
-			authorFirstNameField.attr("value", $(author).data("author-firstname"));
+			authorFirstNameField.attr("value", $(author).attr("data-author-firstname"));
 			$("#editForm").append(authorFirstNameField);
 			
 			var authorLastNameField = $("<input>");
 			authorLastNameField.attr("type", "hidden");
 			authorLastNameField.attr("id", "authors" + idx + ".lastName");
 			authorLastNameField.attr("name", "authors[" + idx + "].lastName");
-			authorLastNameField.attr("value", $(author).data("author-lastname"));
+			authorLastNameField.attr("value", $(author).attr("data-author-lastname"));
 			$("#editForm").append(authorLastNameField);
 			
 			var authorUriField = $("<input>");
@@ -55,14 +55,14 @@ $(function() {
 				affiliationField.attr("type", "hidden");
 				affiliationField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".name");
 				affiliationField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].name");
-				affiliationField.attr("value", $(affiliation).data("affiliation-name"));
+				affiliationField.attr("value", $(affiliation).attr("affiliation-name"));
 				$("#editForm").append(affiliationField);
 				
 				var affiliationIdField = $("<input>");
 				affiliationIdField.attr("type", "hidden");
 				affiliationIdField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".id");
 				affiliationIdField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].id");
-				affiliationIdField.attr("value", $(affiliation).data("affiliation-id"));
+				affiliationIdField.attr("value", $(affiliation).attr("affiliation-id"));
 				$("#editForm").append(affiliationIdField);
 			});
 		});
