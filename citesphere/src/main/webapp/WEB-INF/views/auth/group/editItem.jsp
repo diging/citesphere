@@ -55,14 +55,14 @@ $(function() {
 				affiliationField.attr("type", "hidden");
 				affiliationField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".name");
 				affiliationField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].name");
-				affiliationField.attr("value", $(affiliation).attr("affiliation-name"));
+				affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
 				$("#editForm").append(affiliationField);
 				
 				var affiliationIdField = $("<input>");
 				affiliationIdField.attr("type", "hidden");
 				affiliationIdField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".id");
 				affiliationIdField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].id");
-				affiliationIdField.attr("value", $(affiliation).attr("affiliation-id"));
+				affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
 				$("#editForm").append(affiliationIdField);
 			});
 		});
@@ -110,7 +110,6 @@ $(function() {
 		var firstname = $("#firstNameAuthor").val();
 		var lastname = $("#lastNameAuthor").val();
 		var uri = $("#uriAuthor").val();
-		
 		var authorSpan = $("span[data-author-id='"+$("#idAuthor").val()+"']");
 		authorSpan.attr("class", "label label-primary author-item");
 		authorSpan.attr("data-author-firstname", firstname);
@@ -182,6 +181,18 @@ $(function() {
 		$("#lastNameAuthor").val(authorItem.data("author-lastname"));
 		$("#uriAuthor").val(authorItem.data("author-uri"));
 		$("#idAuthor").val(authorItem.data("author-id"));
+		for(var i=0;i<authorItem.children().length-1;i++){
+			var item = authorItem.children().eq(i);
+			var affInput =  $("#affiliationTemplate").clone();
+			affInput.removeAttr("id");
+			affInput.find("input").attr("data-affiliation-name", item.data("affiliationName"));
+			affInput.find("input").attr("data-affiliation-id", item.data("affiliationId"));
+			affInput.find("input").val(item.data("affiliationName"));
+			$("#affiliations").append(affInput);
+		}
+		if(authorItem.children().length-1>0){
+			//remove existing affiliation
+		}
 		if($("#editAuthorButton").length == 0){
 			$("#addAuthorButton").replaceWith("<button id='editAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
 		}
@@ -319,7 +330,7 @@ let removeAuthor = function removeAuthor(e) {
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
 <span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}">
-<c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+<c:forEach items="${author.affiliations}" var="aff"> <span class="aff-auth" data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;&nbsp;
 <i class="fas fa-times remove-author"></i>
