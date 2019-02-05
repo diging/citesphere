@@ -11,6 +11,7 @@ import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
+import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollectionResult;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 
 public interface IZoteroManager {
@@ -33,5 +34,7 @@ public interface IZoteroManager {
 
     ICitation createCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException;
+
+    CitationCollectionResult getTopCitationCollections(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion);
 
 }

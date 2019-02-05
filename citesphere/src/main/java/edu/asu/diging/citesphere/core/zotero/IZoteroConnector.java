@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
 
+import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
@@ -36,5 +37,7 @@ public interface IZoteroConnector {
             throws ZoteroConnectionException, ZoteroItemCreationFailedException;
 
     CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType);
+
+    ZoteroResponse<Collection> getCitationCollections(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion);
 
 }

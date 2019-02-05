@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.oauth1.OAuthToken;
+import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
@@ -35,6 +36,9 @@ public class ZoteroConnector implements IZoteroConnector {
     
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
+    
+    @Value("${_zotero_collections_max_number}")
+    private Integer zoteroCollectionsMaxNumber;
     
     @Autowired
     private ZoteroTokenManager tokenManager;
@@ -151,6 +155,17 @@ public class ZoteroConnector implements IZoteroConnector {
     @Cacheable(value="itemTypeCreatorTypes", key="#itemType")
     public CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType) {
         return getApi(user).getItemTypesOperations().getCreatorTypes(itemType);
+    }
+    
+    @Override
+    @Cacheable(value="topCitationCollections", key="#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
+    public ZoteroResponse<Collection> getCitationCollections(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
+        if (page < 1) {
+            page = 0;
+        } else  {
+            page = page-1;
+        }
+        return getApi(user).getGroupCollectionsOperations().getTopCollections(groupId, page*zoteroCollectionsMaxNumber, zoteroCollectionsMaxNumber, sortBy, lastGroupVersion);
     }
     
     private Zotero getApi(IUser user) {

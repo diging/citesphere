@@ -1,6 +1,5 @@
 package edu.asu.diging.citesphere.web.user;
 
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
-import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 
 @Controller
 @PropertySource("classpath:/config.properties")
@@ -30,6 +29,9 @@ public class GroupItemsController {
 
     @Autowired
     private ICitationManager citationManager;
+    
+    @Autowired
+    private ICitationCollectionManager collectionManager;
 
     @RequestMapping("/auth/group/{zoteroGroupId}/items")
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
@@ -50,6 +52,7 @@ public class GroupItemsController {
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", groupId);
+        model.addAttribute("citationCollections", collectionManager.getTopCitationCollections(user, groupId, null, pageInt, "title").getCitationCollections());
 
         return "auth/group/items";
     }
