@@ -205,6 +205,17 @@ $(function() {
 		$("#authorModal").modal('show');
 	});
 	
+	$("#iconContainer").on('click', ".popover #createAuthority", function() {
+		var uri = $("#uriLoadingFound").data('authority-uri');
+		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
+			$("#createAuthority").hide();
+			$("#uriAuthorLocalId").val(data['id']);
+			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			$("#uriLoadingFound").popover('hide');
+		});
+	});
+	
 	$("#iconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var authId = $(this).data('authority-id');
 		$("#uriAuthorLocalId").val(authId);

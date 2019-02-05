@@ -167,7 +167,6 @@ public class CitationFactory implements ICitationFactory {
                 }
             }
             extraAuthors.forEach(a -> citation.getAuthors().add(a));
-            
         }
     }
 }
