@@ -71,8 +71,7 @@ public class CitationHelper implements ICitationHelper {
         }
     }
 
-    @Override
-    public void mapPersonFields(ICitation citation, Map<String, IPerson> personMap,
+    void mapPersonFields(ICitation citation, Map<String, IPerson> personMap,
             List<PersonForm> personList, String personType) {
         for (PersonForm personForm : personList) {
             IPerson person;

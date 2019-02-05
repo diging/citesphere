@@ -123,17 +123,17 @@ public class CitationFactory implements ICitationFactory {
             JsonObject jObj = parser.parse(extraMatch).getAsJsonObject();
             if (jObj.has("authors") && !jObj.get("authors").isJsonNull()) {
                 JsonArray authors = jObj.get("authors").getAsJsonArray();
-                mapPersonFields(authors, citation, "author");
+                mapPersonFields(authors, citation, "author", citation.getAuthors());
             }
 
             if (jObj.has("editors") && !jObj.get("editors").isJsonNull()) {
                 JsonArray editors = jObj.get("editors").getAsJsonArray();
-                mapPersonFields(editors, citation, "editor");
+                mapPersonFields(editors, citation, "editor", citation.getEditors());
             }
         }
     }
 
-    private void mapPersonFields(JsonArray personList, ICitation citation, String personType) {
+    private void mapPersonFields(JsonArray personList, ICitation citation, String personType, Set<IPerson> citationPersonList) {
         List<Person> extraPersonList = new ArrayList<>();
         List<String> personNames = new ArrayList<>();
         personList.forEach(a -> {
@@ -155,22 +155,12 @@ public class CitationFactory implements ICitationFactory {
             extraPersonList.add(person);
         });
 
-        if (personType.equals("author")) {
-            for (Iterator<IPerson> iterator = citation.getAuthors().iterator(); iterator.hasNext();) {
-                IPerson author = iterator.next();
-                if (personNames.contains(author.getFirstName() + author.getLastName())) {
-                    iterator.remove();
-                }
+        for (Iterator<IPerson> iterator = citationPersonList.iterator(); iterator.hasNext();) {
+            IPerson person = iterator.next();
+            if (personNames.contains(person.getFirstName() + person.getLastName())) {
+                iterator.remove();
             }
-            extraPersonList.forEach(a -> citation.getAuthors().add(a));
-        } else if (personType.equals("editor")) {
-            for (Iterator<IPerson> iterator = citation.getEditors().iterator(); iterator.hasNext();) {
-                IPerson editor = iterator.next();
-                if (personNames.contains(editor.getFirstName() + editor.getLastName())) {
-                    iterator.remove();
-                }
-            }
-            extraPersonList.forEach(a -> citation.getEditors().add(a));
         }
+        extraPersonList.forEach(a -> citationPersonList.add(a));
     }
 }

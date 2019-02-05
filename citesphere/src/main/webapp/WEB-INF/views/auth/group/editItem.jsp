@@ -88,6 +88,13 @@ $(function() {
 			editorLastNameField.attr("value", $(editor).data("editor-lastname"));
 			$("#editForm").append(editorLastNameField);
 			
+			var editorUriField = $("<input>");
+			editorUriField.attr("type", "hidden");
+			editorUriField.attr("id", "editors" + idx + ".uri");
+			editorUriField.attr("name", "editors[" + idx + "].uri");
+			editorUriField.attr("value", $(editor).data("editor-uri"));
+			$("#editForm").append(editorUriField);
+			
 			$(editor).children("span").each(function(idx2, affiliation) {
 				var affiliationField = $("<input>");
 				affiliationField.attr("type", "hidden");
@@ -151,11 +158,12 @@ $(function() {
 	$("#addEditorButton").click(function() {
 		var firstname = $("#firstNameEditor").val();
 		var lastname = $("#lastNameEditor").val();
-		
+		var uri = $("#uriEditor").val();
 		var editorSpan = $("<span>");
 		editorSpan.attr("class", "label label-info editor-item");
 		editorSpan.attr("data-editor-firstname", firstname);
 		editorSpan.attr("data-editor-lastname", lastname);
+		editorSpan.attr("data-author-uri", uri);
 		
 		var affiliationsList = [];
 		var affSpan = $("<span>");
@@ -219,6 +227,16 @@ $(function() {
 	    }, 1000);
 	});
 	
+	$("#uriEditor").change(function() {
+		resetEditorAuthorityCreation();
+		$("#uriLoadingSpinner").show();
+		var uri = $("#uriEditor").val();
+		clearTimeout(timer); 
+	    timer = setTimeout(function() {
+	    	getAuthority(uri);
+	    }, 1000);
+	});
+	
 	$("#iconContainer").on('click', ".popover #createAuthority", function() {
 		var uri = $("#uriLoadingFound").data('authority-uri');
 		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
@@ -268,6 +286,16 @@ function resetEditorCreationModal() {
 	$("#firstNameEditor").val("");
 	$("#lastNameEditor").val("");
 	$("#editorAffiliationTemplate").find("input").val("");
+	$("#uriEditor").val("");
+	resetEditorAuthorityCreation();
+}
+
+function resetEditorAuthorityCreation() {
+	$("#uriLoadingFound").hide();
+	$("#uriLoadingFailure").hide();
+	$("#uriLoadingSpinner").hide();
+	$("#uriLoadingFound").popover('hide');
+	$("#uriLoadingFailure").popover('hide');
 }
 
 let removeAuthor = function removeAuthor(e) {
@@ -385,7 +413,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <td>
 <span id="editorList" style="font-size: 18px">
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
-<span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}">
+<span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-author-uri="${editor.uri}">
 <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;&nbsp;
@@ -567,6 +595,17 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		  <div class="form-group">
 		    <label for="lastNameEditor">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameEditor" placeholder="Last Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="uriEditor">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriEditor" placeholder="URI">
+			    <div id="iconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinner" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFound" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailure" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+		    </div>
 		  </div>
 		  <div id="editorAffiliations">
 		  <div id="editorAffiliationTemplate" class="form-group">
