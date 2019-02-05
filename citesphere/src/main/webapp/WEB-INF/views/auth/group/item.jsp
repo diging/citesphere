@@ -74,6 +74,9 @@
  <c:if test="${not empty author.uri}">
  <a href="${author.uri}" target="_blank"><i class="fas fa-link"></i></a>
  </c:if>
+  <c:if test="${not empty author.localAuthorityId}">
+ <a href="<c:url value="/auth/authority/${author.localAuthorityId}" />"><i class="fas fa-anchor"></i></a>
+ </c:if>
  </c:forEach>
 </td>
 </tr>

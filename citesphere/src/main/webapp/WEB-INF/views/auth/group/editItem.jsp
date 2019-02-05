@@ -7,7 +7,7 @@
 
 <style>
 .popover {
-	min-width: 200px;
+	min-width: 300px;
 }
 </style>
 <script>
@@ -47,8 +47,15 @@ $(function() {
 			authorUriField.attr("type", "hidden");
 			authorUriField.attr("id", "authors" + idx + ".uri");
 			authorUriField.attr("name", "authors[" + idx + "].uri");
-			authorUriField.attr("value", $(author).data("author-uri"));
+			authorUriField.attr("value", $(author).attr("data-author-uri"));
 			$("#editForm").append(authorUriField);
+			
+			var authorAuthorityField = $("<input>");
+			authorAuthorityField.attr("type", "hidden");
+			authorAuthorityField.attr("id", "authors" + idx + ".localAuthorityId");
+			authorAuthorityField.attr("name", "authors[" + idx + "].localAuthorityId");
+			authorAuthorityField.attr("value", $(author).attr("data-author-authority-id"));
+			$("#editForm").append(authorAuthorityField);
 			
 			$(author).children("span").each(function(idx2, affiliation) {
 				var affiliationField = $("<input>");
@@ -72,12 +79,14 @@ $(function() {
 		var firstname = $("#firstNameAuthor").val();
 		var lastname = $("#lastNameAuthor").val();
 		var uri = $("#uriAuthor").val();
+		var localAuthority = $("#uriAuthorLocalId").val();
 		
 		var authorSpan = $("<span>");
 		authorSpan.attr("class", "label label-primary author-item");
 		authorSpan.attr("data-author-firstname", firstname);
 		authorSpan.attr("data-author-lastname", lastname);
 		authorSpan.attr("data-author-uri", uri);
+		authorSpan.attr("data-author-authority-id", localAuthority);
 		
 		var affiliationsList = [];
 		var affSpan = $("<span>");
@@ -106,7 +115,7 @@ $(function() {
 	});
 	
 	$(document).on('click', '#updateAuthorButton', function() {
-		
+		var authorid = $("#idAuthor").val();
 		var firstname = $("#firstNameAuthor").val();
 		var lastname = $("#lastNameAuthor").val();
 		var uri = $("#uriAuthor").val();
@@ -115,7 +124,7 @@ $(function() {
 		authorSpan.attr("data-author-firstname", firstname);
 		authorSpan.attr("data-author-lastname", lastname);
 		authorSpan.attr("data-author-uri", uri);
-		authorSpan.attr("data-author-id", $("#idAuthor").val());
+		authorSpan.attr("data-author-id", authorid);
 
 		authorSpan.html("");
 		var affiliationsList = [];
@@ -171,20 +180,12 @@ $(function() {
 	    }, 1000);
 	});
 	
-	$("#iconContainer").on('click', ".popover #createAuthority", function() {
-		var uri = $("#uriLoadingFound").data('authority-uri');
-		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
-			$("#createAuthority").hide();
-			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-		});
-	});
-	
 	$(".author-item").on("click", function(){
 		var authorItem = $(this);
-		$("#firstNameAuthor").val(authorItem.data("author-firstname"));
-		$("#lastNameAuthor").val(authorItem.data("author-lastname"));
+		$("#firstNameAuthor").val(authorItem.attr("data-author-firstname"));
+		$("#lastNameAuthor").val(authorItem.attr("data-author-lastname"));
 		$("#uriAuthor").val(authorItem.attr("data-author-uri"));
-		$("#idAuthor").val(authorItem.data("author-id"));
+		$("#idAuthor").val(authorItem.attr("data-author-id"));
 		
 		for(var i=0;i<authorItem.children().length-1;i++){
 			var item = authorItem.children().eq(i);
@@ -202,6 +203,14 @@ $(function() {
 			$("#addAuthorButton").replaceWith("<button id='updateAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
 		}
 		$("#authorModal").modal('show');
+	});
+	
+	$("#iconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).data('authority-id');
+		$("#uriAuthorLocalId").val(authId);
+		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).data('authority-name') + "</i>.");
+		$("#uriLoadingFound").popover('hide');
+		event.preventDefault();
 	});
 });
 
@@ -226,13 +235,33 @@ function resetAuthorAuthorityCreation() {
 }
 
 function getAuthority(uri) {
-	$.get('<c:url value="/auth/authority/get?uri=" />' + uri, function(data) {
+	$.get('<c:url value="/auth/authority/get?uri=" />' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
 		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
-		$("#uriLoadingFound").attr("data-content", "We found the following information:<br><b>Name: </b> " 
-				+ data['name'] + "<br><b>URI: </b>" + data['uri'] + 
-				"<br><br>Do you want to create a managed authority entry?<br>" +
-						'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes!</b></button></span>');
-		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
+		var content = "Authority <b>" + uri + "</b>";
+		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by you:";
+			content += "<ul>"
+			data['userAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
+		if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by someone else for this dataset:";
+			content += '<ul class="foundAuthorities">';
+			data['datasetAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
+		content += "<br><br>Do you want to create a managed authority entry?<br>" +
+					'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+		$("#uriLoadingFound").attr("data-content", content);
+		$("#uriLoadingFound").attr("data-authority-uri", uri);
 		$("#uriLoadingFound").show();
 		$("#uriLoadingFound").popover('show');
 	})
@@ -334,8 +363,8 @@ let removeAuthor = function removeAuthor(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}">
-<c:forEach items="${author.affiliations}" var="aff"> <span class="aff-auth" data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
+<c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;&nbsp;
 <i class="fas fa-times remove-author"></i>
@@ -490,7 +519,9 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 			    	<i id="uriLoadingFound" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
 			    	<i id="uriLoadingFailure" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
+			    <input type="hidden" id="uriAuthorLocalId" />
 		    </div>
+		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
 		  </div>
 		  <div id="affiliations">
 		  <div id="affiliationTemplate" class="form-group">
