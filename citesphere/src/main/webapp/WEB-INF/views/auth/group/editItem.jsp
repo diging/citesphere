@@ -7,7 +7,7 @@
 
 <style>
 .popover {
-	min-width: 200px;
+	min-width: 300px;
 }
 </style>
 <script>
@@ -49,6 +49,13 @@ $(function() {
 			authorUriField.attr("name", "authors[" + idx + "].uri");
 			authorUriField.attr("value", $(author).data("author-uri"));
 			$("#editForm").append(authorUriField);
+			
+			var authorAuthorityField = $("<input>");
+			authorAuthorityField.attr("type", "hidden");
+			authorAuthorityField.attr("id", "authors" + idx + ".localAuthorityId");
+			authorAuthorityField.attr("name", "authors[" + idx + "].localAuthorityId");
+			authorAuthorityField.attr("value", $(author).data("author-authority-id"));
+			$("#editForm").append(authorAuthorityField);
 			
 			$(author).children("span").each(function(idx2, affiliation) {
 				var affiliationField = $("<input>");
@@ -117,12 +124,14 @@ $(function() {
 		var firstname = $("#firstNameAuthor").val();
 		var lastname = $("#lastNameAuthor").val();
 		var uri = $("#uriAuthor").val();
+		var localAuthority = $("#uriAuthorLocalId").val();
 		
 		var authorSpan = $("<span>");
 		authorSpan.attr("class", "label label-primary author-item");
 		authorSpan.attr("data-author-firstname", firstname);
 		authorSpan.attr("data-author-lastname", lastname);
 		authorSpan.attr("data-author-uri", uri);
+		authorSpan.attr("data-author-authority-id", localAuthority);
 		
 		var affiliationsList = [];
 		var affSpan = $("<span>");
@@ -241,8 +250,19 @@ $(function() {
 		var uri = $("#uriLoadingFound").data('authority-uri');
 		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
 			$("#createAuthority").hide();
+			$("#uriAuthorLocalId").val(data['id']);
+			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
 			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			$("#uriLoadingFound").popover('hide');
 		});
+	});
+	
+	$("#iconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).data('authority-id');
+		$("#uriAuthorLocalId").val(authId);
+		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).data('authority-name') + "</i>.");
+		$("#uriLoadingFound").popover('hide');
+		event.preventDefault();
 	});
 });
 
@@ -263,13 +283,33 @@ function resetAuthorAuthorityCreation() {
 }
 
 function getAuthority(uri) {
-	$.get('<c:url value="/auth/authority/get?uri=" />' + uri, function(data) {
+	$.get('<c:url value="/auth/authority/get?uri=" />' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
 		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
-		$("#uriLoadingFound").attr("data-content", "We found the following information:<br><b>Name: </b> " 
-				+ data['name'] + "<br><b>URI: </b>" + data['uri'] + 
-				"<br><br>Do you want to create a managed authority entry?<br>" +
-						'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes!</b></button></span>');
-		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
+		var content = "Authority <b>" + uri + "</b>";
+		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by you:";
+			content += "<ul>"
+			data['userAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
+		if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by someone else for this dataset:";
+			content += '<ul class="foundAuthorities">';
+			data['datasetAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
+		content += "<br><br>Do you want to create a managed authority entry?<br>" +
+					'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+		$("#uriLoadingFound").attr("data-content", content);
+		$("#uriLoadingFound").attr("data-authority-uri", uri);
 		$("#uriLoadingFound").show();
 		$("#uriLoadingFound").popover('show');
 	})
@@ -396,7 +436,7 @@ let removeEditor = function removeEditor(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}">
+<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
 <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;&nbsp;
@@ -558,7 +598,9 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 			    	<i id="uriLoadingFound" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
 			    	<i id="uriLoadingFailure" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
+			    <input type="hidden" id="uriAuthorLocalId" />
 		    </div>
+		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
 		  </div>
 		  <div id="affiliations">
 		  <div id="affiliationTemplate" class="form-group">

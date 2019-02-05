@@ -85,7 +85,7 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public ICitation getCitation(IUser user, String groupId, String key) {
+    public ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException {
         Optional<Citation> optional = citationRepository.findById(key);
         if (optional.isPresent()) {
             return optional.get();
@@ -149,8 +149,13 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey) {
+    public ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey) throws GroupDoesNotExistException {
+        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
         ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey); 
+        citation.setGroup(groupOptional.get());
         citationRepository.save((Citation)citation);
         return citation;
     }
@@ -245,7 +250,10 @@ public class CitationManager implements ICitationManager {
         request.setVersion(group.getVersion());
         request.setZoteroObjectType(ZoteroObjectType.GROUP);
         request.setSortBy(sortBy);
-        results.getCitations().forEach(c -> citationRepository.save((Citation)c));
+        results.getCitations().forEach(c -> {
+            c.setGroup(group);
+            citationRepository.save((Citation)c);
+        });
         request.setLastUpdated(OffsetDateTime.now());
         return request;
     }

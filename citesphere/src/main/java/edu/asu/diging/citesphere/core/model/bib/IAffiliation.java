@@ -14,4 +14,8 @@ public interface IAffiliation {
 
     void setUri(String uri);
 
+    void setLocalAuthorityId(String localAuthorityId);
+
+    String getLocalAuthorityId();
+
 }

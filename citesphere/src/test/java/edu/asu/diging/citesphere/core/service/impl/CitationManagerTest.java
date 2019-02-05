@@ -55,7 +55,7 @@ public class CitationManagerTest {
     Long currentVersion = new Long(1);
     
     private final String ZOTERO_CITATION_ID = "ZOTERO";
-    private final Citation zoteroCitation = new Citation();
+    private final ICitation zoteroCitation = new Citation();
     
     private final String GROUP_ID = "12";
     private IUser user;
@@ -97,7 +97,7 @@ public class CitationManagerTest {
     }
     
     @Test
-    public void test_getCitation_inDb() {
+    public void test_getCitation_inDb() throws GroupDoesNotExistException {
         ICitation actual = managerToTest.getCitation(user, GROUP_ID, EXISTING_ID);
         Assert.assertNotNull(actual);
         Assert.assertEquals(EXISTING_ID, actual.getKey());
@@ -105,7 +105,7 @@ public class CitationManagerTest {
     
     
     @Test
-    public void test_getCitation_inZotero() {
+    public void test_getCitation_inZotero() throws GroupDoesNotExistException {
         ICitation actual = managerToTest.getCitation(user, GROUP_ID, ZOTERO_CITATION_ID);
         Assert.assertNotNull(actual);
         Assert.assertEquals(ZOTERO_CITATION_ID, actual.getKey());
@@ -155,7 +155,7 @@ public class CitationManagerTest {
     }
     
     @Test
-    public void test_updateCitationFromZotero_success() {
+    public void test_updateCitationFromZotero_success() throws GroupDoesNotExistException {
         ICitation updatedCitation = new Citation();
         updatedCitation.setKey(EXISTING_ID);
         updatedCitation.setVersion(new Long(2));

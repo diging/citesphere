@@ -8,6 +8,7 @@ public class PersonForm {
     private String firstName;
     private String lastName;
     private String uri;
+    private String localAuthorityId;
     private int position;
     
     private List<AffiliationForm> affiliations;
@@ -35,6 +36,12 @@ public class PersonForm {
     }
     public void setUri(String uri) {
         this.uri = uri;
+    }
+    public String getLocalAuthorityId() {
+        return localAuthorityId;
+    }
+    public void setLocalAuthorityId(String localAuthorityId) {
+        this.localAuthorityId = localAuthorityId;
     }
     public int getPosition() {
         return position;
