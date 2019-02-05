@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.util.model.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -69,7 +70,6 @@ public class CitationHelper implements ICitationHelper {
                 person.setLastName(personForm.getLastName());
                 person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
                 person.setUri(personForm.getUri());
-                person.setLocalAuthorityId(personForm.getLocalAuthorityId());
                 
                 Map<String, IAffiliation> affiliationMap = new HashMap<>();
                 if (person.getAffiliations() != null) {
