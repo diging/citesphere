@@ -105,7 +105,7 @@ $(function() {
 		resetAuthorCreationModal();
 	});
 	
-	$(document).on('click', '#editAuthorButton', function() {
+	$(document).on('click', '#updateAuthorButton', function() {
 		
 		var firstname = $("#firstNameAuthor").val();
 		var lastname = $("#lastNameAuthor").val();
@@ -116,21 +116,24 @@ $(function() {
 		authorSpan.attr("data-author-lastname", lastname);
 		authorSpan.attr("data-author-uri", uri);
 		authorSpan.attr("data-author-id", $("#idAuthor").val());
+
+		authorSpan.html("");
 		var affiliationsList = [];
-		var affSpan = $("<span>");
-		$("#affiliations").children().each(function(idx, elem) {
+		var aff = $("#affiliations").children();
+		for(var i=1;i<aff.length;i++){
+			var item = aff.eq(i);
 			var affSpan = $("<span>");
-			var input = $(elem).find("input");
+			var input = item.find("input");
+			affSpan.attr("data-affiliation-id", input.attr("data-affiliation-id"));
 			affSpan.attr("data-affiliation-name", input.val());
 			affiliationsList.push(input.val());
 			authorSpan.append(affSpan);
-		});
+		}
 		
 		var affiliationString = "";
 		if (affiliationsList) {
 			affiliationString = " (" + affiliationsList.join(", ") + ")";
 		}
-		authorSpan.html("");
 		authorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
 		var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
 		deleteIcon.click(removeAuthor);
@@ -153,6 +156,7 @@ $(function() {
 		var affiliationCopy = $("#affiliationTemplate").clone();
 		affiliationCopy.removeAttr("id");
 		affiliationCopy.find("input").val("");
+		affiliationCopy.show();
 		$("#affiliations").append(affiliationCopy);
 	});
 	
@@ -179,11 +183,12 @@ $(function() {
 		var authorItem = $(this);
 		$("#firstNameAuthor").val(authorItem.data("author-firstname"));
 		$("#lastNameAuthor").val(authorItem.data("author-lastname"));
-		$("#uriAuthor").val(authorItem.data("author-uri"));
+		$("#uriAuthor").val(authorItem.attr("data-author-uri"));
 		$("#idAuthor").val(authorItem.data("author-id"));
+		
 		for(var i=0;i<authorItem.children().length-1;i++){
 			var item = authorItem.children().eq(i);
-			var affInput =  $("#affiliationTemplate").clone();
+			var affInput = $("#affiliationTemplate").clone();
 			affInput.removeAttr("id");
 			affInput.find("input").attr("data-affiliation-name", item.data("affiliationName"));
 			affInput.find("input").attr("data-affiliation-id", item.data("affiliationId"));
@@ -191,10 +196,10 @@ $(function() {
 			$("#affiliations").append(affInput);
 		}
 		if(authorItem.children().length-1>0){
-			//remove existing affiliation
+			$("#affiliationTemplate").hide();
 		}
-		if($("#editAuthorButton").length == 0){
-			$("#addAuthorButton").replaceWith("<button id='editAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
+		if($("#updateAuthorButton").length == 0){
+			$("#addAuthorButton").replaceWith("<button id='updateAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
 		}
 		$("#authorModal").modal('show');
 	});
@@ -203,13 +208,13 @@ $(function() {
 function resetAuthorCreationModal() {
 	$("#firstNameAuthor").val("");
 	$("#lastNameAuthor").val("");
-	$("#affiliationTemplate").find("input").val("");
+	$("#affiliations").html("<div id='affiliationTemplate' class='form-group'><label for='affiliationAuthor'>Affiliation:</label><input type='text' class='form-control' placeholder='Affiliation'></div>");
 	$("#uriAuthor").val("");
 	resetAuthorAuthorityCreation();
 	if($("#addAuthorButton").length == 0){
 		$("#addAuthorModalCancel").parent().append("<button id='addAuthorButton' type='button' class='btn btn-primary'>Add Author</button>")
 	}
-	$("#editAuthorButton").remove();
+	$("#updateAuthorButton").remove();
 }
 
 function resetAuthorAuthorityCreation() {
