@@ -137,11 +137,11 @@ public class CitationFactory implements ICitationFactory {
             JsonObject jObj = parser.parse(extraMatch).getAsJsonObject();
             if (jObj.has("authors") && !jObj.get("authors").isJsonNull()) {
                 JsonArray authors = jObj.get("authors").getAsJsonArray();
-                mapPersonFields(authors, citation, citation.getAuthors());
+                mapPersonFields(authors, citation.getAuthors());
             }
             if (jObj.has("editors") && !jObj.get("editors").isJsonNull()) {
                 JsonArray editors = jObj.get("editors").getAsJsonArray();
-                mapPersonFields(editors, citation, citation.getEditors());
+                mapPersonFields(editors, citation.getEditors());
             }
             JsonArray authors = jObj.get("authors").getAsJsonArray();
             
@@ -177,7 +177,7 @@ public class CitationFactory implements ICitationFactory {
         }
     }
 
-    private void mapPersonFields(JsonArray personList, ICitation citation, Set<IPerson> citationPersonList) {
+    private void mapPersonFields(JsonArray personList, Set<IPerson> citationPersonList) {
         List<Person> extraPersonList = new ArrayList<>();
         List<String> personNames = new ArrayList<>();
         personList.forEach(a -> {

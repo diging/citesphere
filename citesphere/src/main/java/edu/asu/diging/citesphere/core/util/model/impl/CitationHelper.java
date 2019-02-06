@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
@@ -59,7 +59,7 @@ public class CitationHelper implements ICitationHelper {
         }
         citation.setAuthors(new HashSet<>());
         if (form.getAuthors() != null) {
-            mapPersonFields(citation, authorMap, form.getAuthors(), "author");
+            mapPersonFields(authorMap, form.getAuthors(), citation.getAuthors());
             for (PersonForm personForm : form.getAuthors()) {
                 IPerson person;
                 if (personForm.getId() != null && !personForm.getId().isEmpty()) {
@@ -97,12 +97,12 @@ public class CitationHelper implements ICitationHelper {
         citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
         citation.setEditors(new HashSet<>());
         if (form.getEditors() != null) {
-            mapPersonFields(citation, editorMap, form.getEditors(), "editor");
+            mapPersonFields(editorMap, form.getEditors(), citation.getEditors());
         }
     }
 
-    void mapPersonFields(ICitation citation, Map<String, IPerson> personMap,
-            List<PersonForm> personList, String personType) {
+    void mapPersonFields(Map<String, IPerson> personMap,
+            List<PersonForm> personList, Set<IPerson> citationPersonList) {
         for (PersonForm personForm : personList) {
             IPerson person;
             if (personForm.getId() != null && !personForm.getId().isEmpty()) {
@@ -131,11 +131,7 @@ public class CitationHelper implements ICitationHelper {
                     person.getAffiliations().add(affiliation);
                 }
             }
-            if (personType.equals("author")) {
-                citation.getAuthors().add(person);
-            } else if (personType.equals("editor")) {
-                citation.getEditors().add(person);
-            }
+            citationPersonList.add(person);
         }
     }
 }
