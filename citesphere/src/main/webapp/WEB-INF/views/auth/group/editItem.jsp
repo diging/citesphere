@@ -251,7 +251,7 @@ function getAuthority(uri) {
 		var content = "Authority <b>" + uri + "</b>";
 		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
 			content += "<br><br>This authority entry has already been imported by you:";
-			content += "<ul>"
+			content += '<ul class="foundAuthorities">';
 			data['userAuthorityEntries'].forEach(function(elem) {
 				content += '<li>' + elem['name'];
 				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
