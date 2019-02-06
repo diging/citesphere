@@ -20,6 +20,13 @@ $(function() {
 	$("#uriLoadingFound").popover();
 	$("#uriLoadingFailure").popover();
 	
+	$("#uriLoadingSpinnerEditor").hide();
+	$("#uriLoadingFailureEditor").hide();
+	$("#uriLoadingFoundEditor").hide();
+	
+	$("#uriLoadingFoundEditor").popover();
+	$("#uriLoadingFailureEditor").popover();
+	
 	$("#submitForm").click(function() {
 		$(".author-item").each(function(idx, author) {
 			var authorIdField = $("<input>");
@@ -102,6 +109,13 @@ $(function() {
 			editorUriField.attr("value", $(editor).data("editor-uri"));
 			$("#editForm").append(editorUriField);
 			
+			var editorAuthorityField = $("<input>");
+			editorAuthorityField.attr("type", "hidden");
+			editorAuthorityField.attr("id", "editors" + idx + ".localAuthorityId");
+			editorAuthorityField.attr("name", "editors[" + idx + "].localAuthorityId");
+			editorAuthorityField.attr("value", $(editor).data("editor-authority-id"));
+			$("#editForm").append(editorAuthorityField);
+			
 			$(editor).children("span").each(function(idx2, affiliation) {
 				var affiliationField = $("<input>");
 				affiliationField.attr("type", "hidden");
@@ -168,11 +182,14 @@ $(function() {
 		var firstname = $("#firstNameEditor").val();
 		var lastname = $("#lastNameEditor").val();
 		var uri = $("#uriEditor").val();
+		var localAuthority = $("#uriEditorLocalId").val();
+		
 		var editorSpan = $("<span>");
 		editorSpan.attr("class", "label label-info editor-item");
 		editorSpan.attr("data-editor-firstname", firstname);
 		editorSpan.attr("data-editor-lastname", lastname);
-		editorSpan.attr("data-author-uri", uri);
+		editorSpan.attr("data-editor-uri", uri);
+		editorSpan.attr("data-editor-authority-id", localAuthority);
 		
 		var affiliationsList = [];
 		var affSpan = $("<span>");
@@ -232,17 +249,17 @@ $(function() {
 		var uri = $("#uriAuthor").val();
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
-	    	getAuthority(uri);
+	    	getAuthorAuthority(uri);
 	    }, 1000);
 	});
 	
 	$("#uriEditor").change(function() {
 		resetEditorAuthorityCreation();
-		$("#uriLoadingSpinner").show();
+		$("#uriLoadingSpinnerEditor").show();
 		var uri = $("#uriEditor").val();
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
-	    	getAuthority(uri);
+	    	getEditorAuthority(uri);
 	    }, 1000);
 	});
 	
@@ -261,7 +278,26 @@ $(function() {
 		var authId = $(this).data('authority-id');
 		$("#uriAuthorLocalId").val(authId);
 		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).data('authority-name') + "</i>.");
-		$("#uriLoadingFound").popover('hide');
+		$("#uriLoadingFoundEditor").popover('hide');
+		event.preventDefault();
+	});
+	
+	$("#editorIconContainer").on('click', ".popover #createAuthority", function() {
+		var uri = $("#uriLoadingFoundEditor").data('authority-uri');
+		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
+			$("#createAuthority").hide();
+			$("#uriEditorLocalId").val(data['id']);
+			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			$("#uriLoadingFoundEditor").popover('hide');
+		});
+	});
+	
+	$("#editorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).data('authority-id');
+		$("#uriEditorLocalId").val(authId);
+		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).data('authority-name') + "</i>.");
+		$("#uriLoadingFoundEditor").popover('hide');
 		event.preventDefault();
 	});
 });
@@ -274,6 +310,14 @@ function resetAuthorCreationModal() {
 	resetAuthorAuthorityCreation();
 }
 
+function resetEditorCreationModal() {
+	$("#firstNameEditor").val("");
+	$("#lastNameEditor").val("");
+	$("#editorAffiliationTemplate").find("input").val("");
+	$("#uriEditor").val("");
+	resetEditorAuthorityCreation();
+}
+
 function resetAuthorAuthorityCreation() {
 	$("#uriLoadingFound").hide();
 	$("#uriLoadingFailure").hide();
@@ -282,7 +326,15 @@ function resetAuthorAuthorityCreation() {
 	$("#uriLoadingFailure").popover('hide');
 }
 
-function getAuthority(uri) {
+function resetEditorAuthorityCreation() {
+	$("#uriLoadingFoundEditor").hide();
+	$("#uriLoadingFailureEditor").hide();
+	$("#uriLoadingSpinnerEditor").hide();
+	$("#uriLoadingFoundEditor").popover('hide');
+	$("#uriLoadingFailureEditor").popover('hide');
+}
+
+function getAuthorAuthority(uri) {
 	$.get('<c:url value="/auth/authority/get?uri=" />' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
 		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
 		var content = "Authority <b>" + uri + "</b>";
@@ -322,20 +374,44 @@ function getAuthority(uri) {
 
 }
 
-function resetEditorCreationModal() {
-	$("#firstNameEditor").val("");
-	$("#lastNameEditor").val("");
-	$("#editorAffiliationTemplate").find("input").val("");
-	$("#uriEditor").val("");
-	resetEditorAuthorityCreation();
-}
+function getEditorAuthority(uri) {
+	$.get('<c:url value="/auth/authority/get?uri=" />' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
+		$("#uriLoadingFoundEditor").attr("data-authority-uri", data['uri']);
+		var content = "Authority <b>" + uri + "</b>";
+		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by you:";
+			content += "<ul>"
+			data['userAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
+		if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by someone else for this dataset:";
+			content += '<ul class="foundAuthorities">';
+			data['datasetAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
+		content += "<br><br>Do you want to create a managed authority entry?<br>" +
+					'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+		$("#uriLoadingFoundEditor").attr("data-content", content);
+		$("#uriLoadingFoundEditor").attr("data-authority-uri", uri);
+		$("#uriLoadingFoundEditor").show();
+		$("#uriLoadingFoundEditor").popover('show');
+	})
+	.fail(function() {
+		$("#uriLoadingFailureEditor").show();
+	 })
+    .always(function() {
+    	$("#uriLoadingSpinnerEditor").hide();
+	 });
 
-function resetEditorAuthorityCreation() {
-	$("#uriLoadingFound").hide();
-	$("#uriLoadingFailure").hide();
-	$("#uriLoadingSpinner").hide();
-	$("#uriLoadingFound").popover('hide');
-	$("#uriLoadingFailure").popover('hide');
 }
 
 let removeAuthor = function removeAuthor(e) {
@@ -453,7 +529,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <td>
 <span id="editorList" style="font-size: 18px">
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
-<span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-author-uri="${editor.uri}">
+<span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
 <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;&nbsp;
@@ -642,12 +718,14 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		    <label for="uriEditor">URI:</label>
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriEditor" placeholder="URI">
-			    <div id="iconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinner" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFound" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailure" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    <div id="editorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerEditor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundEditor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureEditor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
+			    <input type="hidden" id="uriEditorLocalId" />
 		    </div>
+		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
 		  </div>
 		  <div id="editorAffiliations">
 		  <div id="editorAffiliationTemplate" class="form-group">
