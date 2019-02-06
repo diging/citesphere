@@ -128,16 +128,14 @@ $(function() {
 
 		authorSpan.html("");
 		var affiliationsList = [];
-		var aff = $("#affiliations").children();
-		for(var i=1;i<aff.length;i++){
-			var item = aff.eq(i);
+		$("#affiliations").children().each(function(idx, elem){
 			var affSpan = $("<span>");
-			var input = item.find("input");
+			var input = $(elem).find("input");
 			affSpan.attr("data-affiliation-id", input.attr("data-affiliation-id"));
 			affSpan.attr("data-affiliation-name", input.val());
 			affiliationsList.push(input.val());
 			authorSpan.append(affSpan);
-		}
+		});
 		
 		var affiliationString = "";
 		if (affiliationsList) {
@@ -187,15 +185,15 @@ $(function() {
 		$("#uriAuthor").val(authorItem.attr("data-author-uri"));
 		$("#idAuthor").val(authorItem.attr("data-author-id"));
 		
-		for(var i=0;i<authorItem.children().length-1;i++){
-			var item = authorItem.children().eq(i);
+		authorItem.children("span").each(function(idx, elem){
 			var affInput = $("#affiliationTemplate").clone();
 			affInput.removeAttr("id");
-			affInput.find("input").attr("data-affiliation-name", item.data("affiliationName"));
-			affInput.find("input").attr("data-affiliation-id", item.data("affiliationId"));
-			affInput.find("input").val(item.data("affiliationName"));
+			affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
+			affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
+			affInput.find("input").val($(elem).data("affiliationName"));
 			$("#affiliations").append(affInput);
-		}
+		});
+		
 		if(authorItem.children().length-1>0){
 			$("#affiliationTemplate").hide();
 		}
@@ -376,7 +374,7 @@ let removeAuthor = function removeAuthor(e) {
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
 <span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
 <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
-${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
+${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
 &nbsp;&nbsp;
 <i class="fas fa-times remove-author"></i>
 </span>
