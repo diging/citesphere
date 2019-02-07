@@ -76,85 +76,20 @@ $(function() {
 	});
 	
 	$(document).on('click', '#addAuthorButton', function() {
-		var firstname = $("#firstNameAuthor").val();
-		var lastname = $("#lastNameAuthor").val();
-		var uri = $("#uriAuthor").val();
-		var localAuthority = $("#uriAuthorLocalId").val();
-		
-		var authorSpan = $("<span>");
-		authorSpan.attr("class", "label label-primary author-item");
-		authorSpan.attr("data-author-firstname", firstname);
-		authorSpan.attr("data-author-lastname", lastname);
-		authorSpan.attr("data-author-uri", uri);
-		authorSpan.attr("data-author-authority-id", localAuthority);
-		
-		var affiliationsList = [];
-		var affSpan = $("<span>");
-		$("#affiliations").children().each(function(idx, elem) {
-			var affSpan = $("<span>");
-			var input = $(elem).find("input");
-			affSpan.attr("data-affiliation-name", input.val());
-			affiliationsList.push(input.val());
-			authorSpan.append(affSpan);
-		});
-		
-		var affiliationString = "";
-		if (affiliationsList) {
-			affiliationString = " (" + affiliationsList.join(", ") + ")";
-		}
-		
-		authorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-		var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
-		deleteIcon.click(removeAuthor);
-		authorSpan.append(deleteIcon);
-		$("#authorList").append(authorSpan);
-		$("#authorList").append("&nbsp;&nbsp; ")
-		
-		$("#authorModal").modal('hide');
-		resetAuthorCreationModal();
+		constructAuthorModal();
 	});
 	
-	$(document).on('click', '#updateAuthorButton', function() {
-		var authorid = $("#idAuthor").val();
-		var firstname = $("#firstNameAuthor").val();
-		var lastname = $("#lastNameAuthor").val();
-		var uri = $("#uriAuthor").val();
-		var authorSpan = $("span[data-author-id='"+$("#idAuthor").val()+"']");
-		authorSpan.attr("class", "label label-primary author-item");
-		authorSpan.attr("data-author-firstname", firstname);
-		authorSpan.attr("data-author-lastname", lastname);
-		authorSpan.attr("data-author-uri", uri);
-		authorSpan.attr("data-author-id", authorid);
-
-		authorSpan.html("");
-		var affiliationsList = [];
-		$("#affiliations").children().each(function(idx, elem){
-			var affSpan = $("<span>");
-			var input = $(elem).find("input");
-			affSpan.attr("data-affiliation-id", input.attr("data-affiliation-id"));
-			affSpan.attr("data-affiliation-name", input.val());
-			affiliationsList.push(input.val());
-			authorSpan.append(affSpan);
-		});
-		
-		var affiliationString = "";
-		if (affiliationsList) {
-			affiliationString = " (" + affiliationsList.join(", ") + ")";
-		}
-		authorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-		var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
-		deleteIcon.click(removeAuthor);
-		authorSpan.append(deleteIcon);
-		$("#authorList").append(authorSpan);
-		$("#authorList").append("&nbsp;&nbsp; ")
-		$("#authorModal").modal('hide');
-		resetAuthorCreationModal();
+	$(document).on('click', '#updateAuthorButton', function(e) {
+		constructAuthorModal();	
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
 		$("#authorModal").modal('hide');
 		resetAuthorCreationModal();
 	});
+	
+	$(".edit-author").click(editAuthor);
+	$(".edit-author").css('cursor', 'pointer');
 	
 	$(".remove-author").click(removeAuthor);
 	$(".remove-author").css('cursor', 'pointer');
@@ -178,31 +113,6 @@ $(function() {
 	    }, 1000);
 	});
 	
-	$(".author-item").on("click", function(){
-		var authorItem = $(this);
-		$("#firstNameAuthor").val(authorItem.attr("data-author-firstname"));
-		$("#lastNameAuthor").val(authorItem.attr("data-author-lastname"));
-		$("#uriAuthor").val(authorItem.attr("data-author-uri"));
-		$("#idAuthor").val(authorItem.attr("data-author-id"));
-		
-		authorItem.children("span").each(function(idx, elem){
-			var affInput = $("#affiliationTemplate").clone();
-			affInput.removeAttr("id");
-			affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
-			affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
-			affInput.find("input").val($(elem).data("affiliationName"));
-			$("#affiliations").append(affInput);
-		});
-		
-		if(authorItem.children().length-1>0){
-			$("#affiliationTemplate").hide();
-		}
-		if($("#updateAuthorButton").length == 0){
-			$("#addAuthorButton").replaceWith("<button id='updateAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
-		}
-		$("#authorModal").modal('show');
-	});
-	
 	$("#iconContainer").on('click', ".popover #createAuthority", function() {
 		var uri = $("#uriLoadingFound").data('authority-uri');
 		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
@@ -223,10 +133,86 @@ $(function() {
 	});
 });
 
+function editAuthor(){
+	var authorItem = $(this).parent();
+	$("#firstNameAuthor").val(authorItem.attr("data-author-firstname"));
+	$("#lastNameAuthor").val(authorItem.attr("data-author-lastname"));
+	$("#uriAuthor").val(authorItem.attr("data-author-uri"));
+	$("#idAuthor").attr("value",authorItem.attr("id"));
+	
+	authorItem.children("span").each(function(idx, elem){
+		var affInput = $("#affiliationTemplate").clone();
+		affInput.removeAttr("id");
+		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
+		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
+		affInput.find("input").val($(elem).data("affiliationName"));
+		$("#affiliations").append(affInput);
+	});
+	
+	if(authorItem.children().length-1>0){
+		$("#affiliationTemplate").hide();
+	}
+	if($("#updateAuthorButton").length == 0){
+		$("#addAuthorButton").replaceWith("<button id='updateAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
+	}
+	$("#authorModal").modal('show');
+}
+
+function constructAuthorModal() {
+	if($("#idAuthor").attr("value").length>0){
+		console.log("edit "+$("#idAuthor").val());
+		authorSpan = $("#authorList").children().eq($("#idAuthor").val());
+		authorSpan.attr("id", $("#idAuthor").val());
+	}
+	else {
+		console.log("new "+$("#authorList").length);
+		authorSpan = $("<span>");
+		authorSpan.attr("id", $("#authorList").length);
+	}
+	var firstname = $("#firstNameAuthor").val();
+	var lastname = $("#lastNameAuthor").val();
+	var uri = $("#uriAuthor").val();
+	var localAuthority = $("#uriAuthorLocalId").val();
+	authorSpan.attr("class", "label label-primary author-item");
+	authorSpan.attr("data-author-firstname", firstname);
+	authorSpan.attr("data-author-lastname", lastname);
+	authorSpan.attr("data-author-uri", uri);
+	authorSpan.attr("data-author-authority-id", localAuthority);
+	authorSpan.html("");
+	
+	var affiliationsList = [];
+	$("#affiliations").children().each(function(idx, elem){
+		var input = $(elem).find("input");
+		if(input.val().length!=0){
+			var affSpan = $("<span>");
+			affSpan.attr("data-affiliation-id", input.attr("data-affiliation-id"));
+			affSpan.attr("data-affiliation-name", input.val());
+			affSpan.attr("class", "aff-remove");
+			affiliationsList.push(input.val());
+			authorSpan.append(affSpan);
+		}
+	});
+	
+	var affiliationString = "";
+	if (affiliationsList.length!=0) {
+		affiliationString = " (" + $.grep(affiliationsList, Boolean).join(", ") + ")";
+	}
+	authorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
+	var editIcon = $('<i class="far fa-edit edit-author"></i>')
+	var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
+	editIcon.click(editAuthor);
+	deleteIcon.click(removeAuthor);
+	authorSpan.append(editIcon);
+	authorSpan.append(deleteIcon);
+	$("#authorList").append(authorSpan);
+	$("#authorList").append("&nbsp;&nbsp; ")
+	$("#authorModal").modal('hide');
+	resetAuthorCreationModal();
+}
 function resetAuthorCreationModal() {
 	$("#firstNameAuthor").val("");
 	$("#lastNameAuthor").val("");
-	$("#affiliations").html("<div id='affiliationTemplate' class='form-group'><label for='affiliationAuthor'>Affiliation:</label><input type='text' class='form-control' placeholder='Affiliation'></div>");
+	$(".aff-remove").remove();
 	$("#uriAuthor").val("");
 	resetAuthorAuthorityCreation();
 	if($("#addAuthorButton").length == 0){
@@ -372,10 +358,12 @@ let removeAuthor = function removeAuthor(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
-<c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+<span id="${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
+<c:forEach items="${author.affiliations}" var="aff"> <span class="aff-remove" data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
-&nbsp;&nbsp;
+&nbsp;
+<i class="far fa-edit edit-author"></i>
+&nbsp;
 <i class="fas fa-times remove-author"></i>
 </span>
 &nbsp;&nbsp;
@@ -509,7 +497,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
       </div>
       <div class="modal-body">
       	  <div class="form-group">
-		    <input type="hidden" class="form-control" id="idAuthor">
+		    <input type="hidden" class="form-control" id="idAuthor" value="">
 		  </div>
           <div class="form-group">
 		    <label for="firstNameAuthor">First Name:</label>
