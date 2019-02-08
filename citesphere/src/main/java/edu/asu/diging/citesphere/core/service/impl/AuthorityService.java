@@ -22,7 +22,6 @@ import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.repository.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.core.repository.bib.CitationRepository;
 import edu.asu.diging.citesphere.core.repository.bib.PersonRepository;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 
@@ -31,9 +30,6 @@ public class AuthorityService implements IAuthorityService {
 
     @Autowired
     private AuthorityEntryRepository entryRepository;
-    
-    @Autowired
-    private CitationRepository citationRepository;
     
     @Autowired
     private CitationGroupRepository groupRepository;

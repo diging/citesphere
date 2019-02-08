@@ -28,14 +28,49 @@ $(function() {
 });
 </script>
 
+<ol class="breadcrumb">
+<li><a href="<c:url value="/" />">Home</a></li>
+<c:forEach items="${breadCrumbs}" var="crumb">
+	<c:choose>
+	<c:when test="${crumb.type == 'GROUP'}">
+		<c:url value="/auth/group/${crumb.objectId}/items" var="crumbUrl" />
+	</c:when>
+	<c:when test="${crumb.type == 'COLLECTION'}">
+		<c:url value="/auth/group/${zoteroGroupId}/collection/${crumb.objectId}/items" var="crumbUrl" />
+	</c:when>
+	<c:otherwise>
+		<c:url value="/auth/group/${zoteroGroupId}/items" var="crumbUrl" />
+	</c:otherwise>
+	</c:choose>
+  <li><a href="${crumbUrl}">${crumb.label}</a></li>
+</c:forEach>
+</ol>
+
 <h2>Items in Group ${zoteroGroupId}</h2>
 
+<div class="col-md-12">
 <ul id="pagination-top" class="pagination-sm"></ul>
+
 
 <div class="pull-right" style="margin-top: 20px;">
 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/create" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
 </div>
+</div>
 
+<div class="col-md-2">
+<p class="lead">Collections</p>
+<ul class="list-group">
+<c:forEach items="${citationCollections}" var="collection">
+  <li class="list-group-item">
+	  <span class="badge">${collection.numberOfItems}</span>
+	  <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collection.key}/items" />">${collection.name}</a>
+  </li>
+</c:forEach>
+</ul>
+
+</div>
+
+<div class="col-md-10">
 <table class="table table-striped table-bordered">
 <tr>
 	<th>Type</th>
@@ -78,4 +113,4 @@ $(function() {
 </tr>
 </c:forEach>
 </table>
-
+</div>
