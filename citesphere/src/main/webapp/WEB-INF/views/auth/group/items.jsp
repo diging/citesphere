@@ -29,6 +29,7 @@ $(function() {
 </script>
 
 <ol class="breadcrumb">
+<li><a href="<c:url value="/" />">Home</a></li>
 <c:forEach items="${breadCrumbs}" var="crumb">
 	<c:choose>
 	<c:when test="${crumb.type == 'GROUP'}">

@@ -233,6 +233,7 @@ public class CitationManager implements ICitationManager {
                     pageRequestRepository.deleteAll(requests);
                 }
                 PageRequest request = createPageRequest(user, page, sortBy, group, results);
+                request.setCollectionId(collectionId);
                 pageRequestRepository.save(request);
             } else if (localPageRequest != null) {
                 localPageRequest.setLastUpdated(OffsetDateTime.now());
