@@ -20,7 +20,6 @@ public class CitationCollection implements ICitationCollection {
     private long numberOfCollections;
     private long numberOfItems;
     private String name;
-    private Boolean parentCollection;
     private String parentCollectionKey;
     
     @ManyToOne(targetEntity=CitationGroup.class)
@@ -97,23 +96,11 @@ public class CitationCollection implements ICitationCollection {
     public void setName(String name) {
         this.name = name;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitationCollection#getParentCollection()
-     */
     @Override
-    public Boolean getParentCollection() {
-        return parentCollection;
-    }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitationCollection#setParentCollection(java.lang.Boolean)
-     */
-    @Override
-    public void setParentCollection(Boolean parentCollection) {
-        this.parentCollection = parentCollection;
-    }
     public String getParentCollectionKey() {
         return parentCollectionKey;
     }
+    @Override
     public void setParentCollectionKey(String parentCollectionKey) {
         this.parentCollectionKey = parentCollectionKey;
     }

@@ -158,14 +158,35 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    @Cacheable(value="topCitationCollections", key="#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
-    public ZoteroResponse<Collection> getCitationCollections(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
+    @Cacheable(value="singleCollections", key="#user.username + '_' + #collectionId + '_' + #groupId")
+    public Collection getCitationCollection(IUser user, String groupId, String collectionId) {
+        return getApi(user).getGroupCollectionsOperations().getCollection(groupId, collectionId);
+    }
+    
+    @Override
+    @Cacheable(value="citationCollections", key="#user.username + '_' + #collectionId + '_' + #groupId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
+    public ZoteroResponse<Collection> getCitationCollections(IUser user, String groupId, String collectionId, int page, String sortBy, Long lastGroupVersion) {
         if (page < 1) {
             page = 0;
         } else  {
             page = page-1;
         }
-        return getApi(user).getGroupCollectionsOperations().getTopCollections(groupId, page*zoteroCollectionsMaxNumber, zoteroCollectionsMaxNumber, sortBy, lastGroupVersion);
+        if (collectionId == null || collectionId.trim().isEmpty()) {
+            return getApi(user).getGroupCollectionsOperations().getTopCollections(groupId, page*zoteroCollectionsMaxNumber, zoteroCollectionsMaxNumber, sortBy, lastGroupVersion);
+        }
+        return getApi(user).getGroupCollectionsOperations().getCollections(groupId, collectionId, page*zoteroCollectionsMaxNumber, zoteroCollectionsMaxNumber, sortBy, lastGroupVersion);
+    }
+    
+    @Override
+    @Cacheable(value="collectionItems", key="#user.username + '_' + #groupId + '_' + #collectionId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
+    public ZoteroResponse<Item> getCollectionItems(IUser user, String groupId, String collectionId, int page, String sortBy, Long lastGroupVersion) {
+        Zotero zotero = getApi(user);
+        if (page < 1) {
+            page = 0;
+        } else  {
+            page = page-1;
+        }
+        return zotero.getGroupCollectionsOperations().getItems(groupId, collectionId, page*zoteroPageSize, zoteroPageSize, sortBy, lastGroupVersion);          
     }
     
     private Zotero getApi(IUser user) {

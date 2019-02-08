@@ -12,7 +12,7 @@ import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollection;
 @JaversSpringDataAuditable
 public interface CitationCollectionRepository extends PagingAndSortingRepository<CitationCollection, String> {
 
-    public CitationCollection findByKeyAndGroup(String id, ICitationGroup group);
+    public ICitationCollection findByKeyAndGroup(String id, ICitationGroup group);
     
     public List<ICitationCollection> findByParentCollectionKeyAndGroup(String parentCollectionKey, ICitationGroup group);
 }

@@ -34,7 +34,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
      * @see edu.asu.diging.citesphere.core.service.impl.ICitationCollectionManager#getTopCitationCollections(edu.asu.diging.citesphere.core.model.IUser, java.lang.String, java.lang.String, int, java.lang.String)
      */
     @Override
-    public CitationCollectionResult getTopCitationCollections(IUser user, String groupId, String parentCollectionId, int page, String sortBy) throws GroupDoesNotExistException {
+    public CitationCollectionResult getCitationCollections(IUser user, String groupId, String parentCollectionId, int page, String sortBy) throws GroupDoesNotExistException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         CitationCollectionResult collectionResult = new CitationCollectionResult();
         if (!groupOptional.isPresent()) {
@@ -45,7 +45,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         List<ICitationCollection> collections = collectionRepository.findByParentCollectionKeyAndGroup(parentCollectionId, group);
         
         
-        CitationCollectionResult results = zoteroManager.getTopCitationCollections(user, groupId, page, sortBy, group.getVersion());
+        CitationCollectionResult results = zoteroManager.getCitationCollections(user, groupId, parentCollectionId, page, sortBy, group.getVersion());
         List<ICitationCollection> updatedCollections = results.getCitationCollections();
         if (!results.isNotModified()) {
             collectionRepository.deleteAll(Arrays.asList(collections.toArray(new CitationCollection[collections.size()])));
@@ -55,5 +55,23 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         
         collectionResult.setCitationCollections(collections);
         return results;
+    }
+    
+    @Override
+    public ICitationCollection getCollection(IUser user, String groupId, String collectionId) {
+        // zotero returns false if there is no parentcollection
+        if (collectionId.equals("false")) {
+            collectionId = null;
+        }
+        if (collectionId == null) {
+            return null;
+        }
+        Optional<CitationCollection> collectionOptional = collectionRepository.findById(collectionId);
+        if (collectionOptional.isPresent()) {
+            return (ICitationCollection) collectionOptional.get();
+        }
+        ICitationCollection collection = zoteroManager.getCitationCollection(user, groupId, collectionId);
+        collectionRepository.save((CitationCollection)collection);
+        return collection;
     }
 }

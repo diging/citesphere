@@ -58,20 +58,7 @@ public class ZoteroManager implements IZoteroManager {
         
     public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page, sortBy, lastGroupVersion);
-        List<ICitation> citations = new ArrayList<>();
-        if (response.getResults() != null) {
-            for (Item item : response.getResults()) {
-                citations.add(citationFactory.createCitation(item));
-            }
-        }
-        CitationResults results = new CitationResults();
-        results.setTotalResults(response.getTotalResults());
-        if (response.getNotModified() != null && response.getNotModified()) {
-            results.setNotModified(true);
-            return results;
-        }
-        results.setCitations(citations);
-        return results;
+        return createCitationResults(response);
     }
 
     @Override
@@ -118,8 +105,14 @@ public class ZoteroManager implements IZoteroManager {
     }
     
     @Override
-    public CitationCollectionResult getTopCitationCollections(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
-        ZoteroResponse<Collection> response = zoteroConnector.getCitationCollections(user, groupId, page, sortBy, lastGroupVersion);
+    public ICitationCollection getCitationCollection(IUser user, String groupId, String collectionId) {
+        Collection collection = zoteroConnector.getCitationCollection(user, groupId, collectionId);
+        return collectionFactory.createCitationCollection(collection);
+    }
+    
+    @Override
+    public CitationCollectionResult getCitationCollections(IUser user, String groupId, String parentCollectionId, int page, String sortBy, Long lastGroupVersion) {
+        ZoteroResponse<Collection> response = zoteroConnector.getCitationCollections(user, groupId, parentCollectionId, page, sortBy, lastGroupVersion);
         List<ICitationCollection> citationCollections = new ArrayList<>();
         if (response.getResults() != null) {
             for (Collection collection : response.getResults()) {
@@ -132,6 +125,29 @@ public class ZoteroManager implements IZoteroManager {
             results.setNotModified(true);
         }
         results.setCitationCollections(citationCollections);
+        return results;
+    }
+    
+    @Override
+    public CitationResults getCollectionItems(IUser user, String groupId, String collectionId, int page, String sortBy, Long lastGroupVersion) {
+        ZoteroResponse<Item> response = zoteroConnector.getCollectionItems(user, groupId, collectionId, page, sortBy, lastGroupVersion);
+        return createCitationResults(response);
+    }
+
+    private CitationResults createCitationResults(ZoteroResponse<Item> response) {
+        List<ICitation> citations = new ArrayList<>();
+        if (response.getResults() != null) {
+            for (Item item : response.getResults()) {
+                citations.add(citationFactory.createCitation(item));
+            }
+        }
+        CitationResults results = new CitationResults();
+        results.setTotalResults(response.getTotalResults());
+        if (response.getNotModified() != null && response.getNotModified()) {
+            results.setNotModified(true);
+            return results;
+        }
+        results.setCitations(citations);
         return results;
     }
     

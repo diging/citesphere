@@ -22,12 +22,12 @@ public interface ICitationCollection {
 
     void setName(String name);
 
-    Boolean getParentCollection();
-
-    void setParentCollection(Boolean parentCollection);
-
     ICitationGroup getGroup();
 
     void setGroup(ICitationGroup group);
+
+    void setParentCollectionKey(String parentCollectionKey);
+
+    String getParentCollectionKey();
 
 }

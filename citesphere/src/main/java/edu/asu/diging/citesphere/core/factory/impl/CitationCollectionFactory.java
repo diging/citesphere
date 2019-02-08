@@ -20,7 +20,10 @@ public class CitationCollectionFactory implements ICitationCollectionFactory {
         citationCollection.setName(collection.getData().getName());
         citationCollection.setNumberOfCollections(collection.getMeta().getNumCollections());
         citationCollection.setNumberOfItems(collection.getMeta().getNumItems());
-        citationCollection.setParentCollection(collection.getData().getParentCollection());
+        // zotero returns "false" if there is no parent collection id
+        if (!collection.getData().getParentCollection().equals("false")) {
+            citationCollection.setParentCollectionKey(collection.getData().getParentCollection());
+        }
         citationCollection.setVersion(collection.getVersion());
         return citationCollection;
     }
