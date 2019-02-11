@@ -138,7 +138,7 @@ function editAuthor(){
 	$("#firstNameAuthor").val(authorItem.attr("data-author-firstname"));
 	$("#lastNameAuthor").val(authorItem.attr("data-author-lastname"));
 	$("#uriAuthor").val(authorItem.attr("data-author-uri"));
-	$("#idAuthor").attr("value",authorItem.attr("id"));
+	$("#idAuthor").attr("data-id-author", authorItem.attr("id"));
 	
 	authorItem.children("span").each(function(idx, elem){
 		var affInput = $("#affiliationTemplate").clone();
@@ -146,7 +146,7 @@ function editAuthor(){
 		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
 		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
 		affInput.find("input").val($(elem).data("affiliationName"));
-		$("#affiliations").append(affInput);
+		$("#authorModal #affiliations").append(affInput);
 	});
 	
 	if(authorItem.children().length-1>0){
@@ -159,16 +159,14 @@ function editAuthor(){
 }
 
 function constructAuthorModal() {
-	if($("#idAuthor").attr("value").length>0){
-		console.log("edit "+$("#idAuthor").val());
-		authorSpan = $("#authorList").children().eq($("#idAuthor").val());
-		authorSpan.attr("id", $("#idAuthor").val());
+	if($("#idAuthor").attr("data-id-author")){
+		$('span[id="'+$("#idAuthor").attr("data-id-author")+'"]').remove();
+		authorSpan = $('<span id="'+$("#idAuthor").attr("data-id-author")+'">');
 	}
 	else {
-		console.log("new "+$("#authorList").length);
-		authorSpan = $("<span>");
-		authorSpan.attr("id", $("#authorList").length);
+		authorSpan = $('<span id="author'+$("#authorList").length+'">');
 	}
+	authorSpan.html("");
 	var firstname = $("#firstNameAuthor").val();
 	var lastname = $("#lastNameAuthor").val();
 	var uri = $("#uriAuthor").val();
@@ -178,15 +176,16 @@ function constructAuthorModal() {
 	authorSpan.attr("data-author-lastname", lastname);
 	authorSpan.attr("data-author-uri", uri);
 	authorSpan.attr("data-author-authority-id", localAuthority);
-	authorSpan.html("");
 	
 	var affiliationsList = [];
-	$("#affiliations").children().each(function(idx, elem){
+	//TODO: exclude first input
+	$("#authorModal #affiliations").children().each(function(idx, elem){
 		var input = $(elem).find("input");
 		if(input.val().length!=0){
 			var affSpan = $("<span>");
 			affSpan.attr("data-affiliation-id", input.attr("data-affiliation-id"));
 			affSpan.attr("data-affiliation-name", input.val());
+			affSpan.val(input.val());
 			affSpan.attr("class", "aff-remove");
 			affiliationsList.push(input.val());
 			authorSpan.append(affSpan);
@@ -212,8 +211,8 @@ function constructAuthorModal() {
 function resetAuthorCreationModal() {
 	$("#firstNameAuthor").val("");
 	$("#lastNameAuthor").val("");
-	$(".aff-remove").remove();
 	$("#uriAuthor").val("");
+	$("#authorModal #affiliations .aff-remove").remove();
 	resetAuthorAuthorityCreation();
 	if($("#addAuthorButton").length == 0){
 		$("#addAuthorModalCancel").parent().append("<button id='addAuthorButton' type='button' class='btn btn-primary'>Add Author</button>")
@@ -358,7 +357,7 @@ let removeAuthor = function removeAuthor(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span id="${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
+<span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
 <c:forEach items="${author.affiliations}" var="aff"> <span class="aff-remove" data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
 &nbsp;
@@ -497,7 +496,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
       </div>
       <div class="modal-body">
       	  <div class="form-group">
-		    <input type="hidden" class="form-control" id="idAuthor" value="">
+		    <input type="hidden" class="form-control" id="idAuthor" data-id-author="">
 		  </div>
           <div class="form-group">
 		    <label for="firstNameAuthor">First Name:</label>
