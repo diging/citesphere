@@ -468,14 +468,16 @@ $(document).ready(function() {
 		loadFields();
 	});
 	
+	<c:if test="${empty citation}">
 	$("#items").val("${defaultItemType}");
 	loadFields();
+	</c:if>
 });
 
 function loadFields() {
 	var itemType = $('#items option:selected').val()
 	$("#displayMessage").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
-		"Reloading form fields");
+		" Loading form fields");
 	$("#messageModal").modal('show');
 	$.ajax({
 		url : '<c:url value="/auth/items/'+itemType+'/fields" />',
