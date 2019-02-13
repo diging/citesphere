@@ -25,6 +25,8 @@ $(function() {
 		window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
 	});
 	
+	$('.collapse').collapse()
+	
 });
 </script>
 
@@ -53,7 +55,7 @@ $(function() {
     <div class="panel-heading" role="tab" id="headingOne">
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Group Info
+          Group Info <i class="fas fa-arrows-alt-v pull-right"></i>
         </a>
       </h4>
     </div>
@@ -68,7 +70,7 @@ $(function() {
         <div class="col-md-6">
         <b>Owner:</b> ${group.owner}<br>
         <br>
-        <b>Last synced:</b> ${group.updatedOn}
+        <b>Last synced:</b> <span class="date">${group.updatedOn}</span>
         </div>
       </div>
     </div>
