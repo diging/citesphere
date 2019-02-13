@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +36,9 @@ public class GroupItemsController {
 
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
+    
+    @Value("${_available_item_columns}")
+    private String availableColumns;
 
     @Autowired
     private ICitationManager citationManager;
@@ -49,7 +53,8 @@ public class GroupItemsController {
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort)
+            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
+            @RequestParam(required = false, value = "columns") String[] columns)
             throws GroupDoesNotExistException {
         
         Integer pageInt = 1;
@@ -68,7 +73,21 @@ public class GroupItemsController {
         model.addAttribute("zoteroGroupId", groupId);
         model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("citationCollections", collectionManager.getCitationCollections(user, groupId, collectionId, pageInt, "title").getCitationCollections());
-
+        
+        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
+        List<String> shownColumns = new ArrayList<>();
+        if (columns != null && columns.length > 0) {
+            for (String column : columns) {
+                if (allowedColumns.contains(column)) {
+                    shownColumns.add(column);
+                }
+            }
+        }
+        
+        model.addAttribute("columns", shownColumns);
+        model.addAttribute("availableColumns", allowedColumns);
+        
+        
         ICitationGroup group = groupManager.getGroup(user, groupId);
         List<BreadCrumb> breadCrumbs = new ArrayList<>();
         

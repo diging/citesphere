@@ -7,6 +7,7 @@
 <script src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>
 
 <script>
+//# sourceURL=page.js
 $(function() {
 	$('#pagination-top').twbsPagination({
 	    totalPages: ${totalPages},
@@ -25,8 +26,22 @@ $(function() {
 		window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
 	});
 	
-	$('.collapse').collapse()
+	$('.collapse').collapse();
 	
+	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
+	
+	$("#addionalColumns a").click(function(event) {
+		var isShown = $(this).data("is-shown");
+		var col = $(this).data("column-name");
+		if (isShown) {
+			shownColumns = shownColumns.filter(function(value, index, arr){
+			    return value != col;
+			});
+		} else {
+			shownColumns.push(col);
+		}
+		window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />?columns=" + shownColumns; 
+	});
 });
 </script>
 
@@ -98,8 +113,25 @@ $(function() {
 </ul>
 
 </div>
-
 <div class="col-md-10">
+<div class="dropdown pull-right" style="padding-bottom: 10px;">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Columns
+    <span class="caret"></span>
+  </button>
+  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+  <c:forEach items="${availableColumns}" var="column">
+    <li><a href="#" data-column-name="${column}" data-is-shown="${fn:contains(columns, column) }">
+    <spring:eval expression="@labelsResource.getProperty('_item_attribute_label_' + column)"  var="columnLabel" />
+	<c:if test="${fn:contains(columns, column) }">
+	<i class="fas fa-check"></i> 
+	</c:if>
+	${columnLabel}
+    </a></li>
+  </c:forEach>
+  </ul>
+</div>
+
 <table class="table table-striped table-bordered">
 <tr>
 	<th>Type</th>
@@ -107,6 +139,12 @@ $(function() {
 	<th>Title</th>
 	<th>Date</th>
 	<th>URL</th>
+	<c:forEach items="${columns}" var="column">
+	<th>
+	<spring:eval expression="@labelsResource.getProperty('_item_attribute_label_' + column)"  var="columnLabel" />
+	${columnLabel}
+	</c:forEach>
+	</th>
 </tr>
 <c:forEach items="${items}" var="entry">
 <tr>
@@ -139,6 +177,9 @@ $(function() {
  		<a href="${entry.url}" target="_blank" title="${entry.url}"><i class="fas fa-globe-americas"></i></a>
  		</c:if>
  	</td>
+ 	<c:forEach items="${columns}" var="column">
+ 	<td style="max-width:300px;">${entry[column]}</td>
+ 	</c:forEach>
 </tr>
 </c:forEach>
 </table>
