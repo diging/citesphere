@@ -66,6 +66,7 @@ public class GroupItemsController {
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", groupId);
+        model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("citationCollections", collectionManager.getCitationCollections(user, groupId, collectionId, pageInt, "title").getCitationCollections());
 
         ICitationGroup group = groupManager.getGroup(user, groupId);

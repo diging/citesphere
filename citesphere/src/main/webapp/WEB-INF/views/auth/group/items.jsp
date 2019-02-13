@@ -46,7 +46,34 @@ $(function() {
 </c:forEach>
 </ol>
 
-<h2>Items in Group ${zoteroGroupId}</h2>
+<h2>Items in Group ${group.name}</h2>
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingOne">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Group Info
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+      <div class="panel-body">
+      	${group.description}
+        <div class="col-md-6">
+        <b>Local Version:</b> ${group.version}<br>
+        <b>Created on:</b> <span class="date">${group.created}</span><br>
+        <b>Last Modified on:</b> <span class="date">${group.lastModified}</span>
+        </div>
+        <div class="col-md-6">
+        <b>Owner:</b> ${group.owner}<br>
+        <br>
+        <b>Last synced:</b> ${group.updatedOn}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="col-md-12">
 <ul id="pagination-top" class="pagination-sm"></ul>
