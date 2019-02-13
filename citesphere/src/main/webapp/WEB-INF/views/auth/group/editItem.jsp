@@ -75,12 +75,8 @@ $(function() {
 		});
 	});
 	
-	$(document).on('click', '#addAuthorButton', function() {
-		constructAuthorModal();
-	});
-	
-	$(document).on('click', '#updateAuthorButton', function(e) {
-		constructAuthorModal();	
+	$(document).on('click', '#addAuthorButton, #updateAuthorButton', function() {
+		saveAuthor();
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
@@ -97,6 +93,7 @@ $(function() {
 	$("#addAffiliation").click(function() {
 		var affiliationCopy = $("#affiliationTemplate").clone();
 		affiliationCopy.removeAttr("id");
+		affiliationCopy.attr("class",affiliationCopy.attr("class")+" aff-info");
 		affiliationCopy.find("input").val("");
 		affiliationCopy.show();
 		$("#affiliations").append(affiliationCopy);
@@ -143,22 +140,24 @@ function editAuthor(){
 	authorItem.children("span").each(function(idx, elem){
 		var affInput = $("#affiliationTemplate").clone();
 		affInput.removeAttr("id");
+		affInput.attr("class",affInput.attr("class")+" aff-info");
 		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
 		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
 		affInput.find("input").val($(elem).data("affiliationName"));
 		$("#authorModal #affiliations").append(affInput);
 	});
 	
-	if(authorItem.children().length-1>0){
+	if(authorItem.children("span").length>0){
 		$("#affiliationTemplate").hide();
 	}
 	if($("#updateAuthorButton").length == 0){
 		$("#addAuthorButton").replaceWith("<button id='updateAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
 	}
+	$(".aff-info").show();
 	$("#authorModal").modal('show');
 }
 
-function constructAuthorModal() {
+function saveAuthor() {
 	if($("#idAuthor").attr("data-id-author")){
 		$('span[id="'+$("#idAuthor").attr("data-id-author")+'"]').remove();
 		authorSpan = $('<span id="'+$("#idAuthor").attr("data-id-author")+'">');
@@ -178,15 +177,13 @@ function constructAuthorModal() {
 	authorSpan.attr("data-author-authority-id", localAuthority);
 	
 	var affiliationsList = [];
-	//TODO: exclude first input
-	$("#authorModal #affiliations").children().each(function(idx, elem){
+	$("#affiliations").children().each(function(idx, elem){
 		var input = $(elem).find("input");
 		if(input.val().length!=0){
 			var affSpan = $("<span>");
 			affSpan.attr("data-affiliation-id", input.attr("data-affiliation-id"));
 			affSpan.attr("data-affiliation-name", input.val());
 			affSpan.val(input.val());
-			affSpan.attr("class", "aff-remove");
 			affiliationsList.push(input.val());
 			authorSpan.append(affSpan);
 		}
@@ -212,7 +209,8 @@ function resetAuthorCreationModal() {
 	$("#firstNameAuthor").val("");
 	$("#lastNameAuthor").val("");
 	$("#uriAuthor").val("");
-	$("#authorModal #affiliations .aff-remove").remove();
+	$(".aff-info").remove();
+	$("#affiliationTemplate").show();
 	resetAuthorAuthorityCreation();
 	if($("#addAuthorButton").length == 0){
 		$("#addAuthorModalCancel").parent().append("<button id='addAuthorButton' type='button' class='btn btn-primary'>Add Author</button>")
@@ -358,7 +356,7 @@ let removeAuthor = function removeAuthor(e) {
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
 <span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
-<c:forEach items="${author.affiliations}" var="aff"> <span class="aff-remove" data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+<c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
 &nbsp;
 <i class="far fa-edit edit-author"></i>
