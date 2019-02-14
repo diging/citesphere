@@ -75,7 +75,7 @@ $(function() {
 		});
 	});
 	
-	$(document).on('click', '#addAuthorButton, #updateAuthorButton', function() {
+	$(document).on('click', '#addAuthorButton', function() {
 		saveAuthor();
 	});
 	
@@ -93,7 +93,6 @@ $(function() {
 	$("#addAffiliation").click(function() {
 		var affiliationCopy = $("#affiliationTemplate").clone();
 		affiliationCopy.removeAttr("id");
-		affiliationCopy.attr("class",affiliationCopy.attr("class")+" aff-info");
 		affiliationCopy.find("input").val("");
 		affiliationCopy.show();
 		$("#affiliations").append(affiliationCopy);
@@ -140,30 +139,23 @@ function editAuthor(){
 	authorItem.children("span").each(function(idx, elem){
 		var affInput = $("#affiliationTemplate").clone();
 		affInput.removeAttr("id");
-		affInput.attr("class",affInput.attr("class")+" aff-info");
+		affInput.attr("class", affInput.attr("class")+" aff-info");
 		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
 		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
 		affInput.find("input").val($(elem).data("affiliationName"));
 		$("#authorModal #affiliations").append(affInput);
 	});
-	
-	if(authorItem.children("span").length>0){
-		$("#affiliationTemplate").hide();
-	}
-	if($("#updateAuthorButton").length == 0){
-		$("#addAuthorButton").replaceWith("<button id='updateAuthorButton' type='button' class='btn btn-primary'>Update Author</button>");
-	}
-	$(".aff-info").show();
+	$("#addAuthorButton").text("Update Author");
 	$("#authorModal").modal('show');
 }
 
 function saveAuthor() {
 	if($("#idAuthor").attr("data-id-author")){
-		$('span[id="'+$("#idAuthor").attr("data-id-author")+'"]').remove();
-		authorSpan = $('<span id="'+$("#idAuthor").attr("data-id-author")+'">');
+		authorSpan = $('#'+$("#idAuthor").attr("data-id-author"));
 	}
 	else {
-		authorSpan = $('<span id="author'+$("#authorList").length+'">');
+		$("#idAuthor").attr("data-id-author", $("#authorList").length);
+		authorSpan = $('<span id="author'+$("#idAuthor").attr("data-id-author")+'">');
 	}
 	authorSpan.html("");
 	var firstname = $("#firstNameAuthor").val();
@@ -209,13 +201,12 @@ function resetAuthorCreationModal() {
 	$("#firstNameAuthor").val("");
 	$("#lastNameAuthor").val("");
 	$("#uriAuthor").val("");
+	$("#idAuthor").attr("data-id-author","");
+	$(".aff-info").find("input").val("");
 	$(".aff-info").remove();
-	$("#affiliationTemplate").show();
+	$("#affiliationTemplate").find("input").val("");
+	$("#addAuthorButton").text("Add Author");
 	resetAuthorAuthorityCreation();
-	if($("#addAuthorButton").length == 0){
-		$("#addAuthorModalCancel").parent().append("<button id='addAuthorButton' type='button' class='btn btn-primary'>Add Author</button>")
-	}
-	$("#updateAuthorButton").remove();
 }
 
 function resetAuthorAuthorityCreation() {
