@@ -94,7 +94,6 @@ $(function() {
 		var affiliationCopy = $("#affiliationTemplate").clone();
 		affiliationCopy.removeAttr("id");
 		affiliationCopy.find("input").val("");
-		affiliationCopy.show();
 		$("#affiliations").append(affiliationCopy);
 	});
 	
@@ -134,7 +133,7 @@ function editAuthor(){
 	$("#firstNameAuthor").val(authorItem.attr("data-author-firstname"));
 	$("#lastNameAuthor").val(authorItem.attr("data-author-lastname"));
 	$("#uriAuthor").val(authorItem.attr("data-author-uri"));
-	$("#idAuthor").attr("data-id-author", authorItem.attr("id"));
+	$("#idAuthor").attr("data-author-id", authorItem.attr("id"));
 	
 	authorItem.children("span").each(function(idx, elem){
 		var affInput = $("#affiliationTemplate").clone();
@@ -150,12 +149,12 @@ function editAuthor(){
 }
 
 function saveAuthor() {
-	if($("#idAuthor").attr("data-id-author")){
-		authorSpan = $('#'+$("#idAuthor").attr("data-id-author"));
+	if($("#idAuthor").attr("data-author-id")){
+		authorSpan = $('#'+$("#idAuthor").attr("data-author-id"));
 	}
 	else {
-		$("#idAuthor").attr("data-id-author", $("#authorList").length);
-		authorSpan = $('<span id="author'+$("#idAuthor").attr("data-id-author")+'">');
+		$("#idAuthor").attr("data-author-id", $("#authorList").length);
+		authorSpan = $('<span id="author'+$("#idAuthor").attr("data-author-id")+'">');
 	}
 	authorSpan.html("");
 	var firstname = $("#firstNameAuthor").val();
@@ -200,11 +199,11 @@ function saveAuthor() {
 function resetAuthorCreationModal() {
 	$("#firstNameAuthor").val("");
 	$("#lastNameAuthor").val("");
+	$("#affiliationTemplate").find("input").val("");
 	$("#uriAuthor").val("");
-	$("#idAuthor").attr("data-id-author","");
+	$("#idAuthor").attr("data-author-id","");
 	$(".aff-info").find("input").val("");
 	$(".aff-info").remove();
-	$("#affiliationTemplate").find("input").val("");
 	$("#addAuthorButton").text("Add Author");
 	resetAuthorAuthorityCreation();
 }
@@ -485,7 +484,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
       </div>
       <div class="modal-body">
       	  <div class="form-group">
-		    <input type="hidden" class="form-control" id="idAuthor" data-id-author="">
+		    <input type="hidden" class="form-control" id="idAuthor" data-author-id="">
 		  </div>
           <div class="form-group">
 		    <label for="firstNameAuthor">First Name:</label>
