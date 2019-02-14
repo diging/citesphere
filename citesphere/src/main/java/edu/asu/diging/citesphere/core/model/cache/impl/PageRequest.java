@@ -64,6 +64,7 @@ public class PageRequest implements IPageRequest {
     @ManyToMany(targetEntity=Citation.class)
     private List<ICitation> citations;
     private String sortBy;
+    private String collectionId;
     
     private OffsetDateTime lastUpdated;
     
@@ -180,6 +181,12 @@ public class PageRequest implements IPageRequest {
     @Override
     public void setSortBy(String sortBy) {
         this.sortBy = sortBy;
+    }
+    public String getCollectionId() {
+        return collectionId;
+    }
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
     }
     @Override
     public OffsetDateTime getLastUpdated() {

@@ -77,10 +77,10 @@ public class CitationManager implements ICitationManager {
     public void init() {
         sortFunctions = new HashMap<>();
         sortFunctions.put("title", ((o1, o2) -> {
-            if (o1 == null || o2 == null) { 
-                return o1.getTitle().compareTo(o2.getTitle());
-            }
-            return o1.getTitle().toLowerCase().compareTo(o2.getTitle().toLowerCase());
+            String o1Title = o1 != null && o1.getTitle() != null ? o1.getTitle() : "";
+            String o2Title = o2 != null && o2.getTitle() != null ? o2.getTitle() : "";
+            
+            return o1Title.toLowerCase().compareTo(o2Title.toLowerCase());
         }));
     }
     
@@ -188,14 +188,14 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy) throws GroupDoesNotExistException {
+    public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy) throws GroupDoesNotExistException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (groupOptional.isPresent()) {
             ICitationGroup group = groupOptional.get();
            
             List<PageRequest> requests = null;
             try {
-                requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortBy(user, groupId, page, ZoteroObjectType.GROUP, sortBy);
+                requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortByAndCollectionId(user, groupId, page, ZoteroObjectType.GROUP, sortBy, collectionId);
             } catch (JpaObjectRetrievalFailureException ex) {
                 logger.warn("Could not retrieve page request.", ex);
             }
@@ -221,13 +221,19 @@ public class CitationManager implements ICitationManager {
                 }
             }
             
-            CitationResults results = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getVersion());
+            CitationResults results = null;
+            if (collectionId == null || collectionId.trim().isEmpty()) {
+                results = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getVersion());
+            } else {
+                results = zoteroManager.getCollectionItems(user, groupId, collectionId, page, sortBy, group.getVersion());
+            }
             if (!results.isNotModified()) {
                 if (requests != null && requests.size() > 0) {
                     // delete last cache
                     pageRequestRepository.deleteAll(requests);
                 }
                 PageRequest request = createPageRequest(user, page, sortBy, group, results);
+                request.setCollectionId(collectionId);
                 pageRequestRepository.save(request);
             } else if (localPageRequest != null) {
                 localPageRequest.setLastUpdated(OffsetDateTime.now());
