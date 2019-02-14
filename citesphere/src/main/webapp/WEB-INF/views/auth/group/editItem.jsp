@@ -297,13 +297,13 @@ let removeAuthor = function removeAuthor(e) {
 
 <form:form action="${processingUrl}" modelAttribute="form" method="POST" id="editForm">
 <table class="table table-striped">
-<c:if test="${not empty citation.key}" >
-<tr>
+
+<tr <c:if test="${empty citation.key}" >style="display:none;"</c:if>>
 <td width="20%">Item Key</td>
 <td>${citation.key}</td>
 <form:hidden path="key" value="${citation.key}"/>
 </tr>
-</c:if>
+
 <tr>
 <td width="20%">Citation Type</td>
 <td>
@@ -321,25 +321,23 @@ let removeAuthor = function removeAuthor(e) {
 </form:select>
 </td>
 </tr>
-<c:if test="${fn:contains(fields, 'title') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'title') }">style="display:none;"</c:if>>
 <td>Title</td>
 <td>
 <form:input path="title" type="text" class="form-control" placeholder="Title" value="${not empty form.title ? form.title : citation.title}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'shortTitle') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'shortTitle') }">style="display:none;"</c:if>>
 <td>Short Title</td>
 <td><form:input path="shortTitle" type="text" class="form-control" placeholder="Short title" value="${citation.shortTitle}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'dateFreetext') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'dateFreetext') }">style="display:none;"</c:if>>
 <td>Date</td>
 <td><form:input path="dateFreetext" type="text" class="form-control" placeholder="Date" value="${not empty form.dateFreetext ? form.dateFreetext : citation.dateFreetext}" /></td>
 </tr>
-</c:if>
+
 <tr>
 <td>Authors</td>
 <td>
@@ -367,108 +365,91 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 </c:forEach>
 </td>
 </tr>
-<c:if test="${fn:contains(fields, 'publicationTitle') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
 <td>Publication Title</td>
 <td><form:input path="publicationTitle" type="text" class="form-control" placeholder="Publication Title" value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'journalAbbreviation') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'journalAbbreviation') }">style="display:none;"</c:if>>
 <td>Journal Abbreviation</td>
 <td><form:input path="journalAbbreviation" type="text" class="form-control" placeholder="Journal Abbreviation" value="${not empty form.journalAbbreviation ? form.journalAbbreviation : citation.journalAbbreviation}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'volume') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'volume') }">style="display:none;"</c:if>>
 <td>Volume</td>
 <td><form:input path="volume"  type="text" class="form-control" placeholder="Volume" value="${not empty form.volume ? form.volume : citation.volume}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'issue') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'issue') }">style="display:none;"</c:if>>
 <td>Issue</td>
 <td><form:input path="issue" type="text" class="form-control" placeholder="Issue" value="${not empty form.issue ? form.issue : citation.issue}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'pages') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'pages') }">style="display:none;"</c:if>>
 <td>Pages</td>
 <td><form:input path="pages" type="text" class="form-control" placeholder="Pages" value="${not empty form.pages ? form.pages : citation.pages}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'series') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'series') }">style="display:none;"</c:if>>
 <td>Series</td>
 <td><form:input path="series" type="text" class="form-control" placeholder="Series" value="${not empty form.series ? form.series : citation.series}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'seriesTitle') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'seriesTitle') }">style="display:none;"</c:if>>
 <td>Series Title</td>
 <td><form:input path="seriesTitle" type="text" class="form-control" placeholder="Series Title" value="${not empty form.seriesTitle ? form.seriesTitle : citation.seriesTitle}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'seriesText') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'seriesText') }">style="display:none;"</c:if>>
 <td>Series Text</td>
 <td><form:input path="seriesText" type="text" class="form-control" placeholder="Series Text" value="${not empty form.seriesText ? form.seriesText : citation.seriesText}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'url') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'url') }">style="display:none;"</c:if>>
 <td>URL</td>
 <td><form:input path="url" type="text" class="form-control" placeholder="Url" value="${not empty form.url ? form.url : citation.url}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'language') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'language') }">style="display:none;"</c:if>>
 <td>Language</td>
 <td><form:input path="language" type="text" class="form-control" placeholder="Language" value="${not empty form.language ? form.language : citation.language}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'doi') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'doi') }">style="display:none;"</c:if>>
 <td>DOI</td>
 <td><form:input path="doi" type="text" class="form-control" placeholder="DOI" value="${not empty form.doi ? form.doi : citation.doi}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'issn') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'issn') }">style="display:none;"</c:if>>
 <td>ISSN</td>
 <td><form:input path="issn" type="text" class="form-control" placeholder="ISSN" value="${not empty form.issn ? form.issn : citation.issn}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'archive') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'archive') }">style="display:none;"</c:if>>
 <td>Archive</td>
 <td><form:input path="archive" type="text" class="form-control" placeholder="Archive" value="${not empty form.archive ? form.archive : citation.archive}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'archiveLocation') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'archiveLocation') }">style="display:none;"</c:if>>
 <td>Archive Location</td>
 <td><form:input path="archiveLocation" type="text" class="form-control" placeholder="Archive Location" value="${not empty form.archiveLocation ? form.archiveLocation : citation.archiveLocation}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'libraryCatalog') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'libraryCatalog') }">style="display:none;"</c:if>>
 <td>Library Catalog</td>
 <td><form:input path="libraryCatalog" type="text" class="form-control" placeholder="Library Catalog" value="${not empty form.libraryCatalog ? form.libraryCatalog : citation.libraryCatalog}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'callNumber') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'callNumber') }">style="display:none;"</c:if>>
 <td>Call Number</td>
 <td><form:input path="callNumber" type="text" class="form-control" placeholder="Call Number" value="${not empty form.callNumber ? form.callNumber : citation.callNumber}" /></td>
 </tr>
-</c:if>
-<c:if test="${fn:contains(fields, 'rights') }">
-<tr>
+
+<tr <c:if test="${not fn:contains(fields, 'rights') }">style="display:none;"</c:if>>
 <td>Rights</td>
 <td><form:input path="rights" type="text" class="form-control" placeholder="Rights" value="${not empty form.rights ? form.rights : citation.rights}" /></td>
 </tr>
-</c:if>
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
@@ -484,7 +465,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
       </div>
       <div class="modal-body">
       	  <div class="form-group">
-		    <input type="hidden" class="form-control" id="idAuthor" data-author-id="">
+		    <input type="hidden" class="form-control" id="idAuthor">
 		  </div>
           <div class="form-group">
 		    <label for="firstNameAuthor">First Name:</label>
@@ -526,33 +507,46 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
   </div>
 </div>
 <script>
+//# sourceURL=fields.js
 $(document).ready(function() {
 	$('#items').on("change", function(e){
-		var itemType = $('#items option:selected').val()
-		$("#displayMessage").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
-			"Reloading form fields");
-		$("#messageModal").modal('show');
-		$.ajax({
-			url : '<c:url value="/auth/items/'+itemType+'/fields" />',
-			type : 'GET',
-			success: function(changedFields){
-				$('form input').parent().closest('tr').hide();
-				for(i=0;i<changedFields.length;i++){
-					$('form input#'+changedFields[i]).parent().closest('tr').show();
-				}
-				$('#messageModal').modal('hide');
-				
-			},
-			error: function(){
-				$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
-				"Error loading the form fields. Try again later.");
-				$('#messageModal').modal('show');
-				setTimeout(function() {
-					$('#messageModal').modal('hide');
-			  	}, 3000);
-				
-			}
-		});
-	})
+		loadFields();
+	});
+	
+	<c:if test="${empty citation}">
+	$("#items").val("${defaultItemType}");
+	loadFields();
+	</c:if>
 });
+
+function loadFields() {
+	var itemType = $('#items option:selected').val()
+	$("#displayMessage").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+		" Loading form fields");
+	$("#messageModal").modal('show');
+	$.ajax({
+		url : '<c:url value="/auth/items/'+itemType+'/fields" />',
+		type : 'GET',
+		success: function(changedFields){
+			$('form input').each(function(idx, elem) {
+				var tr = $(elem).parent().closest('tr');
+				tr.hide()
+			});
+			for(i=0;i<changedFields.length;i++){
+				$('form input#'+changedFields[i]).parent().closest('tr').show();
+			}
+			$('#messageModal').modal('hide');
+			
+		},
+		error: function(){
+			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+			"Error loading the form fields. Try again later.");
+			$('#messageModal').modal('show');
+			setTimeout(function() {
+				$('#messageModal').modal('hide');
+		  	}, 3000);
+			
+		}
+	});
+}
 </script>

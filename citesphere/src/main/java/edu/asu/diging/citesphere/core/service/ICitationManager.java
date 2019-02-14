@@ -18,7 +18,7 @@ public interface ICitationManager {
 
     List<ICitationGroup> getGroups(IUser user);
 
-    CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy) throws GroupDoesNotExistException;
+    CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy) throws GroupDoesNotExistException;
 
     ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException;
 
