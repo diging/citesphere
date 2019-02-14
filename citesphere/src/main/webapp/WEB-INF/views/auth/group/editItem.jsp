@@ -151,8 +151,7 @@ function editAuthor(){
 function saveAuthor() {
 	if($("#idAuthor").attr("data-author-id")){
 		authorSpan = $('#'+$("#idAuthor").attr("data-author-id"));
-	}
-	else {
+	} else {
 		$("#idAuthor").attr("data-author-id", $("#authorList").length);
 		authorSpan = $('<span id="author'+$("#idAuthor").attr("data-author-id")+'">');
 	}
@@ -465,8 +464,8 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
       </div>
       <div class="modal-body">
       	  <div class="form-group">
-		    <input type="hidden" class="form-control" id="idAuthor">
-		  </div>
+      	  	<input type="hidden" class="form-control" id="idAuthor">
+      	  </div>
           <div class="form-group">
 		    <label for="firstNameAuthor">First Name:</label>
 		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
