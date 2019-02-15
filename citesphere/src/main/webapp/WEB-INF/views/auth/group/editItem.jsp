@@ -13,12 +13,12 @@
 <script>
 //@ sourceURL=submit.js
 $(function() {
-	$("#uriLoadingSpinner").hide();
-	$("#uriLoadingFailure").hide();
-	$("#uriLoadingFound").hide();
+	$("#uriLoadingSpinnerAuthor").hide();
+	$("#uriLoadingFailureAuthor").hide();
+	$("#uriLoadingFoundAuthor").hide();
 	
-	$("#uriLoadingFound").popover();
-	$("#uriLoadingFailure").popover();
+	$("#uriLoadingFoundAuthor").popover();
+	$("#uriLoadingFailureAuthor").popover();
 	
 	$("#uriLoadingSpinnerEditor").hide();
 	$("#uriLoadingFailureEditor").hide();
@@ -29,160 +29,38 @@ $(function() {
 	
 	$("#submitForm").click(function() {
 		constructPersonArray("author");
-		
-		$(".editor-item").each(function(idx, editor) {
-			var editorIdField = $("<input>");
-			editorIdField.attr("type", "hidden");
-			editorIdField.attr("id", "editors" + idx + ".id");
-			editorIdField.attr("name", "editors[" + idx + "].id");
-			editorIdField.attr("value", $(editor).attr("data-editor-id"));
-			$("#editForm").append(editorIdField);
-			
-			var editorFirstNameField = $("<input>");
-			editorFirstNameField.attr("type", "hidden");
-			editorFirstNameField.attr("id", "editors" + idx + ".firstName");
-			editorFirstNameField.attr("name", "editors[" + idx + "].firstName");
-			editorFirstNameField.attr("value", $(editor).attr("data-editor-firstname"));
-			$("#editForm").append(editorFirstNameField);
-			
-			var editorLastNameField = $("<input>");
-			editorLastNameField.attr("type", "hidden");
-			editorLastNameField.attr("id", "editors" + idx + ".lastName");
-			editorLastNameField.attr("name", "editors[" + idx + "].lastName");
-			editorLastNameField.attr("value", $(editor).attr("data-editor-lastname"));
-			$("#editForm").append(editorLastNameField);
-			
-			var editorUriField = $("<input>");
-			editorUriField.attr("type", "hidden");
-			editorUriField.attr("id", "editors" + idx + ".uri");
-			editorUriField.attr("name", "editors[" + idx + "].uri");
-			editorUriField.attr("value", $(editor).attr("data-editor-uri"));
-			$("#editForm").append(editorUriField);
-			
-			var editorAuthorityField = $("<input>");
-			editorAuthorityField.attr("type", "hidden");
-			editorAuthorityField.attr("id", "editors" + idx + ".localAuthorityId");
-			editorAuthorityField.attr("name", "editors[" + idx + "].localAuthorityId");
-			editorAuthorityField.attr("value", $(editor).attr("data-editor-authority-id"));
-			$("#editForm").append(editorAuthorityField);
-			
-			$(editor).children("span").each(function(idx2, affiliation) {
-				var affiliationField = $("<input>");
-				affiliationField.attr("type", "hidden");
-				affiliationField.attr("id", "editors" + idx + ".affiliations" + idx2 + ".name");
-				affiliationField.attr("name", "editors[" + idx + "].affiliations[" + idx2 + "].name");
-				affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
-				$("#editForm").append(affiliationField);
-				
-				var affiliationIdField = $("<input>");
-				affiliationIdField.attr("type", "hidden");
-				affiliationIdField.attr("id", "editors" + idx + ".affiliations" + idx2 + ".id");
-				affiliationIdField.attr("name", "editors[" + idx + "].affiliations[" + idx2 + "].id");
-				affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
-				$("#editForm").append(affiliationIdField);
-			});
-		});
+		constructPersonArray("editor");
 	});
 	
 	$("#addAuthorButton").click(function() {
-		var firstname = $("#firstNameAuthor").val();
-		var lastname = $("#lastNameAuthor").val();
-		var uri = $("#uriAuthor").val();
-		var localAuthority = $("#uriAuthorLocalId").val();
-		
-		var authorSpan = $("<span>");
-		authorSpan.attr("class", "label label-primary author-item");
-		authorSpan.attr("data-author-firstname", firstname);
-		authorSpan.attr("data-author-lastname", lastname);
-		authorSpan.attr("data-author-uri", uri);
-		authorSpan.attr("data-author-authority-id", localAuthority);
-		
-		var affiliationsList = [];
-		var affSpan = $("<span>");
-		$("#affiliations").children().each(function(idx, elem) {
-			var affSpan = $("<span>");
-			var input = $(elem).find("input");
-			affSpan.attr("data-affiliation-name", input.val());
-			affiliationsList.push(input.val());
-			authorSpan.append(affSpan);
-		});
-		
-		var affiliationString = "";
-		if (affiliationsList) {
-			affiliationString = " (" + affiliationsList.join(", ") + ")";
-		}
-		
-		authorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-		var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
-		deleteIcon.click(removeAuthor);
-		authorSpan.append(deleteIcon);
-		$("#authorList").append(authorSpan);
-		$("#authorList").append("&nbsp;&nbsp; ")
-		
-		$("#authorModal").modal('hide');
-		resetAuthorCreationModal();
+		savePersonDetails('Author');
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
 		$("#authorModal").modal('hide');
-		resetAuthorCreationModal();
+		resetPersonCreationModal();
 	});
 	
 	$("#addEditorButton").click(function() {
-		var firstname = $("#firstNameEditor").val();
-		var lastname = $("#lastNameEditor").val();
-		var uri = $("#uriEditor").val();
-		var localAuthority = $("#uriEditorLocalId").val();
-		
-		var editorSpan = $("<span>");
-		editorSpan.attr("class", "label label-info editor-item");
-		editorSpan.attr("data-editor-firstname", firstname);
-		editorSpan.attr("data-editor-lastname", lastname);
-		editorSpan.attr("data-editor-uri", uri);
-		editorSpan.attr("data-editor-authority-id", localAuthority);
-		
-		var affiliationsList = [];
-		var affSpan = $("<span>");
-		$("#editorAffiliations").children().each(function(idx, elem) {
-			var affSpan = $("<span>");
-			var input = $(elem).find("input");
-			affSpan.attr("data-affiliation-name", input.val());
-			affiliationsList.push(input.val());
-			editorSpan.append(affSpan);
-		});
-		
-		var affiliationString = "";
-		if (affiliationsList) {
-			affiliationString = " (" + affiliationsList.join(", ") + ")";
-		}
-		
-		editorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-		var deleteIcon = $('<i class="fas fa-times remove-editor"></i>');
-		deleteIcon.click(removeEditor);
-		editorSpan.append(deleteIcon);
-		$("#editorList").append(editorSpan);
-		$("#editorList").append("&nbsp;&nbsp; ")
-		
-		$("#editorModal").modal('hide');
-		resetEditorCreationModal();
+		savePersonDetails('Editor');
 	});
 
 	$("#addEditorModalCancel").click(function() {
 		$("#editorModal").modal('hide');
-		resetEditorCreationModal();
+		resetPersonCreationModal();
 	});
 	
-	$(".remove-author").click(removeAuthor);
+	$(".remove-author").click(removePerson);
 	$(".remove-author").css('cursor', 'pointer');
 	
-	$("#addAffiliation").click(function() {
-		var affiliationCopy = $("#affiliationTemplate").clone();
+	$("#addAuthorAffiliation").click(function() {
+		var affiliationCopy = $("#authorAffiliationTemplate").clone();
 		affiliationCopy.removeAttr("id");
 		affiliationCopy.find("input").val("");
-		$("#affiliations").append(affiliationCopy);
+		$("#authorAffiliations").append(affiliationCopy);
 	});
 	
-	$(".remove-editor").click(removeEditor);
+	$(".remove-editor").click(removePerson);
 	$(".remove-editor").css('cursor', 'pointer');
 
 	$("#addEditorAffiliation").click(function() {
@@ -194,40 +72,40 @@ $(function() {
 	
 	var timer = null;
 	$("#uriAuthor").change(function() {
-		resetAuthorAuthorityCreation();
-		$("#uriLoadingSpinner").show();
+		resetPersonAuthorityCreation("Author");
+		$("#uriLoadingSpinnerAuthor").show();
 		var uri = $("#uriAuthor").val();
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
-	    	getAuthorAuthority(uri);
+	    	getPersonAuthority(uri, "Author");
 	    }, 1000);
 	});
 	
 	$("#uriEditor").change(function() {
-		resetEditorAuthorityCreation();
+		resetPersonAuthorityCreation("Editor");
 		$("#uriLoadingSpinnerEditor").show();
 		var uri = $("#uriEditor").val();
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
-	    	getEditorAuthority(uri);
+	    	getPersonAuthority(uri, "Editor");
 	    }, 1000);
 	});
 	
-	$("#iconContainer").on('click', ".popover #createAuthority", function() {
-		var uri = $("#uriLoadingFound").attr('data-authority-uri');
+	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
+		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
 		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
-			$("#createAuthority").hide();
+			$("#authorCreateAuthority").hide();
 			$("#uriAuthorLocalId").val(data['id']);
 			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			$("#uriLoadingFound").popover('hide');
+			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			$("#uriLoadingFoundAuthor").popover('hide');
 		});
 	});
 	
-	$("#iconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
-		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
 		$("#uriLoadingFoundEditor").popover('hide');
 		event.preventDefault();
 	});
@@ -252,41 +130,79 @@ $(function() {
 	});
 });
 
+function savePersonDetails(personType){
+	personType_lowerCase = personType.toLowerCase();
+	var firstname = $("#firstName"+personType).val();
+	var lastname = $("#lastName"+personType).val();
+	var uri = $("#uri"+personType).val();
+	var localAuthority = $("#uri"+personType+"LocalId").val();
+	
+	var personSpan = $("<span>");
+	personSpan.attr("class", "label label-info "+personType_lowerCase +"-item");
+	personSpan.attr("data-"+personType_lowerCase+"-firstname", firstname);
+	personSpan.attr("data-"+personType_lowerCase+"-lastname", lastname);
+	personSpan.attr("data-"+personType_lowerCase+"-uri", uri);
+	personSpan.attr("data-"+personType_lowerCase+"-authority-id", localAuthority);
+	
+	var affiliationsList = [];
+	var affSpan = $("<span>");
+	$("#"+personType_lowerCase+"Affiliations").children().each(function(idx, elem) {
+		var affSpan = $("<span>");
+		var input = $(elem).find("input");
+		affSpan.attr("data-affiliation-name", input.val());
+		affiliationsList.push(input.val());
+		personSpan.append(affSpan);
+	});
+	
+	var affiliationString = "";
+	if (affiliationsList) {
+		affiliationString = " (" + affiliationsList.join(", ") + ")";
+	}
+	
+	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
+	var deleteIcon = $('<i class="fas fa-times remove-'+personType_lowerCase+'"></i>');
+	deleteIcon.click(removePerson);
+	personSpan.append(deleteIcon);
+	$("#"+personType_lowerCase+"List").append(personSpan);
+	$("#"+personType_lowerCase+"List").append("&nbsp;&nbsp; ");
+	$("#"+personType_lowerCase+"Modal").modal('hide');
+	resetPersonCreationModal(personType);
+}
 function constructPersonArray(arrayName){
 		$('.'+arrayName+'-item').each(function(idx, person) {
 		var personIdField = $("<input>");
 		personIdField.attr("type", "hidden");
 		personIdField.attr("id", arrayName+"s" + idx + ".id");
 		personIdField.attr("name", arrayName+"s[" + idx + "].id");
-		personIdField.attr("value", $(person).data(arrayName+"-id"));
+		personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
 		$("#editForm").append(personIdField);
 		
 		var personFirstNameField = $("<input>");
 		personFirstNameField.attr("type", "hidden");
 		personFirstNameField.attr("id", arrayName+"s" + idx + ".firstName");
 		personFirstNameField.attr("name", arrayName+"s[" + idx + "].firstName");
-		personFirstNameField.attr("value", $(person).data(arrayName+"-firstname"));
+		personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
 		$("#editForm").append(personFirstNameField);
 		
 		var personLastNameField = $("<input>");
 		personLastNameField.attr("type", "hidden");
 		personLastNameField.attr("id", arrayName+"s" + idx + ".lastName");
 		personLastNameField.attr("name", arrayName+"s[" + idx + "].lastName");
-		personLastNameField.attr("value", $(person).data(arrayName+"-lastname"));
+		personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
 		$("#editForm").append(personLastNameField);
 		
 		var personUriField = $("<input>");
 		personUriField.attr("type", "hidden");
 		personUriField.attr("id", arrayName+"s" + idx + ".uri");
 		personUriField.attr("name", arrayName+"s[" + idx + "].uri");
-		personUriField.attr("value", $(person).data(arrayName+"-uri"));
+		personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
 		$("#editForm").append(personUriField);
 		
 		var personAuthorityField = $("<input>");
 		personAuthorityField.attr("type", "hidden");
 		personAuthorityField.attr("id", arrayName+"s" + idx + ".localAuthorityId");
 		personAuthorityField.attr("name", arrayName+"s[" + idx + "].localAuthorityId");
-		personAuthorityField.attr("value", $(person).data(arrayName+"-authority-id"));
+		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
 		$("#editForm").append(personAuthorityField);
 		
 		$(person).children("span").each(function(idx2, affiliation) {
@@ -307,41 +223,25 @@ function constructPersonArray(arrayName){
 	});
 }
 
-function resetAuthorCreationModal() {
-	$("#firstNameAuthor").val("");
-	$("#lastNameAuthor").val("");
-	$("#affiliationTemplate").find("input").val("");
-	$("#uriAuthor").val("");
-	resetAuthorAuthorityCreation();
+function resetPersonCreationModal(personType) {
+	$("#firstName"+personType).val("");
+	$("#lastName"+personType).val("");
+	$("#"+personType+"AffiliationTemplate").find("input").val("");
+	$("#uri"+personType).val("");
+	resetPersonAuthorityCreation(personType);
 }
 
-function resetEditorCreationModal() {
-	$("#firstNameEditor").val("");
-	$("#lastNameEditor").val("");
-	$("#editorAffiliationTemplate").find("input").val("");
-	$("#uriEditor").val("");
-	resetEditorAuthorityCreation();
+function resetPersonAuthorityCreation(personType) {
+	$("#uriLoadingFound"+personType).hide();
+	$("#uriLoadingFailure"+personType).hide();
+	$("#uriLoadingSpinner"+personType).hide();
+	$("#uriLoadingFound"+personType).popover('hide');
+	$("#uriLoadingFailure"+personType).popover('hide');
 }
 
-function resetAuthorAuthorityCreation() {
-	$("#uriLoadingFound").hide();
-	$("#uriLoadingFailure").hide();
-	$("#uriLoadingSpinner").hide();
-	$("#uriLoadingFound").popover('hide');
-	$("#uriLoadingFailure").popover('hide');
-}
-
-function resetEditorAuthorityCreation() {
-	$("#uriLoadingFoundEditor").hide();
-	$("#uriLoadingFailureEditor").hide();
-	$("#uriLoadingSpinnerEditor").hide();
-	$("#uriLoadingFoundEditor").popover('hide');
-	$("#uriLoadingFailureEditor").popover('hide');
-}
-
-function getAuthorAuthority(uri) {
+function getPersonAuthority(uri, personType) {
 	$.get('<c:url value="/auth/authority/get?uri=" />' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
-		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
+		$("#uriLoadingFound"+personType).attr("data-authority-uri", data['uri']);
 		var content = "Authority <b>" + uri + "</b>";
 		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
 			content += "<br><br>This authority entry has already been imported by you:";
@@ -365,70 +265,24 @@ function getAuthorAuthority(uri) {
 		}
 		content += "<br><br>Do you want to create a managed authority entry?<br>" +
 					'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
-		$("#uriLoadingFound").attr("data-content", content);
-		$("#uriLoadingFound").attr("data-authority-uri", uri);
-		$("#uriLoadingFound").show();
-		$("#uriLoadingFound").popover('show');
+		$("#uriLoadingFound"+personType).attr("data-content", content);
+		$("#uriLoadingFound"+personType).attr("data-authority-uri", uri);
+		$("#uriLoadingFound"+personType).show();
+		$("#uriLoadingFound"+personType).popover('show');
 	})
 	.fail(function() {
-		$("#uriLoadingFailure").show();
+		$("#uriLoadingFailure"+personType).show();
 	 })
     .always(function() {
-    	$("#uriLoadingSpinner").hide();
+    	$("#uriLoadingSpinner"+personType).hide();
 	 });
 
 }
 
-function getEditorAuthority(uri) {
-	$.get('<c:url value="/auth/authority/get?uri=" />' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
-		$("#uriLoadingFoundEditor").attr("data-authority-uri", data['uri']);
-		var content = "Authority <b>" + uri + "</b>";
-		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
-			content += "<br><br>This authority entry has already been imported by you:";
-			content += "<ul>"
-			data['userAuthorityEntries'].forEach(function(elem) {
-				content += '<li>' + elem['name'];
-				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
-				content += '</li>';
-			});
-			content += "</ul>";
-		}
-		if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
-			content += "<br><br>This authority entry has already been imported by someone else for this dataset:";
-			content += '<ul class="foundAuthorities">';
-			data['datasetAuthorityEntries'].forEach(function(elem) {
-				content += '<li>' + elem['name'];
-				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
-				content += '</li>';
-			});
-			content += "</ul>";
-		}
-		content += "<br><br>Do you want to create a managed authority entry?<br>" +
-					'<span id="editorAuthorityCreationFeedback"><button id="editorCreateAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
-		$("#uriLoadingFoundEditor").attr("data-content", content);
-		$("#uriLoadingFoundEditor").attr("data-authority-uri", uri);
-		$("#uriLoadingFoundEditor").show();
-		$("#uriLoadingFoundEditor").popover('show');
-	})
-	.fail(function() {
-		$("#uriLoadingFailureEditor").show();
-	 })
-    .always(function() {
-    	$("#uriLoadingSpinnerEditor").hide();
-	 });
-
-}
-
-let removeAuthor = function removeAuthor(e) {
+let removePerson = function removePerson(e) {
 	var deleteIcon = e.currentTarget;
-	var author = $(deleteIcon).parent();
-	author.remove();
-}
-
-let removeEditor = function removeEditor(e) {
-	var deleteIcon = e.currentTarget;
-	var editor = $(deleteIcon).parent();
-	editor.remove();
+	var person = $(deleteIcon).parent();
+	person.remove();
 }
 
 </script>
@@ -655,17 +509,17 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
-			    <div id="iconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinner" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFound" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailure" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundAuthor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureAuthor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
 			    <input type="hidden" id="uriAuthorLocalId" />
 		    </div>
 		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
 		  </div>
-		  <div id="affiliations">
-		  <div id="affiliationTemplate" class="form-group">
+		  <div id="authorAffiliations">
+		  <div id="authorAffiliationTemplate" class="form-group">
 		    <label for="affiliationAuthor">Affiliation:</label>
 		    <input type="text" class="form-control" placeholder="Affiliation">
 		  </div>
