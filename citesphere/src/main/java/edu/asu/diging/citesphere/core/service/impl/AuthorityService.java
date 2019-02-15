@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -12,10 +13,16 @@ import org.springframework.stereotype.Service;
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.core.model.authority.impl.AuthorityEntry;
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.repository.AuthorityEntryRepository;
+import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.core.repository.bib.PersonRepository;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 
 @Service
@@ -23,6 +30,12 @@ public class AuthorityService implements IAuthorityService {
 
     @Autowired
     private AuthorityEntryRepository entryRepository;
+    
+    @Autowired
+    private CitationGroupRepository groupRepository;
+    
+    @Autowired
+    private PersonRepository personRepository;
     
     @Autowired
     private Set<AuthorityImporter> importers;
@@ -64,6 +77,35 @@ public class AuthorityService implements IAuthorityService {
             return entryOptional.get();
         }
         return null;
+    }
+    
+    @Override
+    public List<IAuthorityEntry> findByUri(IUser user, String uri) {
+        List<IAuthorityEntry> results = entryRepository.findByUsernameAndUriOrderByName(user.getUsername(), uri);
+        if (uri.endsWith("/")) {
+            uri = uri.substring(0, uri.length() - 1);
+        } else {
+            uri = uri + "/";
+        }
+        results.addAll(entryRepository.findByUsernameAndUriOrderByName(user.getUsername(), uri));
+        return results;
+    }
+    
+    @Override
+    public Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException {
+        Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
+        if (!group.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
+        }
+        List<Person> persons = personRepository.findPersonsByCitationGroupAndUri((ICitationGroup)group.get(), uri);
+        Set<IAuthorityEntry> entries = new HashSet<>();
+        persons.forEach(p -> {
+            Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
+            if (optional.isPresent()) {
+                entries.add(optional.get());
+            }
+        });
+        return entries;
     }
     
     @Override

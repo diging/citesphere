@@ -18,9 +18,9 @@ public interface ICitationManager {
 
     List<ICitationGroup> getGroups(IUser user);
 
-    CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy) throws GroupDoesNotExistException;
+    CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy) throws GroupDoesNotExistException;
 
-    ICitation getCitation(IUser user, String groupId, String key);
+    ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException;
 
     void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, CitationIsOutdatedException;
 
@@ -30,7 +30,7 @@ public interface ICitationManager {
 
     void detachCitation(ICitation citation);
 
-    ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey);
+    ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey) throws GroupDoesNotExistException;
 
     ICitation createCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException;

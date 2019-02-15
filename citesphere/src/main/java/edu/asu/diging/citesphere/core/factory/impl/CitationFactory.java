@@ -23,6 +23,7 @@ import com.google.gson.JsonParser;
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
@@ -57,9 +58,11 @@ public class CitationFactory implements ICitationFactory {
         
         Set<IPerson> authors = new TreeSet<>();
         Set<IPerson> editors = new TreeSet<>();
+        Set<ICreator> creators = new TreeSet<>();
         if (data.getCreators() != null) {
             int authorPos = 0;
             int editorPos = 0;
+            int creatorPos = 0;
             for (Creator c : data.getCreators()) {
                 if (c.getCreatorType().equals(ZoteroConstants.CREATOR_TYPE_AUTHOR)) {
                     authors.add(createPerson(c, authorPos));
@@ -67,11 +70,15 @@ public class CitationFactory implements ICitationFactory {
                 } else if (c.getCreatorType().equals(ZoteroConstants.CREATOR_TYPE_EDITOR)) {
                     editors.add(createPerson(c, editorPos));
                     editorPos++;
+                } else {
+                    creators.add(createCreator(c, creatorPos));
+                    creatorPos++;
                 }
             }
         }
         citation.setAuthors(authors);
         citation.setEditors(editors);
+        citation.setOtherCreators(creators);
         citation.setDateFreetext(item.getData().getDate());
         if (item.getData().getDate() != null) {
             citation.setDate(dateParser.parse(item.getData().getDate()));
@@ -107,6 +114,13 @@ public class CitationFactory implements ICitationFactory {
         return person;
     }
     
+    private ICreator createCreator(Creator zcreator, int index) {
+        ICreator creator = new edu.asu.diging.citesphere.core.model.bib.impl.Creator();
+        creator.setPerson(createPerson(zcreator, index));
+        creator.setRole(zcreator.getCreatorType());
+        return creator;
+    }
+    
     private void parseExtra(Data data, ICitation citation) {
         if (data.getExtra() == null) {
             return;
@@ -131,6 +145,7 @@ public class CitationFactory implements ICitationFactory {
                 person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
                 person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
                 person.setUri(a.getAsJsonObject().get("uri") != null && !a.getAsJsonObject().get("uri").isJsonNull() ? a.getAsJsonObject().get("uri").getAsString() : "");
+                person.setLocalAuthorityId(a.getAsJsonObject().get("localAuthorityId") != null && !a.getAsJsonObject().get("localAuthorityId").isJsonNull() ? a.getAsJsonObject().get("localAuthorityId").getAsString() : "");
                 authorNames.add(person.getFirstName() + person.getLastName());
                 person.setAffiliations(new HashSet<>());
                 JsonElement affiliations = a.getAsJsonObject().get("affiliations");

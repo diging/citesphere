@@ -12,4 +12,6 @@ import edu.asu.diging.citesphere.core.model.authority.impl.AuthorityEntry;
 public interface AuthorityEntryRepository extends PagingAndSortingRepository<AuthorityEntry, String> {
 
     public List<IAuthorityEntry> findByUsernameOrderByName(String username);
+    
+    public List<IAuthorityEntry> findByUsernameAndUriOrderByName(String username, String uri);
 }

@@ -3,6 +3,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="cite" uri="https://diging.asu.edu/jps/tlds/citesphere" %>
 
 <ol class="breadcrumb">
   <li><a href="<c:url value="/" />">Home</a></li>
@@ -73,6 +74,9 @@
  <c:if test="${not empty author.uri}">
  <a href="${author.uri}" target="_blank"><i class="fas fa-link"></i></a>
  </c:if>
+  <c:if test="${not empty author.localAuthorityId}">
+ <a href="<c:url value="/auth/authority/${author.localAuthorityId}" />"><i class="fas fa-anchor"></i></a>
+ </c:if>
  </c:forEach>
 </td>
 </tr>
@@ -84,6 +88,18 @@
 </c:forEach>
 </td>
 </tr>
+<c:forEach items="${citation.otherCreatorRoles}" var="role">
+<tr>
+<td>
+<spring:eval expression="@labelsResource.getProperty('_item_attribute_label_${role}', '${role}')" />
+</td>
+<td>
+<cite:creators citation="${citation}" role="${role}" var="creator">
+ ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
+</cite:creators>
+</td>
+</tr>
+</c:forEach>
 <c:if test="${fn:contains(fields, 'publicationTitle') }">
 <tr>
 <td>Publication Title</td>

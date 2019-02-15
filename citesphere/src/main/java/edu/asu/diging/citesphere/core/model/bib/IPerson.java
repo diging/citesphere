@@ -31,4 +31,8 @@ public interface IPerson {
     void setId(String id);
 
     String getId();
+
+    void setLocalAuthorityId(String localAuthorityId);
+
+    String getLocalAuthorityId();
 }
