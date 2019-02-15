@@ -127,5 +127,6 @@ public class CitationHelper implements ICitationHelper {
                 System.out.println(" helper "+person.getAffiliations());
                 citation.getEditors().add(person);
             }
+        }
     }
 }

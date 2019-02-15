@@ -9,6 +9,9 @@
 .popover {
 	min-width: 300px;
 }
+#cancelButton {
+	margin-top: 10px;
+}
 </style>
 <script>
 //@ sourceURL=submit.js
@@ -412,6 +415,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
 </form:form>
+<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />"><button id="cancelButton" type="submit" class="btn btn-primary"><i class="fa fa-times"></i>&nbsp;Cancel</button></a>
 
 <!-- Author Modal -->
 <div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
