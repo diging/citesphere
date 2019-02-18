@@ -20,10 +20,6 @@ $(function() {
 	$("#uriLoadingFound").popover();
 	$("#uriLoadingFailure").popover();
 	
-	$("#cancelButton").click(function(e)) {
-		e.preventDefault();
-	}
-	
 	$("#submitForm").click(function() {
 		$(".author-item").each(function(idx, author) {
 			var authorIdField = $("<input>");
