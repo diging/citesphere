@@ -38,7 +38,7 @@ $(function() {
 	
 	$("#addAuthorModalCancel").click(function() {
 		$("#authorModal").modal('hide');
-		resetPersonCreationModal();
+		resetPersonCreationModal("Author");
 	});
 	
 	$("#addEditorButton").click(function() {
@@ -47,7 +47,7 @@ $(function() {
 
 	$("#addEditorModalCancel").click(function() {
 		$("#editorModal").modal('hide');
-		resetPersonCreationModal();
+		resetPersonCreationModal("Editor");
 	});
 	
 	$(".remove-author").click(removePerson);
@@ -240,6 +240,7 @@ function resetPersonAuthorityCreation(personType) {
 }
 
 function getPersonAuthority(uri, personType) {
+	personType_lowerCase = personType.toLowerCase();
 	$.get('<c:url value="/auth/authority/get?uri=" />' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", data['uri']);
 		var content = "Authority <b>" + uri + "</b>";
@@ -264,7 +265,7 @@ function getPersonAuthority(uri, personType) {
 			content += "</ul>";
 		}
 		content += "<br><br>Do you want to create a managed authority entry?<br>" +
-					'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+					'<span id="'+personType_lowerCase+'AuthorityCreationFeedback"><button id="'+personType_lowerCase+'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
 		$("#uriLoadingFound"+personType).attr("data-content", content);
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", uri);
 		$("#uriLoadingFound"+personType).show();
