@@ -6,9 +6,6 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <style>
-#cancelButton {
-	margin-top: 10px;
-}
 .popover {
 	min-width: 300px;
 }
@@ -22,6 +19,10 @@ $(function() {
 	
 	$("#uriLoadingFound").popover();
 	$("#uriLoadingFailure").popover();
+	
+	$("#cancelButton").click(function(e)) {
+		e.preventDefault();
+	}
 	
 	$("#submitForm").click(function() {
 		$(".author-item").each(function(idx, author) {
@@ -414,13 +415,12 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
-</form:form>
-
 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />">
-	<button id="cancelButton" type="submit" class="btn btn-primary">
+	<button id="cancelButton" type="button" class="btn btn-default">
 		<i class="fa fa-times"></i>&nbsp;Cancel
 	</button>
 </a>
+</form:form>
 
 <!-- Author Modal -->
 <div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
