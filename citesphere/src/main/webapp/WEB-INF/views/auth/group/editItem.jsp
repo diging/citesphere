@@ -145,6 +145,9 @@ function editAuthor(){
 		affInput.find("input").val($(elem).data("affiliationName"));
 		$("#authorModal #affiliations").append(affInput);
 	});
+	if(authorItem.children("span").length > 0) {
+		$("#affiliationTemplate").hide();
+	}
 	$("#addAuthorButton").text("Update Author");
 	$("#authorModal").modal('show');
 }
@@ -199,6 +202,7 @@ function resetAuthorCreationModal() {
 	$("#firstNameAuthor").val("");
 	$("#lastNameAuthor").val("");
 	$("#affiliationTemplate").find("input").val("");
+	$("#affiliationTemplate").show();
 	$("#uriAuthor").val("");
 	$("#idAuthor").attr("data-author-id","");
 	$(".aff-info").remove();
