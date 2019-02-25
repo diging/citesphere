@@ -2,8 +2,9 @@ package edu.asu.diging.citesphere.core.util.model.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
@@ -53,24 +54,33 @@ public class CitationHelper implements ICitationHelper {
         citation.setVolume(form.getVolume());
 
         Map<String, IPerson> authorMap = new HashMap<>();
-        if (citation.getAuthors() != null) {
-            citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
-        }
+        citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
         citation.setAuthors(new HashSet<>());
         if (form.getAuthors() != null) {
-            for (PersonForm personForm : form.getAuthors()) {
+            mapPersonFields(authorMap, form.getAuthors(), citation.getAuthors());
+        }
+        
+        Map<String, IPerson> editorMap = new HashMap<>();
+        citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
+        citation.setEditors(new HashSet<>());
+        if (form.getEditors() != null) {
+            mapPersonFields(editorMap, form.getEditors(), citation.getEditors());
+        }
+    }
+
+    void mapPersonFields(Map<String, IPerson> personMap,
+            List<PersonForm> personList, Set<IPerson> citationPersonList) {
+            for (PersonForm personForm : personList) {
                 IPerson person;
                 if (personForm.getId() != null && !personForm.getId().isEmpty()) {
-                    person = authorMap.get(personForm.getId());
+                    person = personMap.get(personForm.getId());
                 } else {
                     person = new Person();
                 }
                 person.setFirstName(personForm.getFirstName());
                 person.setLastName(personForm.getLastName());
                 person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
-                person.setUri(personForm.getUri());
-                person.setLocalAuthorityId(personForm.getLocalAuthorityId());
-                
+    
                 Map<String, IAffiliation> affiliationMap = new HashMap<>();
                 if (person.getAffiliations() != null) {
                     person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
@@ -88,9 +98,7 @@ public class CitationHelper implements ICitationHelper {
                         person.getAffiliations().add(affiliation);
                     }
                 }
-
-                citation.getAuthors().add(person);
-            }
-        }
-    }
+                citationPersonList.add(person);
+          }
+     }
 }
