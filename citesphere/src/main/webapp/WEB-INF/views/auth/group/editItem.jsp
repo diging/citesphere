@@ -105,8 +105,8 @@ $(function() {
 	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
-		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
-		$("#uriLoadingFoundEditor").popover('hide');
+		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		$("#uriLoadingFoundAuthor").popover('hide');
 		event.preventDefault();
 	});
 	
@@ -131,14 +131,19 @@ $(function() {
 });
 
 function savePersonDetails(personType){
-	personType_lowerCase = personType.toLowerCase();
+	var personType_lowerCase = personType.toLowerCase();
 	var firstname = $("#firstName"+personType).val();
 	var lastname = $("#lastName"+personType).val();
 	var uri = $("#uri"+personType).val();
-	var localAuthority = $("#uri"+personType+"LocalId").val();
+	var localAuthority = $("#"+personType+"LocalId").val();
 	
 	var personSpan = $("<span>");
-	personSpan.attr("class", "label label-info "+personType_lowerCase +"-item");
+	if(personType_lowerCase == "author") {
+		personSpan.attr("class", "label label-primary "+personType_lowerCase +"-item");
+	} else {
+		personSpan.attr("class", "label label-info "+personType_lowerCase +"-item");
+	}
+	
 	personSpan.attr("data-"+personType_lowerCase+"-firstname", firstname);
 	personSpan.attr("data-"+personType_lowerCase+"-lastname", lastname);
 	personSpan.attr("data-"+personType_lowerCase+"-uri", uri);
@@ -226,7 +231,10 @@ function constructPersonArray(arrayName){
 function resetPersonCreationModal(personType) {
 	$("#firstName"+personType).val("");
 	$("#lastName"+personType).val("");
-	$("#"+personType+"AffiliationTemplate").find("input").val("");
+	var affTemplate = $("#"+personType.toLowerCase()+"AffiliationTemplate");
+	$("#"+personType.toLowerCase()+"Affiliations").children().remove();
+	$("#"+personType.toLowerCase()+"Affiliations").append(affTemplate);
+	$("#"+personType.toLowerCase()+"AffiliationTemplate").find("input").val("");
 	$("#uri"+personType).val("");
 	resetPersonAuthorityCreation(personType);
 }
@@ -237,6 +245,8 @@ function resetPersonAuthorityCreation(personType) {
 	$("#uriLoadingSpinner"+personType).hide();
 	$("#uriLoadingFound"+personType).popover('hide');
 	$("#uriLoadingFailure"+personType).popover('hide');
+	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
+	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").html("");
 }
 
 function getPersonAuthority(uri, personType) {
@@ -526,7 +536,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
