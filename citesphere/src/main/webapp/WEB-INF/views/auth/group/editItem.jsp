@@ -411,10 +411,8 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
-<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />">
-	<button id="cancelButton" type="button" class="btn btn-default">
+<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />" class="btn btn-default">
 		<i class="fa fa-times"></i>&nbsp;Cancel
-	</button>
 </a>
 </form:form>
 
