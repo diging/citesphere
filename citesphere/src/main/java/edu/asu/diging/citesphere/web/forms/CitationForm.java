@@ -1,7 +1,8 @@
 package edu.asu.diging.citesphere.web.forms;
 
 import java.util.List;
-
+import java.util.Set;
+import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 
 public class CitationForm {
@@ -34,6 +35,14 @@ public class CitationForm {
     private List<PersonForm> authors;
     private List<PersonForm> editors;
     
+    private Set<ICreator> otherCreators;
+    
+    public Set<ICreator> getOtherCreators() {
+        return otherCreators;
+    }
+    public void setOtherCreators(Set<ICreator> otherCreators) {
+        this.otherCreators = otherCreators;
+    }
     public String getKey() {
         return key;
     }
