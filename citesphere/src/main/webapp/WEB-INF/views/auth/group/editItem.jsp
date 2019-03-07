@@ -324,6 +324,19 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 </td>
 </tr>
 
+<c:forEach items="${otherCreators}" var="otherCreators" varStatus="status">
+<tr><td>${otherCreators}</td><td>
+	<c:forEach items="citation.<c:out value='${otherCreators}'/>s" var="creator" varStatus="status">
+	<c:catch var="lastNameException">${creator.lastName}</c:catch>
+	<c:if test="${empty lastNameException}">${creator.lastName}
+		<c:catch var="firstNameException">${creator.firstName}</c:catch>
+		 <c:if test="${empty firstNameException}">, ${creator.firstName}</c:if>
+		 <c:if test="${!status.last}">; </c:if>
+	 </c:if>
+	</c:forEach>
+</td></tr>
+</c:forEach>
+
 <tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
 <td>Publication Title</td>
 <td><form:input path="publicationTitle" type="text" class="form-control" placeholder="Publication Title" value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
