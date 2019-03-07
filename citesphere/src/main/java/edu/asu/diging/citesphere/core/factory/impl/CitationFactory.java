@@ -155,6 +155,8 @@ public class CitationFactory implements ICitationFactory {
             person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
             person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
             personNames.add(person.getFirstName() + person.getLastName());
+            person.setUri(a.getAsJsonObject().get("uri")!=null ? a.getAsJsonObject().get("uri").getAsString():"");
+            person.setLocalAuthorityId(a.getAsJsonObject().get("localAuthorityId")!=null ? a.getAsJsonObject().get("localAuthorityId").getAsString() : "");
             person.setAffiliations(new HashSet<>());
             JsonElement affiliations = a.getAsJsonObject().get("affiliations");
             if (affiliations instanceof JsonArray) {

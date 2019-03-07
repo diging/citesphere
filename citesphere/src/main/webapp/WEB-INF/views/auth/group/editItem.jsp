@@ -33,7 +33,7 @@ $(function() {
 	});
 	
 	$("#addAuthorButton").click(function() {
-		savePersonDetails('Author');
+		savePersonDetails("Author");
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
@@ -41,8 +41,19 @@ $(function() {
 		resetPersonCreationModal("Author");
 	});
 	
-	$(".edit-author").click(editAuthor);
+	$(".edit-author").click(function(){
+		var authorItem = $(this).parent();
+		editPerson('Author', authorItem[0]);
+	});
+	
 	$(".edit-author").css('cursor', 'pointer');
+	
+	$(".edit-editor").click(function(){
+		var editorItem = $(this).parent();
+		editPerson('Editor', editorItem[0]);
+	});
+	
+	$(".edit-editor").css('cursor', 'pointer');
 	
 	$("#addEditorButton").click(function() {
 		savePersonDetails('Editor');
@@ -135,27 +146,31 @@ $(function() {
 	});
 });
 
-function editAuthor(){
-	var authorItem = $(this).parent();
-	$("#firstNameAuthor").val(authorItem.attr("data-author-firstname"));
-	$("#lastNameAuthor").val(authorItem.attr("data-author-lastname"));
-	$("#uriAuthor").val(authorItem.attr("data-author-uri"));
-	$("#idAuthor").attr("data-author-id", authorItem.attr("id"));
+function editPerson(personType, item){
+	var personType_lowerCase = personType.toLowerCase();
+	var personItem = $(item);
+	$("#firstName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-firstname"));
+	$("#lastName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-lastname"));
+	$("#uri"+personType).val(personItem.attr("data-"+personType_lowerCase+"-uri"));
+	$("#id"+personType).attr("data-"+personType_lowerCase+"-id", personItem.attr("id"));
 	
-	authorItem.children("span").each(function(idx, elem){
-		var affInput = $("#authorAffiliationTemplate").clone();
+	personItem.children("span").each(function(idx, elem){
+		var affInput = $("#"+personType_lowerCase+"AffiliationTemplate").clone();
 		affInput.removeAttr("id");
 		affInput.addClass("aff-info");
 		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
 		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
 		affInput.find("input").val($(elem).data("affiliationName"));
-		$("#authorModal #authorAffiliations").append(affInput);
+		$("#"+personType_lowerCase+"Modal #"+personType_lowerCase+"Affiliations").append(affInput);
 	});
-	if(authorItem.children("span").length > 0) {
-		$("#authorAffiliationTemplate").hide();
+	
+	if(personItem.children("span").length > 0) {
+		$("#"+personType_lowerCase+"AffiliationTemplate").hide();
 	}
-	$("#addAuthorButton").text("Update Author");
-	$("#authorModal").modal('show');
+	
+	$("#add"+personType+"Button").text("Update "+personType);
+	
+	$("#"+personType_lowerCase+"Modal").modal('show');
 }
 
 function savePersonDetails(personType){
@@ -206,7 +221,10 @@ function savePersonDetails(personType){
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
 	var editIcon = $('<i class="far fa-edit edit-'+personType_lowerCase+'"></i>')
 	var deleteIcon = $('<i class="fas fa-times remove-'+personType_lowerCase+'"></i>');
-	editIcon.click(editAuthor);
+	editIcon.click(function(){
+		var personItem = $(this).parent();
+		editPerson(personType, personItem[0]);
+	});
 	deleteIcon.click(removePerson);
 	personSpan.append(editIcon);
 	personSpan.append(deleteIcon);
@@ -282,7 +300,7 @@ function resetPersonCreationModal(personType) {
 	$("#id"+personType).attr("data-"+personType.toLowerCase()+"-id","");
 	$(".aff-info").remove();
 	$("#uri"+personType).val("");
-	$("#add"+personType+"Button").text("Add Author");
+	$("#add"+personType+"Button").text("Add "+personType);
 	resetPersonAuthorityCreation(personType);
 }
 
@@ -449,7 +467,9 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
 <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
-&nbsp;&nbsp;
+&nbsp;
+<i class="far fa-edit edit-editor"></i>
+&nbsp;
 <i class="fas fa-times remove-editor"></i>
 </span>
 &nbsp;&nbsp;
