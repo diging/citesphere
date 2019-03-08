@@ -21,7 +21,6 @@ import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
-import edu.asu.diging.citesphere.core.model.impl.User;
 import edu.asu.diging.citesphere.core.repository.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.repository.bib.PersonRepository;
