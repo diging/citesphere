@@ -88,6 +88,12 @@
  <c:if test="${not empty editor.affiliations}">
  (<c:forEach items="${editor.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
  </c:if>
+ <c:if test="${not empty editor.uri}">
+ <a href="${editor.uri}" target="_blank"><i class="fas fa-link"></i></a>
+ </c:if>
+  <c:if test="${not empty editor.localAuthorityId}">
+ <a href="<c:url value="/auth/authority/${editor.localAuthorityId}" />"><i class="fas fa-anchor"></i></a>
+ </c:if>
 </c:forEach>
 </td>
 </tr>
