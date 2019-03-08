@@ -409,6 +409,25 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
 </td>
 </tr>
+<c:set var="defaultCreators" value="${otherCreators}" />
+<c:if test="${not empty citation.key and not empty citation.otherCreatorRoles}" >
+<c:set var="role" value="${citation.otherCreatorRoles}" />
+</c:if>
+<c:forEach items="${defaultCreators}" var="curCreator">
+<c:if test="${ (curCreator ne 'author') and (curCreator ne 'editor')}">
+<tr <c:if test="${not empty role and not role.includes(curCreator)}"> style="display:none;"
+</c:if>>
+<td>
+<spring:eval expression="@labelsResource.getProperty('_item_attribute_label_${curCreator}', '${curCreator}')" />
+</td>
+<td>
+<cite:creators citation="${citation}" role="${role}" var="creator">
+ ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
+</cite:creators>
+</td>
+</tr>
+</c:if>
+</c:forEach>
 
 <tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
 <td>Publication Title</td>
@@ -631,6 +650,30 @@ function loadFields() {
 		error: function(){
 			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
 			"Error loading the form fields. Try again later.");
+			$('#messageModal').modal('show');
+			setTimeout(function() {
+				$('#messageModal').modal('hide');
+		  	}, 3000);
+			
+		}
+	});
+	$.ajax({
+		url : '<c:url value="/auth/items/'+itemType+'/creators" />',
+		type : 'GET',
+		success: function(creators){
+			$('[id^=creator]').each(function(idx, elem) {
+				var tr = $(elem).parent().closest('tr');
+				tr.hide()
+			});
+			for(i=0;i<creators.length;i++){
+				$('form input#'+creators[i]).parent().closest('tr').show();
+			}
+			$('#messageModal').modal('hide');
+			
+		},
+		error: function(){
+			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+			"Error loading the creators. Try again later.");
 			$('#messageModal').modal('show');
 			setTimeout(function() {
 				$('#messageModal').modal('hide');

@@ -68,6 +68,14 @@ public class EditItemController {
         return new ResponseEntity<List<String>>(fields, HttpStatus.OK);
     }
     
+    /**
+     * Method to retrieve all creator types filtered by item type.
+     */
+    @RequestMapping("/auth/items/{itemType}/creators")
+    public ResponseEntity<List<String>> getCreatorsByItemType(Authentication authentication, @PathVariable("itemType") ItemType itemType) {
+        return new ResponseEntity<List<String>>(citationManager.getValidCreatorTypes((IUser)authentication.getPrincipal(), itemType), HttpStatus.OK);
+    }
+    
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
     public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws ZoteroConnectionException, GroupDoesNotExistException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);

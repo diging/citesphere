@@ -42,4 +42,6 @@ public interface IZoteroManager {
 
     ICitationCollection getCitationCollection(IUser user, String groupId, String collectionId);
 
+    List<String> getValidCreatorTypes(IUser user, ItemType itemType);
+
 }

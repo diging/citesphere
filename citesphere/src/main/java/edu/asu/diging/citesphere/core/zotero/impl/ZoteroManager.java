@@ -250,7 +250,8 @@ public class ZoteroManager implements IZoteroManager {
         return itemTypeFields;
     }
     
-    private List<String> getValidCreatorTypes(IUser user, ItemType itemType) {
+    @Override
+    public List<String> getValidCreatorTypes(IUser user, ItemType itemType) {
         CreatorType[] creatorTypes = zoteroConnector.getItemTypeCreatorTypes(user, itemType.getZoteroKey());
         List<String> validTypes = new ArrayList<>();
         for (CreatorType type : creatorTypes) {

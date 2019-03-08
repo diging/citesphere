@@ -268,4 +268,9 @@ public class CitationManager implements ICitationManager {
     public List<BibField> getItemTypeFields(IUser user, ItemType itemType) {
         return zoteroManager.getFields(user, itemType);
     }
+    
+    @Override
+    public List<String> getValidCreatorTypes(IUser user, ItemType itemType) {
+        return zoteroManager.getValidCreatorTypes(user, itemType);
+    }
 }

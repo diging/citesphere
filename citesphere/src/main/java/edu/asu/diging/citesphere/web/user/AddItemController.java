@@ -40,10 +40,11 @@ public class AddItemController {
     private ICitationHelper citationHelper;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create")
-    public String show(Model model, @PathVariable("zoteroGroupId") String zoteroGroupId) {
+    public String show(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId) {
         model.addAttribute("form", new CitationForm());
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("defaultItemType", ItemType.valueOf(defaultItemType));
+        model.addAttribute("otherCreators", citationManager.getValidCreatorTypes((IUser)authentication.getPrincipal(), ItemType.valueOf(defaultItemType)));
         return "auth/group/items/create";
     }
 

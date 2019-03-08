@@ -35,4 +35,6 @@ public interface ICitationManager {
     ICitation createCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException;
 
+    List<String> getValidCreatorTypes(IUser user, ItemType itemType);
+
 }
