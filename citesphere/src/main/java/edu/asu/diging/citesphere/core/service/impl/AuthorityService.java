@@ -18,8 +18,10 @@ import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.core.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
+import edu.asu.diging.citesphere.core.model.impl.User;
 import edu.asu.diging.citesphere.core.repository.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.repository.bib.PersonRepository;
@@ -124,5 +126,14 @@ public class AuthorityService implements IAuthorityService {
         entry.setUsername(user.getUsername());
         entry.setCreatedOn(OffsetDateTime.now());
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry)entry);
+    }
+    
+    @Override
+    public IPerson findByUri(String uri) {
+        Optional<Person> foundPerson = personRepository.findByUri(uri);
+        if (foundPerson.isPresent()) {
+            return (IPerson)foundPerson.get();
+        }
+        return null;
     }
 }

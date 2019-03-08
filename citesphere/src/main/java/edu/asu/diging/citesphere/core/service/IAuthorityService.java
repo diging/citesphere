@@ -9,6 +9,7 @@ import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionExcep
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
+import edu.asu.diging.citesphere.core.model.bib.IPerson;
 
 public interface IAuthorityService {
 
@@ -27,5 +28,7 @@ public interface IAuthorityService {
     List<IAuthorityEntry> findByUri(IUser user, String uri);
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
+
+    IPerson findByUri(String uri);
 
 }

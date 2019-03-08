@@ -78,6 +78,7 @@ $(function() {
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
 	    	getPersonAuthority(uri, "Author");
+	    	getPersonDetails(uri, "Author");
 	    }, 1000);
 	});
 	
@@ -88,6 +89,7 @@ $(function() {
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
 	    	getPersonAuthority(uri, "Editor");
+	    	getPersonDetails(uri, "Editor");
 	    }, 1000);
 	});
 	
@@ -289,6 +291,8 @@ function getPersonAuthority(uri, personType) {
 	 });
 
 }
+
+
 
 let removePerson = function removePerson(e) {
 	var deleteIcon = e.currentTarget;
@@ -638,5 +642,47 @@ function loadFields() {
 			
 		}
 	});
+}
+
+function getPersonDetails(uri, personType) {
+	$.ajax({
+        url: "<c:url value="/auth/uri/personDetails" />",
+        type : 'GET',
+        data: { 'uri' : uri },
+        success: function (person) {
+        	var personType_lowerCase = personType.toLowerCase();
+        	console.log(person.firstname);
+        	$("#firstName"+personType).val(person.firstName);
+        	$("#lastName"+personType).val(person.lastName);
+        	if(person.affiliations!=null){
+	        	for(i=0; i<(person.affiliations).length; i++) {
+	        		var affiliation = person.affiliations[i];
+	        		var affInput = $("#"+personType_lowerCase+"AffiliationTemplate").clone();
+	        		affInput.removeAttr("id");
+	        		affInput.addClass("aff-info");
+	        		affInput.find("input").attr("data-affiliation-name", affiliation.name);
+	        		affInput.find("input").attr("data-affiliation-id", affiliation.id);
+	        		affInput.find("input").val(affiliation.name);
+	        		$("#"+personType_lowerCase+"Modal #"+personType_lowerCase+"Affiliations").append(affInput);
+	        	}
+        	}
+        	if(person.affiliations!=null && (person.affiliations).length > 0) {
+        		$("#"+personType_lowerCase+"AffiliationTemplate").hide();
+        	}
+        	
+        	$("#add"+personType+"Button").text("Update "+personType);
+        	
+        	$("#"+personType_lowerCase+"Modal").modal('show');
+
+        },
+        error: function(e) {
+        	$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+			"Error loading user details.");
+			$('#messageModal').modal('show');
+			setTimeout(function() {
+				$('#messageModal').modal('hide');
+		  	}, 3000);
+        }
+      });
 }
 </script>
