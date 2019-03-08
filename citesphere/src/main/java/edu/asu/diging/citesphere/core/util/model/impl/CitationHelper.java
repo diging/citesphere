@@ -52,19 +52,21 @@ public class CitationHelper implements ICitationHelper {
         citation.setTitle(form.getTitle());
         citation.setUrl(form.getUrl());
         citation.setVolume(form.getVolume());
-        citation.setOtherCreators(form.getOtherCreators());
+        
+        citation.setOtherCreators(new HashSet<>());
+        if(form.getOtherCreators()!= null) {
+            citation.setOtherCreators(form.getOtherCreators());
+        }
         
         Map<String, IPerson> authorMap = new HashMap<>();
-        if(citation.getAuthors()!=null)
-            citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
+        citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
         citation.setAuthors(new HashSet<>());
         if (form.getAuthors() != null) {
             mapPersonFields(authorMap, form.getAuthors(), citation.getAuthors());
         }
         
         Map<String, IPerson> editorMap = new HashMap<>();
-        if(citation.getEditors()!=null)
-            citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
+        citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
         citation.setEditors(new HashSet<>());
         if (form.getEditors() != null) {
             mapPersonFields(editorMap, form.getEditors(), citation.getEditors());

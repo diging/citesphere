@@ -73,7 +73,9 @@ public class EditItemController {
      */
     @RequestMapping("/auth/items/{itemType}/creators")
     public ResponseEntity<List<String>> getCreatorsByItemType(Authentication authentication, @PathVariable("itemType") ItemType itemType) {
-        return new ResponseEntity<List<String>>(citationManager.getValidCreatorTypes((IUser)authentication.getPrincipal(), itemType), HttpStatus.OK);
+        List<String> creators = new ArrayList<>();
+        citationManager.getValidCreatorTypes((IUser) authentication.getPrincipal(), itemType).forEach(f -> creators.add(f));
+        return new ResponseEntity<List<String>>(creators, HttpStatus.OK);
     }
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
@@ -83,6 +85,7 @@ public class EditItemController {
         citation.getAuthors().forEach(a -> a.getAffiliations().size());
         System.out.println(citation.getAuthors().size());
         citation.getEditors().forEach(e -> e.getAffiliations().size());
+        citation.getOtherCreators().forEach(e -> e.getPerson().getAffiliations().size());
         citationManager.detachCitation(citation);
         citationHelper.updateCitation(citation, form);
         try {

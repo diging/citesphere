@@ -487,11 +487,14 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <tr <c:if test="${not empty role and not role.includes(curCreator)}"> style="display:none;"
 </c:if>>
 <td>
-<spring:eval expression="@labelsResource.getProperty('_item_attribute_label_${curCreator}', '${curCreator}')" />
+<span class="creator${curCreator}"><spring:eval expression="@labelsResource.getProperty('_item_attribute_label_${curCreator}', '${curCreator}')" />
+</span>
 </td>
+
 <td>
 <cite:creators citation="${citation}" role="${role}" var="creator">
  ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
+
 </cite:creators>
 </td>
 </tr>
@@ -733,15 +736,15 @@ function loadFields() {
 		url : '<c:url value="/auth/items/'+itemType+'/creators" />',
 		type : 'GET',
 		success: function(creators){
-			$('[id^=creator]').each(function(idx, elem) {
+			$('[class^=creator]').each(function(idx, elem) {
 				var tr = $(elem).parent().closest('tr');
 				tr.hide()
 			});
 			for(i=0;i<creators.length;i++){
-				$('form input#'+creators[i]).parent().closest('tr').show();
+				$('[class=creator'+creators[i]).parent().closest('tr').show();
 			}
 			$('#messageModal').modal('hide');
-			
+			console.log(creators);
 		},
 		error: function(){
 			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
