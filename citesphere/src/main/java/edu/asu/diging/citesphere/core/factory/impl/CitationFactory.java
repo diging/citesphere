@@ -139,7 +139,6 @@ public class CitationFactory implements ICitationFactory {
                 JsonArray authors = jObj.get("authors").getAsJsonArray();
                 mapPersonFields(authors, citation.getAuthors());
             }
-            
             if (jObj.has("editors") && !jObj.get("editors").isJsonNull()) {
                 JsonArray editors = jObj.get("editors").getAsJsonArray();
                 mapPersonFields(editors, citation.getEditors());
