@@ -44,9 +44,6 @@ public class AddItemController {
         model.addAttribute("form", new CitationForm());
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("defaultItemType", ItemType.valueOf(defaultItemType));
-        
-        //TODO get creator types
-        //model.addAttribute("otherCreators", citationManager.getValidCreatorTypes(user, ItemType.valueOf(defaultItemType)));
         return "auth/group/items/create";
     }
 

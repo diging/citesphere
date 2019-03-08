@@ -92,11 +92,8 @@ public class CitationHelper implements ICitationHelper {
                 citation.getAuthors().add(person);
             }
         }
-        
         Map<String, IPerson> editorMap = new HashMap<>();
-        if (citation.getEditors() != null) {
-            citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
-        }
+        citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
         citation.setEditors(new HashSet<>());
         if(form.getEditors()!=null) {
             for (PersonForm personForm : form.getEditors()) {
@@ -130,6 +127,5 @@ public class CitationHelper implements ICitationHelper {
                 System.out.println(" helper "+person.getAffiliations());
                 citation.getEditors().add(person);
             }
-        }
     }
 }
