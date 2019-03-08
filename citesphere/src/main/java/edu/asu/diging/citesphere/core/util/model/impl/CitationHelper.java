@@ -102,6 +102,8 @@ public class CitationHelper implements ICitationHelper {
                         person.getAffiliations().add(affiliation);
                     }
                 }
+                person.setUri(personForm.getUri());
+                person.setLocalAuthorityId(personForm.getLocalAuthorityId());
                 citationPersonList.add(person);
           }
      }

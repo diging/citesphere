@@ -79,7 +79,6 @@ public class CitationManager implements ICitationManager {
         sortFunctions.put("title", ((o1, o2) -> {
             String o1Title = o1 != null && o1.getTitle() != null ? o1.getTitle() : "";
             String o2Title = o2 != null && o2.getTitle() != null ? o2.getTitle() : "";
-            
             return o1Title.toLowerCase().compareTo(o2Title.toLowerCase());
         }));
     }

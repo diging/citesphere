@@ -33,13 +33,27 @@ $(function() {
 	});
 	
 	$("#addAuthorButton").click(function() {
-		savePersonDetails('Author');
+		savePersonDetails("Author");
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
 		$("#authorModal").modal('hide');
 		resetPersonCreationModal("Author");
 	});
+	
+	$(".edit-author").click(function(){
+		var authorItem = $(this).parent();
+		editPerson('Author', authorItem[0]);
+	});
+	
+	$(".edit-author").css('cursor', 'pointer');
+	
+	$(".edit-editor").click(function(){
+		var editorItem = $(this).parent();
+		editPerson('Editor', editorItem[0]);
+	});
+	
+	$(".edit-editor").css('cursor', 'pointer');
 	
 	$("#addEditorButton").click(function() {
 		savePersonDetails('Editor');
@@ -56,7 +70,9 @@ $(function() {
 	$("#addAuthorAffiliation").click(function() {
 		var affiliationCopy = $("#authorAffiliationTemplate").clone();
 		affiliationCopy.removeAttr("id");
+		affiliationCopy.addClass("aff-info");
 		affiliationCopy.find("input").val("");
+		affiliationCopy.show();
 		$("#authorAffiliations").append(affiliationCopy);
 	});
 	
@@ -130,19 +146,55 @@ $(function() {
 	});
 });
 
+function editPerson(personType, item){
+	var personType_lowerCase = personType.toLowerCase();
+	var personItem = $(item);
+	$("#firstName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-firstname"));
+	$("#lastName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-lastname"));
+	$("#uri"+personType).val(personItem.attr("data-"+personType_lowerCase+"-uri"));
+	$("#id"+personType).attr("data-"+personType_lowerCase+"-id", personItem.attr("id"));
+	
+	personItem.children("span").each(function(idx, elem){
+		var affInput = $("#"+personType_lowerCase+"AffiliationTemplate").clone();
+		affInput.removeAttr("id");
+		affInput.addClass("aff-info");
+		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
+		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
+		affInput.find("input").val($(elem).data("affiliationName"));
+		$("#"+personType_lowerCase+"Modal #"+personType_lowerCase+"Affiliations").append(affInput);
+	});
+	
+	if(personItem.children("span").length > 0) {
+		$("#"+personType_lowerCase+"AffiliationTemplate").hide();
+	}
+	
+	$("#add"+personType+"Button").text("Update "+personType);
+	
+	$("#"+personType_lowerCase+"Modal").modal('show');
+}
+
 function savePersonDetails(personType){
 	var personType_lowerCase = personType.toLowerCase();
-	var firstname = $("#firstName"+personType).val();
-	var lastname = $("#lastName"+personType).val();
-	var uri = $("#uri"+personType).val();
-	var localAuthority = $("#"+personType+"LocalId").val();
+	var personSpan;
 	
-	var personSpan = $("<span>");
+	if($("#id"+personType).attr("data-"+personType_lowerCase+"-id")) {
+		personSpan = $('#'+$("#id"+personType).attr("data-"+personType_lowerCase+"-id"));
+	} else {
+		$("#id"+personType).attr("data-"+personType_lowerCase+"-id", $("#"+personType_lowerCase+"List").length);
+		personSpan = $('<span id="'+personType_lowerCase+$("#idAuthor").attr("data-"+personType_lowerCase+"-id")+'">');
+	}
+	
 	if(personType_lowerCase == "author") {
 		personSpan.attr("class", "label label-primary "+personType_lowerCase +"-item");
 	} else {
 		personSpan.attr("class", "label label-info "+personType_lowerCase +"-item");
 	}
+	
+	personSpan.html("");
+	var firstname = $("#firstName"+personType).val();
+	var lastname = $("#lastName"+personType).val();
+	var uri = $("#uri"+personType).val();
+	var localAuthority = $("#"+personType+"LocalId").val();
 	
 	personSpan.attr("data-"+personType_lowerCase+"-firstname", firstname);
 	personSpan.attr("data-"+personType_lowerCase+"-lastname", lastname);
@@ -152,27 +204,36 @@ function savePersonDetails(personType){
 	var affiliationsList = [];
 	var affSpan = $("<span>");
 	$("#"+personType_lowerCase+"Affiliations").children().each(function(idx, elem) {
-		var affSpan = $("<span>");
 		var input = $(elem).find("input");
-		affSpan.attr("data-affiliation-name", input.val());
-		affiliationsList.push(input.val());
-		personSpan.append(affSpan);
+		if(input.val().length!=0){
+			var affSpan = $("<span>");
+			affSpan.attr("data-affiliation-name", input.val());
+			affiliationsList.push(input.val());
+			personSpan.append(affSpan);
+		}
 	});
 	
 	var affiliationString = "";
-	if (affiliationsList) {
-		affiliationString = " (" + affiliationsList.join(", ") + ")";
+	if (affiliationsList.length != 0) {
+		affiliationString = " (" + $.grep(affiliationsList, Boolean).join(", ") + ")";
 	}
 	
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
+	var editIcon = $('<i class="far fa-edit edit-'+personType_lowerCase+'"></i>')
 	var deleteIcon = $('<i class="fas fa-times remove-'+personType_lowerCase+'"></i>');
+	editIcon.click(function(){
+		var personItem = $(this).parent();
+		editPerson(personType, personItem[0]);
+	});
 	deleteIcon.click(removePerson);
+	personSpan.append(editIcon);
 	personSpan.append(deleteIcon);
 	$("#"+personType_lowerCase+"List").append(personSpan);
 	$("#"+personType_lowerCase+"List").append("&nbsp;&nbsp; ");
 	$("#"+personType_lowerCase+"Modal").modal('hide');
 	resetPersonCreationModal(personType);
 }
+
 function constructPersonArray(arrayName){
 		$('.'+arrayName+'-item').each(function(idx, person) {
 		var personIdField = $("<input>");
@@ -235,7 +296,11 @@ function resetPersonCreationModal(personType) {
 	$("#"+personType.toLowerCase()+"Affiliations").children().remove();
 	$("#"+personType.toLowerCase()+"Affiliations").append(affTemplate);
 	$("#"+personType.toLowerCase()+"AffiliationTemplate").find("input").val("");
+	$("#"+personType.toLowerCase()+"AffiliationTemplate").show();
+	$("#id"+personType).attr("data-"+personType.toLowerCase()+"-id","");
+	$(".aff-info").remove();
 	$("#uri"+personType).val("");
+	$("#add"+personType+"Button").text("Add "+personType);
 	resetPersonAuthorityCreation(personType);
 }
 
@@ -380,10 +445,12 @@ let removePerson = function removePerson(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
+<span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
 <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
-${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
-&nbsp;&nbsp;
+${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
+&nbsp;
+<i class="far fa-edit edit-author"></i>
+&nbsp;
 <i class="fas fa-times remove-author"></i>
 </span>
 &nbsp;&nbsp;
@@ -400,7 +467,9 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
 <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
-&nbsp;&nbsp;
+&nbsp;
+<i class="far fa-edit edit-editor"></i>
+&nbsp;
 <i class="fas fa-times remove-editor"></i>
 </span>
 &nbsp;&nbsp;
@@ -527,6 +596,9 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
         <h4 class="modal-title" id="authorLabel">Enter Author Information</h4>
       </div>
       <div class="modal-body">
+      	  <div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idAuthor">
+      	  </div>
           <div class="form-group">
 		    <label for="firstNameAuthor">First Name:</label>
 		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
