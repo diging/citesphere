@@ -125,5 +125,4 @@ public class AuthorityService implements IAuthorityService {
         entry.setCreatedOn(OffsetDateTime.now());
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry)entry);
     }
-    
 }

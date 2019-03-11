@@ -341,8 +341,6 @@ function getPersonAuthority(uri, personType) {
 				content += '<li>' + elem['name'];
 				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
 				content += '</li>';
-
-				console.log(elem);
 			});
 			content += "</ul>";
 		}
@@ -371,8 +369,6 @@ function getPersonAuthority(uri, personType) {
 	 });
 
 }
-
-
 
 let removePerson = function removePerson(e) {
 	var deleteIcon = e.currentTarget;
