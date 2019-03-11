@@ -4,6 +4,7 @@
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/fmt" prefix = "fmt" %>
 
 <style>
 .popover {
@@ -487,6 +488,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <tr <c:if test="${not empty role and not role.includes(curCreator)}"> style="display:none;"
 </c:if>>
 <td>
+<spring:eval expression="@labelsResource', '${curCreator}')" />
 <span class="creator${curCreator}"><spring:eval expression="@labelsResource.getProperty('_item_attribute_label_${curCreator}', '${curCreator}')" />
 </span>
 </td>
@@ -500,7 +502,15 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 </tr>
 </c:if>
 </c:forEach>
+<tr><td>
 
+<fmt:setBundle basename="creator_roles.properties" var="roles"/>
+<c:forEach items="${roles}" var="entry" varStatus="status">
+    <c:out value="${entry}[${status.index}]" />
+    <c:out value ="${entry.value}" /><br>
+</c:forEach>
+<c:out value="${roles._item_attribute_label_castMember}"/>
+</td><td></td></tr>
 <tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
 <td>Publication Title</td>
 <td><form:input path="publicationTitle" type="text" class="form-control" placeholder="Publication Title" value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>

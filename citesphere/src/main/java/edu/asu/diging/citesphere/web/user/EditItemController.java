@@ -1,9 +1,12 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +56,25 @@ public class EditItemController {
         citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
             .forEach(f -> fields.add(f.getFilename()));
         model.addAttribute("fields", fields);
+        
+        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("creator_roles.properties");
+        Properties props = new Properties();
+        try {
+            props.load(stream);
+        } catch (IOException e) {
+            // TODO fix error
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        HashMap<String, String> map = new HashMap<String, String>();
+
+        for (final String name: props.stringPropertyNames()) {
+            map.put(name, props.getProperty(name));
+        }
+
+        model.addAttribute("linkMap", map);
+        
         return "auth/group/items/item/edit";
     }
 
