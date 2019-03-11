@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
@@ -25,10 +24,7 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.IPerson;
-import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
-import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
@@ -42,9 +38,6 @@ public class EditItemController {
     
     @Autowired
     private ICitationHelper citationHelper;
-    
-    @Autowired
-    private IAuthorityService authorityService;
     
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/edit")
     public String showPage(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException {
@@ -166,13 +159,5 @@ public class EditItemController {
                 }
             }
         }
-    }
-    
-    /**
-     * Method to retrieve person details by uri.
-     */
-    @RequestMapping("/auth/uri/personDetails")
-    public ResponseEntity<IPerson> getPersonDetailsByUri(Authentication authentication, @RequestParam("uri") String uri) {
-        return new ResponseEntity<IPerson>(authorityService.findByUri(uri), HttpStatus.OK);
     }
 }

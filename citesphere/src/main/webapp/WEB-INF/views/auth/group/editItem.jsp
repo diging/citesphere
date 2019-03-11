@@ -95,7 +95,6 @@ $(function() {
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
 	    	getPersonAuthority(uri, "Author");
-	    	getPersonDetails(uri, "Author");
 	    }, 1000);
 	});
 	
@@ -106,7 +105,6 @@ $(function() {
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
 	    	getPersonAuthority(uri, "Editor");
-	    	getPersonDetails(uri, "Editor");
 	    }, 1000);
 	});
 	
@@ -117,6 +115,7 @@ $(function() {
 			$("#uriAuthorLocalId").val(data['id']);
 			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
 			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Author");
 			$("#uriLoadingFoundAuthor").popover('hide');
 		});
 	});
@@ -125,6 +124,7 @@ $(function() {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
 		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Author");
 		$("#uriLoadingFoundAuthor").popover('hide');
 		event.preventDefault();
 	});
@@ -136,6 +136,7 @@ $(function() {
 			$("#uriEditorLocalId").val(data['id']);
 			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
 			$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Editor");
 			$("#uriLoadingFoundEditor").popover('hide');
 		});
 	});
@@ -144,10 +145,21 @@ $(function() {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriEditorLocalId").val(authId);
 		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Editor");
 		$("#uriLoadingFoundEditor").popover('hide');
 		event.preventDefault();
 	});
 });
+
+function showPersonNameInModal(name, personType){
+	if(name.split(",")[0] != null && name.split(",")[0].length > 0) {
+		$("#lastName"+personType).val(name.split(",")[0]);
+	}
+	
+	if(name.split(",")[1] != null && name.split(",")[1].length > 0) {
+		$("#firstName"+personType).val(name.split(",")[1]);
+	}
+}
 
 function editPerson(personType, item){
 	var personType_lowerCase = personType.toLowerCase();
@@ -329,6 +341,8 @@ function getPersonAuthority(uri, personType) {
 				content += '<li>' + elem['name'];
 				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
 				content += '</li>';
+
+				console.log(elem);
 			});
 			content += "</ul>";
 		}
@@ -715,50 +729,5 @@ function loadFields() {
 			
 		}
 	});
-}
-
-function getPersonDetails(uri, personType) {
-	$.ajax({
-        url: "<c:url value="/auth/uri/personDetails" />",
-        type : 'GET',
-        data: { 'uri' : uri },
-        success: function (person) {
-        	var personType_lowerCase = personType.toLowerCase();
-        	console.log(person.firstname);
-        	if(person.firstName.length > 0)
-        		$("#firstName"+personType).val(person.firstName);
-        	if(person.lastName.length > 0)
-        		$("#lastName"+personType).val(person.lastName);
-        	if(person.affiliations!=null){
-	        	for(i=0; i<(person.affiliations).length; i++) {
-	        		var affiliation = person.affiliations[i];
-	        		var affInput = $("#"+personType_lowerCase+"AffiliationTemplate").clone();
-	        		affInput.removeAttr("id");
-	        		affInput.addClass("aff-info");
-	        		affInput.find("input").attr("data-affiliation-name", affiliation.name);
-	        		affInput.find("input").attr("data-affiliation-id", affiliation.id);
-	        		affInput.find("input").val(affiliation.name);
-	        		affInput.show();
-	        		$("#"+personType_lowerCase+"Modal #"+personType_lowerCase+"Affiliations").append(affInput);
-	        	}
-        	}
-        	if(person.affiliations!=null && (person.affiliations).length > 0) {
-        		$("#"+personType_lowerCase+"AffiliationTemplate").hide();
-        	}
-        	
-        	$("#add"+personType+"Button").text("Update "+personType);
-        	
-        	$("#"+personType_lowerCase+"Modal").modal('show');
-
-        },
-        error: function(e) {
-        	$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
-			"Error loading user details.");
-			$('#messageModal').modal('show');
-			setTimeout(function() {
-				$('#messageModal').modal('hide');
-		  	}, 3000);
-        }
-      });
 }
 </script>
