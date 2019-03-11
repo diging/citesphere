@@ -83,6 +83,7 @@ $(function() {
 		var affiliationCopy = $("#editorAffiliationTemplate").clone();
 		affiliationCopy.removeAttr("id");
 		affiliationCopy.find("input").val("");
+		affiliationCopy.show();
 		$("#editorAffiliations").append(affiliationCopy);
 	});
 	
@@ -724,8 +725,10 @@ function getPersonDetails(uri, personType) {
         success: function (person) {
         	var personType_lowerCase = personType.toLowerCase();
         	console.log(person.firstname);
-        	$("#firstName"+personType).val(person.firstName);
-        	$("#lastName"+personType).val(person.lastName);
+        	if(person.firstName.length > 0)
+        		$("#firstName"+personType).val(person.firstName);
+        	if(person.lastName.length > 0)
+        		$("#lastName"+personType).val(person.lastName);
         	if(person.affiliations!=null){
 	        	for(i=0; i<(person.affiliations).length; i++) {
 	        		var affiliation = person.affiliations[i];
@@ -735,6 +738,7 @@ function getPersonDetails(uri, personType) {
 	        		affInput.find("input").attr("data-affiliation-name", affiliation.name);
 	        		affInput.find("input").attr("data-affiliation-id", affiliation.id);
 	        		affInput.find("input").val(affiliation.name);
+	        		affInput.show();
 	        		$("#"+personType_lowerCase+"Modal #"+personType_lowerCase+"Affiliations").append(affInput);
 	        	}
         	}
