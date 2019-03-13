@@ -30,9 +30,6 @@ public class CreatorIteratorTag extends SimpleTagSupport {
                 getJspBody().invoke(null);
             }
         }
-        else {
-            getJspContext().setAttribute("lastIteration", true);
-        }
     }
 
     public ICitation getCitation() {

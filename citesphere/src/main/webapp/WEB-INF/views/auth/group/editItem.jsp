@@ -479,38 +479,26 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
 </td>
 </tr>
-<c:set var="defaultCreators" value="${otherCreators}" />
+<!-- When form is in create mode -->
+<c:set var="role" value="${otherCreators}" />
+<!-- When form is in edit mode -->
 <c:if test="${not empty citation.key and not empty citation.otherCreatorRoles}" >
 <c:set var="role" value="${citation.otherCreatorRoles}" />
 </c:if>
-<c:forEach items="${defaultCreators}" var="curCreator">
-<c:if test="${ (curCreator ne 'author') and (curCreator ne 'editor')}">
-<tr <c:if test="${not empty role and not role.includes(curCreator)}"> style="display:none;"
+<c:forEach items="${creatorMap}" var="curCreator">
+<c:if test="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
+<tr <c:if test="${empty role or not fn:contains(role, fn:substringAfter(curCreator.key, '_item_attribute_label_')) or fn:contains(role, curCreator.value)}"> style="display:none;"
 </c:if>>
-<td>
-<spring:eval expression="@labelsResource', '${curCreator}')" />
-<span class="creator${curCreator}"><spring:eval expression="@labelsResource.getProperty('_item_attribute_label_${curCreator}', '${curCreator}')" />
-</span>
+<td class="creator" id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" >${curCreator.value}
 </td>
-
 <td>
 <cite:creators citation="${citation}" role="${role}" var="creator">
  ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
-
 </cite:creators>
 </td>
 </tr>
 </c:if>
 </c:forEach>
-<tr><td>
-
-<fmt:setBundle basename="creator_roles.properties" var="roles"/>
-<c:forEach items="${roles}" var="entry" varStatus="status">
-    <c:out value="${entry}[${status.index}]" />
-    <c:out value ="${entry.value}" /><br>
-</c:forEach>
-<c:out value="${roles._item_attribute_label_castMember}"/>
-</td><td></td></tr>
 <tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
 <td>Publication Title</td>
 <td><form:input path="publicationTitle" type="text" class="form-control" placeholder="Publication Title" value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
@@ -746,12 +734,12 @@ function loadFields() {
 		url : '<c:url value="/auth/items/'+itemType+'/creators" />',
 		type : 'GET',
 		success: function(creators){
-			$('[class^=creator]').each(function(idx, elem) {
+			$('.creator').each(function(idx, elem) {
 				var tr = $(elem).parent().closest('tr');
-				tr.hide()
+				tr.hide();
 			});
 			for(i=0;i<creators.length;i++){
-				$('[class=creator'+creators[i]).parent().closest('tr').show();
+				$('[id='+creators[i].substring(creators[i].indexOf('_item_attribute_label_')+1)).parent().closest('tr').show();
 			}
 			$('#messageModal').modal('hide');
 			console.log(creators);

@@ -1,5 +1,9 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +49,24 @@ public class AddItemController {
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("defaultItemType", ItemType.valueOf(defaultItemType));
         model.addAttribute("otherCreators", citationManager.getValidCreatorTypes((IUser)authentication.getPrincipal(), ItemType.valueOf(defaultItemType)));
+        
+        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("creator_roles.properties");
+        Properties props = new Properties();
+        try {
+            props.load(stream);
+        } catch (IOException e) {
+            // TODO fix error
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        HashMap<String, String> map = new HashMap<String, String>();
+
+        for (final String name: props.stringPropertyNames()) {
+            map.put(name, props.getProperty(name));
+        }
+
+        model.addAttribute("creatorMap", map);
         return "auth/group/items/create";
     }
 

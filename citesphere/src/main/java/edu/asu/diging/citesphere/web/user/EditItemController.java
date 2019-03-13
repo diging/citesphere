@@ -73,7 +73,7 @@ public class EditItemController {
             map.put(name, props.getProperty(name));
         }
 
-        model.addAttribute("linkMap", map);
+        model.addAttribute("creatorMap", map);
         
         return "auth/group/items/item/edit";
     }
