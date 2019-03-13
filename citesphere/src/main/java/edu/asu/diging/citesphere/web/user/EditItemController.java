@@ -1,15 +1,14 @@
 package edu.asu.diging.citesphere.web.user;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -32,10 +31,15 @@ import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller
+@PropertySource("classpath:/creators.properties")
 public class EditItemController {
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    @Qualifier("creatorsFile")
+    private Properties properties;
+    
     @Autowired
     private ICitationManager citationManager;
     
@@ -56,24 +60,7 @@ public class EditItemController {
         citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
             .forEach(f -> fields.add(f.getFilename()));
         model.addAttribute("fields", fields);
-        
-        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("creator_roles.properties");
-        Properties props = new Properties();
-        try {
-            props.load(stream);
-        } catch (IOException e) {
-            // TODO fix error
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        HashMap<String, String> map = new HashMap<String, String>();
-
-        for (final String name: props.stringPropertyNames()) {
-            map.put(name, props.getProperty(name));
-        }
-
-        model.addAttribute("creatorMap", map);
+        model.addAttribute("creatorMap", properties.entrySet());
         
         return "auth/group/items/item/edit";
     }

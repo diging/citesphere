@@ -38,6 +38,9 @@
     <context:property-placeholder
         properties-ref="labelsResource" />
 
+	<util:properties id="creatorsFile"
+        location="classpath:creators.properties" />
+		
     <aop:aspectj-autoproxy
         proxy-target-class="true" />
 
