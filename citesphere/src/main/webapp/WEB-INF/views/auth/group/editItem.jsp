@@ -13,172 +13,311 @@
 <script>
 //@ sourceURL=submit.js
 $(function() {
-	$("#uriLoadingSpinner").hide();
-	$("#uriLoadingFailure").hide();
-	$("#uriLoadingFound").hide();
+	$("#uriLoadingSpinnerAuthor").hide();
+	$("#uriLoadingFailureAuthor").hide();
+	$("#uriLoadingFoundAuthor").hide();
 	
-	$("#uriLoadingFound").popover();
-	$("#uriLoadingFailure").popover();
+	$("#uriLoadingFoundAuthor").popover();
+	$("#uriLoadingFailureAuthor").popover();
+	
+	$("#uriLoadingSpinnerEditor").hide();
+	$("#uriLoadingFailureEditor").hide();
+	$("#uriLoadingFoundEditor").hide();
+	
+	$("#uriLoadingFoundEditor").popover();
+	$("#uriLoadingFailureEditor").popover();
 	
 	$("#submitForm").click(function() {
-		$(".author-item").each(function(idx, author) {
-			var authorIdField = $("<input>");
-			authorIdField.attr("type", "hidden");
-			authorIdField.attr("id", "authors" + idx + ".id");
-			authorIdField.attr("name", "authors[" + idx + "].id");
-			authorIdField.attr("value", $(author).data("author-id"));
-			$("#editForm").append(authorIdField);
-			
-			var authorFirstNameField = $("<input>");
-			authorFirstNameField.attr("type", "hidden");
-			authorFirstNameField.attr("id", "authors" + idx + ".firstName");
-			authorFirstNameField.attr("name", "authors[" + idx + "].firstName");
-			authorFirstNameField.attr("value", $(author).data("author-firstname"));
-			$("#editForm").append(authorFirstNameField);
-			
-			var authorLastNameField = $("<input>");
-			authorLastNameField.attr("type", "hidden");
-			authorLastNameField.attr("id", "authors" + idx + ".lastName");
-			authorLastNameField.attr("name", "authors[" + idx + "].lastName");
-			authorLastNameField.attr("value", $(author).data("author-lastname"));
-			$("#editForm").append(authorLastNameField);
-			
-			var authorUriField = $("<input>");
-			authorUriField.attr("type", "hidden");
-			authorUriField.attr("id", "authors" + idx + ".uri");
-			authorUriField.attr("name", "authors[" + idx + "].uri");
-			authorUriField.attr("value", $(author).data("author-uri"));
-			$("#editForm").append(authorUriField);
-			
-			var authorAuthorityField = $("<input>");
-			authorAuthorityField.attr("type", "hidden");
-			authorAuthorityField.attr("id", "authors" + idx + ".localAuthorityId");
-			authorAuthorityField.attr("name", "authors[" + idx + "].localAuthorityId");
-			authorAuthorityField.attr("value", $(author).data("author-authority-id"));
-			$("#editForm").append(authorAuthorityField);
-			
-			$(author).children("span").each(function(idx2, affiliation) {
-				var affiliationField = $("<input>");
-				affiliationField.attr("type", "hidden");
-				affiliationField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".name");
-				affiliationField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].name");
-				affiliationField.attr("value", $(affiliation).data("affiliation-name"));
-				$("#editForm").append(affiliationField);
-				
-				var affiliationIdField = $("<input>");
-				affiliationIdField.attr("type", "hidden");
-				affiliationIdField.attr("id", "authors" + idx + ".affiliations" + idx2 + ".id");
-				affiliationIdField.attr("name", "authors[" + idx + "].affiliations[" + idx2 + "].id");
-				affiliationIdField.attr("value", $(affiliation).data("affiliation-id"));
-				$("#editForm").append(affiliationIdField);
-			});
-		});
+		constructPersonArray("author");
+		constructPersonArray("editor");
 	});
 	
 	$("#addAuthorButton").click(function() {
-		var firstname = $("#firstNameAuthor").val();
-		var lastname = $("#lastNameAuthor").val();
-		var uri = $("#uriAuthor").val();
-		var localAuthority = $("#uriAuthorLocalId").val();
-		
-		var authorSpan = $("<span>");
-		authorSpan.attr("class", "label label-primary author-item");
-		authorSpan.attr("data-author-firstname", firstname);
-		authorSpan.attr("data-author-lastname", lastname);
-		authorSpan.attr("data-author-uri", uri);
-		authorSpan.attr("data-author-authority-id", localAuthority);
-		
-		var affiliationsList = [];
-		var affSpan = $("<span>");
-		$("#affiliations").children().each(function(idx, elem) {
-			var affSpan = $("<span>");
-			var input = $(elem).find("input");
-			affSpan.attr("data-affiliation-name", input.val());
-			affiliationsList.push(input.val());
-			authorSpan.append(affSpan);
-		});
-		
-		var affiliationString = "";
-		if (affiliationsList) {
-			affiliationString = " (" + affiliationsList.join(", ") + ")";
-		}
-		
-		authorSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-		var deleteIcon = $('<i class="fas fa-times remove-author"></i>');
-		deleteIcon.click(removeAuthor);
-		authorSpan.append(deleteIcon);
-		$("#authorList").append(authorSpan);
-		$("#authorList").append("&nbsp;&nbsp; ")
-		
-		$("#authorModal").modal('hide');
-		resetAuthorCreationModal();
+		savePersonDetails("Author");
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
 		$("#authorModal").modal('hide');
-		resetAuthorCreationModal();
+		resetPersonCreationModal("Author");
 	});
 	
-	$(".remove-author").click(removeAuthor);
+	$(".edit-author").click(function(){
+		var authorItem = $(this).parent();
+		editPerson('Author', authorItem[0]);
+	});
+	
+	$(".edit-author").css('cursor', 'pointer');
+	
+	$(".edit-editor").click(function(){
+		var editorItem = $(this).parent();
+		editPerson('Editor', editorItem[0]);
+	});
+	
+	$(".edit-editor").css('cursor', 'pointer');
+	
+	$("#addEditorButton").click(function() {
+		savePersonDetails('Editor');
+	});
+
+	$("#addEditorModalCancel").click(function() {
+		$("#editorModal").modal('hide');
+		resetPersonCreationModal("Editor");
+	});
+	
+	$(".remove-author").click(removePerson);
 	$(".remove-author").css('cursor', 'pointer');
 	
-	$("#addAffiliation").click(function() {
-		var affiliationCopy = $("#affiliationTemplate").clone();
+	$("#addAuthorAffiliation").click(function() {
+		var affiliationCopy = $("#authorAffiliationTemplate").clone();
+		affiliationCopy.removeAttr("id");
+		affiliationCopy.addClass("aff-info");
+		affiliationCopy.find("input").val("");
+		affiliationCopy.show();
+		$("#authorAffiliations").append(affiliationCopy);
+	});
+	
+	$(".remove-editor").click(removePerson);
+	$(".remove-editor").css('cursor', 'pointer');
+
+	$("#addEditorAffiliation").click(function() {
+		var affiliationCopy = $("#editorAffiliationTemplate").clone();
 		affiliationCopy.removeAttr("id");
 		affiliationCopy.find("input").val("");
-		$("#affiliations").append(affiliationCopy);
+		$("#editorAffiliations").append(affiliationCopy);
 	});
 	
 	var timer = null;
 	$("#uriAuthor").change(function() {
-		resetAuthorAuthorityCreation();
-		$("#uriLoadingSpinner").show();
+		resetPersonAuthorityCreation("Author");
+		$("#uriLoadingSpinnerAuthor").show();
 		var uri = $("#uriAuthor").val();
 		clearTimeout(timer); 
 	    timer = setTimeout(function() {
-	    	getAuthority(uri);
+	    	getPersonAuthority(uri, "Author");
 	    }, 1000);
 	});
 	
-	$("#iconContainer").on('click', ".popover #createAuthority", function() {
-		var uri = $("#uriLoadingFound").data('authority-uri');
+	$("#uriEditor").change(function() {
+		resetPersonAuthorityCreation("Editor");
+		$("#uriLoadingSpinnerEditor").show();
+		var uri = $("#uriEditor").val();
+		clearTimeout(timer); 
+	    timer = setTimeout(function() {
+	    	getPersonAuthority(uri, "Editor");
+	    }, 1000);
+	});
+	
+	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
+		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
 		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
-			$("#createAuthority").hide();
+			$("#authorCreateAuthority").hide();
 			$("#uriAuthorLocalId").val(data['id']);
 			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#authorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			$("#uriLoadingFound").popover('hide');
+			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			$("#uriLoadingFoundAuthor").popover('hide');
 		});
 	});
 	
-	$("#iconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
-		var authId = $(this).data('authority-id');
+	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
-		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).data('authority-name') + "</i>.");
-		$("#uriLoadingFound").popover('hide');
+		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		$("#uriLoadingFoundAuthor").popover('hide');
+		event.preventDefault();
+	});
+	
+	$("#editorIconContainer").on('click', ".popover #editorCreateAuthority", function() {
+		var uri = $("#uriLoadingFoundEditor").attr('data-authority-uri');
+		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
+			$("#editorCreateAuthority").hide();
+			$("#uriEditorLocalId").val(data['id']);
+			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			$("#uriLoadingFoundEditor").popover('hide');
+		});
+	});
+	
+	$("#editorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).attr('data-authority-id');
+		$("#uriEditorLocalId").val(authId);
+		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		$("#uriLoadingFoundEditor").popover('hide');
 		event.preventDefault();
 	});
 });
 
-function resetAuthorCreationModal() {
-	$("#firstNameAuthor").val("");
-	$("#lastNameAuthor").val("");
-	$("#affiliationTemplate").find("input").val("");
-	$("#uriAuthor").val("");
-	resetAuthorAuthorityCreation();
+function editPerson(personType, item){
+	var personType_lowerCase = personType.toLowerCase();
+	var personItem = $(item);
+	$("#firstName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-firstname"));
+	$("#lastName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-lastname"));
+	$("#uri"+personType).val(personItem.attr("data-"+personType_lowerCase+"-uri"));
+	$("#id"+personType).attr("data-"+personType_lowerCase+"-id", personItem.attr("id"));
+	
+	personItem.children("span").each(function(idx, elem){
+		var affInput = $("#"+personType_lowerCase+"AffiliationTemplate").clone();
+		affInput.removeAttr("id");
+		affInput.addClass("aff-info");
+		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
+		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
+		affInput.find("input").val($(elem).data("affiliationName"));
+		$("#"+personType_lowerCase+"Modal #"+personType_lowerCase+"Affiliations").append(affInput);
+	});
+	
+	if(personItem.children("span").length > 0) {
+		$("#"+personType_lowerCase+"AffiliationTemplate").hide();
+	}
+	
+	$("#add"+personType+"Button").text("Update "+personType);
+	
+	$("#"+personType_lowerCase+"Modal").modal('show');
 }
 
-function resetAuthorAuthorityCreation() {
-	$("#uriLoadingFound").hide();
-	$("#uriLoadingFailure").hide();
-	$("#uriLoadingSpinner").hide();
-	$("#uriLoadingFound").popover('hide');
-	$("#uriLoadingFailure").popover('hide');
+function savePersonDetails(personType){
+	var personType_lowerCase = personType.toLowerCase();
+	var personSpan;
+	
+	if($("#id"+personType).attr("data-"+personType_lowerCase+"-id")) {
+		personSpan = $('#'+$("#id"+personType).attr("data-"+personType_lowerCase+"-id"));
+	} else {
+		$("#id"+personType).attr("data-"+personType_lowerCase+"-id", $("#"+personType_lowerCase+"List").length);
+		personSpan = $('<span id="'+personType_lowerCase+$("#idAuthor").attr("data-"+personType_lowerCase+"-id")+'">');
+	}
+	
+	if(personType_lowerCase == "author") {
+		personSpan.attr("class", "label label-primary "+personType_lowerCase +"-item");
+	} else {
+		personSpan.attr("class", "label label-info "+personType_lowerCase +"-item");
+	}
+	
+	personSpan.html("");
+	var firstname = $("#firstName"+personType).val();
+	var lastname = $("#lastName"+personType).val();
+	var uri = $("#uri"+personType).val();
+	var localAuthority = $("#"+personType+"LocalId").val();
+	
+	personSpan.attr("data-"+personType_lowerCase+"-firstname", firstname);
+	personSpan.attr("data-"+personType_lowerCase+"-lastname", lastname);
+	personSpan.attr("data-"+personType_lowerCase+"-uri", uri);
+	personSpan.attr("data-"+personType_lowerCase+"-authority-id", localAuthority);
+	
+	var affiliationsList = [];
+	var affSpan = $("<span>");
+	$("#"+personType_lowerCase+"Affiliations").children().each(function(idx, elem) {
+		var input = $(elem).find("input");
+		if(input.val().length!=0){
+			var affSpan = $("<span>");
+			affSpan.attr("data-affiliation-name", input.val());
+			affiliationsList.push(input.val());
+			personSpan.append(affSpan);
+		}
+	});
+	
+	var affiliationString = "";
+	if (affiliationsList.length != 0) {
+		affiliationString = " (" + $.grep(affiliationsList, Boolean).join(", ") + ")";
+	}
+	
+	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
+	var editIcon = $('<i class="far fa-edit edit-'+personType_lowerCase+'"></i>')
+	var deleteIcon = $('<i class="fas fa-times remove-'+personType_lowerCase+'"></i>');
+	editIcon.click(function(){
+		var personItem = $(this).parent();
+		editPerson(personType, personItem[0]);
+	});
+	deleteIcon.click(removePerson);
+	personSpan.append(editIcon);
+	personSpan.append(deleteIcon);
+	$("#"+personType_lowerCase+"List").append(personSpan);
+	$("#"+personType_lowerCase+"List").append("&nbsp;&nbsp; ");
+	$("#"+personType_lowerCase+"Modal").modal('hide');
+	resetPersonCreationModal(personType);
 }
 
-function getAuthority(uri) {
+function constructPersonArray(arrayName){
+		$('.'+arrayName+'-item').each(function(idx, person) {
+		var personIdField = $("<input>");
+		personIdField.attr("type", "hidden");
+		personIdField.attr("id", arrayName+"s" + idx + ".id");
+		personIdField.attr("name", arrayName+"s[" + idx + "].id");
+		personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
+		$("#editForm").append(personIdField);
+		
+		var personFirstNameField = $("<input>");
+		personFirstNameField.attr("type", "hidden");
+		personFirstNameField.attr("id", arrayName+"s" + idx + ".firstName");
+		personFirstNameField.attr("name", arrayName+"s[" + idx + "].firstName");
+		personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
+		$("#editForm").append(personFirstNameField);
+		
+		var personLastNameField = $("<input>");
+		personLastNameField.attr("type", "hidden");
+		personLastNameField.attr("id", arrayName+"s" + idx + ".lastName");
+		personLastNameField.attr("name", arrayName+"s[" + idx + "].lastName");
+		personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
+		$("#editForm").append(personLastNameField);
+		
+		var personUriField = $("<input>");
+		personUriField.attr("type", "hidden");
+		personUriField.attr("id", arrayName+"s" + idx + ".uri");
+		personUriField.attr("name", arrayName+"s[" + idx + "].uri");
+		personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
+		$("#editForm").append(personUriField);
+		
+		var personAuthorityField = $("<input>");
+		personAuthorityField.attr("type", "hidden");
+		personAuthorityField.attr("id", arrayName+"s" + idx + ".localAuthorityId");
+		personAuthorityField.attr("name", arrayName+"s[" + idx + "].localAuthorityId");
+		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
+		$("#editForm").append(personAuthorityField);
+		
+		$(person).children("span").each(function(idx2, affiliation) {
+			var affiliationField = $("<input>");
+			affiliationField.attr("type", "hidden");
+			affiliationField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".name");
+			affiliationField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].name");
+			affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
+			$("#editForm").append(affiliationField);
+			
+			var affiliationIdField = $("<input>");
+			affiliationIdField.attr("type", "hidden");
+			affiliationIdField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".id");
+			affiliationIdField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].id");
+			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
+			$("#editForm").append(affiliationIdField);
+		});
+	});
+}
+
+function resetPersonCreationModal(personType) {
+	$("#firstName"+personType).val("");
+	$("#lastName"+personType).val("");
+	var affTemplate = $("#"+personType.toLowerCase()+"AffiliationTemplate");
+	$("#"+personType.toLowerCase()+"Affiliations").children().remove();
+	$("#"+personType.toLowerCase()+"Affiliations").append(affTemplate);
+	$("#"+personType.toLowerCase()+"AffiliationTemplate").find("input").val("");
+	$("#"+personType.toLowerCase()+"AffiliationTemplate").show();
+	$("#id"+personType).attr("data-"+personType.toLowerCase()+"-id","");
+	$(".aff-info").remove();
+	$("#uri"+personType).val("");
+	$("#add"+personType+"Button").text("Add "+personType);
+	resetPersonAuthorityCreation(personType);
+}
+
+function resetPersonAuthorityCreation(personType) {
+	$("#uriLoadingFound"+personType).hide();
+	$("#uriLoadingFailure"+personType).hide();
+	$("#uriLoadingSpinner"+personType).hide();
+	$("#uriLoadingFound"+personType).popover('hide');
+	$("#uriLoadingFailure"+personType).popover('hide');
+	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
+	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").html("");
+}
+
+function getPersonAuthority(uri, personType) {
+	personType_lowerCase = personType.toLowerCase();
 	$.get('<c:url value="/auth/authority/get?uri=" />' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
-		$("#uriLoadingFound").attr("data-authority-uri", data['uri']);
+		$("#uriLoadingFound"+personType).attr("data-authority-uri", data['uri']);
 		var content = "Authority <b>" + uri + "</b>";
 		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
 			content += "<br><br>This authority entry has already been imported by you:";
@@ -201,25 +340,25 @@ function getAuthority(uri) {
 			content += "</ul>";
 		}
 		content += "<br><br>Do you want to create a managed authority entry?<br>" +
-					'<span id="authorityCreationFeedback"><button id="createAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
-		$("#uriLoadingFound").attr("data-content", content);
-		$("#uriLoadingFound").attr("data-authority-uri", uri);
-		$("#uriLoadingFound").show();
-		$("#uriLoadingFound").popover('show');
+					'<span id="'+personType_lowerCase+'AuthorityCreationFeedback"><button id="'+personType_lowerCase+'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+		$("#uriLoadingFound"+personType).attr("data-content", content);
+		$("#uriLoadingFound"+personType).attr("data-authority-uri", uri);
+		$("#uriLoadingFound"+personType).show();
+		$("#uriLoadingFound"+personType).popover('show');
 	})
 	.fail(function() {
-		$("#uriLoadingFailure").show();
+		$("#uriLoadingFailure"+personType).show();
 	 })
     .always(function() {
-    	$("#uriLoadingSpinner").hide();
+    	$("#uriLoadingSpinner"+personType).hide();
 	 });
 
 }
 
-let removeAuthor = function removeAuthor(e) {
+let removePerson = function removePerson(e) {
 	var deleteIcon = e.currentTarget;
-	var author = $(deleteIcon).parent();
-	author.remove();
+	var person = $(deleteIcon).parent();
+	person.remove();
 }
 
 </script>
@@ -234,6 +373,9 @@ let removeAuthor = function removeAuthor(e) {
 	 <c:forEach items="${citation.authors}" var="author" varStatus="status">
 	 	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
 	 </c:forEach>
+	 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
+	 	  <strong>${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
+	 </c:forEach> 
 	  <em>${citation.title}</em>
 	  <c:if test="${not empty citation.dateFreetext}">
  	  (${citation.dateFreetext})
@@ -303,10 +445,12 @@ let removeAuthor = function removeAuthor(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
+<span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
 <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
-${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach>
-&nbsp;&nbsp;
+${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
+&nbsp;
+<i class="far fa-edit edit-author"></i>
+&nbsp;
 <i class="fas fa-times remove-author"></i>
 </span>
 &nbsp;&nbsp;
@@ -318,9 +462,20 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <tr>
 <td>Editors</td>
 <td>
+<span id="editorList" style="font-size: 18px">
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
- ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>
+<span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
+<c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
+&nbsp;
+<i class="far fa-edit edit-editor"></i>
+&nbsp;
+<i class="fas fa-times remove-editor"></i>
+</span>
+&nbsp;&nbsp;
 </c:forEach>
+</span>
+<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
 </td>
 </tr>
 
@@ -425,6 +580,9 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
         <h4 class="modal-title" id="authorLabel">Enter Author Information</h4>
       </div>
       <div class="modal-body">
+      	  <div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idAuthor">
+      	  </div>
           <div class="form-group">
 		    <label for="firstNameAuthor">First Name:</label>
 		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
@@ -437,29 +595,78 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
-			    <div id="iconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinner" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFound" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailure" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundAuthor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureAuthor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
 			    <input type="hidden" id="uriAuthorLocalId" />
 		    </div>
 		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
 		  </div>
-		  <div id="affiliations">
-		  <div id="affiliationTemplate" class="form-group">
+		  <div id="authorAffiliations">
+		  <div id="authorAffiliationTemplate" class="form-group">
 		    <label for="affiliationAuthor">Affiliation:</label>
 		    <input type="text" class="form-control" placeholder="Affiliation">
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
       <div class="modal-footer">
         <button type="button" class="btn btn-default" id="addAuthorModalCancel">Close</button>
         <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Editor Modal -->
+<div class="modal fade" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="editorLabel">Enter Editor Information</h4>
+      </div>
+      <div class="modal-body">
+          <div class="form-group">
+		    <label for="firstNameEditor">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameEditor" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameEditor">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameEditor" placeholder="Last Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="uriEditor">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriEditor" placeholder="URI">
+			    <div id="editorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerEditor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundEditor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureEditor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriEditorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
+		  </div>
+		  <div id="editorAffiliations">
+		  <div id="editorAffiliationTemplate" class="form-group">
+		    <label for="editorAffiliation">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addEditorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" id="addEditorModalCancel" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="addEditorButton" type="button" class="btn btn-primary">Add Editor</button>
       </div>
     </div>
   </div>
