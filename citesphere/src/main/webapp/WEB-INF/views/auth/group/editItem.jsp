@@ -4,7 +4,6 @@
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ taglib uri = "http://java.sun.com/jsp/jstl/fmt" prefix = "fmt" %>
 
 <style>
 .popover {
@@ -479,26 +478,31 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
 </td>
 </tr>
+
 <!-- When form is in create mode -->
 <c:set var="role" value="${otherCreators}" />
+
 <!-- When form is in edit mode -->
 <c:if test="${not empty citation.key and not empty citation.otherCreatorRoles}" >
-<c:set var="role" value="${citation.otherCreatorRoles}" />
+	<c:set var="role" value="${citation.otherCreatorRoles}" />
 </c:if>
+
 <c:forEach items="${creatorMap}" var="curCreator">
-<c:if test="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
-<tr <c:if test="${empty role or not fn:contains(role, fn:substringAfter(curCreator.key, '_item_attribute_label_')) or fn:contains(role, curCreator.value)}"> style="display:none;"
-</c:if>>
-<td class="creator" id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" >${curCreator.value}
-</td>
-<td>
-<cite:creators citation="${citation}" role="${role}" var="creator">
- ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
-</cite:creators>
-</td>
-</tr>
-</c:if>
+	<c:if test="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
+		<tr <c:if test="${empty role or not fn:contains(role, fn:substringAfter(curCreator.key, '_item_attribute_label_')) or fn:contains(role, curCreator.value)}"> style="display:none;"
+		</c:if>>
+		<td class="creator" id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" >${curCreator.value}
+		</td>
+		
+		<td>
+			<cite:creators citation="${citation}" role="${role}" var="creator">
+			 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
+			</cite:creators>
+		</td>
+	</tr>
+	</c:if>
 </c:forEach>
+
 <tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
 <td>Publication Title</td>
 <td><form:input path="publicationTitle" type="text" class="form-control" placeholder="Publication Title" value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
@@ -742,7 +746,6 @@ function loadFields() {
 				$('[id='+creators[i].substring(creators[i].indexOf('_item_attribute_label_')+1)).parent().closest('tr').show();
 			}
 			$('#messageModal').modal('hide');
-			console.log(creators);
 		},
 		error: function(){
 			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
