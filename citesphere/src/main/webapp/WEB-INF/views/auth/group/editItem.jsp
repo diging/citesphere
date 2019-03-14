@@ -566,6 +566,9 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
+<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />" class="btn btn-default">
+		<i class="fa fa-times"></i>&nbsp;Cancel
+</a>
 </form:form>
 
 <!-- Author Modal -->
