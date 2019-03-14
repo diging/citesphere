@@ -152,12 +152,14 @@ $(function() {
 });
 
 function showPersonNameInModal(name, personType){
-	if(name.split(",")[0] != null && name.split(",")[0].length > 0) {
-		$("#lastName"+personType).val(name.split(",")[0]);
-	}
-	
-	if(name.split(",")[1] != null && name.split(",")[1].length > 0) {
-		$("#firstName"+personType).val(name.split(",")[1]);
+	// To remove the year from name
+	name = name.substring(0, name.lastIndexOf(','));
+	if(name.indexOf(",") != -1) {
+		$("#firstName"+personType).val(name.substring(name.lastIndexOf(',')+1).trim());
+		$("#lastName"+personType).val(name.substring(0, name.lastIndexOf(', ')));
+	} else {
+		$("#firstName"+personType).val(name.substring(name.lastIndexOf(' ')).trim());
+		$("#lastName"+personType).val(name.substring(0, name.lastIndexOf(' ')));
 	}
 }
 
