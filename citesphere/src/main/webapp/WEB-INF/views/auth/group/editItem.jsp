@@ -480,26 +480,40 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 </tr>
 
 <!-- When form is in create mode -->
-<c:set var="role" value="${otherCreators}" />
+<c:set var="roles" value="${otherCreators}" />
 
 <!-- When form is in edit mode -->
 <c:if test="${not empty citation.key and not empty citation.otherCreatorRoles}" >
-	<c:set var="role" value="${citation.otherCreatorRoles}" />
+	<c:set var="roles" value="${citation.otherCreatorRoles}" />
 </c:if>
 
 <c:forEach items="${creatorMap}" var="curCreator">
 	<c:if test="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
-		<tr <c:if test="${empty role or not fn:contains(role, fn:substringAfter(curCreator.key, '_item_attribute_label_')) or fn:contains(role, curCreator.value)}"> style="display:none;"
-		</c:if>>
-		<td class="creator" id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" >${curCreator.value}
-		</td>
-		
-		<td>
-			<cite:creators citation="${citation}" role="${role}" var="creator">
-			 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
-			</cite:creators>
-		</td>
-	</tr>
+		<tr style="display:none;">
+			<td class="creator" id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" >${curCreator.value}
+			</td>
+			
+			<td>
+				<cite:creators citation="${citation}" role="${curCreator}" var="creator">
+				 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
+				</cite:creators>
+			</td>
+		</tr>
+	</c:if>
+</c:forEach>
+
+<c:forEach items="${roles}" var="curCreator">
+	<c:if test="${ (curCreator ne 'author') and (curCreator ne 'editor') and fn:contains(creatorMap.keySet, '_item_attribute_label_'+curCreator) eq false}">
+		<tr>
+			<td class="creator" id="${curCreator}" >${curCreator}
+			</td>
+			
+			<td>
+				<cite:creators citation="${citation}" role="${curCreator}" var="creator">
+				 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
+				</cite:creators>
+			</td>
+		</tr>
 	</c:if>
 </c:forEach>
 
@@ -695,13 +709,13 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <script>
 //# sourceURL=fields.js
 $(document).ready(function() {
+	loadFields();
 	$('#items').on("change", function(e){
 		loadFields();
 	});
 	
 	<c:if test="${empty citation}">
-	$("#items").val("${defaultItemType}");
-	loadFields();
+		$("#items").val("${defaultItemType}");
 	</c:if>
 });
 
@@ -743,7 +757,21 @@ function loadFields() {
 				tr.hide();
 			});
 			for(i=0;i<creators.length;i++){
-				$('[id='+creators[i].substring(creators[i].indexOf('_item_attribute_label_')+1)).parent().closest('tr').show();
+				if($('[id='+creators[i]).length > 0) {
+					$('[id='+creators[i]).parent().closest('tr').show();
+				} 
+				else { 
+					var creatorRow = $("<tr>");
+					var creatorData = $("<td>");
+					creatorData.attr("class", "creator");
+					creatorData.attr("id", creators[i]);
+					creatorData.append(creators[i]);
+					creatorData.css("display", "table-row");
+					creatorRow.append(creatorData);
+					creatorRow.append($("<td>"));
+					$('.table').append(creatorRow);
+					//console.log(creatorRow);
+				}
 			}
 			$('#messageModal').modal('hide');
 		},
