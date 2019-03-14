@@ -158,8 +158,8 @@ function showPersonNameInModal(name, personType){
 		$("#firstName"+personType).val(name.substring(name.lastIndexOf(',')+1).trim());
 		$("#lastName"+personType).val(name.substring(0, name.lastIndexOf(', ')));
 	} else {
-		$("#firstName"+personType).val(name.substring(name.lastIndexOf(' ')).trim());
-		$("#lastName"+personType).val(name.substring(0, name.lastIndexOf(' ')));
+		$("#lastName"+personType).val(name.substring(name.indexOf(' ')+1).trim());
+		$("#firstName"+personType).val(name.substring(0, name.indexOf(' ')));
 	}
 }
 
