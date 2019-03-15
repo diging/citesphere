@@ -501,9 +501,9 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		</tr>
 	</c:if>
 </c:forEach>
-
 <c:forEach items="${roles}" var="curCreator">
-	<c:if test="${ (curCreator ne 'author') and (curCreator ne 'editor') and fn:contains(creatorMap.keySet, '_item_attribute_label_'+curCreator) eq false}">
+	<c:catch var="roleException">${creatorMap.curCreator}</c:catch>
+	<c:if test="${ (curCreator ne 'author') and (curCreator ne 'editor') and (not empty roleException)}">
 		<tr>
 			<td class="creator" id="${curCreator}" >${curCreator}
 			</td>
@@ -760,17 +760,17 @@ function loadFields() {
 				if($('[id='+creators[i]).length > 0) {
 					$('[id='+creators[i]).parent().closest('tr').show();
 				} 
-				else { 
+				else if(creators[i]!= 'editor' && creators[i]!= 'author'){ 
 					var creatorRow = $("<tr>");
+					creatorRow.css("display", "table-row");
 					var creatorData = $("<td>");
 					creatorData.attr("class", "creator");
+					creatorData.css("text-transform", "capitalize");
 					creatorData.attr("id", creators[i]);
 					creatorData.append(creators[i]);
-					creatorData.css("display", "table-row");
 					creatorRow.append(creatorData);
 					creatorRow.append($("<td>"));
-					$('.table').append(creatorRow);
-					//console.log(creatorRow);
+					creatorRow.insertAfter($('.creator').last().parent());
 				}
 			}
 			$('#messageModal').modal('hide');
