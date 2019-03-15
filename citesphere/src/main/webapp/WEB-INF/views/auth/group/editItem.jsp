@@ -479,33 +479,10 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 </td>
 </tr>
 
-<!-- When form is in create mode -->
-<c:set var="roles" value="${otherCreators}" />
-
-<!-- When form is in edit mode -->
-<c:if test="${not empty citation.key and not empty citation.otherCreatorRoles}" >
-	<c:set var="roles" value="${citation.otherCreatorRoles}" />
-</c:if>
-
 <c:forEach items="${creatorMap}" var="curCreator">
 	<c:if test="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
 		<tr style="display:none;">
 			<td class="creator" id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" >${curCreator.value}
-			</td>
-			
-			<td>
-				<cite:creators citation="${citation}" role="${curCreator}" var="creator">
-				 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
-				</cite:creators>
-			</td>
-		</tr>
-	</c:if>
-</c:forEach>
-<c:forEach items="${roles}" var="curCreator">
-	<c:catch var="roleException">${creatorMap.curCreator}</c:catch>
-	<c:if test="${ (curCreator ne 'author') and (curCreator ne 'editor') and (not empty roleException)}">
-		<tr>
-			<td class="creator" id="${curCreator}" >${curCreator}
 			</td>
 			
 			<td>
@@ -712,14 +689,14 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <script>
 //# sourceURL=fields.js
 $(document).ready(function() {
+	<c:if test="${empty citation}">
+		$("#items").val("${defaultItemType}");
+	</c:if>
 	loadFields();
 	$('#items').on("change", function(e){
 		loadFields();
 	});
 	
-	<c:if test="${empty citation}">
-		$("#items").val("${defaultItemType}");
-	</c:if>
 });
 
 function loadFields() {

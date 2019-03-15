@@ -40,6 +40,8 @@
 
 	<util:properties id="creatorsFile"
         location="classpath:creators.properties" />
+    <context:property-placeholder
+        properties-ref="creatorsFile" />
 		
     <aop:aspectj-autoproxy
         proxy-target-class="true" />
