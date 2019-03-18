@@ -27,18 +27,51 @@ $(function() {
 	$("#uriLoadingFoundEditor").popover();
 	$("#uriLoadingFailureEditor").popover();
 	
-	$("#submitForm").click(function() {
+	$("#uriLoadingSpinnerCreator").hide();
+	$("#uriLoadingFailureCreator").hide();
+	$("#uriLoadingFoundCreator").hide();
+	
+	$("#uriLoadingFoundCreator").popover();
+	$("#uriLoadingFailureCreator").popover();
+	
+	$("#submitForm").click(function(e) {
 		constructPersonArray("author");
 		constructPersonArray("editor");
+		$(".creator").parent().closest("tr").each(function(idx, elem){
+			if($(elem).css("display")!="none") {
+				var ele = $(elem).children().first();
+				constructPersonArray(ele.attr("id"));
+			}
+		});
+		e.preventDefault();
 	});
 	
 	$("#addAuthorButton").click(function() {
-		savePersonDetails("Author");
+		savePersonDetails("Author", "Author");
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
 		$("#authorModal").modal('hide');
 		resetPersonCreationModal("Author");
+	});
+	
+	$("#addCreatorButton").click(function(e) {
+		var target = $(e.target);
+		savePersonDetails(target.attr("data-creator-type"), "Creator");
+	});
+	
+	$(".creatorModalLink").click(function(e) {
+		e.preventDefault();
+		var target = $(e.target);
+		var creatorType = target.attr("data-creator-type").charAt(0).toUpperCase() + target.attr("data-creator-type").slice(1);
+		$("#creatorLabel").text("Enter "+creatorType+" Information");
+		$("#addCreatorButton").text("Add "+creatorType);
+		$("#addCreatorButton").attr("data-creator-type", creatorType);
+	});
+	
+	$("#addCreatorModalCancel").click(function() {
+		$("#creatorModal").modal('hide');
+		resetPersonCreationModal("Creator");
 	});
 	
 	$(".edit-author").click(function(){
@@ -56,7 +89,7 @@ $(function() {
 	$(".edit-editor").css('cursor', 'pointer');
 	
 	$("#addEditorButton").click(function() {
-		savePersonDetails('Editor');
+		savePersonDetails('Editor', 'Editor');
 	});
 
 	$("#addEditorModalCancel").click(function() {
@@ -146,42 +179,42 @@ $(function() {
 	});
 });
 
-function editPerson(personType, item){
+function editPerson(personType, modalName, item){
 	var personType_lowerCase = personType.toLowerCase();
 	var personItem = $(item);
-	$("#firstName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-firstname"));
-	$("#lastName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-lastname"));
-	$("#uri"+personType).val(personItem.attr("data-"+personType_lowerCase+"-uri"));
-	$("#id"+personType).attr("data-"+personType_lowerCase+"-id", personItem.attr("id"));
+	$("#firstName"+modalName).val(personItem.attr("data-"+personType_lowerCase+"-firstname"));
+	$("#lastName"+modalName).val(personItem.attr("data-"+personType_lowerCase+"-lastname"));
+	$("#uri"+modalName).val(personItem.attr("data-"+personType_lowerCase+"-uri"));
+	$("#id"+modalName).attr("data-"+personType_lowerCase+"-id", personItem.attr("id"));
 	
 	personItem.children("span").each(function(idx, elem){
-		var affInput = $("#"+personType_lowerCase+"AffiliationTemplate").clone();
+		var affInput = $("#"+modalName.toLowerCase()+"AffiliationTemplate").clone();
 		affInput.removeAttr("id");
 		affInput.addClass("aff-info");
 		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
 		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
 		affInput.find("input").val($(elem).data("affiliationName"));
-		$("#"+personType_lowerCase+"Modal #"+personType_lowerCase+"Affiliations").append(affInput);
+		$("#"+modalName.toLowerCase()+"Modal #"+modalName.toLowerCase()+"Affiliations").append(affInput);
 	});
 	
 	if(personItem.children("span").length > 0) {
-		$("#"+personType_lowerCase+"AffiliationTemplate").hide();
+		$("#"+modalName.toLowerCase()+"AffiliationTemplate").hide();
 	}
 	
-	$("#add"+personType+"Button").text("Update "+personType);
+	$("#add"+modalName.toLowerCase()+"Button").text("Update "+personType);
 	
-	$("#"+personType_lowerCase+"Modal").modal('show');
+	$("#"+modalName.toLowerCase()+"Modal").modal('show');
 }
 
-function savePersonDetails(personType){
+function savePersonDetails(personType, modalName){
 	var personType_lowerCase = personType.toLowerCase();
 	var personSpan;
-	
-	if($("#id"+personType).attr("data-"+personType_lowerCase+"-id")) {
-		personSpan = $('#'+$("#id"+personType).attr("data-"+personType_lowerCase+"-id"));
+	console.log($("#id"+modalName).attr("data-"+personType_lowerCase+"-id"));
+	if($("#id"+modalName).attr("data-"+personType_lowerCase+"-id")) {
+		personSpan = $('#'+$("#id"+modalName).attr("data-"+personType_lowerCase+"-id"));
 	} else {
-		$("#id"+personType).attr("data-"+personType_lowerCase+"-id", $("#"+personType_lowerCase+"List").length);
-		personSpan = $('<span id="'+personType_lowerCase+$("#idAuthor").attr("data-"+personType_lowerCase+"-id")+'">');
+		$("#id"+modalName).attr("data-"+personType_lowerCase+"-id", $("#"+personType_lowerCase+"List").length);
+		personSpan = $('<span id="'+personType_lowerCase+$("#id"+modalName).attr("data-"+personType_lowerCase+"-id")+'">');
 	}
 	
 	if(personType_lowerCase == "author") {
@@ -191,10 +224,10 @@ function savePersonDetails(personType){
 	}
 	
 	personSpan.html("");
-	var firstname = $("#firstName"+personType).val();
-	var lastname = $("#lastName"+personType).val();
-	var uri = $("#uri"+personType).val();
-	var localAuthority = $("#"+personType+"LocalId").val();
+	var firstname = $("#firstName"+modalName).val();
+	var lastname = $("#lastName"+modalName).val();
+	var uri = $("#uri"+modalName).val();
+	var localAuthority = $("#"+modalName+"LocalId").val();
 	
 	personSpan.attr("data-"+personType_lowerCase+"-firstname", firstname);
 	personSpan.attr("data-"+personType_lowerCase+"-lastname", lastname);
@@ -203,7 +236,7 @@ function savePersonDetails(personType){
 	
 	var affiliationsList = [];
 	var affSpan = $("<span>");
-	$("#"+personType_lowerCase+"Affiliations").children().each(function(idx, elem) {
+	$("#"+modalName.toLowerCase()+"Affiliations").children().each(function(idx, elem) {
 		var input = $(elem).find("input");
 		if(input.val().length!=0){
 			var affSpan = $("<span>");
@@ -219,19 +252,20 @@ function savePersonDetails(personType){
 	}
 	
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-	var editIcon = $('<i class="far fa-edit edit-'+personType_lowerCase+'"></i>')
-	var deleteIcon = $('<i class="fas fa-times remove-'+personType_lowerCase+'"></i>');
+	var editIcon = $('<i class="far fa-edit edit-'+modalName.toLowerCase()+'"></i>')
+	var deleteIcon = $('<i class="fas fa-times remove-'+modalName.toLowerCase()+'"></i>');
 	editIcon.click(function(){
 		var personItem = $(this).parent();
-		editPerson(personType, personItem[0]);
+		editPerson(personType, modalName, personItem[0]);
 	});
 	deleteIcon.click(removePerson);
 	personSpan.append(editIcon);
 	personSpan.append(deleteIcon);
+	console.log(personSpan);
 	$("#"+personType_lowerCase+"List").append(personSpan);
 	$("#"+personType_lowerCase+"List").append("&nbsp;&nbsp; ");
-	$("#"+personType_lowerCase+"Modal").modal('hide');
-	resetPersonCreationModal(personType);
+	$("#"+modalName.toLowerCase()+"Modal").modal('hide');
+	resetPersonCreationModal(modalName);
 }
 
 function constructPersonArray(arrayName){
@@ -486,9 +520,12 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 			</td>
 			
 			<td>
+				<span id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}List" style="font-size: 18px">
 				<cite:creators citation="${citation}" role="${curCreator}" var="creator">
 				 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
 				</cite:creators>
+				</span>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${curCreator.value}</a></div>
 			</td>
 		</tr>
 	</c:if>
@@ -682,6 +719,58 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
       <div class="modal-footer">
         <button type="button" id="addEditorModalCancel" class="btn btn-default" data-dismiss="modal">Close</button>
         <button id="addEditorButton" type="button" class="btn btn-primary">Add Editor</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Other Creator Modal -->
+<div class="modal fade" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="creatorLabel">Enter Creator Information</h4>
+      </div>
+      <div class="modal-body">
+      	  <div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idCreator">
+      	  </div>
+          <div class="form-group">
+		    <label for="firstNameCreator">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameCreator" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameCreator">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameCreator" placeholder="Last Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="uriCreator">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriCreator" placeholder="URI">
+			    <div id="creatorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerCreator" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundCreator" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureCreator" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriCreatorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
+		  </div>
+		  <div id="creatorAffiliations">
+		  <div id="creatorAffiliationTemplate" class="form-group">
+		    <label for="affiliationCreator">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addCreatorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="addCreatorModalCancel">Close</button>
+        <button id="addCreatorButton" type="button" class="btn btn-primary">Add Creator</button>
       </div>
     </div>
   </div>
