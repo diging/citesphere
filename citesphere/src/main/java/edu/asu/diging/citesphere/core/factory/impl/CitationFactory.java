@@ -1,9 +1,11 @@
 package edu.asu.diging.citesphere.core.factory.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -76,6 +78,7 @@ public class CitationFactory implements ICitationFactory {
                 }
             }
         }
+        
         citation.setAuthors(authors);
         citation.setEditors(editors);
         citation.setOtherCreators(creators);
@@ -142,6 +145,14 @@ public class CitationFactory implements ICitationFactory {
             if (jObj.has("editors") && !jObj.get("editors").isJsonNull()) {
                 JsonArray editors = jObj.get("editors").getAsJsonArray();
                 mapPersonFields(editors, citation.getEditors());
+            }
+            if (jObj.has("otherCreators") && !jObj.get("otherCreators").isJsonNull()) {
+                Set<IPerson> map = new HashSet<>();
+                JsonArray creators = jObj.get("otherCreators").getAsJsonArray();
+                for(ICreator otherCreator : citation.getOtherCreators()) {
+                    map.add(otherCreator.getPerson());
+                }
+                mapPersonFields(creators, map);
             }
         }
     }

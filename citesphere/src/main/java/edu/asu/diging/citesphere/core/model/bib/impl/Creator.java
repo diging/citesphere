@@ -27,6 +27,12 @@ public class Creator implements ICreator, Comparable<ICreator> {
     @JsonIgnore
     private String id;
     
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
     private String role;
     @OneToOne(targetEntity=Person.class, cascade=CascadeType.ALL)
     @JoinColumn(name="person_id")

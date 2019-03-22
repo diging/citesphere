@@ -35,15 +35,14 @@ $(function() {
 	$("#uriLoadingFailureCreator").popover();
 	
 	$("#submitForm").click(function(e) {
-		constructPersonArray("author");
-		constructPersonArray("editor");
+		constructPersonArray("author", "author");
+		constructPersonArray("editor", "editor");
 		$(".creator").parent().closest("tr").each(function(idx, elem){
 			if($(elem).css("display")!="none") {
 				var ele = $(elem).children().first();
-				constructPersonArray(ele.attr("id"));
+				constructPersonArray("otherCreator", ele.attr("id"));
 			}
 		});
-		e.preventDefault();
 	});
 	
 	$("#addAuthorButton").click(function() {
@@ -209,12 +208,12 @@ function editPerson(personType, modalName, item){
 function savePersonDetails(personType, modalName){
 	var personType_lowerCase = personType.toLowerCase();
 	var personSpan;
-	console.log($("#id"+modalName).attr("data-"+personType_lowerCase+"-id"));
-	if($("#id"+modalName).attr("data-"+personType_lowerCase+"-id")) {
+	if($("#id"+modalName).attr("data-"+$("#id"+modalName).attr("data-creator-type")+"-id")) {
 		personSpan = $('#'+$("#id"+modalName).attr("data-"+personType_lowerCase+"-id"));
 	} else {
 		$("#id"+modalName).attr("data-"+personType_lowerCase+"-id", $("#"+personType_lowerCase+"List").length);
-		personSpan = $('<span id="'+personType_lowerCase+$("#id"+modalName).attr("data-"+personType_lowerCase+"-id")+'">');
+		var id = personType_lowerCase+$("#id"+modalName).attr("data-"+personType_lowerCase+"-id");
+		personSpan = $('<span id='+id+'>');
 	}
 	
 	if(personType_lowerCase == "author") {
@@ -261,48 +260,54 @@ function savePersonDetails(personType, modalName){
 	deleteIcon.click(removePerson);
 	personSpan.append(editIcon);
 	personSpan.append(deleteIcon);
-	console.log(personSpan);
 	$("#"+personType_lowerCase+"List").append(personSpan);
 	$("#"+personType_lowerCase+"List").append("&nbsp;&nbsp; ");
 	$("#"+modalName.toLowerCase()+"Modal").modal('hide');
 	resetPersonCreationModal(modalName);
 }
 
-function constructPersonArray(arrayName){
-		$('.'+arrayName+'-item').each(function(idx, person) {
+function constructPersonArray(arrayName, role){
+		$('.'+role+'-item').each(function(idx, person) {
 		var personIdField = $("<input>");
 		personIdField.attr("type", "hidden");
 		personIdField.attr("id", arrayName+"s" + idx + ".id");
 		personIdField.attr("name", arrayName+"s[" + idx + "].id");
-		personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
+		personIdField.attr("value", $(person).attr("data-"+role+"-id"));
 		$("#editForm").append(personIdField);
 		
 		var personFirstNameField = $("<input>");
 		personFirstNameField.attr("type", "hidden");
 		personFirstNameField.attr("id", arrayName+"s" + idx + ".firstName");
 		personFirstNameField.attr("name", arrayName+"s[" + idx + "].firstName");
-		personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
+		personFirstNameField.attr("value", $(person).attr("data-"+role+"-firstname"));
 		$("#editForm").append(personFirstNameField);
 		
 		var personLastNameField = $("<input>");
 		personLastNameField.attr("type", "hidden");
 		personLastNameField.attr("id", arrayName+"s" + idx + ".lastName");
 		personLastNameField.attr("name", arrayName+"s[" + idx + "].lastName");
-		personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
+		personLastNameField.attr("value", $(person).attr("data-"+role+"-lastname"));
 		$("#editForm").append(personLastNameField);
+		
+		var personRoleField = $("<input>");
+		personRoleField.attr("type", "hidden");
+		personRoleField.attr("id", arrayName+"s" + idx + ".role");
+		personRoleField.attr("name", arrayName+"s[" + idx + "].role");
+		personRoleField.attr("value", role);
+		$("#editForm").append(personRoleField);
 		
 		var personUriField = $("<input>");
 		personUriField.attr("type", "hidden");
 		personUriField.attr("id", arrayName+"s" + idx + ".uri");
 		personUriField.attr("name", arrayName+"s[" + idx + "].uri");
-		personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
+		personUriField.attr("value", $(person).attr("data-"+role+"-uri"));
 		$("#editForm").append(personUriField);
 		
 		var personAuthorityField = $("<input>");
 		personAuthorityField.attr("type", "hidden");
 		personAuthorityField.attr("id", arrayName+"s" + idx + ".localAuthorityId");
 		personAuthorityField.attr("name", arrayName+"s[" + idx + "].localAuthorityId");
-		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
+		personAuthorityField.attr("value", $(person).attr("data-"+role+"-authority-id"));
 		$("#editForm").append(personAuthorityField);
 		
 		$(person).children("span").each(function(idx2, affiliation) {
@@ -331,8 +336,8 @@ function resetPersonCreationModal(personType) {
 	$("#"+personType.toLowerCase()+"Affiliations").append(affTemplate);
 	$("#"+personType.toLowerCase()+"AffiliationTemplate").find("input").val("");
 	$("#"+personType.toLowerCase()+"AffiliationTemplate").show();
-	$("#id"+personType).attr("data-"+personType.toLowerCase()+"-id","");
 	$(".aff-info").remove();
+	// TODO reset id
 	$("#uri"+personType).val("");
 	$("#add"+personType+"Button").text("Add "+personType);
 	resetPersonAuthorityCreation(personType);

@@ -77,7 +77,7 @@ public class EditItemController {
         return new ResponseEntity<List<String>>(fields, HttpStatus.OK);
     }
     
-    /**
+    /**'
      * Method to retrieve all creator types filtered by item type.
      */
     @RequestMapping("/auth/items/{itemType}/creators")

@@ -14,4 +14,8 @@ public interface ICreator {
 
     int getPositionInList();
 
+    String getId();
+    
+    void setId(String id);
+    
 }

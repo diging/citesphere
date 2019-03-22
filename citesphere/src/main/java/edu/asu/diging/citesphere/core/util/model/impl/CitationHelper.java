@@ -9,8 +9,10 @@ import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
+import edu.asu.diging.citesphere.core.model.bib.impl.Creator;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.AffiliationForm;
@@ -53,23 +55,31 @@ public class CitationHelper implements ICitationHelper {
         citation.setUrl(form.getUrl());
         citation.setVolume(form.getVolume());
         
-        citation.setOtherCreators(new HashSet<>());
-        if(form.getOtherCreators()!= null) {
-            citation.setOtherCreators(form.getOtherCreators());
-        }
-        
         Map<String, IPerson> authorMap = new HashMap<>();
-        citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
+        if(citation.getAuthors()!=null)
+            citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
         citation.setAuthors(new HashSet<>());
         if (form.getAuthors() != null) {
             mapPersonFields(authorMap, form.getAuthors(), citation.getAuthors());
         }
         
         Map<String, IPerson> editorMap = new HashMap<>();
-        citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
+        if(citation.getEditors()!=null)
+            citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
         citation.setEditors(new HashSet<>());
         if (form.getEditors() != null) {
             mapPersonFields(editorMap, form.getEditors(), citation.getEditors());
+        }
+        
+        Map<String, ICreator> creatorMap = new HashMap<>();
+        if(citation.getOtherCreators()!=null)
+            citation.getOtherCreators().forEach(a -> creatorMap.put(a.getPerson().getId(), a));
+        citation.setOtherCreators(new HashSet<>());
+        Set<IPerson> creatorsPersonMap = new HashSet<>();
+        if (form.getOtherCreators() != null) {
+            
+            citation.getOtherCreators().forEach(a -> creatorsPersonMap.add(a.getPerson()));
+            mapCreatorFields(creatorMap, form.getOtherCreators(), citation.getOtherCreators());
         }
 
     }
@@ -109,4 +119,41 @@ public class CitationHelper implements ICitationHelper {
                 citationPersonList.add(person);
           }
      }
+    
+    void mapCreatorFields(Map<String, ICreator> creatorMap, List<PersonForm> personList, Set<ICreator> citationCreatorList) {
+        for (PersonForm personForm : personList) {
+            ICreator creator;
+            if (personForm.getId() != null && !personForm.getId().isEmpty()) {
+                creator = creatorMap.get(personForm.getId());
+            } else {
+                creator = new Creator();
+                creator.setPerson(new Person());
+            }
+            creator.getPerson().setFirstName(personForm.getFirstName());
+            creator.getPerson().setLastName(personForm.getLastName());
+            creator.getPerson().setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
+            creator.setRole(personForm.getRole());
+            
+            Map<String, IAffiliation> affiliationMap = new HashMap<>();
+            if (creator.getPerson().getAffiliations() != null) {
+                creator.getPerson().getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
+            }
+            creator.getPerson().setAffiliations(new HashSet<>());
+            if (personForm.getAffiliations() != null) {
+                for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
+                    IAffiliation affiliation;
+                    if (affiliationForm.getId() != null && !affiliationForm.getId().isEmpty()) {
+                        affiliation = affiliationMap.get(affiliationForm.getId());
+                    } else {
+                        affiliation = new Affiliation();
+                    }
+                    affiliation.setName(affiliationForm.getName());
+                    creator.getPerson().getAffiliations().add(affiliation);
+                }
+            }
+            creator.getPerson().setUri(personForm.getUri());
+            creator.getPerson().setLocalAuthorityId(personForm.getLocalAuthorityId());
+            citationCreatorList.add(creator);
+      }
+    }
 }

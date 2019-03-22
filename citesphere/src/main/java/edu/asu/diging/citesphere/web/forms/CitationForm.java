@@ -35,12 +35,12 @@ public class CitationForm {
     
     private List<PersonForm> authors;
     private List<PersonForm> editors;
-    private Set<ICreator> otherCreators;
+    private List<PersonForm> otherCreators;
 
-    public Set<ICreator> getOtherCreators() {
+    public List<PersonForm> getOtherCreators() {
         return otherCreators;
     }
-    public void setOtherCreators(Set<ICreator> otherCreators) {
+    public void setOtherCreators(List<PersonForm> otherCreators) {
         this.otherCreators = otherCreators;
     }
     public String getKey() {
