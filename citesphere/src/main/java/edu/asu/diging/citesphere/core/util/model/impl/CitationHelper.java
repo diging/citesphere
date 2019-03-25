@@ -73,12 +73,9 @@ public class CitationHelper implements ICitationHelper {
         
         Map<String, ICreator> creatorMap = new HashMap<>();
         if(citation.getOtherCreators()!=null)
-            citation.getOtherCreators().forEach(a -> creatorMap.put(a.getPerson().getId(), a));
+            citation.getOtherCreators().forEach(a -> creatorMap.put(a.getId(), a));
         citation.setOtherCreators(new HashSet<>());
-        Set<IPerson> creatorsPersonMap = new HashSet<>();
         if (form.getOtherCreators() != null) {
-            
-            citation.getOtherCreators().forEach(a -> creatorsPersonMap.add(a.getPerson()));
             mapCreatorFields(creatorMap, form.getOtherCreators(), citation.getOtherCreators());
         }
 
@@ -93,29 +90,7 @@ public class CitationHelper implements ICitationHelper {
                 } else {
                     person = new Person();
                 }
-                person.setFirstName(personForm.getFirstName());
-                person.setLastName(personForm.getLastName());
-                person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
-    
-                Map<String, IAffiliation> affiliationMap = new HashMap<>();
-                if (person.getAffiliations() != null) {
-                    person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
-                }
-                person.setAffiliations(new HashSet<>());
-                if (personForm.getAffiliations() != null) {
-                    for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
-                        IAffiliation affiliation;
-                        if (affiliationForm.getId() != null && !affiliationForm.getId().isEmpty()) {
-                            affiliation = affiliationMap.get(affiliationForm.getId());
-                        } else {
-                            affiliation = new Affiliation();
-                        }
-                        affiliation.setName(affiliationForm.getName());
-                        person.getAffiliations().add(affiliation);
-                    }
-                }
-                person.setUri(personForm.getUri());
-                person.setLocalAuthorityId(personForm.getLocalAuthorityId());
+                mapPersonFields(personForm, person);
                 citationPersonList.add(person);
           }
      }
@@ -127,33 +102,39 @@ public class CitationHelper implements ICitationHelper {
                 creator = creatorMap.get(personForm.getId());
             } else {
                 creator = new Creator();
-                creator.setPerson(new Person());
+                creator.setRole(personForm.getRole());
+                IPerson person = new Person();
+                mapPersonFields(personForm, person);
+                creator.setPerson(person);
             }
-            creator.getPerson().setFirstName(personForm.getFirstName());
-            creator.getPerson().setLastName(personForm.getLastName());
-            creator.getPerson().setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
-            creator.setRole(personForm.getRole());
-            
-            Map<String, IAffiliation> affiliationMap = new HashMap<>();
-            if (creator.getPerson().getAffiliations() != null) {
-                creator.getPerson().getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
-            }
-            creator.getPerson().setAffiliations(new HashSet<>());
-            if (personForm.getAffiliations() != null) {
-                for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
-                    IAffiliation affiliation;
-                    if (affiliationForm.getId() != null && !affiliationForm.getId().isEmpty()) {
-                        affiliation = affiliationMap.get(affiliationForm.getId());
-                    } else {
-                        affiliation = new Affiliation();
-                    }
-                    affiliation.setName(affiliationForm.getName());
-                    creator.getPerson().getAffiliations().add(affiliation);
-                }
-            }
-            creator.getPerson().setUri(personForm.getUri());
-            creator.getPerson().setLocalAuthorityId(personForm.getLocalAuthorityId());
             citationCreatorList.add(creator);
-      }
+        }
+    }
+    
+    void mapPersonFields(PersonForm personForm, IPerson person) {
+        
+        person.setFirstName(personForm.getFirstName());
+        person.setLastName(personForm.getLastName());
+        person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
+
+        Map<String, IAffiliation> affiliationMap = new HashMap<>();
+        if (person.getAffiliations() != null) {
+            person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
+        }
+        person.setAffiliations(new HashSet<>());
+        if (personForm.getAffiliations() != null) {
+            for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
+                IAffiliation affiliation;
+                if (affiliationForm.getId() != null && !affiliationForm.getId().isEmpty()) {
+                    affiliation = affiliationMap.get(affiliationForm.getId());
+                } else {
+                    affiliation = new Affiliation();
+                }
+                affiliation.setName(affiliationForm.getName());
+                person.getAffiliations().add(affiliation);
+            }
+        }
+        person.setUri(personForm.getUri());
+        person.setLocalAuthorityId(personForm.getLocalAuthorityId());
     }
 }

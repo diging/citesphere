@@ -80,7 +80,15 @@ public class ItemFactory implements IItemFactory {
                 data.getCreators().add(creator);
             });
         }
-        
+        if (citation.getOtherCreators() != null) {
+            citation.getOtherCreators().forEach(e -> {
+                Creator creator = new Creator();
+                creator.setFirstName(e.getPerson().getFirstName());
+                creator.setLastName(e.getPerson().getLastName());
+                creator.setCreatorType(e.getRole());
+                data.getCreators().add(creator);
+            });
+        }
         try {
             writeExtraData(citation, data);
         } catch (JsonProcessingException e1) {
@@ -96,6 +104,7 @@ public class ItemFactory implements IItemFactory {
         ExtraDataObject extraDataObject = new ExtraDataObject();
         extraDataObject.setAuthors(citation.getAuthors());
         extraDataObject.setEditors(citation.getEditors());
+        extraDataObject.setOtherCreators(citation.getOtherCreators());
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
         
