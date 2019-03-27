@@ -11,6 +11,7 @@
 }
 </style>
 <script>
+var creatorCount = 0;
 //@ sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
@@ -56,7 +57,9 @@ $(function() {
 	
 	$("#addCreatorButton").click(function(e) {
 		var target = $(e.target);
-		savePersonDetails(target.attr("data-creator-type"), "Creator");
+		if(target.attr("data-creator-type")!=null) {			
+			savePersonDetails(target.attr("data-creator-type"), "Creator");
+		}
 	});
 	
 	$(".creatorModalLink").click(function(e) {
@@ -181,10 +184,10 @@ $(function() {
 function editPerson(personType, modalName, item){
 	var personType_lowerCase = personType.toLowerCase();
 	var personItem = $(item);
-	$("#firstName"+modalName).val(personItem.attr("data-"+personType_lowerCase+"-firstname"));
-	$("#lastName"+modalName).val(personItem.attr("data-"+personType_lowerCase+"-lastname"));
-	$("#uri"+modalName).val(personItem.attr("data-"+personType_lowerCase+"-uri"));
-	$("#id"+modalName).attr("data-"+personType_lowerCase+"-id", personItem.attr("id"));
+	$("#firstName"+modalName).val(personItem.attr("data-"+modalName+"-firstname"));
+	$("#lastName"+modalName).val(personItem.attr("data-"+modalName+"-lastname"));
+	$("#uri"+modalName).val(personItem.attr("data-"+modalName+"-uri"));
+	$("#id"+modalName).attr("data-"+modalName+"-id", personItem.attr("id"));
 	
 	personItem.children("span").each(function(idx, elem){
 		var affInput = $("#"+modalName.toLowerCase()+"AffiliationTemplate").clone();
@@ -208,11 +211,12 @@ function editPerson(personType, modalName, item){
 function savePersonDetails(personType, modalName){
 	var personType_lowerCase = personType.toLowerCase();
 	var personSpan;
-	if($("#id"+modalName).attr("data-"+$("#id"+modalName).attr("data-creator-type")+"-id")) {
-		personSpan = $('#'+$("#id"+modalName).attr("data-"+personType_lowerCase+"-id"));
+	if($("#id"+modalName).attr("data-"+modalName+"-id")) {
+		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalName+"-id"));
 	} else {
-		$("#id"+modalName).attr("data-"+personType_lowerCase+"-id", $("#"+personType_lowerCase+"List").length);
-		var id = personType_lowerCase+$("#id"+modalName).attr("data-"+personType_lowerCase+"-id");
+		creatorCount = creatorCount+1;
+		$("#id"+modalName).attr("data-"+modalName+"-id", creatorCount);
+		var id = personType_lowerCase+$("#id"+modalName).attr("data-"+modalName+"-id");
 		personSpan = $('<span id='+id+'>');
 	}
 	
@@ -228,10 +232,10 @@ function savePersonDetails(personType, modalName){
 	var uri = $("#uri"+modalName).val();
 	var localAuthority = $("#"+modalName+"LocalId").val();
 	
-	personSpan.attr("data-"+personType_lowerCase+"-firstname", firstname);
-	personSpan.attr("data-"+personType_lowerCase+"-lastname", lastname);
-	personSpan.attr("data-"+personType_lowerCase+"-uri", uri);
-	personSpan.attr("data-"+personType_lowerCase+"-authority-id", localAuthority);
+	personSpan.attr("data-"+modalName+"-firstname", firstname);
+	personSpan.attr("data-"+modalName+"-lastname", lastname);
+	personSpan.attr("data-"+modalName+"-uri", uri);
+	personSpan.attr("data-"+modalName+"-authority-id", localAuthority);
 	
 	var affiliationsList = [];
 	var affSpan = $("<span>");
@@ -328,19 +332,20 @@ function constructPersonArray(arrayName, role){
 	});
 }
 
-function resetPersonCreationModal(personType) {
-	$("#firstName"+personType).val("");
-	$("#lastName"+personType).val("");
-	var affTemplate = $("#"+personType.toLowerCase()+"AffiliationTemplate");
-	$("#"+personType.toLowerCase()+"Affiliations").children().remove();
-	$("#"+personType.toLowerCase()+"Affiliations").append(affTemplate);
-	$("#"+personType.toLowerCase()+"AffiliationTemplate").find("input").val("");
-	$("#"+personType.toLowerCase()+"AffiliationTemplate").show();
+function resetPersonCreationModal(modalType) {
+	$("#firstName"+modalType).val("");
+	$("#lastName"+modalType).val("");
+	$("#id"+modalType).val("");
+	$("#id"+modalType).attr("data-"+modalType+"-id", "");
+	var affTemplate = $("#"+modalType.toLowerCase()+"AffiliationTemplate");
+	$("#"+modalType.toLowerCase()+"Affiliations").children().remove();
+	$("#"+modalType.toLowerCase()+"Affiliations").append(affTemplate);
+	$("#"+modalType.toLowerCase()+"AffiliationTemplate").find("input").val("");
+	$("#"+modalType.toLowerCase()+"AffiliationTemplate").show();
 	$(".aff-info").remove();
-	// TODO reset id
-	$("#uri"+personType).val("");
-	$("#add"+personType+"Button").text("Add "+personType);
-	resetPersonAuthorityCreation(personType);
+	$("#uri"+modalType).val("");
+	$("#add"+modalType+"Button").text("Add "+modalType);
+	resetPersonAuthorityCreation(modalType);
 }
 
 function resetPersonAuthorityCreation(personType) {
@@ -834,20 +839,43 @@ function loadFields() {
 				if($('[id='+creators[i]).length > 0) {
 					$('[id='+creators[i]).parent().closest('tr').show();
 				} 
-				else if(creators[i]!= 'editor' && creators[i]!= 'author'){ 
+				else if(creators[i]!= 'editor' && creators[i]!= 'author'){
 					var creatorRow = $("<tr>");
 					creatorRow.css("display", "table-row");
+					var creatorLabel = $("<td>");
+					creatorLabel.attr("class", "creator");
+					creatorLabel.css("text-transform", "capitalize");
+					creatorLabel.attr("id", creators[i]);
+					creatorLabel.append(creators[i]);
+					creatorRow.append(creatorLabel);
 					var creatorData = $("<td>");
-					creatorData.attr("class", "creator");
-					creatorData.css("text-transform", "capitalize");
-					creatorData.attr("id", creators[i]);
-					creatorData.append(creators[i]);
+					var creatorList = $("<span>");
+					creatorList.attr("id",creators[i]+"List");
+					creatorList.css("font-size", "18px");
+					creatorData.append(creatorList);
+					var addIconDiv = $("<div>");
+					addIconDiv.attr("class","pull-right");
+					var iconLink = $("<a>");
+					iconLink.attr("class", "creatorModalLink");
+					iconLink.attr("data-toggle","modal");
+					iconLink.attr("data-creator-type", creators[i]);
+					iconLink.attr("data-target","#creatorModal");
+					var iconImg = $("<i>");
+					iconImg.attr("class", "fas fa-plus-circle");
+					iconLink.append(iconImg);
+					iconLink.append("Add "+creators[i]);
+					addIconDiv.append(iconLink);
+					creatorData.append(addIconDiv);
 					creatorRow.append(creatorData);
-					creatorRow.append($("<td>"));
-					creatorRow.insertAfter($('.creator').last().parent());
+					creatorRow.insertAfter($('.creator').last().parent());	
+
+					$("#creatorLabel").css("text-transform", "capitalize");
+					$("#creatorLabel").text("Enter "+creators[i]+" Information");
+					$("#addCreatorButton").css("text-transform", "capitalize");
+					$("#addCreatorButton").text("Add "+creators[i]);
+					$("#addCreatorButton").attr("data-creator-type", creators[i]);
 				}
 			}
-			$('#messageModal').modal('hide');
 		},
 		error: function(){
 			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
