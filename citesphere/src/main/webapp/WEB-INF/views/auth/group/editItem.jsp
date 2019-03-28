@@ -236,52 +236,53 @@ $(function() {
 /* Function to populate modal on edit */
 function editPerson(modalName, item){
 	var personItem = $(item);
-	$("#firstName"+modalName).val(personItem.attr("data-"+modalName+"-firstname"));
-	$("#lastName"+modalName).val(personItem.attr("data-"+modalName+"-lastname"));
-	$("#uri"+modalName).val(personItem.attr("data-"+modalName+"-uri"));
-	if(personItem.attr("data-"+modalName+"-id") != null) {
-		$("#id"+modalName).attr("data-"+modalName+"-id", personItem.attr("data-"+modalName+"-id"));
+	var modalNameLCase = modalName.toLowerCase();
+	$("#firstName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-firstname"));
+	$("#lastName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-lastname"));
+	$("#uri"+modalName).val(personItem.attr("data-"+modalNameLCase+"-uri"));
+	if(personItem.attr("data-"+modalNameLCase+"-id") != null) {
+		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("data-"+modalNameLCase+"-id"));
 	} else {
-		$("#id"+modalName).attr("data-"+modalName+"-id", personItem.attr("id"));
+		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
 	}
 	
 	personItem.children("span").each(function(idx, elem){
-		var affInput = $("#"+modalName.toLowerCase()+"AffiliationTemplate").clone();
+		var affInput = $("#"+modalNameLCase+"AffiliationTemplate").clone();
 		affInput.removeAttr("id");
 		affInput.addClass("aff-info");
 		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
 		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
 		affInput.find("input").val($(elem).data("affiliationName"));
-		$("#"+modalName.toLowerCase()+"Modal #"+modalName.toLowerCase()+"Affiliations").append(affInput);
+		$("#"+modalNameLCase+"Modal #"+modalNameLCase+"Affiliations").append(affInput);
 	});
 	
 	if(personItem.children("span").length > 0) {
-		$("#"+modalName.toLowerCase()+"AffiliationTemplate").hide();
+		$("#"+modalNameLCase+"AffiliationTemplate").hide();
 	}
 	
-	$("#add"+modalName.toLowerCase()+"Button").text("Update "+modalName);
+	$("#add"+modalName+"Button").text("Update "+modalName);
 	
-	$("#"+modalName.toLowerCase()+"Modal").modal('show');
+	$("#"+modalNameLCase+"Modal").modal('show');
 }
 
 /* Function to save information on closing modal */
 function savePersonDetails(personType, modalName){
-	var personType_lowerCase = personType.toLowerCase();
-	var modalName_lowerCase = modalName.toLowerCase();
+	var personTypeLCase = personType.toLowerCase();
+	var modalNameLCase = modalName.toLowerCase();
 	var personSpan;
-	if($("#id"+modalName).attr("data-"+modalName_lowerCase+"-id")) {
-		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalName_lowerCase+"-id"));
+	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id")) {
+		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
 	} else {
 		creatorCount = creatorCount+1;
-		$("#id"+modalName).attr("data-"+modalName_lowerCase+"-id", creatorCount);
-		var id = modalName_lowerCase+$("#id"+modalName).attr("data-"+modalName_lowerCase+"-id");
+		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", creatorCount);
+		var id = modalNameLCase+$("#id"+modalName).attr("data-"+modalNameLCase+"-id");
 		personSpan = $('<span id='+id+'>');
 	}
 	
-	if(personType_lowerCase == "author") {
-		personSpan.attr("class", "label label-primary "+personType_lowerCase +"-item");
+	if(personTypeLCase == "author") {
+		personSpan.attr("class", "label label-primary "+personTypeLCase +"-item");
 	} else {
-		personSpan.attr("class", "label label-info "+personType_lowerCase +"-item");
+		personSpan.attr("class", "label label-info "+personTypeLCase +"-item");
 	}
 	
 	personSpan.html("");
@@ -290,14 +291,14 @@ function savePersonDetails(personType, modalName){
 	var uri = $("#uri"+modalName).val();
 	var localAuthority = $("#"+modalName+"LocalId").val();
 	
-	personSpan.attr("data-"+modalName_lowerCase+"-firstname", firstname);
-	personSpan.attr("data-"+modalName_lowerCase+"-lastname", lastname);
-	personSpan.attr("data-"+modalName_lowerCase+"-uri", uri);
-	personSpan.attr("data-"+modalName_lowerCase+"-authority-id", localAuthority);
+	personSpan.attr("data-"+modalNameLCase+"-firstname", firstname);
+	personSpan.attr("data-"+modalNameLCase+"-lastname", lastname);
+	personSpan.attr("data-"+modalNameLCase+"-uri", uri);
+	personSpan.attr("data-"+modalNameLCase+"-authority-id", localAuthority);
 	
 	var affiliationsList = [];
 	var affSpan = $("<span>");
-	$("#"+modalName_lowerCase+"Affiliations").children().each(function(idx, elem) {
+	$("#"+modalNameLCase+"Affiliations").children().each(function(idx, elem) {
 		var input = $(elem).find("input");
 		if(input.val().length!=0){
 			var affSpan = $("<span>");
@@ -313,18 +314,18 @@ function savePersonDetails(personType, modalName){
 	}
 	
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-	var editIcon = $('<i class="far fa-edit edit-'+modalName.toLowerCase()+'"></i>')
-	var deleteIcon = $('<i class="fas fa-times remove-'+modalName.toLowerCase()+'"></i>');
+	var editIcon = $('<i class="far fa-edit edit-'+modalNameLCase+'"></i>')
+	var deleteIcon = $('<i class="fas fa-times remove-'+modalNameLCase+'"></i>');
 	editIcon.click(function(){
 		var personItem = $(this).parent();
-		editPerson(personType, modalName, personItem[0]);
+		editPerson(modalName, personItem[0]);
 	});
 	deleteIcon.click(removePerson);
 	personSpan.append(editIcon);
 	personSpan.append(deleteIcon);
-	$("#"+personType_lowerCase+"List").append(personSpan);
-	$("#"+personType_lowerCase+"List").append("&nbsp;&nbsp; ");
-	$("#"+modalName_lowerCase+"Modal").modal('hide');
+	$("#"+personTypeLCase+"List").append(personSpan);
+	$("#"+personTypeLCase+"List").append("&nbsp;&nbsp; ");
+	$("#"+modalNameLCase+"Modal").modal('hide');
 	resetPersonCreationModal(modalName);
 }
 
@@ -391,17 +392,17 @@ function constructPersonArray(arrayName, role){
 	});
 }
 
-/* Reset modal */
 function resetPersonCreationModal(modalType) {
+	var modalNameLCase = modalType.toLowerCase();
 	$("#firstName"+modalType).val("");
 	$("#lastName"+modalType).val("");
 	$("#id"+modalType).val("");
 	$("#id"+modalType).attr("data-"+modalType+"-id", "");
-	var affTemplate = $("#"+modalType.toLowerCase()+"AffiliationTemplate");
-	$("#"+modalType.toLowerCase()+"Affiliations").children().remove();
-	$("#"+modalType.toLowerCase()+"Affiliations").append(affTemplate);
-	$("#"+modalType.toLowerCase()+"AffiliationTemplate").find("input").val("");
-	$("#"+modalType.toLowerCase()+"AffiliationTemplate").show();
+	var affTemplate = $("#"+modalNameLCase+"AffiliationTemplate");
+	$("#"+modalNameLCase+"Affiliations").children().remove();
+	$("#"+modalNameLCase+"Affiliations").append(affTemplate);
+	$("#"+modalNameLCase+"AffiliationTemplate").find("input").val("");
+	$("#"+modalNameLCase+"AffiliationTemplate").show();
 	$(".aff-info").remove();
 	$("#uri"+modalType).val("");
 	$("#add"+modalType+"Button").text("Add "+modalType);
@@ -925,9 +926,7 @@ function loadFields() {
 					var addIconDiv = $("<div>");
 					addIconDiv.attr("class","pull-right");
 					var iconLink = $("<a>");
-					iconLink.click(function(e) {
-						creatorLinkHandler($(e.target));
-					});
+					
 					iconLink.attr("data-toggle","modal");
 					iconLink.attr("data-creator-type", creators[i]);
 					iconLink.attr("data-target","#creatorModal");
@@ -945,6 +944,9 @@ function loadFields() {
 					$("#addCreatorButton").css("text-transform", "capitalize");
 					$("#addCreatorButton").text("Add "+creators[i]);
 					$("#addCreatorButton").attr("data-creator-type", creators[i]);
+					iconLink.click(function(e) {
+						creatorLinkHandler($(e.target));
+					});
 				}
 			}
 		},
