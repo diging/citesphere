@@ -4,6 +4,7 @@
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="cite" uri="https://diging.asu.edu/jps/tlds/citesphere" %>
 
 <style>
 .popover {
@@ -11,7 +12,7 @@
 }
 </style>
 <script>
-var creatorCount = 0;
+var creatorCount = 100, creatorSubmitCount = 0;
 //@ sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
@@ -41,7 +42,7 @@ $(function() {
 		$(".creator").parent().closest("tr").each(function(idx, elem){
 			if($(elem).css("display")!="none") {
 				var ele = $(elem).children().first();
-				constructPersonArray("otherCreator", ele.attr("id"));
+				constructPersonArray("creator", ele.attr("id"));
 			}
 		});
 	});
@@ -240,10 +241,12 @@ function editPerson(modalName, item){
 	$("#firstName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-firstname"));
 	$("#lastName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-lastname"));
 	$("#uri"+modalName).val(personItem.attr("data-"+modalNameLCase+"-uri"));
-	if(personItem.attr("data-"+modalNameLCase+"-id") != null) {
-		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("data-"+modalNameLCase+"-id"));
-	} else {
+	if(personItem.attr("id") != null) {
 		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
+	} else {
+		creatorCount = creatorCount+1;
+		var id = modalNameLCase+creatorCount;
+		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", id);
 	}
 	
 	personItem.children("span").each(function(idx, elem){
@@ -270,12 +273,11 @@ function savePersonDetails(personType, modalName){
 	var personTypeLCase = personType.toLowerCase();
 	var modalNameLCase = modalName.toLowerCase();
 	var personSpan;
-	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id")) {
+	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id") != null && $("#id"+modalName).attr("data-"+modalNameLCase+"-id").length > 0) {
 		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
 	} else {
 		creatorCount = creatorCount+1;
-		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", creatorCount);
-		var id = modalNameLCase+$("#id"+modalName).attr("data-"+modalNameLCase+"-id");
+		var id = modalNameLCase+creatorCount;
 		personSpan = $('<span id='+id+'>');
 	}
 	
@@ -329,66 +331,74 @@ function savePersonDetails(personType, modalName){
 	resetPersonCreationModal(modalName);
 }
 
+
 /* Function to append final information for form submission */
 function constructPersonArray(arrayName, role){
+		var creator;
+		if(arrayName == "creator"){
+			creator = "otherCreator";
+		} else {
+			creator = arrayName;
+		}
 		$('.'+role+'-item').each(function(idx, person) {
 		var personIdField = $("<input>");
 		personIdField.attr("type", "hidden");
-		personIdField.attr("id", arrayName+"s" + idx + ".id");
-		personIdField.attr("name", arrayName+"s[" + idx + "].id");
-		personIdField.attr("value", $(person).attr("data-"+role+"-id"));
+		personIdField.attr("id", creator+"s" + creatorSubmitCount + ".id");
+		personIdField.attr("name", creator+"s[" + creatorSubmitCount + "].id");
+		personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
 		$("#editForm").append(personIdField);
 		
 		var personFirstNameField = $("<input>");
 		personFirstNameField.attr("type", "hidden");
-		personFirstNameField.attr("id", arrayName+"s" + idx + ".firstName");
-		personFirstNameField.attr("name", arrayName+"s[" + idx + "].firstName");
-		personFirstNameField.attr("value", $(person).attr("data-"+role+"-firstname"));
+		personFirstNameField.attr("id", creator+"s" + creatorSubmitCount + ".firstName");
+		personFirstNameField.attr("name", creator+"s[" + creatorSubmitCount + "].firstName");
+		personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
 		$("#editForm").append(personFirstNameField);
 		
 		var personLastNameField = $("<input>");
 		personLastNameField.attr("type", "hidden");
-		personLastNameField.attr("id", arrayName+"s" + idx + ".lastName");
-		personLastNameField.attr("name", arrayName+"s[" + idx + "].lastName");
-		personLastNameField.attr("value", $(person).attr("data-"+role+"-lastname"));
+		personLastNameField.attr("id", creator+"s" + creatorSubmitCount + ".lastName");
+		personLastNameField.attr("name", creator+"s[" + creatorSubmitCount + "].lastName");
+		personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
 		$("#editForm").append(personLastNameField);
 		
 		var personRoleField = $("<input>");
 		personRoleField.attr("type", "hidden");
-		personRoleField.attr("id", arrayName+"s" + idx + ".role");
-		personRoleField.attr("name", arrayName+"s[" + idx + "].role");
+		personRoleField.attr("id", creator+"s" + creatorSubmitCount + ".role");
+		personRoleField.attr("name", creator+"s[" + creatorSubmitCount + "].role");
 		personRoleField.attr("value", role);
 		$("#editForm").append(personRoleField);
 		
 		var personUriField = $("<input>");
 		personUriField.attr("type", "hidden");
-		personUriField.attr("id", arrayName+"s" + idx + ".uri");
-		personUriField.attr("name", arrayName+"s[" + idx + "].uri");
-		personUriField.attr("value", $(person).attr("data-"+role+"-uri"));
+		personUriField.attr("id", creator+"s" + creatorSubmitCount + ".uri");
+		personUriField.attr("name", creator+"s[" + creatorSubmitCount + "].uri");
+		personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
 		$("#editForm").append(personUriField);
 		
 		var personAuthorityField = $("<input>");
 		personAuthorityField.attr("type", "hidden");
-		personAuthorityField.attr("id", arrayName+"s" + idx + ".localAuthorityId");
-		personAuthorityField.attr("name", arrayName+"s[" + idx + "].localAuthorityId");
-		personAuthorityField.attr("value", $(person).attr("data-"+role+"-authority-id"));
+		personAuthorityField.attr("id", creator+"s" + creatorSubmitCount + ".localAuthorityId");
+		personAuthorityField.attr("name", creator+"s[" + creatorSubmitCount + "].localAuthorityId");
+		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
 		$("#editForm").append(personAuthorityField);
 		
 		$(person).children("span").each(function(idx2, affiliation) {
 			var affiliationField = $("<input>");
 			affiliationField.attr("type", "hidden");
-			affiliationField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".name");
-			affiliationField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].name");
+			affiliationField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".name");
+			affiliationField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].name");
 			affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
 			$("#editForm").append(affiliationField);
 			
 			var affiliationIdField = $("<input>");
 			affiliationIdField.attr("type", "hidden");
-			affiliationIdField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".id");
-			affiliationIdField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].id");
+			affiliationIdField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".id");
+			affiliationIdField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].id");
 			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
 			$("#editForm").append(affiliationIdField);
 		});
+		creatorSubmitCount = creatorSubmitCount + 1;
 	});
 }
 
@@ -569,7 +579,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <td>
 <span id="editorList" style="font-size: 18px">
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
-<span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
+<span id="editor${status.index}" class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
 <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;
@@ -592,13 +602,10 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 			
 			<td>
 				<span id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}List" style="font-size: 18px">
-				<cite:creators citation="${citation}" role="${curCreator}" var="creator">
-				 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
-						&nbsp;
+				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator" >
+				 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
 						<i class="far fa-edit edit-creator"></i>
-						&nbsp;
 						<i class="fas fa-times remove-creator"></i>
-						</span>
 						&nbsp;&nbsp;
 				</cite:creators>
 				</span>

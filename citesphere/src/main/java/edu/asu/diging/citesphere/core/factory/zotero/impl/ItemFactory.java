@@ -65,28 +65,34 @@ public class ItemFactory implements IItemFactory {
         
         data.setCreators(new ArrayList<>());
         citation.getAuthors().forEach(a -> {
-            Creator creator = new Creator();
-            creator.setFirstName(a.getFirstName());
-            creator.setLastName(a.getLastName());
-            creator.setCreatorType(ZoteroConstants.CREATOR_TYPE_AUTHOR);
-            data.getCreators().add(creator);
+            if(a.getLastName() !=null) {
+                Creator creator = new Creator();
+                creator.setFirstName(a.getFirstName());
+                creator.setLastName(a.getLastName());
+                creator.setCreatorType(ZoteroConstants.CREATOR_TYPE_AUTHOR);
+                data.getCreators().add(creator);
+            }
         });
         if (citation.getEditors() != null) {
             citation.getEditors().forEach(e -> {
-                Creator creator = new Creator();
-                creator.setFirstName(e.getFirstName());
-                creator.setLastName(e.getLastName());
-                creator.setCreatorType(ZoteroConstants.CREATOR_TYPE_EDITOR);
-                data.getCreators().add(creator);
+                if(e.getLastName() !=null) {
+                    Creator creator = new Creator();
+                    creator.setFirstName(e.getFirstName());
+                    creator.setLastName(e.getLastName());
+                    creator.setCreatorType(ZoteroConstants.CREATOR_TYPE_EDITOR);
+                    data.getCreators().add(creator);
+                }
             });
         }
         if (citation.getOtherCreators() != null) {
             citation.getOtherCreators().forEach(e -> {
-                Creator creator = new Creator();
-                creator.setFirstName(e.getPerson().getFirstName());
-                creator.setLastName(e.getPerson().getLastName());
-                creator.setCreatorType(e.getRole());
-                data.getCreators().add(creator);
+                if(e.getPerson() != null) {
+                    Creator creator = new Creator();
+                    creator.setFirstName(e.getPerson().getFirstName());
+                    creator.setLastName(e.getPerson().getLastName());
+                    creator.setCreatorType(e.getRole());
+                    data.getCreators().add(creator);
+                }
             });
         }
         try {
