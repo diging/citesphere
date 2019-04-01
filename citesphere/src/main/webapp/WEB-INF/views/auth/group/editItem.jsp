@@ -601,11 +601,14 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 			</td>
 			
 			<td>
-				<span id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}List" style="font-size: 18px">
-				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator" >
+				<c:set var="role" value="${fn:toLowerCase(fn:substringAfter(curCreator.key, '_item_attribute_label_'))}" />
+				<span id="${role}List" style="font-size: 18px">
+				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
+				 	<span id="creator${fn:substringAfter(curCreator.key, '_item_attribute_label_')}${varStatus}" class="label label-info ${fn:substringAfter(curCreator.key, '_item_attribute_label_')}-item" data-creator-id="${creator.id}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
 				 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
 						<i class="far fa-edit edit-creator"></i>
 						<i class="fas fa-times remove-creator"></i>
+						</span>
 						&nbsp;&nbsp;
 				</cite:creators>
 				</span>

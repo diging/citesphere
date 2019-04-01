@@ -65,7 +65,7 @@ public class ItemFactory implements IItemFactory {
         
         data.setCreators(new ArrayList<>());
         citation.getAuthors().forEach(a -> {
-            if(a.getLastName() !=null) {
+            if(a.getLastName() !=null && !a.getLastName().isEmpty()) {
                 Creator creator = new Creator();
                 creator.setFirstName(a.getFirstName());
                 creator.setLastName(a.getLastName());
@@ -75,7 +75,7 @@ public class ItemFactory implements IItemFactory {
         });
         if (citation.getEditors() != null) {
             citation.getEditors().forEach(e -> {
-                if(e.getLastName() !=null) {
+                if(e.getLastName() !=null && !e.getLastName().isEmpty()) {
                     Creator creator = new Creator();
                     creator.setFirstName(e.getFirstName());
                     creator.setLastName(e.getLastName());
@@ -86,7 +86,7 @@ public class ItemFactory implements IItemFactory {
         }
         if (citation.getOtherCreators() != null) {
             citation.getOtherCreators().forEach(e -> {
-                if(e.getPerson() != null) {
+                if(e.getRole()!=null && e.getPerson() != null  && e.getPerson().getLastName()!=null && !e.getPerson().getLastName().isEmpty()) {
                     Creator creator = new Creator();
                     creator.setFirstName(e.getPerson().getFirstName());
                     creator.setLastName(e.getPerson().getLastName());

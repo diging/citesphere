@@ -33,6 +33,7 @@ import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.util.IDateParser;
+import edu.asu.diging.citesphere.web.forms.PersonForm;
 
 @Component
 public class CitationFactory implements ICitationFactory {
@@ -147,38 +148,39 @@ public class CitationFactory implements ICitationFactory {
                 mapPersonFields(editors, citation.getEditors());
             }
             if (jObj.has("otherCreators") && !jObj.get("otherCreators").isJsonNull()) {
-                Set<IPerson> map = new HashSet<>();
                 JsonArray creators = jObj.get("otherCreators").getAsJsonArray();
-                for(ICreator otherCreator : citation.getOtherCreators()) {
-                    map.add(otherCreator.getPerson());
-                }
-                mapPersonFields(creators, map);
+                mapCreatorFields(creators, citation.getOtherCreators());
             }
         }
     }
 
+    void mapCreatorFields(JsonArray creatorList, Set<ICreator> citationCreatorList) {
+        List<Creator> extraCreatorList = new ArrayList<>();
+        List<String> personNames = new ArrayList<>();
+        creatorList.forEach(a -> {
+            ICreator creator = (ICreator) new edu.asu.diging.citesphere.core.model.bib.impl.Creator();
+            creator.setRole((a.getAsJsonObject().get("role") != null && !a.getAsJsonObject().get("role").isJsonNull()) ? a.getAsJsonObject().get("role").getAsString() : "");
+            creator.setPerson(new Person());
+            mapPerson(a, creator.getPerson());
+            personNames.add(creator.getPerson().getFirstName() + creator.getPerson().getLastName());
+        });
+        for (Iterator<ICreator> iterator = citationCreatorList.iterator(); iterator.hasNext();) {
+            ICreator creator = iterator.next();
+            if (personNames.contains(creator.getPerson().getFirstName() + creator.getPerson().getLastName())) {
+                iterator.remove();
+            }
+        }
+        extraCreatorList.forEach(a -> citationCreatorList.add((ICreator) a));
+    }
+    
     private void mapPersonFields(JsonArray personList, Set<IPerson> citationPersonList) {
         List<Person> extraPersonList = new ArrayList<>();
         List<String> personNames = new ArrayList<>();
         personList.forEach(a -> {
-            Person person = new Person();
-            person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
-            person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
-            person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
+            IPerson person = new Person();
+            mapPerson(a, person);
             personNames.add(person.getFirstName() + person.getLastName());
-            person.setUri(a.getAsJsonObject().get("uri")!=null && !a.getAsJsonObject().get("uri").isJsonNull() ? a.getAsJsonObject().get("uri").getAsString():"");
-            person.setLocalAuthorityId(a.getAsJsonObject().get("localAuthorityId")!=null && !a.getAsJsonObject().get("localAuthorityId").isJsonNull() ? a.getAsJsonObject().get("localAuthorityId").getAsString() : "");
-            person.setAffiliations(new HashSet<>());
-            JsonElement affiliations = a.getAsJsonObject().get("affiliations");
-            if (affiliations instanceof JsonArray) {
-                affiliations.getAsJsonArray().forEach(af -> {
-                    Affiliation affiliation = new Affiliation();
-                    affiliation.setName(af.getAsJsonObject().get("name") != null && !af.getAsJsonObject().get("name").isJsonNull() ? af.getAsJsonObject().get("name").getAsString() : "");
-                    affiliation.setUri(af.getAsJsonObject().get("uri") != null && !af.getAsJsonObject().get("uri").isJsonNull() ? af.getAsJsonObject().get("uri").getAsString() : "");
-                    person.getAffiliations().add(affiliation);
-                });
-            }
-            extraPersonList.add(person);
+            extraPersonList.add((Person)person);
         });
 
         for (Iterator<IPerson> iterator = citationPersonList.iterator(); iterator.hasNext();) {
@@ -188,5 +190,23 @@ public class CitationFactory implements ICitationFactory {
             }
         }
         extraPersonList.forEach(a -> citationPersonList.add(a));
+    }
+    
+    void mapPerson(JsonElement a, IPerson person) {
+        person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
+        person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
+        person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
+        person.setUri(a.getAsJsonObject().get("uri")!=null && !a.getAsJsonObject().get("uri").isJsonNull() ? a.getAsJsonObject().get("uri").getAsString():"");
+        person.setLocalAuthorityId(a.getAsJsonObject().get("localAuthorityId")!=null && !a.getAsJsonObject().get("localAuthorityId").isJsonNull() ? a.getAsJsonObject().get("localAuthorityId").getAsString() : "");
+        person.setAffiliations(new HashSet<>());
+        JsonElement affiliations = a.getAsJsonObject().get("affiliations");
+        if (affiliations instanceof JsonArray) {
+            affiliations.getAsJsonArray().forEach(af -> {
+                Affiliation affiliation = new Affiliation();
+                affiliation.setName(af.getAsJsonObject().get("name") != null && !af.getAsJsonObject().get("name").isJsonNull() ? af.getAsJsonObject().get("name").getAsString() : "");
+                affiliation.setUri(af.getAsJsonObject().get("uri") != null && !af.getAsJsonObject().get("uri").isJsonNull() ? af.getAsJsonObject().get("uri").getAsString() : "");
+                person.getAffiliations().add(affiliation);
+            });
+        }
     }
 }

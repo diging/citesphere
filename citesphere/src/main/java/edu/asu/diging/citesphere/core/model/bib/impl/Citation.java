@@ -429,8 +429,10 @@ public class Citation implements ICitation {
     @Override
     public Set<ICreator> getOtherCreators(String role) {
         Set<ICreator> creators = new HashSet<>();
+        
         if (otherCreators != null) {
             otherCreators.forEach(c -> {
+                System.out.println(c.getId());
                 if (c.getRole().equals(role)) {
                     creators.add(c);
                 }
