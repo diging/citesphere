@@ -49,7 +49,12 @@
 
   <body>
     <div class="container" style="padding-bottom: 150px;">
-
+    <c:if test="${not empty param.error}">
+    		<div class="alert alert-danger" role="alert" style="margin: 10px;">
+		  <p>${param.error}</p>
+		</div>
+    </c:if>
+		
       <div class="page-header">
       <nav>
           <ul class="nav nav-pills pull-right">
