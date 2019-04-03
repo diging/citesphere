@@ -6,8 +6,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
@@ -17,7 +17,7 @@ import org.springframework.util.Assert;
 
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
-	protected final Log logger = LogFactory.getLog(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private String defaultFailureUrl;
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
@@ -31,10 +31,17 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
-
-		request.setAttribute("error", exception.getMessage());
-		logger.debug("Redirecting to " + defaultFailureUrl + exception.getMessage());
-		redirectStrategy.sendRedirect(request, response, defaultFailureUrl + exception.getMessage());
+		
+		String errorMessage;
+		
+		if(exception.getMessage().equals("User account is locked")) {
+			errorMessage = "Your account has not been approved by an administrator yet.";
+		}else {
+			errorMessage = "Password or username are incorrect.";
+		}
+		
+		logger.debug("Redirecting to " + defaultFailureUrl + errorMessage);
+		redirectStrategy.sendRedirect(request, response, defaultFailureUrl + errorMessage);
 	}
 
 	/**
