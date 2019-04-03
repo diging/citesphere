@@ -18,10 +18,9 @@ import org.springframework.util.Assert;
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
 	protected final Log logger = LogFactory.getLog(getClass());
-//	private ObjectMapper objectMapper = new ObjectMapper();
 	private String defaultFailureUrl;
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
-	
+
 	public CustomAuthenticationFailureHandler() {
 	}
 
@@ -33,28 +32,21 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
 
-//		response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//		Map<String, Object> data = new HashMap<>();
-//		data.put("timestamp", Calendar.getInstance().getTime());
-//		data.put("exception", exception.getMessage());
-//
-//		response.getOutputStream().println(objectMapper.writeValueAsString(data));
-	
 		request.setAttribute("error", exception.getMessage());
-
 		logger.debug("Redirecting to " + defaultFailureUrl + exception.getMessage());
 		redirectStrategy.sendRedirect(request, response, defaultFailureUrl + exception.getMessage());
 	}
-	
+
 	/**
 	 * The URL which will be used as the failure destination.
 	 *
-	 * @param defaultFailureUrl the failure URL, for example "/loginFailed.jsp".
+	 * @param defaultFailureUrl
+	 *            the failure URL, for example "/loginFailed.jsp".
 	 */
 	public void setDefaultFailureUrl(String defaultFailureUrl) {
 		Assert.isTrue(UrlUtils.isValidRedirectUrl(defaultFailureUrl),
 				() -> "'" + defaultFailureUrl + "' is not a valid redirect URL");
 		this.defaultFailureUrl = defaultFailureUrl;
 	}
-		
+
 }
