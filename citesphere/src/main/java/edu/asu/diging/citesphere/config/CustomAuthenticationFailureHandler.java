@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
@@ -31,15 +33,15 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
-		
+
 		String errorMessage;
-		
-		if(exception.getMessage().equals("User account is locked")) {
+
+		if (exception.getClass().equals(LockedException.class)) {
 			errorMessage = "Your account has not been approved by an administrator yet.";
-		}else {
-			errorMessage = "Password or username are incorrect.";
+		} else {
+			errorMessage = "Password or Username are incorrect.";
 		}
-		
+
 		logger.debug("Redirecting to " + defaultFailureUrl + errorMessage);
 		redirectStrategy.sendRedirect(request, response, defaultFailureUrl + errorMessage);
 	}
