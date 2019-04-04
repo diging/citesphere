@@ -432,7 +432,6 @@ public class Citation implements ICitation {
         
         if (otherCreators != null) {
             otherCreators.forEach(c -> {
-                System.out.println(c.getId());
                 if (c.getRole().equals(role)) {
                     creators.add(c);
                 }

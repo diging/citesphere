@@ -1,11 +1,9 @@
 package edu.asu.diging.citesphere.core.factory.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -33,7 +31,6 @@ import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.util.IDateParser;
-import edu.asu.diging.citesphere.web.forms.PersonForm;
 
 @Component
 public class CitationFactory implements ICitationFactory {

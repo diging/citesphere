@@ -95,22 +95,6 @@ public class CitationHelper implements ICitationHelper {
           }
      }
     
-    void mapCreatorFields(Map<String, ICreator> creatorMap, List<PersonForm> personList, Set<ICreator> citationCreatorList) {
-        for (PersonForm personForm : personList) {
-            ICreator creator;
-            if (personForm.getId() != null && !personForm.getId().isEmpty()) {
-                creator = creatorMap.get(personForm.getId());
-            } else {
-                creator = new Creator();
-                creator.setRole(personForm.getRole());
-                IPerson person = new Person();
-                mapPersonFields(personForm, person);
-                creator.setPerson(person);
-            }
-            citationCreatorList.add(creator);
-        }
-    }
-    
     void mapPersonFields(PersonForm personForm, IPerson person) {
         
         person.setFirstName(personForm.getFirstName());
@@ -137,4 +121,21 @@ public class CitationHelper implements ICitationHelper {
         person.setUri(personForm.getUri());
         person.setLocalAuthorityId(personForm.getLocalAuthorityId());
     }
+    
+    void mapCreatorFields(Map<String, ICreator> creatorMap, List<PersonForm> personList, Set<ICreator> citationCreatorList) {
+        for (PersonForm personForm : personList) {
+            ICreator creator;
+            if (personForm.getId() != null && !personForm.getId().isEmpty()) {
+                creator = creatorMap.get(personForm.getId());
+            } else {
+                creator = new Creator();
+                creator.setRole(personForm.getRole());
+                IPerson person = new Person();
+                mapPersonFields(personForm, person);
+                creator.setPerson(person);
+            }
+            citationCreatorList.add(creator);
+        }
+    }
+    
 }

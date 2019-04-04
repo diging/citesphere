@@ -19,11 +19,9 @@ public class CreatorIteratorTag extends SimpleTagSupport {
     @Override
     public void doTag() throws JspException, IOException {
         if (citation != null) {
-            int varStatus = 0;
             Iterator<ICreator> it = citation.getOtherCreators(role).iterator();
             while (it.hasNext()) {
                 getJspContext().setAttribute(var, it.next());
-                getJspContext().setAttribute("varStatus", varStatus++);
                 if (it.hasNext()) {
                     getJspContext().setAttribute("lastIteration", false);
                 } else {

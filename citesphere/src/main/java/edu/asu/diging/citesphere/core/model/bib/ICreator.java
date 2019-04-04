@@ -16,6 +16,4 @@ public interface ICreator {
 
     String getId();
     
-    void setId(String id);
-    
 }
