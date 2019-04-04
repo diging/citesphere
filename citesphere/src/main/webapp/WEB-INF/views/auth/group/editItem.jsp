@@ -38,11 +38,16 @@ $(function() {
 	
 	$("#submitForm").click(function(e) {
 		constructPersonArray("author", "author");
+		creatorSubmitCount = 0;
 		constructPersonArray("editor", "editor");
+		creatorSubmitCount = 0;
 		$(".creator").parent().closest("tr").each(function(idx, elem){
 			if($(elem).css("display")!="none") {
 				var ele = $(elem).children().first();
-				constructPersonArray("creator", ele.attr("id"));
+				if(!(ele.attr("id")=="editor" || ele.attr("id")=="author")) {
+					console.log(ele.attr("id"));
+					constructPersonArray("creator", ele.attr("id"));
+				}
 			}
 		});
 	});
@@ -335,12 +340,13 @@ function savePersonDetails(personType, modalName){
 /* Function to append final information for form submission */
 function constructPersonArray(arrayName, role){
 		var creator;
+		var roleLC = role.toLowerCase();
 		if(arrayName == "creator"){
 			creator = "otherCreator";
 		} else {
 			creator = arrayName;
 		}
-		$('.'+role+'-item').each(function(idx, person) {
+		$('.'+roleLC+'-item').each(function(idx, person) {
 		var personIdField = $("<input>");
 		personIdField.attr("type", "hidden");
 		personIdField.attr("id", creator+"s" + creatorSubmitCount + ".id");
@@ -556,7 +562,7 @@ let removePerson = function removePerson(e) {
 </tr>
 
 <tr>
-<td>Authors</td>
+<td class="creator" id="author">Authors</td>
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
@@ -575,7 +581,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 </td>
 </tr>
 <tr>
-<td>Editors</td>
+<td class="creator" id="editor">Editors</td>
 <td>
 <span id="editorList" style="font-size: 18px">
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
