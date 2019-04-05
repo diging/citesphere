@@ -8,18 +8,15 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.zotero.api.Creator;
 import org.springframework.social.zotero.api.Data;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.stereotype.Component;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
@@ -151,7 +148,7 @@ public class CitationFactory implements ICitationFactory {
         }
     }
 
-    void mapCreatorFields(JsonArray creatorList, Set<ICreator> citationCreatorList) {
+    private void mapCreatorFields(JsonArray creatorList, Set<ICreator> citationCreatorList) {
         List<Creator> extraCreatorList = new ArrayList<>();
         List<String> personNames = new ArrayList<>();
         creatorList.forEach(a -> {
@@ -189,7 +186,7 @@ public class CitationFactory implements ICitationFactory {
         extraPersonList.forEach(a -> citationPersonList.add(a));
     }
     
-    void mapPerson(JsonElement a, IPerson person) {
+    private void mapPerson(JsonElement a, IPerson person) {
         person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
         person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
         person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.stereotype.Component;
-
 import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
@@ -56,24 +55,27 @@ public class CitationHelper implements ICitationHelper {
         citation.setVolume(form.getVolume());
         
         Map<String, IPerson> authorMap = new HashMap<>();
-        if(citation.getAuthors()!=null)
+        if(citation.getAuthors()!=null) {
             citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
+        }
         citation.setAuthors(new HashSet<>());
         if (form.getAuthors() != null) {
             mapPersonFields(authorMap, form.getAuthors(), citation.getAuthors());
         }
         
         Map<String, IPerson> editorMap = new HashMap<>();
-        if(citation.getEditors()!=null)
+        if(citation.getEditors()!=null) {
             citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
+        }
         citation.setEditors(new HashSet<>());
         if (form.getEditors() != null) {
             mapPersonFields(editorMap, form.getEditors(), citation.getEditors());
         }
         
         Map<String, ICreator> creatorMap = new HashMap<>();
-        if(citation.getOtherCreators()!=null)
+        if(citation.getOtherCreators()!=null) {
             citation.getOtherCreators().forEach(a -> creatorMap.put(a.getId(), a));
+        }
         citation.setOtherCreators(new HashSet<>());
         if (form.getOtherCreators() != null) {
             mapCreatorFields(creatorMap, form.getOtherCreators(), citation.getOtherCreators());

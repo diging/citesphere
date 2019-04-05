@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,18 +19,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller
-@PropertySource("classpath:/creators.properties")
 public class EditItemController {
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -65,7 +62,6 @@ public class EditItemController {
         return "auth/group/items/item/edit";
     }
 
-    
     /**
      * Method to retrieve all fields filtered by item type.
      */
@@ -75,16 +71,6 @@ public class EditItemController {
         citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemType)
             .forEach(f -> fields.add(f.getFilename()));
         return new ResponseEntity<List<String>>(fields, HttpStatus.OK);
-    }
-    
-    /**'
-     * Method to retrieve all creator types filtered by item type.
-     */
-    @RequestMapping("/auth/items/{itemType}/creators")
-    public ResponseEntity<List<String>> getCreatorsByItemType(Authentication authentication, @PathVariable("itemType") ItemType itemType) {
-        List<String> creators = new ArrayList<>();
-        citationManager.getValidCreatorTypes((IUser) authentication.getPrincipal(), itemType).forEach(f -> creators.add(f));
-        return new ResponseEntity<List<String>>(creators, HttpStatus.OK);
     }
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
