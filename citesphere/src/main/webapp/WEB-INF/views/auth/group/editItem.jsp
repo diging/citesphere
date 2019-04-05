@@ -12,7 +12,7 @@
 }
 </style>
 <script>
-var creatorCount = 100, creatorSubmitCount = 0;
+var creatorSubmitCount = 0;
 //@ sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
@@ -246,13 +246,7 @@ function editPerson(modalName, item){
 	$("#firstName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-firstname"));
 	$("#lastName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-lastname"));
 	$("#uri"+modalName).val(personItem.attr("data-"+modalNameLCase+"-uri"));
-	if(personItem.attr("id") != null) {
-		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
-	} else {
-		creatorCount = creatorCount+1;
-		var id = modalNameLCase+creatorCount;
-		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", id);
-	}
+	$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
 	
 	personItem.children("span").each(function(idx, elem){
 		var affInput = $("#"+modalNameLCase+"AffiliationTemplate").clone();
@@ -281,8 +275,7 @@ function savePersonDetails(personType, modalName){
 	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id") != null && $("#id"+modalName).attr("data-"+modalNameLCase+"-id").length > 0) {
 		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
 	} else {
-		creatorCount = creatorCount+1;
-		var id = modalNameLCase+creatorCount;
+		var id = modalNameLCase+$(personTypeLCase+"List").length;
 		personSpan = $('<span id='+id+'>');
 	}
 	
