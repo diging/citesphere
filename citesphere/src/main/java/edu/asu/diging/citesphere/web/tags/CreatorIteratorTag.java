@@ -14,10 +14,11 @@ public class CreatorIteratorTag extends SimpleTagSupport {
 
     private String var;
     
+    int varStatus = 0;
+    
     @Override
     public void doTag() throws JspException, IOException {
         if (citation != null) {
-            int varStatus = 0;
             Iterator<ICreator> it = citation.getOtherCreators(role).iterator();
             while (it.hasNext()) {
                 getJspContext().setAttribute(var, it.next());

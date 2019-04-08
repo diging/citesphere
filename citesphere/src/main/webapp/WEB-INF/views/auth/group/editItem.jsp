@@ -12,7 +12,6 @@
 }
 </style>
 <script>
-var creatorCount = 100;
 //@ sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
@@ -45,12 +44,11 @@ $(function() {
 				var ele = $(elem).children().first();
 				if(!(ele.attr("id")=="editor" || ele.attr("id")=="author")) {
 					constructPersonArray("creator", ele.attr("id"), creatorSubmitCount);
-					if($("#" + ele.attr("id") + "List").length > 0) {
+					if($("#" + ele.attr("id").toLowerCase() + "List").length > 0) {
 						creatorSubmitCount = creatorSubmitCount + $("." + ele.attr("id").toLowerCase() + "-item").length;
 					}
-					console.log(creatorSubmitCount);
 				}
-				
+				console.log(creatorSubmitCount);
 			}
 		});
 	});
@@ -175,7 +173,7 @@ $(function() {
 	/* Handle Other Creators events */
 	$("#addCreatorButton").click(function(e) {
 		var target = $(e.target);
-		if(target.attr("data-creator-type")!=null) {			
+		if(target.attr("data-creator-type").length != null) {			
 			savePersonDetails(target.attr("data-creator-type"), "Creator");
 		}
 	});
@@ -245,21 +243,11 @@ $(function() {
 /* Function to populate modal on edit */
 function editPerson(modalName, item){
 	var personItem = $(item);
-	var personType = personItem.parent().closest("span").attr("id");
-	personType = personType.substring(0, personType.length - 4);
-	console.log(personType);
-	$("#addCreatorButton").attr("data-creator-type", personType);
 	var modalNameLCase = modalName.toLowerCase();
 	$("#firstName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-firstname"));
 	$("#lastName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-lastname"));
 	$("#uri"+modalName).val(personItem.attr("data-"+modalNameLCase+"-uri"));
-	if(personItem.attr("id") != null) {
-		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
-	} else {
-		creatorCount = creatorCount+1;
-		var id = modalNameLCase+creatorCount;
-		$("#id"+modalName).attr("data-"+modalNameLCase+"-id", id);
-	}
+	$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
 	
 	personItem.children("span").each(function(idx, elem){
 		var affInput = $("#"+modalNameLCase+"AffiliationTemplate").clone();
@@ -274,7 +262,7 @@ function editPerson(modalName, item){
 	if(personItem.children("span").length > 0) {
 		$("#"+modalNameLCase+"AffiliationTemplate").hide();
 	}
-	
+	$("#addCreatorButton").attr("data-"+modalNameLCase+"type", personItem.attr("data-"+modalNameLCase+"type"));
 	$("#add"+modalName+"Button").text("Update "+modalName);
 	
 	$("#"+modalNameLCase+"Modal").modal('show');
@@ -282,23 +270,17 @@ function editPerson(modalName, item){
 
 /* Function to save information on closing modal */
 function savePersonDetails(personType, modalName){
-	var personTypeLCase = personType.toLowerCase();
 	var modalNameLCase = modalName.toLowerCase();
 	var personSpan;
+	
 	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id") != null && $("#id"+modalName).attr("data-"+modalNameLCase+"-id").length > 0) {
 		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
 	} else {
-		creatorCount = creatorCount+1;
-		var id = modalNameLCase+creatorCount;
+		var id = personTypeLCase + $("."+personTypeLCase+"-item").length;
 		personSpan = $('<span id='+id+'>');
 	}
 	
-	if(personTypeLCase == "author") {
-		personSpan.attr("class", "label label-primary "+personTypeLCase +"-item");
-	} else {
-		personSpan.attr("class", "label label-info "+personTypeLCase +"-item");
-	}
-	
+	personSpan.attr("class", "label label-info "+personTypeLCase +"-item");
 	personSpan.html("");
 	var firstname = $("#firstName"+modalName).val();
 	var lastname = $("#lastName"+modalName).val();
@@ -345,7 +327,7 @@ function savePersonDetails(personType, modalName){
 
 
 /* Function to append final information for form submission */
-function constructPersonArray(arrayName, role, creatorCount){
+function constructPersonArray(arrayName, role, iter){
 	var creator;
 	var roleLC = role.toLowerCase();
 	if(arrayName == "creator"){
@@ -354,7 +336,7 @@ function constructPersonArray(arrayName, role, creatorCount){
 		creator = arrayName;
 	}
 	$('.'+roleLC+'-item').each(function(idx, person) {
-		var creatorSubmitCount = idx + creatorCount;
+		var creatorSubmitCount = idx + iter;
 		var personIdField = $("<input>");
 		personIdField.attr("type", "hidden");
 		personIdField.attr("id", creator+"s" + creatorSubmitCount + ".id");
@@ -615,8 +597,8 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 			<td>
 				<c:set var="role" value="${fn:toLowerCase(fn:substringAfter(curCreator.key, '_item_attribute_label_'))}" />
 				<span id="${role}List" style="font-size: 18px">
-				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
-				 	<span id="creator${varStatus}" class="label label-info ${fn:substringAfter(curCreator.key, '_item_attribute_label_')}-item" data-creator-id="${creator.id}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+				<cite:creators citation="${citation}" role="${role}" var="creator">
+				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
 				 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
 						<i class="far fa-edit edit-creator"></i>
 						<i class="fas fa-times remove-creator"></i>
@@ -928,8 +910,8 @@ function loadFields() {
 				tr.hide();
 			});
 			for(i=0;i<creators.length;i++){
-				if($('[id='+creators[i]).length > 0) {
-					$('[id='+creators[i]).parent().closest('tr').show();
+				if($('[id*='+creators[i]).length > 0) {
+					$('[id*='+creators[i]).parent().closest('tr').show();
 				} 
 				else if(creators[i]!= 'editor' && creators[i]!= 'author'){
 					var creatorRow = $("<tr>");
