@@ -8,7 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -18,6 +19,9 @@ import org.springframework.security.web.util.UrlUtils;
 import org.springframework.util.Assert;
 
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
+		
+	@Autowired
+	private MessageSource messageSource;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private String defaultFailureUrl;
@@ -37,9 +41,9 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 		String errorMessage;
 
 		if (exception.getClass().equals(LockedException.class)) {
-			errorMessage = "Your account has not been approved by an administrator yet.";
+			errorMessage = messageSource.getMessage("alert.login.user_not_approved", null, null);
 		} else {
-			errorMessage = "Password or Username are incorrect.";
+			errorMessage = messageSource.getMessage("alert.login.bad_credentials", null, null);
 		}
 
 		logger.debug("Redirecting to " + defaultFailureUrl + errorMessage);

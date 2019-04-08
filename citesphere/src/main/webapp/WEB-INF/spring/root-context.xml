@@ -19,7 +19,7 @@
         base-package="edu.asu.diging.citesphere" />
 
     <bean id="messageSource"
-        class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        class="org.springframework.context.support.ReloadableResourceBundleMessageSource" autowire="byName">
         <property name="basename"
             value="classpath:locale/messages" />
         <property name="fallbackToSystemLocale" value="false" />
