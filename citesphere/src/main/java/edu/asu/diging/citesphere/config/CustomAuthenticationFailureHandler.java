@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -19,9 +17,6 @@ import org.springframework.security.web.util.UrlUtils;
 import org.springframework.util.Assert;
 
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
-		
-	@Autowired
-	private MessageSource messageSource;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private String defaultFailureUrl;
@@ -38,16 +33,16 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
 
-		String errorMessage;
+		String errorKey;
 
 		if (exception.getClass().equals(LockedException.class)) {
-			errorMessage = messageSource.getMessage("alert.login.user_not_approved", null, null);
+			errorKey = "user_not_approved";
 		} else {
-			errorMessage = messageSource.getMessage("alert.login.bad_credentials", null, null);
+			errorKey = "bad_credentials";
 		}
 
-		logger.debug("Redirecting to " + defaultFailureUrl + errorMessage);
-		redirectStrategy.sendRedirect(request, response, defaultFailureUrl + errorMessage);
+		logger.debug("Redirecting to " + defaultFailureUrl + errorKey);
+		redirectStrategy.sendRedirect(request, response, defaultFailureUrl + errorKey);
 	}
 
 	/**
@@ -61,5 +56,4 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 				() -> "'" + defaultFailureUrl + "' is not a valid redirect URL");
 		this.defaultFailureUrl = defaultFailureUrl;
 	}
-
 }
