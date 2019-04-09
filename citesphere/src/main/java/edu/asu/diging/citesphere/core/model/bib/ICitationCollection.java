@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.core.model.bib;
 
+import java.time.OffsetDateTime;
+
 public interface ICitationCollection {
 
     String getKey();
@@ -29,5 +31,9 @@ public interface ICitationCollection {
     void setParentCollectionKey(String parentCollectionKey);
 
     String getParentCollectionKey();
+
+    void setLastSynced(OffsetDateTime lastSynced);
+
+    OffsetDateTime getLastSynced();
 
 }

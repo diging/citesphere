@@ -29,7 +29,7 @@ public class CitationGroup implements ICitationGroup {
     private String libraryReading;
     private String fileEditing;
     
-    private OffsetDateTime updatedOn;
+    private OffsetDateTime lastSynced;
     private OffsetDateTime lastLocallyModifiedOn;
     
     @OneToMany(targetEntity=Citation.class, mappedBy="group")
@@ -212,13 +212,13 @@ public class CitationGroup implements ICitationGroup {
     }
 
     @Override
-    public OffsetDateTime getUpdatedOn() {
-        return updatedOn;
+    public OffsetDateTime getLastSynced() {
+        return lastSynced;
     }
 
     @Override
-    public void setUpdatedOn(OffsetDateTime updatedOn) {
-        this.updatedOn = updatedOn;
+    public void setLastSynced(OffsetDateTime lastSynced) {
+        this.lastSynced = lastSynced;
     }
 
     @Override

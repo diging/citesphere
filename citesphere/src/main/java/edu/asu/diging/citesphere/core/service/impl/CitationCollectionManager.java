@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +50,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         List<ICitationCollection> updatedCollections = results.getCitationCollections();
         if (!results.isNotModified()) {
             collectionRepository.deleteAll(Arrays.asList(collections.toArray(new CitationCollection[collections.size()])));
+            updatedCollections.forEach(c -> c.setLastSynced(OffsetDateTime.now()));
             collectionRepository.saveAll(Arrays.asList(updatedCollections.toArray(new CitationCollection[updatedCollections.size()])));
             collections = updatedCollections;
         } 
@@ -71,6 +73,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
             return (ICitationCollection) collectionOptional.get();
         }
         ICitationCollection collection = zoteroManager.getCitationCollection(user, groupId, collectionId);
+        collection.setLastSynced(OffsetDateTime.now());
         collectionRepository.save((CitationCollection)collection);
         return collection;
     }

@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class GroupManager implements IGroupManager {
         }
         
         ICitationGroup group = zoteroManager.getGroup(user, groupId, false);
+        group.setLastSynced(OffsetDateTime.now());
         groupRepository.save((CitationGroup)group);
         return null;
     }

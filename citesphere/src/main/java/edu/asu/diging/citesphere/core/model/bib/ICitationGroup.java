@@ -61,9 +61,9 @@ public interface ICitationGroup {
 
     long getOwner();
 
-    void setUpdatedOn(OffsetDateTime updatedOn);
+    void setLastSynced(OffsetDateTime updatedOn);
 
-    OffsetDateTime getUpdatedOn();
+    OffsetDateTime getLastSynced();
 
     void setLastLocallyModifiedOn(OffsetDateTime lastLocallyModifiedOn);
 

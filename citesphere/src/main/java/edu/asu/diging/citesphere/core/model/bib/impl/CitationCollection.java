@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
+import java.time.OffsetDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -25,6 +27,8 @@ public class CitationCollection implements ICitationCollection {
     @ManyToOne(targetEntity=CitationGroup.class)
     @JoinColumn(name="group_id")
     private ICitationGroup group;
+    
+    private OffsetDateTime lastSynced;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitationCollection#getKey()
@@ -117,6 +121,14 @@ public class CitationCollection implements ICitationCollection {
     @Override
     public void setGroup(ICitationGroup group) {
         this.group = group;
+    }
+    @Override
+    public OffsetDateTime getLastSynced() {
+        return lastSynced;
+    }
+    @Override
+    public void setLastSynced(OffsetDateTime lastSynced) {
+        this.lastSynced = lastSynced;
     }
     
 }

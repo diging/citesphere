@@ -77,6 +77,8 @@ public class Citation implements ICitation {
     private String dateAdded;
     private String dateModified;
     
+    private OffsetDateTime lastSynced;
+    
     @Lob
     private String extra;
     
@@ -415,6 +417,15 @@ public class Citation implements ICitation {
     @Override
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+    
+    @Override
+    public OffsetDateTime getLastSynced() {
+        return lastSynced;
+    }
+    @Override
+    public void setLastSynced(OffsetDateTime lastSynced) {
+        this.lastSynced = lastSynced;
     }
     
     @Override

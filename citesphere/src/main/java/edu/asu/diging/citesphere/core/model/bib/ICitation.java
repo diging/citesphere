@@ -141,4 +141,8 @@ public interface ICitation {
 
     Set<String> getOtherCreatorRoles();
 
+    void setLastSynced(OffsetDateTime lastSynced);
+
+    OffsetDateTime getLastSynced();
+
 }
