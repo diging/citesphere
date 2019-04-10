@@ -44,11 +44,10 @@ $(function() {
 				var ele = $(elem).children().first();
 				if(!(ele.attr("id")=="editor" || ele.attr("id")=="author")) {
 					constructPersonArray("creator", ele.attr("id"), creatorSubmitCount);
-					if($("#" + ele.attr("id").toLowerCase() + "List").length > 0) {
+					if($("." + ele.attr("id").toLowerCase() + "-item").length > 0) {
 						creatorSubmitCount = creatorSubmitCount + $("." + ele.attr("id").toLowerCase() + "-item").length;
 					}
 				}
-				console.log(creatorSubmitCount);
 			}
 		});
 	});
@@ -173,8 +172,10 @@ $(function() {
 	/* Handle Other Creators events */
 	$("#addCreatorButton").click(function(e) {
 		var target = $(e.target);
-		if(target.attr("data-creator-type").length != null) {			
+		if(target.attr("data-creator-type") != null) {			
 			savePersonDetails(target.attr("data-creator-type"), "Creator");
+		} else {
+			savePersonDetails("", "Creator");
 		}
 	});
 	
@@ -183,7 +184,7 @@ $(function() {
 		var creatorType = target.attr("data-creator-type").charAt(0).toUpperCase() + target.attr("data-creator-type").slice(1);
 		$("#creatorLabel").text("Enter "+creatorType+" Information");
 		$("#addCreatorButton").text("Add "+creatorType);
-		$("#addCreatorButton").attr("data-creator-type", creatorType);
+		$("#addCreatorButton").attr("data-creator-type", target.attr("data-creator-type"));
 	});
 	
 	$("#addCreatorModalCancel").click(function() {
@@ -272,7 +273,7 @@ function editPerson(modalName, item){
 function savePersonDetails(personType, modalName){
 	var modalNameLCase = modalName.toLowerCase();
 	var personSpan;
-	
+	var personTypeLCase = personType.toLowerCase();
 	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id") != null && $("#id"+modalName).attr("data-"+modalNameLCase+"-id").length > 0) {
 		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
 	} else {
@@ -409,6 +410,12 @@ function resetPersonCreationModal(modalType) {
 	$("#"+modalNameLCase+"AffiliationTemplate").show();
 	$(".aff-info").remove();
 	$("#uri"+modalType).val("");
+	if(modalType == "Creator") {
+		$("#addCreatorButton").attr("data-creator-type", "");
+		$("#creatorLabel").text("Enter Creator Information");
+		$("#addCreatorButton").text("Add Creator");
+	}
+	
 	$("#add"+modalType+"Button").text("Add "+modalType);
 	resetPersonAuthorityCreation(modalType);
 }
@@ -969,6 +976,6 @@ function creatorLinkHandler(target) {
 	var creatorType = target.attr("data-creator-type").charAt(0).toUpperCase() + target.attr("data-creator-type").slice(1);
 	$("#creatorLabel").text("Enter "+creatorType+" Information");
 	$("#addCreatorButton").text("Add "+creatorType);
-	$("#addCreatorButton").attr("data-creator-type", creatorType);
+	$("#addCreatorButton").attr("data-creator-type", target.attr("data-creator-type"));
 }
 </script>
