@@ -3,6 +3,7 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -49,7 +50,13 @@
 
   <body>
     <div class="container" style="padding-bottom: 150px;">
-
+    <c:if test="${not empty param.error}">
+	    <div class="alert alert-danger" role="alert" style="margin: 10px;">
+	    		<spring:eval var="alertMsg" expression="@messageSource.getMessage('alert.login.${param.error}', null, null)"/>
+	    		<p>${alertMsg}</p>
+		</div>
+    </c:if>
+		
       <div class="page-header">
       <nav>
           <ul class="nav nav-pills pull-right">
