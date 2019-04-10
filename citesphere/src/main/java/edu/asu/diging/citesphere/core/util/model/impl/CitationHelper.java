@@ -83,7 +83,7 @@ public class CitationHelper implements ICitationHelper {
 
     }
 
-    void mapPersonFields(Map<String, IPerson> personMap,
+    private void mapPersonFields(Map<String, IPerson> personMap,
             List<PersonForm> personList, Set<IPerson> citationPersonList) {
             for (PersonForm personForm : personList) {
                 IPerson person;
@@ -97,7 +97,7 @@ public class CitationHelper implements ICitationHelper {
           }
      }
     
-    void mapPersonFields(PersonForm personForm, IPerson person) {
+    private void mapPersonFields(PersonForm personForm, IPerson person) {
         
         person.setFirstName(personForm.getFirstName());
         person.setLastName(personForm.getLastName());
@@ -124,7 +124,7 @@ public class CitationHelper implements ICitationHelper {
         person.setLocalAuthorityId(personForm.getLocalAuthorityId());
     }
     
-    void mapCreatorFields(Map<String, ICreator> creatorMap, List<PersonForm> personList, Set<ICreator> citationCreatorList) {
+    private void mapCreatorFields(Map<String, ICreator> creatorMap, List<PersonForm> personList, Set<ICreator> citationCreatorList) {
         for (PersonForm personForm : personList) {
             ICreator creator;
             if (personForm.getId() != null && !personForm.getId().isEmpty()) {
