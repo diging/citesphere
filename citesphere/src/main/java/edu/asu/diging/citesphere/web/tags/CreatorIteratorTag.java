@@ -2,8 +2,10 @@ package edu.asu.diging.citesphere.web.tags;
 
 import java.io.IOException;
 import java.util.Iterator;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 
@@ -14,11 +16,10 @@ public class CreatorIteratorTag extends SimpleTagSupport {
 
     private String var;
     
-    int varStatus = 0;
-    
     @Override
     public void doTag() throws JspException, IOException {
         if (citation != null) {
+            int varStatus = 0;
             Iterator<ICreator> it = citation.getOtherCreators(role).iterator();
             while (it.hasNext()) {
                 getJspContext().setAttribute(var, it.next());

@@ -6,9 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 
@@ -24,13 +27,8 @@ public class Creator implements ICreator, Comparable<ICreator> {
     @JsonIgnore
     private String id;
     
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
     private String role;
+    
     @OneToOne(targetEntity=Person.class, cascade=CascadeType.ALL)
     @JoinColumn(name="person_id")
     private IPerson person;
@@ -38,6 +36,14 @@ public class Creator implements ICreator, Comparable<ICreator> {
     // not ideal but ah well, crappy data model
     private int positionInList;
     
+
+    public String getId() {
+        return id;
+    }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICreator#getRole()

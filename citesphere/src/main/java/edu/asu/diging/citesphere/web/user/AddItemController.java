@@ -1,12 +1,9 @@
 package edu.asu.diging.citesphere.web.user;
 
 import java.util.Properties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -15,7 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
@@ -27,11 +23,7 @@ import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller
-@PropertySource("classpath:/config.properties")
-@PropertySource("classpath:/creators.properties")
 public class AddItemController {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${_creation_default_item_type}")
     private String defaultItemType;
@@ -51,9 +43,7 @@ public class AddItemController {
         model.addAttribute("form", new CitationForm());
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("defaultItemType", ItemType.valueOf(defaultItemType));
-        model.addAttribute("otherCreators", citationManager.getValidCreatorTypes((IUser)authentication.getPrincipal(), ItemType.valueOf(defaultItemType)));
         model.addAttribute("creatorMap", properties.entrySet());
-        
         return "auth/group/items/create";
     }
 
