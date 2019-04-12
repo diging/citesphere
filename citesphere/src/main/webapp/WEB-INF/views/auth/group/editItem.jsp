@@ -39,11 +39,10 @@ $(function() {
 		constructPersonArray("author", "author", 0);
 		constructPersonArray("editor", "editor", 0);
 		var creatorSubmitCount = 0;
-		$(".otherCreator").each(function(idx, elem){
+		$(".creator-row").each(function(idx, elem){
 			var ele = $(elem).children().first();
 			if(!(ele.attr("id")=="editor" || ele.attr("id")=="author")) {
-				constructPersonArray("creator", ele.attr("id"), creatorSubmitCount);
-				var roleCount = $("." + ele.attr("id").toLowerCase() + "-item").length;
+				var roleCount = constructPersonArray("creator", ele.attr("id"), creatorSubmitCount);
 				creatorSubmitCount = creatorSubmitCount + roleCount;
 			}
 		});
@@ -326,7 +325,7 @@ function savePersonDetails(personType, modalName){
 
 /* Function to append final information for form submission */
 function constructPersonArray(arrayName, role, iter){
-	var creator;
+	var creator, otherCreatorCount = 0;
 	var roleLC = role.toLowerCase();
 	if(arrayName == "creator"){
 		creator = "otherCreator";
@@ -392,7 +391,9 @@ function constructPersonArray(arrayName, role, iter){
 			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
 			$("#editForm").append(affiliationIdField);
 		});
+		otherCreatorCount += 1;
 	});
+	return otherCreatorCount;
 }
 
 function resetPersonCreationModal(modalType) {
@@ -617,7 +618,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 </c:forEach>
 <c:forEach items="${citation.otherCreatorRoles}" var="role">
 	<c:if test="${not fn:contains(creatorMap, role)}">
-		<tr class="otherCreator">
+		<tr class="creator-row">
 			<td style="text-transform: capitalize;">${role}s</td>
 			<td>
 				<span id="${role}List" style="font-size: 18px">
@@ -928,18 +929,18 @@ function loadFields() {
 		url : '<c:url value="/auth/items/'+itemType+'/creators" />',
 		type : 'GET',
 		success: function(creators){
-			$('.otherCreator').each(function(idx, elem) {
+			$('.creator-row').each(function(idx, elem) {
 				$(elem).hide();
 			});
 			for(i=0;i<creators.length;i++){
 				if($('[id*='+creators[i]).length > 0) {
-					$('[id*='+creators[i]).parent().closest('tr').addClass("otherCreator");
-					$('[id*='+creators[i]).parent().closest('.otherCreator').show();
+					$('[id*='+creators[i]).parent().closest('tr').addClass("creator-row");
+					$('[id*='+creators[i]).parent().closest('.creator-row').show();
 				}
 				else if(creators[i]!= 'editor' && creators[i]!= 'author'){
 					var creatorRow = $("<tr>");
 					creatorRow.css("display", "table-row");
-					creatorRow.addClass("otherCreator");
+					creatorRow.addClass("creator-row");
 					var creatorLabel = $("<td>");
 					creatorLabel.addClass("creator");
 					creatorLabel.css("text-transform", "capitalize");
