@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.factory.impl;
 
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.stereotype.Component;
+
 import edu.asu.diging.citesphere.core.factory.ICitationCollectionFactory;
 import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollection;

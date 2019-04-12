@@ -2,9 +2,11 @@ package edu.asu.diging.citesphere.core.model.bib.impl;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 

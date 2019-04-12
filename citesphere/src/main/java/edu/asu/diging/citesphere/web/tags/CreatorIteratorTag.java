@@ -2,8 +2,10 @@ package edu.asu.diging.citesphere.web.tags;
 
 import java.io.IOException;
 import java.util.Iterator;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 

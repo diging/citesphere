@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.authority;
 
 import java.net.URISyntaxException;
+
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 
 /**

@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.web;
 
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import edu.asu.diging.citesphere.core.exceptions.UserAlreadyExistsException;
 import edu.asu.diging.citesphere.core.factory.IUserFactory;
 import edu.asu.diging.citesphere.core.model.IUser;

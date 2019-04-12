@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.web.forms;
 
 import java.util.List;
+
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 
 public class CitationForm {

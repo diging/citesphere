@@ -1,6 +1,8 @@
 package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.FieldInfo;
@@ -8,6 +10,7 @@ import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
+
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 

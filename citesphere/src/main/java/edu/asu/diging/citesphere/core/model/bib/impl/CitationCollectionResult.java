@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
 import java.util.List;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
 
 public class CitationCollectionResult {

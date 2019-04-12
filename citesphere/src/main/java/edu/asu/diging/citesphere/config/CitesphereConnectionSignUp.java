@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.config;
 
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionSignUp;
+
 import edu.asu.diging.citesphere.core.user.IUserHelper;
 
 public class CitesphereConnectionSignUp implements ConnectionSignUp {

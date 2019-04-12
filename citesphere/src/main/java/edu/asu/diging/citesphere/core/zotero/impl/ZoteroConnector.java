@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Component;
+
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
@@ -106,7 +108,7 @@ public class ZoteroConnector implements IZoteroConnector {
         // it seems like Zotero needs a minute to process the submitted data
         // so let's wait a second before retrieving updated data
         try {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             logger.error("Could not sleep.", e);
             // well if something goes wrong here, let's just ignore it
@@ -121,7 +123,7 @@ public class ZoteroConnector implements IZoteroConnector {
         
         // let's give Zotero a minute to process
         try {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             logger.error("Could not sleep.", e);
             // well if something goes wrong here, let's just ignore it

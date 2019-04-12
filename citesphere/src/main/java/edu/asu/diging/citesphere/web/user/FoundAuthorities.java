@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.util.List;
 import java.util.Set;
+
 import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
 
 public class FoundAuthorities {

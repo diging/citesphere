@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.google.common.collect.ImmutableMap;
+
 @Configuration
 public class AuditConfig {
 

@@ -14,6 +14,7 @@ import org.springframework.social.connect.mem.InMemoryUsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
+
 import edu.asu.diging.citesphere.core.factory.IZoteroTokenFactory;
 import edu.asu.diging.citesphere.core.user.IUserHelper;
 import edu.asu.diging.citesphere.core.zotero.IZoteroTokenManager;

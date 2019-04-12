@@ -1,7 +1,9 @@
 package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
+
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
+
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;

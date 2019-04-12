@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.web.forms;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+
 import edu.asu.diging.citesphere.web.validation.FieldMatch;
 
 @FieldMatch(first = "password", second = "confirmPassword", message = "The password fields must match.")

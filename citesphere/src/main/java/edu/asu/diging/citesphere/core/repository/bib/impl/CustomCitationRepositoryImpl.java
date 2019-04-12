@@ -2,7 +2,9 @@ package edu.asu.diging.citesphere.core.repository.bib.impl;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
 import org.springframework.stereotype.Repository;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.repository.bib.CustomCitationRepository;
 

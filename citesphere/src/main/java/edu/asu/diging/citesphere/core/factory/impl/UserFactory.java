@@ -2,8 +2,10 @@ package edu.asu.diging.citesphere.core.factory.impl;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+
 import edu.asu.diging.citesphere.core.factory.IUserFactory;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.impl.User;
