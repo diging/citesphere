@@ -39,15 +39,12 @@ $(function() {
 		constructPersonArray("author", "author", 0);
 		constructPersonArray("editor", "editor", 0);
 		var creatorSubmitCount = 0;
-		$(".creator").parent().closest("tr").each(function(idx, elem){
-			if($(elem).css("display")!="none") {
-				var ele = $(elem).children().first();
-				if(!(ele.attr("id")=="editor" || ele.attr("id")=="author")) {
-					constructPersonArray("creator", ele.attr("id"), creatorSubmitCount);
-					if($("." + ele.attr("id").toLowerCase() + "-item").length > 0) {
-						creatorSubmitCount = creatorSubmitCount + $("." + ele.attr("id").toLowerCase() + "-item").length;
-					}
-				}
+		$(".otherCreator").each(function(idx, elem){
+			var ele = $(elem).children().first();
+			if(!(ele.attr("id")=="editor" || ele.attr("id")=="author")) {
+				constructPersonArray("creator", ele.attr("id"), creatorSubmitCount);
+				var roleCount = $("." + ele.attr("id").toLowerCase() + "-item").length;
+				creatorSubmitCount = creatorSubmitCount + roleCount;
 			}
 		});
 	});
@@ -618,6 +615,26 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		</tr>
 	</c:if>
 </c:forEach>
+<c:forEach items="${citation.otherCreatorRoles}" var="role">
+	<c:if test="${not fn:contains(creatorMap, role)}">
+		<tr class="otherCreator">
+			<td style="text-transform: capitalize;">${role}s</td>
+			<td>
+				<span id="${role}List" style="font-size: 18px">
+				<cite:creators citation="${citation}" role="${role}" var="creator">
+				<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${role}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+				 ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
+				<i class="far fa-edit edit-creator"></i>
+				<i class="fas fa-times remove-creator"></i>
+				</span>
+				&nbsp;&nbsp;
+				</cite:creators>
+				</span>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${role}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${role}</a></div>
+			</td>
+		</tr>
+	</c:if>
+</c:forEach>
 
 <tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
 <td>Publication Title</td>
@@ -889,8 +906,7 @@ function loadFields() {
 		type : 'GET',
 		success: function(changedFields){
 			$('form input').each(function(idx, elem) {
-				var tr = $(elem).parent().closest('tr');
-				tr.hide()
+				$(elem).parent().closest('tr').hide();
 			});
 			for(i=0;i<changedFields.length;i++){
 				$('form input#'+changedFields[i]).parent().closest('tr').show();
@@ -912,19 +928,20 @@ function loadFields() {
 		url : '<c:url value="/auth/items/'+itemType+'/creators" />',
 		type : 'GET',
 		success: function(creators){
-			$('.creator').each(function(idx, elem) {
-				var tr = $(elem).parent().closest('tr');
-				tr.hide();
+			$('.otherCreator').each(function(idx, elem) {
+				$(elem).hide();
 			});
 			for(i=0;i<creators.length;i++){
 				if($('[id*='+creators[i]).length > 0) {
-					$('[id*='+creators[i]).parent().closest('tr').show();
-				} 
+					$('[id*='+creators[i]).parent().closest('tr').addClass("otherCreator");
+					$('[id*='+creators[i]).parent().closest('.otherCreator').show();
+				}
 				else if(creators[i]!= 'editor' && creators[i]!= 'author'){
 					var creatorRow = $("<tr>");
 					creatorRow.css("display", "table-row");
+					creatorRow.addClass("otherCreator");
 					var creatorLabel = $("<td>");
-					creatorLabel.attr("class", "creator");
+					creatorLabel.addClass("creator");
 					creatorLabel.css("text-transform", "capitalize");
 					creatorLabel.attr("id", creators[i]);
 					creatorLabel.append(creators[i]);
@@ -935,21 +952,20 @@ function loadFields() {
 					creatorList.css("font-size", "18px");
 					creatorData.append(creatorList);
 					var addIconDiv = $("<div>");
-					addIconDiv.attr("class","pull-right");
+					addIconDiv.addClass("pull-right");
 					var iconLink = $("<a>");
 					
 					iconLink.attr("data-toggle","modal");
 					iconLink.attr("data-creator-type", creators[i]);
 					iconLink.attr("data-target","#creatorModal");
 					var iconImg = $("<i>");
-					iconImg.attr("class", "fas fa-plus-circle");
+					iconImg.addClass("fas fa-plus-circle");
 					iconLink.append(iconImg);
 					iconLink.append("Add "+creators[i]);
 					addIconDiv.append(iconLink);
 					creatorData.append(addIconDiv);
 					creatorRow.append(creatorData);
 					creatorRow.insertAfter($('.creator').last().parent());	
-
 					$("#creatorLabel").css("text-transform", "capitalize");
 					$("#creatorLabel").text("Enter "+creators[i]+" Information");
 					$("#addCreatorButton").css("text-transform", "capitalize");
@@ -959,6 +975,7 @@ function loadFields() {
 						creatorLinkHandler($(e.target));
 					});
 				}
+
 			}
 		},
 		error: function(){
