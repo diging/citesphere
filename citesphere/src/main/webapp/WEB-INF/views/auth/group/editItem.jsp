@@ -153,13 +153,15 @@ $(function() {
 
 function showPersonNameInModal(name, personType){
 	// To remove the year from name
-	name = name.substring(0, name.lastIndexOf(','));
+	if((name.split(",").length-1) == 2){
+		name = name.substring(0, name.lastIndexOf(','));
+	} 
 	if(name.indexOf(",") != -1) {
 		$("#firstName"+personType).val(name.substring(name.lastIndexOf(',')+1).trim());
 		$("#lastName"+personType).val(name.substring(0, name.lastIndexOf(', ')));
 	} else {
-		$("#lastName"+personType).val(name.substring(name.indexOf(' ')+1).trim());
-		$("#firstName"+personType).val(name.substring(0, name.indexOf(' ')));
+		$("#lastName"+personType).val(name.substring(name.lastIndexOf(' ')+1).trim());
+		$("#firstName"+personType).val(name.substring(0, name.lastIndexOf(' ')));
 	}
 }
 

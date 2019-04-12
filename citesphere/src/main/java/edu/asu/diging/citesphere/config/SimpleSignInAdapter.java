@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.config;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,7 +11,6 @@ import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.web.context.request.NativeWebRequest;
-
 import edu.asu.diging.citesphere.core.factory.IZoteroTokenFactory;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;

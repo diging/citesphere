@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.core.model.bib;
 
 import java.util.Map;
-
 import com.google.common.collect.Maps;
 
 public enum ItemType {

@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.core.authority.impl;
 
 import java.util.Map;
-
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 
 public class ImportedAuthority implements IImportedAuthority {

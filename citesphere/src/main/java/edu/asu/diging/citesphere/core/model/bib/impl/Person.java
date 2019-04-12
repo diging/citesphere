@@ -1,19 +1,15 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
-
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 

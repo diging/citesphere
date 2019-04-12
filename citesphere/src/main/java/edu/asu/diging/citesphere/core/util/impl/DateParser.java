@@ -9,11 +9,8 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.stereotype.Component;
-
 import edu.asu.diging.citesphere.core.util.IDateParser;
 
 @Component

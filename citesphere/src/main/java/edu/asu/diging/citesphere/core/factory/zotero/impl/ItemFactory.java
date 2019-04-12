@@ -3,17 +3,14 @@ package edu.asu.diging.citesphere.core.factory.zotero.impl;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.social.zotero.api.Creator;
 import org.springframework.social.zotero.api.Data;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;

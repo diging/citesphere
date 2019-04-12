@@ -2,9 +2,7 @@ package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
-
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
