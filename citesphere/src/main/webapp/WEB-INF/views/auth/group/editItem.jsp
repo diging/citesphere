@@ -152,16 +152,20 @@ $(function() {
 });
 
 function showPersonNameInModal(name, personType){
+	var parsedName = name;
+	if(name.includes("(")) {
+		parsedName = name.substring(0, name.indexOf("(")) + name.substring(name.indexOf(")")+1);
+	}
 	// To remove the year from name
-	if((name.split(",").length-1) == 2) {
-		name = name.substring(0, name.lastIndexOf(','));
-	} 
-	if(name.indexOf(",") != -1) {
-		$("#firstName"+personType).val(name.substring(name.lastIndexOf(',')+1).trim());
-		$("#lastName"+personType).val(name.substring(0, name.lastIndexOf(', ')));
+	if((parsedName.split(",").length-1) == 2) {
+		parsedName = parsedName.substring(0, parsedName.lastIndexOf(','));
+	}
+	if(parsedName.indexOf(",") != -1) {
+		$("#firstName"+personType).val(parsedName.substring(parsedName.lastIndexOf(',')+1).trim());
+		$("#lastName"+personType).val(parsedName.substring(0, parsedName.lastIndexOf(', ')));
 	} else {
-		$("#lastName"+personType).val(name.substring(name.lastIndexOf(' ')+1).trim());
-		$("#firstName"+personType).val(name.substring(0, name.lastIndexOf(' ')));
+		$("#lastName"+personType).val(parsedName.substring(parsedName.lastIndexOf(' ')+1).trim());
+		$("#firstName"+personType).val(parsedName.substring(0, parsedName.lastIndexOf(' ')));
 	}
 }
 
