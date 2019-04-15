@@ -19,17 +19,7 @@ $(function() {
 		$('#authority-delete-confirmation').modal("show");	
 		event.preventDefault();
 	});
-	/* $(".edit-link").click(function(event) {
-		var id=$(this).data("authority-id");
-		$.ajax({
-			'url': '<c:url value="/auth/authority/${id}/edit" />' + "?${_csrf.parameterName}=${_csrf.token}",
-			'type':"GET",
-			'success:' function(data) {
-				
-			},
-			
-		});
-	}); */
+
 	$("#delete-authority-button").click(function() {
 		var id = $(this).data("authority-id");
 		$.ajax({
@@ -84,7 +74,6 @@ $(function() {
 <td>${authority.name}</td>
 <td><span class="date">${authority.createdOn}</span></td>
 <td><a class="delete-link" href="" data-authority-id="${authority.id}" data-authority-name="${authority.name}" data-authority-uri="${authority.uri}"><i class="fas fa-trash-alt"></i></a></td>
-
 <td><a href="<c:url value="/auth/authority/${authority.id}/edit" />"><i class="far fa-edit" title="Edit"></i></a></td>
 </tr>
 </c:forEach>

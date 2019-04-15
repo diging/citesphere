@@ -126,10 +126,10 @@ public class AuthorityService implements IAuthorityService {
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry)entry);
     }
     @Override
-    public IAuthorityEntry edit(IAuthorityEntry entry, String name, String description) {
+    public void edit(IAuthorityEntry entry, String name, String description) {
         entry.setName(name);
         entry.setDescription(description);
-        entry.setCreatedOn(OffsetDateTime.now());
-        return (IAuthorityEntry) entryRepository.save((AuthorityEntry)entry); 
+        entryRepository.save((AuthorityEntry)entry); 
+        return;
     }
 }
