@@ -29,7 +29,7 @@ Do you want to proceed?
 </h2>
 
 <!--  currently stored citation  -->
-<div class="col-md-4">
+<!--  <div class="col-md-4">
 <h4>Currently stored data (Version ${outdatedCitation.version})</h4>
 <table class="table table-striped">
 <tr>
@@ -187,7 +187,7 @@ Do you want to proceed?
 </tr>
 </c:if>
 </table>
-</div>
+</div> -->
 
 <!--  current citation fields -->
 <div class="col-md-4">
