@@ -929,7 +929,6 @@ function loadFields() {
 		url : '<c:url value="/auth/items/'+itemType+'/creators" />',
 		type : 'GET',
 		success: function(creators){
-			console.log(creators);
 			$('.creator-row').each(function(idx, elem) {
 				$(elem).hide();
 			});
