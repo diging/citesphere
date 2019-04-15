@@ -929,13 +929,14 @@ function loadFields() {
 		url : '<c:url value="/auth/items/'+itemType+'/creators" />',
 		type : 'GET',
 		success: function(creators){
+			console.log(creators);
 			$('.creator-row').each(function(idx, elem) {
 				$(elem).hide();
 			});
 			for(i=0;i<creators.length;i++){
-				if($('[id*='+creators[i]).length > 0) {
-					$('[id*='+creators[i]).parent().closest('tr').addClass("creator-row");
-					$('[id*='+creators[i]).parent().closest('.creator-row').show();
+				if($('[id='+creators[i]).length > 0) {
+					$('[id='+creators[i]).parent().closest('tr').addClass("creator-row");
+					$('[id='+creators[i]).parent().closest('tr').show();
 				}
 				else if(creators[i]!= 'editor' && creators[i]!= 'author'){
 					var creatorRow = $("<tr>");
