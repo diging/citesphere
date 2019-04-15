@@ -24,14 +24,24 @@ public class EditAuthorityController {
     @RequestMapping("/auth/authority/{authorityId}/edit")
     public String showPage(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication, AuthorityForm form) {
         IAuthorityEntry entry = authorityService.find(authorityId);
+        entry.setUsername("ss");
+        IUser user = (IUser) authentication.getPrincipal();
+        if (!entry.getUsername().equals(user.getUsername())) {
+            String msg="";
+            model.addAttribute("alert_msg", msg);
+            return "redirect:/auth/authority/list";
+        }
         model.addAttribute("entry", entry);
         model.addAttribute("form", form);
         return "auth/authority/edit";
     }
-    @RequestMapping(value="/auth/authority/{authorityId}/edit/save", method=RequestMethod.POST)
+    @RequestMapping(value="/auth/authority/{authorityId}/edit", method=RequestMethod.POST)
     public String edit(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication, AuthorityForm form) {
         IAuthorityEntry entry = authorityService.find(authorityId);
-        authorityService.edit(entry, form.getName(), form.getDescription());
+        IUser user = (IUser) authentication.getPrincipal();
+        entry.setName(form.getName());
+        entry.setDescription(form.getDescription());
+        authorityService.save(entry, user);
         return "redirect:/auth/authority/list";
     }
 }

@@ -28,5 +28,4 @@ public interface IAuthorityService {
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
-    void edit(IAuthorityEntry entry, String name, String discription);
 }
