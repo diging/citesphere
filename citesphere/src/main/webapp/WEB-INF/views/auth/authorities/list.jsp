@@ -19,7 +19,6 @@ $(function() {
 		$('#authority-delete-confirmation').modal("show");	
 		event.preventDefault();
 	});
-
 	$("#delete-authority-button").click(function() {
 		var id = $(this).data("authority-id");
 		$.ajax({
@@ -67,6 +66,7 @@ $(function() {
 <th>Name</th>
 <th>Created on</th>
 <th></th>
+<th></th>
 </tr>
 <c:forEach items="${authorities}" var="authority">
 <tr id="tr-${authority.id}">
@@ -75,7 +75,6 @@ $(function() {
 <td><span class="date">${authority.createdOn}</span></td>
 <td><a class="delete-link" href="" data-authority-id="${authority.id}" data-authority-name="${authority.name}" data-authority-uri="${authority.uri}"><i class="fas fa-trash-alt"></i></a></td>
 <td><a href="<c:url value="/auth/authority/${authority.id}/edit" />"><i class="far fa-edit" title="Edit"></i></a></td>
-
 </tr>
 </c:forEach>
 </table>
