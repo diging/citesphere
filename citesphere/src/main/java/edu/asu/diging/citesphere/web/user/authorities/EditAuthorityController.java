@@ -25,7 +25,6 @@ public class EditAuthorityController {
     @RequestMapping("/auth/authority/{authorityId}/edit")
     public String showPage(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication, AuthorityForm form) {
         IAuthorityEntry entry = authorityService.find(authorityId);
-//        entry.setUsername("ss");
         model.addAttribute("entry", entry);
         model.addAttribute("form", form);
         return "auth/authority/edit";

@@ -11,7 +11,6 @@
 }
 </style>
 <script>
-
 </script>
 
 <ol class="breadcrumb">
@@ -19,27 +18,22 @@
   <li><a href="<c:url value="/auth/authority/list" />">Managed Authority Entries</a></li>
   <li class="active">${entry.name}</li>
 </ol>
-
 <h2>
 	<strong><c:if test="${not empty entry.name}">${entry.name}</c:if></strong>	  
 </h2>
 
 <c:url value="/auth/authority/${authorityId}/edit" var="processingUrl" />
 <form:form action="${processingUrl}" modelAttribute="form" method="POST" id="editForm">
-
 <tr>
 <td>Name</td>
 <td>
 <form:input path="Name" type="text" class="form-control" placeholder="Name" value="${not empty entry.name ? entry.name : form.name}" /></td>
 </tr>
-
 <tr>
 <td>Description</td>
 <td>
 <form:input path="Description" type="text" class="form-control" placeholder="Description" value="${not empty entry.description ? entry.description : form.description}" /></td>
 </tr>
-
-
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
 <a href="<c:url value="/auth/authority/list" />" class="btn btn-default">
 		<i class="fa fa-times"></i>&nbsp;Cancel 
