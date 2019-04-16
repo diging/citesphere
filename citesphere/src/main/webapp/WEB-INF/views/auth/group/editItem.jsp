@@ -563,6 +563,8 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <td>Rights</td>
 <td><form:input path="rights" type="text" class="form-control" placeholder="Rights" value="${not empty form.rights ? form.rights : citation.rights}" /></td>
 </tr>
+
+<form:input path="version" type="text" class="form-control" value="${citation.version}" />
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>

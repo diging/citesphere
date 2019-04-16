@@ -391,16 +391,23 @@ Do you want to proceed?
 <td>${form.dateFreetext}</td>
 </tr>
 </c:if>
-<tr>
+
+<tr <c:if test="${length(form.authors) != length(outdatedCitation.authors)}" >class="changed"</c:if>>
 <td>Authors</td>
 <td>
-
+<c:forEach items="${form.authors}" var="author" varStatus="status">
+ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach><c:if test="${!status.last}">; </c:if>
+</c:forEach>
 </td>
 </tr>
+
 <tr>
 <td>Editors</td>
 <td>
-
+<c:forEach items="${currentCitation.editors}" var="editor" varStatus="status">
+ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>
+</c:forEach>
+</td>
 </tr>
 <c:if test="${fn:contains(formFields, 'publicationTitle') }">
 <tr  <c:if test="${form.publicationTitle != outdatedCitation.publicationTitle}" >class="changed"</c:if>>

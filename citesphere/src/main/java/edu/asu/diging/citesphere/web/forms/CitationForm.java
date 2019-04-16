@@ -30,6 +30,7 @@ public class CitationForm {
     private String libraryCatalog;
     private String callNumber;
     private String rights;
+    private long version;
     
     private List<PersonForm> authors;
     private List<PersonForm> editors;
@@ -171,6 +172,12 @@ public class CitationForm {
     }
     public void setRights(String rights) {
         this.rights = rights;
+    }
+    public long getVersion() {
+        return version;
+    }
+    public void setVersion(long version) {
+        this.version = version;
     }
     public List<PersonForm> getAuthors() {
         return authors;

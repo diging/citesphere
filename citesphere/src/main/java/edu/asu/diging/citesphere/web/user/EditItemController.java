@@ -30,166 +30,157 @@ import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller
 public class EditItemController {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ICitationManager citationManager;
-    
+
     @Autowired
     private ICitationHelper citationHelper;
-    
+
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/edit")
-    public String showPage(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException {
-        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-        model.addAttribute("zoteroGroupId", zoteroGroupId);
-        model.addAttribute("citation", citation);
-        if (model.containsAttribute("resolvedForm")) {
-            model.addAttribute("form", model.asMap().get("resolvedForm"));
-        } else {
-            model.addAttribute("form", form);
-        }
-        List<String> fields = new ArrayList<>();
-        citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
-            .forEach(f -> fields.add(f.getFilename()));
-        model.addAttribute("fields", fields);
-        return "auth/group/items/item/edit";
+    public String showPage(Authentication authentication, Model model, CitationForm form,
+	    @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId)
+	    throws GroupDoesNotExistException {
+	ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
+	model.addAttribute("zoteroGroupId", zoteroGroupId);
+	model.addAttribute("citation", citation);
+	if (model.containsAttribute("resolvedForm")) {
+	    model.addAttribute("form", model.asMap().get("resolvedForm"));
+	} else {
+	    model.addAttribute("form", form);
+	}
+	List<String> fields = new ArrayList<>();
+	citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
+		.forEach(f -> fields.add(f.getFilename()));
+	model.addAttribute("fields", fields);
+	return "auth/group/items/item/edit";
     }
 
-    
     /**
      * Method to retrieve all fields filtered by item type.
      */
     @RequestMapping("/auth/items/{itemType}/fields")
-    public ResponseEntity<List<String>> getFieldsByItemType(Authentication authentication, @PathVariable("itemType") ItemType itemType) {
-        List<String> fields = new ArrayList<>();
-        citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemType)
-            .forEach(f -> fields.add(f.getFilename()));
-        return new ResponseEntity<List<String>>(fields, HttpStatus.OK);
+    public ResponseEntity<List<String>> getFieldsByItemType(Authentication authentication,
+	    @PathVariable("itemType") ItemType itemType) {
+	List<String> fields = new ArrayList<>();
+	citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), itemType)
+		.forEach(f -> fields.add(f.getFilename()));
+	return new ResponseEntity<List<String>>(fields, HttpStatus.OK);
     }
-    
-    @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
-    public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws ZoteroConnectionException, GroupDoesNotExistException {
-        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-        ICitation currentCitation = citationManager.getCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-        
-        if(citation.getVersion() == currentCitation.getVersion()) {
-            // load authors and editors before detaching
-            citation.getAuthors().forEach(a -> a.getAffiliations().size());
-            System.out.println(citation.getAuthors().size());
-            citation.getEditors().forEach(e -> e.getAffiliations().size());
-            citationManager.detachCitation(citation);
-            citationHelper.updateCitation(citation, form);
-            try {
-		citationManager.updateCitation((IUser)authentication.getPrincipal(), zoteroGroupId, citation);
-	    } catch (CitationIsOutdatedException e1) {
-		// TODO Auto-generated catch block
-		e1.printStackTrace();
+
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
+    public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model,
+	    @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId)
+	    throws ZoteroConnectionException, GroupDoesNotExistException {
+	ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
+
+	if(form.getVersion() == citation.getVersion()) {
+	    // load authors and editors before detaching
+	    citation.getAuthors().forEach(a -> a.getAffiliations().size());
+	    System.out.println(citation.getAuthors().size());
+	    citation.getEditors().forEach(e -> e.getAffiliations().size());
+	    citationManager.detachCitation(citation);
+	    citationHelper.updateCitation(citation, form);
+	    
+	    try {
+		citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+	    } catch (CitationIsOutdatedException e) {
+		System.out.println(e);
 	    }
-        }else {
-//            citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-//            ICitation currentCitation = citationManager.getCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-            model.addAttribute("outdatedCitation", citation);
-            model.addAttribute("currentCitation", currentCitation);
-            model.addAttribute("form", form);
-            model.addAttribute("zoteroGroupId", zoteroGroupId);
-            
-            List<String> outdatedCitationFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> outdatedCitationFields.add(f.getFilename()));
-            model.addAttribute("outdatedCitationFields", outdatedCitationFields);
-            
-            List<String> currentCitationFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), currentCitation.getItemType()).forEach(f -> currentCitationFields.add(f.getFilename()));
-            model.addAttribute("currentCitationFields", currentCitationFields);
-            
-            List<String> formFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), form.getItemType()).forEach(f -> formFields.add(f.getFilename()));
-            model.addAttribute("formFields", formFields);
-            
-            return "auth/group/items/item/edit/conflict";
-        }
-        
-//        try {
-//            
-//        } catch (CitationIsOutdatedException e) {
-////            citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-//            ICitation currentCitation = citationManager.getCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-////            model.addAttribute("outdatedCitation", citation);
-//            model.addAttribute("currentCitation", currentCitation);
-//            model.addAttribute("form", form);
-//            model.addAttribute("zoteroGroupId", zoteroGroupId);
-//            
-////            List<String> outdatedCitationFields = new ArrayList<>();
-////            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> outdatedCitationFields.add(f.getFilename()));
-////            model.addAttribute("outdatedCitationFields", outdatedCitationFields);
-//            
-//            List<String> currentCitationFields = new ArrayList<>();
-//            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), currentCitation.getItemType()).forEach(f -> currentCitationFields.add(f.getFilename()));
-//            model.addAttribute("currentCitationFields", currentCitationFields);
-//            
-//            List<String> formFields = new ArrayList<>();
-//            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), form.getItemType()).forEach(f -> formFields.add(f.getFilename()));
-//            model.addAttribute("formFields", formFields);
-//            
-//            return "auth/group/items/item/edit/conflict";
-//        }
-        return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
+	    
+	} else {
+	    citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
+	    ICitation currentCitation = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),
+		    zoteroGroupId, itemId);
+	    model.addAttribute("outdatedCitation", citation);
+	    model.addAttribute("currentCitation", currentCitation);
+	    model.addAttribute("form", form);
+	    model.addAttribute("zoteroGroupId", zoteroGroupId);
+
+	    List<String> outdatedCitationFields = new ArrayList<>();
+	    citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
+		    .forEach(f -> outdatedCitationFields.add(f.getFilename()));
+	    model.addAttribute("outdatedCitationFields", outdatedCitationFields);
+
+	    List<String> currentCitationFields = new ArrayList<>();
+	    citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), currentCitation.getItemType())
+		    .forEach(f -> currentCitationFields.add(f.getFilename()));
+	    model.addAttribute("currentCitationFields", currentCitationFields);
+
+	    List<String> formFields = new ArrayList<>();
+	    citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), form.getItemType())
+		    .forEach(f -> formFields.add(f.getFilename()));
+	    model.addAttribute("formFields", formFields);
+
+	    return "auth/group/items/item/edit/conflict";
+	}
+	return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
     }
-    
-    @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/conflict/resolve", method = RequestMethod.POST)
-    public String resolveConflict(@ModelAttribute CitationForm form, Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, RedirectAttributes redirectAttrs) throws GroupDoesNotExistException {
-//        ICitation outdatedCitation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-	ICitation citation = citationManager.updateCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/conflict/resolve", method = RequestMethod.POST)
+    public String resolveConflict(@ModelAttribute CitationForm form, Authentication authentication,
+	    @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
+	    RedirectAttributes redirectAttrs) throws GroupDoesNotExistException {
+	// ICitation outdatedCitation =
+	// citationManager.getCitation((IUser)authentication.getPrincipal(),
+	// zoteroGroupId, itemId);
+	ICitation citation = citationManager.updateCitationFromZotero((IUser) authentication.getPrincipal(),
+		zoteroGroupId, itemId);
 	List<String> changedFields = compare(citation, form);
-        updateForm(citation, form, changedFields);
-        
-        redirectAttrs.addFlashAttribute("resolvedForm", form);
-        return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}/edit";
+	updateForm(citation, form, changedFields);
+
+	redirectAttrs.addFlashAttribute("resolvedForm", form);
+	return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}/edit";
     }
-    
+
     private List<String> compare(ICitation citation, CitationForm form) {
-        List<String> changedFields = new ArrayList<>();
-        Field[] fields = form.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            String fieldname = field.getName();
-            try {
-                field.setAccessible(true);
-                String formValue = field.get(form) != null ? field.get(form).toString() : "";
-                Field citationField = citation.getClass().getDeclaredField(fieldname);
-                citationField.setAccessible(true);
-                String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
-                // if values are the same, continue
-                formValue = formValue != null ? formValue : "";
-                citationValue = citationValue != null ? citationValue : "";
-                
-                if (!formValue.equals(citationValue)) {
-                    changedFields.add(fieldname);                
-                }
-                
-            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-                logger.error("Could ont access field.", e);
-                // let's ignore that for nonw
-            }
-        }
-        return changedFields;
+	List<String> changedFields = new ArrayList<>();
+	Field[] fields = form.getClass().getDeclaredFields();
+	for (Field field : fields) {
+	    String fieldname = field.getName();
+	    try {
+		field.setAccessible(true);
+		String formValue = field.get(form) != null ? field.get(form).toString() : "";
+		Field citationField = citation.getClass().getDeclaredField(fieldname);
+		citationField.setAccessible(true);
+		String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString()
+			: "";
+		// if values are the same, continue
+		formValue = formValue != null ? formValue : "";
+		citationValue = citationValue != null ? citationValue : "";
+
+		if (!formValue.equals(citationValue)) {
+		    changedFields.add(fieldname);
+		}
+
+	    } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+		logger.error("Could ont access field.", e);
+		// let's ignore that for nonw
+	    }
+	}
+	return changedFields;
     }
-    
+
     private void updateForm(ICitation citation, CitationForm form, List<String> changedFields) {
-        Field[] allFields = form.getClass().getDeclaredFields();
-        for (Field field : allFields) {
-            String fieldName = field.getName();
-            if (!changedFields.contains(fieldName)) {
-                try {
-                    Field citationField = citation.getClass().getDeclaredField(fieldName);
-                    citationField.setAccessible(true);
-                    String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
-                    field.setAccessible(true);
-                    field.set(form, citationValue);
-                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-                    logger.error("Could ont access field.", e);
-                    // let's ignore that for nonw
-                }
-            }
-        }
+	Field[] allFields = form.getClass().getDeclaredFields();
+	for (Field field : allFields) {
+	    String fieldName = field.getName();
+	    if (!changedFields.contains(fieldName)) {
+		try {
+		    Field citationField = citation.getClass().getDeclaredField(fieldName);
+		    citationField.setAccessible(true);
+		    String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString()
+			    : "";
+		    field.setAccessible(true);
+		    field.set(form, citationValue);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+			| IllegalAccessException e) {
+		    logger.error("Could ont access field.", e);
+		    // let's ignore that for nonw
+		}
+	    }
+	}
     }
 }
