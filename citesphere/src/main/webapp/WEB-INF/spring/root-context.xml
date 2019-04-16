@@ -16,7 +16,7 @@
 
     <mvc:annotation-driven />
     <context:component-scan
-        base-package="edu.asu.diging.citesphere" />
+        base-package="edu.asu.diging.citesphere.config, edu.asu.diging.citesphere.core" />
 
     <bean id="messageSource"
         class="org.springframework.context.support.ReloadableResourceBundleMessageSource" autowire="byName">

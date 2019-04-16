@@ -33,8 +33,12 @@
 	</logger>
 
 	<logger name="org.springframework.web">
-		<level value="${log.level}" />
+		<level value="TRACE" />
 	</logger>
+    
+    <logger name="org.springframework.security">
+        <level value="${log.level}" />
+    </logger>
 
 	<!-- Root Logger -->
 	<root>
