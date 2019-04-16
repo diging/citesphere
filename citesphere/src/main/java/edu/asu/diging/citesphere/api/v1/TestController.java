@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.api.endpoints;
+package edu.asu.diging.citesphere.api.v1;
 
 import javax.annotation.PostConstruct;
 
@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Controller
-@RequestMapping("/api/v1")
-public class TestController {
+public class TestController extends V1Controller {
     
     @Autowired
     @Qualifier("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping")
