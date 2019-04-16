@@ -37,7 +37,6 @@ public class EditAuthorityController {
         entry.setName(form.getName());
         entry.setDescription(form.getDescription());
         authorityService.save(entry, user);
-        entry.setUsername("aaaaaa");
         if (!entry.getUsername().equals(user.getUsername())) {
             String msg="Only Owner can edit managed authorities";
             redirectAttributes.addFlashAttribute("show_alert", true);
