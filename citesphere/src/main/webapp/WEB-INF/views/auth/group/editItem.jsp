@@ -604,11 +604,13 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 				<span id="${role}List" style="font-size: 18px">
 				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
 				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
-				 	${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
-						<i class="far fa-edit edit-creator"></i>
+				 		<c:forEach items="${creator.person.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+							${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+							<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
+							&nbsp;<i class="far fa-edit edit-creator"></i>
 						<i class="fas fa-times remove-creator"></i>
-						</span>
-						&nbsp;&nbsp;
+					</span>
+					&nbsp;&nbsp;
 				</cite:creators>
 				</span>
 				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${curCreator.value}</a></div>
@@ -622,13 +624,15 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 			<td style="text-transform: capitalize;">${role}s</td>
 			<td>
 				<span id="${role}List" style="font-size: 18px">
-				<cite:creators citation="${citation}" role="${role}" var="creator">
-				<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${role}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
-				 ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
-				<i class="far fa-edit edit-creator"></i>
-				<i class="fas fa-times remove-creator"></i>
-				</span>
-				&nbsp;&nbsp;
+				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
+				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+				 		<c:forEach items="${creator.person.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+							${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+							<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
+							&nbsp;<i class="far fa-edit edit-creator"></i>
+						<i class="fas fa-times remove-creator"></i>
+					</span>
+					&nbsp;&nbsp;
 				</cite:creators>
 				</span>
 				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${role}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${role}</a></div>

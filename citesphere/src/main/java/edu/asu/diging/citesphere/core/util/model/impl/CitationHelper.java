@@ -135,9 +135,9 @@ public class CitationHelper implements ICitationHelper {
                 creator = new Creator();
                 creator.setRole(personForm.getRole());
                 IPerson person = new Person();
-                mapPersonFields(personForm, person);
                 creator.setPerson(person);
             }
+            mapPersonFields(personForm, creator.getPerson());
             citationCreatorList.add(creator);
         }
     }
