@@ -16,10 +16,10 @@
 <ol class="breadcrumb">
   <li><a href="<c:url value="/" />">Home</a></li>
   <li><a href="<c:url value="/auth/authority/list" />">Managed Authority Entries</a></li>
-  <li class="active">${entry.name}</li>
+  <li class="active">${entry_name}</li>
 </ol>
 <h2>
-	<strong><c:if test="${not empty entry.name}">${entry.name}</c:if></strong>	  
+	<strong>${entry_name}</strong>	  
 </h2>
 
 <c:url value="/auth/authority/${authorityId}/edit" var="processingUrl" />
@@ -27,12 +27,12 @@
 <tr>
 <td>Name</td>
 <td>
-<form:input path="Name" type="text" class="form-control" placeholder="Name" value="${not empty entry.name ? entry.name : form.name}" /></td>
+<form:input path="name" type="text" class="form-control" placeholder="Name" value="${form.name}" /></td>
 </tr>
 <tr>
 <td>Description</td>
 <td>
-<form:input path="Description" type="text" class="form-control" placeholder="Description" value="${not empty entry.description ? entry.description : form.description}" /></td>
+<form:input path="description" type="text" class="form-control" placeholder="Description" value="${form.description}" /></td>
 </tr>
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
 <a href="<c:url value="/auth/authority/list" />" class="btn btn-default">
