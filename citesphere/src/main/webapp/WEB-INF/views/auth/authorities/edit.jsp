@@ -16,24 +16,22 @@
 <ol class="breadcrumb">
   <li><a href="<c:url value="/" />">Home</a></li>
   <li><a href="<c:url value="/auth/authority/list" />">Managed Authority Entries</a></li>
-  <li class="active">${entry_name}</li>
+  <li class="active">${form.name}</li>
 </ol>
 <h2>
-	<strong>${entry_name}</strong>	  
+	<strong>${form.name}</strong>	  
 </h2>
 
 <c:url value="/auth/authority/${authorityId}/edit" var="processingUrl" />
 <form:form action="${processingUrl}" modelAttribute="form" method="POST" id="editForm">
-<tr>
-<td>Name</td>
-<td>
-<form:input path="name" type="text" class="form-control" placeholder="Name" value="${form.name}" /></td>
-</tr>
-<tr>
-<td>Description</td>
-<td>
-<form:input path="description" type="text" class="form-control" placeholder="Description" value="${form.description}" /></td>
-</tr>
+
+<label>Name:</label>
+<form:input path="name" type="text" class="form-control" placeholder="Name" value="${form.name}" ></form:input>
+<p class="text-danger"><form:errors path="name"/></p>
+
+<label>Description:</label>
+<form:input path="description" type="text" class="form-control" placeholder="Description" value="${form.description}" ></form:input>
+
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
 <a href="<c:url value="/auth/authority/list" />" class="btn btn-default">
 		<i class="fa fa-times"></i>&nbsp;Cancel 
