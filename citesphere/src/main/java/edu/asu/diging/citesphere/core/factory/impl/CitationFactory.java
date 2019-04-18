@@ -156,8 +156,11 @@ public class CitationFactory implements ICitationFactory {
         creatorList.forEach(a -> {
             ICreator creator = (ICreator) new edu.asu.diging.citesphere.core.model.bib.impl.Creator();
             creator.setRole((a.getAsJsonObject().get("role") != null && !a.getAsJsonObject().get("role").isJsonNull()) ? a.getAsJsonObject().get("role").getAsString() : "");
-            creator.setPerson(new Person());
-            mapPerson(a, creator.getPerson());
+            Person person = new Person();
+            if(a.getAsJsonObject().get("person") != null && !a.getAsJsonObject().get("person").isJsonNull()) {
+                mapPerson(a.getAsJsonObject().get("person"), person);
+            }
+            creator.setPerson(person);
             personNames.add(creator.getPerson().getFirstName() + creator.getPerson().getLastName());
             extraCreatorList.add((edu.asu.diging.citesphere.core.model.bib.impl.Creator) creator);
         });
@@ -167,7 +170,7 @@ public class CitationFactory implements ICitationFactory {
                 iterator.remove();
             }
         }
-        extraCreatorList.forEach(a -> citationCreatorList.add((ICreator) a));
+        extraCreatorList.forEach(a -> citationCreatorList.add(a));
     }
     
     private void mapPersonFields(JsonArray personList, Set<IPerson> citationPersonList) {
