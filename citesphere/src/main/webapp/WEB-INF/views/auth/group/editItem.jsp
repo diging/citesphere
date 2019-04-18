@@ -154,24 +154,27 @@ $(function() {
 function showPersonNameInModal(name, personType){
 	var personName = name;
 	
-	// Name containing brackets
-	if(name.includes("(") && name.includes(")")) {
-		personName = name.substring(0, name.indexOf("(")) + name.substring(name.indexOf(")")+1);
-	}
+	/* Name containing brackets
+	example: http://viaf.org/viaf/97768708 */
 	if(name.includes("(")) {
 		personName = name.substring(0, name.indexOf("("));
 	}
 	
-	// Name containing year/span
-	if(personName.split(",").length -1 > 1) {
+	/* Name containing title/year
+	example: http://viaf.org/viaf/100267743 */
+	if(personName.split(",").length > 2) {
 		personName = personName.substring(0, personName.indexOf(',', personName.indexOf(",")+1));
 	}
+	
+	/* Name containing span
+	example: http://viaf.org/viaf/85865113 */
 	if(personName.includes("-")) {
 		personName = personName.trim();
 		personName = personName.substring(0, personName.lastIndexOf(' '));
 	}
 	
-	// Name separated by comma
+	/* Name separated by comma
+	example: http://viaf.org/viaf/43270634 */
 	if(personName.indexOf(",") != -1) {
 		$("#firstName"+personType).val(personName.substring(personName.indexOf(',')+1).trim());
 		$("#lastName"+personType).val(personName.substring(0, personName.lastIndexOf(', ')));
