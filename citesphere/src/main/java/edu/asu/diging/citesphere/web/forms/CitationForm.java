@@ -33,7 +33,14 @@ public class CitationForm {
     
     private List<PersonForm> authors;
     private List<PersonForm> editors;
-    
+    private List<PersonForm> otherCreators;
+
+    public List<PersonForm> getOtherCreators() {
+        return otherCreators;
+    }
+    public void setOtherCreators(List<PersonForm> otherCreators) {
+        this.otherCreators = otherCreators;
+    }
     public String getKey() {
         return key;
     }

@@ -3,10 +3,12 @@ package edu.asu.diging.citesphere.web.user;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,8 +24,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
@@ -33,6 +35,10 @@ public class EditItemController {
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    @Qualifier("creatorsFile")
+    private Properties properties;
+    
     @Autowired
     private ICitationManager citationManager;
     
@@ -53,10 +59,11 @@ public class EditItemController {
         citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
             .forEach(f -> fields.add(f.getFilename()));
         model.addAttribute("fields", fields);
+        model.addAttribute("creatorMap", properties.entrySet());
+        
         return "auth/group/items/item/edit";
     }
 
-    
     /**
      * Method to retrieve all fields filtered by item type.
      */
@@ -75,6 +82,7 @@ public class EditItemController {
         citation.getAuthors().forEach(a -> a.getAffiliations().size());
         System.out.println(citation.getAuthors().size());
         citation.getEditors().forEach(e -> e.getAffiliations().size());
+        citation.getOtherCreators().forEach(e -> e.getPerson().getAffiliations().size());
         citationManager.detachCitation(citation);
         citationHelper.updateCitation(citation, form);
         try {

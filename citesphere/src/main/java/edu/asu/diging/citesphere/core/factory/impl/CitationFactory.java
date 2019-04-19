@@ -143,31 +143,43 @@ public class CitationFactory implements ICitationFactory {
                 JsonArray editors = jObj.get("editors").getAsJsonArray();
                 mapPersonFields(editors, citation.getEditors());
             }
+            if (jObj.has("otherCreators") && !jObj.get("otherCreators").isJsonNull()) {
+                JsonArray creators = jObj.get("otherCreators").getAsJsonArray();
+                mapCreatorFields(creators, citation.getOtherCreators());
+            }
         }
     }
 
+    private void mapCreatorFields(JsonArray creatorList, Set<ICreator> citationCreatorList) {
+        List<edu.asu.diging.citesphere.core.model.bib.impl.Creator> extraCreatorList = new ArrayList<>();
+        List<String> personNames = new ArrayList<>();
+        creatorList.forEach(a -> {
+            ICreator creator = (ICreator) new edu.asu.diging.citesphere.core.model.bib.impl.Creator();
+            creator.setRole((a.getAsJsonObject().get("role") != null && !a.getAsJsonObject().get("role").isJsonNull()) ? a.getAsJsonObject().get("role").getAsString() : "");
+            creator.setPerson(new Person());
+            if(a.getAsJsonObject().get("person") != null && !a.getAsJsonObject().get("person").isJsonNull()) {
+                mapPerson(a.getAsJsonObject().get("person"), creator.getPerson());
+            }
+            personNames.add(creator.getPerson().getFirstName() + creator.getPerson().getLastName());
+            extraCreatorList.add((edu.asu.diging.citesphere.core.model.bib.impl.Creator) creator);
+        });
+        for (Iterator<ICreator> iterator = citationCreatorList.iterator(); iterator.hasNext();) {
+            ICreator creator = iterator.next();
+            if (personNames.contains(creator.getPerson().getFirstName() + creator.getPerson().getLastName())) {
+                iterator.remove();
+            }
+        }
+        extraCreatorList.forEach(a -> citationCreatorList.add(a));
+    }
+    
     private void mapPersonFields(JsonArray personList, Set<IPerson> citationPersonList) {
         List<Person> extraPersonList = new ArrayList<>();
         List<String> personNames = new ArrayList<>();
         personList.forEach(a -> {
-            Person person = new Person();
-            person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
-            person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
-            person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
+            IPerson person = new Person();
+            mapPerson(a, person);
             personNames.add(person.getFirstName() + person.getLastName());
-            person.setUri(a.getAsJsonObject().get("uri")!=null && !a.getAsJsonObject().get("uri").isJsonNull() ? a.getAsJsonObject().get("uri").getAsString():"");
-            person.setLocalAuthorityId(a.getAsJsonObject().get("localAuthorityId")!=null && !a.getAsJsonObject().get("localAuthorityId").isJsonNull() ? a.getAsJsonObject().get("localAuthorityId").getAsString() : "");
-            person.setAffiliations(new HashSet<>());
-            JsonElement affiliations = a.getAsJsonObject().get("affiliations");
-            if (affiliations instanceof JsonArray) {
-                affiliations.getAsJsonArray().forEach(af -> {
-                    Affiliation affiliation = new Affiliation();
-                    affiliation.setName(af.getAsJsonObject().get("name") != null && !af.getAsJsonObject().get("name").isJsonNull() ? af.getAsJsonObject().get("name").getAsString() : "");
-                    affiliation.setUri(af.getAsJsonObject().get("uri") != null && !af.getAsJsonObject().get("uri").isJsonNull() ? af.getAsJsonObject().get("uri").getAsString() : "");
-                    person.getAffiliations().add(affiliation);
-                });
-            }
-            extraPersonList.add(person);
+            extraPersonList.add((Person)person);
         });
 
         for (Iterator<IPerson> iterator = citationPersonList.iterator(); iterator.hasNext();) {
@@ -177,5 +189,23 @@ public class CitationFactory implements ICitationFactory {
             }
         }
         extraPersonList.forEach(a -> citationPersonList.add(a));
+    }
+    
+    private void mapPerson(JsonElement a, IPerson person) {
+        person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
+        person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
+        person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
+        person.setUri(a.getAsJsonObject().get("uri")!=null && !a.getAsJsonObject().get("uri").isJsonNull() ? a.getAsJsonObject().get("uri").getAsString():"");
+        person.setLocalAuthorityId(a.getAsJsonObject().get("localAuthorityId")!=null && !a.getAsJsonObject().get("localAuthorityId").isJsonNull() ? a.getAsJsonObject().get("localAuthorityId").getAsString() : "");
+        person.setAffiliations(new HashSet<>());
+        JsonElement affiliations = a.getAsJsonObject().get("affiliations");
+        if (affiliations instanceof JsonArray) {
+            affiliations.getAsJsonArray().forEach(af -> {
+                Affiliation affiliation = new Affiliation();
+                affiliation.setName(af.getAsJsonObject().get("name") != null && !af.getAsJsonObject().get("name").isJsonNull() ? af.getAsJsonObject().get("name").getAsString() : "");
+                affiliation.setUri(af.getAsJsonObject().get("uri") != null && !af.getAsJsonObject().get("uri").isJsonNull() ? af.getAsJsonObject().get("uri").getAsString() : "");
+                person.getAffiliations().add(affiliation);
+            });
+        }
     }
 }

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
 
 @Component
@@ -65,19 +66,25 @@ public class ItemFactory implements IItemFactory {
         
         data.setCreators(new ArrayList<>());
         citation.getAuthors().forEach(a -> {
-            Creator creator = new Creator();
-            creator.setFirstName(a.getFirstName());
-            creator.setLastName(a.getLastName());
-            creator.setCreatorType(ZoteroConstants.CREATOR_TYPE_AUTHOR);
-            data.getCreators().add(creator);
+            if(a.getLastName() !=null || a.getFirstName()!=null) {
+                Creator mappedCreator = mapCreatorFields(a, ZoteroConstants.CREATOR_TYPE_AUTHOR);
+                data.getCreators().add(mappedCreator);
+            }
         });
         if (citation.getEditors() != null) {
             citation.getEditors().forEach(e -> {
-                Creator creator = new Creator();
-                creator.setFirstName(e.getFirstName());
-                creator.setLastName(e.getLastName());
-                creator.setCreatorType(ZoteroConstants.CREATOR_TYPE_EDITOR);
-                data.getCreators().add(creator);
+                if(e.getLastName() !=null || e.getFirstName()!=null) {
+                    Creator mappedCreator = mapCreatorFields(e, ZoteroConstants.CREATOR_TYPE_EDITOR);
+                    data.getCreators().add(mappedCreator);
+                }
+            });
+        }
+        if (citation.getOtherCreators() != null) {
+            citation.getOtherCreators().forEach(e -> {
+                if(e.getRole()!=null) {
+                    Creator mappedCreator = mapCreatorFields(e.getPerson(), e.getRole());
+                    data.getCreators().add(mappedCreator);
+                }
             });
         }
         
@@ -91,11 +98,20 @@ public class ItemFactory implements IItemFactory {
         return item;
     }
     
+    private Creator mapCreatorFields(IPerson creator, String creatorType) {
+        Creator mappedCreator = new Creator();
+        mappedCreator.setFirstName(creator.getFirstName());
+        mappedCreator.setLastName(creator.getLastName());
+        mappedCreator.setCreatorType(creatorType);
+        return mappedCreator;
+    }
+    
     private void writeExtraData(ICitation citation, Data data) throws JsonProcessingException {
         
         ExtraDataObject extraDataObject = new ExtraDataObject();
         extraDataObject.setAuthors(citation.getAuthors());
         extraDataObject.setEditors(citation.getEditors());
+        extraDataObject.setOtherCreators(citation.getOtherCreators());
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
         
