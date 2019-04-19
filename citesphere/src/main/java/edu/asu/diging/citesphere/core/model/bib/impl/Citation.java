@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
@@ -74,6 +75,10 @@ public class Citation implements ICitation {
     
     private String dateAdded;
     private String dateModified;
+    
+    @OneToMany(targetEntity=CitationConcept.class)
+    @JoinTable(name="CitationConcept_Concept")
+    private Set<ICitationConcept> concepts;
     
     @Lob
     private String extra;
@@ -405,6 +410,14 @@ public class Citation implements ICitation {
     @Override
     public void setDateModified(String dateModified) {
         this.dateModified = dateModified;
+    }
+    @Override
+    public Set<ICitationConcept> getConcepts() {
+        return concepts;
+    }
+    @Override
+    public void setConcepts(Set<ICitationConcept> concepts) {
+        this.concepts = concepts;
     }
     @Override
     public String getExtra() {
