@@ -39,6 +39,33 @@
 	</definition>
 	<definition name="auth/group/items/item/edit/conflict" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/auth/group/editConflict.jsp" />	
-	</definition>		
+	</definition>
+    <definition name="auth/group/items/create" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/group/editItem.jsp" />    
+    </definition>
+    
+    <!-- Authorities -->
+    <definition name="auth/authorities/list" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/authorities/list.jsp" />    
+    </definition>
+     <definition name="auth/authority" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/authorities/show.jsp" />    
+    </definition>
+    
+    <!-- Concepts -->
+    <definition name="auth/concepts/list" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/concepts/list.jsp" />    
+    </definition>
+    <definition name="auth/concepts/add" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/concepts/add.jsp" />    
+    </definition>
+    
+    <!-- Concept Types -->
+    <definition name="auth/concepts/types/list" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/concepts/types/list.jsp" />    
+    </definition>
+    <definition name="auth/concepts/types/add" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/concepts/types/add.jsp" />    
+    </definition>
 	
 </tiles-definitions>

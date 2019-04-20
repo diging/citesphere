@@ -1,6 +1,9 @@
 package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
+import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
 
 @Component
@@ -63,19 +68,27 @@ public class ItemFactory implements IItemFactory {
         
         data.setCreators(new ArrayList<>());
         citation.getAuthors().forEach(a -> {
-            Creator creator = new Creator();
-            creator.setFirstName(a.getFirstName());
-            creator.setLastName(a.getLastName());
-            creator.setCreatorType(ZoteroConstants.CREATOR_TYPE_AUTHOR);
-            data.getCreators().add(creator);
+            if(a.getLastName() !=null || a.getFirstName()!=null) {
+                Creator mappedCreator = mapCreatorFields(a, ZoteroConstants.CREATOR_TYPE_AUTHOR);
+                data.getCreators().add(mappedCreator);
+            }
         });
-        citation.getEditors().forEach(e -> {
-            Creator creator = new Creator();
-            creator.setFirstName(e.getFirstName());
-            creator.setLastName(e.getLastName());
-            creator.setCreatorType(ZoteroConstants.CREATOR_TYPE_EDITOR);
-            data.getCreators().add(creator);
-        });
+        if (citation.getEditors() != null) {
+            citation.getEditors().forEach(e -> {
+                if(e.getLastName() !=null || e.getFirstName()!=null) {
+                    Creator mappedCreator = mapCreatorFields(e, ZoteroConstants.CREATOR_TYPE_EDITOR);
+                    data.getCreators().add(mappedCreator);
+                }
+            });
+        }
+        if (citation.getOtherCreators() != null) {
+            citation.getOtherCreators().forEach(e -> {
+                if(e.getRole()!=null) {
+                    Creator mappedCreator = mapCreatorFields(e.getPerson(), e.getRole());
+                    data.getCreators().add(mappedCreator);
+                }
+            });
+        }
         
         try {
             writeExtraData(citation, data);
@@ -87,15 +100,47 @@ public class ItemFactory implements IItemFactory {
         return item;
     }
     
+    private Creator mapCreatorFields(IPerson creator, String creatorType) {
+        Creator mappedCreator = new Creator();
+        mappedCreator.setFirstName(creator.getFirstName());
+        mappedCreator.setLastName(creator.getLastName());
+        mappedCreator.setCreatorType(creatorType);
+        return mappedCreator;
+    }
+    
     private void writeExtraData(ICitation citation, Data data) throws JsonProcessingException {
         
         ExtraDataObject extraDataObject = new ExtraDataObject();
         extraDataObject.setAuthors(citation.getAuthors());
+        extraDataObject.setEditors(citation.getEditors());
+        extraDataObject.setOtherCreators(citation.getOtherCreators());
+        
+        if (citation.getConceptTags() != null) {
+            extraDataObject.setConceptTags(citation.getConceptTags());
+        }
+        
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
         
-        String extraData = citation.getExtra() != null ? citation.getExtra() : "";
-        extraData = extraData.replaceAll(ExtraData.CITESPHERE_PATTERN, ExtraData.CITESPHERE_PREFIX + " " + extraDataAsJson + "\n");
+        String extraData = "";
+        String citesphereData = ExtraData.CITESPHERE_PREFIX + " " + extraDataAsJson + "\n";
+        if (citation.getExtra() != null && !citation.getExtra().trim().isEmpty()) {
+            // if extra field is already filled
+            Pattern pattern = Pattern.compile(ExtraData.CITESPHERE_PATTERN);
+            Matcher matcher = pattern.matcher(citation.getExtra());
+            if (!matcher.find()) {
+                // if there is no citesphere data yet, append citesphere data
+                extraData = extraData + citesphereData;
+            } else {
+                // else replace citesphere data
+                extraData = citation.getExtra().replaceAll(ExtraData.CITESPHERE_PATTERN, citesphereData);
+            }
+        } else {
+            // if there is no extra data
+            extraData = citesphereData;
+        }
+        
         data.setExtra(extraData);
     }
+ 
 }

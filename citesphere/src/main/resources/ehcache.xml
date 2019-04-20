@@ -31,7 +31,22 @@
       <heap unit="entries">2000</heap>
     </resources>
   </cache>
+  <cache alias="citationCollections">
+    <resources>
+      <heap unit="entries">2000</heap>
+    </resources>
+  </cache>
+  <cache alias="singleCollections">
+    <resources>
+      <heap unit="entries">2000</heap>
+    </resources>
+  </cache>
   <cache alias="groupItemsLimit">
+    <resources>
+      <heap unit="entries">2000</heap>
+    </resources>
+  </cache>
+  <cache alias="collectionItems">
     <resources>
       <heap unit="entries">2000</heap>
     </resources>
@@ -44,6 +59,16 @@
   <cache alias="itemTypeFields">
     <resources>
       <heap unit="entries">500</heap>
+    </resources>
+  </cache>
+  <cache alias="itemTypeCreatorTypes">
+    <resources>
+      <heap unit="entries">500</heap>
+    </resources>
+  </cache>
+  <cache alias="viafAuthorities">
+    <resources>
+      <heap unit="entries">2000</heap>
     </resources>
   </cache>
 </config>

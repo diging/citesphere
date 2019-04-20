@@ -3,6 +3,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="cite" uri="https://diging.asu.edu/jps/tlds/citesphere" %>
 
 <ol class="breadcrumb">
   <li><a href="<c:url value="/" />">Home</a></li>
@@ -66,18 +67,57 @@
 <td>Authors</td>
 <td>
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
- ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach><c:if test="${!status.last}">; </c:if>
-</c:forEach>
+ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if>
+ <c:if test="${not empty author.affiliations}">
+ (<c:forEach items="${author.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
+ </c:if>
+ <c:if test="${not empty author.uri}">
+ <a href="${author.uri}" target="_blank"><i class="fas fa-link"></i></a>
+ </c:if>
+  <c:if test="${not empty author.localAuthorityId}">
+ <a href="<c:url value="/auth/authority/${author.localAuthorityId}" />"><i class="fas fa-anchor"></i></a>
+ </c:if>
+ </c:forEach>
 </td>
 </tr>
 <tr>
 <td>Editors</td>
 <td>
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
- ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>
+ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if>
+ <c:if test="${not empty editor.affiliations}">
+ (<c:forEach items="${editor.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
+ </c:if>
+ <c:if test="${not empty editor.uri}">
+ <a href="${editor.uri}" target="_blank"><i class="fas fa-link"></i></a>
+ </c:if>
+  <c:if test="${not empty editor.localAuthorityId}">
+ <a href="<c:url value="/auth/authority/${editor.localAuthorityId}" />"><i class="fas fa-anchor"></i></a>
+ </c:if>
 </c:forEach>
 </td>
 </tr>
+<c:forEach items="${citation.otherCreatorRoles}" var="role">
+<tr>
+<td>
+<spring:eval expression="@labelsResource.getProperty('_item_attribute_label_${role}', '${role}')" />
+</td>
+<td>
+<cite:creators citation="${citation}" role="${role}" var="creator">
+ ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+<c:if test="${not empty creator.person.affiliations}">
+ (<c:forEach items="${creator.person.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
+ </c:if>
+ <c:if test="${not empty creator.person.uri}">
+ <a href="${creator.person.uri}" target="_blank"><i class="fas fa-link"></i></a>
+ </c:if>
+  <c:if test="${not empty creator.person.localAuthorityId}">
+ <a href="<c:url value="/auth/authority/${creator.person.localAuthorityId}" />"><i class="fas fa-anchor"></i></a>
+ </c:if><c:if test="${!lastIteration}">; </c:if>
+</cite:creators>
+</td>
+</tr>
+</c:forEach>
 <c:if test="${fn:contains(fields, 'publicationTitle') }">
 <tr>
 <td>Publication Title</td>
@@ -178,6 +218,14 @@
 <tr>
 <td>Rights</td>
 <td>${citation.rights}</td>
+</tr>
+<tr>
+<td>Concepts</td>
+<td>
+<c:forEach items="${citation.conceptTags}" var="tag">
+<span class="badge">${tag.conceptName} | ${tag.typeName}</span>
+</c:forEach>
+</td>
 </tr>
 </c:if>
 </table>

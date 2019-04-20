@@ -62,7 +62,7 @@ Do you want to proceed?
 <td>${outdatedCitation.shortTitle}</td>
 </tr>
 </c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'dateFreetext') }">
+<c:if test="${fn:contains(outdatedCitationFields, 'date') }">
 <tr>
 <td>Date</td>
 <td>${outdatedCitation.dateFreetext}</td>
@@ -223,7 +223,7 @@ Do you want to proceed?
 <td>${currentCitation.shortTitle}</td>
 </tr>
 </c:if>
-<c:if test="${fn:contains(currentCitationFields, 'dateFreetext') }">
+<c:if test="${fn:contains(currentCitationFields, 'date') }">
 <tr  <c:if test="${currentCitation.dateFreetext != outdatedCitation.dateFreetext}" >class="changed"</c:if>>
 <td>Date</td>
 <td>${currentCitation.dateFreetext}</td>
@@ -385,7 +385,7 @@ Do you want to proceed?
 <td>${form.shortTitle}</td>
 </tr>
 </c:if>
-<c:if test="${fn:contains(formFields, 'dateFreetext') }">
+<c:if test="${fn:contains(formFields, 'date') }">
 <tr  <c:if test="${form.dateFreetext != outdatedCitation.dateFreetext}" >class="changed"</c:if>>
 <td>Date</td>
 <td>${form.dateFreetext}</td>

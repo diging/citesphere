@@ -30,6 +30,7 @@ public class Person implements IPerson, Comparable<Person> {
     private String id;
     private String name;
     private String uri;
+    private String localAuthorityId;
     private String firstName;
     private String lastName;
     private int positionInList;
@@ -39,9 +40,11 @@ public class Person implements IPerson, Comparable<Person> {
     private Set<IAffiliation> affiliations;
    
     
+    @Override
     public String getId() {
         return id;
     }
+    @Override
     public void setId(String id) {
         this.id = id;
     }
@@ -72,6 +75,14 @@ public class Person implements IPerson, Comparable<Person> {
     @Override
     public void setUri(String uri) {
         this.uri = uri;
+    }
+    @Override
+    public String getLocalAuthorityId() {
+        return localAuthorityId;
+    }
+    @Override
+    public void setLocalAuthorityId(String localAuthorityId) {
+        this.localAuthorityId = localAuthorityId;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.IPerson#getFirstName()

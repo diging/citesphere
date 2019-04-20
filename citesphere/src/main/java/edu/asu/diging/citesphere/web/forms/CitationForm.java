@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.web.forms;
 
+import java.util.List;
+
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 
 public class CitationForm {
@@ -29,6 +31,12 @@ public class CitationForm {
     private String callNumber;
     private String rights;
     
+    private List<PersonForm> authors;
+    private List<PersonForm> editors;
+    private List<PersonForm> otherCreators;
+    
+    private List<ConceptAssignmentForm> conceptAssignments;
+
     public String getKey() {
         return key;
     }
@@ -166,5 +174,29 @@ public class CitationForm {
     }
     public void setRights(String rights) {
         this.rights = rights;
+    }
+    public List<PersonForm> getAuthors() {
+        return authors;
+    }
+    public void setAuthors(List<PersonForm> authors) {
+        this.authors = authors;
+    }
+    public List<PersonForm> getEditors() {
+        return editors;
+    }
+    public void setEditors(List<PersonForm> editors) {
+        this.editors = editors;
+    }
+    public List<PersonForm> getOtherCreators() {
+        return otherCreators;
+    }
+    public void setOtherCreators(List<PersonForm> otherCreators) {
+        this.otherCreators = otherCreators;
+    }
+    public List<ConceptAssignmentForm> getConceptAssignments() {
+        return conceptAssignments;
+    }
+    public void setConceptAssignments(List<ConceptAssignmentForm> conceptAssignments) {
+        this.conceptAssignments = conceptAssignments;
     }
 }

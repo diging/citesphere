@@ -133,4 +133,16 @@ public interface ICitation {
 
     ICitationGroup getGroup();
 
+    void setOtherCreators(Set<ICreator> otherCreators);
+
+    Set<ICreator> getOtherCreators();
+
+    Set<ICreator> getOtherCreators(String role);
+
+    Set<String> getOtherCreatorRoles();
+
+    void setConceptTags(Set<ICitationConceptTag> concepts);
+
+    Set<ICitationConceptTag> getConceptTags();
+
 }

@@ -3,6 +3,7 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -41,11 +42,21 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
  	<script src="<c:url value="/resources/bootstrap/js/bootstrap.min.js" />"></script>
 	<script src="<c:url value="/resources/bootstrap/js/main.js" />"></script>
+	
+	<script src="<c:url value="/resources/dateFormatting/dateFormat.min.js" />"></script>
+	<script src="<c:url value="/resources/dateFormatting/jquery-dateformat.min.js" />"></script>
+	
   </head>
 
   <body>
     <div class="container" style="padding-bottom: 150px;">
-
+    <c:if test="${not empty param.error}">
+	    <div class="alert alert-danger" role="alert" style="margin: 10px;">
+	    		<spring:eval var="alertMsg" expression="@messageSource.getMessage('alert.login.${param.error}', null, null)"/>
+	    		<p>${alertMsg}</p>
+		</div>
+    </c:if>
+		
       <div class="page-header">
       <nav>
           <ul class="nav nav-pills pull-right">
@@ -60,6 +71,23 @@
           	</sec:authorize>
           	
           	<sec:authorize access="isAuthenticated()">
+          	
+          	<li role="presentation" class="dropdown">
+			    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+			      Citation Concepts <span class="caret"></span>
+			    </a>
+			    <ul class="dropdown-menu">
+			      <li role="presentation">
+		          	<a href="<c:url value="/auth/concepts/list" />" >Concepts</a>
+		          </li>
+		          <li role="presentation">
+		          	<a href="<c:url value="/auth/concepts/types/list" />" >Concept Types</a>
+		          </li>
+			    </ul>
+			  </li>
+          	<li role="presentation">
+          		<a href="<c:url value="/auth/authority/list" />" >Managed Authority Entries</a>
+          	</li>
           	<li role="presentation">
          	 	<form action="<c:url value="/logout" />" method="POST">
          	 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

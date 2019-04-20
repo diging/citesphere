@@ -8,6 +8,7 @@ public class CitationResults {
 
     private long totalResults;
     private List<ICitation> citations;
+    private boolean notModified;
     
     public long getTotalResults() {
         return totalResults;
@@ -20,6 +21,12 @@ public class CitationResults {
     }
     public void setCitations(List<ICitation> citations) {
         this.citations = citations;
+    }
+    public boolean isNotModified() {
+        return notModified;
+    }
+    public void setNotModified(boolean notModified) {
+        this.notModified = notModified;
     }
     
     

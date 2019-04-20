@@ -27,4 +27,12 @@ public interface IPerson {
     void setAffiliations(Set<IAffiliation> affiliations);
 
     Set<IAffiliation> getAffiliations();
+
+    void setId(String id);
+
+    String getId();
+
+    void setLocalAuthorityId(String localAuthorityId);
+
+    String getLocalAuthorityId();
 }
