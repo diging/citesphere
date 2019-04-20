@@ -78,7 +78,7 @@ public class Citation implements ICitation {
     private String dateAdded;
     private String dateModified;
     
-    @OneToMany(targetEntity=CitationConceptTag.class, cascade=CascadeType.ALL, orphanRemoval=true)
+    @OneToMany(targetEntity=CitationConceptTag.class, cascade=CascadeType.ALL)
     @JoinTable(name="CitationConcept_ConceptTag")
     private Set<ICitationConceptTag> conceptTags;
     
