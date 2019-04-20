@@ -141,8 +141,8 @@ public interface ICitation {
 
     Set<String> getOtherCreatorRoles();
 
-    void setConcepts(Set<ICitationConcept> concepts);
+    void setConceptTags(Set<ICitationConceptTag> concepts);
 
-    Set<ICitationConcept> getConcepts();
+    Set<ICitationConceptTag> getConceptTags();
 
 }

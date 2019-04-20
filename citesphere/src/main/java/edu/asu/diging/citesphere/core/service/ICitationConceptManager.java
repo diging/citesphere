@@ -12,4 +12,6 @@ public interface ICitationConceptManager {
 
     void create(CitationConceptForm conceptForm, IUser user);
 
+    ICitationConcept get(String conceptId);
+
 }

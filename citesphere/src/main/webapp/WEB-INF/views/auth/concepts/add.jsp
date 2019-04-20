@@ -26,15 +26,6 @@
 <td><form:input type="text" path="uri" class="form-control" /></td>
 </tr>
 
-<tr>
-<td width="20%"><label>Type</label></td>
-<td>
-<form:select path="type" class="form-control" >
-<form:options items="${types}" itemLabel="name" itemValue="id" />
-</form:select>
-</td>
-</tr>
-
 </table>
 
 <p class="pull-right">

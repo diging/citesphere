@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.model.bib.impl;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,8 +14,9 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
@@ -76,9 +78,9 @@ public class Citation implements ICitation {
     private String dateAdded;
     private String dateModified;
     
-    @OneToMany(targetEntity=CitationConcept.class)
-    @JoinTable(name="CitationConcept_Concept")
-    private Set<ICitationConcept> concepts;
+    @OneToMany(targetEntity=CitationConceptTag.class, cascade=CascadeType.ALL, orphanRemoval=true)
+    @JoinTable(name="CitationConcept_ConceptTag")
+    private Set<ICitationConceptTag> conceptTags;
     
     @Lob
     private String extra;
@@ -412,12 +414,12 @@ public class Citation implements ICitation {
         this.dateModified = dateModified;
     }
     @Override
-    public Set<ICitationConcept> getConcepts() {
-        return concepts;
+    public Set<ICitationConceptTag> getConceptTags() {
+        return conceptTags;
     }
     @Override
-    public void setConcepts(Set<ICitationConcept> concepts) {
-        this.concepts = concepts;
+    public void setConceptTags(Set<ICitationConceptTag> concepts) {
+        this.conceptTags = concepts;
     }
     @Override
     public String getExtra() {

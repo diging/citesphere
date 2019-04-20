@@ -48,7 +48,7 @@ public class ConceptTypeManager implements IConceptTypeManager {
     }
     
     @Override
-    public IConceptType getById(String id) {
+    public IConceptType get(String id) {
         Optional<ConceptType> type = typeRepository.findById(id);
         if (!type.isPresent()) {
             return null;

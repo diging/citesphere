@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.web.user;
 
 import java.lang.reflect.Field;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -26,7 +27,10 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
+import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
+import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
@@ -45,6 +49,15 @@ public class EditItemController {
     @Autowired
     private ICitationHelper citationHelper;
     
+    @Autowired
+    private ICitationConceptManager conceptManager;
+    
+    @Autowired
+    private IConceptTypeManager typeManager;
+    
+    @Autowired
+    private IUserManager userManager;
+    
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/edit")
     public String showPage(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
@@ -60,6 +73,9 @@ public class EditItemController {
             .forEach(f -> fields.add(f.getFilename()));
         model.addAttribute("fields", fields);
         model.addAttribute("creatorMap", properties.entrySet());
+        
+        model.addAttribute("concepts", conceptManager.findAll(userManager.findByUsername(authentication.getName())));
+        model.addAttribute("conceptTypes", typeManager.getAllTypes(userManager.findByUsername(authentication.getName())));
         
         return "auth/group/items/item/edit";
     }
@@ -80,7 +96,6 @@ public class EditItemController {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         // load authors and editors before detaching
         citation.getAuthors().forEach(a -> a.getAffiliations().size());
-        System.out.println(citation.getAuthors().size());
         citation.getEditors().forEach(e -> e.getAffiliations().size());
         citation.getOtherCreators().forEach(e -> e.getPerson().getAffiliations().size());
         citationManager.detachCitation(citation);

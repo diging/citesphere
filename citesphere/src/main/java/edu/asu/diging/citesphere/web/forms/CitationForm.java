@@ -34,13 +34,9 @@ public class CitationForm {
     private List<PersonForm> authors;
     private List<PersonForm> editors;
     private List<PersonForm> otherCreators;
+    
+    private List<ConceptAssignmentForm> conceptAssignments;
 
-    public List<PersonForm> getOtherCreators() {
-        return otherCreators;
-    }
-    public void setOtherCreators(List<PersonForm> otherCreators) {
-        this.otherCreators = otherCreators;
-    }
     public String getKey() {
         return key;
     }
@@ -190,5 +186,17 @@ public class CitationForm {
     }
     public void setEditors(List<PersonForm> editors) {
         this.editors = editors;
+    }
+    public List<PersonForm> getOtherCreators() {
+        return otherCreators;
+    }
+    public void setOtherCreators(List<PersonForm> otherCreators) {
+        this.otherCreators = otherCreators;
+    }
+    public List<ConceptAssignmentForm> getConceptAssignments() {
+        return conceptAssignments;
+    }
+    public void setConceptAssignments(List<ConceptAssignmentForm> conceptAssignments) {
+        this.conceptAssignments = conceptAssignments;
     }
 }

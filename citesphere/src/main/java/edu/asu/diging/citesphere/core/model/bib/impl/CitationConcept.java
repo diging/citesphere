@@ -6,14 +6,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
-import edu.asu.diging.citesphere.core.model.bib.IConceptType;
 import edu.asu.diging.citesphere.core.model.impl.User;
 
 @Entity
@@ -27,9 +25,6 @@ public class CitationConcept implements ICitationConcept {
     private String description;
     private String uri;
 
-    @OneToOne(targetEntity = ConceptType.class)
-    private IConceptType type;
-    
     @ManyToOne(targetEntity=User.class)
     private IUser owner;
     
@@ -98,22 +93,6 @@ public class CitationConcept implements ICitationConcept {
     @Override
     public void setUri(String uri) {
         this.uri = uri;
-    }
-
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.IConcept#getType()
-     */
-    @Override
-    public IConceptType getType() {
-        return type;
-    }
-
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.IConcept#setType(edu.asu.diging.citesphere.core.model.bib.impl.IConceptType)
-     */
-    @Override
-    public void setType(IConceptType type) {
-        this.type = type;
     }
 
     @Override

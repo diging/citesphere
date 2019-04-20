@@ -12,6 +12,6 @@ public interface IConceptTypeManager {
 
     List<IConceptType> getAllTypes(IUser owner);
 
-    IConceptType getById(String id);
+    IConceptType get(String id);
 
 }

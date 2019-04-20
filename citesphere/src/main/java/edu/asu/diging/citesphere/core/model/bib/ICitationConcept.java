@@ -22,10 +22,6 @@ public interface ICitationConcept {
 
     void setUri(String uri);
 
-    IConceptType getType();
-
-    void setType(IConceptType type);
-
     void setCreatedOn(OffsetDateTime createdOn);
 
     OffsetDateTime getCreatedOn();
