@@ -71,6 +71,20 @@
           	</sec:authorize>
           	
           	<sec:authorize access="isAuthenticated()">
+          	
+          	<li role="presentation" class="dropdown">
+			    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+			      Citation Concepts <span class="caret"></span>
+			    </a>
+			    <ul class="dropdown-menu">
+			      <li role="presentation">
+		          	<a href="<c:url value="/auth/concepts/list" />" >Concepts</a>
+		          </li>
+		          <li role="presentation">
+		          	<a href="<c:url value="/auth/concepts/types/list" />" >Concept Types</a>
+		          </li>
+			    </ul>
+			  </li>
           	<li role="presentation">
           		<a href="<c:url value="/auth/authority/list" />" >Managed Authority Entries</a>
           	</li>

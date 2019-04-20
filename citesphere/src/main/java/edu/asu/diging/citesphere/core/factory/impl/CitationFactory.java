@@ -23,12 +23,18 @@ import com.google.gson.JsonParser;
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
+import edu.asu.diging.citesphere.core.model.bib.IConceptType;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
 import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.core.model.bib.impl.CitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
+import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
+import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.util.IDateParser;
 
@@ -37,6 +43,12 @@ public class CitationFactory implements ICitationFactory {
     
     @Autowired
     private IDateParser dateParser;
+    
+    @Autowired
+    private ICitationConceptManager conceptManager;
+    
+    @Autowired
+    private IConceptTypeManager conceptTypeManager;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.factory.impl.ICitationFactory#createCitation(org.springframework.social.zotero.api.Item)
@@ -147,6 +159,11 @@ public class CitationFactory implements ICitationFactory {
                 JsonArray creators = jObj.get("otherCreators").getAsJsonArray();
                 mapCreatorFields(creators, citation.getOtherCreators());
             }
+            citation.setConceptTags(new HashSet<>());
+            if (jObj.has("conceptTags") && !jObj.get("conceptTags").isJsonNull()) {
+                JsonArray conceptTags = jObj.get("conceptTags").getAsJsonArray();
+                mapConceptTags(conceptTags, citation.getConceptTags());
+            }
         }
     }
 
@@ -207,5 +224,24 @@ public class CitationFactory implements ICitationFactory {
                 person.getAffiliations().add(affiliation);
             });
         }
+    }
+    
+    private void mapConceptTags(JsonArray conceptArray, Set<ICitationConceptTag> conceptTags) {
+        conceptArray.forEach(c -> {
+            ICitationConceptTag tag = new CitationConceptTag();
+            JsonObject conceptJsonObject = c.getAsJsonObject();
+            tag.setConceptName(conceptJsonObject.get("conceptName") != null && !conceptJsonObject.get("conceptName").isJsonNull() ? conceptJsonObject.get("conceptName").getAsString() : "");
+            tag.setTypeName(conceptJsonObject.get("typeName") != null && !conceptJsonObject.get("typeName").isJsonNull() ? conceptJsonObject.get("typeName").getAsString() : "");
+            
+            tag.setConceptUri(conceptJsonObject.get("conceptUri") != null && !conceptJsonObject.get("conceptUri").isJsonNull() ? conceptJsonObject.get("conceptUri").getAsString() : null);
+            tag.setLocalConceptId(conceptJsonObject.get("localConceptId") != null && !conceptJsonObject.get("localConceptId").isJsonNull() ? conceptJsonObject.get("localConceptId").getAsString() : null);
+            
+            tag.setTypeUri(conceptJsonObject.get("typeUri") != null && !conceptJsonObject.get("typeUri").isJsonNull() ? conceptJsonObject.get("typeUri").getAsString() : null);
+            tag.setLocalConceptTypeId(conceptJsonObject.get("localConceptTypeId") != null && !conceptJsonObject.get("localConceptTypeId").isJsonNull() ? conceptJsonObject.get("localConceptTypeId").getAsString() : null);
+            
+            
+            conceptTags.add(tag);
+        });
+        
     }
 }

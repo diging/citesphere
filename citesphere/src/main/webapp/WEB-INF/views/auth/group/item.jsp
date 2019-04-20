@@ -219,5 +219,13 @@
 <td>Rights</td>
 <td>${citation.rights}</td>
 </tr>
+<tr>
+<td>Concepts</td>
+<td>
+<c:forEach items="${citation.conceptTags}" var="tag">
+<span class="badge">${tag.conceptName} | ${tag.typeName}</span>
+</c:forEach>
+</td>
+</tr>
 </c:if>
 </table>

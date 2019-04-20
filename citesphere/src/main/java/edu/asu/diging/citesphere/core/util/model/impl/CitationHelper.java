@@ -6,22 +6,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
+import edu.asu.diging.citesphere.core.model.bib.IConceptType;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
+import edu.asu.diging.citesphere.core.model.bib.impl.CitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.impl.Creator;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
+import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
+import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.AffiliationForm;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
+import edu.asu.diging.citesphere.web.forms.ConceptAssignmentForm;
 import edu.asu.diging.citesphere.web.forms.PersonForm;
 
 @Component
 public class CitationHelper implements ICitationHelper {
+    
+    @Autowired
+    private ICitationConceptManager conceptManager;
+    
+    @Autowired
+    private IConceptTypeManager typeManager;
 
     /*
      * (non-Javadoc)
@@ -83,6 +97,26 @@ public class CitationHelper implements ICitationHelper {
             mapCreatorFields(creatorMap, form.getOtherCreators(), citation.getOtherCreators());
         }
 
+        citation.setConceptTags(new HashSet<>());
+        if (form.getConceptAssignments() != null) {
+            for (ConceptAssignmentForm assignment : form.getConceptAssignments()) {
+                if (assignment.getConceptId() != null && assignment.getConceptTypeId() != null) {
+                    ICitationConceptTag tag = new CitationConceptTag();
+                    ICitationConcept concept = conceptManager.get(assignment.getConceptId());
+                    IConceptType type = typeManager.get(assignment.getConceptTypeId());
+                    if (concept != null && type != null) {
+                        tag.setConceptName(concept.getName());
+                        tag.setConceptUri(concept.getUri());
+                        tag.setLocalConceptId(concept.getId());
+                        tag.setTypeName(type.getName());
+                        tag.setTypeUri(type.getUri());
+                        tag.setLocalConceptTypeId(type.getId());
+                        
+                        citation.getConceptTags().add(tag);
+                    }
+                }
+            }
+        }
     }
 
     private void mapPersonFields(Map<String, IPerson> personMap,

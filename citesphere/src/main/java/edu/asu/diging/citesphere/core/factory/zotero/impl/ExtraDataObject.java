@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
 import java.util.Set;
 
+import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 
@@ -12,6 +13,8 @@ public class ExtraDataObject {
     private Set<IPerson> editors;
     
     private Set<ICreator> otherCreators;
+    
+    private Set<ICitationConceptTag> conceptTags;
 
     public Set<ICreator> getOtherCreators() {
         return otherCreators;
@@ -35,6 +38,14 @@ public class ExtraDataObject {
 
     public void setEditors(Set<IPerson> editors) {
         this.editors = editors;
+    }
+
+    public Set<ICitationConceptTag> getConceptTags() {
+        return conceptTags;
+    }
+
+    public void setConceptTags(Set<ICitationConceptTag> conceptTags) {
+        this.conceptTags = conceptTags;
     }
 
 }

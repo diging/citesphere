@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
 
@@ -112,6 +114,11 @@ public class ItemFactory implements IItemFactory {
         extraDataObject.setAuthors(citation.getAuthors());
         extraDataObject.setEditors(citation.getEditors());
         extraDataObject.setOtherCreators(citation.getOtherCreators());
+        
+        if (citation.getConceptTags() != null) {
+            extraDataObject.setConceptTags(citation.getConceptTags());
+        }
+        
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
         
@@ -135,4 +142,5 @@ public class ItemFactory implements IItemFactory {
         
         data.setExtra(extraData);
     }
+ 
 }

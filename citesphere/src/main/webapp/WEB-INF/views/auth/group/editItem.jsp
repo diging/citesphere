@@ -46,6 +46,8 @@ $(function() {
 				creatorSubmitCount = creatorSubmitCount + roleCount;
 			}
 		});
+		
+		createConceptTags();
 	});
 	
 	/* Handle Author events */
@@ -235,6 +237,26 @@ $(function() {
 		$("#uriLoadingFoundCreator").popover('hide');
 		event.preventDefault();
 	});
+	
+	/* adding concepts */
+	$("#addConceptButton").click(function(e) {
+		e.preventDefault();
+		
+		var conceptId = $("#addConceptConceptSelect");
+		var conceptType = $("#addConceptTypeSelect");
+		
+		var conceptSpan = $('<span class="badge"></span>');
+		conceptSpan.attr("data-concept-id", conceptId.val());
+		conceptSpan.attr("data-concept-type-id", conceptType.val());
+		
+		var text = $("#addConceptConceptSelect option:selected").text();
+		var typeName = $("#addConceptTypeSelect option:selected").text();
+		conceptSpan.text(text + " | " + typeName + " ");
+	
+		$("#conceptTags").append(conceptSpan);
+		
+		$("#addConceptModal").modal('hide');
+	});
 });
 
 /* Function to populate modal on edit */
@@ -394,6 +416,24 @@ function constructPersonArray(arrayName, role, iter){
 		otherCreatorCount += 1;
 	});
 	return otherCreatorCount;
+}
+
+function createConceptTags() {
+	$("#conceptTags").children("span").each(function (idx, tag) {
+		var conceptTagInput = $("<input>");
+		conceptTagInput.attr("type", "hidden");
+		conceptTagInput.attr("id", "conceptAssignments" + idx + ".conceptId");
+		conceptTagInput.attr("name", "conceptAssignments[" + idx + "].conceptId");
+		conceptTagInput.attr("value", $(tag).attr("data-concept-id"));
+		$("#editForm").append(conceptTagInput);
+		
+		var conceptTagTypeInput = $("<input>");
+		conceptTagTypeInput.attr("type", "hidden");
+		conceptTagTypeInput.attr("id", "conceptAssignments" + idx + ".conceptTypeId");
+		conceptTagTypeInput.attr("name", "conceptAssignments[" + idx + "].conceptTypeId");
+		conceptTagTypeInput.attr("value", $(tag).attr("data-concept-type-id"));
+		$("#editForm").append(conceptTagTypeInput);
+	});
 }
 
 function resetPersonCreationModal(modalType) {
@@ -725,6 +765,19 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <td>Rights</td>
 <td><form:input path="rights" type="text" class="form-control" placeholder="Rights" value="${not empty form.rights ? form.rights : citation.rights}" /></td>
 </tr>
+
+<tr>
+<td>Concepts</td>
+<td>
+<div id="conceptTags">
+<c:forEach items="${citation.conceptTags}" var="tag">
+<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName}</span>
+</c:forEach>
+</div>
+<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
+</td>
+</tr>
+
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
@@ -887,7 +940,44 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
       </div>
     </div>
   </div>
-</div>
+</div> <!-- End modal -->
+
+<!-- Concept Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="addConceptModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Concept</h4>
+      </div>
+      <div class="modal-body">
+        <form id="conceptForm">
+        <p>
+        <label>Concept</label>
+        <select class="form-control" id="addConceptConceptSelect">
+        <c:forEach items="${concepts}" var="concept">
+        	<option value="${concept.id}">${concept.name}</option>
+        </c:forEach>
+        </select>
+        </p>
+        
+        <p style="padding-top: 20px;">
+        <label>Type of Concept</label>
+        <select class="form-control"  id="addConceptTypeSelect">
+        <c:forEach items="${conceptTypes}" var="type">
+        	<option value="${type.id}">${type.name}</option>
+        </c:forEach>
+        </select>
+        </p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="addConceptButton">Add</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <script>
 //# sourceURL=fields.js
 $(document).ready(function() {
