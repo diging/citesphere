@@ -1,5 +1,9 @@
 package edu.asu.diging.citesphere.core.model.bib;
 
+import java.time.OffsetDateTime;
+
+import edu.asu.diging.citesphere.core.model.IUser;
+
 public interface IConceptType {
 
     String getId();
@@ -17,5 +21,13 @@ public interface IConceptType {
     String getUri();
 
     void setUri(String uri);
+
+    IUser getOwner();
+
+    void setCreatedOn(OffsetDateTime createdOn);
+
+    OffsetDateTime getCreatedOn();
+
+    void setOwner(IUser owner);
 
 }

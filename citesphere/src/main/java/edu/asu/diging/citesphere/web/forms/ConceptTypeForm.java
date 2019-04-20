@@ -1,13 +1,10 @@
 package edu.asu.diging.citesphere.web.forms;
 
-import edu.asu.diging.citesphere.core.model.bib.IConceptType;
-
-public class CitationConceptForm {
+public class ConceptTypeForm {
 
     private String name;
     private String description;
     private String uri;
-    private String type;
     
     public String getName() {
         return name;
@@ -27,12 +24,5 @@ public class CitationConceptForm {
     public void setUri(String uri) {
         this.uri = uri;
     }
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
-    
     
 }

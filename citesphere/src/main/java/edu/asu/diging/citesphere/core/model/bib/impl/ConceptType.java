@@ -1,13 +1,18 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
+import java.time.OffsetDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.IConceptType;
+import edu.asu.diging.citesphere.core.model.impl.User;
 
 @Entity
 public class ConceptType implements IConceptType {
@@ -22,6 +27,11 @@ public class ConceptType implements IConceptType {
     private String name;
     private String description;
     private String uri;
+    
+    @ManyToOne(targetEntity=User.class)
+    private IUser owner;
+    
+    private OffsetDateTime createdOn;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.IConceptType#getId()
@@ -78,5 +88,21 @@ public class ConceptType implements IConceptType {
     @Override
     public void setUri(String uri) {
         this.uri = uri;
+    }
+    @Override
+    public IUser getOwner() {
+        return owner;
+    }
+    @Override
+    public void setOwner(IUser owner) {
+        this.owner = owner;
+    }
+    @Override
+    public OffsetDateTime getCreatedOn() {
+        return createdOn;
+    }
+    @Override
+    public void setCreatedOn(OffsetDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 }
