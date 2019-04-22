@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
@@ -76,6 +77,10 @@ public class Citation implements ICitation {
     
     private String dateAdded;
     private String dateModified;
+    
+    @OneToMany(targetEntity=CitationConceptTag.class, cascade=CascadeType.ALL)
+    @JoinTable(name="CitationConcept_ConceptTag")
+    private Set<ICitationConceptTag> conceptTags;
     
     @Lob
     private String extra;
@@ -407,6 +412,14 @@ public class Citation implements ICitation {
     @Override
     public void setDateModified(String dateModified) {
         this.dateModified = dateModified;
+    }
+    @Override
+    public Set<ICitationConceptTag> getConceptTags() {
+        return conceptTags;
+    }
+    @Override
+    public void setConceptTags(Set<ICitationConceptTag> concepts) {
+        this.conceptTags = concepts;
     }
     @Override
     public String getExtra() {

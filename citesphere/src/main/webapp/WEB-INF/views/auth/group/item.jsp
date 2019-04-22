@@ -84,7 +84,16 @@
 <td>Editors</td>
 <td>
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
- ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>
+ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if>
+ <c:if test="${not empty editor.affiliations}">
+ (<c:forEach items="${editor.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
+ </c:if>
+ <c:if test="${not empty editor.uri}">
+ <a href="${editor.uri}" target="_blank"><i class="fas fa-link"></i></a>
+ </c:if>
+  <c:if test="${not empty editor.localAuthorityId}">
+ <a href="<c:url value="/auth/authority/${editor.localAuthorityId}" />"><i class="fas fa-anchor"></i></a>
+ </c:if>
 </c:forEach>
 </td>
 </tr>
@@ -95,7 +104,16 @@
 </td>
 <td>
 <cite:creators citation="${citation}" role="${role}" var="creator">
- ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if><c:if test="${!lastIteration}">; </c:if>
+ ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+<c:if test="${not empty creator.person.affiliations}">
+ (<c:forEach items="${creator.person.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
+ </c:if>
+ <c:if test="${not empty creator.person.uri}">
+ <a href="${creator.person.uri}" target="_blank"><i class="fas fa-link"></i></a>
+ </c:if>
+  <c:if test="${not empty creator.person.localAuthorityId}">
+ <a href="<c:url value="/auth/authority/${creator.person.localAuthorityId}" />"><i class="fas fa-anchor"></i></a>
+ </c:if><c:if test="${!lastIteration}">; </c:if>
 </cite:creators>
 </td>
 </tr>
@@ -200,6 +218,14 @@
 <tr>
 <td>Rights</td>
 <td>${citation.rights}</td>
+</tr>
+<tr>
+<td>Concepts</td>
+<td>
+<c:forEach items="${citation.conceptTags}" var="tag">
+<span class="badge">${tag.conceptName} | ${tag.typeName}</span>
+</c:forEach>
+</td>
 </tr>
 </c:if>
 </table>
