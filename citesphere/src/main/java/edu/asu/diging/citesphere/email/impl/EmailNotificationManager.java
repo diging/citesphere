@@ -42,7 +42,7 @@ public class EmailNotificationManager implements IEmailNotificationManager {
             }
             body = body.replace("$user", admin.getFirstName() + " " + admin.getLastName());
             body = body.replace("$app", "Citesphere");
-            
+            System.out.println(admin.getEmail() + " " + body);
             emailNotificationSender.sendNotificationEmail(admin.getEmail(), "New Account Request", body);
             logger.info("The system sent a user request email to <<" + admin.getUsername()
                     + ">> for the request placed.");
