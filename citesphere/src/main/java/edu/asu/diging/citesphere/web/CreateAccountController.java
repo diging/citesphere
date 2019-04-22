@@ -17,6 +17,7 @@ import edu.asu.diging.citesphere.core.factory.IUserFactory;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.web.forms.UserForm;
+import edu.asu.diging.citesphere.email.IEmailNotificationManager;
 
 @Controller
 public class CreateAccountController {
@@ -28,6 +29,9 @@ public class CreateAccountController {
     
     @Autowired
     private IUserFactory userFactory;
+    
+    @Autowired
+    private IEmailNotificationManager emailNotificationManager;
 
     @RequestMapping(value = "/register", method=RequestMethod.GET)
     public String get(Model model) {
@@ -45,6 +49,7 @@ public class CreateAccountController {
         IUser user = userFactory.createUser(userForm);
         try {
             userManager.create(user);
+            emailNotificationManager.sendNewAccountRequestPlacementEmail(user);
         } catch (UserAlreadyExistsException e) {
             logger.error("User could not be created. Username already in use.");
             model.addAttribute("user", userForm);
