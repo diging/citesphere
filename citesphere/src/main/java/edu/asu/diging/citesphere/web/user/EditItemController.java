@@ -96,7 +96,8 @@ public class EditItemController {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         // load authors and editors before detaching
         citation.getAuthors().forEach(a -> a.getAffiliations().size());
-        citation.getEditors().forEach(a -> a.getAffiliations().size());
+        citation.getEditors().forEach(e -> e.getAffiliations().size());
+        citation.getOtherCreators().forEach(e -> e.getPerson().getAffiliations().size());
         citationManager.detachCitation(citation);
         citationHelper.updateCitation(citation, form);
         try {
