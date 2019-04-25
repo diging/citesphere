@@ -47,6 +47,9 @@
    
     <util:properties id="usersFile"
         location="classpath:user.properties" />
+        
+    <util:properties id="configFile"
+        location="classpath:config.properties" />
 
     <util:properties id="iconsResource"
         location="classpath:/item_type_icons.properties" />

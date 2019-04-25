@@ -40,6 +40,10 @@
         <email.pw></email.pw>
         <email.from></email.from>
         <email.enabled>true</email.enabled>
+        
+        <app.name></app.name>
+        <app.url></app.url>
+        <app.createUserApprovalPath></app.createUserApprovalPath>
     </properties>
 
     <dependencyManagement>

@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.web;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -48,8 +50,14 @@ public class CreateAccountController {
         
         IUser user = userFactory.createUser(userForm);
         try {
+            List<IUser> adminList = new ArrayList<>();
+            for(IUser admin: userManager.loadUsersByRole()) {
+                if(user.getEmail()!=null && !user.getEmail().equals("")) {
+                    adminList.add(admin);
+                }
+            }
             userManager.create(user);
-            emailNotificationManager.sendNewAccountRequestPlacementEmail(user);
+            emailNotificationManager.sendNewAccountRequestPlacementEmail(user, adminList);
         } catch (UserAlreadyExistsException e) {
             logger.error("User could not be created. Username already in use.");
             model.addAttribute("user", userForm);

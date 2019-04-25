@@ -28,4 +28,6 @@ public interface IUserManager {
 
     void disableUser(String username, String initiator);
 
+    List<IUser> loadUsersByRole();
+
 }

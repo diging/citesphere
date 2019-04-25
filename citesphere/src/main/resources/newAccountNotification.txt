@@ -1,21 +1,13 @@
-<html>
-<body>
-<p>
-Hi $admin!
-</p>
-<p>
-A new account for $createdUser ($createdUsername) has been created in Citesphere. Please review the account and approve or reject it.
-<a href="$url">$url</a>.
-</p>
+Hi Admin!
 
-<p>
+A new account for $createdUser ($createdUsername) has been created in $app. 
+Please review the account and approve or reject it here - $url.
+
+
 Your $app Team
-</p>
 
-<p>
-<br> 
------<br>
+
+ 
+-----
+
 This email was automatically generated. Please do not reply.
-</p>
-</body>
-</html>
