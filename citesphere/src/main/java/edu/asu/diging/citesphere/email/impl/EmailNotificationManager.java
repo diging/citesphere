@@ -4,29 +4,28 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.email.IEmailNotificationManager;
-import edu.asu.diging.citesphere.email.impl.EmailNotificationManager;
-import edu.asu.diging.citesphere.email.impl.EmailNotificationSender;
 
 @Service
-@PropertySource("classpath:/config.properties")
 public class EmailNotificationManager implements IEmailNotificationManager {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailNotificationManager.class);
 
     @Autowired
-    @Qualifier(value="configFile")
+    @Qualifier(value = "configFile")
     private Properties appProperties;
 
     @Autowired
@@ -52,10 +51,11 @@ public class EmailNotificationManager implements IEmailNotificationManager {
             body = body.replace("$app", appProperties.getProperty("app.name"));
             body = body.replace("$url", appProperties.getProperty("app.url")
                     + appProperties.getProperty("app.createUserApprovalPath"));
-            emailNotificationSender.sendNotificationEmail(user.getEmail(), "New Account Request for Citesphere", body, adminList);
+            emailNotificationSender.sendNotificationEmail(user.getEmail(),
+                    "New Account Request for " + appProperties.getProperty("app.name"), body,
+                    adminList);
             logger.info("The system sent a user request email to <<" + user.getUsername()
                     + ">> for the request placed.");
         }
-
     }
 }

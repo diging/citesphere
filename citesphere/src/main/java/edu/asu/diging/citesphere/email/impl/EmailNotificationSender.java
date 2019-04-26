@@ -38,18 +38,21 @@ public class EmailNotificationSender {
         this.enabled = enabled;
     }
     
-    public void sendNotificationEmail(String emailaddress, String subject, String msgText, List<IUser> adminList) {
+    public void sendNotificationEmail(String emailaddress, String subject, String body, List<IUser> adminList) {
         if (enabled) {
             try {
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true);
+                String bodyClone = body;
                 for(IUser to: adminList) {
-                    helper.addTo(to.getEmail());
+                    helper.setTo(to.getEmail());
+                    helper.setSubject(subject);
+                    helper.setFrom(new InternetAddress(fromAddress));
+                    bodyClone = bodyClone.replace("$admin", to.getFirstName() + " " + to.getLastName());
+                    message.setContent(bodyClone, "text/html; charset=utf-8");
+                    mailSender.send(message);
+                    bodyClone = body;
                 }
-                helper.setSubject(subject);
-                helper.setFrom(new InternetAddress(fromAddress));
-                helper.setText(msgText);
-                mailSender.send(message);
                 logger.debug("Send email to admin with subject \"" + subject + "\"");
             } catch (MessagingException ex) {
                 logger.error("Notification email could not be sent.", ex);

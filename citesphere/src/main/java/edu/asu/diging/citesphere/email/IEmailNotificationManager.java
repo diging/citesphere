@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.email;
 
 import java.util.List;
+
 import edu.asu.diging.citesphere.core.model.IUser;
 
 public interface IEmailNotificationManager {
