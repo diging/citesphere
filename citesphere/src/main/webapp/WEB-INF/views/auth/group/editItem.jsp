@@ -334,6 +334,7 @@ function savePersonDetails(personType, modalName){
 	var personTypeLCase = personType.toLowerCase();
 	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id") != null && $("#id"+modalName).attr("data-"+modalNameLCase+"-id").length > 0) {
 		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
+		personTypeLCase = personSpan.attr("data-creator-type").toLowerCase();
 	} else {
 		var id = personTypeLCase + $("."+personTypeLCase+"-item").length;
 		personSpan = $('<span id='+id+'>');
