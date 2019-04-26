@@ -30,7 +30,7 @@
         <property name="host" value="${email.host}"/>
         <property name="port" value="${email.port}"/>
         <property name="username" value="${email.username}"/>
-        <property name="password" value="${email.pw}"/>
+        <property name="password" value="${email.password}"/>
         <property name="javaMailProperties">
             <props>
             	<prop key="mail.transport.protocol">smtp</prop>
@@ -48,8 +48,8 @@
     <util:properties id="usersFile"
         location="classpath:user.properties" />
         
-    <util:properties id="configFile"
-        location="classpath:config.properties" />
+    <util:properties id="appFile"
+        location="classpath:app.properties" />
 
     <util:properties id="iconsResource"
         location="classpath:/item_type_icons.properties" />

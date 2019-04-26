@@ -151,16 +151,4 @@ public class UserService implements UserDetailsService, IUserManager {
             userRepository.save((User)user);
         }
     }
-    
-    @Override
-    public List<IUser> loadUsersByRole() {
-        Iterable<User> users = userRepository.findAll();
-        List<IUser> results = new ArrayList<>();
-        users.iterator().forEachRemaining(u -> {
-            if(u.getRoles()!=null && u.getRoles().contains(new SimpleGrantedAuthority(Role.ADMIN))) {
-                results.add(u);
-            }
-        });
-        return results;
-    }
 }

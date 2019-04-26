@@ -25,7 +25,7 @@ public class EmailNotificationManager implements IEmailNotificationManager {
     private static final Logger logger = LoggerFactory.getLogger(EmailNotificationManager.class);
 
     @Autowired
-    @Qualifier(value = "configFile")
+    @Qualifier(value = "appFile")
     private Properties appProperties;
 
     @Autowired
@@ -54,8 +54,6 @@ public class EmailNotificationManager implements IEmailNotificationManager {
             emailNotificationSender.sendNotificationEmail(user.getEmail(),
                     "New Account Request for " + appProperties.getProperty("app.name"), body,
                     adminList);
-            logger.info("The system sent a user request email to <<" + user.getUsername()
-                    + ">> for the request placed.");
         }
     }
 }

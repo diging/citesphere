@@ -37,7 +37,7 @@
         <email.host></email.host>
         <email.port></email.port>
         <email.username></email.username>
-        <email.pw></email.pw>
+        <email.password></email.password>
         <email.from></email.from>
         <email.enabled>true</email.enabled>
         
@@ -279,12 +279,13 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
         </dependency>
-
-		<dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.5.0-b01</version>
-        </dependency>
+        
+        <dependency>
+        	<groupId>javax.mail</groupId>
+        	<artifactId>mail</artifactId>
+        	<version>1.5.0-b01</version>
+       	</dependency>
+        
         <!-- Validation -->
         <!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
         <dependency>
