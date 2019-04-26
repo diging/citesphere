@@ -28,6 +28,7 @@ public class Creator implements ICreator, Comparable<ICreator> {
     private String id;
     
     private String role;
+    
     @OneToOne(targetEntity=Person.class, cascade=CascadeType.ALL)
     @JoinColumn(name="person_id")
     private IPerson person;
@@ -35,6 +36,14 @@ public class Creator implements ICreator, Comparable<ICreator> {
     // not ideal but ah well, crappy data model
     private int positionInList;
     
+
+    public String getId() {
+        return id;
+    }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICreator#getRole()

@@ -1,10 +1,9 @@
 package edu.asu.diging.citesphere.web.user;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
@@ -25,13 +23,14 @@ import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller
-@PropertySource("classpath:/config.properties")
 public class AddItemController {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${_creation_default_item_type}")
     private String defaultItemType;
+    
+    @Autowired
+    @Qualifier("creatorsFile")
+    private Properties properties;
     
     @Autowired
     private ICitationManager citationManager;
@@ -40,10 +39,11 @@ public class AddItemController {
     private ICitationHelper citationHelper;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create")
-    public String show(Model model, @PathVariable("zoteroGroupId") String zoteroGroupId) {
+    public String show(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId) {
         model.addAttribute("form", new CitationForm());
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("defaultItemType", ItemType.valueOf(defaultItemType));
+        model.addAttribute("creatorMap", properties.entrySet());
         return "auth/group/items/create";
     }
 

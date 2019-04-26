@@ -10,6 +10,15 @@ public class PersonForm {
     private String uri;
     private String localAuthorityId;
     private int position;
+    private String role;
+    
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
     
     private List<AffiliationForm> affiliations;
     
