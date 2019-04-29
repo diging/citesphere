@@ -1,8 +1,12 @@
 package edu.asu.diging.citesphere.web.user;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +27,16 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
+import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
+import edu.asu.diging.citesphere.core.model.bib.impl.Person;
+import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
+import edu.asu.diging.citesphere.web.forms.AffiliationForm;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
+import edu.asu.diging.citesphere.web.forms.PersonForm;
 
 @Controller
 public class EditItemController {
@@ -76,20 +86,20 @@ public class EditItemController {
 	    throws ZoteroConnectionException, GroupDoesNotExistException {
 	ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
 
-	if(form.getVersion() == citation.getVersion()) {
+	if (form.getVersion() == citation.getVersion()) {
 	    // load authors and editors before detaching
 	    citation.getAuthors().forEach(a -> a.getAffiliations().size());
 	    System.out.println(citation.getAuthors().size());
 	    citation.getEditors().forEach(e -> e.getAffiliations().size());
 	    citationManager.detachCitation(citation);
 	    citationHelper.updateCitation(citation, form);
-	    
+
 	    try {
 		citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
 	    } catch (CitationIsOutdatedException e) {
 		System.out.println(e);
 	    }
-	    
+
 	} else {
 	    citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
 	    ICitation currentCitation = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),
@@ -98,6 +108,22 @@ public class EditItemController {
 	    model.addAttribute("currentCitation", currentCitation);
 	    model.addAttribute("form", form);
 	    model.addAttribute("zoteroGroupId", zoteroGroupId);
+
+	    Set<IPerson> currentAuthors = currentCitation.getAuthors();
+	    Set<IPerson> formAuthors = formPersonListToPersonSet(form.getAuthors());
+	    if (!currentAuthors.equals(formAuthors)) {
+		model.addAttribute("authorsChanged", true);
+	    } else {
+		model.addAttribute("authorsChanged", false);
+	    }
+
+	    Set<IPerson> currentEditors = currentCitation.getEditors();
+	    Set<IPerson> formEditors = formPersonListToPersonSet(form.getEditors());
+	    if (!currentEditors.equals(formEditors)) {
+		model.addAttribute("editorsChanged", true);
+	    } else {
+		model.addAttribute("editorsChanged", false);
+	    }
 
 	    List<String> outdatedCitationFields = new ArrayList<>();
 	    citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
@@ -117,6 +143,36 @@ public class EditItemController {
 	    return "auth/group/items/item/edit/conflict";
 	}
 	return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
+    }
+
+    Set<IPerson> formPersonListToPersonSet(List<PersonForm> personForms) {
+	Set<IPerson> set = new HashSet<>();
+
+	if (personForms != null) {
+	    for (PersonForm personForm : personForms) {
+		Person person = new Person();
+		person.setId(personForm.getId());
+		person.setFirstName(personForm.getFirstName());
+		person.setLastName(personForm.getLastName());
+		person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
+		person.setLocalAuthorityId(personForm.getLocalAuthorityId());
+		person.setPositionInList(personForm.getPosition());
+		person.setUri(personForm.getUri());
+		person.setAffiliations(new HashSet<>());
+		if (personForm.getAffiliations() != null) {
+		    for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
+			IAffiliation affiliation = new Affiliation();
+			affiliation.setId(affiliationForm.getId());
+			affiliation.setName(affiliationForm.getName());
+			person.getAffiliations().add(affiliation);
+		    }
+		}
+
+		set.add(person);
+	    }
+	}
+
+	return set;
     }
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/conflict/resolve", method = RequestMethod.POST)

@@ -392,7 +392,7 @@ Do you want to proceed?
 </tr>
 </c:if>
 
-<tr <c:if test="${length(form.authors) != length(outdatedCitation.authors)}" >class="changed"</c:if>>
+<tr <c:if test = "${authorsChanged}">class="changed"</c:if>>
 <td>Authors</td>
 <td>
 <c:forEach items="${form.authors}" var="author" varStatus="status">
@@ -401,10 +401,10 @@ Do you want to proceed?
 </td>
 </tr>
 
-<tr>
+<tr <c:if test = "${editorsChanged}">class="changed"</c:if>>
 <td>Editors</td>
 <td>
-<c:forEach items="${currentCitation.editors}" var="editor" varStatus="status">
+<c:forEach items="${form.editors}" var="editor" varStatus="status">
  ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>
 </c:forEach>
 </td>
@@ -522,6 +522,8 @@ Do you want to proceed?
 <form:hidden path="title" value="${form.title}" />
 <form:hidden path="shortTitle" value="${form.shortTitle}" />
 <form:hidden path="dateFreetext" value="${form.dateFreetext}" />
+<form:hidden path="authors" value="${form.authors}" />
+<form:hidden path="editors" value="${form.editors}" />
 <form:hidden path="publicationTitle" value="${form.publicationTitle}" />
 <form:hidden path="journalAbbreviation" value="${form.journalAbbreviation}" />
 <form:hidden path="volume" value="${form.volume}" />
