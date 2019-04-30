@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.web.user;
+package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -20,6 +20,7 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
+import edu.asu.diging.citesphere.web.user.FoundAuthorities;
 
 @Controller
 public class AuthorityEntryController {
