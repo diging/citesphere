@@ -1,7 +1,5 @@
 package edu.asu.diging.citesphere.web.user;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,12 +24,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
-import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
-import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
+import edu.asu.diging.citesphere.core.model.bib.ItemType;
+import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
+import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.AffiliationForm;

@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.web.forms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
@@ -34,6 +35,11 @@ public class CitationForm {
     
     private List<PersonForm> authors;
     private List<PersonForm> editors;
+    
+    public CitationForm() {
+	authors = new ArrayList<PersonForm>();
+	editors = new ArrayList<PersonForm>();
+    }
     
     public String getKey() {
         return key;

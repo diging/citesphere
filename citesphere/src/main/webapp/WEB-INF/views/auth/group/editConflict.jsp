@@ -5,6 +5,69 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
+<script>
+function constructPersonArray(arrayName){
+		$('.'+arrayName+'-item').each(function(idx, person) {
+		var personIdField = $("<input>");
+		personIdField.attr("type", "hidden");
+		personIdField.attr("id", arrayName+"s" + idx + ".id");
+		personIdField.attr("name", arrayName+"s[" + idx + "].id");
+		personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
+		$("#conflictForm").append(personIdField);
+		
+		var personFirstNameField = $("<input>");
+		personFirstNameField.attr("type", "hidden");
+		personFirstNameField.attr("id", arrayName+"s" + idx + ".firstName");
+		personFirstNameField.attr("name", arrayName+"s[" + idx + "].firstName");
+		personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
+		$("#conflictForm").append(personFirstNameField);
+		
+		var personLastNameField = $("<input>");
+		personLastNameField.attr("type", "hidden");
+		personLastNameField.attr("id", arrayName+"s" + idx + ".lastName");
+		personLastNameField.attr("name", arrayName+"s[" + idx + "].lastName");
+		personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
+		$("#conflictForm").append(personLastNameField);
+		
+		var personUriField = $("<input>");
+		personUriField.attr("type", "hidden");
+		personUriField.attr("id", arrayName+"s" + idx + ".uri");
+		personUriField.attr("name", arrayName+"s[" + idx + "].uri");
+		personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
+		$("#conflictForm").append(personUriField);
+		
+		var personAuthorityField = $("<input>");
+		personAuthorityField.attr("type", "hidden");
+		personAuthorityField.attr("id", arrayName+"s" + idx + ".localAuthorityId");
+		personAuthorityField.attr("name", arrayName+"s[" + idx + "].localAuthorityId");
+		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
+		$("#conflictForm").append(personAuthorityField);
+		
+		$(person).children("span").each(function(idx2, affiliation) {
+			var affiliationField = $("<input>");
+			affiliationField.attr("type", "hidden");
+			affiliationField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".name");
+			affiliationField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].name");
+			affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
+			$("#conflictForm").append(affiliationField);
+			
+			var affiliationIdField = $("<input>");
+			affiliationIdField.attr("type", "hidden");
+			affiliationIdField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".id");
+			affiliationIdField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].id");
+			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
+			$("#conflictForm").append(affiliationIdField);
+		});
+	});
+}
+
+$(function() {
+	$("#conflictFormSubmit").click(function() {
+		constructPersonArray("author");
+		//constructPersonArray("editor");
+	});
+});
+</script>
 <ol class="breadcrumb">
   <li><a href="<c:url value="/" />">Home</a></li>
   <li><a href="<c:url value="/auth/group/${zoteroGroupId}/items" />">Group</a></li>
@@ -395,9 +458,15 @@ Do you want to proceed?
 <tr <c:if test = "${authorsChanged}">class="changed"</c:if>>
 <td>Authors</td>
 <td>
+<span id="authorList">
 <c:forEach items="${form.authors}" var="author" varStatus="status">
- ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach><c:if test="${!status.last}">; </c:if>
+<span id="author${status.index}" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" 
+data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
+ <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span> </c:forEach>
+ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:if test="${!status.last}">; </c:if>
+ </span>
 </c:forEach>
+</span>
 </td>
 </tr>
 
@@ -516,14 +585,12 @@ Do you want to proceed?
 
 <div class="col-md-12">
 <c:url value="/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}/conflict/resolve" var="editUrl" />
-<form:form action="${editUrl}" modelAttribute="form" method="POST">
+<form:form action="${editUrl}" modelAttribute="form" method="POST" id="conflictForm">
 <form:hidden path="key" value="${form.key}" />
 <form:hidden path="itemType" value="${form.itemType}" />
 <form:hidden path="title" value="${form.title}" />
 <form:hidden path="shortTitle" value="${form.shortTitle}" />
 <form:hidden path="dateFreetext" value="${form.dateFreetext}" />
-<form:hidden path="authors" value="${form.authors}" />
-<form:hidden path="editors" value="${form.editors}" />
 <form:hidden path="publicationTitle" value="${form.publicationTitle}" />
 <form:hidden path="journalAbbreviation" value="${form.journalAbbreviation}" />
 <form:hidden path="volume" value="${form.volume}" />
@@ -542,7 +609,7 @@ Do you want to proceed?
 <form:hidden path="callNumber" value="${form.callNumber}" />
 <form:hidden path="rights" value="${form.rights}" />
 
-<button type="submit" class="btn btn-primary">Sounds good, proceed!</button>
+<button id="conflictFormSubmit" type="submit" class="btn btn-primary">Sounds good, proceed!</button>
 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}" />" class="btn btn-default">No, cancel.</a>
 </form:form>
 </div>
