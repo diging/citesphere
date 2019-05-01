@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,18 +197,32 @@ public class EditItemController {
 	    String fieldname = field.getName();
 	    try {
 		field.setAccessible(true);
-		String formValue = field.get(form) != null ? field.get(form).toString() : "";
-		Field citationField = citation.getClass().getDeclaredField(fieldname);
-		citationField.setAccessible(true);
-		String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString()
-			: "";
-		// if values are the same, continue
-		formValue = formValue != null ? formValue : "";
-		citationValue = citationValue != null ? citationValue : "";
+		
+		if(fieldname.equals("authors") || fieldname.equals("editors")) {
+		    
+		    List<PersonForm> formValue = field.get(form) != null ? (List<PersonForm>)field.get(form) : null;
+		    Set<IPerson> formValueSet = formValue != null ? formPersonListToPersonSet(formValue) : null;
+		    Field citationField = citation.getClass().getDeclaredField(fieldname);
+		    citationField.setAccessible(true);
+		    TreeSet<IPerson> citationValue = citationField.get(citation) != null ? (TreeSet<IPerson>)citationField.get(citation) : null;
+		    Set<IPerson> citationValueSet = citationValue != null ? new HashSet<>(citationValue) : null;
+		    
+		    if(!formValueSet.equals(citationValueSet)) {
+			changedFields.add(fieldname);
+		    }
+		    
+		}else {
+		    
+		    String formValue = field.get(form) != null ? field.get(form).toString() : "";
+		    Field citationField = citation.getClass().getDeclaredField(fieldname);
+		    citationField.setAccessible(true);
+		    String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
 
-		if (!formValue.equals(citationValue)) {
-		    changedFields.add(fieldname);
+		    if (!formValue.equals(citationValue)) {
+			changedFields.add(fieldname);
+		    }
 		}
+		
 
 	    } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
 		logger.error("Could ont access field.", e);
@@ -222,18 +237,37 @@ public class EditItemController {
 	for (Field field : allFields) {
 	    String fieldName = field.getName();
 	    if (!changedFields.contains(fieldName)) {
-		try {
-		    Field citationField = citation.getClass().getDeclaredField(fieldName);
-		    citationField.setAccessible(true);
-		    String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString()
-			    : "";
-		    field.setAccessible(true);
-		    field.set(form, citationValue);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-			| IllegalAccessException e) {
-		    logger.error("Could ont access field.", e);
-		    // let's ignore that for nonw
+		
+		if(fieldName.equals("authors") || fieldName.equals("editors")) {
+		    try {
+			Field citationField = citation.getClass().getDeclaredField(fieldName);
+			citationField.setAccessible(true);
+			TreeSet<IPerson> citationValue = citationField.get(citation) != null ? (TreeSet<IPerson>)citationField.get(citation) : null;
+			field.setAccessible(true);
+			field.set(form, citationValue);
+		    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+				| IllegalAccessException e) {
+			    
+			logger.error("Could ont access field.", e);
+			// let's ignore that for nonw
+		    }
+		}else {
+		    
+		    try {
+			Field citationField = citation.getClass().getDeclaredField(fieldName);
+			citationField.setAccessible(true);
+			String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
+			field.setAccessible(true);
+			field.set(form, citationValue);
+		    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+				| IllegalAccessException e) {
+			    
+			logger.error("Could ont access field.", e);
+			// let's ignore that for nonw
+		    }
+		    
 		}
+		
 	    }
 	}
     }
