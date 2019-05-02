@@ -30,6 +30,7 @@ import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
+import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
@@ -55,8 +56,13 @@ public class EditItemController {
 	ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
 	model.addAttribute("zoteroGroupId", zoteroGroupId);
 	model.addAttribute("citation", citation);
+
 	if (model.containsAttribute("resolvedForm")) {
-	    model.addAttribute("form", model.asMap().get("resolvedForm"));
+
+	    CitationForm resolvedCitationForm = (CitationForm) model.asMap().get("resolvedForm");
+	    ICitation resolvedCitation = convertCitationFormToObject(resolvedCitationForm);
+	    model.addAttribute("form", resolvedCitation);
+
 	} else {
 	    model.addAttribute("form", form);
 	}
@@ -86,17 +92,28 @@ public class EditItemController {
 	ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
 
 	if (form.getVersion() == citation.getVersion()) {
-	    // load authors and editors before detaching
-	    citation.getAuthors().forEach(a -> a.getAffiliations().size());
-	    System.out.println(citation.getAuthors().size());
-	    citation.getEditors().forEach(e -> e.getAffiliations().size());
-	    citationManager.detachCitation(citation);
-	    citationHelper.updateCitation(citation, form);
 
-	    try {
-		citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
-	    } catch (CitationIsOutdatedException e) {
-		System.out.println(e);
+	    if (!form.getIsResolved()) {
+		// load authors and editors before detaching
+		citation.getAuthors().forEach(a -> a.getAffiliations().size());
+		System.out.println(citation.getAuthors().size());
+		citation.getEditors().forEach(e -> e.getAffiliations().size());
+		citationManager.detachCitation(citation);
+		citationHelper.updateCitation(citation, form);
+
+		try {
+		    citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+		} catch (CitationIsOutdatedException e) {
+		    System.out.println(e);
+		}
+	    } else {
+		ICitation updatedCitation = convertCitationFormToObject(form);
+		try {
+		    citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
+			    updatedCitation);
+		} catch (CitationIsOutdatedException e) {
+		    System.out.println(e);
+		}
 	    }
 
 	} else {
@@ -197,32 +214,34 @@ public class EditItemController {
 	    String fieldname = field.getName();
 	    try {
 		field.setAccessible(true);
-		
-		if(fieldname.equals("authors") || fieldname.equals("editors")) {
-		    
-		    List<PersonForm> formValue = field.get(form) != null ? (List<PersonForm>)field.get(form) : null;
+
+		if (fieldname.equals("authors") || fieldname.equals("editors")) {
+
+		    List<PersonForm> formValue = field.get(form) != null ? (List<PersonForm>) field.get(form) : null;
 		    Set<IPerson> formValueSet = formValue != null ? formPersonListToPersonSet(formValue) : null;
 		    Field citationField = citation.getClass().getDeclaredField(fieldname);
 		    citationField.setAccessible(true);
-		    TreeSet<IPerson> citationValue = citationField.get(citation) != null ? (TreeSet<IPerson>)citationField.get(citation) : null;
+		    TreeSet<IPerson> citationValue = citationField.get(citation) != null
+			    ? (TreeSet<IPerson>) citationField.get(citation)
+			    : null;
 		    Set<IPerson> citationValueSet = citationValue != null ? new HashSet<>(citationValue) : null;
-		    
-		    if(!formValueSet.equals(citationValueSet)) {
+
+		    if (!formValueSet.equals(citationValueSet)) {
 			changedFields.add(fieldname);
 		    }
-		    
-		}else {
-		    
+
+		} else {
+
 		    String formValue = field.get(form) != null ? field.get(form).toString() : "";
 		    Field citationField = citation.getClass().getDeclaredField(fieldname);
 		    citationField.setAccessible(true);
-		    String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
+		    String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString()
+			    : "";
 
 		    if (!formValue.equals(citationValue)) {
 			changedFields.add(fieldname);
 		    }
 		}
-		
 
 	    } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
 		logger.error("Could ont access field.", e);
@@ -237,38 +256,87 @@ public class EditItemController {
 	for (Field field : allFields) {
 	    String fieldName = field.getName();
 	    if (!changedFields.contains(fieldName)) {
-		
-		if(fieldName.equals("authors") || fieldName.equals("editors")) {
+
+		if (fieldName.equals("authors") || fieldName.equals("editors")) {
 		    try {
 			Field citationField = citation.getClass().getDeclaredField(fieldName);
 			citationField.setAccessible(true);
-			TreeSet<IPerson> citationValue = citationField.get(citation) != null ? (TreeSet<IPerson>)citationField.get(citation) : null;
+			TreeSet<IPerson> citationValue = citationField.get(citation) != null
+				? (TreeSet<IPerson>) citationField.get(citation)
+				: null;
 			field.setAccessible(true);
 			field.set(form, citationValue);
 		    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-				| IllegalAccessException e) {
-			    
+			    | IllegalAccessException e) {
+
 			logger.error("Could ont access field.", e);
 			// let's ignore that for nonw
 		    }
-		}else {
-		    
+		} else {
+
 		    try {
 			Field citationField = citation.getClass().getDeclaredField(fieldName);
 			citationField.setAccessible(true);
-			String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
+			String citationValue = citationField.get(citation) != null
+				? citationField.get(citation).toString()
+				: "";
 			field.setAccessible(true);
 			field.set(form, citationValue);
 		    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-				| IllegalAccessException e) {
-			    
+			    | IllegalAccessException e) {
+
 			logger.error("Could ont access field.", e);
 			// let's ignore that for nonw
 		    }
-		    
+
 		}
-		
+
 	    }
 	}
+    }
+
+    private ICitation convertCitationFormToObject(CitationForm citationForm) {
+
+	List<PersonForm> authorForms = citationForm.getAuthors();
+	Set<IPerson> authors = formPersonListToPersonSet(authorForms);
+
+	List<PersonForm> editorForms = citationForm.getEditors();
+	Set<IPerson> editors = formPersonListToPersonSet(editorForms);
+
+	ICitation citation = new Citation();
+	citation.setAbstractNote(citationForm.getAbstractNote());
+	// citation.setAccessDate();
+	citation.setArchive(citationForm.getArchive());
+	citation.setArchiveLocation(citationForm.getArchiveLocation());
+	citation.setAuthors(authors);
+	citation.setCallNumber(citationForm.getCallNumber());
+	// citation.setDate();
+	// citation.setDateAdded();
+	citation.setDateFreetext(citationForm.getDateFreetext());
+	// citation.setDateModified();
+	citation.setDoi(citationForm.getDoi());
+	citation.setEditors(editors);
+	// citation.setExtra();
+	// citation.setGroup();
+	citation.setIssn(citationForm.getIssn());
+	citation.setIssue(citationForm.getIssue());
+	citation.setItemType(citationForm.getItemType());
+	citation.setJournalAbbreviation(citationForm.getJournalAbbreviation());
+	citation.setKey(citationForm.getKey());
+	citation.setLanguage(citationForm.getLanguage());
+	citation.setLibraryCatalog(citationForm.getLibraryCatalog());
+	// citation.setOtherCreators();
+	citation.setPages(citationForm.getPages());
+	citation.setPublicationTitle(citationForm.getPublicationTitle());
+	citation.setRights(citationForm.getRights());
+	citation.setSeries(citationForm.getSeries());
+	citation.setSeriesText(citationForm.getSeriesText());
+	citation.setSeriesTitle(citationForm.getSeriesTitle());
+	citation.setTitle(citationForm.getTitle());
+	citation.setUrl(citationForm.getUrl());
+	citation.setVersion(citationForm.getVersion());
+	citation.setVolume(citationForm.getVolume());
+
+	return citation;
     }
 }

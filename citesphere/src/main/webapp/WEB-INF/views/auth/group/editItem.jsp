@@ -369,8 +369,14 @@ let removePerson = function removePerson(e) {
   <li class="active">${citation.key}</li>
 </ol>
 
+<c:set var="authors" value="${citation.authors}" />
+
+<c:if test="${not empty resolvedForm}" >
+	<c:set var="authors" value="${form.authors}" />
+</c:if>
+
 <h2>
-	 <c:forEach items="${citation.authors}" var="author" varStatus="status">
+	 <c:forEach items="${authors}" var="author" varStatus="status">
 	 	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
 	 </c:forEach>
 	 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
@@ -444,7 +450,7 @@ let removePerson = function removePerson(e) {
 <td>Authors</td>
 <td>
 <span id="authorList" style="font-size: 18px">
-<c:forEach items="${citation.authors}" var="author" varStatus="status">
+<c:forEach items="${authors}" var="author" varStatus="status">
 <span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
 <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
@@ -564,7 +570,15 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <td><form:input path="rights" type="text" class="form-control" placeholder="Rights" value="${not empty form.rights ? form.rights : citation.rights}" /></td>
 </tr>
 
-<form:input path="version" type="text" class="form-control" value="${citation.version}" />
+<form:input path="version" type="hidden" class="form-control" value="${citation.version}" />
+
+<c:if test="${not empty resolvedForm}">
+<form:input path="isResolved" type="hidden" class="form-control" value="true" />
+</c:if>
+
+<c:if test="${empty resolvedForm}">
+<form:input path="isResolved" type="hidden" class="form-control" value="false />
+</c:if>
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
