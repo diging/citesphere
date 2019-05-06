@@ -14,7 +14,7 @@
   <li class="active">${form.name}</li>
 </ol>
 <h2>
-	<strong>${form.name}</strong>	  
+	<strong>Edit Authority Entry: ${form.name}</strong>	  
 </h2>
 
 <c:url value="/auth/authority/${authorityId}/edit" var="processingUrl" />
@@ -26,9 +26,9 @@
 
 <label>Description:</label>
 <form:input path="description" type="text" class="form-control" placeholder="Description" value="${form.description}" ></form:input>
-
+<br>
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
 <a href="<c:url value="/auth/authority/list" />" class="btn btn-default">
-		<i class="fa fa-times"></i>&nbsp;Cancel 
+		<i class="fa fa-times"></i>&nbsp;Cancel
 </a>
 </form:form>

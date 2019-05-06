@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
 import java.net.URISyntaxException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -195,5 +196,32 @@ public class AuthorityServiceTest {
 
         List<IAuthorityEntry> actual = managerToTest.findByUri(user, uri);
         Assert.assertTrue(actual.isEmpty());
+    }
+    
+    @Test
+    public void test_create() {
+        String username = "user";
+        IAuthorityEntry entry = new AuthorityEntry();
+        IUser user = new User();
+        user.setUsername(username);
+        Mockito.when(managerToTest.save(entry)).thenReturn(entry);
+
+        IAuthorityEntry actualEntry = managerToTest.create(entry, user);
+        Assert.assertEquals(username, actualEntry.getUsername());
+    }
+    
+    @Test
+    public void test_save() {
+        String id = "id";
+        String name = "name";
+        String uri = "uri";
+        AuthorityEntry entry = new AuthorityEntry();
+        entry.setId(id);
+        entry.setName(name);
+        entry.setUri(uri);
+        Mockito.when(entryRepository.save(entry)).thenReturn(entry);
+        
+        IAuthorityEntry actualEntry = managerToTest.save(entry);
+        Assert.assertEquals(entry, actualEntry);        
     }
 }
