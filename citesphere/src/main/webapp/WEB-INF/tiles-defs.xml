@@ -59,6 +59,9 @@
     <definition name="auth/concepts/add" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/concepts/add.jsp" />    
     </definition>
+    <definition name="auth/concepts/edit" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/concepts/edit.jsp" />    
+    </definition>
     
     <!-- Concept Types -->
     <definition name="auth/concepts/types/list" extends="base.definition">

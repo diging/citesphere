@@ -20,6 +20,7 @@
 <th>Name</th>
 <th>Description</th>
 <th>Created on</th>
+<th></th>
 </tr>
 <c:forEach items="${concepts}" var="concept">
 <tr id="tr-${concept.id}">
@@ -27,6 +28,7 @@
 <td>${concept.name}</td>
 <td>${concept.description}</td>
 <td><span class="date">${concept.createdOn}</span></td>
+<td><a href="<c:url value="/auth/concepts/edit" />"><i class="far fa-edit" title="Edit"></i></a></td>
 </tr>
 </c:forEach>
 </table>
