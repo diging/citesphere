@@ -50,7 +50,7 @@ public class EditAuthorityController {
         else {
             entry.setName(form.getName());
             entry.setDescription(form.getDescription());
-            authorityService.save(entry, user);            
+            authorityService.save(entry);            
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Managed authority was successfully saved.");
             redirectAttributes.addFlashAttribute("alert_type", "success");

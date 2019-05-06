@@ -16,7 +16,7 @@ public interface IAuthorityService {
 
     IAuthorityEntry importAuthority(String uri)  throws AuthorityServiceConnectionException, URISyntaxException;
 
-    IAuthorityEntry save(IAuthorityEntry entry, IUser user);
+    IAuthorityEntry save(IAuthorityEntry entry);
 
     List<IAuthorityEntry> getAll(IUser user);
 

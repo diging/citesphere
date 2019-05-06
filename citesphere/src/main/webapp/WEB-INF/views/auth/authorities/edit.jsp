@@ -5,11 +5,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-<style>
-.popover {
-	min-width: 300px;
-}
-</style>
 <script>
 </script>
 
