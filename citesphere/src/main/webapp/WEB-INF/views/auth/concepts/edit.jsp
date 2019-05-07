@@ -31,7 +31,7 @@
 <form:input path="uri" type="text" class="form-control" placeholder="URI" value="${form.uri}" ></form:input>
 <br>
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
-<a href="<c:url value="auth/concepts/list" />" class="btn btn-default">
+<a href="<c:url value="/auth/concepts/list" />" class="btn btn-default">
 		<i class="fa fa-times"></i>&nbsp;Cancel 
 </a>
 </form:form>
