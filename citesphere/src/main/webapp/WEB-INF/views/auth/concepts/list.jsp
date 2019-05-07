@@ -28,7 +28,7 @@
 <td>${concept.name}</td>
 <td>${concept.description}</td>
 <td><span class="date">${concept.createdOn}</span></td>
-<td><a href="<c:url value="/auth/concepts/edit" />"><i class="far fa-edit" title="Edit"></i></a></td>
+<td><a href="<c:url value="/auth/concepts/${concept.id}/edit" />"><i class="far fa-edit" title="Edit"></i></a></td>
 </tr>
 </c:forEach>
 </table>
