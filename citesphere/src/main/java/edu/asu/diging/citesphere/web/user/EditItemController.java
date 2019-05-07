@@ -30,7 +30,6 @@ import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
-import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
@@ -56,16 +55,20 @@ public class EditItemController {
 	ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
 	model.addAttribute("zoteroGroupId", zoteroGroupId);
 	model.addAttribute("citation", citation);
+	model.addAttribute("form", form);
 
 	if (model.containsAttribute("resolvedForm")) {
-
 	    CitationForm resolvedCitationForm = (CitationForm) model.asMap().get("resolvedForm");
-	    ICitation resolvedCitation = convertCitationFormToObject(resolvedCitationForm);
-	    model.addAttribute("form", resolvedCitation);
 
-	} else {
-	    model.addAttribute("form", form);
+	    Set<IPerson> resolvedAuthorSet = personFormListToPersonSet(resolvedCitationForm.getAuthors());
+	    model.addAttribute("resolvedAuthors", resolvedAuthorSet);
+
+	    Set<IPerson> resolvedEditorSet = personFormListToPersonSet(resolvedCitationForm.getEditors());
+	    model.addAttribute("resolvedEditors", resolvedEditorSet);
+	    
+	    model.addAttribute("form", resolvedCitationForm);
 	}
+
 	List<String> fields = new ArrayList<>();
 	citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
 		.forEach(f -> fields.add(f.getFilename()));
@@ -93,27 +96,17 @@ public class EditItemController {
 
 	if (form.getVersion() == citation.getVersion()) {
 
-	    if (!form.getIsResolved()) {
-		// load authors and editors before detaching
-		citation.getAuthors().forEach(a -> a.getAffiliations().size());
-		System.out.println(citation.getAuthors().size());
-		citation.getEditors().forEach(e -> e.getAffiliations().size());
-		citationManager.detachCitation(citation);
-		citationHelper.updateCitation(citation, form);
+	    // load authors and editors before detaching
+	    citation.getAuthors().forEach(a -> a.getAffiliations().size());
+	    System.out.println(citation.getAuthors().size());
+	    citation.getEditors().forEach(e -> e.getAffiliations().size());
+	    citationManager.detachCitation(citation);
+	    citationHelper.updateCitation(citation, form);
 
-		try {
-		    citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
-		} catch (CitationIsOutdatedException e) {
-		    System.out.println(e);
-		}
-	    } else {
-		ICitation updatedCitation = convertCitationFormToObject(form);
-		try {
-		    citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
-			    updatedCitation);
-		} catch (CitationIsOutdatedException e) {
-		    System.out.println(e);
-		}
+	    try {
+		citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+	    } catch (CitationIsOutdatedException e) {
+		System.out.println(e);
 	    }
 
 	} else {
@@ -126,7 +119,7 @@ public class EditItemController {
 	    model.addAttribute("zoteroGroupId", zoteroGroupId);
 
 	    Set<IPerson> currentAuthors = currentCitation.getAuthors();
-	    Set<IPerson> formAuthors = formPersonListToPersonSet(form.getAuthors());
+	    Set<IPerson> formAuthors = personFormListToPersonSet(form.getAuthors());
 	    if (!currentAuthors.equals(formAuthors)) {
 		model.addAttribute("authorsChanged", true);
 	    } else {
@@ -134,7 +127,7 @@ public class EditItemController {
 	    }
 
 	    Set<IPerson> currentEditors = currentCitation.getEditors();
-	    Set<IPerson> formEditors = formPersonListToPersonSet(form.getEditors());
+	    Set<IPerson> formEditors = personFormListToPersonSet(form.getEditors());
 	    if (!currentEditors.equals(formEditors)) {
 		model.addAttribute("editorsChanged", true);
 	    } else {
@@ -161,7 +154,7 @@ public class EditItemController {
 	return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
     }
 
-    Set<IPerson> formPersonListToPersonSet(List<PersonForm> personForms) {
+    private Set<IPerson> personFormListToPersonSet(List<PersonForm> personForms) {
 	Set<IPerson> set = new HashSet<>();
 
 	if (personForms != null) {
@@ -195,9 +188,7 @@ public class EditItemController {
     public String resolveConflict(@ModelAttribute CitationForm form, Authentication authentication,
 	    @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
 	    RedirectAttributes redirectAttrs) throws GroupDoesNotExistException {
-	// ICitation outdatedCitation =
-	// citationManager.getCitation((IUser)authentication.getPrincipal(),
-	// zoteroGroupId, itemId);
+
 	ICitation citation = citationManager.updateCitationFromZotero((IUser) authentication.getPrincipal(),
 		zoteroGroupId, itemId);
 	List<String> changedFields = compare(citation, form);
@@ -218,7 +209,7 @@ public class EditItemController {
 		if (fieldname.equals("authors") || fieldname.equals("editors")) {
 
 		    List<PersonForm> formValue = field.get(form) != null ? (List<PersonForm>) field.get(form) : null;
-		    Set<IPerson> formValueSet = formValue != null ? formPersonListToPersonSet(formValue) : null;
+		    Set<IPerson> formValueSet = formValue != null ? personFormListToPersonSet(formValue) : null;
 		    Field citationField = citation.getClass().getDeclaredField(fieldname);
 		    citationField.setAccessible(true);
 		    TreeSet<IPerson> citationValue = citationField.get(citation) != null
@@ -293,50 +284,5 @@ public class EditItemController {
 
 	    }
 	}
-    }
-
-    private ICitation convertCitationFormToObject(CitationForm citationForm) {
-
-	List<PersonForm> authorForms = citationForm.getAuthors();
-	Set<IPerson> authors = formPersonListToPersonSet(authorForms);
-
-	List<PersonForm> editorForms = citationForm.getEditors();
-	Set<IPerson> editors = formPersonListToPersonSet(editorForms);
-
-	ICitation citation = new Citation();
-	citation.setAbstractNote(citationForm.getAbstractNote());
-	// citation.setAccessDate();
-	citation.setArchive(citationForm.getArchive());
-	citation.setArchiveLocation(citationForm.getArchiveLocation());
-	citation.setAuthors(authors);
-	citation.setCallNumber(citationForm.getCallNumber());
-	// citation.setDate();
-	// citation.setDateAdded();
-	citation.setDateFreetext(citationForm.getDateFreetext());
-	// citation.setDateModified();
-	citation.setDoi(citationForm.getDoi());
-	citation.setEditors(editors);
-	// citation.setExtra();
-	// citation.setGroup();
-	citation.setIssn(citationForm.getIssn());
-	citation.setIssue(citationForm.getIssue());
-	citation.setItemType(citationForm.getItemType());
-	citation.setJournalAbbreviation(citationForm.getJournalAbbreviation());
-	citation.setKey(citationForm.getKey());
-	citation.setLanguage(citationForm.getLanguage());
-	citation.setLibraryCatalog(citationForm.getLibraryCatalog());
-	// citation.setOtherCreators();
-	citation.setPages(citationForm.getPages());
-	citation.setPublicationTitle(citationForm.getPublicationTitle());
-	citation.setRights(citationForm.getRights());
-	citation.setSeries(citationForm.getSeries());
-	citation.setSeriesText(citationForm.getSeriesText());
-	citation.setSeriesTitle(citationForm.getSeriesTitle());
-	citation.setTitle(citationForm.getTitle());
-	citation.setUrl(citationForm.getUrl());
-	citation.setVersion(citationForm.getVersion());
-	citation.setVolume(citationForm.getVolume());
-
-	return citation;
     }
 }

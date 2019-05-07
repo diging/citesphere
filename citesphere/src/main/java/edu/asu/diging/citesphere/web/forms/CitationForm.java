@@ -33,8 +33,8 @@ public class CitationForm {
     private String libraryCatalog;
     private String callNumber;
     private String rights;
+    private String resolved;
     private long version;
-    private boolean isResolved;
     
     private List<PersonForm> authors;
     private List<PersonForm> editors;
@@ -200,10 +200,10 @@ public class CitationForm {
     public void setEditors(List<PersonForm> editors) {
         this.editors = editors;
     }
-    public boolean getIsResolved() {
-	return isResolved;
+    public String getResolved() {
+	return resolved;
     }
-    public void setIsResolved(boolean isResolved) {
-	this.isResolved = isResolved;
+    public void setResolved(String resolved) {
+	this.resolved = resolved;
     }
 }

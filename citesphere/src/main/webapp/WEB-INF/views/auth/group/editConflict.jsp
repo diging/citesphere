@@ -9,6 +9,7 @@
 $(function() {
 	$("#conflictFormSubmit").click(function() {
 		constructPersonArray("author");
+		constructPersonArray("editor");
 	});
 });
 
@@ -92,167 +93,6 @@ Do you want to proceed?
  	  </c:if> 
 </h2>
 
-<!--  currently stored citation  -->
-<!--  <div class="col-md-4">
-<h4>Currently stored data (Version ${outdatedCitation.version})</h4>
-<table class="table table-striped">
-<tr>
-<td width="20%">Item Key</td>
-<td>${outdatedCitation.key}</td>
-</tr>
-<tr>
-<td>Citation Type</td>
-<td>
-<spring:eval expression="@iconsResource.getProperty(outdatedCitation.itemType + '_icon')"  var="iconClass" />
-<spring:eval expression="@iconsResource.getProperty(outdatedCitation.itemType + '_label')"  var="iconLabel" />	
-<c:if test="${empty iconClass}">
-<c:set var="iconClass" value="fas fa-file" />
-</c:if>
-<c:if test="${empty iconLabel}">
-<c:set var="iconLabel" value="${entry.itemType}" />
-</c:if>
-<i class="${iconClass}" title="${iconLabel}"></i> ${iconLabel}
-</td>
-</tr>
-<c:if test="${fn:contains(outdatedCitationFields, 'title') }">
-<tr>
-<td>Title</td>
-<td>${outdatedCitation.title}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'shortTitle') }">
-<tr>
-<td>Short Title</td>
-<td>${outdatedCitation.shortTitle}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'date') }">
-<tr>
-<td>Date</td>
-<td>${outdatedCitation.dateFreetext}</td>
-</tr>
-</c:if>
-<tr>
-<td>Authors</td>
-<td>
-<c:forEach items="${outdatedCitation.authors}" var="author" varStatus="status">
- ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"> (${aff.name})</c:forEach><c:if test="${!status.last}">; </c:if>
-</c:forEach>
-</td>
-</tr>
-<tr>
-<td>Editors</td>
-<td>
-<c:forEach items="${outdatedCitation.editors}" var="editor" varStatus="status">
- ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>
-</c:forEach>
-</td>
-</tr>
-<c:if test="${fn:contains(outdatedCitationFields, 'publicationTitle') }">
-<tr>
-<td>Publication Title</td>
-<td>${outdatedCitation.publicationTitle}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'journalAbbreviation') }">
-<tr>
-<td>Journal Abbreviation</td>
-<td>${outdatedCitation.journalAbbreviation}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'volume') }">
-<tr>
-<td>Volume</td>
-<td>${outdatedCitation.volume}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'issue') }">
-<tr>
-<td>Issue</td>
-<td>${outdatedCitation.issue}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'pages') }">
-<tr>
-<td>Pages</td>
-<td>${outdatedCitation.pages}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'series') }">
-<tr>
-<td>Series</td>
-<td>${outdatedCitation.series}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'seriesTitle') }">
-<tr>
-<td>Series Title</td>
-<td>${outdatedCitation.seriesTitle}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'seriesText') }">
-<tr>
-<td>Series Text</td>
-<td>${outdatedCitation.seriesText}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'url') }">
-<tr>
-<td>URL</td>
-<td><a href="${outdatedCitation.url}">${outdatedCitation.url}</a></td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'language') }">
-<tr>
-<td>Language</td>
-<td>${outdatedCitation.language}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'doi') }">
-<tr>
-<td>DOI</td>
-<td>${outdatedCitation.doi}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'issn') }">
-<tr>
-<td>ISSN</td>
-<td>${outdatedCitation.issn}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'archive') }">
-<tr>
-<td>Archive</td>
-<td>${outdatedCitation.archive}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'archiveLocation') }">
-<tr>
-<td>Archive Location</td>
-<td>${outdatedCitation.archiveLocation}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'libraryCatalog') }">
-<tr>
-<td>Library Catalog</td>
-<td>${outdatedCitation.libraryCatalog}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'callNumber') }">
-<tr>
-<td>Call Number</td>
-<td>${outdatedCitation.callNumber}</td>
-</tr>
-</c:if>
-<c:if test="${fn:contains(outdatedCitationFields, 'rights') }">
-<tr>
-<td>Rights</td>
-<td>${outdatedCitation.rights}</td>
-</tr>
-</c:if>
-</table>
-</div> -->
-
 <!--  current citation fields -->
 <div class="col-md-4">
 <h4>Data retrieved from Zotero (Version ${currentCitation.version})</h4>
@@ -276,19 +116,19 @@ Do you want to proceed?
 </td>
 </tr>
 <c:if test="${fn:contains(currentCitationFields, 'title') }">
-<tr  <c:if test="${currentCitation.title != outdatedCitation.title}" >class="changed"</c:if>>
+<tr>
 <td>Title</td>
 <td>${currentCitation.title}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'shortTitle') }">
-<tr  <c:if test="${currentCitation.shortTitle != outdatedCitation.shortTitle}" >class="changed"</c:if>>
+<tr>
 <td>Short Title</td>
 <td>${currentCitation.shortTitle}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'date') }">
-<tr  <c:if test="${currentCitation.dateFreetext != outdatedCitation.dateFreetext}" >class="changed"</c:if>>
+<tr>
 <td>Date</td>
 <td>${currentCitation.dateFreetext}</td>
 </tr>
@@ -310,103 +150,103 @@ Do you want to proceed?
 </td>
 </tr>
 <c:if test="${fn:contains(currentCitationFields, 'publicationTitle') }">
-<tr  <c:if test="${currentCitation.publicationTitle != outdatedCitation.publicationTitle}" >class="changed"</c:if>>
+<tr>
 <td>Publication Title</td>
 <td>${currentCitation.publicationTitle}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'journalAbbreviation') }">
-<tr  <c:if test="${currentCitation.journalAbbreviation != outdatedCitation.journalAbbreviation}" >class="changed"</c:if>>
+<tr>
 <td>Journal Abbreviation</td>
 <td>${currentCitation.journalAbbreviation}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'volume') }">
-<tr  <c:if test="${currentCitation.volume != outdatedCitation.volume}" >class="changed"</c:if>>
+<tr>
 <td>Volume</td>
 <td>${currentCitation.volume}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'issue') }">
-<tr  <c:if test="${currentCitation.issue != outdatedCitation.issue}" >class="changed"</c:if>>
+<tr>
 <td>Issue</td>
 <td>${currentCitation.issue}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'pages') }">
-<tr  <c:if test="${currentCitation.pages != outdatedCitation.pages}" >class="changed"</c:if>>
+<tr>
 <td>Pages</td>
 <td>${currentCitation.pages}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'series') }">
-<tr  <c:if test="${currentCitation.series != outdatedCitation.series}" >class="changed"</c:if>>
+<tr>
 <td>Series</td>
 <td>${currentCitation.series}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'seriesTitle') }">
-<tr <c:if test="${currentCitation.seriesTitle != outdatedCitation.seriesTitle}" >class="changed"</c:if>>
+<tr>
 <td>Series Title</td>
 <td >${currentCitation.seriesTitle}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'seriesText') }">
-<tr  <c:if test="${currentCitation.seriesText != outdatedCitation.seriesText}" >class="changed"</c:if>>
+<tr>
 <td>Series Text</td>
 <td>${currentCitation.seriesText}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'url') }">
-<tr  <c:if test="${currentCitation.url != outdatedCitation.url}" >class="changed"</c:if>>
+<tr>
 <td>URL</td>
 <td><a href="${currentCitation.url}">${currentCitation.url}</a></td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'language') }">
-<tr  <c:if test="${currentCitation.language != outdatedCitation.language}" >class="changed"</c:if>>
+<tr>
 <td>Language</td>
 <td>${currentCitation.language}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'doi') }">
-<tr  <c:if test="${currentCitation.doi != outdatedCitation.doi}" >class="changed"</c:if>>
+<tr>
 <td>DOI</td>
 <td>${currentCitation.doi}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'issn') }">
-<tr  <c:if test="${currentCitation.issn != outdatedCitation.issn}" >class="changed"</c:if>>
+<tr>
 <td>ISSN</td>
 <td>${currentCitation.issn}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'archive') }">
-<tr  <c:if test="${currentCitation.archive != outdatedCitation.archive}" >class="changed"</c:if>>
+<tr>
 <td>Archive</td>
 <td>${currentCitation.archive}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'archiveLocation') }">
-<tr  <c:if test="${currentCitation.archiveLocation != outdatedCitation.archiveLocation}" >class="changed"</c:if>>
+<tr>
 <td>Archive Location</td>
 <td>${currentCitation.archiveLocation}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'libraryCatalog') }">
-<tr  <c:if test="${currentCitation.libraryCatalog != outdatedCitation.libraryCatalog}" >class="changed"</c:if>>
+<tr>
 <td>Library Catalog</td>
 <td>${currentCitation.libraryCatalog}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'callNumber') }">
-<tr  <c:if test="${currentCitation.callNumber != outdatedCitation.callNumber}" >class="changed"</c:if>>
+<tr>
 <td>Call Number</td>
 <td>${currentCitation.callNumber}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(currentCitationFields, 'rights') }">
-<tr  <c:if test="${currentCitation.rights != outdatedCitation.rights}" >class="changed"</c:if>>
+<tr>
 <td>Rights</td>
 <td>${currentCitation.rights}</td>
 </tr>
@@ -438,19 +278,19 @@ Do you want to proceed?
 </td>
 </tr>
 <c:if test="${fn:contains(formFields, 'title') }">
-<tr  <c:if test="${form.title != outdatedCitation.title}" >class="changed"</c:if>>
+<tr  <c:if test="${form.title != currentCitation.title}" >class="changed"</c:if>>
 <td>Title</td>
 <td>${form.title}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'shortTitle') }">
-<tr  <c:if test="${form.shortTitle != outdatedCitation.shortTitle}" >class="changed"</c:if>>
+<tr  <c:if test="${form.shortTitle != currentCitation.shortTitle}" >class="changed"</c:if>>
 <td>Short Title</td>
 <td>${form.shortTitle}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'date') }">
-<tr  <c:if test="${form.dateFreetext != outdatedCitation.dateFreetext}" >class="changed"</c:if>>
+<tr  <c:if test="${form.dateFreetext != currentCitation.dateFreetext}" >class="changed"</c:if>>
 <td>Date</td>
 <td>${form.dateFreetext}</td>
 </tr>
@@ -474,109 +314,115 @@ data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorit
 <tr <c:if test = "${editorsChanged}">class="changed"</c:if>>
 <td>Editors</td>
 <td>
+<span id="editorList">
 <c:forEach items="${form.editors}" var="editor" varStatus="status">
+ <!-- ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>  -->
+ <span id="editor${status.index}" class="editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" 
+data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
+ <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span> </c:forEach>
  ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:if test="${!status.last}">; </c:if>
+ </span>
 </c:forEach>
 </td>
 </tr>
 <c:if test="${fn:contains(formFields, 'publicationTitle') }">
-<tr  <c:if test="${form.publicationTitle != outdatedCitation.publicationTitle}" >class="changed"</c:if>>
+<tr  <c:if test="${form.publicationTitle != currentCitation.publicationTitle}" >class="changed"</c:if>>
 <td>Publication Title</td>
 <td>${form.publicationTitle}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'journalAbbreviation') }">
-<tr  <c:if test="${form.journalAbbreviation != outdatedCitation.journalAbbreviation}" >class="changed"</c:if>>
+<tr  <c:if test="${form.journalAbbreviation != currentCitation.journalAbbreviation}" >class="changed"</c:if>>
 <td>Journal Abbreviation</td>
 <td>${form.journalAbbreviation}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'volume') }">
-<tr  <c:if test="${form.volume != outdatedCitation.volume}" >class="changed"</c:if>>
+<tr  <c:if test="${form.volume != currentCitation.volume}" >class="changed"</c:if>>
 <td>Volume</td>
 <td>${form.volume}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'issue') }">
-<tr  <c:if test="${form.issue != outdatedCitation.issue}" >class="changed"</c:if>>
+<tr  <c:if test="${form.issue != currentCitation.issue}" >class="changed"</c:if>>
 <td>Issue</td>
 <td>${form.issue}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'pages') }">
-<tr  <c:if test="${form.pages != outdatedCitation.pages}" >class="changed"</c:if>>
+<tr  <c:if test="${form.pages != currentCitation.pages}" >class="changed"</c:if>>
 <td>Pages</td>
 <td>${form.pages}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'series') }">
-<tr  <c:if test="${form.series != outdatedCitation.series}" >class="changed"</c:if>>
+<tr  <c:if test="${form.series != currentCitation.series}" >class="changed"</c:if>>
 <td>Series</td>
 <td>${form.series}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'seriesTitle') }">
-<tr <c:if test="${form.seriesTitle != outdatedCitation.seriesTitle}" >class="changed"</c:if>>
+<tr <c:if test="${form.seriesTitle != currentCitation.seriesTitle}" >class="changed"</c:if>>
 <td>Series Title</td>
 <td >${form.seriesTitle}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'seriesText') }">
-<tr  <c:if test="${form.seriesText != outdatedCitation.seriesText}" >class="changed"</c:if>>
+<tr  <c:if test="${form.seriesText != currentCitation.seriesText}" >class="changed"</c:if>>
 <td>Series Text</td>
 <td>${form.seriesText}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'url') }">
-<tr  <c:if test="${form.url != outdatedCitation.url}" >class="changed"</c:if>>
+<tr  <c:if test="${form.url != currentCitation.url}" >class="changed"</c:if>>
 <td>URL</td>
 <td><a href="${form.url}">${form.url}</a></td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'language') }">
-<tr  <c:if test="${form.language != outdatedCitation.language}" >class="changed"</c:if>>
+<tr  <c:if test="${form.language != currentCitation.language}" >class="changed"</c:if>>
 <td>Language</td>
 <td>${form.language}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'doi') }">
-<tr  <c:if test="${form.doi != outdatedCitation.doi}" >class="changed"</c:if>>
+<tr  <c:if test="${form.doi != currentCitation.doi}" >class="changed"</c:if>>
 <td>DOI</td>
 <td>${form.doi}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'issn') }">
-<tr  <c:if test="${form.issn != outdatedCitation.issn}" >class="changed"</c:if>>
+<tr  <c:if test="${form.issn != currentCitation.issn}" >class="changed"</c:if>>
 <td>ISSN</td>
 <td>${form.issn}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'archive') }">
-<tr  <c:if test="${form.archive != outdatedCitation.archive}" >class="changed"</c:if>>
+<tr  <c:if test="${form.archive != currentCitation.archive}" >class="changed"</c:if>>
 <td>Archive</td>
 <td>${form.archive}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'archiveLocation') }">
-<tr  <c:if test="${form.archiveLocation != outdatedCitation.archiveLocation}" >class="changed"</c:if>>
+<tr  <c:if test="${form.archiveLocation != currentCitation.archiveLocation}" >class="changed"</c:if>>
 <td>Archive Location</td>
 <td>${form.archiveLocation}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'libraryCatalog') }">
-<tr  <c:if test="${form.libraryCatalog != outdatedCitation.libraryCatalog}" >class="changed"</c:if>>
+<tr  <c:if test="${form.libraryCatalog != currentCitation.libraryCatalog}" >class="changed"</c:if>>
 <td>Library Catalog</td>
 <td>${form.libraryCatalog}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'callNumber') }">
-<tr  <c:if test="${form.callNumber != outdatedCitation.callNumber}" >class="changed"</c:if>>
+<tr  <c:if test="${form.callNumber != currentCitation.callNumber}" >class="changed"</c:if>>
 <td>Call Number</td>
 <td>${form.callNumber}</td>
 </tr>
 </c:if>
 <c:if test="${fn:contains(formFields, 'rights') }">
-<tr  <c:if test="${form.rights != outdatedCitation.rights}" >class="changed"</c:if>>
+<tr  <c:if test="${form.rights != currentCitation.rights}" >class="changed"</c:if>>
 <td>Rights</td>
 <td>${form.rights}</td>
 </tr>

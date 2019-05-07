@@ -14,6 +14,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.Transient;
 
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
@@ -79,6 +80,9 @@ public class Citation implements ICitation {
     
     @Lob
     private String extra;
+    
+    @Transient
+    private String resolved;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getKey()
@@ -416,7 +420,6 @@ public class Citation implements ICitation {
     public void setExtra(String extra) {
         this.extra = extra;
     }
-    
     @Override
     public Set<String> getOtherCreatorRoles(){
         Set<String> roles = new HashSet<>();
@@ -437,5 +440,13 @@ public class Citation implements ICitation {
             });
         }
         return creators;
+    }
+    @Override
+    public String getResolved() {
+	return resolved;
+    }
+    @Override
+    public void setResolved(String resolved) {
+	this.resolved = resolved;
     }
 }

@@ -372,14 +372,20 @@ let removePerson = function removePerson(e) {
 <c:set var="authors" value="${citation.authors}" />
 
 <c:if test="${not empty resolvedForm}" >
-	<c:set var="authors" value="${form.authors}" />
+	<c:set var="authors" value="${resolvedAuthors}" />
+</c:if>
+
+<c:set var="editors" value="${citation.editors}" />
+
+<c:if test="${not empty resolvedForm}" >
+	<c:set var="editors" value="${resolvedEditors}" />
 </c:if>
 
 <h2>
 	 <c:forEach items="${authors}" var="author" varStatus="status">
 	 	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
 	 </c:forEach>
-	 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
+	 <c:forEach items="${editors}" var="editor" varStatus="status">
 	 	  <strong>${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
 	 </c:forEach> 
 	  <em>${citation.title}</em>
@@ -469,8 +475,8 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <td>Editors</td>
 <td>
 <span id="editorList" style="font-size: 18px">
-<c:forEach items="${citation.editors}" var="editor" varStatus="status">
-<span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
+<c:forEach items="${editors}" var="editor" varStatus="status">
+<span id="editor${status.index}" class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
 <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;
@@ -573,11 +579,11 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <form:input path="version" type="hidden" class="form-control" value="${citation.version}" />
 
 <c:if test="${not empty resolvedForm}">
-<form:input path="isResolved" type="hidden" class="form-control" value="true" />
+<form:input path="resolved" type="hidden" class="form-control" value="true" />
 </c:if>
 
 <c:if test="${empty resolvedForm}">
-<form:input path="isResolved" type="hidden" class="form-control" value="false />
+<form:input path="resolved" type="hidden" class="form-control" value="false" />
 </c:if>
 </table>
 

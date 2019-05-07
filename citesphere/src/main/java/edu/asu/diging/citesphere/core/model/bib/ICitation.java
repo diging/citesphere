@@ -140,5 +140,9 @@ public interface ICitation {
     Set<ICreator> getOtherCreators(String role);
 
     Set<String> getOtherCreatorRoles();
+    
+    String getResolved();
+    
+    void setResolved(String resolved);
 
 }
