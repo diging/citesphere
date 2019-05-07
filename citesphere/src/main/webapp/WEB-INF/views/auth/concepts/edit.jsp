@@ -10,14 +10,14 @@
 
 <ol class="breadcrumb">
   <li><a href="<c:url value="/" />">Home</a></li>
-  <li><a href="<c:url value="/auth/authority/list" />">Concepts</a></li>
+  <li><a href="<c:url value="/auth/concepts/list" />">Concepts</a></li>
   <li class="active">${form.name}</li>
 </ol>
 <h2>
-	<strong>${form.name}</strong>	  
+	<strong>Edit Concept: ${form.name}</strong>	  
 </h2>
 
-<c:url value="/auth/authority/${authorityId}/edit" var="processingUrl" />
+<c:url value="/auth/concepts/${conceptId}/edit" var="processingUrl" />
 <form:form action="${processingUrl}" modelAttribute="form" method="POST" id="editForm">
 
 <label>Name:</label>
@@ -26,9 +26,12 @@
 
 <label>Description:</label>
 <form:input path="description" type="text" class="form-control" placeholder="Description" value="${form.description}" ></form:input>
-
+<p></p>
+<label>URI:</label>
+<form:input path="uri" type="text" class="form-control" placeholder="URI" value="${form.uri}" ></form:input>
+<br>
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
-<a href="<c:url value="/auth/authority/list" />" class="btn btn-default">
+<a href="<c:url value="auth/concepts/list" />" class="btn btn-default">
 		<i class="fa fa-times"></i>&nbsp;Cancel 
 </a>
 </form:form>
