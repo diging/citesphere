@@ -14,7 +14,7 @@
   <li class="active">${form.name}</li>
 </ol>
 <h2>
-	<strong>Edit Authority Entry: ${form.name}</strong>	  
+	Edit Authority Entry: ${form.name}	  
 </h2>
 
 <c:url value="/auth/authority/${authorityId}/edit" var="processingUrl" />

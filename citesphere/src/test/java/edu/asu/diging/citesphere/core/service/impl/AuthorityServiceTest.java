@@ -201,13 +201,16 @@ public class AuthorityServiceTest {
     @Test
     public void test_create() {
         String username = "user";
+        OffsetDateTime createdOn = OffsetDateTime.now();
         AuthorityEntry entry = new AuthorityEntry();
         IUser user = new User();
         user.setUsername(username);
         Mockito.when(entryRepository.save(entry)).thenReturn(entry);
-
+     
         IAuthorityEntry actualEntry = managerToTest.create(entry, user);
         Assert.assertEquals(username, actualEntry.getUsername());
+        Assert.assertTrue(createdOn.isBefore(actualEntry.getCreatedOn()));
+        Mockito.verify(entryRepository).save(entry);
     }
     
     @Test
@@ -222,6 +225,7 @@ public class AuthorityServiceTest {
         Mockito.when(entryRepository.save(entry)).thenReturn(entry);
         
         IAuthorityEntry actualEntry = managerToTest.save(entry);
+        Mockito.verify(entryRepository).save(entry);
         Assert.assertEquals(entry, actualEntry);        
     }
 }
