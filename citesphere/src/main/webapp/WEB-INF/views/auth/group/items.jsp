@@ -101,8 +101,13 @@ $(function() {
 </div>
 </div>
 
-<div class="col-md-2">
-<p class="lead">Collections</p>
+<div class="col-md-2" id="accordion">
+<p>
+  <a class="btn btn-primary" data-toggle="collapse" data-parent="#accordion" href="#collapseCollection" aria-expanded="true" aria-controls="collapseCollection">
+          Collection
+  </a>
+</p>
+<div class="panel-collapse collapse in" id="collapseCollection">
 <ul class="list-group">
 <c:forEach items="${citationCollections}" var="collection">
   <li class="list-group-item">
@@ -111,8 +116,9 @@ $(function() {
   </li>
 </c:forEach>
 </ul>
-
 </div>
+</div>
+
 <div class="col-md-10">
 <div class="dropdown pull-right" style="padding-bottom: 10px;">
   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
