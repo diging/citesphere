@@ -138,6 +138,7 @@ $(function() {
 	<th>Authors</th>
 	<th>Title</th>
 	<th>Date</th>
+	<th>Concept Tags</th>
 	<th>URL</th>
 	<c:forEach items="${columns}" var="column">
 	<th>
@@ -171,6 +172,11 @@ $(function() {
  	</td>
  	<td class="bib-entry" data-key="${entry.key}">
  		${entry.dateFreetext}
+ 	</td>
+ 	<td class="bib-entry" data-key="${entry.key}">
+ 		<c:forEach items="${entry.conceptTags}" var="tag" varStatus="status">
+ 		<strong>${tag.conceptName}</strong><c:if test="${!status.last}">; </c:if>
+ 		</c:forEach>
  	</td>
  	<td>
  		<c:if test="${not empty entry.url}">
