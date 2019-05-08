@@ -14,7 +14,7 @@
   <li class="active">${form.name}</li>
 </ol>
 <h2>
-	<strong>Edit Concept Type: ${form.name}</strong>	  
+	Edit Concept Type: ${form.name}	  
 </h2>
 
 <c:url value="/auth/concepts/types/${typeId}/edit" var="processingUrl" />
