@@ -95,11 +95,20 @@ $(function() {
 <div class="col-md-12">
 <ul id="pagination-top" class="pagination-sm"></ul>
 
-
 <div class="pull-right" style="margin-top: 20px;">
 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/create" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
 </div>
+
+<div class="search-main" style="width: 30%;">
+ <div class="form-group has-feedback has-search" style="">
+    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+    <input type="text" class="form-control" placeholder="Search">
+ </div>
 </div>
+ 
+</div>
+
+
 
 <div class="col-md-2">
 <p class="lead">Collections</p>
