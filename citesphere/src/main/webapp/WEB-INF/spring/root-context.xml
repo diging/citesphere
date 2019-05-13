@@ -15,39 +15,21 @@
 	">
 
     <mvc:annotation-driven />
-	
+
     <context:component-scan
         base-package="edu.asu.diging.citesphere" />
 
     <bean id="messageSource"
-        class="org.springframework.context.support.ReloadableResourceBundleMessageSource" autowire="byName">
+        class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
+        autowire="byName">
         <property name="basename"
             value="classpath:locale/messages" />
         <property name="fallbackToSystemLocale" value="false" />
     </bean>
 
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="${email.host}"/>
-        <property name="port" value="${email.port}"/>
-        <property name="username" value="${email.username}"/>
-        <property name="password" value="${email.password}"/>
-        <property name="javaMailProperties">
-            <props>
-            	<prop key="mail.transport.protocol">smtp</prop>
-                <prop key="mail.smtp.auth">true</prop>
-                <prop key="mail.smtp.starttls.enable">true</prop>
-            </props>
-        </property>
-    </bean>
-   
-   <bean id="emailNoficationSender" class="edu.asu.diging.citesphere.email.impl.EmailNotificationSender">
-       <property name="enabled" value="${email.enabled}" />
-       <property name="fromAddress" value="${email.from}" />
-   </bean>
-   
     <util:properties id="usersFile"
         location="classpath:user.properties" />
-        
+
     <util:properties id="appFile"
         location="classpath:app.properties" />
 
@@ -60,11 +42,11 @@
         location="classpath:/labels.properties" />
     <context:property-placeholder
         properties-ref="labelsResource" />
-        
+
     <util:properties id="creatorsFile"
-	location="classpath:creators.properties" />
+        location="classpath:creators.properties" />
     <context:property-placeholder
-  	properties-ref="creatorsFile" />
+        properties-ref="creatorsFile" />
 
     <aop:aspectj-autoproxy
         proxy-target-class="true" />

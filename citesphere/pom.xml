@@ -33,17 +33,21 @@
         <tomcat.server.id>TomcatServer</tomcat.server.id>
 
         <log.level>debug</log.level>
-        
+
         <email.host></email.host>
         <email.port></email.port>
         <email.username></email.username>
         <email.password></email.password>
         <email.from></email.from>
         <email.enabled>true</email.enabled>
-        
-        <app.name></app.name>
+        <email.transport.protocol>smtp</email.transport.protocol>
+        <email.smtp.auth>true</email.smtp.auth>
+        <email.smtp.starttls.enable>true</email.smtp.starttls.enable>
+        <email.debug>false</email.debug>
+
+        <app.name>Citesphere</app.name>
         <app.url></app.url>
-        <app.createUserApprovalPath></app.createUserApprovalPath>
+        <app.createUserApprovalPath>admin/user/list</app.createUserApprovalPath>
     </properties>
 
     <dependencyManagement>
@@ -279,13 +283,21 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
         </dependency>
-        
+
+        <!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
         <dependency>
-        	<groupId>javax.mail</groupId>
-        	<artifactId>mail</artifactId>
-        	<version>1.5.0-b01</version>
-       	</dependency>
-        
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.sun.mail/javax.mail -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
+
         <!-- Validation -->
         <!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
         <dependency>
@@ -381,6 +393,12 @@
             <version>2.7.2</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
 
 
     </dependencies>

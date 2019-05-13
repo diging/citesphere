@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.email;
+package edu.asu.diging.citesphere.core.email;
 
 import java.util.List;
 
