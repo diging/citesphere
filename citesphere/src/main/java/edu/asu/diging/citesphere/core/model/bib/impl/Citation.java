@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -16,7 +17,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
@@ -26,29 +31,29 @@ import edu.asu.diging.citesphere.core.model.bib.ItemType;
 public class Citation implements ICitation {
 
     @Id
-    @Column(name="citationKey")
+    @Column(name = "citationKey")
     private String key;
-    
-    @ManyToOne(targetEntity=CitationGroup.class)
-    @JoinColumn(name="group_id")
+
+    @ManyToOne(targetEntity = CitationGroup.class)
+    @JoinColumn(name = "group_id")
     private ICitationGroup group;
-    
+
     private long version;
     private String title;
-    @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL, orphanRemoval=true)
-    @JoinTable(name="Citation_Author")
+    @OneToMany(targetEntity = Person.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(name = "Citation_Author")
     @OrderBy("positionInList")
     private Set<IPerson> authors;
-    @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL, orphanRemoval=true)
-    @JoinTable(name="Citation_Editor")
+    @OneToMany(targetEntity = Person.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(name = "Citation_Editor")
     @OrderBy("positionInList")
     private Set<IPerson> editors;
-    
-    @OneToMany(targetEntity=Creator.class, cascade=CascadeType.ALL, orphanRemoval=true)
-    @JoinTable(name="Citation_Creator")
+
+    @OneToMany(targetEntity = Creator.class, cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinTable(name = "Citation_Creator")
     @OrderBy("role, positionInList")
     private Set<ICreator> otherCreators;
-    
+
     private ItemType itemType;
     private String publicationTitle;
     private String volume;
@@ -62,7 +67,7 @@ public class Citation implements ICitation {
     @Lob
     private String abstractNote;
     private String accessDate;
-    
+
     private String seriesText;
     private String journalAbbreviation;
     private String language;
@@ -74,377 +79,532 @@ public class Citation implements ICitation {
     private String libraryCatalog;
     private String callNumber;
     private String rights;
-    
+
     private String dateAdded;
     private String dateModified;
-    
+
+    @OneToMany(targetEntity = CitationConceptTag.class, cascade = CascadeType.ALL)
+    @JoinTable(name = "CitationConcept_ConceptTag")
+    private Set<ICitationConceptTag> conceptTags;
+
     @Lob
     private String extra;
-    
+
     @Transient
     private String resolved;
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getKey()
      */
     @Override
     public String getKey() {
-        return key;
+	return key;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setKey(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setKey(java.lang.
+     * String)
      */
     @Override
     public void setKey(String key) {
-        this.key = key;
+	this.key = key;
     }
+
     @Override
     public ICitationGroup getGroup() {
-        return group;
+	return group;
     }
+
     @Override
     public void setGroup(ICitationGroup group) {
-        this.group = group;
+	this.group = group;
     }
+
     @Override
     public long getVersion() {
-        return version;
+	return version;
     }
+
     @Override
     public void setVersion(long version) {
-        this.version = version;
+	this.version = version;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getTitle()
      */
     @Override
     public String getTitle() {
-        return title;
+	return title;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setTitle(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setTitle(java.lang.
+     * String)
      */
     @Override
     public void setTitle(String title) {
-        this.title = title;
+	this.title = title;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getAuthors()
      */
     @Override
     public Set<IPerson> getAuthors() {
-        return authors;
+	return authors;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setAuthors(java.util.List)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setAuthors(java.util.
+     * List)
      */
     @Override
     public void setAuthors(Set<IPerson> authors) {
-        this.authors = authors;
+	this.authors = authors;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getEditors()
      */
     @Override
     public Set<IPerson> getEditors() {
-        return editors;
+	return editors;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setEditors(java.util.List)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setEditors(java.util.
+     * List)
      */
     @Override
     public void setEditors(Set<IPerson> editors) {
-        this.editors = editors;
+	this.editors = editors;
     }
+
     @Override
     public Set<ICreator> getOtherCreators() {
-        return otherCreators;
+	return otherCreators;
     }
+
     @Override
     public void setOtherCreators(Set<ICreator> otherCreators) {
-        this.otherCreators = otherCreators;
+	this.otherCreators = otherCreators;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getItemType()
      */
     @Override
     public ItemType getItemType() {
-        return itemType;
+	return itemType;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setItemType(edu.asu.diging.citesphere.core.model.bib.ItemType)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setItemType(edu.asu.
+     * diging.citesphere.core.model.bib.ItemType)
      */
     @Override
     public void setItemType(ItemType itemType) {
-        this.itemType = itemType;
+	this.itemType = itemType;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getPublicationTitle()
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getPublicationTitle()
      */
     @Override
     public String getPublicationTitle() {
-        return publicationTitle;
+	return publicationTitle;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setPublicationTitle(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setPublicationTitle(
+     * java.lang.String)
      */
     @Override
     public void setPublicationTitle(String publicationTitle) {
-        this.publicationTitle = publicationTitle;
+	this.publicationTitle = publicationTitle;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getVolume()
      */
     @Override
     public String getVolume() {
-        return volume;
+	return volume;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setVolume(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setVolume(java.lang.
+     * String)
      */
     @Override
     public void setVolume(String volume) {
-        this.volume = volume;
+	this.volume = volume;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getIssue()
      */
     @Override
     public String getIssue() {
-        return issue;
+	return issue;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setIssue(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setIssue(java.lang.
+     * String)
      */
     @Override
     public void setIssue(String issue) {
-        this.issue = issue;
+	this.issue = issue;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getPages()
      */
     @Override
     public String getPages() {
-        return pages;
+	return pages;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setPages(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setPages(java.lang.
+     * String)
      */
     @Override
     public void setPages(String pages) {
-        this.pages = pages;
+	this.pages = pages;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getDate()
      */
     @Override
     public OffsetDateTime getDate() {
-        return date;
+	return date;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setDate(java.time.OffsetDateTime)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setDate(java.time.
+     * OffsetDateTime)
      */
     @Override
     public void setDate(OffsetDateTime date) {
-        this.date = date;
+	this.date = date;
     }
+
     @Override
     public String getDateFreetext() {
-        return dateFreetext;
+	return dateFreetext;
     }
+
     @Override
     public void setDateFreetext(String dateFreetext) {
-        this.dateFreetext = dateFreetext;
+	this.dateFreetext = dateFreetext;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getSeries()
      */
     @Override
     public String getSeries() {
-        return series;
+	return series;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setSeries(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setSeries(java.lang.
+     * String)
      */
     @Override
     public void setSeries(String series) {
-        this.series = series;
+	this.series = series;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#getSeriesTitle()
      */
     @Override
     public String getSeriesTitle() {
-        return seriesTitle;
+	return seriesTitle;
     }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setSeriesTitle(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.model.bib.impl.ICitation#setSeriesTitle(java.
+     * lang.String)
      */
     @Override
     public void setSeriesTitle(String seriesTitle) {
-        this.seriesTitle = seriesTitle;
+	this.seriesTitle = seriesTitle;
     }
+
     @Override
     public String getUrl() {
-        return url;
+	return url;
     }
+
     @Override
     public void setUrl(String url) {
-        this.url = url;
+	this.url = url;
     }
+
     @Override
     public String getAbstractNote() {
-        return abstractNote;
+	return abstractNote;
     }
+
     @Override
     public void setAbstractNote(String abstractNote) {
-        this.abstractNote = abstractNote;
+	this.abstractNote = abstractNote;
     }
+
     @Override
     public String getAccessDate() {
-        return accessDate;
+	return accessDate;
     }
+
     @Override
     public void setAccessDate(String accessDate) {
-        this.accessDate = accessDate;
+	this.accessDate = accessDate;
     }
+
     @Override
     public String getSeriesText() {
-        return seriesText;
+	return seriesText;
     }
+
     @Override
     public void setSeriesText(String seriesText) {
-        this.seriesText = seriesText;
+	this.seriesText = seriesText;
     }
+
     @Override
     public String getJournalAbbreviation() {
-        return journalAbbreviation;
+	return journalAbbreviation;
     }
+
     @Override
     public void setJournalAbbreviation(String journalAbbreviation) {
-        this.journalAbbreviation = journalAbbreviation;
+	this.journalAbbreviation = journalAbbreviation;
     }
+
     @Override
     public String getLanguage() {
-        return language;
+	return language;
     }
+
     @Override
     public void setLanguage(String language) {
-        this.language = language;
+	this.language = language;
     }
+
     @Override
     public String getDoi() {
-        return doi;
+	return doi;
     }
+
     @Override
     public void setDoi(String doi) {
-        this.doi = doi;
+	this.doi = doi;
     }
+
     @Override
     public String getIssn() {
-        return issn;
+	return issn;
     }
+
     @Override
     public void setIssn(String issn) {
-        this.issn = issn;
+	this.issn = issn;
     }
+
     @Override
     public String getShortTitle() {
-        return shortTitle;
+	return shortTitle;
     }
+
     @Override
     public void setShortTitle(String shortTitle) {
-        this.shortTitle = shortTitle;
+	this.shortTitle = shortTitle;
     }
+
     @Override
     public String getArchive() {
-        return archive;
+	return archive;
     }
+
     @Override
     public void setArchive(String archive) {
-        this.archive = archive;
+	this.archive = archive;
     }
+
     @Override
     public String getArchiveLocation() {
-        return archiveLocation;
+	return archiveLocation;
     }
+
     @Override
     public void setArchiveLocation(String archiveLocation) {
-        this.archiveLocation = archiveLocation;
+	this.archiveLocation = archiveLocation;
     }
+
     @Override
     public String getLibraryCatalog() {
-        return libraryCatalog;
+	return libraryCatalog;
     }
+
     @Override
     public void setLibraryCatalog(String libraryCatalog) {
-        this.libraryCatalog = libraryCatalog;
+	this.libraryCatalog = libraryCatalog;
     }
+
     @Override
     public String getCallNumber() {
-        return callNumber;
+	return callNumber;
     }
+
     @Override
     public void setCallNumber(String callNumber) {
-        this.callNumber = callNumber;
+	this.callNumber = callNumber;
     }
+
     @Override
     public String getRights() {
-        return rights;
+	return rights;
     }
+
     @Override
     public void setRights(String rights) {
-        this.rights = rights;
+	this.rights = rights;
     }
+
     @Override
     public String getDateAdded() {
-        return dateAdded;
+	return dateAdded;
     }
+
     @Override
     public void setDateAdded(String dateAdded) {
-        this.dateAdded = dateAdded;
+	this.dateAdded = dateAdded;
     }
+
     @Override
     public String getDateModified() {
-        return dateModified;
+	return dateModified;
     }
+
     @Override
     public void setDateModified(String dateModified) {
-        this.dateModified = dateModified;
+	this.dateModified = dateModified;
     }
+
+    @Override
+    public Set<ICitationConceptTag> getConceptTags() {
+	return conceptTags;
+    }
+
+    @Override
+    public void setConceptTags(Set<ICitationConceptTag> concepts) {
+	this.conceptTags = concepts;
+    }
+
     @Override
     public String getExtra() {
-        return extra;
+	return extra;
     }
+
     @Override
     public void setExtra(String extra) {
-        this.extra = extra;
+	this.extra = extra;
     }
+
     @Override
-    public Set<String> getOtherCreatorRoles(){
-        Set<String> roles = new HashSet<>();
-        if (otherCreators != null) {
-            otherCreators.forEach(c -> roles.add(c.getRole()));
-        }
-        return roles;
+    public Set<String> getOtherCreatorRoles() {
+	Set<String> roles = new HashSet<>();
+	if (otherCreators != null) {
+	    otherCreators.forEach(c -> roles.add(c.getRole()));
+	}
+	return roles;
     }
-    
+
     @Override
     public Set<ICreator> getOtherCreators(String role) {
-        Set<ICreator> creators = new HashSet<>();
-        if (otherCreators != null) {
-            otherCreators.forEach(c -> {
-                if (c.getRole().equals(role)) {
-                    creators.add(c);
-                }
-            });
-        }
-        return creators;
+	Set<ICreator> creators = new HashSet<>();
+	if (otherCreators != null) {
+	    otherCreators.forEach(c -> {
+		if (c.getRole().equals(role)) {
+		    creators.add(c);
+		}
+	    });
+	}
+	return creators;
     }
+
     @Override
     public String getResolved() {
 	return resolved;
     }
+
     @Override
     public void setResolved(String resolved) {
 	this.resolved = resolved;

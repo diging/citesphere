@@ -4,12 +4,14 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -31,7 +33,10 @@ import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
+import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
+import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.AffiliationForm;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
@@ -43,10 +48,23 @@ public class EditItemController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
+    @Qualifier("creatorsFile")
+    private Properties properties;
+
+    @Autowired
     private ICitationManager citationManager;
 
     @Autowired
     private ICitationHelper citationHelper;
+
+    @Autowired
+    private ICitationConceptManager conceptManager;
+
+    @Autowired
+    private IConceptTypeManager typeManager;
+
+    @Autowired
+    private IUserManager userManager;
 
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/edit")
     public String showPage(Authentication authentication, Model model, CitationForm form,
@@ -56,7 +74,6 @@ public class EditItemController {
 	model.addAttribute("zoteroGroupId", zoteroGroupId);
 	model.addAttribute("citation", citation);
 	model.addAttribute("form", form);
-
 	if (model.containsAttribute("resolvedForm")) {
 	    CitationForm resolvedCitationForm = (CitationForm) model.asMap().get("resolvedForm");
 
@@ -65,14 +82,19 @@ public class EditItemController {
 
 	    Set<IPerson> resolvedEditorSet = personFormListToPersonSet(resolvedCitationForm.getEditors());
 	    model.addAttribute("resolvedEditors", resolvedEditorSet);
-	    
+
 	    model.addAttribute("form", resolvedCitationForm);
 	}
-
 	List<String> fields = new ArrayList<>();
 	citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
 		.forEach(f -> fields.add(f.getFilename()));
 	model.addAttribute("fields", fields);
+	model.addAttribute("creatorMap", properties.entrySet());
+
+	model.addAttribute("concepts", conceptManager.findAll(userManager.findByUsername(authentication.getName())));
+	model.addAttribute("conceptTypes",
+		typeManager.getAllTypes(userManager.findByUsername(authentication.getName())));
+
 	return "auth/group/items/item/edit";
     }
 
@@ -93,7 +115,6 @@ public class EditItemController {
 	    @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId)
 	    throws ZoteroConnectionException, GroupDoesNotExistException {
 	ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
-
 	if (form.getVersion() == citation.getVersion()) {
 
 	    // load authors and editors before detaching

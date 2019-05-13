@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -25,7 +26,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
        http.formLogin()
                 .loginPage("/")
                 .loginProcessingUrl("/login/authenticate")
-                .failureUrl("/?error=bad_credentials")
+                .failureHandler(customAuthenticationFailureHandler("/?error="))
                 // Configures the logout function
                 .and()
                 .logout()
@@ -48,6 +49,11 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(4);
+    }
+    
+    @Bean
+    public AuthenticationFailureHandler customAuthenticationFailureHandler(String defaultFailureUrl) {
+        return new CustomAuthenticationFailureHandler(defaultFailureUrl);
     }
 
 }

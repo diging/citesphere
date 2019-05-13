@@ -145,4 +145,8 @@ public interface ICitation {
     
     void setResolved(String resolved);
 
+    void setConceptTags(Set<ICitationConceptTag> concepts);
+
+    Set<ICitationConceptTag> getConceptTags();
+
 }

@@ -23,12 +23,18 @@ import com.google.gson.JsonParser;
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
+import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
+import edu.asu.diging.citesphere.core.model.bib.IConceptType;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
 import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.core.model.bib.impl.CitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
+import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
+import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.util.IDateParser;
 
@@ -37,6 +43,12 @@ public class CitationFactory implements ICitationFactory {
     
     @Autowired
     private IDateParser dateParser;
+    
+    @Autowired
+    private ICitationConceptManager conceptManager;
+    
+    @Autowired
+    private IConceptTypeManager conceptTypeManager;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.factory.impl.ICitationFactory#createCitation(org.springframework.social.zotero.api.Item)
@@ -143,31 +155,48 @@ public class CitationFactory implements ICitationFactory {
                 JsonArray editors = jObj.get("editors").getAsJsonArray();
                 mapPersonFields(editors, citation.getEditors());
             }
+            if (jObj.has("otherCreators") && !jObj.get("otherCreators").isJsonNull()) {
+                JsonArray creators = jObj.get("otherCreators").getAsJsonArray();
+                mapCreatorFields(creators, citation.getOtherCreators());
+            }
+            citation.setConceptTags(new HashSet<>());
+            if (jObj.has("conceptTags") && !jObj.get("conceptTags").isJsonNull()) {
+                JsonArray conceptTags = jObj.get("conceptTags").getAsJsonArray();
+                mapConceptTags(conceptTags, citation.getConceptTags());
+            }
         }
     }
 
+    private void mapCreatorFields(JsonArray creatorList, Set<ICreator> citationCreatorList) {
+        List<edu.asu.diging.citesphere.core.model.bib.impl.Creator> extraCreatorList = new ArrayList<>();
+        List<String> personNames = new ArrayList<>();
+        creatorList.forEach(a -> {
+            ICreator creator = (ICreator) new edu.asu.diging.citesphere.core.model.bib.impl.Creator();
+            creator.setRole((a.getAsJsonObject().get("role") != null && !a.getAsJsonObject().get("role").isJsonNull()) ? a.getAsJsonObject().get("role").getAsString() : "");
+            creator.setPerson(new Person());
+            if(a.getAsJsonObject().get("person") != null && !a.getAsJsonObject().get("person").isJsonNull()) {
+                mapPerson(a.getAsJsonObject().get("person"), creator.getPerson());
+            }
+            personNames.add(creator.getPerson().getFirstName() + creator.getPerson().getLastName());
+            extraCreatorList.add((edu.asu.diging.citesphere.core.model.bib.impl.Creator) creator);
+        });
+        for (Iterator<ICreator> iterator = citationCreatorList.iterator(); iterator.hasNext();) {
+            ICreator creator = iterator.next();
+            if (personNames.contains(creator.getPerson().getFirstName() + creator.getPerson().getLastName())) {
+                iterator.remove();
+            }
+        }
+        extraCreatorList.forEach(a -> citationCreatorList.add(a));
+    }
+    
     private void mapPersonFields(JsonArray personList, Set<IPerson> citationPersonList) {
         List<Person> extraPersonList = new ArrayList<>();
         List<String> personNames = new ArrayList<>();
         personList.forEach(a -> {
-            Person person = new Person();
-            person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
-            person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
-            person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
+            IPerson person = new Person();
+            mapPerson(a, person);
             personNames.add(person.getFirstName() + person.getLastName());
-            person.setUri(a.getAsJsonObject().get("uri")!=null && !a.getAsJsonObject().get("uri").isJsonNull() ? a.getAsJsonObject().get("uri").getAsString():"");
-            person.setLocalAuthorityId(a.getAsJsonObject().get("localAuthorityId")!=null && !a.getAsJsonObject().get("localAuthorityId").isJsonNull() ? a.getAsJsonObject().get("localAuthorityId").getAsString() : "");
-            person.setAffiliations(new HashSet<>());
-            JsonElement affiliations = a.getAsJsonObject().get("affiliations");
-            if (affiliations instanceof JsonArray) {
-                affiliations.getAsJsonArray().forEach(af -> {
-                    Affiliation affiliation = new Affiliation();
-                    affiliation.setName(af.getAsJsonObject().get("name") != null && !af.getAsJsonObject().get("name").isJsonNull() ? af.getAsJsonObject().get("name").getAsString() : "");
-                    affiliation.setUri(af.getAsJsonObject().get("uri") != null && !af.getAsJsonObject().get("uri").isJsonNull() ? af.getAsJsonObject().get("uri").getAsString() : "");
-                    person.getAffiliations().add(affiliation);
-                });
-            }
-            extraPersonList.add(person);
+            extraPersonList.add((Person)person);
         });
 
         for (Iterator<IPerson> iterator = citationPersonList.iterator(); iterator.hasNext();) {
@@ -177,5 +206,42 @@ public class CitationFactory implements ICitationFactory {
             }
         }
         extraPersonList.forEach(a -> citationPersonList.add(a));
+    }
+    
+    private void mapPerson(JsonElement a, IPerson person) {
+        person.setName(a.getAsJsonObject().get("name") != null && !a.getAsJsonObject().get("name").isJsonNull() ? a.getAsJsonObject().get("name").getAsString() : "");
+        person.setFirstName(a.getAsJsonObject().get("firstName") != null && !a.getAsJsonObject().get("firstName").isJsonNull() ? a.getAsJsonObject().get("firstName").getAsString() : "");
+        person.setLastName(a.getAsJsonObject().get("lastName") != null && !a.getAsJsonObject().get("lastName").isJsonNull() ? a.getAsJsonObject().get("lastName").getAsString() : "");
+        person.setUri(a.getAsJsonObject().get("uri")!=null && !a.getAsJsonObject().get("uri").isJsonNull() ? a.getAsJsonObject().get("uri").getAsString():"");
+        person.setLocalAuthorityId(a.getAsJsonObject().get("localAuthorityId")!=null && !a.getAsJsonObject().get("localAuthorityId").isJsonNull() ? a.getAsJsonObject().get("localAuthorityId").getAsString() : "");
+        person.setAffiliations(new HashSet<>());
+        JsonElement affiliations = a.getAsJsonObject().get("affiliations");
+        if (affiliations instanceof JsonArray) {
+            affiliations.getAsJsonArray().forEach(af -> {
+                Affiliation affiliation = new Affiliation();
+                affiliation.setName(af.getAsJsonObject().get("name") != null && !af.getAsJsonObject().get("name").isJsonNull() ? af.getAsJsonObject().get("name").getAsString() : "");
+                affiliation.setUri(af.getAsJsonObject().get("uri") != null && !af.getAsJsonObject().get("uri").isJsonNull() ? af.getAsJsonObject().get("uri").getAsString() : "");
+                person.getAffiliations().add(affiliation);
+            });
+        }
+    }
+    
+    private void mapConceptTags(JsonArray conceptArray, Set<ICitationConceptTag> conceptTags) {
+        conceptArray.forEach(c -> {
+            ICitationConceptTag tag = new CitationConceptTag();
+            JsonObject conceptJsonObject = c.getAsJsonObject();
+            tag.setConceptName(conceptJsonObject.get("conceptName") != null && !conceptJsonObject.get("conceptName").isJsonNull() ? conceptJsonObject.get("conceptName").getAsString() : "");
+            tag.setTypeName(conceptJsonObject.get("typeName") != null && !conceptJsonObject.get("typeName").isJsonNull() ? conceptJsonObject.get("typeName").getAsString() : "");
+            
+            tag.setConceptUri(conceptJsonObject.get("conceptUri") != null && !conceptJsonObject.get("conceptUri").isJsonNull() ? conceptJsonObject.get("conceptUri").getAsString() : null);
+            tag.setLocalConceptId(conceptJsonObject.get("localConceptId") != null && !conceptJsonObject.get("localConceptId").isJsonNull() ? conceptJsonObject.get("localConceptId").getAsString() : null);
+            
+            tag.setTypeUri(conceptJsonObject.get("typeUri") != null && !conceptJsonObject.get("typeUri").isJsonNull() ? conceptJsonObject.get("typeUri").getAsString() : null);
+            tag.setLocalConceptTypeId(conceptJsonObject.get("localConceptTypeId") != null && !conceptJsonObject.get("localConceptTypeId").isJsonNull() ? conceptJsonObject.get("localConceptTypeId").getAsString() : null);
+            
+            
+            conceptTags.add(tag);
+        });
+        
     }
 }

@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
@@ -35,7 +36,7 @@ public class Person implements IPerson, Comparable<Person> {
     private String lastName;
     private int positionInList;
     
-    @OneToMany(targetEntity=Affiliation.class, cascade=CascadeType.ALL)
+    @OneToMany(targetEntity=Affiliation.class, cascade=CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name="Person_Affiliation")
     private Set<IAffiliation> affiliations;
    
