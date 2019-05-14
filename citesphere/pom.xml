@@ -10,7 +10,7 @@
 
     <properties>
         <org.slf4j-version>1.7.25</org.slf4j-version>
-        <org.springframework-version>5.1.1.RELEASE</org.springframework-version>
+        <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
         <spring-security-version>5.1.3.RELEASE</spring-security-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
         <spring.version>5.1.2.RELEASE</spring.version>
@@ -33,6 +33,21 @@
         <tomcat.server.id>TomcatServer</tomcat.server.id>
 
         <log.level>debug</log.level>
+
+        <email.host></email.host>
+        <email.port></email.port>
+        <email.username></email.username>
+        <email.password></email.password>
+        <email.from></email.from>
+        <email.enabled>true</email.enabled>
+        <email.transport.protocol>smtp</email.transport.protocol>
+        <email.smtp.auth>true</email.smtp.auth>
+        <email.smtp.starttls.enable>true</email.smtp.starttls.enable>
+        <email.debug>false</email.debug>
+
+        <app.name>Citesphere</app.name>
+        <app.url></app.url>
+        <app.createUserApprovalPath>admin/user/list</app.createUserApprovalPath>
     </properties>
 
     <dependencyManagement>
@@ -275,6 +290,20 @@
             <version>3.1.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.sun.mail/javax.mail -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
+
         <!-- Validation -->
         <!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
         <dependency>
@@ -356,6 +385,27 @@
             <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/xalan/xalan -->
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/xalan/serializer -->
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>serializer</artifactId>
+            <version>2.7.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+
 
     </dependencies>
 

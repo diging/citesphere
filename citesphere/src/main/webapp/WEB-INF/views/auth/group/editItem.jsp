@@ -4,6 +4,7 @@
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="cite" uri="https://diging.asu.edu/jps/tlds/citesphere" %>
 
 <style>
 .popover {
@@ -27,13 +28,31 @@ $(function() {
 	$("#uriLoadingFoundEditor").popover();
 	$("#uriLoadingFailureEditor").popover();
 	
-	$("#submitForm").click(function() {
-		constructPersonArray("author");
-		constructPersonArray("editor");
+	$("#uriLoadingSpinnerCreator").hide();
+	$("#uriLoadingFailureCreator").hide();
+	$("#uriLoadingFoundCreator").hide();
+	
+	$("#uriLoadingFoundCreator").popover();
+	$("#uriLoadingFailureCreator").popover();
+	
+	$("#submitForm").click(function(e) {
+		constructPersonArray("author", "author", 0);
+		constructPersonArray("editor", "editor", 0);
+		var creatorSubmitCount = 0;
+		$(".creator-row").each(function(idx, elem){
+			var ele = $(elem).children().first();
+			if(!(ele.attr("id")=="editor" || ele.attr("id")=="author")) {
+				var roleCount = constructPersonArray("creator", ele.attr("id"), creatorSubmitCount);
+				creatorSubmitCount = creatorSubmitCount + roleCount;
+			}
+		});
+		
+		createConceptTags();
 	});
 	
+	/* Handle Author events */
 	$("#addAuthorButton").click(function() {
-		savePersonDetails("Author");
+		savePersonDetails("Author", "Author");
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
@@ -48,22 +67,6 @@ $(function() {
 	
 	$(".edit-author").css('cursor', 'pointer');
 	
-	$(".edit-editor").click(function(){
-		var editorItem = $(this).parent();
-		editPerson('Editor', editorItem[0]);
-	});
-	
-	$(".edit-editor").css('cursor', 'pointer');
-	
-	$("#addEditorButton").click(function() {
-		savePersonDetails('Editor');
-	});
-
-	$("#addEditorModalCancel").click(function() {
-		$("#editorModal").modal('hide');
-		resetPersonCreationModal("Editor");
-	});
-	
 	$(".remove-author").click(removePerson);
 	$(".remove-author").css('cursor', 'pointer');
 	
@@ -76,14 +79,25 @@ $(function() {
 		$("#authorAffiliations").append(affiliationCopy);
 	});
 	
-	$(".remove-editor").click(removePerson);
-	$(".remove-editor").css('cursor', 'pointer');
-
-	$("#addEditorAffiliation").click(function() {
-		var affiliationCopy = $("#editorAffiliationTemplate").clone();
-		affiliationCopy.removeAttr("id");
-		affiliationCopy.find("input").val("");
-		$("#editorAffiliations").append(affiliationCopy);
+	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
+		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
+		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
+			$("#authorCreateAuthority").hide();
+			$("#uriAuthorLocalId").val(data['id']);
+			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Author");
+			$("#uriLoadingFoundAuthor").popover('hide');
+		});
+	});
+	
+	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).attr('data-authority-id');
+		$("#uriAuthorLocalId").val(authId);
+		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Author");
+		$("#uriLoadingFoundAuthor").popover('hide');
+		event.preventDefault();
 	});
 	
 	var timer = null;
@@ -97,6 +111,35 @@ $(function() {
 	    }, 1000);
 	});
 	
+	/* Handle editor events */
+	$(".edit-editor").click(function(){
+		var editorItem = $(this).parent();
+		editPerson('Editor', editorItem[0]);
+	});
+	
+	$(".edit-editor").css('cursor', 'pointer');
+	
+	$("#addEditorButton").click(function() {
+		savePersonDetails('Editor', 'Editor');
+	});
+
+	$("#addEditorModalCancel").click(function() {
+		$("#editorModal").modal('hide');
+		resetPersonCreationModal("Editor");
+	});
+	
+	$(".remove-editor").click(removePerson);
+	$(".remove-editor").css('cursor', 'pointer');
+	
+	$("#addEditorAffiliation").click(function() {
+		var affiliationCopy = $("#editorAffiliationTemplate").clone();
+		affiliationCopy.removeAttr("id");
+		affiliationCopy.addClass("aff-info");
+		affiliationCopy.find("input").val("");
+		affiliationCopy.show();
+		$("#editorAffiliations").append(affiliationCopy);
+	});
+	
 	$("#uriEditor").change(function() {
 		resetPersonAuthorityCreation("Editor");
 		$("#uriLoadingSpinnerEditor").show();
@@ -107,25 +150,6 @@ $(function() {
 	    }, 1000);
 	});
 	
-	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
-		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
-			$("#authorCreateAuthority").hide();
-			$("#uriAuthorLocalId").val(data['id']);
-			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			$("#uriLoadingFoundAuthor").popover('hide');
-		});
-	});
-	
-	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
-		var authId = $(this).attr('data-authority-id');
-		$("#uriAuthorLocalId").val(authId);
-		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
-		$("#uriLoadingFoundAuthor").popover('hide');
-		event.preventDefault();
-	});
-	
 	$("#editorIconContainer").on('click', ".popover #editorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundEditor").attr('data-authority-uri');
 		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
@@ -133,6 +157,7 @@ $(function() {
 			$("#uriEditorLocalId").val(data['id']);
 			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
 			$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Editor");
 			$("#uriLoadingFoundEditor").popover('hide');
 		});
 	});
@@ -141,69 +166,195 @@ $(function() {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriEditorLocalId").val(authId);
 		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Editor");
 		$("#uriLoadingFoundEditor").popover('hide');
 		event.preventDefault();
 	});
+	
+	/* Handle Other Creators events */
+	$("#addCreatorButton").click(function(e) {
+		var target = $(e.target);
+		if(target.attr("data-creator-type") != null) {			
+			savePersonDetails(target.attr("data-creator-type"), "Creator");
+		} else {
+			savePersonDetails("", "Creator");
+		}
+	});
+	
+	$(".creatorModalLink").click(function(e) {
+		var target = $(e.target);
+		var creatorType = target.attr("data-creator-type").charAt(0).toUpperCase() + target.attr("data-creator-type").slice(1);
+		$("#creatorLabel").text("Enter "+creatorType+" Information");
+		$("#addCreatorButton").text("Add "+creatorType);
+		$("#addCreatorButton").attr("data-creator-type", target.attr("data-creator-type"));
+	});
+	
+	$("#addCreatorModalCancel").click(function() {
+		$("#creatorModal").modal('hide');
+		resetPersonCreationModal("Creator");
+	});
+	
+	$(".edit-creator").click(function(){
+		var creatorItem = $(this).parent();
+		editPerson('Creator', creatorItem[0]);
+	});
+	
+	$(".edit-creator").css('cursor', 'pointer');
+		
+	$(".remove-creator").click(removePerson);
+	$(".remove-creator").css('cursor', 'pointer');
+
+	$("#addCreatorAffiliation").click(function() {
+		var affiliationCopy = $("#creatorAffiliationTemplate").clone();
+		affiliationCopy.removeAttr("id");
+		affiliationCopy.addClass("aff-info");
+		affiliationCopy.find("input").val("");
+		affiliationCopy.show();
+		$("#creatorAffiliations").append(affiliationCopy);
+	});
+	
+	$("#uriCreator").change(function() {
+		resetPersonAuthorityCreation("Creator");
+		$("#uriLoadingSpinnerCreator").show();
+		var uri = $("#uriCreator").val();
+		clearTimeout(timer); 
+	    timer = setTimeout(function() {
+	    	getPersonAuthority(uri, "Creator");
+	    }, 1000);
+	});
+	
+	$("#creatorIconContainer").on('click', ".popover #creatorCreateAuthority", function() {
+		var uri = $("#uriLoadingFoundCreator").attr('data-authority-uri');
+		$.post("<c:url value="/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=" + uri, function(data) {
+			$("#creatorCreateAuthority").hide();
+			$("#uriCreatorLocalId").val(data['id']);
+			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Creator");
+			$("#uriLoadingFoundCreator").popover('hide');
+		});
+	});
+	
+	$("#creatorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).attr('data-authority-id');
+		$("#uriCreatorLocalId").val(authId);
+		$("#creatorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Creator");
+		$("#uriLoadingFoundCreator").popover('hide');
+		event.preventDefault();
+	});
+	
+	/* adding concepts */
+	$("#addConceptButton").click(function(e) {
+		e.preventDefault();
+		
+		var conceptId = $("#addConceptConceptSelect");
+		var conceptType = $("#addConceptTypeSelect");
+		
+		var conceptSpan = $('<span class="badge"></span>');
+		conceptSpan.attr("data-concept-id", conceptId.val());
+		conceptSpan.attr("data-concept-type-id", conceptType.val());
+		
+		var text = $("#addConceptConceptSelect option:selected").text();
+		var typeName = $("#addConceptTypeSelect option:selected").text();
+		conceptSpan.text(text + " | " + typeName + " ");
+	
+		$("#conceptTags").append(conceptSpan);
+		
+		$("#addConceptModal").modal('hide');
+	});
 });
 
-function editPerson(personType, item){
-	var personType_lowerCase = personType.toLowerCase();
+/* Function to populate name in modal fetched from uri */
+function showPersonNameInModal(name, personType){
+	var personName = name;
+	
+	/* Name containing brackets
+	example: Dempsey, Hugh A. (Hugh Aylmer), 1929- */
+	if(name.includes("(")) {
+		personName = name.substring(0, name.indexOf("("));
+	}
+	
+	/* Name containing title/year
+	example: Iqbāl, Muḥammad, Sir, 1877-1938 */
+	if(personName.split(",").length > 2) {
+		personName = personName.substring(0, personName.indexOf(',', personName.indexOf(",")+1));
+	}
+	
+	/* Name containing span
+	example: Dempsey, Patrick, 1966- */
+	if(personName.includes("-")) {
+		personName = personName.trim();
+		personName = personName.substring(0, personName.lastIndexOf(' '));
+	}
+	
+	/* Name separated by comma
+	example: Dempsey, Paul Stephen */
+	if(personName.indexOf(",") != -1) {
+		$("#firstName"+personType).val(personName.substring(personName.indexOf(',')+1).trim());
+		$("#lastName"+personType).val(personName.substring(0, personName.lastIndexOf(', ')));
+	} else {
+		$("#lastName"+personType).val(personName.substring(personName.lastIndexOf(' ')+1).trim());
+		$("#firstName"+personType).val(personName.substring(0, personName.lastIndexOf(' ')));
+	}
+}
+
+/* Function to populate modal on edit */
+function editPerson(modalName, item){
 	var personItem = $(item);
-	$("#firstName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-firstname"));
-	$("#lastName"+personType).val(personItem.attr("data-"+personType_lowerCase+"-lastname"));
-	$("#uri"+personType).val(personItem.attr("data-"+personType_lowerCase+"-uri"));
-	$("#id"+personType).attr("data-"+personType_lowerCase+"-id", personItem.attr("id"));
+	var modalNameLCase = modalName.toLowerCase();
+	$("#firstName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-firstname"));
+	$("#lastName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-lastname"));
+	$("#uri"+modalName).val(personItem.attr("data-"+modalNameLCase+"-uri"));
+	$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
 	
 	personItem.children("span").each(function(idx, elem){
-		var affInput = $("#"+personType_lowerCase+"AffiliationTemplate").clone();
+		var affInput = $("#"+modalNameLCase+"AffiliationTemplate").clone();
 		affInput.removeAttr("id");
 		affInput.addClass("aff-info");
 		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
 		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
 		affInput.find("input").val($(elem).data("affiliationName"));
-		$("#"+personType_lowerCase+"Modal #"+personType_lowerCase+"Affiliations").append(affInput);
+		$("#"+modalNameLCase+"Modal #"+modalNameLCase+"Affiliations").append(affInput);
 	});
 	
 	if(personItem.children("span").length > 0) {
-		$("#"+personType_lowerCase+"AffiliationTemplate").hide();
+		$("#"+modalNameLCase+"AffiliationTemplate").hide();
 	}
+	$("#addCreatorButton").attr("data-"+modalNameLCase+"-type", personItem.attr("data-"+modalNameLCase+"type"));
+	$("#add"+modalName+"Button").text("Update "+modalName);
 	
-	$("#add"+personType+"Button").text("Update "+personType);
-	
-	$("#"+personType_lowerCase+"Modal").modal('show');
+	$("#"+modalNameLCase+"Modal").modal('show');
 }
 
-function savePersonDetails(personType){
-	var personType_lowerCase = personType.toLowerCase();
+/* Function to save information on closing modal */
+function savePersonDetails(personType, modalName){
+	var modalNameLCase = modalName.toLowerCase();
 	var personSpan;
-	
-	if($("#id"+personType).attr("data-"+personType_lowerCase+"-id")) {
-		personSpan = $('#'+$("#id"+personType).attr("data-"+personType_lowerCase+"-id"));
+	var personTypeLCase = personType.toLowerCase();
+	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id") != null && $("#id"+modalName).attr("data-"+modalNameLCase+"-id").length > 0) {
+		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
+		personTypeLCase = personSpan.attr("data-creator-type").toLowerCase();
 	} else {
-		$("#id"+personType).attr("data-"+personType_lowerCase+"-id", $("#"+personType_lowerCase+"List").length);
-		personSpan = $('<span id="'+personType_lowerCase+$("#idAuthor").attr("data-"+personType_lowerCase+"-id")+'">');
+		var id = personTypeLCase + $("."+personTypeLCase+"-item").length;
+		personSpan = $('<span id='+id+'>');
 	}
 	
-	if(personType_lowerCase == "author") {
-		personSpan.attr("class", "label label-primary "+personType_lowerCase +"-item");
-	} else {
-		personSpan.attr("class", "label label-info "+personType_lowerCase +"-item");
-	}
-	
+	personSpan.attr("class", "label label-info "+personTypeLCase +"-item");
 	personSpan.html("");
-	var firstname = $("#firstName"+personType).val();
-	var lastname = $("#lastName"+personType).val();
-	var uri = $("#uri"+personType).val();
-	var localAuthority = $("#"+personType+"LocalId").val();
+	var firstname = $("#firstName"+modalName).val();
+	var lastname = $("#lastName"+modalName).val();
+	var uri = $("#uri"+modalName).val();
+	var localAuthority = $("#"+modalName+"LocalId").val();
 	
-	personSpan.attr("data-"+personType_lowerCase+"-firstname", firstname);
-	personSpan.attr("data-"+personType_lowerCase+"-lastname", lastname);
-	personSpan.attr("data-"+personType_lowerCase+"-uri", uri);
-	personSpan.attr("data-"+personType_lowerCase+"-authority-id", localAuthority);
+	personSpan.attr("data-"+modalNameLCase+"-firstname", firstname);
+	personSpan.attr("data-"+modalNameLCase+"-lastname", lastname);
+	personSpan.attr("data-"+modalNameLCase+"-uri", uri);
+	personSpan.attr("data-"+modalNameLCase+"-authority-id", localAuthority);
 	
 	var affiliationsList = [];
 	var affSpan = $("<span>");
-	$("#"+personType_lowerCase+"Affiliations").children().each(function(idx, elem) {
+	$("#"+modalNameLCase+"Affiliations").children().each(function(idx, elem) {
 		var input = $(elem).find("input");
 		if(input.val().length!=0){
 			var affSpan = $("<span>");
@@ -219,89 +370,133 @@ function savePersonDetails(personType){
 	}
 	
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-	var editIcon = $('<i class="far fa-edit edit-'+personType_lowerCase+'"></i>')
-	var deleteIcon = $('<i class="fas fa-times remove-'+personType_lowerCase+'"></i>');
+	var editIcon = $('<i class="far fa-edit edit-'+modalNameLCase+'"></i>')
+	var deleteIcon = $('<i class="fas fa-times remove-'+modalNameLCase+'"></i>');
 	editIcon.click(function(){
 		var personItem = $(this).parent();
-		editPerson(personType, personItem[0]);
+		editPerson(modalName, personItem[0]);
 	});
 	deleteIcon.click(removePerson);
 	personSpan.append(editIcon);
 	personSpan.append(deleteIcon);
-	$("#"+personType_lowerCase+"List").append(personSpan);
-	$("#"+personType_lowerCase+"List").append("&nbsp;&nbsp; ");
-	$("#"+personType_lowerCase+"Modal").modal('hide');
-	resetPersonCreationModal(personType);
+	$("#"+personTypeLCase+"List").append(personSpan);
+	$("#"+personTypeLCase+"List").append("&nbsp;&nbsp; ");
+	$("#"+modalNameLCase+"Modal").modal('hide');
+	resetPersonCreationModal(modalName);
 }
 
-function constructPersonArray(arrayName){
-		$('.'+arrayName+'-item').each(function(idx, person) {
+
+/* Function to append final information for form submission */
+function constructPersonArray(arrayName, role, iter){
+	var creator, otherCreatorCount = 0;
+	var roleLC = role.toLowerCase();
+	if(arrayName == "creator"){
+		creator = "otherCreator";
+	} else {
+		creator = arrayName;
+	}
+	$('.'+roleLC+'-item').each(function(idx, person) {
+		var creatorSubmitCount = idx + iter;
 		var personIdField = $("<input>");
 		personIdField.attr("type", "hidden");
-		personIdField.attr("id", arrayName+"s" + idx + ".id");
-		personIdField.attr("name", arrayName+"s[" + idx + "].id");
+		personIdField.attr("id", creator+"s" + creatorSubmitCount + ".id");
+		personIdField.attr("name", creator+"s[" + creatorSubmitCount + "].id");
 		personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
 		$("#editForm").append(personIdField);
 		
 		var personFirstNameField = $("<input>");
 		personFirstNameField.attr("type", "hidden");
-		personFirstNameField.attr("id", arrayName+"s" + idx + ".firstName");
-		personFirstNameField.attr("name", arrayName+"s[" + idx + "].firstName");
+		personFirstNameField.attr("id", creator+"s" + creatorSubmitCount + ".firstName");
+		personFirstNameField.attr("name", creator+"s[" + creatorSubmitCount + "].firstName");
 		personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
 		$("#editForm").append(personFirstNameField);
 		
 		var personLastNameField = $("<input>");
 		personLastNameField.attr("type", "hidden");
-		personLastNameField.attr("id", arrayName+"s" + idx + ".lastName");
-		personLastNameField.attr("name", arrayName+"s[" + idx + "].lastName");
+		personLastNameField.attr("id", creator+"s" + creatorSubmitCount + ".lastName");
+		personLastNameField.attr("name", creator+"s[" + creatorSubmitCount + "].lastName");
 		personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
 		$("#editForm").append(personLastNameField);
 		
+		var personRoleField = $("<input>");
+		personRoleField.attr("type", "hidden");
+		personRoleField.attr("id", creator+"s" + creatorSubmitCount + ".role");
+		personRoleField.attr("name", creator+"s[" + creatorSubmitCount + "].role");
+		personRoleField.attr("value", role);
+		$("#editForm").append(personRoleField);
+		
 		var personUriField = $("<input>");
 		personUriField.attr("type", "hidden");
-		personUriField.attr("id", arrayName+"s" + idx + ".uri");
-		personUriField.attr("name", arrayName+"s[" + idx + "].uri");
+		personUriField.attr("id", creator+"s" + creatorSubmitCount + ".uri");
+		personUriField.attr("name", creator+"s[" + creatorSubmitCount + "].uri");
 		personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
 		$("#editForm").append(personUriField);
 		
 		var personAuthorityField = $("<input>");
 		personAuthorityField.attr("type", "hidden");
-		personAuthorityField.attr("id", arrayName+"s" + idx + ".localAuthorityId");
-		personAuthorityField.attr("name", arrayName+"s[" + idx + "].localAuthorityId");
+		personAuthorityField.attr("id", creator+"s" + creatorSubmitCount + ".localAuthorityId");
+		personAuthorityField.attr("name", creator+"s[" + creatorSubmitCount + "].localAuthorityId");
 		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
 		$("#editForm").append(personAuthorityField);
 		
 		$(person).children("span").each(function(idx2, affiliation) {
 			var affiliationField = $("<input>");
 			affiliationField.attr("type", "hidden");
-			affiliationField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".name");
-			affiliationField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].name");
+			affiliationField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".name");
+			affiliationField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].name");
 			affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
 			$("#editForm").append(affiliationField);
 			
 			var affiliationIdField = $("<input>");
 			affiliationIdField.attr("type", "hidden");
-			affiliationIdField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".id");
-			affiliationIdField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].id");
+			affiliationIdField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".id");
+			affiliationIdField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].id");
 			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
 			$("#editForm").append(affiliationIdField);
 		});
+		otherCreatorCount += 1;
+	});
+	return otherCreatorCount;
+}
+
+function createConceptTags() {
+	$("#conceptTags").children("span").each(function (idx, tag) {
+		var conceptTagInput = $("<input>");
+		conceptTagInput.attr("type", "hidden");
+		conceptTagInput.attr("id", "conceptAssignments" + idx + ".conceptId");
+		conceptTagInput.attr("name", "conceptAssignments[" + idx + "].conceptId");
+		conceptTagInput.attr("value", $(tag).attr("data-concept-id"));
+		$("#editForm").append(conceptTagInput);
+		
+		var conceptTagTypeInput = $("<input>");
+		conceptTagTypeInput.attr("type", "hidden");
+		conceptTagTypeInput.attr("id", "conceptAssignments" + idx + ".conceptTypeId");
+		conceptTagTypeInput.attr("name", "conceptAssignments[" + idx + "].conceptTypeId");
+		conceptTagTypeInput.attr("value", $(tag).attr("data-concept-type-id"));
+		$("#editForm").append(conceptTagTypeInput);
 	});
 }
 
-function resetPersonCreationModal(personType) {
-	$("#firstName"+personType).val("");
-	$("#lastName"+personType).val("");
-	var affTemplate = $("#"+personType.toLowerCase()+"AffiliationTemplate");
-	$("#"+personType.toLowerCase()+"Affiliations").children().remove();
-	$("#"+personType.toLowerCase()+"Affiliations").append(affTemplate);
-	$("#"+personType.toLowerCase()+"AffiliationTemplate").find("input").val("");
-	$("#"+personType.toLowerCase()+"AffiliationTemplate").show();
-	$("#id"+personType).attr("data-"+personType.toLowerCase()+"-id","");
+function resetPersonCreationModal(modalType) {
+	var modalNameLCase = modalType.toLowerCase();
+	$("#firstName"+modalType).val("");
+	$("#lastName"+modalType).val("");
+	$("#id"+modalType).attr("data-"+modalType+"-id", "");
+	var affTemplate = $("#"+modalNameLCase+"AffiliationTemplate");
+	$("#"+modalNameLCase+"Affiliations").children().remove();
+	$("#"+modalNameLCase+"Affiliations").append(affTemplate);
+	$("#"+modalNameLCase+"AffiliationTemplate").find("input").val("");
+	$("#"+modalNameLCase+"AffiliationTemplate").show();
 	$(".aff-info").remove();
-	$("#uri"+personType).val("");
-	$("#add"+personType+"Button").text("Add "+personType);
-	resetPersonAuthorityCreation(personType);
+	$("#uri"+modalType).val("");
+	if(modalType == "Creator") {
+		$("#addCreatorButton").attr("data-creator-type", "");
+		$("#creatorLabel").text("Enter Creator Information");
+		$("#addCreatorButton").text("Add Creator");
+	}
+	
+	$("#add"+modalType+"Button").text("Add "+modalType);
+	resetPersonAuthorityCreation(modalType);
 }
 
 function resetPersonAuthorityCreation(personType) {
@@ -441,7 +636,7 @@ let removePerson = function removePerson(e) {
 </tr>
 
 <tr>
-<td>Authors</td>
+<td class="creator" id="author">Authors</td>
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
@@ -460,11 +655,11 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 </td>
 </tr>
 <tr>
-<td>Editors</td>
+<td class="creator" id="editor">Editors</td>
 <td>
 <span id="editorList" style="font-size: 18px">
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
-<span class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
+<span id="editor${status.index}" class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
 <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;
@@ -478,6 +673,54 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
 </td>
 </tr>
+
+<c:forEach items="${creatorMap}" var="curCreator">
+	<c:if test="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
+		<tr style="display:none;">
+			<td class="creator" id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" >${curCreator.value}
+			</td>
+			
+			<td>
+				<c:set var="role" value="${fn:toLowerCase(fn:substringAfter(curCreator.key, '_item_attribute_label_'))}" />
+				<span id="${role}List" style="font-size: 18px">
+				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
+				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+				 		<c:forEach items="${creator.person.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+							${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+							<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
+							&nbsp;<i class="far fa-edit edit-creator"></i>
+						<i class="fas fa-times remove-creator"></i>
+					</span>
+					&nbsp;&nbsp;
+				</cite:creators>
+				</span>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${curCreator.value}</a></div>
+			</td>
+		</tr>
+	</c:if>
+</c:forEach>
+<c:forEach items="${citation.otherCreatorRoles}" var="role">
+	<c:if test="${not fn:contains(creatorMap, role)}">
+		<tr class="creator-row">
+			<td style="text-transform: capitalize;">${role}s</td>
+			<td>
+				<span id="${role}List" style="font-size: 18px">
+				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
+				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+				 		<c:forEach items="${creator.person.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+							${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+							<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
+							&nbsp;<i class="far fa-edit edit-creator"></i>
+						<i class="fas fa-times remove-creator"></i>
+					</span>
+					&nbsp;&nbsp;
+				</cite:creators>
+				</span>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${role}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${role}</a></div>
+			</td>
+		</tr>
+	</c:if>
+</c:forEach>
 
 <tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
 <td>Publication Title</td>
@@ -563,6 +806,19 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <td>Rights</td>
 <td><form:input path="rights" type="text" class="form-control" placeholder="Rights" value="${not empty form.rights ? form.rights : citation.rights}" /></td>
 </tr>
+
+<tr>
+<td>Concepts</td>
+<td>
+<div id="conceptTags">
+<c:forEach items="${citation.conceptTags}" var="tag">
+<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName}</span>
+</c:forEach>
+</div>
+<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
+</td>
+</tr>
+
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
@@ -632,6 +888,9 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
         <h4 class="modal-title" id="editorLabel">Enter Editor Information</h4>
       </div>
       <div class="modal-body">
+      	<div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idEditor">
+      	  </div>
           <div class="form-group">
 		    <label for="firstNameEditor">First Name:</label>
 		    <input type="text" class="form-control" id="firstNameEditor" placeholder="First Name">
@@ -671,17 +930,106 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
     </div>
   </div>
 </div>
+
+<!-- Other Creator Modal -->
+<div class="modal fade" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="creatorLabel">Enter Creator Information</h4>
+      </div>
+      <div class="modal-body">
+      	  <div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idCreator">
+      	  </div>
+          <div class="form-group">
+		    <label for="firstNameCreator">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameCreator" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameCreator">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameCreator" placeholder="Last Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="uriCreator">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriCreator" placeholder="URI">
+			    <div id="creatorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerCreator" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundCreator" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureCreator" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriCreatorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
+		  </div>
+		  <div id="creatorAffiliations">
+		  <div id="creatorAffiliationTemplate" class="form-group">
+		    <label for="affiliationCreator">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addCreatorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="addCreatorModalCancel">Close</button>
+        <button id="addCreatorButton" type="button" class="btn btn-primary">Add Creator</button>
+      </div>
+    </div>
+  </div>
+</div> <!-- End modal -->
+
+<!-- Concept Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="addConceptModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Concept</h4>
+      </div>
+      <div class="modal-body">
+        <form id="conceptForm">
+        <p>
+        <label>Concept</label>
+        <select class="form-control" id="addConceptConceptSelect">
+        <c:forEach items="${concepts}" var="concept">
+        	<option value="${concept.id}">${concept.name}</option>
+        </c:forEach>
+        </select>
+        </p>
+        
+        <p style="padding-top: 20px;">
+        <label>Type of Concept</label>
+        <select class="form-control"  id="addConceptTypeSelect">
+        <c:forEach items="${conceptTypes}" var="type">
+        	<option value="${type.id}">${type.name}</option>
+        </c:forEach>
+        </select>
+        </p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="addConceptButton">Add</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <script>
 //# sourceURL=fields.js
 $(document).ready(function() {
+	<c:if test="${empty citation}">
+		$("#items").val("${defaultItemType}");
+	</c:if>
+	loadFields();
 	$('#items').on("change", function(e){
 		loadFields();
 	});
 	
-	<c:if test="${empty citation}">
-	$("#items").val("${defaultItemType}");
-	loadFields();
-	</c:if>
 });
 
 function loadFields() {
@@ -694,8 +1042,7 @@ function loadFields() {
 		type : 'GET',
 		success: function(changedFields){
 			$('form input').each(function(idx, elem) {
-				var tr = $(elem).parent().closest('tr');
-				tr.hide()
+				$(elem).parent().closest('tr').hide();
 			});
 			for(i=0;i<changedFields.length;i++){
 				$('form input#'+changedFields[i]).parent().closest('tr').show();
@@ -713,5 +1060,75 @@ function loadFields() {
 			
 		}
 	});
+	$.ajax({
+		url : '<c:url value="/auth/items/'+itemType+'/creators" />',
+		type : 'GET',
+		success: function(creators){
+			$('.creator-row').each(function(idx, elem) {
+				$(elem).hide();
+			});
+			for(i=0;i<creators.length;i++){
+				if($('[id='+creators[i]).length > 0) {
+					$('[id='+creators[i]).parent().closest('tr').addClass("creator-row");
+					$('[id='+creators[i]).parent().closest('tr').show();
+				}
+				else if(creators[i]!= 'editor' && creators[i]!= 'author'){
+					var creatorRow = $("<tr>");
+					creatorRow.css("display", "table-row");
+					creatorRow.addClass("creator-row");
+					var creatorLabel = $("<td>");
+					creatorLabel.addClass("creator");
+					creatorLabel.css("text-transform", "capitalize");
+					creatorLabel.attr("id", creators[i]);
+					creatorLabel.append(creators[i]);
+					creatorRow.append(creatorLabel);
+					var creatorData = $("<td>");
+					var creatorList = $("<span>");
+					creatorList.attr("id",creators[i]+"List");
+					creatorList.css("font-size", "18px");
+					creatorData.append(creatorList);
+					var addIconDiv = $("<div>");
+					addIconDiv.addClass("pull-right");
+					var iconLink = $("<a>");
+					
+					iconLink.attr("data-toggle","modal");
+					iconLink.attr("data-creator-type", creators[i]);
+					iconLink.attr("data-target","#creatorModal");
+					var iconImg = $("<i>");
+					iconImg.addClass("fas fa-plus-circle");
+					iconLink.append(iconImg);
+					iconLink.append("Add "+creators[i]);
+					addIconDiv.append(iconLink);
+					creatorData.append(addIconDiv);
+					creatorRow.append(creatorData);
+					creatorRow.insertAfter($('.creator').last().parent());	
+					$("#creatorLabel").css("text-transform", "capitalize");
+					$("#creatorLabel").text("Enter "+creators[i]+" Information");
+					$("#addCreatorButton").css("text-transform", "capitalize");
+					$("#addCreatorButton").text("Add "+creators[i]);
+					$("#addCreatorButton").attr("data-creator-type", creators[i]);
+					iconLink.click(function(e) {
+						creatorLinkHandler($(e.target));
+					});
+				}
+
+			}
+		},
+		error: function(){
+			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+			"Error loading the creators. Try again later.");
+			$('#messageModal').modal('show');
+			setTimeout(function() {
+				$('#messageModal').modal('hide');
+		  	}, 3000);
+			
+		}
+	});
+}
+function creatorLinkHandler(target) {
+	var creatorType = target.attr("data-creator-type").charAt(0).toUpperCase() + target.attr("data-creator-type").slice(1);
+	$("#creatorLabel").text("Enter "+creatorType+" Information");
+	$("#addCreatorButton").text("Add "+creatorType);
+	$("#addCreatorButton").attr("data-creator-type", target.attr("data-creator-type"));
 }
 </script>

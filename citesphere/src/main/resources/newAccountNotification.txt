@@ -1,0 +1,24 @@
+<html>
+	<body>
+		<p>
+			Hi $admin!
+		</p>
+		
+		<p>
+			A new account request for $createdUser ($createdUsername) has been created in $app. 
+			<br>
+			Please review the account request and approve or reject it here:
+			<br><a href="$url">$url</a>
+		</p>
+		
+		<p>
+			Your $app Team
+		</p>
+		
+		<p>
+			<br>
+			-----<br>
+			This email was automatically generated. Please do not reply.
+		</p>
+	</body>
+</html>
