@@ -19,5 +19,12 @@ public interface PageRequestRepository extends PagingAndSortingRepository<PageRe
     @Query(value="SELECT DISTINCT pr from PageRequest pr LEFT JOIN FETCH pr.citations c LEFT JOIN FETCH c.authors a WHERE pr.objectId = ?2 AND pr.user = ?1 AND pr.pageNumber = ?3 AND pr.zoteroObjectType = ?4")
 //    @EntityGraph(value="requestsWithFullCitations")
     List<PageRequest> findPageRequestWithCitations(IUser user, String objectId, int page, ZoteroObjectType zoteroObjectType);
+    
+    @Query(value="SELECT DISTINCT pr from PageRequest pr LEFT JOIN FETCH pr.citations c LEFT JOIN FETCH c.conceptTags ct WHERE pr.objectId = ?2 AND pr.user = ?1 AND pr.pageNumber = ?3 AND pr.zoteroObjectType = ?4 AND ct.conceptName like CONCAT('%',UPPER(?5),'%') order by ?6")
+    List<PageRequest> findPageRequestWithObjectIdAndConceptTags(IUser user, String objectId, int page, ZoteroObjectType zoteroObjectType, String conceptTag, String sortBy);
+    
+    @Query(value="SELECT DISTINCT pr from PageRequest pr LEFT JOIN FETCH pr.citations c LEFT JOIN FETCH c.conceptTags ct WHERE pr.objectId = ?2 AND pr.collectionId = ?7 AND pr.user = ?1 AND pr.pageNumber = ?3 AND pr.zoteroObjectType = ?4 AND ct.conceptName like CONCAT('%',UPPER(?5),'%') order by ?6")
+    List<PageRequest> findPageRequestWithObjectIdAndCollectionIdAndConceptTags(IUser user, String objectId, int page, ZoteroObjectType zoteroObjectType, String conceptTag, String sortBy, String collectionId);
+    
 } 
 

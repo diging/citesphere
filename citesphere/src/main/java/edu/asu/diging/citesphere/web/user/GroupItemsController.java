@@ -54,7 +54,8 @@ public class GroupItemsController {
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
-            @RequestParam(required = false, value = "columns") String[] columns)
+            @RequestParam(required = false, value = "columns") String[] columns,
+            @RequestParam(required = false, value = "conceptTag") String conceptTag)
             throws GroupDoesNotExistException {
         
         Integer pageInt = 1;
@@ -65,7 +66,7 @@ public class GroupItemsController {
         }
 
         IUser user = (IUser) authentication.getPrincipal();
-        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, conceptTag);
         model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
@@ -73,6 +74,8 @@ public class GroupItemsController {
         model.addAttribute("zoteroGroupId", groupId);
         model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("citationCollections", collectionManager.getCitationCollections(user, groupId, collectionId, pageInt, "title").getCitationCollections());
+        model.addAttribute("collectionId", collectionId);
+        model.addAttribute("conceptTag", conceptTag);
         
         List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();
