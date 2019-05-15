@@ -31,6 +31,7 @@ $(function() {
 	$('.collapse').collapse();
 	
 	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
+	var conceptSearchString = $("#search-input").val();
 	
 	$("#addionalColumns a").click(function(event) {
 		var isShown = $(this).data("is-shown");
@@ -42,27 +43,40 @@ $(function() {
 		} else {
 			shownColumns.push(col);
 		}
-		window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />?columns=" + shownColumns; 
+		reloadWithParams(shownColumns, conceptSearchString);
 	});
+	
 	
 	$("#search-input").on('keyup', function (e) {
 		if (e.keyCode == 13) {
-			var conceptSearchString = $("#search-input").val();
-			if(conceptSearchString !== ""){
-				var collectionId = "${collectionId}";
-				if(collectionId === ""){
-					window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />?conceptTag=" + conceptSearchString;
-				}else{
-					window.location.href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/" />?conceptTag=" + conceptSearchString;
-				}
-				
-			}
+			conceptSearchString = $("#search-input").val();
+			reloadWithParams(shownColumns, conceptSearchString);
 		}
 	});
 });
 
-function reloadWithParams(){
+function reloadWithParams(shownColumns, conceptSearchString){
+	var queryString = "";
 	
+	if(shownColumns.length != 0){
+		queryString += "columns=" + shownColumns;
+	}
+	
+	if(conceptSearchString !== ""){
+		if(shownColumns.length != 0){
+			queryString += "&";
+		}
+        queryString += "conceptTag=" + conceptSearchString;
+    }
+	
+	if(shownColumns.length != 0 || conceptSearchString !== ""){
+		var collectionId = "${collectionId}";
+        if(collectionId === ""){
+            window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />?" + queryString;
+        }else{
+            window.location.href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/" />?" + queryString;
+        }
+	}
 }
 </script>
 
