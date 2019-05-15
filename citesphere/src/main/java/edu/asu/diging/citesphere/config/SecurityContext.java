@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
@@ -25,6 +26,9 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+
+import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
+import edu.asu.diging.citesphere.core.service.oauth.impl.OAuthClientManager;
 
 @Configuration
 @EnableWebSecurity
@@ -59,7 +63,13 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
         @Autowired
         private AuthenticationManager authenticationManager;
-
+        
+        @Autowired 
+        private OAuthClientRepository clientRepo;
+        
+        @Autowired
+        private BCryptPasswordEncoder bCryptPasswordEncoder;
+        
         @Bean
         public TokenStore tokenStore() {
             return new InMemoryTokenStore();
@@ -72,15 +82,17 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
         @Override
         public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
-            configurer.inMemory().withClient(CLIENT_ID).secret(CLIENT_SECRET)
-                    .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, REFRESH_TOKEN, IMPLICIT)
-                    .scopes(SCOPE_READ, SCOPE_WRITE, TRUST).accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)
-                    .refreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
+            configurer.withClientDetails(clientDetailsService());
+        }
+        
+        @Bean
+        public ClientDetailsService clientDetailsService() {
+            return new OAuthClientManager(clientRepo, bCryptPasswordEncoder);
         }
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-            endpoints// .prefix("/api/v1/")
+            endpoints
                     .pathMapping("/oauth/authorize", "/api/v1/oauth/authorize")
                     .pathMapping("/oauth/check_token", "/api/v1/oauth/check_token")
                     .pathMapping("/oauth/confirm_access", "/api/v1/oauth/confirm_access")

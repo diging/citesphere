@@ -26,6 +26,11 @@
 	<definition name="admin/user/list" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/admin/user/list.jsp" />	
 	</definition>	
+    
+    <!-- Apps -->
+    <definition name="admin/apps/add" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/admin/apps/add.jsp" /> 
+    </definition>   
 	
 	<!-- zotero -->
 	<definition name="auth/group/items" extends="base.definition">
