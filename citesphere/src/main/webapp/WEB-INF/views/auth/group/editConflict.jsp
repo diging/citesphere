@@ -94,7 +94,7 @@ Do you want to proceed?
 </h2>
 
 <!--  current citation fields -->
-<div class="col-md-4">
+<div class="col-md-6">
 <h4>Data retrieved from Zotero (Version ${currentCitation.version})</h4>
 <table class="table table-striped">
 <tr>
@@ -255,7 +255,7 @@ Do you want to proceed?
 </div>
 
 <!-- Form fields -->
-<div class="col-md-4">
+<div class="col-md-6">
 <h4>Your edits</h4>
 
 <table class="table table-striped">

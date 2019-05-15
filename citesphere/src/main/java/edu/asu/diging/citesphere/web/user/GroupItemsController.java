@@ -36,27 +36,27 @@ public class GroupItemsController {
 
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
-    
+
     @Value("${_available_item_columns}")
     private String availableColumns;
 
     @Autowired
     private ICitationManager citationManager;
-    
+
     @Autowired
     private ICitationCollectionManager collectionManager;
-    
+
     @Autowired
     private IGroupManager groupManager;
 
-    @RequestMapping(value= { "/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items",
+            "/auth/group/{zoteroGroupId}/collection/{collectionId}/items" })
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value="collectionId", required=false) String collectionId,
+            @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
-            @RequestParam(required = false, value = "columns") String[] columns)
-            throws GroupDoesNotExistException {
-        
+            @RequestParam(required = false, value = "columns") String[] columns) throws GroupDoesNotExistException {
+
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
@@ -72,8 +72,9 @@ public class GroupItemsController {
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", groupId);
         model.addAttribute("group", groupManager.getGroup(user, groupId));
-        model.addAttribute("citationCollections", collectionManager.getCitationCollections(user, groupId, collectionId, pageInt, "title").getCitationCollections());
-        
+        model.addAttribute("citationCollections", collectionManager
+                .getCitationCollections(user, groupId, collectionId, pageInt, "title").getCitationCollections());
+
         List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();
         if (columns != null && columns.length > 0) {
@@ -83,20 +84,20 @@ public class GroupItemsController {
                 }
             }
         }
-        
+
         model.addAttribute("columns", shownColumns);
         model.addAttribute("availableColumns", allowedColumns);
-        
-        
+
         ICitationGroup group = groupManager.getGroup(user, groupId);
         List<BreadCrumb> breadCrumbs = new ArrayList<>();
-        
+
         ICitationCollection collection = null;
         if (collectionId != null) {
             collection = collectionManager.getCollection(user, groupId, collectionId);
         }
-        while(collection != null) {
-            breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
+        while (collection != null) {
+            breadCrumbs.add(
+                    new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
             if (collection.getParentCollectionKey() != null) {
                 collection = collectionManager.getCollection(user, groupId, collection.getParentCollectionKey());
             } else {

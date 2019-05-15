@@ -833,14 +833,6 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 
 <form:input path="version" type="hidden" class="form-control" value="${citation.version}" />
 
-<c:if test="${not empty resolvedForm}">
-<form:input path="resolved" type="hidden" class="form-control" value="true" />
-</c:if>
-
-<c:if test="${empty resolvedForm}">
-<form:input path="resolved" type="hidden" class="form-control" value="false" />
-</c:if>
-
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
