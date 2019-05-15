@@ -186,6 +186,7 @@ function reloadWithParams(shownColumns, conceptSearchString){
 		</ul>
 	</div>
 
+    <c:if test="${fn:length(items) != 0}">
 	<table class="table table-striped table-bordered">
 		<tr>
 			<th>Type</th>
@@ -238,4 +239,10 @@ function reloadWithParams(shownColumns, conceptSearchString){
 			</tr>
 		</c:forEach>
 	</table>
+	</c:if>
+	<c:if test="${fn:length(items) == 0}">
+	<div class="alert alert-info" role="alert" style="margin-top:50px;">
+	  No results found.
+	</div>
+	</c:if>
 </div>

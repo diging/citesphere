@@ -253,13 +253,16 @@ public class CitationManager implements ICitationManager {
 		}
 	    }
 
-	    CitationResults results = null;
-	    if (collectionId == null || collectionId.trim().isEmpty()) {
-		results = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getVersion());
-	    } else {
-		results = zoteroManager.getCollectionItems(user, groupId, collectionId, page, sortBy,
-			group.getVersion());
-	    }
+	    CitationResults results = new CitationResults();
+	    results.setCitations(new ArrayList<>());
+	    results.setTotalResults(0);
+	    results.setNotModified(true);
+//	    if (collectionId == null || collectionId.trim().isEmpty()) {
+//		results = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getVersion());
+//	    } else {
+//		results = zoteroManager.getCollectionItems(user, groupId, collectionId, page, sortBy,
+//			group.getVersion());
+//	    }
 	    if (!results.isNotModified()) {
 		if (requests != null && requests.size() > 0) {
 		    // delete last cache
