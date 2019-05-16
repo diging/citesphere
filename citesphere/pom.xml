@@ -44,6 +44,8 @@
         <email.smtp.auth>true</email.smtp.auth>
         <email.smtp.starttls.enable>true</email.smtp.starttls.enable>
         <email.debug>false</email.debug>
+        
+        <token.signing.key></token.signing.key>
 
         <app.name>Citesphere</app.name>
         <app.url></app.url>
@@ -405,6 +407,14 @@
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+
 
 
     </dependencies>

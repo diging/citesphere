@@ -1,8 +1,10 @@
 package edu.asu.diging.citesphere.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,6 +35,7 @@ import edu.asu.diging.citesphere.core.service.oauth.impl.OAuthClientManager;
 @Configuration
 @EnableWebSecurity
 public class SecurityContext extends WebSecurityConfigurerAdapter {
+    
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -44,6 +47,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Configuration
     @EnableAuthorizationServer
+    @PropertySource("classpath:/config.properties")
     public static class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
 
         static final String CLIENT_ID = "android-client";
@@ -55,8 +59,10 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         static final String SCOPE_READ = "read";
         static final String SCOPE_WRITE = "write";
         static final String TRUST = "trust";
-        static final int ACCESS_TOKEN_VALIDITY_SECONDS = 1 * 60 * 60;
         static final int REFRESH_TOKEN_VALIDITY_SECONDS = 6 * 60 * 60;
+        
+        @Value("${_oauth_token_validity}")
+        private int oauthTokenValidity;
 
         @Autowired
         private TokenStore tokenStore;
@@ -87,7 +93,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         
         @Bean
         public ClientDetailsService clientDetailsService() {
-            return new OAuthClientManager(clientRepo, bCryptPasswordEncoder);
+            return new OAuthClientManager(clientRepo, bCryptPasswordEncoder, oauthTokenValidity);
         }
 
         @Override
