@@ -1,7 +1,10 @@
 package edu.asu.diging.citesphere.web.forms;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 
 public class CitationForm {
@@ -259,5 +262,25 @@ public class CitationForm {
 
     public void setConceptAssignments(List<ConceptAssignmentForm> conceptAssignments) {
         this.conceptAssignments = conceptAssignments;
+    }
+    
+    public Set<String> getOtherCreatorRoles() {
+        Set<String> roles = new HashSet<>();
+        if (otherCreators != null) {
+            otherCreators.forEach(c -> roles.add(c.getRole()));
+        }
+        return roles;
+    }
+
+    public Set<ICreator> getOtherCreators(String role) {
+        Set<ICreator> creators = new HashSet<>();
+        if (otherCreators != null) {
+            otherCreators.forEach(c -> {
+                if (c.getRole().equals(role)) {
+                    creators.add((ICreator) c);
+                }
+            });
+        }
+        return creators;
     }
 }

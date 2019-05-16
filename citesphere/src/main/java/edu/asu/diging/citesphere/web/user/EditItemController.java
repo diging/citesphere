@@ -119,62 +119,62 @@ public class EditItemController {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         if (form.getVersion() == citation.getVersion()) {
 
-            // load authors and editors before detaching
-            citation.getAuthors().forEach(a -> a.getAffiliations().size());
-            System.out.println(citation.getAuthors().size());
-            citation.getEditors().forEach(e -> e.getAffiliations().size());
             citationManager.detachCitation(citation);
             citationHelper.updateCitation(citation, form);
 
             try {
                 citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
             } catch (CitationIsOutdatedException e) {
-                System.out.println(e);
+                return handleConflict(authentication, form, model, zoteroGroupId, itemId);
             }
 
         } else {
-            citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
-            ICitation currentCitation = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),
-                    zoteroGroupId, itemId);
-            model.addAttribute("outdatedCitation", citation);
-            model.addAttribute("currentCitation", currentCitation);
-            model.addAttribute("form", form);
-            model.addAttribute("zoteroGroupId", zoteroGroupId);
-
-            Set<IPerson> currentAuthors = currentCitation.getAuthors();
-            Set<IPerson> formAuthors = personFormListToPersonSet(form.getAuthors());
-            if (!currentAuthors.equals(formAuthors)) {
-                model.addAttribute("authorsChanged", true);
-            } else {
-                model.addAttribute("authorsChanged", false);
-            }
-
-            Set<IPerson> currentEditors = currentCitation.getEditors();
-            Set<IPerson> formEditors = personFormListToPersonSet(form.getEditors());
-            if (!currentEditors.equals(formEditors)) {
-                model.addAttribute("editorsChanged", true);
-            } else {
-                model.addAttribute("editorsChanged", false);
-            }
-
-            List<String> outdatedCitationFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
-                    .forEach(f -> outdatedCitationFields.add(f.getFilename()));
-            model.addAttribute("outdatedCitationFields", outdatedCitationFields);
-
-            List<String> currentCitationFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), currentCitation.getItemType())
-                    .forEach(f -> currentCitationFields.add(f.getFilename()));
-            model.addAttribute("currentCitationFields", currentCitationFields);
-
-            List<String> formFields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), form.getItemType())
-                    .forEach(f -> formFields.add(f.getFilename()));
-            model.addAttribute("formFields", formFields);
-
-            return "auth/group/items/item/edit/conflict";
+            return handleConflict(authentication, form, model, zoteroGroupId, itemId);
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
+    }
+
+    private String handleConflict(Authentication authentication, CitationForm form, Model model, String zoteroGroupId,
+            String itemId) {
+        ICitation currentCitation = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),
+                zoteroGroupId, itemId);
+        model.addAttribute("currentCitation", currentCitation);
+        model.addAttribute("form", form);
+        model.addAttribute("zoteroGroupId", zoteroGroupId);
+
+        Set<IPerson> currentAuthors = currentCitation.getAuthors();
+        Set<IPerson> formAuthors = personFormListToPersonSet(form.getAuthors());
+        if (!currentAuthors.equals(formAuthors)) {
+            model.addAttribute("authorsChanged", true);
+        } else {
+            model.addAttribute("authorsChanged", false);
+        }
+
+        Set<IPerson> currentEditors = currentCitation.getEditors();
+        Set<IPerson> formEditors = personFormListToPersonSet(form.getEditors());
+        if (!currentEditors.equals(formEditors)) {
+            model.addAttribute("editorsChanged", true);
+        } else {
+            model.addAttribute("editorsChanged", false);
+        }
+
+        List<String> currentCitationFields = new ArrayList<>();
+        citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), currentCitation.getItemType())
+                .forEach(f -> currentCitationFields.add(f.getFilename()));
+        model.addAttribute("currentCitationFields", currentCitationFields);
+
+        List<String> formFields = new ArrayList<>();
+        citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), form.getItemType())
+                .forEach(f -> formFields.add(f.getFilename()));
+        model.addAttribute("formFields", formFields);
+        
+        model.addAttribute("creatorMap", properties.entrySet());
+
+        model.addAttribute("concepts", conceptManager.findAll(userManager.findByUsername(authentication.getName())));
+        model.addAttribute("conceptTypes",
+                typeManager.getAllTypes(userManager.findByUsername(authentication.getName())));
+
+        return "auth/group/items/item/edit/conflict";
     }
 
     private Set<IPerson> personFormListToPersonSet(List<PersonForm> personForms) {
@@ -249,7 +249,7 @@ public class EditItemController {
             try {
                 field.setAccessible(true);
 
-                if (fieldname.equals("authors") || fieldname.equals("editors")) {
+                if (fieldname.equals("authors") || fieldname.equals("editors") || fieldname.equals("otherCreators")) {
 
                     List<PersonForm> formValue = field.get(form) != null ? (List<PersonForm>) field.get(form) : null;
                     Set<IPerson> formValueSet = formValue != null ? personFormListToPersonSet(formValue) : null;
@@ -291,7 +291,7 @@ public class EditItemController {
             String fieldName = field.getName();
             if (!changedFields.contains(fieldName)) {
 
-                if (fieldName.equals("authors") || fieldName.equals("editors")) {
+                if (fieldName.equals("authors") || fieldName.equals("editors") || fieldName.equals("otherCreators")) {
                     try {
                         Field citationField = citation.getClass().getDeclaredField(fieldName);
                         citationField.setAccessible(true);

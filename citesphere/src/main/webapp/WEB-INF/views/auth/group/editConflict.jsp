@@ -4,70 +4,150 @@
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="cite" uri="https://diging.asu.edu/jps/tlds/citesphere" %>
 
 <script type="text/javascript">
 $(function() {
 	$("#conflictFormSubmit").click(function() {
-		constructPersonArray("author");
-		constructPersonArray("editor");
+		constructPersonArray("author", "author", 0);
+        constructPersonArray("editor", "editor", 0);
+        var creatorSubmitCount = 0;
+        $(".creator-row").each(function(idx, elem){
+            var ele = $(elem).children().first();
+            if(!(ele.attr("id")=="editor" || ele.attr("id")=="author")) {
+                var roleCount = constructPersonArray("creator", ele.attr("id"), creatorSubmitCount);
+                creatorSubmitCount = creatorSubmitCount + roleCount;
+            }
+        });
 	});
 });
 
-function constructPersonArray(arrayName){
-		$('.'+arrayName+'-item').each(function(idx, person) {
-			
-			var personIdField = $("<input>");
-			personIdField.attr("type", "hidden");
-			personIdField.attr("id", arrayName+"s" + idx + ".id");
-			personIdField.attr("name", arrayName+"s[" + idx + "].id");
-			personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
-			$("#conflictForm").append(personIdField);
-			
-			var personFirstNameField = $("<input>");
-			personFirstNameField.attr("type", "hidden");
-			personFirstNameField.attr("id", arrayName+"s" + idx + ".firstName");
-			personFirstNameField.attr("name", arrayName+"s[" + idx + "].firstName");
-			personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
-			$("#conflictForm").append(personFirstNameField);
-			
-			var personLastNameField = $("<input>");
-			personLastNameField.attr("type", "hidden");
-			personLastNameField.attr("id", arrayName+"s" + idx + ".lastName");
-			personLastNameField.attr("name", arrayName+"s[" + idx + "].lastName");
-			personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
-			$("#conflictForm").append(personLastNameField);
-			
-			var personUriField = $("<input>");
-			personUriField.attr("type", "hidden");
-			personUriField.attr("id", arrayName+"s" + idx + ".uri");
-			personUriField.attr("name", arrayName+"s[" + idx + "].uri");
-			personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
-			$("#conflictForm").append(personUriField);
-			
-			var personAuthorityField = $("<input>");
-			personAuthorityField.attr("type", "hidden");
-			personAuthorityField.attr("id", arrayName+"s" + idx + ".localAuthorityId");
-			personAuthorityField.attr("name", arrayName+"s[" + idx + "].localAuthorityId");
-			personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
-			$("#conflictForm").append(personAuthorityField);
-			
-			$(person).children("span").each(function(idx2, affiliation) {
-				var affiliationField = $("<input>");
-				affiliationField.attr("type", "hidden");
-				affiliationField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".name");
-				affiliationField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].name");
-				affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
-				$("#conflictForm").append(affiliationField);
-				
-				var affiliationIdField = $("<input>");
-				affiliationIdField.attr("type", "hidden");
-				affiliationIdField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".id");
-				affiliationIdField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].id");
-				affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
-				$("#conflictForm").append(affiliationIdField);
-			});
-	});
+function constructPersonArray(arrayName, role, iter){
+    var creator, otherCreatorCount = 0;
+    var roleLC = role.toLowerCase();
+    if(arrayName == "creator"){
+        creator = "otherCreator";
+    } else {
+        creator = arrayName;
+    }
+    $('.'+roleLC+'-item').each(function(idx, person) {
+        var creatorSubmitCount = idx + iter;
+        var personIdField = $("<input>");
+        personIdField.attr("type", "hidden");
+        personIdField.attr("id", creator+"s" + creatorSubmitCount + ".id");
+        personIdField.attr("name", creator+"s[" + creatorSubmitCount + "].id");
+        personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
+        $("#editForm").append(personIdField);
+        
+        var personFirstNameField = $("<input>");
+        personFirstNameField.attr("type", "hidden");
+        personFirstNameField.attr("id", creator+"s" + creatorSubmitCount + ".firstName");
+        personFirstNameField.attr("name", creator+"s[" + creatorSubmitCount + "].firstName");
+        personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
+        $("#editForm").append(personFirstNameField);
+        
+        var personLastNameField = $("<input>");
+        personLastNameField.attr("type", "hidden");
+        personLastNameField.attr("id", creator+"s" + creatorSubmitCount + ".lastName");
+        personLastNameField.attr("name", creator+"s[" + creatorSubmitCount + "].lastName");
+        personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
+        $("#editForm").append(personLastNameField);
+        
+        var personRoleField = $("<input>");
+        personRoleField.attr("type", "hidden");
+        personRoleField.attr("id", creator+"s" + creatorSubmitCount + ".role");
+        personRoleField.attr("name", creator+"s[" + creatorSubmitCount + "].role");
+        personRoleField.attr("value", role);
+        $("#editForm").append(personRoleField);
+        
+        var personUriField = $("<input>");
+        personUriField.attr("type", "hidden");
+        personUriField.attr("id", creator+"s" + creatorSubmitCount + ".uri");
+        personUriField.attr("name", creator+"s[" + creatorSubmitCount + "].uri");
+        personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
+        $("#editForm").append(personUriField);
+        
+        var personAuthorityField = $("<input>");
+        personAuthorityField.attr("type", "hidden");
+        personAuthorityField.attr("id", creator+"s" + creatorSubmitCount + ".localAuthorityId");
+        personAuthorityField.attr("name", creator+"s[" + creatorSubmitCount + "].localAuthorityId");
+        personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
+        $("#editForm").append(personAuthorityField);
+        
+        $(person).children("span").each(function(idx2, affiliation) {
+            var affiliationField = $("<input>");
+            affiliationField.attr("type", "hidden");
+            affiliationField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".name");
+            affiliationField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].name");
+            affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
+            $("#editForm").append(affiliationField);
+            
+            var affiliationIdField = $("<input>");
+            affiliationIdField.attr("type", "hidden");
+            affiliationIdField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".id");
+            affiliationIdField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].id");
+            affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
+            $("#editForm").append(affiliationIdField);
+        });
+        otherCreatorCount += 1;
+    });
+    return otherCreatorCount;
 }
+/* function constructPersonArray(arrayName){
+	$('.'+arrayName+'-item').each(function(idx, person) {
+		
+		var personIdField = $("<input>");
+		personIdField.attr("type", "hidden");
+		personIdField.attr("id", arrayName+"s" + idx + ".id");
+		personIdField.attr("name", arrayName+"s[" + idx + "].id");
+		personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
+		$("#conflictForm").append(personIdField);
+		
+		var personFirstNameField = $("<input>");
+		personFirstNameField.attr("type", "hidden");
+		personFirstNameField.attr("id", arrayName+"s" + idx + ".firstName");
+		personFirstNameField.attr("name", arrayName+"s[" + idx + "].firstName");
+		personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
+		$("#conflictForm").append(personFirstNameField);
+		
+		var personLastNameField = $("<input>");
+		personLastNameField.attr("type", "hidden");
+		personLastNameField.attr("id", arrayName+"s" + idx + ".lastName");
+		personLastNameField.attr("name", arrayName+"s[" + idx + "].lastName");
+		personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
+		$("#conflictForm").append(personLastNameField);
+		
+		var personUriField = $("<input>");
+		personUriField.attr("type", "hidden");
+		personUriField.attr("id", arrayName+"s" + idx + ".uri");
+		personUriField.attr("name", arrayName+"s[" + idx + "].uri");
+		personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
+		$("#conflictForm").append(personUriField);
+		
+		var personAuthorityField = $("<input>");
+		personAuthorityField.attr("type", "hidden");
+		personAuthorityField.attr("id", arrayName+"s" + idx + ".localAuthorityId");
+		personAuthorityField.attr("name", arrayName+"s[" + idx + "].localAuthorityId");
+		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
+		$("#conflictForm").append(personAuthorityField);
+		
+		$(person).children("span").each(function(idx2, affiliation) {
+			var affiliationField = $("<input>");
+			affiliationField.attr("type", "hidden");
+			affiliationField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".name");
+			affiliationField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].name");
+			affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
+			$("#conflictForm").append(affiliationField);
+			
+			var affiliationIdField = $("<input>");
+			affiliationIdField.attr("type", "hidden");
+			affiliationIdField.attr("id", arrayName+"s" + idx + ".affiliations" + idx2 + ".id");
+			affiliationIdField.attr("name", arrayName+"s[" + idx + "].affiliations[" + idx2 + "].id");
+			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
+			$("#conflictForm").append(affiliationIdField);
+		});
+	});
+} */
 //# sourceURL=somename.js
 </script>
 <ol class="breadcrumb">
@@ -149,6 +229,27 @@ Do you want to proceed?
 </c:forEach>
 </td>
 </tr>
+<c:forEach items="${currentCitation.otherCreatorRoles}" var="role">
+<tr>
+<td>
+<spring:eval expression="@labelsResource.getProperty('_item_attribute_label_${role}', '${role}')" />
+</td>
+<td>
+<cite:creators citation="${currentCitation}" role="${role}" var="creator">
+ ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+<c:if test="${not empty creator.person.affiliations}">
+ (<c:forEach items="${creator.person.affiliations}" varStatus="affStatus" var="aff">${aff.name}<c:if test="${!affStatus.last}">, </c:if></c:forEach>)<c:if test="${!status.last}">; </c:if>
+ </c:if>
+ <c:if test="${not empty creator.person.uri}">
+ <a href="${creator.person.uri}" target="_blank"><i class="fas fa-link"></i></a>
+ </c:if>
+  <c:if test="${not empty creator.person.localAuthorityId}">
+ <a href="<c:url value="/auth/authority/${creator.person.localAuthorityId}" />"><i class="fas fa-anchor"></i></a>
+ </c:if><c:if test="${!lastIteration}">; </c:if>
+</cite:creators>
+</td>
+</tr>
+</c:forEach>
 <c:if test="${fn:contains(currentCitationFields, 'publicationTitle') }">
 <tr>
 <td>Publication Title</td>
@@ -325,6 +426,28 @@ data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorit
 </c:forEach>
 </td>
 </tr>
+<%-- <c:forEach items="${currentCitation.otherCreatorRoles}" var="curCreator">
+    <c:if test="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
+        <tr style="">
+            <td class="creator" id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" >${curCreator.value}
+            </td>
+            
+            <td>
+                <c:set var="role" value="${fn:toLowerCase(fn:substringAfter(curCreator.key, '_item_attribute_label_'))}" />
+                <span id="${role}List" style="font-size: 18px">
+                <cite:creators citation="${currentCitation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
+                    <span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+                        <c:forEach items="${creator.person.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+                            ${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+                            <c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
+                    </span>      
+                </cite:creators>
+                </span>
+                
+            </td>
+        </tr>
+    </c:if>
+</c:forEach> --%>
 <c:if test="${fn:contains(formFields, 'publicationTitle') }">
 <tr  <c:if test="${form.publicationTitle != currentCitation.publicationTitle}" >class="changed"</c:if>>
 <td>Publication Title</td>

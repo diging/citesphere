@@ -36,11 +36,11 @@ public class Citation implements ICitation {
 
     private long version;
     private String title;
-    @OneToMany(targetEntity = Person.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity = Person.class, cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinTable(name = "Citation_Author")
     @OrderBy("positionInList")
     private Set<IPerson> authors;
-    @OneToMany(targetEntity = Person.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity = Person.class, cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinTable(name = "Citation_Editor")
     @OrderBy("positionInList")
     private Set<IPerson> editors;
