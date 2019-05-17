@@ -1,13 +1,21 @@
 package edu.asu.diging.citesphere.core.model.jobs.impl;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
+
+import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 
 @Entity
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
@@ -22,6 +30,12 @@ public class Job {
     private String id;
     
     private String username;
+    
+    @Enumerated(EnumType.STRING)
+    private JobStatus status;
+    
+    @OneToMany(cascade=CascadeType.ALL)
+    private List<JobPhase> phases;
     
 
     /* (non-Javadoc)
@@ -48,5 +62,21 @@ public class Job {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public JobStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(JobStatus status) {
+        this.status = status;
+    }
+
+    public List<JobPhase> getPhases() {
+        return phases;
+    }
+
+    public void setPhases(List<JobPhase> phases) {
+        this.phases = phases;
     }
 }

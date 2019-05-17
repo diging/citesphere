@@ -11,7 +11,7 @@
     <properties>
         <org.slf4j-version>1.7.25</org.slf4j-version>
         <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
-        <spring-security-version>5.1.3.RELEASE</spring-security-version>
+        <spring-security-version>5.1.5.RELEASE</spring-security-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
         <spring.version>5.1.2.RELEASE</spring.version>
         <spring-data.version>Lovelace-RELEASE</spring-data.version>
@@ -27,6 +27,8 @@
         <db.database.url></db.database.url>
         <db.user></db.user>
         <db.password></db.password>
+
+        <upload.folder.path></upload.folder.path>
 
         <tomcat.deploy.path></tomcat.deploy.path>
         <tomcat.app.name>citesphere</tomcat.app.name>
@@ -44,7 +46,7 @@
         <email.smtp.auth>true</email.smtp.auth>
         <email.smtp.starttls.enable>true</email.smtp.starttls.enable>
         <email.debug>false</email.debug>
-        
+
         <token.signing.key></token.signing.key>
 
         <app.name>Citesphere</app.name>
@@ -415,7 +417,19 @@
             <version>0.9.1</version>
         </dependency>
 
+        <!-- tessaract/tika -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>1.13</version>
+        </dependency>
 
+        <!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
+        </dependency>
 
     </dependencies>
 

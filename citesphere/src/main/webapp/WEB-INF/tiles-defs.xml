@@ -49,6 +49,11 @@
         <put-attribute name="content" value="/WEB-INF/views/auth/group/editItem.jsp" />    
     </definition>
     
+    <!--  import  -->
+    <definition name="auth/import/upload" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/import/upload.jsp" />    
+    </definition>
+    
     <!-- Authorities -->
     <definition name="auth/authorities/list" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/authorities/list.jsp" />    

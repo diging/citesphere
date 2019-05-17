@@ -9,6 +9,8 @@ public class UploadJob extends Job implements IUploadJob {
 
     
     private String filename;
+    private long fileSize;
+    private String contentType;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.jobs.impl.IUploadJob#getFilename()
@@ -23,6 +25,18 @@ public class UploadJob extends Job implements IUploadJob {
     @Override
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+    public long getFileSize() {
+        return fileSize;
+    }
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+    public String getContentType() {
+        return contentType;
+    }
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
       
 }

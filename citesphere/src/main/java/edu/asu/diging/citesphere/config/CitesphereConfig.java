@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import edu.asu.diging.citesphere.core.email.impl.NotSetupMailSender;
 
@@ -50,6 +51,10 @@ public class CitesphereConfig {
     @Value("${email.debug}")
     private String emailDebug;
     
+    @Value("${max_upload_size}")
+    private String maxUploadSize;
+
+    
     @Bean
     public CacheManager cacheManager() throws URISyntaxException {
         CacheManagerBuilder.newCacheManagerBuilder().withCache("preConfigured", CacheConfigurationBuilder
@@ -80,5 +85,12 @@ public class CitesphereConfig {
         sender.setJavaMailProperties(javaMailProperties);
 
         return sender;
+    }
+    
+    @Bean(name = "multipartResolver")
+    public CommonsMultipartResolver multipartResolver() {
+        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+        multipartResolver.setMaxUploadSize(new Long(maxUploadSize));
+        return multipartResolver;
     }
 }
