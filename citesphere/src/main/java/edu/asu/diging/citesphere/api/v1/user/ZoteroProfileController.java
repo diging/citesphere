@@ -1,15 +1,19 @@
 package edu.asu.diging.citesphere.api.v1.user;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.asu.diging.citesphere.api.v1.CitesphereHeaders;
 import edu.asu.diging.citesphere.api.v1.V1Controller;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
@@ -20,7 +24,7 @@ import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.core.zotero.impl.ZoteroTokenManager;
 
 @Controller
-public class ProfileController extends V1Controller {
+public class ZoteroProfileController extends V1Controller {
     
     @Autowired
     private IUserManager userManager;
@@ -36,7 +40,16 @@ public class ProfileController extends V1Controller {
     
 
     @RequestMapping(value="/user/zotero")
-    public ResponseEntity<String> getProfile(@RequestParam("apitoken") String jwtToken) {
+    public ResponseEntity<String> getProfile(@RequestHeader HttpHeaders headers) {
+        List<String> tokenHeader = headers.get(CitesphereHeaders.CITESPHERE_API_TOKEN);
+        if (tokenHeader == null || tokenHeader.isEmpty()) {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode node = mapper.createObjectNode();
+            node.put("message", "No token provided.");
+            return new ResponseEntity<String>(node.toString(), HttpStatus.BAD_REQUEST);
+        }
+        // there should only be one
+        String jwtToken = tokenHeader.get(0);
         IJobApiTokenContents tokenContents = tokenService.getJobApiTokenContents(jwtToken);
         if (tokenContents == null) {
             ObjectMapper mapper = new ObjectMapper();
@@ -56,7 +69,7 @@ public class ProfileController extends V1Controller {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
         node.put("zotero", zoteroToken.getToken());
-        node.put("zoteroId", zoteroToken.getUser().getZoteroId());
+        node.put("zoteroId", zoteroToken.getUserId());
         
         return new ResponseEntity<>(node.toString(), HttpStatus.OK);
     }

@@ -94,7 +94,10 @@
 		          	<a href="<c:url value="/auth/concepts/types/list" />" >Concept Types</a>
 		          </li>
 			    </ul>
-			  </li>
+			</li>
+			<li role="presentation">
+          		<a href="<c:url value="/auth/import/upload" />" >Import</a>
+          	</li>
           	<li role="presentation">
           		<a href="<c:url value="/auth/authority/list" />" >Managed Authority Entries</a>
           	</li>
