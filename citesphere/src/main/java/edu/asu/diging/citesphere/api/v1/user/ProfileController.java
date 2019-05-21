@@ -36,7 +36,7 @@ public class ProfileController extends V1Controller {
     
 
     @RequestMapping(value="/user/zotero")
-    public ResponseEntity<String> getProfile(@RequestParam("token") String jwtToken) {
+    public ResponseEntity<String> getProfile(@RequestParam("apitoken") String jwtToken) {
         IJobApiTokenContents tokenContents = tokenService.getJobApiTokenContents(jwtToken);
         if (tokenContents == null) {
             ObjectMapper mapper = new ObjectMapper();

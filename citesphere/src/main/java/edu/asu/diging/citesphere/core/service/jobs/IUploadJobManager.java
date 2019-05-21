@@ -13,4 +13,6 @@ public interface IUploadJobManager {
 
     List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes);
 
+    byte[] getUploadedFile(IUploadJob job);
+
 }

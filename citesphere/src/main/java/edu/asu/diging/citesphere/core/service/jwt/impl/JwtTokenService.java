@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
-import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.service.jwt.IJobApiTokenContents;
 import edu.asu.diging.citesphere.core.service.jwt.IJwtTokenService;
 import io.jsonwebtoken.Claims;
@@ -33,10 +33,10 @@ public class JwtTokenService implements IJwtTokenService {
      * @see edu.asu.diging.citesphere.core.service.jwt.impl.IJwtTokenService#generateToken(edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
-    public String generateApiToken(IUser user) {
+    public String generateJobApiToken(IJob job) {
         String compactJws = Jwts.builder()
-                .setSubject(user.getUsername())
-                .setExpiration(new Date((new Date()).getTime() + apiTokenExpiration))
+                .setSubject(job.getId())
+                .setExpiration(new Date(new Date().getTime() + apiTokenExpiration*1000))
                 .signWith(SignatureAlgorithm.HS512, tokenSigningKey)
                 .compact();
         

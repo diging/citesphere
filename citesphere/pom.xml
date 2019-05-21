@@ -16,6 +16,7 @@
         <spring.version>5.1.2.RELEASE</spring.version>
         <spring-data.version>Lovelace-RELEASE</spring-data.version>
         <javers.version>5.0.0</javers.version>
+        <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -52,6 +53,8 @@
         <app.name>Citesphere</app.name>
         <app.url></app.url>
         <app.createUserApprovalPath>admin/user/list</app.createUserApprovalPath>
+        
+        <kafka.hosts></kafka.hosts>
     </properties>
 
     <dependencyManagement>
@@ -429,6 +432,13 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.4</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>${spring.kafka.version}</version>
         </dependency>
 
     </dependencies>

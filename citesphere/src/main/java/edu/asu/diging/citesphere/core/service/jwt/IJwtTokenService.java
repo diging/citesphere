@@ -1,10 +1,10 @@
 package edu.asu.diging.citesphere.core.service.jwt;
 
-import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.jobs.IJob;
 
 public interface IJwtTokenService {
 
-    String generateApiToken(IUser user);
+    String generateJobApiToken(IJob job);
 
     /**
      * Method to parse a JWT token. If the token has expired, the returned {@link IJobApiTokenContents}

@@ -1,10 +1,14 @@
 package edu.asu.diging.citesphere.core.service.upload.impl;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 
 import javax.annotation.PostConstruct;
 
@@ -52,7 +56,7 @@ public class FileStorageManager implements IFileStorageManager {
     }
 
     private String getAndCreateStoragePath(String username, String jobId) {
-        String path = baseDirectory + File.separator + jobId;
+        String path = getFolderPath(username, jobId);
         File dirFile = new File(path);
         if (!dirFile.exists()) {
             dirFile.mkdirs();
@@ -99,5 +103,31 @@ public class FileStorageManager implements IFileStorageManager {
 
         return true;
     }
+    
+    @Override
+    public byte[] getFileContentFromUrl(URL url) throws IOException {
+        URLConnection con = url.openConnection();
+        
+        InputStream input = con.getInputStream();
+
+        byte[] buffer = new byte[4096];
+        
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+        BufferedOutputStream output = new BufferedOutputStream(byteOutput);
+       
+        int n = -1;
+        while ((n = input.read(buffer)) != -1) {
+            output.write(buffer, 0, n);
+        }
+        input.close();
+        output.flush();
+        output.close();
+        
+        byteOutput.flush();
+        byte[] bytes = byteOutput.toByteArray();
+        byteOutput.close();
+        return bytes;
+    }
+
 
 }

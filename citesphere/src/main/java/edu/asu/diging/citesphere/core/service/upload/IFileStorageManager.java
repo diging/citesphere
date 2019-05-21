@@ -1,5 +1,8 @@
 package edu.asu.diging.citesphere.core.service.upload;
 
+import java.io.IOException;
+import java.net.URL;
+
 import edu.asu.diging.citesphere.core.exceptions.FileStorageException;
 
 public interface IFileStorageManager {
@@ -9,5 +12,7 @@ public interface IFileStorageManager {
     String getFolderPath(String username, String jobId);
 
     boolean deleteFile(String username, String jobId, String filename, boolean deleteEmptyFolders);
+
+    byte[] getFileContentFromUrl(URL url) throws IOException;
 
 }

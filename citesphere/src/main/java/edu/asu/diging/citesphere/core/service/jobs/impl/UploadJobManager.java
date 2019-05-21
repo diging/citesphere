@@ -1,8 +1,13 @@
 package edu.asu.diging.citesphere.core.service.jobs.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
@@ -12,7 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.asu.diging.citesphere.core.exceptions.FileStorageException;
+import edu.asu.diging.citesphere.core.exceptions.MessageCreationException;
+import edu.asu.diging.citesphere.core.kafka.IKafkaRequestProducer;
+import edu.asu.diging.citesphere.core.kafka.KafkaTopics;
+import edu.asu.diging.citesphere.core.kafka.impl.KafkaJobMessage;
 import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.Job;
@@ -20,9 +30,11 @@ import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
 import edu.asu.diging.citesphere.core.model.jobs.impl.UploadJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
+import edu.asu.diging.citesphere.core.service.jwt.IJwtTokenService;
 import edu.asu.diging.citesphere.core.service.upload.IFileStorageManager;
 
 @Service
+@Transactional
 public class UploadJobManager implements IUploadJobManager {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -32,6 +44,12 @@ public class UploadJobManager implements IUploadJobManager {
 
     @Autowired
     private IFileStorageManager fileManager;
+
+    @Autowired
+    private IKafkaRequestProducer kafkaProducer;
+    
+    @Autowired
+    private IJwtTokenService tokenService;
 
     /*
      * (non-Javadoc)
@@ -43,7 +61,7 @@ public class UploadJobManager implements IUploadJobManager {
     public IUploadJob findUploadJob(String id) {
         Optional<Job> jobOptional = jobRepository.findById(id);
         if (jobOptional.isPresent()) {
-            Job job = jobOptional.get();
+            IJob job = jobOptional.get();
             if (IUploadJob.class.isAssignableFrom(job.getClass())) {
                 return (IUploadJob) job;
             }
@@ -69,10 +87,11 @@ public class UploadJobManager implements IUploadJobManager {
                     bytes = fileBytes.get(i);
                 } else {
                     job.setStatus(JobStatus.FAILURE);
-                    job.getPhases().add(new JobPhase(JobStatus.FAILURE, "There is a mismatch between file metadata and file contents."));
+                    job.getPhases().add(new JobPhase(JobStatus.FAILURE,
+                            "There is a mismatch between file metadata and file contents."));
                     continue;
                 }
-                
+
                 if (bytes == null) {
                     job.setStatus(JobStatus.FAILURE);
                     job.getPhases().add(new JobPhase(JobStatus.FAILURE, "There is not file content."));
@@ -80,11 +99,13 @@ public class UploadJobManager implements IUploadJobManager {
                 }
                 job = jobRepository.save(job);
                 fileManager.saveFile(user.getUsername(), job.getId(), filename, bytes);
+
                 job.setStatus(JobStatus.PREPARED);
             } catch (FileStorageException e) {
                 logger.error("Could not store file.", e);
                 job.setStatus(JobStatus.FAILURE);
                 job.getPhases().add(new JobPhase(JobStatus.FAILURE, e.getMessage()));
+                continue;
             } finally {
                 i++;
                 jobRepository.save(job);
@@ -104,8 +125,28 @@ public class UploadJobManager implements IUploadJobManager {
             job.setContentType(contentType);
             job.setFileSize(f.getSize());
             jobRepository.save(job);
+            String token = tokenService.generateJobApiToken(job);
+            try {
+                kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.REFERENCES_IMPORT_TOPIC);
+            } catch (MessageCreationException e) {
+                logger.error("Could not send Kafka message.", e);
+                job.setStatus(JobStatus.FAILURE);
+                job.getPhases().add(new JobPhase(JobStatus.FAILURE, e.getMessage()));
+                jobRepository.save(job);
+            }
         }
 
         return jobs;
+    }
+    
+    @Override
+    public byte[] getUploadedFile(IUploadJob job) {
+        String folderPath = fileManager.getFolderPath(job.getUsername(), job.getId());
+        try {
+            return fileManager.getFileContentFromUrl(new URL("file:" + folderPath + File.separator + job.getFilename()));
+        } catch (IOException e) {
+            logger.error("Could not retrieve uploaded file.", e);
+            return null;
+        }
     }
 }

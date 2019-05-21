@@ -26,15 +26,19 @@ public class UploadJob extends Job implements IUploadJob {
     public void setFilename(String filename) {
         this.filename = filename;
     }
+    @Override
     public long getFileSize() {
         return fileSize;
     }
+    @Override
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
+    @Override
     public String getContentType() {
         return contentType;
     }
+    @Override
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
