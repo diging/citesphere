@@ -29,6 +29,7 @@ $(document).ready(function() {
 
     var startUpload = function(files) {
     	var formData = new FormData();
+    	formData.append("group", $("#groupSelect option:selected").val());
     	for (var i = 0; i < files.length; i++) {
     		formData.append("files", files[i]);
     	}
@@ -99,6 +100,16 @@ $(document).ready(function() {
        
        <h4>Select files from your computer</h4>
        <form action="" method="post" enctype="multipart/form-data" id="js-upload-form">
+       	 <div class="form-inline" style="padding-bottom: 20px;">
+       	 <label>Select Group for Upload: </label>
+       	 <select id="groupSelect" name="group" class="form-control">
+       	 	<option value="">Please select one</option>
+       	 	<c:forEach items="${groups}" var="citGroup">
+       	 		<option value="${citGroup.id}">${citGroup.name}</option>
+       	 	</c:forEach>
+       	 </select>
+       	 </div>
+       
          <div class="form-inline">
            <div class="form-group">
              <input type="file" name="files[]" id="js-upload-files" multiple>

@@ -11,6 +11,7 @@ public class UploadJob extends Job implements IUploadJob {
     private String filename;
     private long fileSize;
     private String contentType;
+    private String citationGroup;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.jobs.impl.IUploadJob#getFilename()
@@ -41,6 +42,14 @@ public class UploadJob extends Job implements IUploadJob {
     @Override
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+    @Override
+    public String getCitationGroup() {
+        return citationGroup;
+    }
+    @Override
+    public void setCitationGroup(String citationGroup) {
+        this.citationGroup = citationGroup;
     }
       
 }

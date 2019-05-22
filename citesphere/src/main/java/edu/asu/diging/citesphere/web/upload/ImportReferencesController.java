@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +23,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.impl.User;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
+import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
 
 @Controller
@@ -34,13 +38,17 @@ public class ImportReferencesController {
     @Autowired
     private IUploadJobManager jobManager;
     
+    @Autowired
+    private ICitationManager citationManager;
+    
     @RequestMapping(value = "/auth/import/upload", method = RequestMethod.GET)
-    public String show(Model model) {
+    public String show(Model model, Authentication authentication) {
+        model.addAttribute("groups", citationManager.getGroups((IUser)authentication.getPrincipal()));
         return "auth/import/upload";
     }
 
     @RequestMapping(value = "/auth/import/upload", method = RequestMethod.POST)
-    public ResponseEntity<String> uploadFiles(Principal principal,
+    public ResponseEntity<String> uploadFiles(Principal principal, @RequestParam("group") String group,
             @RequestParam("files") MultipartFile[] files) {
 
         User user = null;
@@ -62,7 +70,13 @@ public class ImportReferencesController {
                 fileBytes.add(null);
             }
         }
-        List<IUploadJob> jobs = jobManager.createUploadJob(user, files, fileBytes);
+        List<IUploadJob> jobs;
+        try {
+            jobs = jobManager.createUploadJob(user, files, fileBytes, group);
+        } catch (GroupDoesNotExistException e) {
+            logger.error("Could not create job because group does not exist.", e);
+            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+        }
         
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode();

@@ -17,11 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.asu.diging.citesphere.core.exceptions.FileStorageException;
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.MessageCreationException;
 import edu.asu.diging.citesphere.core.kafka.IKafkaRequestProducer;
 import edu.asu.diging.citesphere.core.kafka.KafkaTopics;
 import edu.asu.diging.citesphere.core.kafka.impl.KafkaJobMessage;
 import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
@@ -29,6 +31,8 @@ import edu.asu.diging.citesphere.core.model.jobs.impl.Job;
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
 import edu.asu.diging.citesphere.core.model.jobs.impl.UploadJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
+import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
 import edu.asu.diging.citesphere.core.service.jwt.IJwtTokenService;
 import edu.asu.diging.citesphere.core.service.upload.IFileStorageManager;
@@ -50,6 +54,9 @@ public class UploadJobManager implements IUploadJobManager {
     
     @Autowired
     private IJwtTokenService tokenService;
+    
+    @Autowired
+    private IGroupManager groupManager;
 
     /*
      * (non-Javadoc)
@@ -70,7 +77,12 @@ public class UploadJobManager implements IUploadJobManager {
     }
 
     @Override
-    public List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes) {
+    public List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes, String groupId) throws GroupDoesNotExistException {
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        if (group == null) {
+            throw new GroupDoesNotExistException();
+        }
+        
         List<IUploadJob> jobs = new ArrayList<>();
         int i = 0;
         for (MultipartFile f : files) {
@@ -81,6 +93,7 @@ public class UploadJobManager implements IUploadJobManager {
             jobs.add(job);
             job.setFilename(filename);
             job.setUsername(user.getUsername());
+            job.setCitationGroup(groupId);
             job.setPhases(new ArrayList<>());
             try {
                 if (fileBytes != null && fileBytes.size() == files.length) {

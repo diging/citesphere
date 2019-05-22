@@ -26,4 +26,8 @@ public interface IUploadJob extends IJob {
 
     long getFileSize();
 
+    void setCitationGroup(String citationGroup);
+
+    String getCitationGroup();
+
 }

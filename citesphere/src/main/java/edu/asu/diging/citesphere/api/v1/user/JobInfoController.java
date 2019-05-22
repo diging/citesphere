@@ -24,7 +24,7 @@ import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.core.zotero.impl.ZoteroTokenManager;
 
 @Controller
-public class ZoteroProfileController extends V1Controller {
+public class JobInfoController extends V1Controller {
     
     @Autowired
     private IUserManager userManager;
@@ -39,7 +39,7 @@ public class ZoteroProfileController extends V1Controller {
     private IUploadJobManager jobManager;
     
 
-    @RequestMapping(value="/user/zotero")
+    @RequestMapping(value="/job/info")
     public ResponseEntity<String> getProfile(@RequestHeader HttpHeaders headers) {
         List<String> tokenHeader = headers.get(CitesphereHeaders.CITESPHERE_API_TOKEN);
         if (tokenHeader == null || tokenHeader.isEmpty()) {
@@ -70,6 +70,7 @@ public class ZoteroProfileController extends V1Controller {
         ObjectNode node = mapper.createObjectNode();
         node.put("zotero", zoteroToken.getToken());
         node.put("zoteroId", zoteroToken.getUserId());
+        node.put("groupId", job.getCitationGroup());
         
         return new ResponseEntity<>(node.toString(), HttpStatus.OK);
     }
