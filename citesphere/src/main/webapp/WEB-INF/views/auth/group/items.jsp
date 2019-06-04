@@ -27,6 +27,12 @@ $(function() {
 	});
 	
 	$('.collapse').collapse();
+	$('#collapseCollection').on('show.bs.collapse', function () {
+        $('#collapseToggle').text('Hide Collections');
+     })
+	$('#collapseCollection').on('hidden.bs.collapse', function () {
+		$('#collapseToggle').text('Show Collections');
+		})
 	
 	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
 	
@@ -103,8 +109,8 @@ $(function() {
 
 <div class="col-md-2" id="accordion">
 <p>
-  <a class="btn btn-primary" data-toggle="collapse" data-parent="#accordion" href="#collapseCollection" aria-expanded="true" aria-controls="collapseCollection">
-          Collection
+  <a class="btn btn-primary dropdown-toggle" id="collapseToggle" data-toggle="collapse" data-parent="#accordion" href="#collapseCollection" aria-expanded="true" aria-controls="collapseCollection">
+          Show Collections
   </a>
 </p>
 <div class="panel-collapse collapse in" id="collapseCollection">
