@@ -31,11 +31,11 @@ $(function() {
 	$('.collapse').collapse();
 	
 	$('#collapseCollection').on('show.bs.collapse', function () {
-	    $('#collapseToggle').text('Hide Collections');
-    })
-     
+		$('#collapseToggle').text('Hide Collections');
+	})
+
 	$('#collapseCollection').on('hide.bs.collapse', function () {
-		   $('#collapseToggle').text('Show Collections');
+		$('#collapseToggle').text('Show Collections');
 	})
 	
 	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
