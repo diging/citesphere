@@ -8,7 +8,7 @@ import edu.asu.diging.citesphere.core.model.export.IExportTask;
 
 public interface IExportProcessor {
 
-    void runExport(ExportType exportType, IUser user, String groupId, IExportTask task, ExportFinishedCallback callback)
+    void runExport(ExportType exportType, IUser user, String groupId, String collectionId, IExportTask task, ExportFinishedCallback callback)
             throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException;
 
 }

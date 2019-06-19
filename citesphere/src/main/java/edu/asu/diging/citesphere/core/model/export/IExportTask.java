@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.core.model.export;
 
+import java.time.OffsetDateTime;
+
 import edu.asu.diging.citesphere.core.export.ExportType;
 
 public interface IExportTask {
@@ -27,5 +29,17 @@ public interface IExportTask {
     void setExportType(ExportType exportType);
 
     ExportType getExportType();
+
+    void setFinishedOn(OffsetDateTime finishedOn);
+
+    OffsetDateTime getFinishedOn();
+
+    void setCreatedOn(OffsetDateTime createdOn);
+
+    OffsetDateTime getCreatedOn();
+
+    void setFilename(String filename);
+
+    String getFilename();
 
 }

@@ -1,6 +1,9 @@
 package edu.asu.diging.citesphere.core.export.impl;
 
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,6 +14,11 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
@@ -28,11 +36,15 @@ import edu.asu.diging.citesphere.core.repository.export.ExportTaskRepository;
 
 @Service
 @Transactional
+@PropertySource("classpath:config.properties")
 public class ExportManager implements IExportManager, ExportFinishedCallback {
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
     private ConcurrentHashMap<String, IExportTask> runningTasks; 
+    
+    @Value("${_tasks_page_size}")
+    private Integer tasksPageSize;
     
     @Autowired
     private ExportTaskRepository taskRepo;
@@ -49,15 +61,32 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
      * @see edu.asu.diging.citesphere.core.export.impl.IExportManager#runExport(edu.asu.diging.citesphere.core.export.ExportType, edu.asu.diging.citesphere.core.model.IUser, java.lang.String)
      */
     @Override
-    public void export(ExportType exportType, IUser user, String groupId) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException {
+    public void export(ExportType exportType, IUser user, String groupId, String collectionId) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException {
         IExportTask task = new ExportTask();
         task.setExportType(exportType);
         task.setUsername(user.getUsername());
-        task.setStatus(ExportStatus.PENDING);;
+        task.setStatus(ExportStatus.PENDING);
+        task.setCreatedOn(OffsetDateTime.now());
         task = taskRepo.save((ExportTask) task);
         runningTasks.put(task.getId(), task);
         
-        processor.runExport(exportType, user, groupId, task, this);
+        processor.runExport(exportType, user, groupId, collectionId, task, this);
+    }
+    
+    @Override
+    public IExportTask getTask(String id) {
+        Optional<ExportTask> optional = taskRepo.findById(id);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        return null;
+    }
+    
+    @Override
+    public List<IExportTask> getTasks(IUser user, int page) {
+        List<IExportTask> tasks = new ArrayList<>();
+        taskRepo.findByUsername(user.getUsername(), PageRequest.of(page, tasksPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(t -> tasks.add(t));
+        return tasks;
     }
 
     @Override
@@ -71,7 +100,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
         for (String taskId : runningTasks.keySet()) {
             Optional<ExportTask> taskOptional = taskRepo.findById(taskId);
             if (taskOptional.isPresent()) {
-                ExportTask task = taskOptional.get();
+                IExportTask task = taskOptional.get();
                 if (Arrays.asList(ExportStatus.PENDING, ExportStatus.INITIALIZING, ExportStatus.STARTED).contains(task.getStatus())) {
                     task.setStatus(ExportStatus.FAILED);
                     taskRepo.save((ExportTask) task);

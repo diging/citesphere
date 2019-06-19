@@ -48,6 +48,9 @@
     <definition name="auth/group/export" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/group/export/started.jsp" />    
     </definition>
+    <definition name="auth/exports" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/group/export/list.jsp" />    
+    </definition>
     
     <!-- Authorities -->
     <definition name="auth/authorities/list" extends="base.definition">

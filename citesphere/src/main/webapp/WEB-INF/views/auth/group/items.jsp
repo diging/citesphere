@@ -3,6 +3,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <script src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>
 
@@ -106,10 +107,10 @@ $(function() {
   </button>
   <ul class="dropdown-menu">
     <c:if test="${empty collectionId}">
-    <li><a href="<c:url value="/auth/group/${zoteroGroupId}/export" />">CSV (up to 300 items)</a></li>
+    <li><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
     </c:if>
     <c:if test="${not empty collectionId}">
-    <li><a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/export" />">CSV (up to 300 items)</a></li>
+    <li><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
     </c:if>
   </ul>
 </div>

@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.core.model.export.impl;
 
+import java.time.OffsetDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -28,6 +30,10 @@ public class ExportTask implements IExportTask {
     private long totalRecords;
     private long progress;
     private ExportType exportType;
+    
+    private OffsetDateTime createdOn;
+    private OffsetDateTime finishedOn;
+    private String filename;
     
     @Enumerated(EnumType.STRING)
     private ExportStatus status;
@@ -104,6 +110,36 @@ public class ExportTask implements IExportTask {
     @Override
     public void setExportType(ExportType exportType) {
         this.exportType = exportType;
+    }
+
+    @Override
+    public OffsetDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    @Override
+    public void setCreatedOn(OffsetDateTime createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    @Override
+    public OffsetDateTime getFinishedOn() {
+        return finishedOn;
+    }
+
+    @Override
+    public void setFinishedOn(OffsetDateTime finishedOn) {
+        this.finishedOn = finishedOn;
+    }
+
+    @Override
+    public String getFilename() {
+        return filename;
+    }
+
+    @Override
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     /* (non-Javadoc)

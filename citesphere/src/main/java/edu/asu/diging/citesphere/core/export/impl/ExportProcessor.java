@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
@@ -82,18 +83,22 @@ public class ExportProcessor implements IExportProcessor {
      */
     @Override
     @Async
-    public void runExport(ExportType exportType, IUser user, String groupId, IExportTask task, ExportFinishedCallback callback) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException {
+    public void runExport(ExportType exportType, IUser user, String groupId, String collectionId, IExportTask task, ExportFinishedCallback callback) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException {
         Processor processor = processors.get(exportType);
         if (processor == null) {
             throw new ExportTypeNotSupportedException("Export type " + exportType + " is not supported.");
         }
         
-        CitationResults initialPage = initializeTask(user, groupId, task);
-        List<ICitation> citations = collectCitations(initialPage, user, groupId, task);
+        CitationResults initialPage = initializeTask(user, groupId, collectionId, task);
+        List<ICitation> citations = collectCitations(initialPage, user, groupId, collectionId, task);
         
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd--HH-mm-ss");
+        String time = LocalDateTime.now().format(formatter);
+        String filename = "export-" + time + "." + processor.getFileExtension();
+       
         BufferedWriter writer;
         try {
-            writer = createWriter(user, task, processor);
+            writer = createWriter(user, task, processor, filename);
         } catch (IOException e) {
             throw new ExportFailedException("Could not create file.", e);
         }
@@ -101,17 +106,16 @@ public class ExportProcessor implements IExportProcessor {
         
         // -- export finished
         task.setStatus(ExportStatus.DONE);
+        task.setFinishedOn(OffsetDateTime.now());
+        task.setFilename(filename);
         taskRepo.save((ExportTask) task);
         callback.exportFinished(task.getId());
     }
 
 
-    private BufferedWriter createWriter(IUser user, IExportTask task, Processor processor)
+    private BufferedWriter createWriter(IUser user, IExportTask task, Processor processor, String filename)
             throws ExportFailedException, IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd--HH-mm-ss");
-        String time = LocalDateTime.now().format(formatter);
-        String filename = "export-" + time + "." + processor.getFileExtension();
-        try {
+         try {
             storageManager.saveFile(user.getUsername(), task.getId(), filename, new byte[0]);
         } catch (FileStorageException e) {
             throw new ExportFailedException("Could not create export file.", e);
@@ -124,8 +128,8 @@ public class ExportProcessor implements IExportProcessor {
         return writer;
     }
     
-    private CitationResults initializeTask(IUser user, String groupId, IExportTask task) throws GroupDoesNotExistException {
-        CitationResults results = citationManager.getGroupItems(user, groupId, null, 1, SORT_BY_TITLE);
+    private CitationResults initializeTask(IUser user, String groupId, String collectionId, IExportTask task) throws GroupDoesNotExistException {
+        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, 1, SORT_BY_TITLE);
         
         long total = results.getTotalResults();
         task.setTotalRecords(total);
@@ -135,7 +139,7 @@ public class ExportProcessor implements IExportProcessor {
         return results;
     }
     
-    private List<ICitation> collectCitations(CitationResults initialPage, IUser user, String groupId, IExportTask task) throws GroupDoesNotExistException {
+    private List<ICitation> collectCitations(CitationResults initialPage, IUser user, String groupId, String collectionId, IExportTask task) throws GroupDoesNotExistException {
         List<ICitation> citations = new ArrayList<>();
         
         long total = initialPage.getTotalResults();
@@ -151,7 +155,7 @@ public class ExportProcessor implements IExportProcessor {
         int page = 1;
         while(page < pageTotal) {
             page += 1;
-            initialPage = citationManager.getGroupItems(user, groupId, null, page, SORT_BY_TITLE);
+            initialPage = citationManager.getGroupItems(user, groupId, collectionId, page, SORT_BY_TITLE);
             citations.addAll(initialPage.getCitations());
             task.setProgress(citations.size());
             taskRepo.save((ExportTask) task);
