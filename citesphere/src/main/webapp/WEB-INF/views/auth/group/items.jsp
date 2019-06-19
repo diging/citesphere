@@ -63,7 +63,7 @@ $(function() {
 </c:forEach>
 </ol>
 
-<h2>Items in Group ${group.name}</h2>
+<h2>Items in Group ${group.name}<br><small>${total} records</small></h2>
 
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <div class="panel panel-default">
@@ -98,6 +98,20 @@ $(function() {
 
 <div class="pull-right" style="margin-top: 20px;">
 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/create" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
+</div>
+
+<div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
+  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Export <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <c:if test="${empty collectionId}">
+    <li><a href="<c:url value="/auth/group/${zoteroGroupId}/export" />">CSV (up to 300 items)</a></li>
+    </c:if>
+    <c:if test="${not empty collectionId}">
+    <li><a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/export" />">CSV (up to 300 items)</a></li>
+    </c:if>
+  </ul>
 </div>
 </div>
 
