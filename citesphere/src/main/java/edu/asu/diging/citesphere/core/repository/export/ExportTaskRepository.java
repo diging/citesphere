@@ -9,5 +9,7 @@ import edu.asu.diging.citesphere.core.model.export.impl.ExportTask;
 
 public interface ExportTaskRepository extends PagingAndSortingRepository<ExportTask, String> {
 
-    public List<ExportTask> findByUsername(String username, Pageable pagable);
+    List<ExportTask> findByUsername(String username, Pageable pagable);
+    
+    int countByUsername(String username);
 }

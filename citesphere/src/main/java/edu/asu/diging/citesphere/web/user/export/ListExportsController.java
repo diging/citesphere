@@ -22,7 +22,10 @@ public class ListExportsController {
         if (page < 0 ) {
             page = 0;
         }
-        model.addAttribute("tasks", exportManager.getTasks((IUser) authentication.getPrincipal(), page));
+        IUser user = (IUser) authentication.getPrincipal();
+        model.addAttribute("tasks", exportManager.getTasks(user, page));
+        model.addAttribute("total", exportManager.getTasksTotalPages(user));
+        model.addAttribute("page", page+1);
         return "auth/exports";
     }
 }

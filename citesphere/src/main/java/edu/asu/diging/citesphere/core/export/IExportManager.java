@@ -16,4 +16,8 @@ public interface IExportManager {
 
     IExportTask getTask(String id);
 
+    int getTasksTotal(IUser user);
+
+    int getTasksTotalPages(IUser user);
+
 }

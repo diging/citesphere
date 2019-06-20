@@ -88,6 +88,21 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
         taskRepo.findByUsername(user.getUsername(), PageRequest.of(page, tasksPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(t -> tasks.add(t));
         return tasks;
     }
+    
+    @Override
+    public int getTasksTotal(IUser user) {
+        return taskRepo.countByUsername(user.getUsername());
+    }
+    
+    @Override
+    public int getTasksTotalPages(IUser user) {
+        int totalTasks = getTasksTotal(user);
+        int pagesTotal = totalTasks/tasksPageSize;
+        if (totalTasks % tasksPageSize > 0) {
+            pagesTotal += 1;
+        }
+        return pagesTotal;
+    }
 
     @Override
     public void exportFinished(String taskId) {

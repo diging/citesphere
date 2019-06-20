@@ -1,7 +1,30 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
+<script src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>
+
+<script>
+//# sourceURL=page.js
+$(function() {
+    $('#pagination-top').twbsPagination({
+        totalPages: ${total},
+        startPage: ${page},
+        prev: "«",
+        next: "»",
+        visiblePages: 10,
+        initiateStartPageClick: false,
+        onPageClick: function (event, page) {
+            window.location.href = "<c:url value="/auth/exports" />?page=" + page;
+        }
+    });
+});
+</script>
+
+    
+
 <h1>Exports</h1>
+
+<ul id="pagination-top" class="pagination-sm"></ul>
 
 <table class="table table-striped">
 <tr>
@@ -33,7 +56,10 @@
 </c:choose>
 </td>
 <td>${task.createdOn}</td>
-<th><a href="<c:url value="/auth/exports/${task.id}/download" />"><i class="fas fa-download"></i> Download</a>
+<th>
+<c:if test="${task.status == 'DONE'}">
+<a href="<c:url value="/auth/exports/${task.id}/download" />"><i class="fas fa-download"></i> Download</a>
+</c:if>
 </tr>
 </c:forEach>
 </table>
