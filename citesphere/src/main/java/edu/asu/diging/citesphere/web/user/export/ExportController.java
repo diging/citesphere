@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
+import edu.asu.diging.citesphere.core.exceptions.ExportTooBigException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTypeNotSupportedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.export.ExportType;
@@ -40,8 +41,12 @@ public class ExportController {
             model.addAttribute("show_alert", true);
             model.addAttribute("alert_type", "danger");
             model.addAttribute("alert_msg", "Export failed.");
+        } catch (ExportTooBigException e) {
+            model.addAttribute("show_alert", true);
+            model.addAttribute("alert_type", "danger");
+            model.addAttribute("alert_msg", "You tried to export more than 300 records, which is currently the limit.");
         }
         
-        return "auth/group/export";
+        return "redirect:/auth/exports";
     }
 }

@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
+import edu.asu.diging.citesphere.core.exceptions.ExportTooBigException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTypeNotSupportedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.export.ExportFinishedCallback;
@@ -29,10 +30,16 @@ import edu.asu.diging.citesphere.core.export.ExportType;
 import edu.asu.diging.citesphere.core.export.IExportManager;
 import edu.asu.diging.citesphere.core.export.IExportProcessor;
 import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.model.export.ExportStatus;
 import edu.asu.diging.citesphere.core.model.export.IExportTask;
 import edu.asu.diging.citesphere.core.model.export.impl.ExportTask;
 import edu.asu.diging.citesphere.core.repository.export.ExportTaskRepository;
+import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
+import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.IGroupManager;
 
 @Service
 @Transactional
@@ -46,11 +53,23 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
     @Value("${_tasks_page_size}")
     private Integer tasksPageSize;
     
+    @Value("${_max_export_size}")
+    private Integer maxExportSize;
+    
     @Autowired
     private ExportTaskRepository taskRepo;
     
     @Autowired
     private IExportProcessor processor;
+    
+    @Autowired
+    private ICitationManager citationManager;
+    
+    @Autowired
+    private IGroupManager groupManager;
+    
+    @Autowired
+    private ICitationCollectionManager collectionManager;
     
     @PostConstruct
     public void init() {
@@ -61,12 +80,37 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
      * @see edu.asu.diging.citesphere.core.export.impl.IExportManager#runExport(edu.asu.diging.citesphere.core.export.ExportType, edu.asu.diging.citesphere.core.model.IUser, java.lang.String)
      */
     @Override
-    public void export(ExportType exportType, IUser user, String groupId, String collectionId) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException {
+    public void export(ExportType exportType, IUser user, String groupId, String collectionId) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+        
+        // FIXME: sort field should not be hard coded!
+        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, 1, "title");
+        if (results.getTotalResults() > maxExportSize) {
+            throw new ExportTooBigException("Can't export " + results.getTotalResults() + " records.");
+        }
+        
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        if (group == null) {
+            throw new GroupDoesNotExistException("Group does not exist.");
+        }
+        
+        ICitationCollection collection = null;
+        if (collectionId != null && !collectionId.trim().isEmpty()) {
+            collection = collectionManager.getCollection(user, groupId, collectionId);
+        }
+        
+        
         IExportTask task = new ExportTask();
         task.setExportType(exportType);
         task.setUsername(user.getUsername());
         task.setStatus(ExportStatus.PENDING);
         task.setCreatedOn(OffsetDateTime.now());
+        task.setGroupId(groupId);
+        task.setGroupName(group.getName());
+        if (collection != null) {
+            task.setCollectionId(collectionId);
+            task.setCollectionName(collection.getName());
+        }
+        
         task = taskRepo.save((ExportTask) task);
         runningTasks.put(task.getId(), task);
         

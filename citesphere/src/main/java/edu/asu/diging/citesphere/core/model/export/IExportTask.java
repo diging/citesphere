@@ -42,4 +42,20 @@ public interface IExportTask {
 
     String getFilename();
 
+    void setCollectionName(String collectionName);
+
+    String getCollectionName();
+
+    void setCollectionId(String collectionId);
+
+    String getCollectionId();
+
+    void setGroupName(String groupName);
+
+    String getGroupName();
+
+    void setGroupId(String groupId);
+
+    String getGroupId();
+
 }

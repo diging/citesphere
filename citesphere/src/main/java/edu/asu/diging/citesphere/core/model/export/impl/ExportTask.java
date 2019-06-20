@@ -31,6 +31,11 @@ public class ExportTask implements IExportTask {
     private long progress;
     private ExportType exportType;
     
+    private String groupId;
+    private String groupName;
+    private String collectionId;
+    private String collectionName;
+    
     private OffsetDateTime createdOn;
     private OffsetDateTime finishedOn;
     private String filename;
@@ -110,6 +115,46 @@ public class ExportTask implements IExportTask {
     @Override
     public void setExportType(ExportType exportType) {
         this.exportType = exportType;
+    }
+
+    @Override
+    public String getGroupId() {
+        return groupId;
+    }
+
+    @Override
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    @Override
+    public String getGroupName() {
+        return groupName;
+    }
+
+    @Override
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    @Override
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    @Override
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
+    }
+
+    @Override
+    public String getCollectionName() {
+        return collectionName;
+    }
+
+    @Override
+    public void setCollectionName(String collectionName) {
+        this.collectionName = collectionName;
     }
 
     @Override

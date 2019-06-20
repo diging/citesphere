@@ -24,12 +24,16 @@ $(function() {
 
 <h1>Exports</h1>
 
+<div class="alert alert-info" role="alert">Please reload the page to see updated status information.</div>
+
 <ul id="pagination-top" class="pagination-sm"></ul>
 
 <table class="table table-striped">
 <tr>
 <th>Task ID</th>
 <th>Export Type</th>
+<th>Group</th>
+<th>Collection</th>
 <th># of records</th>
 <th># of processed records</th>
 <th>Status</th> 
@@ -40,6 +44,8 @@ $(function() {
 <tr>
 <td>${task.id}</td>
 <td><span class="label label-primary">${task.exportType}</span></td>
+<td>${task.groupName}</td>
+<td>${task.collectionName}</td>
 <td>${task.totalRecords}</td>
 <td>${task.progress}</td>
 <td>
