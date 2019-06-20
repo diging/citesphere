@@ -82,15 +82,15 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
     @Override
     public void export(ExportType exportType, IUser user, String groupId, String collectionId) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
         
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        if (group == null) {
+            throw new GroupDoesNotExistException("Group does not exist.");
+        }
+        
         // FIXME: sort field should not be hard coded!
         CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, 1, "title");
         if (results.getTotalResults() > maxExportSize) {
             throw new ExportTooBigException("Can't export " + results.getTotalResults() + " records.");
-        }
-        
-        ICitationGroup group = groupManager.getGroup(user, groupId);
-        if (group == null) {
-            throw new GroupDoesNotExistException("Group does not exist.");
         }
         
         ICitationCollection collection = null;
