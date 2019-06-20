@@ -140,6 +140,12 @@ public class ExportManagerTest {
         managerToTest.export(ExportType.CSV, user, "GROUP3", null);
     }
     
+    @Test(expected=ExportTypeNotSupportedException.class)
+    public void test_export_typeNotSupported() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+        Mockito.doThrow(ExportTypeNotSupportedException.class).when(processor).runExport(null, user, groupId.toString(), null, task, managerToTest);
+        managerToTest.export(null, user, groupId.toString(), null);
+    }
+    
     @Test
     public void test_getTask_success() {
         IExportTask actual = managerToTest.getTask(TASK1_ID);
