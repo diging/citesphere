@@ -28,6 +28,8 @@
         <db.user></db.user>
         <db.password></db.password>
 
+        <upload.folder.path></upload.folder.path>
+
         <tomcat.deploy.path></tomcat.deploy.path>
         <tomcat.app.name>citesphere</tomcat.app.name>
         <tomcat.server.id>TomcatServer</tomcat.server.id>
@@ -399,6 +401,14 @@
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.7</version>
+        </dependency>
+
 
 
     </dependencies>

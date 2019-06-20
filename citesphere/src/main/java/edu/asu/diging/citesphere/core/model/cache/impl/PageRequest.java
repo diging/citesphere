@@ -57,6 +57,7 @@ public class PageRequest implements IPageRequest {
     private ZoteroObjectType zoteroObjectType;
     private int pageNumber;
     private int pageSize;
+    private long totalNumResults;
     @ManyToOne(targetEntity=User.class)
     private IUser user;
     private String objectId;
@@ -123,6 +124,14 @@ public class PageRequest implements IPageRequest {
     @Override
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+    }
+    @Override
+    public long getTotalNumResults() {
+        return totalNumResults;
+    }
+    @Override
+    public void setTotalNumResults(long totalNumResults) {
+        this.totalNumResults = totalNumResults;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.IPageRequest#getUser()

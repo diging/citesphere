@@ -72,6 +72,7 @@ public class GroupItemsController {
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", groupId);
         model.addAttribute("group", groupManager.getGroup(user, groupId));
+        model.addAttribute("collectionId", collectionId);
         model.addAttribute("citationCollections", collectionManager.getCitationCollections(user, groupId, collectionId, pageInt, "title").getCitationCollections());
         
         List<String> allowedColumns = Arrays.asList(availableColumns.split(","));

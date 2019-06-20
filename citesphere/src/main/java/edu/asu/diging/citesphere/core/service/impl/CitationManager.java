@@ -215,7 +215,7 @@ public class CitationManager implements ICitationManager {
                             return sortFunctions.get(sortBy).apply(o1, o2);
                         }
                     });
-                    results.setTotalResults(group.getNumItems());
+                    results.setTotalResults(localPageRequest.getTotalNumResults());
                     return results;
                 }
             }
@@ -251,6 +251,7 @@ public class CitationManager implements ICitationManager {
         request.setObjectId(group.getId() + "");
         request.setPageNumber(page);
         request.setPageSize(zoteroPageSize);
+        request.setTotalNumResults(results.getTotalResults());
         request.setUser(user);
         request.setVersion(group.getVersion());
         request.setZoteroObjectType(ZoteroObjectType.GROUP);
