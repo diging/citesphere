@@ -108,7 +108,7 @@ public class ExportProcessor implements IExportProcessor {
         task.setStatus(ExportStatus.DONE);
         task.setFinishedOn(OffsetDateTime.now());
         task.setFilename(filename);
-        taskRepo.save((ExportTask) task);
+        taskRepo.saveAndFlush((ExportTask) task);
         callback.exportFinished(task.getId());
     }
 
@@ -134,7 +134,7 @@ public class ExportProcessor implements IExportProcessor {
         long total = results.getTotalResults();
         task.setTotalRecords(total);
         task.setStatus(ExportStatus.INITIALIZING);
-        taskRepo.save((ExportTask) task);
+        taskRepo.saveAndFlush((ExportTask) task);
         
         return results;
     }
@@ -151,7 +151,7 @@ public class ExportProcessor implements IExportProcessor {
         citations.addAll(initialPage.getCitations());
         task.setProgress(citations.size());
         task.setStatus(ExportStatus.STARTED);
-        taskRepo.save((ExportTask) task);
+        taskRepo.saveAndFlush((ExportTask) task);
         int page = 1;
         while(page < pageTotal) {
             page += 1;

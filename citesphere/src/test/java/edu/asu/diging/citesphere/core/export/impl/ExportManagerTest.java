@@ -92,7 +92,7 @@ public class ExportManagerTest {
         task = new ExportTask();
         task.setStatus(ExportStatus.STARTED);
         task.setId(EXPORT_TASK_ID);
-        Mockito.when(taskRepo.save(Mockito.any(ExportTask.class))).thenReturn(task);
+        Mockito.when(taskRepo.saveAndFlush(Mockito.any(ExportTask.class))).thenReturn(task);
         
         Mockito.when(taskRepo.findById(EXPORT_TASK_ID)).thenReturn(Optional.of(task));
         
@@ -114,14 +114,14 @@ public class ExportManagerTest {
     public void test_export_group() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
         managerToTest.export(ExportType.CSV, user, groupId.toString(), null);
         Mockito.verify(processor).runExport(ExportType.CSV, user, groupId.toString(), null, task, managerToTest);
-        Mockito.verify(taskRepo).save(Mockito.any(ExportTask.class));
+        Mockito.verify(taskRepo).saveAndFlush(Mockito.any(ExportTask.class));
     }
     
     @Test
     public void test_export_collection() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
         managerToTest.export(ExportType.CSV, user, groupId.toString(), COLLECTION_ID);
         Mockito.verify(processor).runExport(ExportType.CSV, user, groupId.toString(), COLLECTION_ID, task, managerToTest);
-        Mockito.verify(taskRepo).save(Mockito.any(ExportTask.class));
+        Mockito.verify(taskRepo).saveAndFlush(Mockito.any(ExportTask.class));
     }
     
     @Test(expected=ExportTooBigException.class)

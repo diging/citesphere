@@ -49,8 +49,13 @@ public class CsvProcessor implements Processor {
             for (ICitation citation : citations) {
                 List<String> row = new ArrayList<>();
                 row.add(citation.getKey());
-                row.add(citation.getGroup().getId() + "");
-                row.add(citation.getGroup().getName());
+                if (citation.getGroup() != null) {
+                    row.add(citation.getGroup().getId() + "");
+                    row.add(citation.getGroup().getName());
+                } else {
+                    row.add("");
+                    row.add("");
+                }
                 row.add(citation.getItemType().getZoteroKey());
                 row.add(citation.getTitle());
                 row.add(citation.getDateFreetext());

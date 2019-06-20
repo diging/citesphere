@@ -340,7 +340,7 @@ function savePersonDetails(personType, modalName){
 		personSpan = $('<span id='+id+'>');
 	}
 	
-	personSpan.attr("class", "label label-info "+personTypeLCase +"-item");
+	personSpan.attr("class", "label label-warning "+personTypeLCase +"-item");
 	personSpan.html("");
 	var firstname = $("#firstName"+modalName).val();
 	var lastname = $("#lastName"+modalName).val();
@@ -507,6 +507,7 @@ function resetPersonAuthorityCreation(personType) {
 	$("#uriLoadingFailure"+personType).popover('hide');
 	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
 	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").html("");
+	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
@@ -640,7 +641,7 @@ let removePerson = function removePerson(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
+<span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-creator-type="author" data-author-authority-id="${author.localAuthorityId}">
 <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
 &nbsp;
@@ -659,7 +660,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <td>
 <span id="editorList" style="font-size: 18px">
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
-<span id="editor${status.index}" class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
+<span id="editor${status.index}" class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}" data-creator-type="editor">
 <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;

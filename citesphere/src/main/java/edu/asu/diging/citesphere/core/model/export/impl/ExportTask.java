@@ -19,8 +19,8 @@ import edu.asu.diging.citesphere.core.model.export.IExportTask;
 public class ExportTask implements IExportTask {
 
     @Id
-    @GeneratedValue(generator = "page_id_generator")
-    @GenericGenerator(name = "page_id_generator",    
+    @GeneratedValue(generator = "task_id_generator")
+    @GenericGenerator(name = "task_id_generator",    
                     parameters = @Parameter(name = "prefix", value = "EX"), 
                     strategy = "edu.asu.diging.citesphere.core.repository.IdGenerator"
             )
