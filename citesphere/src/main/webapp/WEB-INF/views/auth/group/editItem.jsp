@@ -86,6 +86,7 @@ $(function() {
 			$("#uriAuthorLocalId").val(data['id']);
 			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
 			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Author");
 			$("#uriLoadingFoundAuthor").popover('hide');
 		});
 	});
@@ -94,6 +95,7 @@ $(function() {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
 		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Author");
 		$("#uriLoadingFoundAuthor").popover('hide');
 		event.preventDefault();
 	});
@@ -155,6 +157,7 @@ $(function() {
 			$("#uriEditorLocalId").val(data['id']);
 			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
 			$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Editor");
 			$("#uriLoadingFoundEditor").popover('hide');
 		});
 	});
@@ -163,6 +166,7 @@ $(function() {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriEditorLocalId").val(authId);
 		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Editor");
 		$("#uriLoadingFoundEditor").popover('hide');
 		event.preventDefault();
 	});
@@ -226,6 +230,7 @@ $(function() {
 			$("#uriCreatorLocalId").val(data['id']);
 			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
 			$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Creator");
 			$("#uriLoadingFoundCreator").popover('hide');
 		});
 	});
@@ -234,6 +239,7 @@ $(function() {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriCreatorLocalId").val(authId);
 		$("#creatorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Creator");
 		$("#uriLoadingFoundCreator").popover('hide');
 		event.preventDefault();
 	});
@@ -259,6 +265,40 @@ $(function() {
 	});
 });
 
+/* Function to populate name in modal fetched from uri */
+function showPersonNameInModal(name, personType){
+	var personName = name;
+	
+	/* Name containing brackets
+	example: Dempsey, Hugh A. (Hugh Aylmer), 1929- */
+	if(name.includes("(")) {
+		personName = name.substring(0, name.indexOf("("));
+	}
+	
+	/* Name containing title/year
+	example: Iqbāl, Muḥammad, Sir, 1877-1938 */
+	if(personName.split(",").length > 2) {
+		personName = personName.substring(0, personName.indexOf(',', personName.indexOf(",")+1));
+	}
+	
+	/* Name containing span
+	example: Dempsey, Patrick, 1966- */
+	if(personName.includes("-")) {
+		personName = personName.trim();
+		personName = personName.substring(0, personName.lastIndexOf(' '));
+	}
+	
+	/* Name separated by comma
+	example: Dempsey, Paul Stephen */
+	if(personName.indexOf(",") != -1) {
+		$("#firstName"+personType).val(personName.substring(personName.indexOf(',')+1).trim());
+		$("#lastName"+personType).val(personName.substring(0, personName.lastIndexOf(', ')));
+	} else {
+		$("#lastName"+personType).val(personName.substring(personName.lastIndexOf(' ')+1).trim());
+		$("#firstName"+personType).val(personName.substring(0, personName.lastIndexOf(' ')));
+	}
+}
+
 /* Function to populate modal on edit */
 function editPerson(modalName, item){
 	var personItem = $(item);
@@ -281,7 +321,7 @@ function editPerson(modalName, item){
 	if(personItem.children("span").length > 0) {
 		$("#"+modalNameLCase+"AffiliationTemplate").hide();
 	}
-	$("#addCreatorButton").attr("data-"+modalNameLCase+"type", personItem.attr("data-"+modalNameLCase+"type"));
+	$("#addCreatorButton").attr("data-"+modalNameLCase+"-type", personItem.attr("data-"+modalNameLCase+"type"));
 	$("#add"+modalName+"Button").text("Update "+modalName);
 	
 	$("#"+modalNameLCase+"Modal").modal('show');
@@ -294,12 +334,13 @@ function savePersonDetails(personType, modalName){
 	var personTypeLCase = personType.toLowerCase();
 	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id") != null && $("#id"+modalName).attr("data-"+modalNameLCase+"-id").length > 0) {
 		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
+		personTypeLCase = personSpan.attr("data-creator-type").toLowerCase();
 	} else {
 		var id = personTypeLCase + $("."+personTypeLCase+"-item").length;
 		personSpan = $('<span id='+id+'>');
 	}
 	
-	personSpan.attr("class", "label label-info "+personTypeLCase +"-item");
+	personSpan.attr("class", "label label-warning "+personTypeLCase +"-item");
 	personSpan.html("");
 	var firstname = $("#firstName"+modalName).val();
 	var lastname = $("#lastName"+modalName).val();
@@ -466,6 +507,7 @@ function resetPersonAuthorityCreation(personType) {
 	$("#uriLoadingFailure"+personType).popover('hide');
 	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
 	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").html("");
+	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
@@ -599,7 +641,7 @@ let removePerson = function removePerson(e) {
 <td>
 <span id="authorList" style="font-size: 18px">
 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-author-authority-id="${author.localAuthorityId}">
+<span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-creator-type="author" data-author-authority-id="${author.localAuthorityId}">
 <c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
 &nbsp;
@@ -618,7 +660,7 @@ ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstNam
 <td>
 <span id="editorList" style="font-size: 18px">
 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
-<span id="editor${status.index}" class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}">
+<span id="editor${status.index}" class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}" data-creator-type="editor">
 <c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
 ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
 &nbsp;

@@ -15,6 +15,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
@@ -38,15 +41,18 @@ public class Citation implements ICitation {
     @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Citation_Author")
     @OrderBy("positionInList")
+    @NotFound(action=NotFoundAction.IGNORE)
     private Set<IPerson> authors;
     @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Citation_Editor")
     @OrderBy("positionInList")
+    @NotFound(action=NotFoundAction.IGNORE)
     private Set<IPerson> editors;
     
     @OneToMany(targetEntity=Creator.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Citation_Creator")
     @OrderBy("role, positionInList")
+    @NotFound(action=NotFoundAction.IGNORE)
     private Set<ICreator> otherCreators;
     
     private ItemType itemType;

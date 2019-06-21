@@ -1,9 +1,10 @@
 package edu.asu.diging.citesphere.web.forms;
 
-import edu.asu.diging.citesphere.core.model.bib.IConceptType;
+import javax.validation.constraints.NotEmpty;
 
 public class CitationConceptForm {
-
+    
+    @NotEmpty(message="Name cannot be empty.")
     private String name;
     private String description;
     private String uri;

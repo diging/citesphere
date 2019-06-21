@@ -64,6 +64,10 @@
           		<a href="<c:url value="/" />" >Home</a>
           	</li>
           	
+          	<li role="presentation">
+                <a href="<c:url value="/auth/exports" />" >Exports</a>
+            </li>
+          	
           	<sec:authorize access="hasRole('ADMIN')">
           	<li role="presentation">
           		<a href="<c:url value="/admin/user/list" />" >Users</a>
