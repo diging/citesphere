@@ -258,7 +258,6 @@ public class CitationManager implements ICitationManager {
         request.setSortBy(sortBy);
         results.getCitations().forEach(c -> {
             c.setGroup(group);
-            citationRepository.save((Citation)c);
         });
         request.setLastUpdated(OffsetDateTime.now());
         return request;
