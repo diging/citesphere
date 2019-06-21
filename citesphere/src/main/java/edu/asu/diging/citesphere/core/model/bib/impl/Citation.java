@@ -37,6 +37,7 @@ public class Citation implements ICitation {
     private ICitationGroup group;
     
     private long version;
+    @Lob
     private String title;
     @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Citation_Author")
