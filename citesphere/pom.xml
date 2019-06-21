@@ -27,6 +27,7 @@
         <db.database.url></db.database.url>
         <db.user></db.user>
         <db.password></db.password>
+        <db.log.queries>false</db.log.queries>
 
         <upload.folder.path></upload.folder.path>
 
