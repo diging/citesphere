@@ -111,7 +111,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
             task.setCollectionName(collection.getName());
         }
         
-        task = taskRepo.save((ExportTask) task);
+        task = taskRepo.saveAndFlush((ExportTask) task);
         runningTasks.put(task.getId(), task);
         
         processor.runExport(exportType, user, groupId, collectionId, task, this);
