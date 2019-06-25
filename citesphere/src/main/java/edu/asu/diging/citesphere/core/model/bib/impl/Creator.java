@@ -8,6 +8,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Parameter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,6 +33,7 @@ public class Creator implements ICreator, Comparable<ICreator> {
     
     @OneToOne(targetEntity=Person.class, cascade=CascadeType.ALL)
     @JoinColumn(name="person_id")
+    @NotFound(action=NotFoundAction.IGNORE)
     private IPerson person;
     
     // not ideal but ah well, crappy data model

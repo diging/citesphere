@@ -64,6 +64,10 @@
           		<a href="<c:url value="/" />" >Home</a>
           	</li>
           	
+          	<li role="presentation">
+                <a href="<c:url value="/auth/exports" />" >Exports</a>
+            </li>
+          	
           	<sec:authorize access="hasRole('ADMIN')">
           	<li role="presentation">
           		<a href="<c:url value="/admin/user/list" />" >Users</a>
@@ -130,6 +134,9 @@
         <div class="col-md-12">
 		<hr style="margin-bottom: 25px;">
 		<p class="text-muted pull-left">
+		<c:set var="PR" value="${pullrequest}" />
+            Version: ${buildNumber}<c:if test="${not empty PR}">, Pull Request: ${pullrequest}</c:if> 
+        </p>
 		
 	    <p class="text-muted">
 	    

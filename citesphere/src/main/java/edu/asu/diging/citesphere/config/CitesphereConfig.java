@@ -19,11 +19,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import edu.asu.diging.citesphere.core.email.impl.NotSetupMailSender;
 
 @Configuration
 @EnableCaching
+@EnableAsync
 @PropertySource("classpath:/config.properties")
 public class CitesphereConfig {
     

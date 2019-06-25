@@ -28,6 +28,9 @@
         <db.database.url></db.database.url>
         <db.user></db.user>
         <db.password></db.password>
+        <db.log.queries>false</db.log.queries>
+
+        <upload.folder.path></upload.folder.path>
 
         <upload.folder.path></upload.folder.path>
 
@@ -55,6 +58,9 @@
         <app.createUserApprovalPath>admin/user/list</app.createUserApprovalPath>
         
         <kafka.hosts></kafka.hosts>
+        <pullrequest></pullrequest>
+        <buildNumber>v42.0.0</buildNumber>
+        
     </properties>
 
     <dependencyManagement>
@@ -440,6 +446,15 @@
             <artifactId>spring-kafka</artifactId>
             <version>${spring.kafka.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.7</version>
+        </dependency>
+
+
 
     </dependencies>
 
