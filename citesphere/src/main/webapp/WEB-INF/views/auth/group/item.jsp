@@ -57,7 +57,7 @@
 <td>${citation.shortTitle}</td>
 </tr>
 </c:if>
-<c:if test="${fn:contains(fields, 'dateFreetext') }">
+<c:if test="${fn:contains(fields, 'date') }">
 <tr>
 <td>Date</td>
 <td>${citation.dateFreetext}</td>
