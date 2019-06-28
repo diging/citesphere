@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.service.jobs.impl;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,11 @@ import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +36,7 @@ import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.Job;
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
 import edu.asu.diging.citesphere.core.model.jobs.impl.UploadJob;
-import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
+import edu.asu.diging.citesphere.core.repository.jobs.UploadJobRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
@@ -39,12 +45,16 @@ import edu.asu.diging.citesphere.core.service.upload.IFileStorageManager;
 
 @Service
 @Transactional
+@PropertySource("classpath:/config.properties")
 public class UploadJobManager implements IUploadJobManager {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    
+    @Value("${_job_page_size}")
+    private int jobPageSize;
 
     @Autowired
-    private JobRepository jobRepository;
+    private UploadJobRepository jobRepository;
 
     @Autowired
     private IFileStorageManager fileManager;
@@ -66,7 +76,7 @@ public class UploadJobManager implements IUploadJobManager {
      */
     @Override
     public IUploadJob findUploadJob(String id) {
-        Optional<Job> jobOptional = jobRepository.findById(id);
+        Optional<UploadJob> jobOptional = jobRepository.findById(id);
         if (jobOptional.isPresent()) {
             IJob job = jobOptional.get();
             if (IUploadJob.class.isAssignableFrom(job.getClass())) {
@@ -92,6 +102,7 @@ public class UploadJobManager implements IUploadJobManager {
             UploadJob job = new UploadJob();
             jobs.add(job);
             job.setFilename(filename);
+            job.setCreatedOn(OffsetDateTime.now());
             job.setUsername(user.getUsername());
             job.setCitationGroup(groupId);
             job.setPhases(new ArrayList<>());
@@ -161,5 +172,12 @@ public class UploadJobManager implements IUploadJobManager {
             logger.error("Could not retrieve uploaded file.", e);
             return null;
         }
+    }
+    
+    @Override
+    public List<IUploadJob> getUploadJobs(String username, int page) {
+        List<IUploadJob> results = new ArrayList<>();
+        jobRepository.findByUsername(username, PageRequest.of(page, jobPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(j -> results.add(j));
+        return results;
     }
 }

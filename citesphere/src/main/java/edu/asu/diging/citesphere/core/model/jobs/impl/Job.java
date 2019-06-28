@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.model.jobs.impl;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -36,6 +37,8 @@ public class Job implements IJob {
     
     @Enumerated(EnumType.STRING)
     private JobStatus status;
+    
+    private OffsetDateTime createdOn;
     
     @JsonIgnore
     @OneToMany(cascade=CascadeType.ALL)
@@ -114,5 +117,15 @@ public class Job implements IJob {
     @Override
     public void setPhases(List<JobPhase> phases) {
         this.phases = phases;
+    }
+
+    @Override
+    public OffsetDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    @Override
+    public void setCreatedOn(OffsetDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 }

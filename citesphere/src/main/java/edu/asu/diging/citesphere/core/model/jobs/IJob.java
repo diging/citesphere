@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.model.jobs;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
@@ -33,5 +34,9 @@ public interface IJob {
     List<JobPhase> getPhases();
 
     void setPhases(List<JobPhase> phases);
+
+    void setCreatedOn(OffsetDateTime createdOn);
+
+    OffsetDateTime getCreatedOn();
 
 }

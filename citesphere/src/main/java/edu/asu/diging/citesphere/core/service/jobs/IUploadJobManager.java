@@ -16,4 +16,6 @@ public interface IUploadJobManager {
 
     byte[] getUploadedFile(IUploadJob job);
 
+    List<IUploadJob> getUploadJobs(String username, int page);
+
 }

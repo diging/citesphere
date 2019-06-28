@@ -99,9 +99,19 @@
 		          </li>
 			    </ul>
 			</li>
-			<li role="presentation">
-          		<a href="<c:url value="/auth/import/upload" />" >Import</a>
-          	</li>
+			<li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                  Import <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+					<li role="presentation">
+		          		<a href="<c:url value="/auth/import/upload" />" >Import from File</a>
+		          	</li>
+		          	<li role="presentation">
+                        <a href="<c:url value="/auth/import/jobs" />" >Import Job List</a>
+                    </li>
+	          	</ul>
+	        </li>
           	<li role="presentation">
           		<a href="<c:url value="/auth/authority/list" />" >Managed Authority Entries</a>
           	</li>
