@@ -73,7 +73,8 @@ public class GroupItemsController {
         model.addAttribute("zoteroGroupId", groupId);
         model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("collectionId", collectionId);
-        model.addAttribute("citationCollections", collectionManager.getCitationCollections(user, groupId, collectionId, pageInt, "title").getCitationCollections());
+        // more than 200 really don't make sense here, this needs to be changed
+        model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, null, "title", 200));
         
         List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();

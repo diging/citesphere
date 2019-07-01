@@ -596,6 +596,16 @@ let removePerson = function removePerson(e) {
 <form:form action="${processingUrl}" modelAttribute="form" method="POST" id="editForm">
 <table class="table table-striped">
 
+<c:if test="${empty citation.key}">
+<td width="20%">Collection</td>
+<td>
+<form:select class="form-control" path="collectionId" >
+     <option value="">&nbsp;</option>
+     <form:options itemValue="key" itemLabel="name" items="${citationCollections}" />
+</form:select>
+</td>
+</c:if>
+
 <tr <c:if test="${empty citation.key}" >style="display:none;"</c:if>>
 <td width="20%">Item Key</td>
 <td>${citation.key}</td>
@@ -631,7 +641,7 @@ let removePerson = function removePerson(e) {
 <td><form:input path="shortTitle" type="text" class="form-control" placeholder="Short title" value="${citation.shortTitle}" /></td>
 </tr>
 
-<tr <c:if test="${not fn:contains(fields, 'dateFreetext') }">style="display:none;"</c:if>>
+<tr <c:if test="${fn:contains(fields, 'date') }">style="display:none;"</c:if>>
 <td>Date</td>
 <td><form:input path="dateFreetext" type="text" class="form-control" placeholder="Date" value="${not empty form.dateFreetext ? form.dateFreetext : citation.dateFreetext}" /></td>
 </tr>
@@ -1046,7 +1056,11 @@ function loadFields() {
 				$(elem).parent().closest('tr').hide();
 			});
 			for(i=0;i<changedFields.length;i++){
-				$('form input#'+changedFields[i]).parent().closest('tr').show();
+				var fieldId = changedFields[i];
+				if (fieldId == "date") {
+					fieldId = "dateFreetext";
+				}
+				$('form input#'+fieldId).parent().closest('tr').show();
 			}
 			$('#messageModal').modal('hide');
 			

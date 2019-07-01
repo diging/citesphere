@@ -227,9 +227,9 @@ public class CitationManagerTest {
         ICitation newCitation = new Citation();
         ICitation createdCitation = new Citation();
         createdCitation.setKey("KEY");
-        Mockito.when(zoteroManager.createCitation(user, GROUP_ID, newCitation)).thenReturn(createdCitation);
+        Mockito.when(zoteroManager.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation)).thenReturn(createdCitation);
         
-        ICitation actual = managerToTest.createCitation(user, GROUP_ID, newCitation);
+        ICitation actual = managerToTest.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation);
         Mockito.verify(citationRepository).save((Citation)createdCitation);
         Assert.assertEquals(createdCitation, actual);
     }
@@ -237,8 +237,8 @@ public class CitationManagerTest {
     @Test(expected=ZoteroItemCreationFailedException.class)
     public void test_createCitation_failure() throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException {
         ICitation newCitation = new Citation();
-        Mockito.when(zoteroManager.createCitation(user, GROUP_ID, newCitation)).thenThrow(new ZoteroItemCreationFailedException());
+        Mockito.when(zoteroManager.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation)).thenThrow(new ZoteroItemCreationFailedException());
         
-        managerToTest.createCitation(user, GROUP_ID, newCitation);
+        managerToTest.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation);
     }
 }
