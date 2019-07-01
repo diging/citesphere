@@ -596,6 +596,16 @@ let removePerson = function removePerson(e) {
 <form:form action="${processingUrl}" modelAttribute="form" method="POST" id="editForm">
 <table class="table table-striped">
 
+<c:if test="${empty citation.key}">
+<td width="20%">Collection</td>
+<td>
+<form:select class="form-control" path="collectionId" >
+     <option value="">&nbsp;</option>
+     <form:options itemValue="key" itemLabel="name" items="${citationCollections}" />
+</form:select>
+</td>
+</c:if>
+
 <tr <c:if test="${empty citation.key}" >style="display:none;"</c:if>>
 <td width="20%">Item Key</td>
 <td>${citation.key}</td>

@@ -1,10 +1,13 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -19,6 +22,7 @@ import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 
 @Service
+@PropertySource("classpath:/config.properties")
 public class CitationCollectionManager implements ICitationCollectionManager {
 
     @Autowired
@@ -29,6 +33,10 @@ public class CitationCollectionManager implements ICitationCollectionManager {
     
     @Autowired
     private IZoteroManager zoteroManager;
+    
+    @Value("${_zotero_collections_max_number}")
+    private Integer zoteroCollectionsMaxNumber;
+    
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.impl.ICitationCollectionManager#getTopCitationCollections(edu.asu.diging.citesphere.core.model.IUser, java.lang.String, java.lang.String, int, java.lang.String)
@@ -55,6 +63,34 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         
         collectionResult.setCitationCollections(collections);
         return results;
+    }
+    
+    @Override
+    public long getTotalCitationCollections(IUser user, String groupId, String parentCollectionId) throws GroupDoesNotExistException {
+        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
+        CitationGroup group = groupOptional.get();
+        
+        CitationCollectionResult results = zoteroManager.getCitationCollections(user, groupId, parentCollectionId, 1, "title", group.getVersion());
+        return results.getTotalResults();        
+    }
+    
+    @Override
+    public List<ICitationCollection> getAllCollections(IUser user, String groupId, String parentCollectionId, String sortBy, int maxCollections) throws GroupDoesNotExistException {
+        int page = 1;
+        CitationCollectionResult result = getCitationCollections(user, groupId, parentCollectionId, page, sortBy);
+        List<ICitationCollection> collections = new ArrayList<>();
+        collections.addAll(result.getCitationCollections());
+        int idx = 1;
+        while (result.getTotalResults() > collections.size() && idx*zoteroCollectionsMaxNumber < maxCollections) {
+            page++;
+            idx++;
+            result = getCitationCollections(user, groupId, parentCollectionId, page, sortBy);
+            collections.addAll(result.getCitationCollections());
+        }
+        return collections;
     }
     
     @Override

@@ -1,7 +1,9 @@
 package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +33,7 @@ public class ItemFactory implements IItemFactory {
      * @see edu.asu.diging.citesphere.core.factory.zotero.impl.IItemFactory#createItem(edu.asu.diging.citesphere.core.model.bib.ICitation)
      */
     @Override
-    public Item createItem(ICitation citation) {
+    public Item createItem(ICitation citation, List<String> collectionIds) {
         Item item = new Item();
         item.setKey(citation.getKey());
         
@@ -65,6 +67,7 @@ public class ItemFactory implements IItemFactory {
         data.setUrl(citation.getUrl());
         data.setVolume(citation.getVolume());
         data.setVersion(citation.getVersion());
+        data.setCollections(collectionIds);
         
         data.setCreators(new ArrayList<>());
         citation.getAuthors().forEach(a -> {

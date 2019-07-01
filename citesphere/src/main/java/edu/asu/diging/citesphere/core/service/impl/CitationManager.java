@@ -125,13 +125,13 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public ICitation createCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException {
+    public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation) throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
         
-        ICitation newCitation = zoteroManager.createCitation(user, groupId, citation);
+        ICitation newCitation = zoteroManager.createCitation(user, groupId, collectionIds, citation);
         citationRepository.save((Citation) newCitation);
         
         // mark group outdated, so it'll be updated on the next loading
