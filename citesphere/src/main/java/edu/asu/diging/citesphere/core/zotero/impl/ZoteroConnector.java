@@ -102,7 +102,7 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    public Item updateItem(IUser user, Item item, String groupId, List<String> ignoreFields, List<String> validCreatorTypes) throws ZoteroConnectionException {
+    public Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields, List<String> validCreatorTypes) throws ZoteroConnectionException {
         Zotero zotero = getApi(user);
         zotero.getGroupsOperations().updateItem(groupId, item, ignoreFields, validCreatorTypes);
         // it seems like Zotero needs a minute to process the submitted data
@@ -117,7 +117,7 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    public Item createItem(IUser user, Item item, String groupId, List<String> ignoreFields, List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+    public Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields, List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException {
         Zotero zotero = getApi(user);
         ItemCreationResponse response = zotero.getGroupsOperations().createItem(groupId, item, ignoreFields, validCreatorTypes);
         

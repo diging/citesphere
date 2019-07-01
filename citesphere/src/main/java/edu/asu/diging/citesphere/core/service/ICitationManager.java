@@ -32,7 +32,7 @@ public interface ICitationManager {
 
     ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey) throws GroupDoesNotExistException;
 
-    ICitation createCitation(IUser user, String groupId, ICitation citation)
+    ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException;
 
     List<String> getValidCreatorTypes(IUser user, ItemType itemType);
