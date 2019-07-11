@@ -21,7 +21,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
@@ -84,7 +86,7 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException {
+    public ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException, CannotFindCitationException {
         Optional<Citation> optional = citationRepository.findById(key);
         if (optional.isPresent()) {
             return optional.get();
@@ -148,15 +150,20 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey) throws GroupDoesNotExistException {
+    public ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey) throws GroupDoesNotExistException, CannotFindCitationException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
-        ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey); 
-        citation.setGroup(groupOptional.get());
-        citationRepository.save((Citation)citation);
-        return citation;
+        try {
+            ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey); 
+            citation.setGroup(groupOptional.get());
+            citationRepository.save((Citation)citation);
+            return citation;
+        } catch (HttpClientErrorException ex) {
+            throw new CannotFindCitationException(ex);
+        }
+        
     }
 
     /* (non-Javadoc)

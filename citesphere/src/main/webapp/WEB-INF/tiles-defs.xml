@@ -78,5 +78,10 @@
     <definition name="auth/concepts/types/add" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/concepts/types/add.jsp" />    
     </definition>
+    
+    <!-- Error Pages -->
+    <definition name="error/citation/notFound" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/error/citationNotFound.jsp" />    
+    </definition>
 	
 </tiles-definitions>
