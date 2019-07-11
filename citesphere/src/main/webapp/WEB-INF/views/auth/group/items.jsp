@@ -43,6 +43,22 @@ $(function() {
 		}
 		window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />?columns=" + shownColumns; 
 	});
+	
+	$("#findByItemKeyBtn").click(function() {
+		var key = $("#findItemKey").val();
+		if (key != undefined && key != '') {
+			window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+		}
+	});
+	
+	$("#findItemKey").on('keypress',function(e) {
+	    if(e.which == 13) {
+	    	var key = $("#findItemKey").val();
+	        if (key != undefined && key != '') {
+	            window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+	        }
+	    }
+	});
 });
 </script>
 
@@ -64,7 +80,17 @@ $(function() {
 </c:forEach>
 </ol>
 
-<h2>Items in Group ${group.name}<br><small>${total} records</small></h2>
+
+<h2>Items in Group ${group.name}<br>
+<small>${total} records </small>
+</h2>
+
+<div class="form-group">
+<div class="input-group">
+    <input type="text" id="findItemKey" name="findItemKey" class="form-control" placeholder="Find by item key"/>
+    <div class="input-group-addon" id="findByItemKeyBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
+</div>
+</div>
 
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <div class="panel panel-default">

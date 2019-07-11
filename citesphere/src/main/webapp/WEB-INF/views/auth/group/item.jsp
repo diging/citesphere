@@ -24,6 +24,7 @@
 
 <div style="margin-bottom: 20px;">
 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />"><i class="far fa-edit" title="Edit"></i></a>
+&nbsp;&nbsp; <a href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync" />"><i class="fas fa-sync" title="Sync Citation"></i></a>
 </div>
 
 <table class="table table-striped">
