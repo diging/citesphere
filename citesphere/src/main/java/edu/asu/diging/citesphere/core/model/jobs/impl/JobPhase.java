@@ -5,6 +5,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -25,7 +26,10 @@ public class JobPhase {
     @Enumerated(EnumType.STRING)
     private JobStatus status;
    
+    @Lob
     private String message;
+    
+    public JobPhase() {}
 
     public JobPhase(JobStatus status, String message) {
         super();

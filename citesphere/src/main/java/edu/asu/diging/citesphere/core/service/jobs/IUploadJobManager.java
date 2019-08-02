@@ -18,4 +18,6 @@ public interface IUploadJobManager {
 
     List<IUploadJob> getUploadJobs(String username, int page);
 
+    IUploadJob findUploadJobFullyLoaded(String id);
+
 }

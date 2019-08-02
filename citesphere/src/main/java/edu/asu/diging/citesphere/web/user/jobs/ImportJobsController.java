@@ -18,7 +18,7 @@ public class ImportJobsController {
     
     @RequestMapping("/auth/import/jobs")
     public String list(Model model, @RequestParam(value="page", required=false, defaultValue="1") String page, Authentication authentication) {
-        model.addAttribute("jobs", jobManager.getUploadJobs(authentication.getName(), new Integer(page)));
+        model.addAttribute("jobs", jobManager.getUploadJobs(authentication.getName(), new Integer(page)-1));
         return "auth/import/jobs";
     }
 }

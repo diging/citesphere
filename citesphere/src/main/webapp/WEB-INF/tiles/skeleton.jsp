@@ -107,8 +107,9 @@
 					<li role="presentation">
 		          		<a href="<c:url value="/auth/import/upload" />" >Import from File</a>
 		          	</li>
+		          	<li role="separator" class="divider"></li>
 		          	<li role="presentation">
-                        <a href="<c:url value="/auth/import/jobs" />" >Import Job List</a>
+                        <a href="<c:url value="/auth/import/jobs" />" >See all Imports</a>
                     </li>
 	          	</ul>
 	        </li>

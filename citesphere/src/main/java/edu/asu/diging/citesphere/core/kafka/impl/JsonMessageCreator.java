@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.core.exceptions.MessageCreationException;
 import edu.asu.diging.citesphere.core.kafka.IJsonMessageCreator;
+import edu.asu.diging.citesphere.messages.model.KafkaJobMessage;
 
 @Component
 public class JsonMessageCreator implements IJsonMessageCreator {

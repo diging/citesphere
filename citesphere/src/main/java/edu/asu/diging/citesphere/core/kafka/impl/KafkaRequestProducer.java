@@ -18,7 +18,7 @@ import edu.asu.diging.citesphere.config.KafkaConfig;
 import edu.asu.diging.citesphere.core.exceptions.MessageCreationException;
 import edu.asu.diging.citesphere.core.kafka.IJsonMessageCreator;
 import edu.asu.diging.citesphere.core.kafka.IKafkaRequestProducer;
-import edu.asu.diging.citesphere.core.model.jobs.IJob;
+import edu.asu.diging.citesphere.messages.model.KafkaJobMessage;
 
 @Service
 public class KafkaRequestProducer implements IKafkaRequestProducer {

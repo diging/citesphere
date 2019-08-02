@@ -34,17 +34,25 @@ $(function() {
 <th>Content Type</th>
 <th>Status</th> 
 <th>Created On</th>
+<th></th>
 </tr>
 
 <c:forEach items="${jobs}" var="job">
 <tr>
-<td>${job.id}</td>
-<td><span class="label label-primary">${job.citationGroup}</span></td>
+<td>
+    ${job.id}
+</td>
+<td><span class="label label-default">${job.citationGroup}</span></td>
 <td>${job.filename}</td>
 <td>${job.fileSize}</td>
 <td>${job.contentType}</td>
 <td>${job.status}</td>
 <td>${job.createdOn}</td>
+<td>
+    <c:if test="${job.status == 'DONE'}"><i style="color: green;" class="fas fa-check-circle"></i></c:if>
+    <c:if test="${job.status == 'STARTED'}"><i style="color: orange;" class="fas fa-cogs"></i></c:if>
+    <c:if test="${job.status == 'FAILURE'}"><i style="color: red;" class="fas fa-exclamation-circle"></i></c:if>
+</td>
 </tr>
 </c:forEach>
 

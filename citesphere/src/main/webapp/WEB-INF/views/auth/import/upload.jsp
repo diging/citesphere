@@ -26,7 +26,7 @@
 $(document).ready(function() {
     var dropZone = document.getElementById('drop-zone');
     var uploadForm = document.getElementById('js-upload-form');
-
+    
     var startUpload = function(files) {
     	var formData = new FormData();
     	formData.append("group", $("#groupSelect option:selected").val());
@@ -52,6 +52,7 @@ $(document).ready(function() {
 		        		successBox.append(badge);
 		        		successBox.append(obj.filename);
 		        		uploadedFilesList.append(successBox);
+		        		$("#uploadedAlert").show();
 	        		} else {
 	        			var successBox = $('<a href="#" class="list-group-item list-group-item-danger"></a>');
 		        		var badge = $('<span class="badge alert-danger pull-right">Failure</span>');
@@ -96,7 +97,11 @@ $(document).ready(function() {
    <div class="panel panel-default">
      <div class="panel-heading"><strong>Upload References</strong> <small></small></div>
      <div class="panel-body">
-
+        
+        <div id="uploadedAlert" style="display: none;" class="alert alert-info alert-dismissible fade in" role="alert">
+	      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button>
+	      <strong>Import started!</strong> Head over to the <a href="<c:url value='/auth/import/jobs' />">job list</a> to see the status of your import.
+	    </div>
        
        <h4>Select files from your computer</h4>
        <form action="" method="post" enctype="multipart/form-data" id="js-upload-form">

@@ -26,22 +26,20 @@ import edu.asu.diging.citesphere.core.exceptions.FileStorageException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.MessageCreationException;
 import edu.asu.diging.citesphere.core.kafka.IKafkaRequestProducer;
-import edu.asu.diging.citesphere.core.kafka.KafkaTopics;
-import edu.asu.diging.citesphere.core.kafka.impl.KafkaJobMessage;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
-import edu.asu.diging.citesphere.core.model.jobs.impl.Job;
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
 import edu.asu.diging.citesphere.core.model.jobs.impl.UploadJob;
 import edu.asu.diging.citesphere.core.repository.jobs.UploadJobRepository;
-import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
 import edu.asu.diging.citesphere.core.service.jwt.IJwtTokenService;
 import edu.asu.diging.citesphere.core.service.upload.IFileStorageManager;
+import edu.asu.diging.citesphere.messages.KafkaTopics;
+import edu.asu.diging.citesphere.messages.model.KafkaJobMessage;
 
 @Service
 @Transactional
@@ -79,6 +77,20 @@ public class UploadJobManager implements IUploadJobManager {
         Optional<UploadJob> jobOptional = jobRepository.findById(id);
         if (jobOptional.isPresent()) {
             IJob job = jobOptional.get();
+            if (IUploadJob.class.isAssignableFrom(job.getClass())) {
+                return (IUploadJob) job;
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public IUploadJob findUploadJobFullyLoaded(String id) {
+        Optional<UploadJob> jobOptional = jobRepository.findById(id);
+        if (jobOptional.isPresent()) {
+            IJob job = jobOptional.get();
+            // load phases
+            job.getPhases().size();
             if (IUploadJob.class.isAssignableFrom(job.getClass())) {
                 return (IUploadJob) job;
             }
