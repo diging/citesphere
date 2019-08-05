@@ -33,8 +33,6 @@
 
         <upload.folder.path></upload.folder.path>
 
-        <upload.folder.path></upload.folder.path>
-
         <tomcat.deploy.path></tomcat.deploy.path>
         <tomcat.app.name>citesphere</tomcat.app.name>
         <tomcat.server.id>TomcatServer</tomcat.server.id>
