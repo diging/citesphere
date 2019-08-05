@@ -50,17 +50,6 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
     @PropertySource("classpath:/config.properties")
     public static class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
 
-        static final String CLIENT_ID = "android-client";
-        static final String CLIENT_SECRET = "$2a$04$heXhjyss0lT52E8UZAjIC.y8cor0.SlgTVr8JdVzJ/g6iQyU87zvC";
-        static final String GRANT_TYPE_PASSWORD = "password";
-        static final String AUTHORIZATION_CODE = "authorization_code";
-        static final String REFRESH_TOKEN = "refresh_token";
-        static final String IMPLICIT = "implicit";
-        static final String SCOPE_READ = "read";
-        static final String SCOPE_WRITE = "write";
-        static final String TRUST = "trust";
-        static final int REFRESH_TOKEN_VALIDITY_SECONDS = 6 * 60 * 60;
-        
         @Value("${_oauth_token_validity}")
         private int oauthTokenValidity;
 
