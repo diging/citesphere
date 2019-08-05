@@ -26,23 +26,23 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     }
 
     public CustomAuthenticationFailureHandler(String defaultFailureUrl) {
-	setDefaultFailureUrl(defaultFailureUrl);
+        setDefaultFailureUrl(defaultFailureUrl);
     }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-	    AuthenticationException exception) throws IOException, ServletException {
+            AuthenticationException exception) throws IOException, ServletException {
 
-	String errorKey;
+        String errorKey;
 
-	if (exception.getClass().equals(LockedException.class)) {
-	    errorKey = "user_not_approved";
-	} else {
-	    errorKey = "bad_credentials";
-	}
+        if (exception.getClass().equals(LockedException.class)) {
+            errorKey = "user_not_approved";
+        } else {
+            errorKey = "bad_credentials";
+        }
 
-	logger.debug("Redirecting to " + defaultFailureUrl + errorKey);
-	redirectStrategy.sendRedirect(request, response, defaultFailureUrl + errorKey);
+        logger.debug("Redirecting to " + defaultFailureUrl + errorKey);
+        redirectStrategy.sendRedirect(request, response, defaultFailureUrl + errorKey);
     }
 
     /**
@@ -52,8 +52,8 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
      *            the failure URL, for example "/loginFailed.jsp".
      */
     public void setDefaultFailureUrl(String defaultFailureUrl) {
-	Assert.isTrue(UrlUtils.isValidRedirectUrl(defaultFailureUrl),
-		() -> "'" + defaultFailureUrl + "' is not a valid redirect URL");
-	this.defaultFailureUrl = defaultFailureUrl;
+        Assert.isTrue(UrlUtils.isValidRedirectUrl(defaultFailureUrl),
+                () -> "'" + defaultFailureUrl + "' is not a valid redirect URL");
+        this.defaultFailureUrl = defaultFailureUrl;
     }
 }
