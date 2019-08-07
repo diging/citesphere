@@ -14,7 +14,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.stereotype.Service;
 
-import edu.asu.diging.citesphere.config.KafkaConfig;
+import edu.asu.diging.citesphere.config.core.KafkaConfig;
 import edu.asu.diging.citesphere.core.exceptions.MessageCreationException;
 import edu.asu.diging.citesphere.core.kafka.IJsonMessageCreator;
 import edu.asu.diging.citesphere.core.kafka.IKafkaRequestProducer;
