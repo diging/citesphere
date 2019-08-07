@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.config;
+package edu.asu.diging.citesphere.config.core;
 
 import java.util.Properties;
 

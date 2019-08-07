@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.config;
+package edu.asu.diging.citesphere.config.core;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

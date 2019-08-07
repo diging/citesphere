@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.config;
+package edu.asu.diging.citesphere.config.core;
 
 import org.javers.core.Javers;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
