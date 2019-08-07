@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
-import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroTokenManager;
 
 @Controller
@@ -31,7 +30,7 @@ public class HomeController {
                 model.addAttribute("groups", citationManager.getGroups(user));
             }
         }
-
+        
         return "home";
     }
 }
