@@ -64,7 +64,7 @@ public class SocialContext implements SocialConfigurer {
 
     @Bean
     public ProviderSignInController providerSignInController(ConnectionFactoryLocator connectionFactoryLocator,
-            UsersConnectionRepository usersConnectionRepository) throws NoSuchMethodException, SecurityException {
+            UsersConnectionRepository usersConnectionRepository) {
         ProviderSignInController controller = new ProviderSignInController(connectionFactoryLocator,
                 usersConnectionRepository, new SimpleSignInAdapter(tokenManager, tokenFactory));
         return controller;
