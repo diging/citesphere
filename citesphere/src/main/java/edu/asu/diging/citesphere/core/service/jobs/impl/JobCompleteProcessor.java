@@ -70,6 +70,8 @@ public class JobCompleteProcessor implements IJobCompleteProcessor {
                         phase.setMessage(msg.getCode() + " - uploader could not authenticate with Citephere.");
                     } else if (msg.getCode() == ResponseCode.X20) {
                         phase.setMessage(msg.getCode() + " - uploader could not download required file from Citephere.");
+                    } else if (msg.getCode() == ResponseCode.X30) {
+                        phase.setMessage(msg.getCode() + " - file format cannot be handled.");
                     }
                 } else if (msg.getStatus() == Status.PROCESSING) {
                     job.setStatus(JobStatus.STARTED);
