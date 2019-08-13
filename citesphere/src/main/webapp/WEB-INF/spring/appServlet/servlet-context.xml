@@ -20,7 +20,7 @@
 		pre-post-annotations="enabled" />
         
         
-    <context:component-scan base-package="edu.asu.diging.citesphere.web, edu.asu.diging.citesphere.api"></context:component-scan>
+    <context:component-scan base-package="edu.asu.diging.citesphere.web, edu.asu.diging.citesphere.api, edu.asu.diging.citesphere.config.web"></context:component-scan>
 		
 	<beans:bean id="tilesViewResolver"
 		class="org.springframework.web.servlet.view.UrlBasedViewResolver">

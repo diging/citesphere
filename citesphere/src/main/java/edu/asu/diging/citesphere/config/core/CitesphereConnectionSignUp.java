@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.config;
+package edu.asu.diging.citesphere.config.core;
 
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionSignUp;
