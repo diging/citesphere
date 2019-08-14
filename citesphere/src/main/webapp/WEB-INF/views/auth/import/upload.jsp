@@ -102,6 +102,10 @@ $(document).ready(function() {
 	      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button>
 	      <strong>Import started!</strong> Head over to the <a href="<c:url value='/auth/import/jobs' />">job list</a> to see the status of your import.
 	    </div>
+	    
+	    <div class="alert alert-warning" role="alert">
+          You can upload bibliographical data in JSTOR XML format or Web of Science's tagged fields format. You can also zip several of these files and upload the zip file.
+        </div>
        
        <h4>Select files from your computer</h4>
        <form action="" method="post" enctype="multipart/form-data" id="js-upload-form">
