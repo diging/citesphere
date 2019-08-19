@@ -5,6 +5,7 @@ import java.util.Set;
 import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
+import edu.asu.diging.citesphere.core.model.bib.IReference;
 
 public class ExtraDataObject {
 
@@ -15,6 +16,8 @@ public class ExtraDataObject {
     private Set<ICreator> otherCreators;
     
     private Set<ICitationConceptTag> conceptTags;
+    
+    private Set<IReference> references;
 
     public Set<ICreator> getOtherCreators() {
         return otherCreators;
@@ -46,6 +49,14 @@ public class ExtraDataObject {
 
     public void setConceptTags(Set<ICitationConceptTag> conceptTags) {
         this.conceptTags = conceptTags;
+    }
+
+    public Set<IReference> getReferences() {
+        return references;
+    }
+
+    public void setReferences(Set<IReference> references) {
+        this.references = references;
     }
 
 }
