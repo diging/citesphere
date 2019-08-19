@@ -1,28 +1,44 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.Parameter;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IReference;
 
-
+@Entity
 public class Reference implements IReference {
 
-    private String authorString;
+    @Id
+    @GeneratedValue(generator = "reference_id_generator")
+    @GenericGenerator(name = "reference_id_generator",    
+                    parameters = @Parameter(name = "prefix", value = "REF"), 
+                    strategy = "edu.asu.diging.citesphere.core.repository.IdGenerator"
+            )
+    @JsonIgnore
+    private String id;
     
+    private String authorString;
     @OneToMany(targetEntity=Creator.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Reference_Contributor")
     @OrderBy("role, positionInList")
     @NotFound(action=NotFoundAction.IGNORE)
-    private List<ICreator> contributors;
+    private Set<ICreator> contributors;
     
     private String title;
     private String year;
@@ -37,7 +53,9 @@ public class Reference implements IReference {
     private String publicationType;
     private String citationId;
     
+    @Lob
     private String referenceString;
+    @Lob
     private String referenceStringRaw;
     
     /* (non-Javadoc)
@@ -58,14 +76,14 @@ public class Reference implements IReference {
      * @see edu.asu.diging.citesphere.core.model.bib.impl.IReference#getContributors()
      */
     @Override
-    public List<ICreator> getContributors() {
+    public Set<ICreator> getContributors() {
         return contributors;
     }
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.IReference#setContributors(java.util.List)
      */
     @Override
-    public void setContributors(List<ICreator> contributors) {
+    public void setContributors(Set<ICreator> contributors) {
         this.contributors = contributors;
     }
     /* (non-Javadoc)

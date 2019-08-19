@@ -434,9 +434,11 @@ public class Citation implements ICitation {
     public void setConceptTags(Set<ICitationConceptTag> concepts) {
         this.conceptTags = concepts;
     }
+    @Override
     public Set<IReference> getReferences() {
         return references;
     }
+    @Override
     public void setReferences(Set<IReference> references) {
         this.references = references;
     }

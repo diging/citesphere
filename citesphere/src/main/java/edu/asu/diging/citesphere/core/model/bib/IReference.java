@@ -1,6 +1,6 @@
 package edu.asu.diging.citesphere.core.model.bib;
 
-import java.util.List;
+import java.util.Set;
 
 public interface IReference {
 
@@ -8,9 +8,9 @@ public interface IReference {
 
     void setAuthorString(String authorString);
 
-    List<ICreator> getContributors();
+    Set<ICreator> getContributors();
 
-    void setContributors(List<ICreator> contributors);
+    void setContributors(Set<ICreator> contributors);
 
     String getTitle();
 
