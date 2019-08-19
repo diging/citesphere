@@ -23,6 +23,7 @@ import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
+import edu.asu.diging.citesphere.core.model.bib.IReference;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 
 @Entity
@@ -88,6 +89,11 @@ public class Citation implements ICitation {
     @OneToMany(targetEntity=CitationConceptTag.class, cascade=CascadeType.ALL)
     @JoinTable(name="CitationConcept_ConceptTag")
     private Set<ICitationConceptTag> conceptTags;
+    
+    @OneToMany(targetEntity=Reference.class, cascade=CascadeType.ALL, orphanRemoval=true)
+    @JoinTable(name="Citation_Reference")
+    @NotFound(action=NotFoundAction.IGNORE)
+    private Set<IReference> references;
     
     @Lob
     private String extra;
@@ -427,6 +433,14 @@ public class Citation implements ICitation {
     @Override
     public void setConceptTags(Set<ICitationConceptTag> concepts) {
         this.conceptTags = concepts;
+    }
+    @Override
+    public Set<IReference> getReferences() {
+        return references;
+    }
+    @Override
+    public void setReferences(Set<IReference> references) {
+        this.references = references;
     }
     @Override
     public String getExtra() {
