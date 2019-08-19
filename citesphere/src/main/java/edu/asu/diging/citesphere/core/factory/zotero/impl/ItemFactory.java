@@ -121,6 +121,9 @@ public class ItemFactory implements IItemFactory {
         if (citation.getConceptTags() != null) {
             extraDataObject.setConceptTags(citation.getConceptTags());
         }
+        if (citation.getReferences() != null) {
+            extraDataObject.setReferences(citation.getReferences());
+        }
         
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
@@ -136,7 +139,7 @@ public class ItemFactory implements IItemFactory {
                 extraData = extraData + citesphereData;
             } else {
                 // else replace citesphere data
-                extraData = citation.getExtra().replaceAll(ExtraData.CITESPHERE_PATTERN, citesphereData);
+                extraData = citation.getExtra().replaceAll(ExtraData.CITESPHERE_PATTERN, citesphereData.replace("\\", "\\\\"));
             }
         } else {
             // if there is no extra data
