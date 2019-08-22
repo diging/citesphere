@@ -17,6 +17,7 @@ import edu.asu.diging.citesphere.core.model.bib.IConceptType;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
+import edu.asu.diging.citesphere.core.model.bib.impl.CitationConcept;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.impl.Creator;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
@@ -102,8 +103,8 @@ public class CitationHelper implements ICitationHelper {
             for (ConceptAssignmentForm assignment : form.getConceptAssignments()) {
                 if (assignment.getConceptId() != null && assignment.getConceptTypeId() != null) {
                     ICitationConceptTag tag = new CitationConceptTag();
-                    ICitationConcept concept = conceptManager.get(assignment.getConceptId());
-                    IConceptType type = typeManager.get(assignment.getConceptTypeId());
+                    ICitationConcept concept = conceptManager.getByUri(assignment.getConceptUri());
+                    IConceptType type = typeManager.getByUri(assignment.getConceptTypeUri());
                     if (concept != null && type != null) {
                         tag.setConceptName(concept.getName());
                         tag.setConceptUri(concept.getUri());
@@ -114,6 +115,7 @@ public class CitationHelper implements ICitationHelper {
                         
                         citation.getConceptTags().add(tag);
                     }
+                    //TODO: Save concept and tag by uri 
                 }
             }
         }

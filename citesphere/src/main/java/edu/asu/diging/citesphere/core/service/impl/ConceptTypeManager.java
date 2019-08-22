@@ -56,4 +56,14 @@ public class ConceptTypeManager implements IConceptTypeManager {
         
         return type.get();
     }
+    
+    @Override
+    public IConceptType getByUri(String uri) {
+        Optional<ConceptType> type = typeRepository.findByUri(uri);
+        if (!type.isPresent()) {
+            return null;
+        }
+        
+        return type.get();
+    }
 }

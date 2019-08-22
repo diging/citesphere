@@ -1,7 +1,7 @@
 package edu.asu.diging.citesphere.core.repository.bib;
 
 import java.util.List;
-
+import java.util.Optional;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -12,4 +12,6 @@ import edu.asu.diging.citesphere.core.model.bib.impl.CitationConcept;
 public interface CitationConceptRepository extends PagingAndSortingRepository<CitationConcept, String> {
 
     List<CitationConcept> findByOwner(IUser user);
+
+    Optional<CitationConcept> findByUri(String uri);
 }

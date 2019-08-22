@@ -14,4 +14,6 @@ public interface IConceptTypeManager {
 
     IConceptType get(String id);
 
+    IConceptType getByUri(String conceptTypeUri);
+
 }

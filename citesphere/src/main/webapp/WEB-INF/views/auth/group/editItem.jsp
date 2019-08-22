@@ -474,6 +474,34 @@ function createConceptTags() {
 		conceptTagTypeInput.attr("name", "conceptAssignments[" + idx + "].conceptTypeId");
 		conceptTagTypeInput.attr("value", $(tag).attr("data-concept-type-id"));
 		$("#editForm").append(conceptTagTypeInput);
+		
+		var conceptTagUri = $("<input>");
+		conceptTagUri.attr("type", "hidden");
+		conceptTagUri.attr("id", "conceptAssignments" + idx + ".conceptUri");
+		conceptTagUri.attr("name", "conceptAssignments[" + idx + "].conceptUri");
+		conceptTagUri.attr("value", $(tag).attr("data-concept-uri"));
+		$("#editForm").append(conceptTagUri);
+		
+		var conceptTagName = $("<input>");
+		conceptTagName.attr("type", "hidden");
+		conceptTagName.attr("id", "conceptAssignments" + idx + ".conceptName");
+		conceptTagName.attr("name", "conceptAssignments[" + idx + "].conceptName");
+		conceptTagName.attr("value", $(tag).attr("data-concept-name"));
+		$("#editForm").append(conceptTagName);
+		
+		var conceptTagType = $("<input>");
+		conceptTagType.attr("type", "hidden");
+		conceptTagType.attr("id", "conceptAssignments" + idx + ".conceptTypeName");
+		conceptTagType.attr("name", "conceptAssignments[" + idx + "].conceptTypeName");
+		conceptTagType.attr("value", $(tag).attr("data-type-name"));
+		$("#editForm").append(conceptTagType);
+		
+		var conceptTagTypeUri = $("<input>");
+		conceptTagTypeUri.attr("type", "hidden");
+		conceptTagTypeUri.attr("id", "conceptAssignments" + idx + ".conceptTypeUri");
+		conceptTagTypeUri.attr("name", "conceptAssignments[" + idx + "].conceptTypeUri");
+		conceptTagTypeUri.attr("value", $(tag).attr("data-type-uri"));
+		$("#editForm").append(conceptTagTypeUri);
 	});
 }
 
@@ -823,7 +851,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <td>
 <div id="conceptTags">
 <c:forEach items="${citation.conceptTags}" var="tag">
-<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName}</span>
+<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-uri="${tag.conceptUri}" data-concept-name="${tag.conceptName}" data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName}</span>
 </c:forEach>
 </div>
 <div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
