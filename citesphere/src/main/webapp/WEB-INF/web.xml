@@ -71,11 +71,12 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-
+    
     <servlet-mapping>
         <servlet-name>appServlet</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
+
 
     <session-config>
         <!-- 2 hours -->
@@ -84,7 +85,8 @@
 
     <jsp-config>
         <taglib>
-            <taglib-uri>https://diging.asu.edu/jps/tlds/citesphere</taglib-uri>
+            <taglib-uri>https://diging.asu.edu/jps/tlds/citesphere
+            </taglib-uri>
             <taglib-location>/WEB-INF/citesphere.tld</taglib-location>
         </taglib>
     </jsp-config>

@@ -64,10 +64,24 @@
           		<a href="<c:url value="/" />" >Home</a>
           	</li>
           	
+          	<li role="presentation">
+                <a href="<c:url value="/auth/exports" />" >Exports</a>
+            </li>
+          	
           	<sec:authorize access="hasRole('ADMIN')">
           	<li role="presentation">
           		<a href="<c:url value="/admin/user/list" />" >Users</a>
           	</li>
+          	<li role="presentation" class="dropdown">
+          	<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+			      Apps <span class="caret"></span>
+			    </a>
+	          	<ul class="dropdown-menu">
+			      <li role="presentation">
+		          	<a href="<c:url value="/admin/apps/add" />" >Add</a>
+		          </li>
+			    </ul>
+		    </li>
           	</sec:authorize>
           	
           	<sec:authorize access="isAuthenticated()">
@@ -84,7 +98,21 @@
 		          	<a href="<c:url value="/auth/concepts/types/list" />" >Concept Types</a>
 		          </li>
 			    </ul>
-			  </li>
+			</li>
+			<li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                  Import <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+					<li role="presentation">
+		          		<a href="<c:url value="/auth/import/upload" />" >Import from File</a>
+		          	</li>
+		          	<li role="separator" class="divider"></li>
+		          	<li role="presentation">
+                        <a href="<c:url value="/auth/import/jobs" />" >See all Imports</a>
+                    </li>
+	          	</ul>
+	        </li>
           	<li role="presentation">
           		<a href="<c:url value="/auth/authority/list" />" >Managed Authority Entries</a>
           	</li>
@@ -117,6 +145,9 @@
         <div class="col-md-12">
 		<hr style="margin-bottom: 25px;">
 		<p class="text-muted pull-left">
+		<c:set var="PR" value="${pullrequest}" />
+            Version: ${buildNumber}<c:if test="${not empty PR}">, Pull Request: ${pullrequest}</c:if> 
+        </p>
 		
 	    <p class="text-muted">
 	    

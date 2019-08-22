@@ -11,7 +11,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="edu.asu.template">
+	<logger name="edu.asu.diging">
 		<level value="${log.level}" />
 	</logger>
 	
@@ -35,6 +35,10 @@
 	<logger name="org.springframework.web">
 		<level value="${log.level}" />
 	</logger>
+    
+    <logger name="org.springframework.security">
+        <level value="${log.level}" />
+    </logger>
 
 	<!-- Root Logger -->
 	<root>

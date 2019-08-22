@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
@@ -60,7 +61,12 @@ public class EditItemController {
     
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/edit")
     public String showPage(Authentication authentication, Model model, CitationForm form, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException {
-        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+        ICitation citation;
+        try {
+            citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+        } catch (CannotFindCitationException e) {
+            return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
+        }
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("citation", citation);
         if (model.containsAttribute("resolvedForm")) {
@@ -92,7 +98,7 @@ public class EditItemController {
     }
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
-    public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws ZoteroConnectionException, GroupDoesNotExistException {
+    public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         // load authors and editors before detaching
         citation.getAuthors().forEach(a -> a.getAffiliations().size());
@@ -128,7 +134,7 @@ public class EditItemController {
     }
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/conflict/resolve", method = RequestMethod.POST)
-    public String resolveConflict(@ModelAttribute CitationForm form, Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, RedirectAttributes redirectAttrs) throws GroupDoesNotExistException {
+    public String resolveConflict(@ModelAttribute CitationForm form, Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, RedirectAttributes redirectAttrs) throws GroupDoesNotExistException, CannotFindCitationException {
         ICitation outdatedCitation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         List<String> changedFields = compare(outdatedCitation, form);
         ICitation citation = citationManager.updateCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
