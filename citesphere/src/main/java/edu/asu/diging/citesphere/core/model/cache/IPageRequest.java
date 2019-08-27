@@ -49,4 +49,8 @@ public interface IPageRequest {
 
     OffsetDateTime getLastUpdated();
 
+    void setTotalNumResults(long totalNumResults);
+
+    long getTotalNumResults();
+
 }

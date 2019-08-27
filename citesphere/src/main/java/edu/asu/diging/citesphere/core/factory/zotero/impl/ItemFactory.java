@@ -1,7 +1,9 @@
 package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +33,7 @@ public class ItemFactory implements IItemFactory {
      * @see edu.asu.diging.citesphere.core.factory.zotero.impl.IItemFactory#createItem(edu.asu.diging.citesphere.core.model.bib.ICitation)
      */
     @Override
-    public Item createItem(ICitation citation) {
+    public Item createItem(ICitation citation, List<String> collectionIds) {
         Item item = new Item();
         item.setKey(citation.getKey());
         
@@ -65,6 +67,7 @@ public class ItemFactory implements IItemFactory {
         data.setUrl(citation.getUrl());
         data.setVolume(citation.getVolume());
         data.setVersion(citation.getVersion());
+        data.setCollections(collectionIds);
         
         data.setCreators(new ArrayList<>());
         citation.getAuthors().forEach(a -> {
@@ -118,6 +121,9 @@ public class ItemFactory implements IItemFactory {
         if (citation.getConceptTags() != null) {
             extraDataObject.setConceptTags(citation.getConceptTags());
         }
+        if (citation.getReferences() != null) {
+            extraDataObject.setReferences(citation.getReferences());
+        }
         
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
@@ -133,7 +139,7 @@ public class ItemFactory implements IItemFactory {
                 extraData = extraData + citesphereData;
             } else {
                 // else replace citesphere data
-                extraData = citation.getExtra().replaceAll(ExtraData.CITESPHERE_PATTERN, citesphereData);
+                extraData = citation.getExtra().replaceAll(ExtraData.CITESPHERE_PATTERN, citesphereData.replace("\\", "\\\\"));
             }
         } else {
             // if there is no extra data

@@ -52,6 +52,11 @@ public class CitationConceptManager implements ICitationConceptManager {
         concept.setUri(conceptForm.getUri());
         concept.setOwner(user);
         concept.setCreatedOn(OffsetDateTime.now());
+        save(concept);
+    }
+    
+    @Override
+    public void save(ICitationConcept concept) {
         conceptRepo.save((CitationConcept)concept);
     }
 }

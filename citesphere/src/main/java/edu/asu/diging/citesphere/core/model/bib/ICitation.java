@@ -145,4 +145,8 @@ public interface ICitation {
 
     Set<ICitationConceptTag> getConceptTags();
 
+    void setReferences(Set<IReference> references);
+
+    Set<IReference> getReferences();
+
 }

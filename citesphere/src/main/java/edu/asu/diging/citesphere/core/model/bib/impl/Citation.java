@@ -15,11 +15,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ICreator;
 import edu.asu.diging.citesphere.core.model.bib.IPerson;
+import edu.asu.diging.citesphere.core.model.bib.IReference;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 
 @Entity
@@ -34,19 +38,23 @@ public class Citation implements ICitation {
     private ICitationGroup group;
     
     private long version;
+    @Lob
     private String title;
     @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Citation_Author")
     @OrderBy("positionInList")
+    @NotFound(action=NotFoundAction.IGNORE)
     private Set<IPerson> authors;
     @OneToMany(targetEntity=Person.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Citation_Editor")
     @OrderBy("positionInList")
+    @NotFound(action=NotFoundAction.IGNORE)
     private Set<IPerson> editors;
     
     @OneToMany(targetEntity=Creator.class, cascade=CascadeType.ALL, orphanRemoval=true)
     @JoinTable(name="Citation_Creator")
     @OrderBy("role, positionInList")
+    @NotFound(action=NotFoundAction.IGNORE)
     private Set<ICreator> otherCreators;
     
     private ItemType itemType;
@@ -81,6 +89,11 @@ public class Citation implements ICitation {
     @OneToMany(targetEntity=CitationConceptTag.class, cascade=CascadeType.ALL)
     @JoinTable(name="CitationConcept_ConceptTag")
     private Set<ICitationConceptTag> conceptTags;
+    
+    @OneToMany(targetEntity=Reference.class, cascade=CascadeType.ALL, orphanRemoval=true)
+    @JoinTable(name="Citation_Reference")
+    @NotFound(action=NotFoundAction.IGNORE)
+    private Set<IReference> references;
     
     @Lob
     private String extra;
@@ -420,6 +433,14 @@ public class Citation implements ICitation {
     @Override
     public void setConceptTags(Set<ICitationConceptTag> concepts) {
         this.conceptTags = concepts;
+    }
+    @Override
+    public Set<IReference> getReferences() {
+        return references;
+    }
+    @Override
+    public void setReferences(Set<IReference> references) {
+        this.references = references;
     }
     @Override
     public String getExtra() {

@@ -6,6 +6,7 @@ import edu.asu.diging.citesphere.core.model.bib.ItemType;
 
 public class CitationForm {
 
+    private String collectionId;
     private String key;
     private String title;
     private ItemType itemType;
@@ -37,6 +38,12 @@ public class CitationForm {
     
     private List<ConceptAssignmentForm> conceptAssignments;
 
+    public String getCollectionId() {
+        return collectionId;
+    }
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
+    }
     public String getKey() {
         return key;
     }
