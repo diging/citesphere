@@ -26,6 +26,11 @@
 	<definition name="admin/user/list" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/admin/user/list.jsp" />	
 	</definition>	
+    
+    <!-- Apps -->
+    <definition name="admin/apps/add" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/admin/apps/add.jsp" /> 
+    </definition>   
 	
 	<!-- zotero -->
 	<definition name="auth/group/items" extends="base.definition">
@@ -42,6 +47,22 @@
 	</definition>
     <definition name="auth/group/items/create" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/group/editItem.jsp" />    
+    </definition>
+    
+    <!--  import  -->
+    <definition name="auth/import/upload" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/import/upload.jsp" />   
+    </definition>
+    <definition name="auth/import/jobs" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/import/jobs.jsp" />   
+    </definition>
+     
+    <!-- Export -->
+    <definition name="auth/group/export" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/group/export/started.jsp" />    
+    </definition>
+    <definition name="auth/exports" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/group/export/list.jsp" />    
     </definition>
     
     <!-- Authorities -->
@@ -62,6 +83,9 @@
     <definition name="auth/concepts/add" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/concepts/add.jsp" />    
     </definition>
+    <definition name="auth/concepts/edit" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/concepts/edit.jsp" />    
+    </definition>
     
     <!-- Concept Types -->
     <definition name="auth/concepts/types/list" extends="base.definition">
@@ -69,6 +93,11 @@
     </definition>
     <definition name="auth/concepts/types/add" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/concepts/types/add.jsp" />    
+    </definition>
+    
+    <!-- Error Pages -->
+    <definition name="error/citation/notFound" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/error/citationNotFound.jsp" />    
     </definition>
 	
 </tiles-definitions>

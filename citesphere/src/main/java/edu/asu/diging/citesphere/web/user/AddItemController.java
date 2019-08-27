@@ -1,6 +1,12 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +22,19 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollection;
+import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller
 public class AddItemController {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${_creation_default_item_type}")
     private String defaultItemType;
@@ -37,6 +48,9 @@ public class AddItemController {
 
     @Autowired
     private ICitationHelper citationHelper;
+    
+    @Autowired
+    private ICitationCollectionManager collectionManager;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create")
     public String show(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId) {
@@ -44,15 +58,25 @@ public class AddItemController {
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("defaultItemType", ItemType.valueOf(defaultItemType));
         model.addAttribute("creatorMap", properties.entrySet());
+        
+        try {
+            model.addAttribute("citationCollections", collectionManager.getAllCollections((IUser)authentication.getPrincipal(), zoteroGroupId, null, "title", 200));
+        } catch (GroupDoesNotExistException e) {
+            logger.error("Could not retrieve collections.", e);
+        }
         return "auth/group/items/create";
     }
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create", method = RequestMethod.POST)
     public String create(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId) throws ZoteroConnectionException, GroupDoesNotExistException {
         ICitation citation = new Citation();
+        List<String> collectionIds = new ArrayList<>();
+        if (form.getCollectionId() != null && !form.getCollectionId().trim().isEmpty()) {
+            collectionIds.add(form.getCollectionId());
+        }
         citationHelper.updateCitation(citation, form);
         try {
-            citation = citationManager.createCitation((IUser)authentication.getPrincipal(), zoteroGroupId, citation);
+            citation = citationManager.createCitation((IUser)authentication.getPrincipal(), zoteroGroupId, collectionIds, citation);
         } catch (ZoteroItemCreationFailedException e) {
             model.addAttribute("form", form);
             model.addAttribute("zoteroGroupId", zoteroGroupId);

@@ -15,11 +15,13 @@
 	">
 
     <mvc:annotation-driven />
+
     <context:component-scan
-        base-package="edu.asu.diging.citesphere" />
+        base-package="edu.asu.diging.citesphere.config, edu.asu.diging.citesphere.core, edu.asu.diging.citesphere.config.core" />
 
     <bean id="messageSource"
-        class="org.springframework.context.support.ReloadableResourceBundleMessageSource" autowire="byName">
+        class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
+        autowire="byName">
         <property name="basename"
             value="classpath:locale/messages" />
         <property name="fallbackToSystemLocale" value="false" />
@@ -27,6 +29,9 @@
 
     <util:properties id="usersFile"
         location="classpath:user.properties" />
+
+    <util:properties id="appFile"
+        location="classpath:app.properties" />
 
     <util:properties id="iconsResource"
         location="classpath:/item_type_icons.properties" />
@@ -37,11 +42,11 @@
         location="classpath:/labels.properties" />
     <context:property-placeholder
         properties-ref="labelsResource" />
-        
+
     <util:properties id="creatorsFile"
-	location="classpath:creators.properties" />
+        location="classpath:creators.properties" />
     <context:property-placeholder
-  	properties-ref="creatorsFile" />
+        properties-ref="creatorsFile" />
 
     <aop:aspectj-autoproxy
         proxy-target-class="true" />

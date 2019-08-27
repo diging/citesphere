@@ -3,6 +3,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <script src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>
 
@@ -42,6 +43,22 @@ $(function() {
 		}
 		window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />?columns=" + shownColumns; 
 	});
+	
+	$("#findByItemKeyBtn").click(function() {
+		var key = $("#findItemKey").val();
+		if (key != undefined && key != '') {
+			window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+		}
+	});
+	
+	$("#findItemKey").on('keypress',function(e) {
+	    if(e.which == 13) {
+	    	var key = $("#findItemKey").val();
+	        if (key != undefined && key != '') {
+	            window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+	        }
+	    }
+	});
 });
 </script>
 
@@ -63,7 +80,17 @@ $(function() {
 </c:forEach>
 </ol>
 
-<h2>Items in Group ${group.name}</h2>
+
+<h2>Items in Group ${group.name}<br>
+<small>${total} records </small>
+</h2>
+
+<div class="form-group">
+<div class="input-group">
+    <input type="text" id="findItemKey" name="findItemKey" class="form-control" placeholder="Find by item key"/>
+    <div class="input-group-addon" id="findByItemKeyBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
+</div>
+</div>
 
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
   <div class="panel panel-default">
@@ -98,6 +125,23 @@ $(function() {
 
 <div class="pull-right" style="margin-top: 20px;">
 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/create" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
+</div>
+
+<div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
+  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Export <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <c:if test="${empty collectionId and total <= 300 }">
+    <li><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
+    </c:if>
+    <c:if test="${not empty collectionId and total <= 300 }">
+    <li><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
+    </c:if>
+    <c:if test="${total > 300}">
+    <li><a class="btn btn-disabled" style="color: #999">CSV (up to 300 items)</a></li>
+    </c:if>
+  </ul>
 </div>
 </div>
 

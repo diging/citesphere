@@ -33,7 +33,7 @@ public interface IZoteroManager {
 
     long getGroupItemVersion(IUser user, String groupId, String itemKey);
 
-    ICitation createCitation(IUser user, String groupId, ICitation citation)
+    ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException;
 
     CitationCollectionResult getCitationCollections(IUser user, String groupId, String parentCollectionId, int page, String sortBy, Long lastGroupVersion);

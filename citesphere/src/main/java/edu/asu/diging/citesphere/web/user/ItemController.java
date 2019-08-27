@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
@@ -22,14 +23,16 @@ public class ItemController {
     private ICitationManager citationManager;
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
-    public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException {
-        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+    public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException, CannotFindCitationException {
+        ICitation citation = citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
-        model.addAttribute("citation", citation);
-        List<String> fields = new ArrayList<>();
-        citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
-        model.addAttribute("fields", fields);
-        System.out.println(citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()));
+        
+        if (citation != null) {
+            model.addAttribute("citation", citation);
+            List<String> fields = new ArrayList<>();
+            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
+            model.addAttribute("fields", fields);
+        }
         return "auth/group/items/item";
     }
 }
