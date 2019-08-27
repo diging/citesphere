@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -206,9 +207,11 @@ public class AuthorityServiceTest {
         IUser user = new User();
         user.setUsername(username);
         Mockito.when(entryRepository.save(entry)).thenReturn(entry);
-     
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {}
         IAuthorityEntry actualEntry = managerToTest.create(entry, user);
-        Assert.assertEquals(username, actualEntry.getUsername());
+        Assert.assertEquals(username, actualEntry.getUsername());       
         Assert.assertTrue(createdOn.isBefore(actualEntry.getCreatedOn()));
         Mockito.verify(entryRepository).save(entry);
     }
