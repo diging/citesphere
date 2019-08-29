@@ -5,8 +5,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-<script>
-</script>
 
 <ol class="breadcrumb">
   <li><a href="<c:url value="/" />">Home</a></li>
