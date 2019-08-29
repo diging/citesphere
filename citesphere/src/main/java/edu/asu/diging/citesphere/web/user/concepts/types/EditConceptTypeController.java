@@ -52,8 +52,7 @@ public class EditConceptTypeController {
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Only the owner can edit a Concept Type.");
             redirectAttributes.addFlashAttribute("alert_type", "danger");
-        }
-        else {
+        } else {
             conceptType.setName(form.getName());
             conceptType.setDescription(form.getDescription());
             conceptType.setUri(form.getUri());
