@@ -46,8 +46,7 @@ public class EditAuthorityController {
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Only the owner can edit a managed authority.");
             redirectAttributes.addFlashAttribute("alert_type", "danger");
-        }
-        else {
+        } else {
             entry.setName(form.getName());
             entry.setDescription(form.getDescription());
             authorityService.save(entry);            
