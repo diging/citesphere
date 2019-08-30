@@ -26,14 +26,14 @@ public class ConceptTypeManager implements IConceptTypeManager {
      */
     @Override
     public IConceptType create(ConceptTypeForm form, IUser owner) {
-        ConceptType type = new ConceptType();
+        IConceptType type = new ConceptType();
         type.setName(form.getName());
         type.setDescription(form.getDescription());
         type.setUri(form.getUri());
         type.setOwner(owner);
         type.setCreatedOn(OffsetDateTime.now());
         
-        typeRepository.save(type);
+        save(type);
         return type;
     }
     
@@ -55,5 +55,10 @@ public class ConceptTypeManager implements IConceptTypeManager {
         }
         
         return type.get();
+    }
+    
+    @Override
+    public void save(IConceptType type) {
+        typeRepository.save((ConceptType)type);
     }
 }

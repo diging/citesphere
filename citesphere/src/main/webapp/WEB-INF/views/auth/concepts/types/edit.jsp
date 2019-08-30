@@ -8,14 +8,14 @@
 
 <ol class="breadcrumb">
   <li><a href="<c:url value="/" />">Home</a></li>
-  <li><a href="<c:url value="/auth/concepts/list" />">Concepts</a></li>
+  <li><a href="<c:url value="/auth/concepts/list" />">Concept Types</a></li>
   <li class="active">${form.name}</li>
 </ol>
 <h2>
-	Edit Concept: ${form.name}  
+	Edit Concept Type: ${form.name}	  
 </h2>
 
-<c:url value="/auth/concepts/${conceptId}/edit" var="processingUrl" />
+<c:url value="/auth/concepts/types/${typeId}/edit" var="processingUrl" />
 <form:form action="${processingUrl}" modelAttribute="form" method="POST" id="editForm">
 
 <label>Name:</label>
@@ -29,7 +29,7 @@
 <form:input path="uri" type="text" class="form-control" placeholder="URI"></form:input>
 <br>
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
-<a href="<c:url value="/auth/concepts/list" />" class="btn btn-default">
+<a href="<c:url value="/auth/concepts/types/list" />" class="btn btn-default">
 		<i class="fa fa-times"></i>&nbsp;Cancel 
 </a>
 </form:form>
