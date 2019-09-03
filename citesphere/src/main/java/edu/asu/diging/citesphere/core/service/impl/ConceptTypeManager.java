@@ -66,4 +66,9 @@ public class ConceptTypeManager implements IConceptTypeManager {
         
         return type.get();
     }
+    
+    @Override
+    public IConceptType save(IConceptType type) {
+        return typeRepository.save((ConceptType)type);
+    }
 }

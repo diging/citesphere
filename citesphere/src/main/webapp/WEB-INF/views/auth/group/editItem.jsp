@@ -252,8 +252,8 @@ $(function() {
 		var conceptType = $("#addConceptTypeSelect");
 		
 		var conceptSpan = $('<span class="badge"></span>');
-		conceptSpan.attr("data-concept-id", conceptId.val());
-		conceptSpan.attr("data-concept-type-id", conceptType.val());
+		conceptSpan.attr("data-concept-uri", conceptId.val());
+		conceptSpan.attr("data-type-uri", conceptType.val());
 		
 		var text = $("#addConceptConceptSelect option:selected").text();
 		var typeName = $("#addConceptTypeSelect option:selected").text();
@@ -1036,7 +1036,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
         <label>Concept</label>
         <select class="form-control" id="addConceptConceptSelect">
         <c:forEach items="${concepts}" var="concept">
-        	<option value="${concept.id}">${concept.name}</option>
+        	<option value="${concept.uri}">${concept.name}</option>
         </c:forEach>
         </select>
         </p>
@@ -1045,7 +1045,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
         <label>Type of Concept</label>
         <select class="form-control"  id="addConceptTypeSelect">
         <c:forEach items="${conceptTypes}" var="type">
-        	<option value="${type.id}">${type.name}</option>
+        	<option value="${type.uri}">${type.name}</option>
         </c:forEach>
         </select>
         </p>

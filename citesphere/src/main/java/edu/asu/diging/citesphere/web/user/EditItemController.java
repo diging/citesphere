@@ -105,7 +105,7 @@ public class EditItemController {
         citation.getEditors().forEach(e -> e.getAffiliations().size());
         citation.getOtherCreators().forEach(e -> e.getPerson().getAffiliations().size());
         citationManager.detachCitation(citation);
-        citationHelper.updateCitation(citation, form);
+        citationHelper.updateCitation(citation, form, (IUser)authentication.getPrincipal());
         try {
             citationManager.updateCitation((IUser)authentication.getPrincipal(), zoteroGroupId, citation);
         } catch (CitationIsOutdatedException e) {

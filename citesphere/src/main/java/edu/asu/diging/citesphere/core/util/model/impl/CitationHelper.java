@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
@@ -19,6 +19,7 @@ import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationConcept;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationConceptTag;
+import edu.asu.diging.citesphere.core.model.bib.impl.ConceptType;
 import edu.asu.diging.citesphere.core.model.bib.impl.Creator;
 import edu.asu.diging.citesphere.core.model.bib.impl.Person;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
@@ -47,7 +48,7 @@ public class CitationHelper implements ICitationHelper {
      * edu.asu.diging.citesphere.web.forms.CitationForm)
      */
     @Override
-    public void updateCitation(ICitation citation, CitationForm form) {
+    public void updateCitation(ICitation citation, CitationForm form, IUser user) {
         citation.setAbstractNote(form.getAbstractNote());
         citation.setArchive(form.getArchive());
         citation.setArchiveLocation(form.getArchiveLocation());
@@ -105,17 +106,29 @@ public class CitationHelper implements ICitationHelper {
                     ICitationConceptTag tag = new CitationConceptTag();
                     ICitationConcept concept = conceptManager.getByUri(assignment.getConceptUri());
                     IConceptType type = typeManager.getByUri(assignment.getConceptTypeUri());
-                    if (concept != null && type != null) {
-                        tag.setConceptName(concept.getName());
-                        tag.setConceptUri(concept.getUri());
-                        tag.setLocalConceptId(concept.getId());
-                        tag.setTypeName(type.getName());
-                        tag.setTypeUri(type.getUri());
-                        tag.setLocalConceptTypeId(type.getId());
-                        
-                        citation.getConceptTags().add(tag);
+                    if(concept == null) {
+                        concept = new CitationConcept();
+                        concept.setName(assignment.getConceptName());
+                        concept.setUri(assignment.getConceptUri());
+                        concept.setOwner(user);
+                        concept = conceptManager.save(concept);
                     }
-                    //TODO: Save concept and tag by uri 
+                    if(type == null) {
+                        type = new ConceptType();
+                        type.setName(assignment.getConceptTypeName());
+                        type.setUri(assignment.getConceptTypeUri());
+                        type.setOwner(user);
+                        type = typeManager.save(type);
+                    }
+                    
+                    tag.setConceptName(concept.getName());
+                    tag.setConceptUri(concept.getUri());
+                    tag.setLocalConceptId(concept.getId());
+                    tag.setTypeName(type.getName());
+                    tag.setTypeUri(type.getUri());
+                    tag.setLocalConceptTypeId(type.getId());
+                    
+                    citation.getConceptTags().add(tag);
                 }
             }
         }

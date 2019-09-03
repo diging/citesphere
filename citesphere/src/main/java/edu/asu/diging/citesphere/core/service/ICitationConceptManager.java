@@ -15,7 +15,7 @@ public interface ICitationConceptManager {
 
     ICitationConcept get(String conceptId);
 
-    void save(ICitationConcept concept);
+    ICitationConcept save(ICitationConcept concept);
 
     ICitationConcept getByUri(String uri);
 

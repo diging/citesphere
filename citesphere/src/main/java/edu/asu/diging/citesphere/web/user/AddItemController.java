@@ -74,7 +74,7 @@ public class AddItemController {
         if (form.getCollectionId() != null && !form.getCollectionId().trim().isEmpty()) {
             collectionIds.add(form.getCollectionId());
         }
-        citationHelper.updateCitation(citation, form);
+        citationHelper.updateCitation(citation, form, (IUser)authentication.getPrincipal());
         try {
             citation = citationManager.createCitation((IUser)authentication.getPrincipal(), zoteroGroupId, collectionIds, citation);
         } catch (ZoteroItemCreationFailedException e) {

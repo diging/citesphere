@@ -65,7 +65,7 @@ public class CitationConceptManager implements ICitationConceptManager {
     }
     
     @Override
-    public void save(ICitationConcept concept) {
-        conceptRepo.save((CitationConcept)concept);
+    public ICitationConcept save(ICitationConcept concept) {
+        return conceptRepo.save((CitationConcept)concept);
     }
 }
