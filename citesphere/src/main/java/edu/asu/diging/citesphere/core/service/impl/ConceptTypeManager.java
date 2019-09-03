@@ -63,7 +63,6 @@ public class ConceptTypeManager implements IConceptTypeManager {
         if (!type.isPresent()) {
             return null;
         }
-        
         return type.get();
     }
     
