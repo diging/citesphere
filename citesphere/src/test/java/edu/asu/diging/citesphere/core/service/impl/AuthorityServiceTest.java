@@ -202,10 +202,15 @@ public class AuthorityServiceTest {
     @Test
     public void test_create() throws InterruptedException {
         String username = "user";
+        String id="entry1";
         OffsetDateTime timeBfr = OffsetDateTime.now();
+        
         AuthorityEntry entry = new AuthorityEntry();
         IUser user = new User();
+        IAuthorityEntry savedEntry = new AuthorityEntry();
         user.setUsername(username);
+        entry.setId(id);
+        
         Mockito.when(entryRepository.save(entry)).thenReturn(entry);
         try {
             Thread.sleep(100);
@@ -214,8 +219,13 @@ public class AuthorityServiceTest {
         }
         IAuthorityEntry actualEntry = managerToTest.create(entry, user);
         Assert.assertEquals(username, actualEntry.getUsername());
-        Mockito.verify(entryRepository).save(entry);
         Assert.assertTrue(timeBfr.isBefore(actualEntry.getCreatedOn()));
+        
+        Mockito.verify(entryRepository).save(entry);
+
+        Assert.assertEquals(null, savedEntry.getId());
+        savedEntry = (entryRepository).save(entry);
+        Assert.assertEquals(id ,savedEntry.getId());
     }
     
     @Test
