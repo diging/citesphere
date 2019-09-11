@@ -463,43 +463,43 @@ function createConceptTags() {
 	$("#conceptTags").children("span").each(function (idx, tag) {
 		var conceptTagInput = $("<input>");
 		conceptTagInput.attr("type", "hidden");
-		conceptTagInput.attr("id", "conceptAssignments" + idx + ".conceptId");
-		conceptTagInput.attr("name", "conceptAssignments[" + idx + "].conceptId");
+		conceptTagInput.attr("id", "conceptTags" + idx + ".conceptId");
+		conceptTagInput.attr("name", "conceptTags[" + idx + "].conceptId");
 		conceptTagInput.attr("value", $(tag).attr("data-concept-id"));
 		$("#editForm").append(conceptTagInput);
 		
 		var conceptTagTypeInput = $("<input>");
 		conceptTagTypeInput.attr("type", "hidden");
-		conceptTagTypeInput.attr("id", "conceptAssignments" + idx + ".conceptTypeId");
-		conceptTagTypeInput.attr("name", "conceptAssignments[" + idx + "].conceptTypeId");
+		conceptTagTypeInput.attr("id", "conceptTags" + idx + ".conceptTypeId");
+		conceptTagTypeInput.attr("name", "conceptTags[" + idx + "].conceptTypeId");
 		conceptTagTypeInput.attr("value", $(tag).attr("data-concept-type-id"));
 		$("#editForm").append(conceptTagTypeInput);
 		
 		var conceptTagUri = $("<input>");
 		conceptTagUri.attr("type", "hidden");
-		conceptTagUri.attr("id", "conceptAssignments" + idx + ".conceptUri");
-		conceptTagUri.attr("name", "conceptAssignments[" + idx + "].conceptUri");
+		conceptTagUri.attr("id", "conceptTags" + idx + ".conceptUri");
+		conceptTagUri.attr("name", "conceptTags[" + idx + "].conceptUri");
 		conceptTagUri.attr("value", $(tag).attr("data-concept-uri"));
 		$("#editForm").append(conceptTagUri);
 		
 		var conceptTagName = $("<input>");
 		conceptTagName.attr("type", "hidden");
-		conceptTagName.attr("id", "conceptAssignments" + idx + ".conceptName");
-		conceptTagName.attr("name", "conceptAssignments[" + idx + "].conceptName");
+		conceptTagName.attr("id", "conceptTags" + idx + ".conceptName");
+		conceptTagName.attr("name", "conceptTags[" + idx + "].conceptName");
 		conceptTagName.attr("value", $(tag).attr("data-concept-name"));
 		$("#editForm").append(conceptTagName);
 		
 		var conceptTagType = $("<input>");
 		conceptTagType.attr("type", "hidden");
-		conceptTagType.attr("id", "conceptAssignments" + idx + ".conceptTypeName");
-		conceptTagType.attr("name", "conceptAssignments[" + idx + "].conceptTypeName");
+		conceptTagType.attr("id", "conceptTags" + idx + ".conceptTypeName");
+		conceptTagType.attr("name", "conceptTags[" + idx + "].conceptTypeName");
 		conceptTagType.attr("value", $(tag).attr("data-type-name"));
 		$("#editForm").append(conceptTagType);
 		
 		var conceptTagTypeUri = $("<input>");
 		conceptTagTypeUri.attr("type", "hidden");
-		conceptTagTypeUri.attr("id", "conceptAssignments" + idx + ".conceptTypeUri");
-		conceptTagTypeUri.attr("name", "conceptAssignments[" + idx + "].conceptTypeUri");
+		conceptTagTypeUri.attr("id", "conceptTags" + idx + ".conceptTypeUri");
+		conceptTagTypeUri.attr("name", "conceptTags[" + idx + "].conceptTypeUri");
 		conceptTagTypeUri.attr("value", $(tag).attr("data-type-uri"));
 		$("#editForm").append(conceptTagTypeUri);
 	});

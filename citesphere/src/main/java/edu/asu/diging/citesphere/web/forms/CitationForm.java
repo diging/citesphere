@@ -36,7 +36,7 @@ public class CitationForm {
     private List<PersonForm> editors;
     private List<PersonForm> otherCreators;
     
-    private List<ConceptAssignmentForm> conceptAssignments;
+    private List<ConceptAssignmentForm> conceptTags;
 
     public String getCollectionId() {
         return collectionId;
@@ -200,10 +200,10 @@ public class CitationForm {
     public void setOtherCreators(List<PersonForm> otherCreators) {
         this.otherCreators = otherCreators;
     }
-    public List<ConceptAssignmentForm> getConceptAssignments() {
-        return conceptAssignments;
+    public List<ConceptAssignmentForm> getConceptTags() {
+        return conceptTags;
     }
-    public void setConceptAssignments(List<ConceptAssignmentForm> conceptAssignments) {
-        this.conceptAssignments = conceptAssignments;
+    public void setConceptTags(List<ConceptAssignmentForm> conceptTags) {
+        this.conceptTags = conceptTags;
     }
 }

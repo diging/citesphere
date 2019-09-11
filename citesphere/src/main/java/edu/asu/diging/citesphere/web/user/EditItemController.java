@@ -152,9 +152,6 @@ public class EditItemController {
             try {
                 field.setAccessible(true);
                 String formValue = field.get(form) != null ? field.get(form).toString() : "";
-                if(fieldname.equals("conceptAssignments")) {
-                    fieldname = "conceptTags";
-                }
                 Field citationField = citation.getClass().getDeclaredField(fieldname);
                 citationField.setAccessible(true);
                 String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
@@ -180,9 +177,6 @@ public class EditItemController {
             String fieldName = field.getName();
             if (!changedFields.contains(fieldName)) {
                 try {
-                    if(fieldName.equals("conceptAssignments")) {
-                        fieldName = "conceptTags";
-                    }
                     Field citationField = citation.getClass().getDeclaredField(fieldName);
                     citationField.setAccessible(true);
                     String citationValue = citationField.get(citation) != null ? citationField.get(citation).toString() : "";
