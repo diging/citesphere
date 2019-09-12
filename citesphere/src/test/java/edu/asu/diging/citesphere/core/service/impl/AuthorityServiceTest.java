@@ -16,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
@@ -206,26 +208,25 @@ public class AuthorityServiceTest {
         OffsetDateTime timeBfr = OffsetDateTime.now();
         
         AuthorityEntry entry = new AuthorityEntry();
+
         IUser user = new User();
-        IAuthorityEntry savedEntry = new AuthorityEntry();
         user.setUsername(username);
-        entry.setId(id);
         
-        Mockito.when(entryRepository.save(entry)).thenReturn(entry);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-        	throw new InterruptedException();
-        }
+        Answer<AuthorityEntry> answer = new Answer<AuthorityEntry>() {
+            public AuthorityEntry answer(InvocationOnMock invocation) throws Throwable {       
+            	entry.setId(id);
+                return entry;
+            }
+        };
+
+        Thread.sleep(100);       
+        
+        Mockito.when(entryRepository.save(entry)).thenAnswer(answer);
+               
         IAuthorityEntry actualEntry = managerToTest.create(entry, user);
         Assert.assertEquals(username, actualEntry.getUsername());
         Assert.assertTrue(timeBfr.isBefore(actualEntry.getCreatedOn()));
-        
-        Mockito.verify(entryRepository).save(entry);
-
-        Assert.assertEquals(null, savedEntry.getId());
-        savedEntry = (entryRepository).save(entry);
-        Assert.assertEquals(id ,savedEntry.getId());
+        Assert.assertEquals(id ,actualEntry.getId());
     }
     
     @Test
