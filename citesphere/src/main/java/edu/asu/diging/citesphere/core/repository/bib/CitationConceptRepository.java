@@ -14,5 +14,5 @@ public interface CitationConceptRepository extends PagingAndSortingRepository<Ci
 
     List<CitationConcept> findByOwner(IUser user);
 
-    Optional<CitationConcept> findByUri(String uri);
+    Optional<CitationConcept> findFirstByUriAndOwner(String uri, IUser user);
 }

@@ -7,7 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
@@ -33,10 +34,20 @@ public class AddConceptController {
     }
     
     @RequestMapping(value="/auth/concepts/add", method=RequestMethod.POST)
-    public String post(CitationConceptForm form, Model model, Principal principal) {
+    public String post(CitationConceptForm form, Model model, Principal principal, RedirectAttributes redirectAttributes) {
         
-        if (form.getUri() != null && !form.getUri().trim().isEmpty() && form.getName() != null && !form.getName().trim().isEmpty()) {
-            conceptManager.create(form, userManager.findByUsername(principal.getName()));
+        IUser user = userManager.findByUsername(principal.getName());
+        if (form.getName() != null && !form.getName().trim().isEmpty() && 
+                form.getUri() != null && !form.getUri().trim().isEmpty() && 
+                        conceptManager.getByUriAndOwner(form.getUri(), user) == null) {
+            conceptManager.create(form, user);
+        } else if(form.getUri() != null && !form.getUri().trim().isEmpty() && 
+                conceptManager.getByUriAndOwner(form.getUri(), user) != null){
+            redirectAttributes.addFlashAttribute("show_alert", true);
+            redirectAttributes.addFlashAttribute("alert_msg", "A concept with this URI exists.");
+            redirectAttributes.addFlashAttribute("alert_type", "danger");
+            model.addAttribute("conceptForm", form);
+            return "auth/concepts/add";
         } else {
             model.addAttribute("conceptForm", form);
             return "auth/concepts/add";

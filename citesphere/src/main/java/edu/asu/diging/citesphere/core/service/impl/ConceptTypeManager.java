@@ -58,8 +58,8 @@ public class ConceptTypeManager implements IConceptTypeManager {
     }
     
     @Override
-    public IConceptType getByUri(String uri) {
-        Optional<ConceptType> type = typeRepository.findByUri(uri);
+    public IConceptType getByUriAndOwner(String uri, IUser owner) {
+        Optional<ConceptType> type = typeRepository.findFirstByUriAndOwner(uri, owner);
         if (!type.isPresent()) {
             return null;
         }

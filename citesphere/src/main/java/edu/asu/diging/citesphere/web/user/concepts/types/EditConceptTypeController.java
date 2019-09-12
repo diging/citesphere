@@ -52,7 +52,8 @@ public class EditConceptTypeController {
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Only the owner can edit a Concept Type.");
             redirectAttributes.addFlashAttribute("alert_type", "danger");
-        } else {
+        } else if(form.getUri() != null && !form.getUri().trim().isEmpty() && 
+                conceptTypeManager.getByUriAndOwner(form.getUri(), user) == null){
             conceptType.setName(form.getName());
             conceptType.setDescription(form.getDescription());
             conceptType.setUri(form.getUri());
@@ -61,6 +62,13 @@ public class EditConceptTypeController {
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Concept Type was successfully saved.");
             redirectAttributes.addFlashAttribute("alert_type", "success");
+        } else {
+            redirectAttributes.addFlashAttribute("show_alert", true);
+            redirectAttributes.addFlashAttribute("alert_msg", "A concept type with this URI exists.");
+            redirectAttributes.addFlashAttribute("alert_type", "danger");
+
+            model.addAttribute("form", form);
+            return "auth/concepts/types/edit";
         }
         return "redirect:/auth/concepts/types/list";
     }

@@ -42,8 +42,8 @@ public class CitationConceptManager implements ICitationConceptManager {
     }
     
     @Override
-    public ICitationConcept getByUri(String uri) {
-        Optional<CitationConcept> concept = conceptRepo.findByUri(uri);
+    public ICitationConcept getByUriAndOwner(String uri, IUser owner) {
+        Optional<CitationConcept> concept = conceptRepo.findFirstByUriAndOwner(uri, owner);
         if (concept.isPresent()) {
             return concept.get();
         }

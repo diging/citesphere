@@ -50,7 +50,8 @@ public class EditConceptController {
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Only the owner can edit a Concept.");
             redirectAttributes.addFlashAttribute("alert_type", "danger");
-        } else {
+        } else if(form.getUri() != null && !form.getUri().trim().isEmpty() && 
+                conceptManager.getByUriAndOwner(form.getUri(), user) == null){
             citationConcept.setName(form.getName());
             citationConcept.setDescription(form.getDescription());
             citationConcept.setUri(form.getUri());
@@ -59,6 +60,12 @@ public class EditConceptController {
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Concept was successfully saved.");
             redirectAttributes.addFlashAttribute("alert_type", "success");
+        } else {
+            redirectAttributes.addFlashAttribute("show_alert", true);
+            redirectAttributes.addFlashAttribute("alert_msg", "A concept with this URI exists.");
+            redirectAttributes.addFlashAttribute("alert_type", "danger");
+            model.addAttribute("form", form);
+            return "auth/concepts/edit";
         }
         return "redirect:/auth/concepts/list";
     }
