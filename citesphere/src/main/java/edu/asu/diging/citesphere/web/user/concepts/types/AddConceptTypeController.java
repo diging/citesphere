@@ -29,7 +29,7 @@ public class AddConceptTypeController {
     }
     
     @RequestMapping(value="/auth/concepts/types/add", method=RequestMethod.POST)
-    public String post(ConceptTypeForm form, Model model, Principal principal, RedirectAttributes redirectAttributes) {
+    public String post(ConceptTypeForm form, Model model, Principal principal) {
 
         IUser user = userManager.findByUsername(principal.getName());
         if (form.getName() != null && !form.getName().trim().isEmpty() && 
@@ -38,9 +38,9 @@ public class AddConceptTypeController {
                 conceptTypeManager.create(form, user);
         } else if(form.getUri() != null && !form.getUri().trim().isEmpty() && 
                 conceptTypeManager.getByUriAndOwner(form.getUri(), user) != null){
-            redirectAttributes.addFlashAttribute("show_alert", true);
-            redirectAttributes.addFlashAttribute("alert_msg", "A concept type with this URI exists.");
-            redirectAttributes.addFlashAttribute("alert_type", "danger");
+            model.addAttribute("show_alert", true);
+            model.addAttribute("alert_msg", "A concept type with this URI exists.");
+            model.addAttribute("alert_type", "danger");
             model.addAttribute("conceptTypeForm", form);
             return "auth/concepts/types/add";
         } else {

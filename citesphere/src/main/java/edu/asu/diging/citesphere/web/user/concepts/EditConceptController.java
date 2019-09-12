@@ -61,9 +61,9 @@ public class EditConceptController {
             redirectAttributes.addFlashAttribute("alert_msg", "Concept was successfully saved.");
             redirectAttributes.addFlashAttribute("alert_type", "success");
         } else {
-            redirectAttributes.addFlashAttribute("show_alert", true);
-            redirectAttributes.addFlashAttribute("alert_msg", "A concept with this URI exists.");
-            redirectAttributes.addFlashAttribute("alert_type", "danger");
+            model.addAttribute("show_alert", true);
+            model.addAttribute("alert_msg", "A concept with this URI exists.");
+            model.addAttribute("alert_type", "danger");
             model.addAttribute("form", form);
             return "auth/concepts/edit";
         }

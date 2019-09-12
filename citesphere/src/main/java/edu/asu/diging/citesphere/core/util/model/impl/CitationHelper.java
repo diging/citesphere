@@ -105,8 +105,8 @@ public class CitationHelper implements ICitationHelper {
             for (ConceptAssignmentForm assignment : form.getConceptTags()) {
                 if (assignment.getConceptId() != null && assignment.getConceptTypeId() != null) {
                     ICitationConceptTag tag = new CitationConceptTag();
-                    ICitationConcept concept = conceptManager.getByUri(assignment.getConceptUri());
-                    IConceptType type = typeManager.getByUri(assignment.getConceptTypeUri());
+                    ICitationConcept concept = conceptManager.getByUriAndOwner(assignment.getConceptUri(), user);
+                    IConceptType type = typeManager.getByUriAndOwner(assignment.getConceptTypeUri(), user);
                     if(concept == null) {
                         concept = new CitationConcept();
                         concept.setName(assignment.getConceptName());
