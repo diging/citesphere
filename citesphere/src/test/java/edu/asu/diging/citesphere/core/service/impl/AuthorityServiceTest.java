@@ -213,7 +213,7 @@ public class AuthorityServiceTest {
         user.setUsername(username);
         
         Answer<AuthorityEntry> answer = new Answer<AuthorityEntry>() {
-            public AuthorityEntry answer(InvocationOnMock invocation) throws Throwable {       
+            public AuthorityEntry answer(InvocationOnMock invocation) {       
             	entry.setId(id);
                 return entry;
             }
