@@ -226,7 +226,7 @@ public class AuthorityServiceTest {
         IAuthorityEntry actualEntry = managerToTest.create(entry, user);
         Assert.assertEquals(username, actualEntry.getUsername());
         Assert.assertTrue(timeBfr.isBefore(actualEntry.getCreatedOn()));
-        Assert.assertEquals(id ,actualEntry.getId());
+        Assert.assertEquals(id, actualEntry.getId());
     }
     
     @Test
