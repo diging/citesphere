@@ -16,7 +16,7 @@ public interface IAuthorityService {
 
     IAuthorityEntry importAuthority(String uri)  throws AuthorityServiceConnectionException, URISyntaxException;
 
-    IAuthorityEntry save(IAuthorityEntry entry, IUser user);
+    IAuthorityEntry save(IAuthorityEntry entry);
 
     List<IAuthorityEntry> getAll(IUser user);
 
@@ -27,4 +27,6 @@ public interface IAuthorityService {
     List<IAuthorityEntry> findByUri(IUser user, String uri);
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
+
+    IAuthorityEntry create(IAuthorityEntry entry, IUser user);
 }

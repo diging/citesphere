@@ -1,11 +1,13 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
 import java.net.URISyntaxException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
@@ -195,5 +199,51 @@ public class AuthorityServiceTest {
 
         List<IAuthorityEntry> actual = managerToTest.findByUri(user, uri);
         Assert.assertTrue(actual.isEmpty());
+    }
+    
+    @Test
+    public void test_create() throws InterruptedException {
+        String username = "user";
+        String id="entry1";
+        OffsetDateTime timeBfr = OffsetDateTime.now();
+        
+        AuthorityEntry entry = new AuthorityEntry();
+
+        IUser user = new User();
+        user.setUsername(username);
+        
+        Answer<AuthorityEntry> answer = new Answer<AuthorityEntry>() {
+            public AuthorityEntry answer(InvocationOnMock invocation) {       
+            	entry.setId(id);
+                return entry;
+            }
+        };
+
+        Thread.sleep(100);       
+        
+        Mockito.when(entryRepository.save(entry)).thenAnswer(answer);
+               
+        IAuthorityEntry actualEntry = managerToTest.create(entry, user);
+        Assert.assertEquals(username, actualEntry.getUsername());
+        Assert.assertTrue(timeBfr.isBefore(actualEntry.getCreatedOn()));
+        Assert.assertEquals(id, actualEntry.getId());
+    }
+    
+    @Test
+    public void test_save() {
+        String id = "id";
+        String name = "name";
+        String uri = "uri";
+        AuthorityEntry entry = new AuthorityEntry();
+        entry.setId(id);
+        entry.setName(name);
+        entry.setUri(uri);
+        Mockito.when(entryRepository.save(entry)).thenReturn(entry);
+        
+        IAuthorityEntry actualEntry = managerToTest.save(entry);
+        Mockito.verify(entryRepository).save(entry);
+        Assert.assertEquals(entry.getId(), actualEntry.getId());
+        Assert.assertEquals(entry.getName(), actualEntry.getName());
+        Assert.assertEquals(entry.getUri(), actualEntry.getUri());
     }
 }

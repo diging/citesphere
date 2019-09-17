@@ -72,7 +72,7 @@ public class AuthorityEntryController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
      
-        entry = authorityService.save(entry, (IUser)authentication.getPrincipal());
+        entry = authorityService.create(entry, (IUser)authentication.getPrincipal());
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
 }

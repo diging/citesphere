@@ -72,6 +72,9 @@
      <definition name="auth/authority" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/authorities/show.jsp" />    
     </definition>
+    <definition name="auth/authority/edit" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/auth/authorities/edit.jsp" />    
+    </definition>
     
     <!-- Concepts -->
     <definition name="auth/concepts/list" extends="base.definition">
