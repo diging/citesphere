@@ -44,7 +44,7 @@ $(function() {
 <td>
     ${job.id}
 </td>
-<td><span class="label label-default">${job.citationGroupName}</span></td>
+<td><span class="label label-default">${job.citationGroupDetail.name}</span></td>
 <td>${job.filename}</td>
 <td>${job.fileSize}</td>
 <td>${job.contentType}</td>

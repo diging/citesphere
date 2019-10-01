@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.model.jobs.impl;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 
 @Entity
@@ -14,7 +15,7 @@ public class UploadJob extends Job implements IUploadJob {
     private String contentType;
     private String citationGroup;
     @Transient
-    private String citationGroupName;
+    private ICitationGroup citationGroupDetail;
     
     
     /* (non-Javadoc)
@@ -56,11 +57,12 @@ public class UploadJob extends Job implements IUploadJob {
         this.citationGroup = citationGroup;
     }
     @Override
-    public String getCitationGroupName() {
-        return citationGroupName;
+    public ICitationGroup getCitationGroupDetail() {
+        return citationGroupDetail;
     }
     @Override
-    public void setCitationGroupName(String citationGroupName) {
-        this.citationGroupName = citationGroupName;
-    } 
+    public void setCitationGroupDetail(ICitationGroup citationGroupDetail) {
+        this.citationGroupDetail = citationGroupDetail;
+    }
+     
 }
