@@ -44,7 +44,6 @@ public class AddConceptController {
         
         if (result.hasErrors()) {
             model.addAttribute("conceptForm", form);
-            logger.error("Form has errors");
             return "auth/concepts/add";
         }
         
