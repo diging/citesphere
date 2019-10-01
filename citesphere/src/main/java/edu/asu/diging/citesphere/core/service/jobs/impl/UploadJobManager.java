@@ -194,20 +194,10 @@ public class UploadJobManager implements IUploadJobManager {
     @Override
     public List<IUploadJob> getUploadJobs(String username, int page) {
         List<IUploadJob> results = new ArrayList<>();
-        jobRepository.findByUsername(username, PageRequest.of(page, jobPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(j -> results.add(j));
-        for (IUploadJob job : results) {
-            job.setCitationGroupDetail(getCitationGroup(job));
-        }
+        jobRepository.findByUsername(username, PageRequest.of(page, jobPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(job -> {
+            job.setCitationGroupDetail(groupManager.getCitationGroup(job));
+            results.add(job); 
+        });
         return results;
-    }
-
-    @Override
-    public ICitationGroup getCitationGroup(IUploadJob job) {
-        ICitationGroup citationGroup = null;
-        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(job.getCitationGroup()));
-        if (groupOptional.isPresent()) {
-            citationGroup = groupOptional.get();
-        }
-        return citationGroup;
     }
 }

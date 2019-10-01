@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
@@ -34,5 +35,15 @@ public class GroupManager implements IGroupManager {
         ICitationGroup group = zoteroManager.getGroup(user, groupId, false);
         groupRepository.save((CitationGroup)group);
         return null;
+    }
+    
+    @Override
+    public ICitationGroup getCitationGroup(IUploadJob job) {
+        ICitationGroup citationGroup = null;
+        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(job.getCitationGroup()));
+        if (groupOptional.isPresent()) {
+            citationGroup = groupOptional.get();
+        }
+        return citationGroup;
     }
 }
