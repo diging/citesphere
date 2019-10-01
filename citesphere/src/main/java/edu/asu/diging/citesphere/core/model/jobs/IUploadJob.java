@@ -30,8 +30,8 @@ public interface IUploadJob extends IJob {
 
     String getCitationGroup();
 
-	String getCitationGroupName();
+    String getCitationGroupName();
 
-	void setCitationGroupName(String citationGroupName);
+    void setCitationGroupName(String citationGroupName);
 
 }

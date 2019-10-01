@@ -21,6 +21,6 @@ public interface IUploadJobManager {
 
     IUploadJob findUploadJobFullyLoaded(String id);
 
-	ICitationGroup getCitationGroup(IUploadJob job);
+    ICitationGroup getCitationGroup(IUploadJob job);
 
 }

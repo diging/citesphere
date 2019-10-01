@@ -57,10 +57,10 @@ public class UploadJob extends Job implements IUploadJob {
     }
     @Override
     public String getCitationGroupName() {
-		return citationGroupName;
-	}
+        return citationGroupName;
+    }
     @Override
-	public void setCitationGroupName(String citationGroupName) {
-		this.citationGroupName = citationGroupName;
-	} 
+    public void setCitationGroupName(String citationGroupName) {
+        this.citationGroupName = citationGroupName;
+    } 
 }
