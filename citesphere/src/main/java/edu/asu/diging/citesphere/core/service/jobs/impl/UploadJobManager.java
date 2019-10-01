@@ -28,11 +28,13 @@ import edu.asu.diging.citesphere.core.exceptions.MessageCreationException;
 import edu.asu.diging.citesphere.core.kafka.IKafkaRequestProducer;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
 import edu.asu.diging.citesphere.core.model.jobs.impl.UploadJob;
+import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.repository.jobs.UploadJobRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
@@ -65,6 +67,9 @@ public class UploadJobManager implements IUploadJobManager {
     
     @Autowired
     private IGroupManager groupManager;
+    
+    @Autowired
+    private CitationGroupRepository groupRepository;
 
     /*
      * (non-Javadoc)
@@ -190,6 +195,19 @@ public class UploadJobManager implements IUploadJobManager {
     public List<IUploadJob> getUploadJobs(String username, int page) {
         List<IUploadJob> results = new ArrayList<>();
         jobRepository.findByUsername(username, PageRequest.of(page, jobPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(j -> results.add(j));
+        for (IUploadJob job : results) {
+            job.setCitationGroupDetail(getCitationGroup(job));
+        }
         return results;
+    }
+
+    @Override
+    public ICitationGroup getCitationGroup(IUploadJob job) {
+        ICitationGroup citationGroup = null;
+        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(job.getCitationGroup()));
+        if (groupOptional.isPresent()) {
+            citationGroup = groupOptional.get();
+        }
+        return citationGroup;
     }
 }
