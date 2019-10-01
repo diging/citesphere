@@ -38,9 +38,9 @@ public class GroupManager implements IGroupManager {
     }
     
     @Override
-    public ICitationGroup getCitationGroup(IUploadJob job) {
+    public ICitationGroup getCitationGroup(String groupId) {
         ICitationGroup citationGroup = null;
-        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(job.getCitationGroup()));
+        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (groupOptional.isPresent()) {
             citationGroup = groupOptional.get();
         }

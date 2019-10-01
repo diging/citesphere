@@ -195,7 +195,7 @@ public class UploadJobManager implements IUploadJobManager {
     public List<IUploadJob> getUploadJobs(String username, int page) {
         List<IUploadJob> results = new ArrayList<>();
         jobRepository.findByUsername(username, PageRequest.of(page, jobPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(job -> {
-            job.setCitationGroupDetail(groupManager.getCitationGroup(job));
+            job.setCitationGroupDetail(groupManager.getCitationGroup(job.getCitationGroup()));
             results.add(job); 
         });
         return results;
