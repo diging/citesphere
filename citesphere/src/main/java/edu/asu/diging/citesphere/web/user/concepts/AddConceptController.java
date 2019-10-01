@@ -1,10 +1,14 @@
 package edu.asu.diging.citesphere.web.user.concepts;
 
 import java.security.Principal;
-
+import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -17,6 +21,8 @@ import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 @Controller
 public class AddConceptController {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     @Autowired
     private ICitationConceptManager conceptManager;
     
@@ -34,7 +40,13 @@ public class AddConceptController {
     }
     
     @RequestMapping(value="/auth/concepts/add", method=RequestMethod.POST)
-    public String post(CitationConceptForm form, Model model, Principal principal) {
+    public String post(@Valid @ModelAttribute("conceptForm") CitationConceptForm form, Model model, BindingResult result, Principal principal) {
+        
+        if (result.hasErrors()) {
+            model.addAttribute("conceptForm", form);
+            logger.error("Form has errors");
+            return "auth/concepts/add";
+        }
         
         IUser user = userManager.findByUsername(principal.getName());
         if (form.getName() != null && !form.getName().trim().isEmpty()
@@ -43,10 +55,8 @@ public class AddConceptController {
             conceptManager.create(form, user);
         } else if(form.getUri() != null && !form.getUri().trim().isEmpty()
                 && conceptManager.getByUriAndOwner(form.getUri(), user) != null){
-            model.addAttribute("show_alert", true);
-            model.addAttribute("alert_msg", "A concept with this URI exists.");
-            model.addAttribute("alert_type", "danger");
             model.addAttribute("conceptForm", form);
+            result.rejectValue("uri", "uri", "A concept with this uri exists.");
             return "auth/concepts/add";
         } else {
             model.addAttribute("conceptForm", form);

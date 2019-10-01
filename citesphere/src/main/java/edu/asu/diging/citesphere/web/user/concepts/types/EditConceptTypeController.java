@@ -1,7 +1,5 @@
 package edu.asu.diging.citesphere.web.user.concepts.types;
 
-import java.security.Principal;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
 import edu.asu.diging.citesphere.core.model.bib.IConceptType;
-import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
-import edu.asu.diging.citesphere.core.user.IUserManager;
-import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 
 @Controller
@@ -53,7 +47,8 @@ public class EditConceptTypeController {
             redirectAttributes.addFlashAttribute("alert_msg", "Only the owner can edit a Concept Type.");
             redirectAttributes.addFlashAttribute("alert_type", "danger");
         } else if(form.getUri() != null && !form.getUri().trim().isEmpty() && 
-                conceptTypeManager.getByUriAndOwner(form.getUri(), user) == null){
+                (form.getUri().equals(conceptType.getUri()) ||
+                conceptTypeManager.getByUriAndOwner(form.getUri(), user) == null)){
             conceptType.setName(form.getName());
             conceptType.setDescription(form.getDescription());
             conceptType.setUri(form.getUri());
@@ -63,11 +58,8 @@ public class EditConceptTypeController {
             redirectAttributes.addFlashAttribute("alert_msg", "Concept Type was successfully saved.");
             redirectAttributes.addFlashAttribute("alert_type", "success");
         } else {
-            model.addAttribute("show_alert", true);
-            model.addAttribute("alert_msg", "A concept type with this URI exists.");
-            model.addAttribute("alert_type", "danger");
-
             model.addAttribute("form", form);
+            result.rejectValue("uri", "uri", "A concept type with this uri exists.");
             return "auth/concepts/types/edit";
         }
         return "redirect:/auth/concepts/types/list";

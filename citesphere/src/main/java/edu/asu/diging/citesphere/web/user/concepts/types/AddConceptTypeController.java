@@ -1,10 +1,12 @@
 package edu.asu.diging.citesphere.web.user.concepts.types;
 
 import java.security.Principal;
-
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -29,8 +31,11 @@ public class AddConceptTypeController {
     }
     
     @RequestMapping(value="/auth/concepts/types/add", method=RequestMethod.POST)
-    public String post(ConceptTypeForm form, Model model, Principal principal) {
-
+    public String post(@Valid @ModelAttribute("conceptTypeForm") ConceptTypeForm form, Model model, Principal principal, BindingResult result) {
+        if (result.hasErrors()) {
+            model.addAttribute("form", form);
+            return "auth/concepts/edit";
+        }
         IUser user = userManager.findByUsername(principal.getName());
         if (form.getName() != null && !form.getName().trim().isEmpty()
                 && form.getUri() != null && !form.getUri().trim().isEmpty() 
@@ -38,10 +43,8 @@ public class AddConceptTypeController {
                 conceptTypeManager.create(form, user);
         } else if(form.getUri() != null && !form.getUri().trim().isEmpty()
                 && conceptTypeManager.getByUriAndOwner(form.getUri(), user) != null){
-            model.addAttribute("show_alert", true);
-            model.addAttribute("alert_msg", "A concept type with this URI exists.");
-            model.addAttribute("alert_type", "danger");
             model.addAttribute("conceptTypeForm", form);
+            result.rejectValue("uri", "uri", "A concept type with this uri exists.");
             return "auth/concepts/types/add";
         } else {
             model.addAttribute("conceptTypeForm", form);

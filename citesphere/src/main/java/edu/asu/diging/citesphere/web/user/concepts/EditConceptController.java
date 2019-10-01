@@ -1,7 +1,5 @@
 package edu.asu.diging.citesphere.web.user.concepts;
 
-import java.security.Principal;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
-import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
-import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 
 @Controller
@@ -51,7 +47,8 @@ public class EditConceptController {
             redirectAttributes.addFlashAttribute("alert_msg", "Only the owner can edit a Concept.");
             redirectAttributes.addFlashAttribute("alert_type", "danger");
         } else if(form.getUri() != null && !form.getUri().trim().isEmpty() && 
-                conceptManager.getByUriAndOwner(form.getUri(), user) == null){
+                (form.getUri().equals(citationConcept.getUri()) ||
+                conceptManager.getByUriAndOwner(form.getUri(), user) == null)){
             citationConcept.setName(form.getName());
             citationConcept.setDescription(form.getDescription());
             citationConcept.setUri(form.getUri());
@@ -61,10 +58,8 @@ public class EditConceptController {
             redirectAttributes.addFlashAttribute("alert_msg", "Concept was successfully saved.");
             redirectAttributes.addFlashAttribute("alert_type", "success");
         } else {
-            model.addAttribute("show_alert", true);
-            model.addAttribute("alert_msg", "A concept with this URI exists.");
-            model.addAttribute("alert_type", "danger");
             model.addAttribute("form", form);
+            result.rejectValue("uri", "uri", "A concept with this uri exists.");
             return "auth/concepts/edit";
         }
         return "redirect:/auth/concepts/list";
