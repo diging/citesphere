@@ -14,13 +14,10 @@ import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.ItemType;
 import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
-import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 
 public interface ICitationManager {
 
     List<ICitationGroup> getGroups(IUser user);
-    
-    List<ICitationGroup> getCitationGroup(List<IUploadJob> jobList);
 
     CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy) throws GroupDoesNotExistException;
 

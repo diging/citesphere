@@ -44,10 +44,7 @@ $(function() {
 <td>
     ${job.id}
 </td>
-<c:forEach items="${citationGroups}" var="citationGroup">
-  <c:set var="citationGrp" value="${citationGroup.id}"  />
-  <td><c:if test="${job.citationGroup == citationGrp}"><span class="label label-default">${citationGroup.name}</span></c:if></td>
-</c:forEach>
+<td><span class="label label-default">${job.citationGroupName}</span></td>
 <td>${job.filename}</td>
 <td>${job.fileSize}</td>
 <td>${job.contentType}</td>
