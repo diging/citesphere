@@ -2,8 +2,7 @@ package edu.asu.diging.citesphere.web.user.concepts;
 
 import java.security.Principal;
 import javax.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,8 +19,6 @@ import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 
 @Controller
 public class AddConceptController {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Autowired
     private ICitationConceptManager conceptManager;
