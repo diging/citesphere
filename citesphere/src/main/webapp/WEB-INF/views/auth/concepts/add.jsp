@@ -24,7 +24,7 @@
 <tr>
 <td width="20%"><label>URI</label></td>
 <td><form:input type="text" path="uri" class="form-control" />
-<p class="text-danger"><form:errors path="uri"/></p>
+<p class="text-danger"><form:errors path="uri"/></p></td>
 </tr>
 
 </table>
