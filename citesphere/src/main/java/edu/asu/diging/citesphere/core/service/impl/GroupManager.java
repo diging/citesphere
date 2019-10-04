@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;

@@ -6,7 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 
 public interface IUploadJobManager {
