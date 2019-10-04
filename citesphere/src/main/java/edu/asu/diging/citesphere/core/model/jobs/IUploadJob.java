@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.model.jobs;
 
 import java.util.List;
 
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
 
 public interface IUploadJob extends IJob {
@@ -29,5 +30,11 @@ public interface IUploadJob extends IJob {
     void setCitationGroup(String citationGroup);
 
     String getCitationGroup();
+
+    ICitationGroup getCitationGroupDetail();
+
+    void setCitationGroupDetail(ICitationGroup citationGroupDetail);
+
+    
 
 }
