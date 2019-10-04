@@ -36,14 +36,4 @@ public class GroupManager implements IGroupManager {
         groupRepository.save((CitationGroup)group);
         return null;
     }
-    
-    @Override
-    public ICitationGroup getCitationGroup(String groupId) {
-        ICitationGroup citationGroup = null;
-        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
-        if (groupOptional.isPresent()) {
-            citationGroup = groupOptional.get();
-        }
-        return citationGroup;
-    }
 }

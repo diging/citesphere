@@ -7,6 +7,4 @@ public interface IGroupManager {
 
     ICitationGroup getGroup(IUser user, String groupId);
 
-    ICitationGroup getCitationGroup(String groupId);
-
 }

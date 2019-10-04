@@ -8,6 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
 
 @Controller
@@ -18,7 +19,7 @@ public class ImportJobsController {
     
     @RequestMapping("/auth/import/jobs")
     public String list(Model model, @RequestParam(value="page", required=false, defaultValue="1") String page, Authentication authentication) {
-        model.addAttribute("jobs", jobManager.getUploadJobs(authentication.getName(), new Integer(page)-1));
+        model.addAttribute("jobs", jobManager.getUploadJobs((IUser) authentication.getPrincipal(), new Integer(page)-1));
         return "auth/import/jobs";
     }
 }
