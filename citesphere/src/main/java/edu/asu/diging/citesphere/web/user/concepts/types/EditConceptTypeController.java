@@ -46,9 +46,8 @@ public class EditConceptTypeController {
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Only the owner can edit a Concept Type.");
             redirectAttributes.addFlashAttribute("alert_type", "danger");
-        } else if(form.getUri() != null && !form.getUri().trim().isEmpty() && 
-                (form.getUri().equals(conceptType.getUri()) ||
-                conceptTypeManager.getByUriAndOwner(form.getUri(), user) == null)){
+        } else if(form.getUri().equals(conceptType.getUri()) ||
+                conceptTypeManager.getByUriAndOwner(form.getUri(), user) == null) {
             conceptType.setName(form.getName());
             conceptType.setDescription(form.getDescription());
             conceptType.setUri(form.getUri());

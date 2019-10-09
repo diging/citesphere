@@ -3,10 +3,12 @@ package edu.asu.diging.citesphere.web.user.concepts;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,10 @@ import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 public class EditConceptController {
     @Autowired
     private ICitationConceptManager conceptManager;
+    
+    @Autowired
+    @Qualifier("conceptValidator")
+    private Validator validator;
     
     @RequestMapping(value="/auth/concepts/{conceptId}/edit")
     public String show(Model model, @PathVariable("conceptId") String conceptId, Authentication authentication, CitationConceptForm form) {
@@ -46,9 +52,8 @@ public class EditConceptController {
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Only the owner can edit a Concept.");
             redirectAttributes.addFlashAttribute("alert_type", "danger");
-        } else if(form.getUri() != null && !form.getUri().trim().isEmpty() && 
-                (form.getUri().equals(citationConcept.getUri()) ||
-                conceptManager.getByUriAndOwner(form.getUri(), user) == null)){
+        } else if(form.getUri().equals(citationConcept.getUri()) ||
+                conceptManager.getByUriAndOwner(form.getUri(), user) == null) {
             citationConcept.setName(form.getName());
             citationConcept.setDescription(form.getDescription());
             citationConcept.setUri(form.getUri());

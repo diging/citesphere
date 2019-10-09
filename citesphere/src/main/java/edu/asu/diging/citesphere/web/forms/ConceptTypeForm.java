@@ -7,6 +7,7 @@ public class ConceptTypeForm {
     @NotEmpty(message="Name cannot be empty.")
     private String name;
     private String description;
+    @NotEmpty(message="Uri cannot be empty.")
     private String uri;
     
     public String getName() {
