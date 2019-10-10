@@ -1,14 +1,12 @@
 package edu.asu.diging.citesphere.web.user.concepts;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +17,7 @@ import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
+import edu.asu.diging.citesphere.web.validation.CitationConceptValidator;
 
 @Controller
 public class EditConceptController {
@@ -26,8 +25,8 @@ public class EditConceptController {
     private ICitationConceptManager conceptManager;
     
     @Autowired
-    @Qualifier("conceptValidator")
-    private Validator validator;
+    @Qualifier("citationConceptValidator")
+    private CitationConceptValidator conceptValidator;
     
     @RequestMapping(value="/auth/concepts/{conceptId}/edit")
     public String show(Model model, @PathVariable("conceptId") String conceptId, Authentication authentication, CitationConceptForm form) {
@@ -40,7 +39,7 @@ public class EditConceptController {
     }
     
     @RequestMapping(value="/auth/concepts/{conceptId}/edit", method=RequestMethod.POST)
-    public String post(Model model, @PathVariable("conceptId") String conceptId, Authentication authentication, @Valid @ModelAttribute("form") CitationConceptForm form, BindingResult result, RedirectAttributes redirectAttributes) {
+    public String post(Model model, @PathVariable("conceptId") String conceptId, Authentication authentication, @Validated @ModelAttribute("form") CitationConceptForm form, BindingResult result, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("form", form);
             return "auth/concepts/edit";

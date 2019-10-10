@@ -5,7 +5,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 
-public class ConceptValidator implements Validator {
+public class CitationConceptValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> paramClass) {
@@ -17,5 +17,4 @@ public class ConceptValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "uri", "uri.required");
     }
 
-    
 }

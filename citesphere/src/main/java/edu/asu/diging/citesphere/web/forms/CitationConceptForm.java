@@ -1,7 +1,7 @@
 package edu.asu.diging.citesphere.web.forms;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.URL;
 
 public class CitationConceptForm {
     
@@ -10,7 +10,7 @@ public class CitationConceptForm {
     private String description;
 
     @NotEmpty(message="Uri cannot be empty.")
-    @NotNull(message="Uri cannot be empty.")
+    @URL
     private String uri;
     private String type;
     
