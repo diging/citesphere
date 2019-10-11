@@ -110,32 +110,35 @@
 			</c:forEach></td>
 	</tr>
 	<c:forEach items="${citation.otherCreatorRoles}" var="role">
-		<tr>
-			<td><spring:eval
-					expression="@labelsResource.getProperty('_item_attribute_label_${role}', '${role}')" />
-			</td>
-			<td><cite:creators citation="${citation}" role="${role}"
-					var="creator">
+
+		<c:if test="${role != 'editor'}">
+			<tr>
+				<td><spring:eval
+						expression="@labelsResource.getProperty('_item_attribute_label_${role}', '${role}')" />
+				</td>
+				<td><cite:creators citation="${citation}" role="${role}"
+						var="creator">
  ${creator.person.lastName}<c:if
-						test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
-					<c:if test="${not empty creator.person.affiliations}">
+							test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+						<c:if test="${not empty creator.person.affiliations}">
  (<c:forEach items="${creator.person.affiliations}"
-							varStatus="affStatus" var="aff">${aff.name}<c:if
-								test="${!affStatus.last}">, </c:if>
-						</c:forEach>)<c:if test="${!status.last}">; </c:if>
-					</c:if>
-					<c:if test="${not empty creator.person.uri}">
-						<a href="${creator.person.uri}" target="_blank"><i
-							class="fas fa-link"></i></a>
-					</c:if>
-					<c:if test="${not empty creator.person.localAuthorityId}">
-						<a
-							href="<c:url value="/auth/authority/${creator.person.localAuthorityId}" />"><i
-							class="fas fa-anchor"></i></a>
-					</c:if>
-					<c:if test="${!lastIteration}">; </c:if>
-				</cite:creators></td>
-		</tr>
+								varStatus="affStatus" var="aff">${aff.name}<c:if
+									test="${!affStatus.last}">, </c:if>
+							</c:forEach>)<c:if test="${!status.last}">; </c:if>
+						</c:if>
+						<c:if test="${not empty creator.person.uri}">
+							<a href="${creator.person.uri}" target="_blank"><i
+								class="fas fa-link"></i></a>
+						</c:if>
+						<c:if test="${not empty creator.person.localAuthorityId}">
+							<a
+								href="<c:url value="/auth/authority/${creator.person.localAuthorityId}" />"><i
+								class="fas fa-anchor"></i></a>
+						</c:if>
+						<c:if test="${!lastIteration}">; </c:if>
+					</cite:creators></td>
+			</tr>
+		</c:if>
 	</c:forEach>
 	<c:if test="${fn:contains(fields, 'publicationTitle') }">
 		<tr>
