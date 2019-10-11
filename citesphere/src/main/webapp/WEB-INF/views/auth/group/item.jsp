@@ -110,6 +110,7 @@
 			</c:forEach></td>
 	</tr>
 	<c:forEach items="${citation.otherCreatorRoles}" var="role">
+		<c:if test="${role != 'editor'}">
 		<tr>
 			<td><spring:eval
 					expression="@labelsResource.getProperty('_item_attribute_label_${role}', '${role}')" />
@@ -136,6 +137,7 @@
 					<c:if test="${!lastIteration}">; </c:if>
 				</cite:creators></td>
 		</tr>
+		</c:if>
 	</c:forEach>
 	<c:if test="${fn:contains(fields, 'publicationTitle') }">
 		<tr>
