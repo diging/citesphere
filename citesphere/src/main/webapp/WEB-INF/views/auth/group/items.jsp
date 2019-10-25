@@ -120,7 +120,7 @@ $(function() {
 </div>
 
 <div class="col-md-12">
-<ul id="pagination-top" class="pagination-sm"> </ul>
+<ul id="pagination-top" class="pagination-sm"></ul>
 <div class= "pull-right" style="margin-top: 20px;">
 <c:choose>
     <c:when test="${collectionId!=null}">
@@ -155,6 +155,7 @@ $(function() {
 
 <div class="col-md-2">
 <p class="lead">Collections</p>
+
 <ul class="list-group">
 <c:forEach items="${citationCollections}" var="collection">
   <li class="list-group-item">
@@ -164,7 +165,6 @@ $(function() {
 </c:forEach>
 </ul>
 </div>
-
 <div class="col-md-10">
 <div class="dropdown pull-right" style="padding-bottom: 10px;">
   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.oauth1.OAuthToken;
@@ -63,9 +62,6 @@ public class ZoteroConnector implements IZoteroConnector {
         return zotero.getGroupsOperations().getGroupItemsTop(groupId, page*zoteroPageSize, zoteroPageSize, sortBy, lastGroupVersion);          
     }
     
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.IZoteroConnector#getGroupItems(edu.asu.diging.citesphere.core.model.IUser, java.lang.String, int)
-     */
     @Override
     @CacheEvict(value="groupItems", key="#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
     public void clearGroupItemsCache(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) { }

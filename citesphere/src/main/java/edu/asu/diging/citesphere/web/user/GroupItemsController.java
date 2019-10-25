@@ -86,6 +86,7 @@ public class GroupItemsController {
                 }
             }
         }
+        
         model.addAttribute("columns", shownColumns);
         model.addAttribute("availableColumns", allowedColumns);
         
