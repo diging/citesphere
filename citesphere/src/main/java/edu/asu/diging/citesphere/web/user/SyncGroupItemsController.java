@@ -33,29 +33,24 @@ public class SyncGroupItemsController {
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
-            @RequestParam(required = false, value = "columns") List<String> columns) throws GroupDoesNotExistException {
+            @RequestParam(required = false, value = "columns") String columns) throws GroupDoesNotExistException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(zoteroGroupId));
         
         String redirectUrl = "redirect:/auth/group/{zoteroGroupId}/items?page=" + page + "&sort=" + sort;
-        String columnString = null;
-        if(columns.size() > 0 && !columns.get(0).equals("[]")) {
-            columnString = String.join(",", columns);
-            columnString = columnString.substring(1, columnString.length()-1); 
-        }
-        
+        columns = (columns.substring(1, columns.length()-1)).replace(" ",""); 
         if (groupOptional.isPresent()) {
             ICitationGroup group = groupOptional.get();
             if (collectionId == null || collectionId.trim().isEmpty()) {
                 zoteroConnector.clearGroupItemsCache((IUser) authentication.getPrincipal(), zoteroGroupId, new Integer(page), sort, group.getVersion());
-                if(columnString != null) {
-                    redirectUrl = "redirect:/auth/group/{zoteroGroupId}/items?page=" + page + "&sort=" + sort + "&columns=" + columnString;
+                if(!columns.equals("")) {
+                    redirectUrl = "redirect:/auth/group/{zoteroGroupId}/items?page=" + page + "&sort=" + sort + "&columns=" + columns;
                 }
             } else {
                 zoteroConnector.clearCollectionItemsCache((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId, new Integer(page), sort, group.getVersion());
-                if(columnString == null) {
+                if(columns.equals("")) {
                     redirectUrl =  "redirect:/auth/group/{zoteroGroupId}/collection/{collectionId}/items?page=" + page + "&sort=" + sort;
                 } else {
-                    redirectUrl = "redirect:/auth/group/{zoteroGroupId}/collection/{collectionId}/items?page=" + page + "&sort=" + sort + "&columns=" + columnString;
+                    redirectUrl = "redirect:/auth/group/{zoteroGroupId}/collection/{collectionId}/items?page=" + page + "&sort=" + sort + "&columns=" + columns;
                 }
             }
         }
