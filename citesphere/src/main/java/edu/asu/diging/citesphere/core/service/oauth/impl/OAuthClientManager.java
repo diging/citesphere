@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.oauth.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,8 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
+import edu.asu.diging.citesphere.core.model.IOAuthClient;
+import edu.asu.diging.citesphere.core.model.bib.IConceptType;
 import edu.asu.diging.citesphere.core.model.oauth.OAuthClient;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
 import edu.asu.diging.citesphere.core.service.oauth.GrantTypes;
@@ -65,6 +68,14 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         scopes.forEach(s -> client.getScope().add(s.getScope()));
         OAuthClient storeClient = clientRepo.save(client);
         return new OAuthCredentials(storeClient.getClientId(), clientSecret);
+    }
+    
+    @Override
+    public List<IOAuthClient> showAllApps() {
+        List<IOAuthClient> clientList = new ArrayList<>();
+        clientRepo.findAll().forEach(client -> clientList.add(client));
+        return clientList;
+        
     }
     
 }
