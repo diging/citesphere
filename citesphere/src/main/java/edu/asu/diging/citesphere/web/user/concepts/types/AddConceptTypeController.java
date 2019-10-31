@@ -48,20 +48,7 @@ public class AddConceptTypeController {
             return "auth/concepts/types/add";
         }
         IUser user = userManager.findByUsername(principal.getName());
-        if (form.getName() != null && !form.getName().trim().isEmpty()
-                && form.getUri() != null && !form.getUri().trim().isEmpty() 
-                && conceptTypeManager.getByUriAndOwner(form.getUri(), user) == null) {
-                conceptTypeManager.create(form, user);
-        } else if(form.getUri() != null && !form.getUri().trim().isEmpty()
-                && conceptTypeManager.getByUriAndOwner(form.getUri(), user) != null){
-            model.addAttribute("conceptTypeForm", form);
-            result.rejectValue("uri", "uri", "A concept type with this uri exists.");
-            return "auth/concepts/types/add";
-        } else {
-            model.addAttribute("conceptTypeForm", form);
-            return "auth/concepts/types/add";
-        }
-        
+        conceptTypeManager.create(form, user);
         return "redirect:/auth/concepts/types/list";
     }
 }
