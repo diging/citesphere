@@ -37,4 +37,5 @@
 	</beans:bean>
 
 	<beans:bean id="citationConceptValidator" class="edu.asu.diging.citesphere.web.validation.CitationConceptValidator" />
+	<beans:bean id="conceptTypeValidator" class="edu.asu.diging.citesphere.web.validation.ConceptTypeValidator" />
 </beans:beans>
