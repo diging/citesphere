@@ -13,7 +13,14 @@ public class CitationConceptForm {
     @URL
     private String uri;
     private String type;
+    private String accessMode;
     
+    public String getAccessMode() {
+        return accessMode;
+    }
+    public void setAccessMode(String mode) {
+        this.accessMode = mode;
+    }
     public String getName() {
         return name;
     }

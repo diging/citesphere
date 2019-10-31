@@ -13,7 +13,6 @@ import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationConcept;
 import edu.asu.diging.citesphere.core.repository.bib.CitationConceptRepository;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
-import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 
 @Service
