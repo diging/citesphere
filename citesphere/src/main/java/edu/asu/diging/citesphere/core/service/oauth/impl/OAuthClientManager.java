@@ -8,14 +8,20 @@ import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
 import edu.asu.diging.citesphere.core.model.IOAuthClient;
+import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.IConceptType;
 import edu.asu.diging.citesphere.core.model.oauth.OAuthClient;
+import edu.asu.diging.citesphere.core.model.oauth.OAuthClientCollectionResult;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
 import edu.asu.diging.citesphere.core.service.oauth.GrantTypes;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
@@ -30,6 +36,9 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     
     private int accessTokenValidity;
+    
+    @Value("${_job_page_size}")
+    private int jobPageSize;
     
     public OAuthClientManager(OAuthClientRepository repo, BCryptPasswordEncoder bCryptPasswordEncoder, int accessTokenValidity) {
         this.clientRepo = repo;
@@ -71,10 +80,14 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
     }
     
     @Override
-    public List<IOAuthClient> showAllApps() {
+    public OAuthClientCollectionResult getClientDetails(Pageable pageable) {
+        OAuthClientCollectionResult result = new OAuthClientCollectionResult();
         List<IOAuthClient> clientList = new ArrayList<>();
-        clientRepo.findAll().forEach(client -> clientList.add(client));
-        return clientList;
+        Page<OAuthClient> oAuthClients = clientRepo.findAll(pageable);
+        oAuthClients.forEach(oAuthClient -> clientList.add(oAuthClient));
+        result.setClientList(clientList);
+        //result.setTotalResults(oAuthClients.);
+        return result;
         
     }
     

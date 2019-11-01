@@ -2,10 +2,10 @@ package edu.asu.diging.citesphere.core.service.oauth;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
-
-import edu.asu.diging.citesphere.core.model.IOAuthClient;
+import edu.asu.diging.citesphere.core.model.oauth.OAuthClientCollectionResult;
 
 public interface IOAuthClientManager {
 
@@ -13,6 +13,6 @@ public interface IOAuthClientManager {
 
     OAuthCredentials create(String name, String description, List<OAuthScope> scopes);
 
-    List<IOAuthClient> showAllApps();
+    OAuthClientCollectionResult getClientDetails(Pageable pageable);
 
 }
