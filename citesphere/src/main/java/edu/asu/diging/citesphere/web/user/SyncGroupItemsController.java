@@ -1,6 +1,4 @@
 package edu.asu.diging.citesphere.web.user;
-
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,21 +35,22 @@ public class SyncGroupItemsController {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(zoteroGroupId));
         
         String redirectUrl = "redirect:/auth/group/{zoteroGroupId}/items?page=" + page + "&sort=" + sort;
+        
         columns = (columns.substring(1, columns.length()-1)).replace(" ",""); 
         if (groupOptional.isPresent()) {
             ICitationGroup group = groupOptional.get();
             if (collectionId == null || collectionId.trim().isEmpty()) {
                 zoteroConnector.clearGroupItemsCache((IUser) authentication.getPrincipal(), zoteroGroupId, new Integer(page), sort, group.getVersion());
                 if(!columns.equals("")) {
-                    redirectUrl = "redirect:/auth/group/{zoteroGroupId}/items?page=" + page + "&sort=" + sort + "&columns=" + columns;
+                    redirectUrl = redirectUrl + "&columns=" + columns;
                 }
             } else {
                 zoteroConnector.clearCollectionItemsCache((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId, new Integer(page), sort, group.getVersion());
-                if(columns.equals("")) {
-                    redirectUrl =  "redirect:/auth/group/{zoteroGroupId}/collection/{collectionId}/items?page=" + page + "&sort=" + sort;
-                } else {
-                    redirectUrl = "redirect:/auth/group/{zoteroGroupId}/collection/{collectionId}/items?page=" + page + "&sort=" + sort + "&columns=" + columns;
+                String redirectUrlWithCollection = "redirect:/auth/group/{zoteroGroupId}/collection/{collectionId}/items?page=" + page + "&sort=" + sort;
+                if(!columns.equals("")) {
+                    redirectUrlWithCollection =  redirectUrlWithCollection + "&columns=" + columns;
                 }
+                return redirectUrlWithCollection;
             }
         }
         
