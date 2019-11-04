@@ -6,14 +6,14 @@
 <script>
 $(function() {
     $('#pagination-top').twbsPagination({
-        totalPages: ${totalPages},
         startPage: ${currentPage},
+        totalPages: ${totalPages},
         prev: "«",
         next: "»",
         visiblePages: 10,
         initiateStartPageClick: false,
         onPageClick: function (event, page) {
-            window.location.href = "<c:url value="/admin/apps" />?page=" + page;
+            window.location.href = "<c:url value="/admin/apps" />?page=" + (page-1);
         }
     });
 });

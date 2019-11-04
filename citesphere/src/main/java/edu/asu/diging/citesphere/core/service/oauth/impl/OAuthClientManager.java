@@ -86,7 +86,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         Page<OAuthClient> oAuthClients = clientRepo.findAll(pageable);
         oAuthClients.forEach(oAuthClient -> clientList.add(oAuthClient));
         result.setClientList(clientList);
-        //result.setTotalResults(oAuthClients.);
+        result.setTotalPages(oAuthClients.getTotalPages());
         return result;
         
     }

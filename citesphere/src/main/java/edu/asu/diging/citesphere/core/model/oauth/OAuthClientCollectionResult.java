@@ -6,14 +6,14 @@ import edu.asu.diging.citesphere.core.model.IOAuthClient;
 
 public class OAuthClientCollectionResult {
     
-    private long totalResults;
+    private long totalPages;
     private List<IOAuthClient> clientList;
     
-    public long getTotalResults() {
-        return totalResults;
+    public long getTotalPages() {
+        return totalPages;
     }
-    public void setTotalResults(long totalResults) {
-        this.totalResults = totalResults;
+    public void setTotalPages(long totalPages) {
+        this.totalPages = totalPages;
     }
     public List<IOAuthClient> getClientList() {
         return clientList;
