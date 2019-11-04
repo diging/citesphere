@@ -121,18 +121,10 @@ $(function() {
 
 <div class="col-md-12">
 <ul id="pagination-top" class="pagination-sm"></ul>
-<div class= "pull-right" style="margin-top: 20px;">
-<c:choose>
-    <c:when test="${collectionId!=null}">
-        <a href="<c:url value="/auth/group/${zoteroGroupId}/items/create" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>&nbsp;&nbsp; <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columns}" />"><i
-		class="fas fa-sync" title="Sync Citation"></i></a>
-    </c:when>    
-    <c:otherwise>
-        <a href="<c:url value="/auth/group/${zoteroGroupId}/items/create" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>&nbsp;&nbsp; <a href="<c:url value="/auth/group/${zoteroGroupId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columns}" />"><i
-		class="fas fa-sync" title="Sync Citation"></i></a>
-    </c:otherwise>
-</c:choose>
 
+
+<div class="pull-right" style="margin-top: 20px;">
+<a href="<c:url value="/auth/group/${zoteroGroupId}/items/create" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
 </div>
 
 <div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
@@ -154,8 +146,18 @@ $(function() {
 </div>
 
 <div class="col-md-2">
-<p class="lead">Collections</p>
-
+<p class="lead">Collections &nbsp;&nbsp;
+<c:choose>
+    <c:when test="${collectionId!=null}">
+        <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columns}" />"><i
+		class="fas fa-sync" title="Sync Citation"></i></a>
+    </c:when>    
+    <c:otherwise>
+        <a href="<c:url value="/auth/group/${zoteroGroupId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columns}" />"><i
+		class="fas fa-sync" title="Sync Citation"></i></a>
+    </c:otherwise>
+</c:choose>
+</p>
 <ul class="list-group">
 <c:forEach items="${citationCollections}" var="collection">
   <li class="list-group-item">
@@ -164,6 +166,7 @@ $(function() {
   </li>
 </c:forEach>
 </ul>
+
 </div>
 <div class="col-md-10">
 <div class="dropdown pull-right" style="padding-bottom: 10px;">
