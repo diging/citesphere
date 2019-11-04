@@ -36,10 +36,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     
     private int accessTokenValidity;
-    
-    @Value("${_job_page_size}")
-    private int jobPageSize;
-    
+       
     public OAuthClientManager(OAuthClientRepository repo, BCryptPasswordEncoder bCryptPasswordEncoder, int accessTokenValidity) {
         this.clientRepo = repo;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
