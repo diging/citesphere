@@ -11,6 +11,7 @@ public class ConceptTypeForm {
     private String uri;
     
     private String accessMode;
+    private String conceptTypeId;
     
     public String getAccessMode() {
         return accessMode;
@@ -35,6 +36,12 @@ public class ConceptTypeForm {
     }
     public void setUri(String uri) {
         this.uri = uri;
+    }
+    public String getConceptTypeId() {
+        return conceptTypeId;
+    }
+    public void setConceptTypeId(String conceptTypeId) {
+        this.conceptTypeId = conceptTypeId;
     }
     
 }

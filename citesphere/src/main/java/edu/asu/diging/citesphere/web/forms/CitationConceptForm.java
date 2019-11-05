@@ -14,6 +14,7 @@ public class CitationConceptForm {
     private String uri;
     private String type;
     private String accessMode;
+    private String conceptId;
     
     public String getAccessMode() {
         return accessMode;
@@ -44,6 +45,12 @@ public class CitationConceptForm {
     }
     public void setType(String type) {
         this.type = type;
+    }
+    public String getConceptId() {
+        return conceptId;
+    }
+    public void setConceptId(String conceptId) {
+        this.conceptId = conceptId;
     }
     
     

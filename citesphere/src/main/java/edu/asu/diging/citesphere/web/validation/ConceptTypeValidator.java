@@ -12,7 +12,7 @@ import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 public class ConceptTypeValidator implements Validator {
     @Autowired
     private IConceptTypeManager conceptTypeManager;
-    
+
     @Override
     public boolean supports(Class<?> paramClass) {
         return ConceptTypeForm.class.equals(paramClass);
@@ -21,12 +21,24 @@ public class ConceptTypeValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         ConceptTypeForm conceptTypeForm = (ConceptTypeForm) target;
-        IUser user = (IUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(!errors.hasErrors() && conceptTypeForm.getAccessMode().equals("edit") &&
-                conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user) == null) {
-            errors.rejectValue("uri", "uri", "Only the owner can edit a Concept Type.");
-        } else if(conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user) != null) {
-            errors.rejectValue("uri", "uri", "Concept Type with this uri already exists!");
+        IUser user = (IUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!errors.hasErrors()) {
+            if (conceptTypeForm.getAccessMode().equals("edit")
+                    && conceptTypeManager.get(conceptTypeForm.getConceptTypeId()) != null
+                    && conceptTypeManager.get(conceptTypeForm.getConceptTypeId()).getOwner() != null
+                    && !(conceptTypeManager.get(conceptTypeForm.getConceptTypeId()).getOwner()
+                            .getUsername().equals(user.getUsername()))) {
+                errors.rejectValue("uri", "uri", "Only the owner can edit a Concept Type.");
+            } else if (conceptTypeForm.getAccessMode().equals("edit")
+                    && !conceptTypeManager.get(conceptTypeForm.getConceptTypeId()).getUri()
+                            .equals(conceptTypeForm.getUri())
+                    && conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(),
+                            user) != null) {
+                errors.rejectValue("uri", "uri", "Concept Type with this uri already exists!");
+            } else if (conceptTypeForm.getAccessMode().equals("add") && conceptTypeManager
+                    .getByUriAndOwner(conceptTypeForm.getUri(), user) != null) {
+                errors.rejectValue("uri", "uri", "Concept Type with this uri already exists!");
+            }
         }
     }
 }
