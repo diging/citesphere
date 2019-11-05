@@ -121,7 +121,7 @@ public class GroupItemsController {
     }
     
     @RequestMapping(value= {"/auth/group/{zoteroGroupId}/collections/{collectionId}/items"})
-    public String display(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
+    public ResponseEntity<String> display(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
@@ -138,10 +138,18 @@ public class GroupItemsController {
         IUser user = (IUser) authentication.getPrincipal();
         CitationResults results = citationManager.getGroupItems(user, groupId, null, pageInt, sort);
         
-        ICollectionsJSON object = new ICollectionsJSON(results.getCitations(), results.getTotalResults(), Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)),
-                pageInt, groupId, groupManager.getGroup(user, groupId), collectionId, collectionManager.getCitationCollections(user, groupId, null, pageInt, "title").getCitationCollections());
+        ICollectionsJSON object = new ICollectionsJSON();
 
-        return new com.google.gson.Gson().toJson(object);
+        object.setTotal(results.getTotalResults());
+        object.setTotalPages(Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
+        object.setCurrentPage(pageInt);
+        object.setZoteroGroupId(groupId);
+        object.setCollectionId(collectionId);
+        object.setCitationCollections(collectionManager.getCitationCollections(user, groupId, null, pageInt, "title").getCitationCollections());
+        List<ICitation> list = results.getCitations();
+        object.setItems(list);
+        
+        return new ResponseEntity<String>(new com.google.gson.Gson().toJson(object), HttpStatus.OK);
         
         /*
          * To deserialize

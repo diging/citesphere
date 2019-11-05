@@ -34,7 +34,6 @@ If you try and take a cat apart to see how it works, the first thing you have on
 <div class="jumbotron col-md-12"  style="margin-bottom: 20px;">
 <h2>Welcome back, ${user.firstName}!</h2>
 </div>
-<div id="happy">
 <div class="col-md-12">
 <c:forEach items="${groups}" var="group">
 <div class="panel panel-default">
