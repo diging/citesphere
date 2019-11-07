@@ -25,8 +25,9 @@ import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.ICollectionsJSON;
+import edu.asu.diging.citesphere.core.model.bib.ICollectionResult;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.core.model.bib.impl.CollectionResult;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
@@ -135,7 +136,7 @@ public class GroupItemsController {
         IUser user = (IUser) authentication.getPrincipal();
         CitationResults results = citationManager.getGroupItems(user, groupId, null, pageInt, sort);
 
-        ICollectionsJSON object = new ICollectionsJSON();
+        ICollectionResult object = new CollectionResult();
         object.setTotal(results.getTotalResults());
         object.setTotalPages(
                 Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
