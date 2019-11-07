@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.core.model.bib;
 
 import java.util.List;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollectionResult;
 
 public class ICollectionsJSON {
 
@@ -69,7 +68,6 @@ public class ICollectionsJSON {
     public void setCitationCollections(List<ICitationCollection> list) {
         this.citationCollections = list;
     }
-//List<ICitationCollection>
     private List<ICitation> items;
     private long total;
     private double totalPages;

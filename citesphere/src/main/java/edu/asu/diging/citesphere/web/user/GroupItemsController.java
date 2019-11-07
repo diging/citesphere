@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,13 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.JsonObject;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
@@ -120,14 +116,15 @@ public class GroupItemsController {
         return "auth/group/items";
     }
     
-    @RequestMapping(value= {"/auth/group/{zoteroGroupId}/collections/{collectionId}/items"})
-    public ResponseEntity<String> display(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value="collectionId", required=false) String collectionId,
+    @RequestMapping(value = {"/auth/group/{zoteroGroupId}/collections/{collectionId}/items"})
+    public ResponseEntity<String> display(Authentication authentication, Model model,
+            @PathVariable("zoteroGroupId") String groupId,
+            @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns)
             throws GroupDoesNotExistException {
-        
+
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
@@ -137,25 +134,27 @@ public class GroupItemsController {
 
         IUser user = (IUser) authentication.getPrincipal();
         CitationResults results = citationManager.getGroupItems(user, groupId, null, pageInt, sort);
-        
-        ICollectionsJSON object = new ICollectionsJSON();
 
+        ICollectionsJSON object = new ICollectionsJSON();
         object.setTotal(results.getTotalResults());
-        object.setTotalPages(Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
+        object.setTotalPages(
+                Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         object.setCurrentPage(pageInt);
         object.setZoteroGroupId(groupId);
         object.setCollectionId(collectionId);
-        object.setCitationCollections(collectionManager.getCitationCollections(user, groupId, null, pageInt, "title").getCitationCollections());
+        object.setCitationCollections(
+                collectionManager.getCitationCollections(user, groupId, null, pageInt, "title")
+                        .getCitationCollections());
         List<ICitation> list = results.getCitations();
         object.setItems(list);
-        
-        return new ResponseEntity<String>(new com.google.gson.Gson().toJson(object), HttpStatus.OK);
-        
-        /*
-         * To deserialize
-         *  MyObject obj = new com.google.gson.Gson().fromJSON(responseAsString, MyObject.class);
-          *    obj.getMessage();
-           *    obj.getSuccess();
-         */
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResponse = "";
+        try {
+            jsonResponse = objectMapper.writeValueAsString(object);
+        } catch (IOException e) {
+            logger.debug("Unable to process JSON response " + e);
+        }
+        return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
     }
 }

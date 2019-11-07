@@ -18,6 +18,8 @@ import javax.persistence.OrderBy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
@@ -33,6 +35,7 @@ public class Citation implements ICitation {
     @Column(name="citationKey")
     private String key;
     
+    @JsonManagedReference
     @ManyToOne(targetEntity=CitationGroup.class)
     @JoinColumn(name="group_id")
     private ICitationGroup group;
