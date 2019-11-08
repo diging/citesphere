@@ -5,8 +5,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import edu.asu.diging.citesphere.core.model.oauth.OAuthClientResultPage;
+
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
+import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
 
 @Controller
 public class ShowOAuthClientsController {

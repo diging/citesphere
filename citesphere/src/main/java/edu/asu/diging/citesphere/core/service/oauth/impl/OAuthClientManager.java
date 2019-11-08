@@ -21,10 +21,10 @@ import edu.asu.diging.citesphere.core.model.IOAuthClient;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.IConceptType;
 import edu.asu.diging.citesphere.core.model.oauth.OAuthClient;
-import edu.asu.diging.citesphere.core.model.oauth.OAuthClientResultPage;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
 import edu.asu.diging.citesphere.core.service.oauth.GrantTypes;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
+import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
 

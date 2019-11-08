@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.core.model.oauth;
+package edu.asu.diging.citesphere.core.service.oauth;
 
 import java.util.List;
 
