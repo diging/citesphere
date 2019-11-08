@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.core.model.IOAuthClient;
 
-public class OAuthClientCollectionResult {
+public class OAuthClientResultPage {
     
     private long totalPages;
     private List<IOAuthClient> clientList;

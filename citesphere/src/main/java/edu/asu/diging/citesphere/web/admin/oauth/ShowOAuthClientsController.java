@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import edu.asu.diging.citesphere.core.model.oauth.OAuthClientCollectionResult;
+import edu.asu.diging.citesphere.core.model.oauth.OAuthClientResultPage;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 
 @Controller
@@ -17,7 +17,7 @@ public class ShowOAuthClientsController {
 
     @RequestMapping(value="/admin/apps", method=RequestMethod.GET)
     public String showAllApps(Model model, Pageable pageable) {
-        OAuthClientCollectionResult result = clientManager.getClientDetails(pageable);
+        OAuthClientResultPage result = clientManager.getAllClientDetails(pageable);
         model.addAttribute("clientList", result.getClientList());
         model.addAttribute("currentPage", pageable.getPageNumber()+1);
         model.addAttribute("totalPages", result.getTotalPages());

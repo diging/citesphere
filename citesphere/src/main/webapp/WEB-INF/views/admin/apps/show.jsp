@@ -19,8 +19,8 @@ $(function() {
 });
 </script>
 <h2>Apps</h2>
-
 <ul id="pagination-top" class="pagination-sm"></ul>
+<div class="pull-right" style="margin-top: 20px;"><a href="<c:url value="/admin/apps/add" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Add App</a></div>
 <table class="table table-striped">
 <tr>
 <th>Client Id</th>

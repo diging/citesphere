@@ -21,7 +21,7 @@ import edu.asu.diging.citesphere.core.model.IOAuthClient;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.IConceptType;
 import edu.asu.diging.citesphere.core.model.oauth.OAuthClient;
-import edu.asu.diging.citesphere.core.model.oauth.OAuthClientCollectionResult;
+import edu.asu.diging.citesphere.core.model.oauth.OAuthClientResultPage;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
 import edu.asu.diging.citesphere.core.service.oauth.GrantTypes;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
@@ -77,11 +77,11 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
     }
     
     @Override
-    public OAuthClientCollectionResult getClientDetails(Pageable pageable) {
-        OAuthClientCollectionResult result = new OAuthClientCollectionResult();
+    public OAuthClientResultPage getAllClientDetails(Pageable pageable) {
         List<IOAuthClient> clientList = new ArrayList<>();
         Page<OAuthClient> oAuthClients = clientRepo.findAll(pageable);
         oAuthClients.forEach(oAuthClient -> clientList.add(oAuthClient));
+        OAuthClientResultPage result = new OAuthClientResultPage();
         result.setClientList(clientList);
         result.setTotalPages(oAuthClients.getTotalPages());
         return result;

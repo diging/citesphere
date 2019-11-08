@@ -17,12 +17,13 @@
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving 
 		up static resources in the ${webappRoot}/resources directory -->
-	<mvc:resources mapping="/resources/**"
-		location="/resources/" />
+	<mvc:resources mapping="/resources/**" location="/resources/" />
 	<mvc:annotation-driven />
 	<se:global-method-security
 		pre-post-annotations="enabled" />
-
+	<context:component-scan
+		base-package="edu.asu.diging.citesphere.web, edu.asu.diging.citesphere.api, edu.asu.diging.citesphere.config.web"></context:component-scan>
+	
 	<beans:bean
 		class="org.springframework.data.web.config.SpringDataWebConfiguration" />
 	<mvc:annotation-driven>
@@ -38,9 +39,7 @@
 		class="org.springframework.data.web.PageableHandlerMethodArgumentResolver">
 		<constructor-arg ref="sortResolver" />
 	</bean>
-	<context:component-scan
-		base-package="edu.asu.diging.citesphere.web, edu.asu.diging.citesphere.api, edu.asu.diging.citesphere.config.web"></context:component-scan>
-
+	
 	<beans:bean id="tilesViewResolver"
 		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
 		<beans:property name="viewClass"
