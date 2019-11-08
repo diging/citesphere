@@ -147,13 +147,20 @@ $(function() {
 
 <div class="col-md-2">
 <p class="lead">Collections &nbsp;&nbsp;
+<c:set var = "columnString" value = ""/>
+<c:forEach items="${columns}" var="column" varStatus="loop">
+   <c:set var = "columnString" value = "${columnString}${column}"/>
+   <c:if test="${!loop.last}">
+   		<c:set var = "columnString" value = "${columnString},"/>
+   </c:if>
+</c:forEach>
 <c:choose>
     <c:when test="${collectionId!=null}">
-        <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columns}" />"><i
+        <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><i
 		class="fas fa-sync" title="Sync Citation"></i></a>
     </c:when>    
     <c:otherwise>
-        <a href="<c:url value="/auth/group/${zoteroGroupId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columns}" />"><i
+        <a href="<c:url value="/auth/group/${zoteroGroupId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><i
 		class="fas fa-sync" title="Sync Citation"></i></a>
     </c:otherwise>
 </c:choose>
