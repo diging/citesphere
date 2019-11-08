@@ -7,8 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
@@ -27,10 +25,12 @@ public class AddOAuthClientController {
     }
     
     @RequestMapping(value="/admin/apps/add", method=RequestMethod.POST)
-    public String add(AppForm appForm, RedirectAttributes redirectAttrs) {
+    public String add(AppForm appForm, Model model) {
         OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ));
-        redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
-        redirectAttrs.addFlashAttribute("secret", creds.getSecret());
-        return "redirect:/admin/apps/add";
+        model.addAttribute("clientId", creds.getClientId());
+        model.addAttribute("secret", creds.getSecret());
+        model.addAttribute("name", appForm.getName());
+        model.addAttribute("description", appForm.getDescription());
+        return "admin/apps/details";
     }
 }
