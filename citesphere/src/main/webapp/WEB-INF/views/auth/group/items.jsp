@@ -146,7 +146,6 @@ $(function() {
 </div>
 
 <div class="col-md-2">
-<p class="lead">Collections &nbsp;&nbsp;
 <c:set var = "columnString" value = ""/>
 <c:forEach items="${columns}" var="column" varStatus="loop">
    <c:set var = "columnString" value = "${columnString}${column}"/>
@@ -154,6 +153,7 @@ $(function() {
    		<c:set var = "columnString" value = "${columnString},"/>
    </c:if>
 </c:forEach>
+<p class="lead">Collections &nbsp;&nbsp;
 <c:choose>
     <c:when test="${collectionId!=null}">
         <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><i
