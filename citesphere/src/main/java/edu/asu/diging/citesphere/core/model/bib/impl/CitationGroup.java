@@ -6,7 +6,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 
@@ -32,6 +32,7 @@ public class CitationGroup implements ICitationGroup {
     private OffsetDateTime updatedOn;
     private OffsetDateTime lastLocallyModifiedOn;
     
+    @JsonBackReference
     @OneToMany(targetEntity=Citation.class, mappedBy="group")
     private List<ICitation> citations;
 
