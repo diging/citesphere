@@ -21,6 +21,14 @@
 	<definition name="register" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/register.jsp" />	
 	</definition>
+    
+    <definition name="login/reset" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/resetPassword.jsp" />    
+    </definition>
+    
+    <definition name="password/change" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/password/change.jsp" />    
+    </definition>
 	
 	<!-- Users -->
 	<definition name="admin/user/list" extends="base.definition">
