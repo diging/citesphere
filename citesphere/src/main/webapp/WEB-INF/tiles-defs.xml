@@ -30,7 +30,10 @@
     <!-- Apps -->
     <definition name="admin/apps/add" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/admin/apps/add.jsp" /> 
-    </definition>   
+    </definition>
+    <definition name="admin/apps/show" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/admin/apps/show.jsp" /> 
+    </definition>    
 	
 	<!-- zotero -->
 	<definition name="auth/group/items" extends="base.definition">
