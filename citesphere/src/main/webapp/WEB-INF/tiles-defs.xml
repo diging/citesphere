@@ -36,7 +36,7 @@
     </definition>
     <definition name="admin/apps/details" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/admin/apps/details.jsp" /> 
-    </definition>     
+    </definition>
 	
 	<!-- zotero -->
 	<definition name="auth/group/items" extends="base.definition">
