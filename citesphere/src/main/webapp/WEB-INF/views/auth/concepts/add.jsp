@@ -25,7 +25,6 @@
 <td width="20%"><label>URI</label></td>
 <td><form:input type="text" path="uri" class="form-control" />
 <p class="text-danger"><form:errors path="uri"/></p></td>
-<td><form:input path="accessMode" type="hidden" class="form-control" value="add"></form:input></td>
 </tr>
 </table>
 

@@ -10,15 +10,8 @@ public class ConceptTypeForm {
     @NotEmpty(message="Uri cannot be empty.")
     private String uri;
     
-    private String accessMode;
     private String conceptTypeId;
     
-    public String getAccessMode() {
-        return accessMode;
-    }
-    public void setAccessMode(String accessMode) {
-        this.accessMode = accessMode;
-    }
     public String getName() {
         return name;
     }

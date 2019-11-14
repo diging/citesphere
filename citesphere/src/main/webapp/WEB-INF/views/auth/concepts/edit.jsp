@@ -28,7 +28,6 @@
 <label>URI:</label>
 <form:input path="uri" type="text" class="form-control" placeholder="URI"></form:input>
 <p class="text-danger"><form:errors path="uri"/></p>
-<form:input path="accessMode" type="hidden" class="form-control" value="edit"></form:input>
 <form:input path="conceptId" type="hidden" class="form-control" value="${conceptId }"></form:input>
 <br>
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>

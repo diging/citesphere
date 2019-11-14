@@ -23,19 +23,18 @@ public class CitationConceptValidator implements Validator {
         CitationConceptForm conceptForm = (CitationConceptForm) target;
         IUser user = (IUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!errors.hasErrors()) {
-            if (conceptForm.getAccessMode().equals("edit")
-                    && conceptManager.get(conceptForm.getConceptId()) != null
-                    && conceptManager.get(conceptForm.getConceptId()).getOwner() != null
-                    && !(conceptManager.get(conceptForm.getConceptId()).getOwner().getUsername()
-                            .equals(user.getUsername()))) {
-                errors.rejectValue("uri", "uri", "Only the owner can edit a Concept.");
-            } else if (conceptForm.getAccessMode().equals("edit")
-                    && !conceptManager.get(conceptForm.getConceptId()).getUri()
-                            .equals(conceptForm.getUri())
-                    && conceptManager.getByUriAndOwner(conceptForm.getUri(), user) != null) {
-                errors.rejectValue("uri", "uri", "Concept with this uri already exists!");
-            } else if (conceptForm.getAccessMode().equals("add")
-                    && conceptManager.getByUriAndOwner(conceptForm.getUri(), user) != null) {
+            if (conceptForm.getConceptId() == null) {
+                if (conceptManager.get(conceptForm.getConceptId()) != null
+                        && conceptManager.get(conceptForm.getConceptId()).getOwner() != null
+                        && !(conceptManager.get(conceptForm.getConceptId()).getOwner().getUsername()
+                                .equals(user.getUsername()))) {
+                    errors.rejectValue("uri", "uri", "Only the owner can edit a Concept.");
+                } else if (!conceptManager.get(conceptForm.getConceptId()).getUri()
+                                .equals(conceptForm.getUri())
+                        && conceptManager.getByUriAndOwner(conceptForm.getUri(), user) != null) {
+                    errors.rejectValue("uri", "uri", "Concept with this uri already exists!");
+                }
+            } else if (conceptForm.getConceptId() != null && conceptManager.getByUriAndOwner(conceptForm.getUri(), user) != null) {
                 errors.rejectValue("uri", "uri", "Concept with this uri already exists!");
             }
         }
