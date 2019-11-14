@@ -156,12 +156,12 @@ $(function() {
 <p class="lead">Collections &nbsp;&nbsp;
 <c:choose>
     <c:when test="${collectionId!=null}">
-        <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><i
-		class="fas fa-sync" title="Sync Citation"></i></a>
+        <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><small><i
+		class="fas fa-sync" title="Sync Page"></i></small></a>
     </c:when>    
     <c:otherwise>
-        <a href="<c:url value="/auth/group/${zoteroGroupId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><i
-		class="fas fa-sync" title="Sync Citation"></i></a>
+        <a href="<c:url value="/auth/group/${zoteroGroupId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><small><i
+		class="fas fa-sync" title="Sync Page"></i></small></a>
     </c:otherwise>
 </c:choose>
 </p>
