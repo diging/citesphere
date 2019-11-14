@@ -1,6 +1,9 @@
-package edu.asu.diging.citesphere.core.model.bib;
+package edu.asu.diging.citesphere.core.model;
 
 import java.util.List;
+import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 
 
 public interface ICollectionResult {

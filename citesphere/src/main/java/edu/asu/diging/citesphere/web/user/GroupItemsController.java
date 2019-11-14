@@ -1,6 +1,5 @@
 package edu.asu.diging.citesphere.web.user;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,23 +10,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.ICollectionResult;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
-import edu.asu.diging.citesphere.core.model.bib.impl.CollectionResult;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
@@ -115,47 +109,5 @@ public class GroupItemsController {
         Collections.reverse(breadCrumbs);
         model.addAttribute("breadCrumbs", breadCrumbs);
         return "auth/group/items";
-    }
-    
-    @RequestMapping(value = {"/auth/group/{zoteroGroupId}/collections/{collectionId}/items"})
-    public ResponseEntity<String> display(Authentication authentication, Model model,
-            @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value = "collectionId", required = false) String collectionId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
-            @RequestParam(required = false, value = "columns") String[] columns)
-            throws GroupDoesNotExistException {
-
-        Integer pageInt = 1;
-        try {
-            pageInt = new Integer(page);
-        } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-        }
-
-        IUser user = (IUser) authentication.getPrincipal();
-        CitationResults results = citationManager.getGroupItems(user, groupId, null, pageInt, sort);
-
-        ICollectionResult object = new CollectionResult();
-        object.setTotal(results.getTotalResults());
-        object.setTotalPages(
-                Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
-        object.setCurrentPage(pageInt);
-        object.setZoteroGroupId(groupId);
-        object.setCollectionId(collectionId);
-        object.setCitationCollections(
-                collectionManager.getCitationCollections(user, groupId, null, pageInt, "title")
-                        .getCitationCollections());
-        List<ICitation> list = results.getCitations();
-        object.setItems(list);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonResponse = "";
-        try {
-            jsonResponse = objectMapper.writeValueAsString(object);
-        } catch (IOException e) {
-            logger.debug("Unable to process JSON response " + e);
-        }
-        return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
     }
 }
