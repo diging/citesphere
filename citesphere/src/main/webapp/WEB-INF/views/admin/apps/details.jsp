@@ -2,7 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-
 <div class="pull-right" style="margin-top: 20px;">
 	<a href="<c:url value="/admin/apps/add" />" class="btn btn-primary"><i
 		class="fas fa-plus-circle"></i> Add App</a> &nbsp;&nbsp; 
