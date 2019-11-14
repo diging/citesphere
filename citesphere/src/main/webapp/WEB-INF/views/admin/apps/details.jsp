@@ -7,6 +7,7 @@
 		class="fas fa-plus-circle"></i> Add App</a> &nbsp;&nbsp; 
 	<a href="<c:url value="/admin/apps" />" class="btn btn-primary">Show All Apps</a>
 </div>
+<br/>
 <h2>App Details</h2>
 <table class="table table-striped">
 <tr>
