@@ -1,7 +1,10 @@
 package edu.asu.diging.citesphere.web.forms;
 
-public class ConceptTypeForm {
+import javax.validation.constraints.NotEmpty;
 
+public class ConceptTypeForm {
+    
+    @NotEmpty(message="Name cannot be empty.")
     private String name;
     private String description;
     private String uri;

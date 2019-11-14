@@ -50,8 +50,7 @@ public class EditConceptController {
             redirectAttributes.addFlashAttribute("show_alert", true);
             redirectAttributes.addFlashAttribute("alert_msg", "Only the owner can edit a Concept.");
             redirectAttributes.addFlashAttribute("alert_type", "danger");
-        }
-        else {
+        } else {
             citationConcept.setName(form.getName());
             citationConcept.setDescription(form.getDescription());
             citationConcept.setUri(form.getUri());
