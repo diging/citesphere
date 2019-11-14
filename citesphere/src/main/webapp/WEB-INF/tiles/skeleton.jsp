@@ -77,11 +77,11 @@
 			      Apps <span class="caret"></span>
 			    </a>
 	          	<ul class="dropdown-menu">
+	          	  <li role="presentation">
+		          	<a href="<c:url value="/admin/apps" />" >See all Apps</a>
+		          </li>
 			      <li role="presentation">
 		          	<a href="<c:url value="/admin/apps/add" />" >Add</a>
-		          </li>
-		          <li role="presentation">
-		          	<a href="<c:url value="/admin/apps" />" >See all Apps</a>
 		          </li>
 			    </ul>
 		    </li>
