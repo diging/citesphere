@@ -26,12 +26,14 @@ $(function() {
 <th>Client Id</th>
 <th>Name</th>
 <th>Description</th>
+<th/>
 </tr>
 <c:forEach items="${clientList}" var="client">
 <tr> 
 <td>${client.clientId}</td>
 <td>${client.name}</td>
 <td>${client.description}</td>
+<td><span class="label label-default"><a href="<c:url value='/admin/apps/${client.clientId}?page=${currentPage -1}'/>" style="color: #ffffff">Delete</a></span></td>
 </tr>
 </c:forEach>
 </table>
