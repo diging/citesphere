@@ -1,6 +1,8 @@
 package edu.asu.diging.citesphere.web.admin.oauth;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +17,10 @@ public class DeleteOAuthClientController {
     @Autowired
     private IOAuthClientManager clientManager;
 
-    @RequestMapping(value = "/admin/apps/{clientId}", method = RequestMethod.GET)
-    public String deleteApp(@PathVariable("clientId") String clientId,
+    @RequestMapping(value = "/admin/apps/{clientId}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteApp(@PathVariable("clientId") String clientId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
         clientManager.deleteClient(clientId);
-        return "redirect:/admin/apps?page=" + new Integer(page);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -17,23 +17,38 @@ $(function() {
         }
     });
 });
+
+function removeRow(url,count) {
+    $.ajax({
+        url: url,
+        type: 'DELETE',
+        success : function(){
+        	var id = "row"+count;
+        	var row = document.getElementById(id);
+        	row.parentNode.removeChild(row); 
+        	}
+    });
+}
 </script>
 <h2>Apps</h2>
 <ul id="pagination-top" class="pagination-sm"></ul>
 <div class="pull-right" style="margin-top: 20px;"><a href="<c:url value="/admin/apps/add" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Add App</a></div>
-<table class="table table-striped">
+<table id ="table" class="table table-striped">
 <tr>
 <th>Client Id</th>
 <th>Name</th>
 <th>Description</th>
 <th/>
 </tr>
+<c:set var="count" value="0" />
 <c:forEach items="${clientList}" var="client">
-<tr> 
+<c:set var="count" value='${count+1}' />
+<tr id="row${count}"> 
 <td>${client.clientId}</td>
 <td>${client.name}</td>
 <td>${client.description}</td>
-<td><span class="label label-default"><a href="<c:url value='/admin/apps/${client.clientId}?page=${currentPage -1}'/>" style="color: #ffffff">Delete</a></span></td>
+<td><input type="button" value="Delete" onclick="removeRow('<c:url value="/admin/apps/${client.clientId}?page=${currentPage - 1}&${_csrf.parameterName}=${_csrf.token}" />','${count}')" /></td>
 </tr>
 </c:forEach>
 </table>
+<div id="show"></div>
