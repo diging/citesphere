@@ -15,6 +15,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.email.IEmailNotificationManager;
+import edu.asu.diging.citesphere.core.model.IPasswordResetToken;
 import edu.asu.diging.citesphere.core.model.IUser;
 
 @Service
@@ -33,7 +34,7 @@ public class EmailNotificationManager implements IEmailNotificationManager {
     public void sendNewAccountRequestPlacementEmail(IUser user, List<IUser> adminList) {
         if (user.getEmail() != null && !user.getEmail().trim().isEmpty() && !adminList.isEmpty()) {
             ClassPathResource resource = new ClassPathResource("/newAccountNotification.txt");
-            
+
             String body;
             try {
                 body = FileUtils.readFileToString(resource.getFile(), Charset.forName("utf-8"));
@@ -41,7 +42,7 @@ public class EmailNotificationManager implements IEmailNotificationManager {
                 logger.error("Could not read email template for new account notification.", e);
                 return;
             }
-            
+
             body = body.replace("$createdUsername", user.getUsername());
             body = body.replace("$createdUser", user.getFirstName() + " " + user.getLastName());
             body = body.replace("$app", appProperties.getProperty("app.name"));
@@ -49,9 +50,8 @@ public class EmailNotificationManager implements IEmailNotificationManager {
             if (!appUrl.endsWith("/")) {
                 appUrl += "/";
             }
-            body = body.replace("$url", appUrl
-                    + appProperties.getProperty("app.createUserApprovalPath"));
-            
+            body = body.replace("$url", appUrl + appProperties.getProperty("app.createUserApprovalPath"));
+
             for (IUser admin : adminList) {
                 // ugly but ahh well
                 List<String> names = new ArrayList<>();
@@ -62,11 +62,38 @@ public class EmailNotificationManager implements IEmailNotificationManager {
                     names.add(admin.getLastName());
                 }
                 String name = String.join(" ", names);
-                
+
                 String message = body.replace("$admin", name.trim().isEmpty() ? admin.getEmail() : name);
                 emailNotificationSender.sendNotificationEmail(admin,
-                    "New Account Request for " + appProperties.getProperty("app.name"), message);
+                        "New Account Request for " + appProperties.getProperty("app.name"), message);
             }
         }
     }
+
+    @Override
+    public void sendResetPasswordEmail(IUser user, IPasswordResetToken token) throws IOException {
+        ClassPathResource resource = new ClassPathResource("/passwordResetEmail.txt");
+
+        String body;
+        try {
+            body = FileUtils.readFileToString(resource.getFile(), Charset.forName("utf-8"));
+        } catch (IOException e) {
+            logger.error("Could not read email template for new account notification.", e);
+            return;
+        }
+
+        body = body.replace("$user", user.getFirstName() + " " + user.getLastName());
+        body = body.replace("$app", appProperties.getProperty("app.name"));
+
+        String appUrl = appProperties.getProperty("app.url");
+        if (!appUrl.endsWith("/")) {
+            appUrl += "/";
+        }
+        body = body.replace("$url", appUrl + appProperties.getProperty("app.createUserApprovalPath") + "?token="
+                + token.getToken() + "&user=" + user.getUsername());
+
+        emailNotificationSender.sendNotificationEmail(user, appProperties.getProperty("app.resetPasswordSubject")
+                .replace("$app", appProperties.getProperty("app.name")), body);
+    }
+
 }
