@@ -2,7 +2,7 @@ package edu.asu.diging.citesphere.core.service.oauth;
 
 import java.util.List;
 
-import edu.asu.diging.citesphere.core.model.IOAuthClient;
+import edu.asu.diging.citesphere.core.model.oauth.IOAuthClient;
 
 public class OAuthClientResultPage {
     

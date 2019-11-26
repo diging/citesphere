@@ -90,7 +90,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
             endpoints
                     .pathMapping("/oauth/authorize", "/api/v1/oauth/authorize")
                     .pathMapping("/oauth/check_token", "/api/v1/oauth/check_token")
-                    .pathMapping("/oauth/confirm_access", "/api/v1/oauth/confirm_access")
+                    //.pathMapping("/oauth/confirm_access", "/api/v1/oauth/confirm_access")
                     .pathMapping("/oauth/error", "/api/v1/oauth/error")
                     .pathMapping("/oauth/token", "/api/v1/oauth/token").tokenStore(tokenStore)
                     .authenticationManager(authenticationManager);

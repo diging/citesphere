@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.core.model.oauth;
+package edu.asu.diging.citesphere.core.model.oauth.impl;
 
 import java.util.Collection;
 import java.util.Map;
@@ -14,7 +14,7 @@ import org.hibernate.annotations.Parameter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
-import edu.asu.diging.citesphere.core.model.IOAuthClient;
+import edu.asu.diging.citesphere.core.model.oauth.IOAuthClient;
 
 @Entity
 public class OAuthClient implements IOAuthClient, ClientDetails {

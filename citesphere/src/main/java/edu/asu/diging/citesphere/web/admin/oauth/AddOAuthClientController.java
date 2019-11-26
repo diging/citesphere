@@ -1,14 +1,23 @@
 package edu.asu.diging.citesphere.web.admin.oauth;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import edu.asu.diging.citesphere.core.service.oauth.GrantTypes;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
@@ -19,6 +28,15 @@ public class AddOAuthClientController {
     
     @Autowired
     private IOAuthClientManager clientManager;
+    
+    private List<String> allowedGrantTypes;
+    
+    @PostConstruct
+    public void init() {
+        allowedGrantTypes = new ArrayList<String>();
+        allowedGrantTypes.add(GrantTypes.AUTHORIZATION_CODE);
+        allowedGrantTypes.add(GrantTypes.CLIENT_CREDENTIALS);
+    }
 
     @RequestMapping(value="/admin/apps/add", method=RequestMethod.GET)
     public String show(Model model) {
@@ -27,8 +45,16 @@ public class AddOAuthClientController {
     }
     
     @RequestMapping(value="/admin/apps/add", method=RequestMethod.POST)
-    public String add(AppForm appForm, RedirectAttributes redirectAttrs) {
-        OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ));
+    public String add(@Validated AppForm appForm, Model model, BindingResult errors, RedirectAttributes redirectAttrs) {
+        if (!allowedGrantTypes.contains(appForm.getGrantType())) {
+            errors.rejectValue("grantType", "app.creation.invalid.granttype");
+            model.addAttribute("appForm", appForm);
+            return "admin/apps/add";
+        }
+        
+        Set<String> grantTypes = new HashSet<>();
+        grantTypes.add(appForm.getGrantType());
+        OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ), grantTypes, appForm.getRedirectUrl());
         redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
         redirectAttrs.addFlashAttribute("secret", creds.getSecret());
         return "redirect:/admin/apps/add";

@@ -29,6 +29,10 @@
     <definition name="password/change" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/password/change.jsp" />    
     </definition>
+    
+    <definition name="oauth/approve_access" template="/WEB-INF/tiles/skeleton_no_menu.jsp">
+        <put-attribute name="content" value="/WEB-INF/views/auth/oauth_approve.jsp" />    
+    </definition>
 	
 	<!-- Users -->
 	<definition name="admin/user/list" extends="base.definition">
