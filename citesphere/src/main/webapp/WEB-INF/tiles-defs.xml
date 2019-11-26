@@ -13,10 +13,23 @@
 		<put-attribute name="pageName" value="" />
 		<put-attribute name="currentPage" value="home" />
 	</definition>
+    
+    <definition name="base.definition.no.menu" template="/WEB-INF/tiles/skeleton_no_menu.jsp">
+        <put-attribute name="title" value="" />
+        <put-attribute name="navigation" value="" />
+        <put-attribute name="content" value="" />
+        <put-attribute name="header" value="" />
+        <put-attribute name="pageName" value="" />
+        <put-attribute name="currentPage" value="home" />
+    </definition>
 	
 	<definition name="home" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/home.jsp" />	
 	</definition>
+    
+    <definition name="login" extends="base.definition.no.menu">
+        <put-attribute name="content" value="/WEB-INF/views/login.jsp" />    
+    </definition>
 	
 	<definition name="register" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/register.jsp" />	

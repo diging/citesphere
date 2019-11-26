@@ -89,21 +89,6 @@
 		
 	    <p class="text-muted">
 	    
-	         
-	   	<sec:authorize access="isAnonymous()">
-	   	
-		<form name='f' class="form-inline pull-right" action="<c:url value="/login/authenticate" />" method="POST">
-			Login:
-			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-  			<input placeholder="Username" class="form-control input-sm" type="text" id="username" name="username"/>        
-		    <input placeholder="Password" class="form-control input-sm" type="password" id="password" name="password"/>    
-		    <button type="submit" class="btn btn-default btn-sm">Log in</button>
-		    <a href="<c:url value="/register" />" class="btn btn-primary btn-sm">Sign Up</a><br>
-		    <a href="<c:url value="/login/reset" />"><small>Forgot Password?</small></a>
-		</form>
-		
-		
-		</sec:authorize>
         </p>
         </div>
         </div>
