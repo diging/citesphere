@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.model.bib.impl;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -22,6 +23,7 @@ public class Affiliation implements IAffiliation {
             )
     @JsonIgnore
     private String id;
+    @Lob
     private String name;
     private String uri;
     private String localAuthorityId;

@@ -22,6 +22,7 @@ public class AuthorityEntry implements IAuthorityEntry {
                     strategy = "edu.asu.diging.citesphere.core.repository.IdGenerator"
             )
     private String id;
+    @Lob
     private String name;
     @Lob
     private String description;

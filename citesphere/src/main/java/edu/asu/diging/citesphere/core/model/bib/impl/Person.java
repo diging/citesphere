@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -28,10 +29,13 @@ public class Person implements IPerson, Comparable<Person> {
             )
     @JsonIgnore
     private String id;
+    @Lob
     private String name;
     private String uri;
     private String localAuthorityId;
+    @Lob
     private String firstName;
+    @Lob
     private String lastName;
     private int positionInList;
     
