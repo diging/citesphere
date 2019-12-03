@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.oauth1.OAuthToken;
@@ -60,6 +61,10 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return zotero.getGroupsOperations().getGroupItemsTop(groupId, page*zoteroPageSize, zoteroPageSize, sortBy, lastGroupVersion);          
     }
+    
+    @Override
+    @CacheEvict(value="groupItems", key="#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
+    public void clearGroupItemsCache(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) { }
     
     @Override
     @Cacheable(value="groupItemsLimit", key="#user.username + '_' + #groupId + '_' + #limit + '_' + #sortBy")
@@ -188,6 +193,10 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return zotero.getGroupCollectionsOperations().getItems(groupId, collectionId, page*zoteroPageSize, zoteroPageSize, sortBy, lastGroupVersion);          
     }
+    
+    @Override
+    @CacheEvict(value="collectionItems", key="#user.username + '_' + #groupId + '_' + #collectionId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
+    public void clearCollectionItemsCache(IUser user, String groupId, String collectionId, int page, String sortBy, Long lastGroupVersion) {}
     
     private Zotero getApi(IUser user) {
         IZoteroToken token = tokenManager.getToken(user);

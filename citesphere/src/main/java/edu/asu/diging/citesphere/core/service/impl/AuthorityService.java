@@ -120,9 +120,14 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public IAuthorityEntry save(IAuthorityEntry entry, IUser user) {
+    public IAuthorityEntry create(IAuthorityEntry entry, IUser user) {
         entry.setUsername(user.getUsername());
         entry.setCreatedOn(OffsetDateTime.now());
+        return save(entry);
+    }
+    
+    @Override
+    public IAuthorityEntry save(IAuthorityEntry entry) {
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry)entry);
     }
 }

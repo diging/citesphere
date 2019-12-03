@@ -1,6 +1,6 @@
 package edu.asu.diging.citesphere.core.service.oauth;
 
-import edu.asu.diging.citesphere.core.model.IOAuthClient;
+import edu.asu.diging.citesphere.core.model.oauth.IOAuthClient;
 
 /**
  * This class is a temporary holder for app client id and secret to be used after

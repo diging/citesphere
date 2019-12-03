@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.IConceptType;
+import edu.asu.diging.citesphere.core.model.bib.impl.ConceptType;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 
 public interface IConceptTypeManager {
@@ -13,5 +14,7 @@ public interface IConceptTypeManager {
     List<IConceptType> getAllTypes(IUser owner);
 
     IConceptType get(String id);
+
+    void save(IConceptType type);
 
 }

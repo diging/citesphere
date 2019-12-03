@@ -12,11 +12,13 @@
         <org.slf4j-version>1.7.25</org.slf4j-version>
         <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
         <spring-security-version>5.1.5.RELEASE</spring-security-version>
+        <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
         <spring.version>5.1.2.RELEASE</spring.version>
         <spring-data.version>Lovelace-RELEASE</spring-data.version>
         <javers.version>5.0.0</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
+        <spring-social-zotero.version>0.1</spring-social-zotero.version>
         <citesphere.messages.version>0.2</citesphere.messages.version>
         
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
@@ -26,6 +28,9 @@
 
 
         <db.driver>com.mysql.jdbc.Driver</db.driver>
+        
+        <!-- Append to URL: ?useUnicode=true&amp;characterEncoding=UTF-8 (where &amp; is just an ampersand) -->
+        <!-- Example: jdbc:mysql://localhost:3306/citesphere?useUnicode=true&amp;characterEncoding=UTF-8 -->
         <db.database.url></db.database.url>
         <db.user></db.user>
         <db.password></db.password>
@@ -54,8 +59,7 @@
 
         <app.name>Citesphere</app.name>
         <app.url></app.url>
-        <app.createUserApprovalPath>admin/user/list</app.createUserApprovalPath>
-
+        
         <kafka.hosts></kafka.hosts>
         <pullrequest></pullrequest>
         <buildNumber>v42.0.0</buildNumber>
@@ -154,7 +158,7 @@
         <dependency>
             <groupId>org.springframework.security.oauth</groupId>
             <artifactId>spring-security-oauth2</artifactId>
-            <version>2.3.5.RELEASE</version>
+            <version>${spring-security-oauth2-version}</version>
         </dependency>
 
         <dependency>
@@ -180,7 +184,7 @@
         <dependency>
             <groupId>edu.asu.diging</groupId>
             <artifactId>spring-social-zotero</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${spring-social-zotero.version}</version>
         </dependency>
 
         <!-- Spring AOP + AspectJ -->

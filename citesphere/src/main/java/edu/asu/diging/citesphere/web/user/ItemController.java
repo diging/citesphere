@@ -24,7 +24,7 @@ public class ItemController {
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException, CannotFindCitationException {
-        ICitation citation = citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         
         if (citation != null) {

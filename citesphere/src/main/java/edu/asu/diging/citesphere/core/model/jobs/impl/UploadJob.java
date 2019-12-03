@@ -1,7 +1,9 @@
 package edu.asu.diging.citesphere.core.model.jobs.impl;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 
 @Entity
@@ -12,6 +14,9 @@ public class UploadJob extends Job implements IUploadJob {
     private long fileSize;
     private String contentType;
     private String citationGroup;
+    @Transient
+    private ICitationGroup citationGroupDetail;
+    
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.jobs.impl.IUploadJob#getFilename()
@@ -51,5 +56,13 @@ public class UploadJob extends Job implements IUploadJob {
     public void setCitationGroup(String citationGroup) {
         this.citationGroup = citationGroup;
     }
-      
+    @Override
+    public ICitationGroup getCitationGroupDetail() {
+        return citationGroupDetail;
+    }
+    @Override
+    public void setCitationGroupDetail(ICitationGroup citationGroupDetail) {
+        this.citationGroupDetail = citationGroupDetail;
+    }
+     
 }
