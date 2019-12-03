@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.model.bib.impl;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -16,9 +17,11 @@ public class CitationConceptTag implements ICitationConceptTag {
     @GeneratedValue(generator = "concepttag_id_generator")
     @GenericGenerator(name = "concepttag_id_generator", parameters = @Parameter(name = "prefix", value = "CPTT"), strategy = "edu.asu.diging.citesphere.core.repository.IdGenerator")
     private String id;
+    @Lob
     private String conceptName;
     private String conceptUri;
     private String localConceptId;
+    @Lob
     private String typeName;
     private String typeUri;
     private String localConceptTypeId;
