@@ -27,7 +27,7 @@
 
         <db.driver>com.mysql.jdbc.Driver</db.driver>
         
-        <!-- Append to URL: ?useUnicode=true&amp;characterEncoding=UTF-8 -->
+        <!-- Append to URL: ?useUnicode=true&amp;characterEncoding=UTF-8 (where &amp; is just an ampersand) -->
         <!-- Example: jdbc:mysql://localhost:3306/citesphere?useUnicode=true&amp;characterEncoding=UTF-8 -->
         <db.database.url></db.database.url>
         <db.user></db.user>
