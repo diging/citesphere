@@ -37,7 +37,7 @@
 	</logger>
     
     <logger name="org.springframework.security">
-        <level value="${log.level}" />
+        <level value="trace" />
     </logger>
 
 	<!-- Root Logger -->

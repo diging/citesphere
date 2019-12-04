@@ -90,7 +90,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
             endpoints
                     .pathMapping("/oauth/authorize", "/api/v1/oauth/authorize")
                     .pathMapping("/oauth/check_token", "/api/v1/oauth/check_token")
-                    .pathMapping("/oauth/confirm_access", "/api/v1/oauth/confirm_access")
+                    //.pathMapping("/oauth/confirm_access", "/api/v1/oauth/confirm_access")
                     .pathMapping("/oauth/error", "/api/v1/oauth/error")
                     .pathMapping("/oauth/token", "/api/v1/oauth/token").tokenStore(tokenStore)
                     .authenticationManager(authenticationManager);
@@ -111,7 +111,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.csrf().requireCsrfProtectionMatcher(new CsrfSecurityRequestMatcher()).and().formLogin().loginPage("/")
-                    .loginProcessingUrl("/login/authenticate")
+                    .loginProcessingUrl("/login/authenticate").defaultSuccessUrl("/")
                     .failureHandler(customAuthenticationFailureHandler("/?error="))
                     // Configures the logout function
                     .and().logout().deleteCookies("JSESSIONID").logoutUrl("/logout").logoutSuccessUrl("/").and()
@@ -124,10 +124,11 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
                     // Configures url based authorization
                     .and().authorizeRequests()
                     // Anyone can access the urls
-                    .antMatchers("/", "/resources/**", "/login/authenticate", "/", "/register", "/logout").permitAll()
+                    .antMatchers("/", "/resources/**", "/login/authenticate", "/login", "/login/reset", "/login/reset/initiated", "/", "/register", "/logout").permitAll()
                     // .antMatchers("/api/v1/oauth/token").permitAll()
                     // The rest of the our application is protected.
                     //.antMatchers("/api/**").authenticated()
+                    .antMatchers("/password/reset").hasRole("CHANGE_PASSWORD")
                     .antMatchers("/users/**", "/admin/**").hasRole("ADMIN").anyRequest().hasAnyRole("USER", "ADMIN");
         }
 

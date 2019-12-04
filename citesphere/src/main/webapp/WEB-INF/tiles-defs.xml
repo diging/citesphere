@@ -13,14 +13,39 @@
 		<put-attribute name="pageName" value="" />
 		<put-attribute name="currentPage" value="home" />
 	</definition>
+    
+    <definition name="base.definition.no.menu" template="/WEB-INF/tiles/skeleton_no_menu.jsp">
+        <put-attribute name="title" value="" />
+        <put-attribute name="navigation" value="" />
+        <put-attribute name="content" value="" />
+        <put-attribute name="header" value="" />
+        <put-attribute name="pageName" value="" />
+        <put-attribute name="currentPage" value="home" />
+    </definition>
 	
 	<definition name="home" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/home.jsp" />	
 	</definition>
+    
+    <definition name="login" extends="base.definition.no.menu">
+        <put-attribute name="content" value="/WEB-INF/views/login.jsp" />    
+    </definition>
 	
 	<definition name="register" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/register.jsp" />	
 	</definition>
+    
+    <definition name="login/reset" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/resetPassword.jsp" />    
+    </definition>
+    
+    <definition name="password/change" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/password/change.jsp" />    
+    </definition>
+    
+    <definition name="oauth/approve_access" template="/WEB-INF/tiles/skeleton_no_menu.jsp">
+        <put-attribute name="content" value="/WEB-INF/views/auth/oauth_approve.jsp" />    
+    </definition>
 	
 	<!-- Users -->
 	<definition name="admin/user/list" extends="base.definition">
@@ -30,7 +55,10 @@
     <!-- Apps -->
     <definition name="admin/apps/add" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/admin/apps/add.jsp" /> 
-    </definition>   
+    </definition>
+    <definition name="admin/apps/show" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/admin/apps/show.jsp" /> 
+    </definition>    
 	
 	<!-- zotero -->
 	<definition name="auth/group/items" extends="base.definition">

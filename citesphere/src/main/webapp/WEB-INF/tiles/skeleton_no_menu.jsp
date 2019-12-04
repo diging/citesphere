@@ -60,72 +60,7 @@
       <div class="page-header">
       <nav>
           <ul class="nav nav-pills pull-right">
-          	<li role="presentation">
-          		<a href="<c:url value="/" />" >Home</a>
-          	</li>
           	
-          	<sec:authorize access="hasRole('ADMIN')">
-          	<li role="presentation">
-          		<a href="<c:url value="/admin/user/list" />" >Users</a>
-          	</li>
-          	<li role="presentation" class="dropdown">
-          	<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-			      Apps <span class="caret"></span>
-			    </a>
-	          	<ul class="dropdown-menu">
-	          	  <li role="presentation">
-		          	<a href="<c:url value="/admin/apps" />" >See all Apps</a>
-		          </li>
-			      <li role="presentation">
-		          	<a href="<c:url value="/admin/apps/add" />" >Add</a>
-		          </li>
-			    </ul>
-		    </li>
-          	</sec:authorize>
-          	
-          	<sec:authorize access="hasAnyRole('USER', 'ADMIN')">
-          	<li role="presentation">
-                <a href="<c:url value="/auth/exports" />" >Exports</a>
-            </li>
-          	<li role="presentation" class="dropdown">
-			    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-			      Citation Concepts <span class="caret"></span>
-			    </a>
-			    <ul class="dropdown-menu">
-			      <li role="presentation">
-		          	<a href="<c:url value="/auth/concepts/list" />" >Concepts</a>
-		          </li>
-		          <li role="presentation">
-		          	<a href="<c:url value="/auth/concepts/types/list" />" >Concept Types</a>
-		          </li>
-			    </ul>
-			</li>
-			<li role="presentation" class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                  Import <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-					<li role="presentation">
-		          		<a href="<c:url value="/auth/import/upload" />" >Import from File</a>
-		          	</li>
-		          	<li role="separator" class="divider"></li>
-		          	<li role="presentation">
-                        <a href="<c:url value="/auth/import/jobs" />" >See all Imports</a>
-                    </li>
-	          	</ul>
-	        </li>
-          	<li role="presentation">
-          		<a href="<c:url value="/auth/authority/list" />" >Managed Authority Entries</a>
-          	</li>
-          	</sec:authorize>
-          	<sec:authorize access="isAuthenticated()">
-          	<li role="presentation">
-         	 	<form action="<c:url value="/logout" />" method="POST">
-         	 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-  				<button class="btn-link" type="submit" title="Logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
-         	 	</form>
-         	 </li>
-          </sec:authorize>
           </ul>
          
         </nav>
@@ -154,21 +89,6 @@
 		
 	    <p class="text-muted">
 	    
-	         
-	   	<sec:authorize access="isAnonymous()">
-	   	
-		<form name='f' class="form-inline pull-right" action="<c:url value="/login/authenticate" />" method="POST">
-			Login:
-			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-  			<input placeholder="Username" class="form-control input-sm" type="text" id="username" name="username"/>        
-		    <input placeholder="Password" class="form-control input-sm" type="password" id="password" name="password"/>    
-		    <button type="submit" class="btn btn-default btn-sm">Log in</button>
-		    <a href="<c:url value="/register" />" class="btn btn-primary btn-sm">Sign Up</a><br>
-		    <a href="<c:url value="/login/reset" />"><small>Forgot Password?</small></a>
-		</form>
-		
-		
-		</sec:authorize>
         </p>
         </div>
         </div>
