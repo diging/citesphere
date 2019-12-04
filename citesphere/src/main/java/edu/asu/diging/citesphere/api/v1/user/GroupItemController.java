@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
 import edu.asu.diging.citesphere.api.v1.model.ICollectionResult;
@@ -50,6 +48,9 @@ public class GroupItemController extends V1Controller {
 
     @Autowired
     private IUserManager userManager;
+    
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @RequestMapping(value = { "/group/{zoteroGroupId}",
             "/group/{zoteroGroupId}/collections/{collectionId}/items" }, produces = {
@@ -81,8 +82,6 @@ public class GroupItemController extends V1Controller {
         List<ICitation> list = results.getCitations();
         collectionResponse.setItems(list);
 
-        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         String jsonResponse = "";
         try {
             jsonResponse = objectMapper.writeValueAsString(collectionResponse);
