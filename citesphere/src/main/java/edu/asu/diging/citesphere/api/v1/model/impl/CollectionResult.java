@@ -1,14 +1,20 @@
-package edu.asu.diging.citesphere.core.model.impl;
+package edu.asu.diging.citesphere.api.v1.model.impl;
 
 import java.util.List;
-import edu.asu.diging.citesphere.core.model.ICollectionResult;
+
+import edu.asu.diging.citesphere.api.v1.model.ICollectionResult;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 
 public class CollectionResult implements ICollectionResult {
 
-    public CollectionResult() {}
+    private List<ICitation> items;
+    private long total;
+    private double totalPages;
+    private int currentPage;
+    private String zoteroGroupId;
+    private ICitationGroup group;
+    private String collectionId;
     
     @Override
     public List<ICitation> getItems() {
@@ -81,21 +87,4 @@ public class CollectionResult implements ICollectionResult {
         this.collectionId = collectionId;
     }
 
-    @Override
-    public List<ICitationCollection> getCitationCollections() {
-        return citationCollections;
-    }
-
-    @Override
-    public void setCitationCollections(List<ICitationCollection> list) {
-        this.citationCollections = list;
-    }
-    private List<ICitation> items;
-    private long total;
-    private double totalPages;
-    private int currentPage;
-    private String zoteroGroupId;
-    private ICitationGroup group;
-    private String collectionId;
-    private List<ICitationCollection> citationCollections;
 }

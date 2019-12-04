@@ -1,8 +1,8 @@
-package edu.asu.diging.citesphere.core.model;
+package edu.asu.diging.citesphere.api.v1.model;
 
 import java.util.List;
+
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 
 
@@ -35,9 +35,5 @@ public interface ICollectionResult {
     String getCollectionId();
 
     void setCollectionId(String collectionId);
-
-    List<ICitationCollection> getCitationCollections();
-
-    void setCitationCollections(List<ICitationCollection> list);
 
 }
