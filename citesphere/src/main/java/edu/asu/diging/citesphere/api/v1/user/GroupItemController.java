@@ -79,14 +79,14 @@ public class GroupItemController extends V1Controller {
         collectionResponse.setCurrentPage(pageInt);
         collectionResponse.setZoteroGroupId(groupId);
         collectionResponse.setCollectionId(collectionId);
-        List<ICitation> list = results.getCitations();
-        collectionResponse.setItems(list);
+        collectionResponse.setItems(results.getCitations());
 
         String jsonResponse = "";
         try {
             jsonResponse = objectMapper.writeValueAsString(collectionResponse);
         } catch (IOException e) {
             logger.error("Unable to process JSON response ", e);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
     }
