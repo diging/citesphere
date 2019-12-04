@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -21,7 +22,9 @@ public class CitationConcept implements ICitationConcept {
     @GeneratedValue(generator = "concept_id_generator")
     @GenericGenerator(name = "concept_id_generator", parameters = @Parameter(name = "prefix", value = "CON"), strategy = "edu.asu.diging.citesphere.core.repository.IdGenerator")
     private String id;
+    @Lob
     private String name;
+    @Lob
     private String description;
     private String uri;
 
