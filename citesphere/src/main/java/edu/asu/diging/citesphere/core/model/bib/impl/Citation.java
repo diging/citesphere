@@ -59,6 +59,7 @@ public class Citation implements ICitation {
     private Set<ICreator> otherCreators;
     
     private ItemType itemType;
+    @Lob
     private String publicationTitle;
     private String volume;
     private String issue;
@@ -66,12 +67,13 @@ public class Citation implements ICitation {
     private OffsetDateTime date;
     private String dateFreetext;
     private String series;
+    @Lob
     private String seriesTitle;
     private String url;
     @Lob
     private String abstractNote;
     private String accessDate;
-    
+    @Lob
     private String seriesText;
     private String journalAbbreviation;
     private String language;

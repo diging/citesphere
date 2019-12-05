@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.api.v1;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -22,9 +24,12 @@ public class TestController extends V1Controller {
   
 
     @RequestMapping("/test")
-    public ResponseEntity<ArrayNode> test() {
+    public ResponseEntity<ArrayNode> test(Principal principal) {
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode array = mapper.createArrayNode();
+        ObjectNode node = mapper.createObjectNode();
+        node.put("user", principal.getName());
+        array.add(node);
         for (RequestMappingInfo info : handlerMappings.getHandlerMethods().keySet()) {
             if (info.getPatternsCondition().getPatterns().stream().anyMatch(p -> p.startsWith("/api/v1"))) {
                 ObjectNode infoNode = mapper.createObjectNode();
