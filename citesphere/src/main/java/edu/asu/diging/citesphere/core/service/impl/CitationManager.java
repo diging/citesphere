@@ -64,6 +64,7 @@ public class CitationManager implements ICitationManager {
     @Autowired
     private IZoteroManager zoteroManager;
     
+    // FIXME: needs to be replaced with group manager
     @Autowired
     private CitationGroupRepository groupRepository;
     

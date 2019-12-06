@@ -15,7 +15,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
-import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -31,6 +30,7 @@ import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.repository.bib.CitationRepository;
 import edu.asu.diging.citesphere.core.repository.bib.CustomCitationRepository;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
+import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 
 public class CitationManagerTest {
@@ -49,6 +49,9 @@ public class CitationManagerTest {
     
     @Mock
     private PageRequestRepository pageRequestRepository;
+    
+    @Mock
+    private IGroupManager groupManager;
     
     @InjectMocks
     private CitationManager managerToTest;
@@ -73,20 +76,24 @@ public class CitationManagerTest {
         MockitoAnnotations.initMocks(this);
         managerToTest.init();
         
-        existingCitation.setKey(EXISTING_ID);
-        existingCitation.setVersion(currentVersion);
-        Mockito.when(citationRepository.findById(EXISTING_ID)).thenReturn(Optional.of(existingCitation));
-    
         user = new User();
         user.setUsername("USERNAME");
-        zoteroCitation.setKey(ZOTERO_CITATION_ID);
-        Mockito.when(zoteroManager.getGroupItem(user, GROUP_ID, ZOTERO_CITATION_ID)).thenReturn(zoteroCitation);
-        Mockito.when(citationRepository.findById(ZOTERO_CITATION_ID)).thenReturn(Optional.empty());
         
         ICitationGroup group = new CitationGroup();
         group.setId(new Long(GROUP_ID));
+        group.getUsers().add(user.getUsername());
         Mockito.when(groupRepository.findById(new Long(GROUP_ID))).thenReturn(Optional.of((CitationGroup)group));
+        Mockito.when(groupManager.getGroup(user, GROUP_ID)).thenReturn(group);
         
+        existingCitation.setKey(EXISTING_ID);
+        existingCitation.setVersion(currentVersion);
+        existingCitation.setGroup(group);
+        Mockito.when(citationRepository.findById(EXISTING_ID)).thenReturn(Optional.of(existingCitation));
+    
+        zoteroCitation.setKey(ZOTERO_CITATION_ID);
+        Mockito.when(zoteroManager.getGroupItem(user, GROUP_ID, ZOTERO_CITATION_ID)).thenReturn(zoteroCitation);
+        Mockito.when(citationRepository.findById(ZOTERO_CITATION_ID)).thenReturn(Optional.empty());
+          
         group1 = new CitationGroup();
         group1.setId(GROUP1_ID);
         group1.setVersion(20L);
