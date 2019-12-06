@@ -69,4 +69,8 @@ public interface ICitationGroup {
 
     OffsetDateTime getLastLocallyModifiedOn();
 
+    void setUsers(List<String> users);
+
+    List<String> getUsers();
+
 }

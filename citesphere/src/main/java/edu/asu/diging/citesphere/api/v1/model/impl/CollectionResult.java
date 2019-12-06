@@ -4,16 +4,14 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.api.v1.model.ICollectionResult;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 
 public class CollectionResult implements ICollectionResult {
 
     private List<ICitation> items;
     private long total;
-    private double totalPages;
+    private long totalPages;
     private int currentPage;
     private String zoteroGroupId;
-    private ICitationGroup group;
     private String collectionId;
     
     @Override
@@ -38,12 +36,12 @@ public class CollectionResult implements ICollectionResult {
     }
 
     @Override
-    public double getTotalPages() {
+    public long getTotalPages() {
         return totalPages;
     }
 
     @Override
-    public void setTotalPages(double totalPages) {
+    public void setTotalPages(long totalPages) {
         this.totalPages = totalPages;
     }
 
@@ -65,16 +63,6 @@ public class CollectionResult implements ICollectionResult {
     @Override
     public void setZoteroGroupId(String zoteroGroupId) {
         this.zoteroGroupId = zoteroGroupId;
-    }
-
-    @Override
-    public ICitationGroup getGroup() {
-        return group;
-    }
-
-    @Override
-    public void setGroup(ICitationGroup group) {
-        this.group = group;
     }
 
     @Override
