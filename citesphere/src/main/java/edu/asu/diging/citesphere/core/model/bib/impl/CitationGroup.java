@@ -1,8 +1,10 @@
 package edu.asu.diging.citesphere.core.model.bib.impl;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -35,6 +37,9 @@ public class CitationGroup implements ICitationGroup {
     @JsonBackReference
     @OneToMany(targetEntity=Citation.class, mappedBy="group")
     private List<ICitation> citations;
+    
+    @ElementCollection
+    private List<String> users = new ArrayList<String>();
 
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.bib.impl.IGroup#getId()
@@ -232,4 +237,13 @@ public class CitationGroup implements ICitationGroup {
         this.lastLocallyModifiedOn = lastLocallyModifiedOn;
     }
 
+    @Override
+    public List<String> getUsers() {
+        return users;
+    }
+
+    @Override
+    public void setUsers(List<String> users) {
+        this.users = users;
+    }
 }

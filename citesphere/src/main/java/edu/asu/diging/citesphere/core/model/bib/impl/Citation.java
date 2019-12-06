@@ -17,9 +17,7 @@ import javax.persistence.OrderBy;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;

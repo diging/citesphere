@@ -10,8 +10,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
@@ -23,7 +25,7 @@ public class ItemController {
     private ICitationManager citationManager;
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
-    public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException, CannotFindCitationException {
+    public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         
@@ -35,4 +37,5 @@ public class ItemController {
         }
         return "auth/group/items/item";
     }
+    
 }

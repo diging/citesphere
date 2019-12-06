@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +29,7 @@ import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTypeNotSupportedException;
 import edu.asu.diging.citesphere.core.exceptions.FileStorageException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.export.ExportFinishedCallback;
 import edu.asu.diging.citesphere.core.export.ExportType;
 import edu.asu.diging.citesphere.core.export.IExportProcessor;
@@ -83,7 +83,7 @@ public class ExportProcessor implements IExportProcessor {
      */
     @Override
     @Async
-    public void runExport(ExportType exportType, IUser user, String groupId, String collectionId, IExportTask task, ExportFinishedCallback callback) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException {
+    public void runExport(ExportType exportType, IUser user, String groupId, String collectionId, IExportTask task, ExportFinishedCallback callback) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ZoteroHttpStatusException {
         Processor processor = processors.get(exportType);
         if (processor == null) {
             throw new ExportTypeNotSupportedException("Export type " + exportType + " is not supported.");
@@ -128,7 +128,7 @@ public class ExportProcessor implements IExportProcessor {
         return writer;
     }
     
-    private CitationResults initializeTask(IUser user, String groupId, String collectionId, IExportTask task) throws GroupDoesNotExistException {
+    private CitationResults initializeTask(IUser user, String groupId, String collectionId, IExportTask task) throws GroupDoesNotExistException, ZoteroHttpStatusException {
         CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, 1, SORT_BY_TITLE);
         
         long total = results.getTotalResults();
@@ -139,7 +139,7 @@ public class ExportProcessor implements IExportProcessor {
         return results;
     }
     
-    private List<ICitation> collectCitations(CitationResults initialPage, IUser user, String groupId, String collectionId, IExportTask task) throws GroupDoesNotExistException {
+    private List<ICitation> collectCitations(CitationResults initialPage, IUser user, String groupId, String collectionId, IExportTask task) throws GroupDoesNotExistException, ZoteroHttpStatusException {
         List<ICitation> citations = new ArrayList<>();
         
         long total = initialPage.getTotalResults();

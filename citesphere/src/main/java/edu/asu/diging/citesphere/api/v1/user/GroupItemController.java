@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.api.v1.user;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +24,9 @@ import edu.asu.diging.citesphere.api.v1.V1Controller;
 import edu.asu.diging.citesphere.api.v1.model.ICollectionResult;
 import edu.asu.diging.citesphere.api.v1.model.impl.CollectionResult;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
@@ -52,7 +52,7 @@ public class GroupItemController extends V1Controller {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @RequestMapping(value = { "/group/{zoteroGroupId}",
+    @RequestMapping(value = { "/group/{zoteroGroupId}/items",
             "/group/{zoteroGroupId}/collections/{collectionId}/items" }, produces = {
                     MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
@@ -71,11 +71,18 @@ public class GroupItemController extends V1Controller {
 
         // TODO: Get logged in user, remove:
         IUser user = userManager.findByUsername(principal.getName());
-        CitationResults results = citationManager.getGroupItems(user, groupId, null, pageInt, sort);
+        CitationResults results;
+        try {
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+        } catch(AccessForbiddenException ex) {
+            return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+        } catch (ZoteroHttpStatusException e1) {
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         ICollectionResult collectionResponse = new CollectionResult();
         collectionResponse.setTotal(results.getTotalResults());
-        collectionResponse.setTotalPages(Math.ceil(new Float(results.getTotalResults()) / new Float(apiPageSize)));
+        collectionResponse.setTotalPages(new Double(Math.ceil(new Float(results.getTotalResults()) / new Float(apiPageSize))).longValue());
         collectionResponse.setCurrentPage(pageInt);
         collectionResponse.setZoteroGroupId(groupId);
         collectionResponse.setCollectionId(collectionId);

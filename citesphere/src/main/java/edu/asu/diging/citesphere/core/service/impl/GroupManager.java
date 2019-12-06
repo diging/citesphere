@@ -17,22 +17,30 @@ public class GroupManager implements IGroupManager {
 
     @Autowired
     private CitationGroupRepository groupRepository;
-    
+
     @Autowired
     private IZoteroManager zoteroManager;
-   
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.IGroupManager#getGroup(java.lang.Long)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.impl.IGroupManager#getGroup(java.lang.
+     * Long)
      */
     @Override
     public ICitationGroup getGroup(IUser user, String groupId) {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
-        if (groupOptional.isPresent()) {
+        if (groupOptional.isPresent() && groupOptional.get().getUsers().contains(user.getUsername())) {
             return (ICitationGroup) groupOptional.get();
         }
-        
+
         ICitationGroup group = zoteroManager.getGroup(user, groupId, false);
-        groupRepository.save((CitationGroup)group);
+        if (group != null) {
+            group.getUsers().add(user.getUsername());
+            groupRepository.save((CitationGroup) group);
+            return group;
+        }
         return null;
     }
 }

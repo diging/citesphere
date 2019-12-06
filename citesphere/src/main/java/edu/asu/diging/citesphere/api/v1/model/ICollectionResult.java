@@ -16,9 +16,9 @@ public interface ICollectionResult {
 
     void setTotal(long total);
 
-    double getTotalPages();
+    long getTotalPages();
 
-    void setTotalPages(double totalPages);
+    void setTotalPages(long totalPages);
 
     int getCurrentPage();
 
@@ -27,10 +27,6 @@ public interface ICollectionResult {
     String getZoteroGroupId();
 
     void setZoteroGroupId(String zoteroGroupId);
-
-    ICitationGroup getGroup();
-
-    void setGroup(ICitationGroup group);
 
     String getCollectionId();
 
