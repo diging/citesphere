@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
@@ -49,8 +50,8 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
             ClientDetails details = clientOptional.get();
             details.getAuthorities().size();
             return details;
-        }
-        return null;
+        } 
+        throw new InvalidClientException("Client with id " + clientId + " does not exist.");
     }
     
     /* (non-Javadoc)
