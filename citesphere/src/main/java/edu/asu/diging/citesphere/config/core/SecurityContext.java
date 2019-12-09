@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -29,7 +30,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
+import edu.asu.diging.citesphere.core.repository.oauth.DbAccessTokenRepository;
+import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
+import edu.asu.diging.citesphere.core.service.impl.DbTokenStore;
 import edu.asu.diging.citesphere.core.service.oauth.impl.OAuthClientManager;
 
 @Configuration
@@ -54,9 +58,6 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         private int oauthTokenValidity;
 
         @Autowired
-        private TokenStore tokenStore;
-
-        @Autowired
         private AuthenticationManager authenticationManager;
         
         @Autowired 
@@ -65,9 +66,22 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         @Autowired
         private BCryptPasswordEncoder bCryptPasswordEncoder;
         
+        @Autowired
+        private DbAccessTokenRepository accessTokenRepo;
+        
+        @Autowired
+        private DbRefreshTokenRepository refreshTokenRepo;
+        
+        @Autowired
+        private UserDetailsService userDetailsService;
+        
+        @Autowired
+        private TokenStore tokenStore;
+
+        
         @Bean
         public TokenStore tokenStore() {
-            return new InMemoryTokenStore();
+            return new DbTokenStore(accessTokenRepo, refreshTokenRepo);
         }
 
         protected void configure(HttpSecurity http) throws Exception {
@@ -93,7 +107,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
                     //.pathMapping("/oauth/confirm_access", "/api/v1/oauth/confirm_access")
                     .pathMapping("/oauth/error", "/api/v1/oauth/error")
                     .pathMapping("/oauth/token", "/api/v1/oauth/token").tokenStore(tokenStore)
-                    .authenticationManager(authenticationManager);
+                    .userDetailsService(userDetailsService).authenticationManager(authenticationManager);
         }
 
         @Override
