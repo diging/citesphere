@@ -54,6 +54,9 @@ public class AddOAuthClientController {
         
         Set<String> grantTypes = new HashSet<>();
         grantTypes.add(appForm.getGrantType());
+        if (appForm.getGrantType().equals(GrantTypes.AUTHORIZATION_CODE)) {
+            grantTypes.add(GrantTypes.REFRESH_TOKEN);
+        }
         OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ), grantTypes, appForm.getRedirectUrl());
         redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
         redirectAttrs.addFlashAttribute("secret", creds.getSecret());
