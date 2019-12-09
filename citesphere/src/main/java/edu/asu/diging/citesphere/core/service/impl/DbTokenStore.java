@@ -21,6 +21,12 @@ import edu.asu.diging.citesphere.core.model.oauth.impl.DbRefreshToken;
 import edu.asu.diging.citesphere.core.repository.oauth.DbAccessTokenRepository;
 import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
 
+/**
+ * Modeled after:
+ * https://blog.couchbase.com/custom-token-store-spring-securtiy-oauth2/
+ * @author jdamerow
+ *
+ */
 public class DbTokenStore implements TokenStore {
 
     private DbAccessTokenRepository dbAccessTokenRepository;
