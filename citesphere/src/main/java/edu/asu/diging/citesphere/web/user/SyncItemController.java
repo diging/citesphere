@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 
@@ -19,7 +20,7 @@ public class SyncItemController {
     private ICitationManager citationManager;
 
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/sync")
-    public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException, CannotFindCitationException {
+    public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         citationManager.updateCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
     }

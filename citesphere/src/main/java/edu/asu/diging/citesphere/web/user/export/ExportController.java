@@ -12,6 +12,7 @@ import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTooBigException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTypeNotSupportedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.export.ExportType;
 import edu.asu.diging.citesphere.core.export.IExportManager;
 import edu.asu.diging.citesphere.core.model.IUser;
@@ -25,7 +26,7 @@ public class ExportController {
     @RequestMapping(value = { "/auth/group/{zoteroGroupId}/export",
             "/auth/group/{zoteroGroupId}/collection/{collectionId}/export" }, method=RequestMethod.POST)
     public String startExport(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value="collectionId", required=false) String collectionId) {
+            @PathVariable(value="collectionId", required=false) String collectionId) throws ZoteroHttpStatusException {
 
         try {
             exportManager.export(ExportType.CSV, (IUser) authentication.getPrincipal(), groupId, collectionId);

@@ -16,6 +16,7 @@ import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTooBigException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTypeNotSupportedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.export.ExportType;
 import edu.asu.diging.citesphere.core.export.IExportProcessor;
 import edu.asu.diging.citesphere.core.model.IUser;
@@ -73,7 +74,7 @@ public class ExportManagerTest {
     private String TASK1_ID = "task1";
     
     @Before
-    public void setUp() throws GroupDoesNotExistException {
+    public void setUp() throws GroupDoesNotExistException, ZoteroHttpStatusException {
         MockitoAnnotations.initMocks(this);
         
         user = new User();
@@ -111,21 +112,21 @@ public class ExportManagerTest {
     }
     
     @Test
-    public void test_export_group() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+    public void test_export_group() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         managerToTest.export(ExportType.CSV, user, groupId.toString(), null);
         Mockito.verify(processor).runExport(ExportType.CSV, user, groupId.toString(), null, task, managerToTest);
         Mockito.verify(taskRepo).saveAndFlush(Mockito.any(ExportTask.class));
     }
     
     @Test
-    public void test_export_collection() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+    public void test_export_collection() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         managerToTest.export(ExportType.CSV, user, groupId.toString(), COLLECTION_ID);
         Mockito.verify(processor).runExport(ExportType.CSV, user, groupId.toString(), COLLECTION_ID, task, managerToTest);
         Mockito.verify(taskRepo).saveAndFlush(Mockito.any(ExportTask.class));
     }
     
     @Test(expected=ExportTooBigException.class)
-    public void test_export_maxExportSize() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+    public void test_export_maxExportSize() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         CitationResults results2 = new CitationResults();
         results2.setTotalResults(400);
         String GROUP2 = "GROUP2";
@@ -136,12 +137,12 @@ public class ExportManagerTest {
     }
     
     @Test(expected=GroupDoesNotExistException.class)
-    public void test_export_groupDoesNotExist() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+    public void test_export_groupDoesNotExist() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         managerToTest.export(ExportType.CSV, user, "GROUP3", null);
     }
     
     @Test(expected=ExportTypeNotSupportedException.class)
-    public void test_export_typeNotSupported() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+    public void test_export_typeNotSupported() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         Mockito.doThrow(ExportTypeNotSupportedException.class).when(processor).runExport(null, user, groupId.toString(), null, task, managerToTest);
         managerToTest.export(null, user, groupId.toString(), null);
     }
@@ -171,7 +172,7 @@ public class ExportManagerTest {
     }
     
     @Test
-    public void test_exportFinished() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+    public void test_exportFinished() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         ConcurrentHashMap<String, IExportTask> runningTasks = (ConcurrentHashMap<String, IExportTask>) Whitebox.getInternalState(managerToTest, "runningTasks");
         managerToTest.export(ExportType.CSV, user, groupId.toString(), null);
         Assert.assertEquals(1, runningTasks.size());
@@ -180,7 +181,7 @@ public class ExportManagerTest {
     }
     
     @Test
-    public void test_shutdown() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+    public void test_shutdown() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         ConcurrentHashMap<String, IExportTask> runningTasks = (ConcurrentHashMap<String, IExportTask>) Whitebox.getInternalState(managerToTest, "runningTasks");
         managerToTest.export(ExportType.CSV, user, groupId.toString(), null);
         Assert.assertEquals(1, runningTasks.size());

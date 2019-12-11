@@ -130,5 +130,13 @@
     <definition name="error/citation/notFound" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/error/citationNotFound.jsp" />    
     </definition>
+    
+    <definition name="error/403" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/error/403.jsp" />    
+    </definition>
+    
+    <definition name="error/500" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/error/500.jsp" />    
+    </definition>
 	
 </tiles-definitions>

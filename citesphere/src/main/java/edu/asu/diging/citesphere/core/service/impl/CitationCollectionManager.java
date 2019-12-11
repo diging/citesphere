@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollection;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollectionResult;
 import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
@@ -49,7 +50,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
         
-        CitationGroup group = groupOptional.get();
+        ICitationGroup group = groupOptional.get();
         List<ICitationCollection> collections = collectionRepository.findByParentCollectionKeyAndGroup(parentCollectionId, group);
         
         
@@ -71,7 +72,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
-        CitationGroup group = groupOptional.get();
+        ICitationGroup group = groupOptional.get();
         
         CitationCollectionResult results = zoteroManager.getCitationCollections(user, groupId, parentCollectionId, 1, "title", group.getVersion());
         return results.getTotalResults();        
