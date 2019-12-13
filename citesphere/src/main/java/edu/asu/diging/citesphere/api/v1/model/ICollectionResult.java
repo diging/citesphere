@@ -2,8 +2,7 @@ package edu.asu.diging.citesphere.api.v1.model;
 
 import java.util.List;
 
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.ICitation;
 
 
 public interface ICollectionResult {

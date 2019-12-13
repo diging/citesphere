@@ -1,8 +1,6 @@
 package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,10 +17,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
-import edu.asu.diging.citesphere.core.model.bib.IPerson;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.IPerson;
 
 @Component
 public class ItemFactory implements IItemFactory {

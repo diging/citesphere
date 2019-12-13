@@ -25,19 +25,19 @@ import com.google.gson.JsonParser;
 
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.ZoteroConstants;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
-import edu.asu.diging.citesphere.core.model.bib.ICreator;
-import edu.asu.diging.citesphere.core.model.bib.IPerson;
-import edu.asu.diging.citesphere.core.model.bib.IReference;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
-import edu.asu.diging.citesphere.core.model.bib.impl.Affiliation;
-import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationConceptTag;
-import edu.asu.diging.citesphere.core.model.bib.impl.Person;
-import edu.asu.diging.citesphere.core.model.bib.impl.Reference;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.util.IDateParser;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationConceptTag;
+import edu.asu.diging.citesphere.model.bib.ICreator;
+import edu.asu.diging.citesphere.model.bib.IPerson;
+import edu.asu.diging.citesphere.model.bib.IReference;
+import edu.asu.diging.citesphere.model.bib.ItemType;
+import edu.asu.diging.citesphere.model.bib.impl.Affiliation;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.model.bib.impl.CitationConceptTag;
+import edu.asu.diging.citesphere.model.bib.impl.Person;
+import edu.asu.diging.citesphere.model.bib.impl.Reference;
 
 @Component
 public class CitationFactory implements ICitationFactory {
@@ -138,7 +138,7 @@ public class CitationFactory implements ICitationFactory {
     }
 
     private ICreator createCreator(Creator zcreator, int index) {
-        ICreator creator = new edu.asu.diging.citesphere.core.model.bib.impl.Creator();
+        ICreator creator = new edu.asu.diging.citesphere.model.bib.impl.Creator();
         creator.setPerson(createPerson(zcreator, index));
         creator.setRole(zcreator.getCreatorType());
         return creator;
@@ -272,10 +272,10 @@ public class CitationFactory implements ICitationFactory {
     }
 
     private void mapCreatorFields(JsonArray creatorList, Set<ICreator> citationCreatorList) {
-        List<edu.asu.diging.citesphere.core.model.bib.impl.Creator> extraCreatorList = new ArrayList<>();
+        List<edu.asu.diging.citesphere.model.bib.impl.Creator> extraCreatorList = new ArrayList<>();
         List<String> personNames = new ArrayList<>();
         creatorList.forEach(a -> {
-            ICreator creator = (ICreator) new edu.asu.diging.citesphere.core.model.bib.impl.Creator();
+            ICreator creator = (ICreator) new edu.asu.diging.citesphere.model.bib.impl.Creator();
             creator.setRole((a.getAsJsonObject().get("role") != null && !a.getAsJsonObject().get("role").isJsonNull())
                     ? a.getAsJsonObject().get("role").getAsString()
                     : "");
@@ -284,7 +284,7 @@ public class CitationFactory implements ICitationFactory {
                 mapPerson(a.getAsJsonObject().get("person"), creator.getPerson());
             }
             personNames.add(creator.getPerson().getFirstName() + creator.getPerson().getLastName());
-            extraCreatorList.add((edu.asu.diging.citesphere.core.model.bib.impl.Creator) creator);
+            extraCreatorList.add((edu.asu.diging.citesphere.model.bib.impl.Creator) creator);
         });
         for (Iterator<ICreator> iterator = citationCreatorList.iterator(); iterator.hasNext();) {
             ICreator creator = iterator.next();

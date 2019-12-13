@@ -3,8 +3,8 @@ package edu.asu.diging.citesphere.core.model.jobs.impl;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 
 @Entity
 public class UploadJob extends Job implements IUploadJob {

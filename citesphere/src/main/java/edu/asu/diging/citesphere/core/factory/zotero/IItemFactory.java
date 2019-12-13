@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.social.zotero.api.Item;
 
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitation;
 
 public interface IItemFactory {
 

@@ -8,12 +8,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationConcept;
-import edu.asu.diging.citesphere.core.repository.bib.CitationConceptRepository;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
-import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
+import edu.asu.diging.citesphere.data.bib.CitationConceptRepository;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitationConcept;
+import edu.asu.diging.citesphere.model.bib.impl.CitationConcept;
 import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 
 @Service
