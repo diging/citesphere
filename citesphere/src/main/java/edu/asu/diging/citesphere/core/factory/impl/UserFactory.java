@@ -7,8 +7,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.factory.IUserFactory;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.impl.User;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.impl.User;
 import edu.asu.diging.citesphere.web.forms.UserForm;
 
 @Component

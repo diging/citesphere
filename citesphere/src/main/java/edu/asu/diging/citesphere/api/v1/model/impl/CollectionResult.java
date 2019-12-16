@@ -3,7 +3,7 @@ package edu.asu.diging.citesphere.api.v1.model.impl;
 import java.util.List;
 
 import edu.asu.diging.citesphere.api.v1.model.ICollectionResult;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitation;
 
 public class CollectionResult implements ICollectionResult {
 

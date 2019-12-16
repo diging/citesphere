@@ -20,18 +20,18 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.core.model.impl.User;
-import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.core.repository.bib.CitationRepository;
-import edu.asu.diging.citesphere.core.repository.bib.CustomCitationRepository;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.data.bib.CitationRepository;
+import edu.asu.diging.citesphere.data.bib.CustomCitationRepository;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.model.impl.User;
 
 public class CitationManagerTest {
 

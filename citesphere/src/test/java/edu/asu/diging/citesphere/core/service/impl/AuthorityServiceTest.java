@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,13 +22,13 @@ import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.authority.impl.ImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
-import edu.asu.diging.citesphere.core.model.authority.impl.AuthorityEntry;
-import edu.asu.diging.citesphere.core.model.impl.User;
-import edu.asu.diging.citesphere.core.repository.AuthorityEntryRepository;
-import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.core.repository.bib.PersonRepository;
+import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.data.bib.PersonRepository;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
+import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
+import edu.asu.diging.citesphere.model.impl.User;
 
 public class AuthorityServiceTest {
 

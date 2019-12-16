@@ -29,24 +29,24 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
-import edu.asu.diging.citesphere.core.model.bib.ZoteroObjectType;
-import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
-import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
 import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
-import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.core.repository.bib.CitationRepository;
-import edu.asu.diging.citesphere.core.repository.bib.CustomCitationRepository;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.data.bib.CitationRepository;
+import edu.asu.diging.citesphere.data.bib.CustomCitationRepository;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.ItemType;
+import edu.asu.diging.citesphere.model.bib.ZoteroObjectType;
+import edu.asu.diging.citesphere.model.bib.impl.BibField;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 
 @Service
 @PropertySource("classpath:/config.properties")

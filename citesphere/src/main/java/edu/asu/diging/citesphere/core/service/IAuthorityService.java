@@ -7,8 +7,8 @@ import java.util.Set;
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 
 public interface IAuthorityService {
 

@@ -1,6 +1,6 @@
 package edu.asu.diging.citesphere.core.factory;
 
-import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.web.forms.UserForm;
 
 public interface IUserFactory {

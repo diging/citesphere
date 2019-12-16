@@ -18,12 +18,12 @@ import javax.persistence.NamedSubgraph;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ZoteroObjectType;
-import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
-import edu.asu.diging.citesphere.core.model.impl.User;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ZoteroObjectType;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.model.impl.User;
 
 @Entity
 @NamedEntityGraphs({

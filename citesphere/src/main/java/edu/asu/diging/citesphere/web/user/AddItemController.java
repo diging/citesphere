@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
-import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ItemType;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller

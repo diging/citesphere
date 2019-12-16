@@ -615,7 +615,7 @@ let removePerson = function removePerson(e) {
 <tr>
 <td width="20%">Citation Type</td>
 <td>
-<c:set var="enumValues" value="<%=edu.asu.diging.citesphere.core.model.bib.ItemType.values()%>"/>
+<c:set var="enumValues" value="<%=edu.asu.diging.citesphere.model.bib.ItemType.values()%>"/>
 <form:select id="items" path="itemType" data-show-icon="true" class="form-control selectpicker">
 <c:forEach items="${enumValues}" var="enumValue">
     <spring:eval expression="@iconsResource.getProperty(enumValue + '_label')"  var="iconLabel" />	
