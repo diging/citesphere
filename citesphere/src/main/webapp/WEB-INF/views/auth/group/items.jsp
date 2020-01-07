@@ -135,8 +135,14 @@ $(function() {
     <c:if test="${empty collectionId and total <= 300 }">
     <li><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
     </c:if>
+    <c:if test="${empty collectionId}">
+    <li><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/job/export/" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV  (for many items)</button></form></li>
+    </c:if>
     <c:if test="${not empty collectionId and total <= 300 }">
     <li><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
+    </c:if>
+     <c:if test="${not empty collectionId}">
+    <li><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/job/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (for many items)</button></form></li>
     </c:if>
     <c:if test="${total > 300}">
     <li><a class="btn btn-disabled" style="color: #999">CSV (up to 300 items)</a></li>

@@ -22,4 +22,7 @@ public interface IExportManager {
 
     int getTasksTotalPages(IUser user);
 
+    void distributedExport(ExportType exportType, IUser user, String groupId, String collectionId) throws GroupDoesNotExistException,
+            ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException;
+
 }

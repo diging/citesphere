@@ -19,7 +19,7 @@
         <javers.version>5.0.0</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
         <spring-social-zotero.version>0.1</spring-social-zotero.version>
-        <citesphere.messages.version>0.2</citesphere.messages.version>
+        <citesphere.messages.version>0.3-SNAPSHOT</citesphere.messages.version>
         <citesphere.model.version>0.1</citesphere.model.version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
