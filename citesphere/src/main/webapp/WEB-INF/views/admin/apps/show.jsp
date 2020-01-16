@@ -16,6 +16,11 @@ $(function() {
             window.location.href = "<c:url value="/admin/apps" />?page=" + (page-1);
         }
     });
+    
+    $(".client-entry").click(function() {
+		var id = $(this).data("id");
+		window.location.href = "<c:url value="/admin/apps/" />" + id;
+	});
 });
 </script>
 <h2>Apps</h2>
@@ -23,15 +28,15 @@ $(function() {
 <div class="pull-right" style="margin-top: 20px;"><a href="<c:url value="/admin/apps/add" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Add App</a></div>
 <table class="table table-striped">
 <tr>
-<th>Client Id</th>
-<th>Name</th>
-<th>Description</th>
+	<th>Client Id</th>
+	<th>Name</th>
+	<th>Description</th>
 </tr>
 <c:forEach items="${clientList}" var="client">
 <tr> 
-<td>${client.clientId}</td>
-<td>${client.name}</td>
-<td>${client.description}</td>
+	<td class="client-entry" data-id="${client.clientId}"> ${client.clientId} </td>
+	<td class="client-entry" data-id="${client.clientId}"> ${client.name} </td>
+	<td class="client-entry" data-id="${client.clientId}"> ${client.description} </td>
 </tr>
 </c:forEach>
 </table>

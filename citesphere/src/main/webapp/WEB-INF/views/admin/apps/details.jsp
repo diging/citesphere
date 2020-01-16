@@ -8,18 +8,22 @@
 	<a href="<c:url value="/admin/apps" />" class="btn btn-primary">Show All Apps</a>
 </div>
 <br/>
-<h2>App Details</h2>
+<h2>${name} Details</h2>
 <table class="table table-striped">
 <tr>
-<th>Client Id</th>
-<th>Client Secret</th>
-<th>Name</th>
-<th>Description</th>
+	<td>Client Id</td>
+	<td>${clientId}</td>
 </tr>
-<tr> 
-<td>${clientId}</td>
-<td>${secret}</td>
-<td>${name}</td>
-<td>${description}</td>
+<tr>
+	<td>Client Secret</td>
+	<td>${secret}</td>
+</tr>
+<tr>
+	<td>Name</td>
+	<td>${name}</td>
+</tr>
+<tr>
+	<td>Description</td>
+	<td>${description}</td>
 </tr>
 </table>
