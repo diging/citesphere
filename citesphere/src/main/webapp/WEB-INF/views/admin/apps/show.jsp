@@ -64,6 +64,7 @@ $(function() {
 		});
 		$('#client-delete-confirmation').modal("hide");
 		event.preventDefault();
+		$(this).removeData();
 	});
 });
 
