@@ -22,7 +22,6 @@ $(function() {
 $(function() {
 	$(".delete-link").click(function(event) {
 		var id = $(this).data('client-id');
-		console.log(id);
 		$("#delete-client-button").attr("data-client-id", id);
 		$("#confirm-client-entry-id").text(id);
 		$('#client-delete-confirmation').modal("show");	
@@ -30,7 +29,6 @@ $(function() {
 	});
 	$("#delete-client-button").click(function() {
 		var id = $(this).data("client-id");
-		console.log(id);
 		$.ajax({
 			'url': '<c:url value="/admin/apps/" />' + id + "?${_csrf.parameterName}=${_csrf.token}",
 			'type': "DELETE",
