@@ -1,8 +1,9 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-
 <script src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>
+<script src="<c:url value="/resources/notify/bootstrap-notify.min.js" />"></script>
+<link href="<c:url value="/resources/notify/animate.css" />" rel="stylesheet">
 <script>
 $(function() {
     $('#pagination-top').twbsPagination({
@@ -18,24 +19,50 @@ $(function() {
     });
 });
 
-function removeRow(url,count) {
-	console.log(url);
-	$.ajax({
-		url: url,
-	    type: 'DELETE',
-	    success : function(){
-	    	var id = "#row"+count;
-	    	console.log(id);
-	        $(id).remove();	
-	    }
+$(function() {
+	$(".delete-link").click(function(event) {
+		var id = $(this).data('client-id');
+		$("#delete-client-button").attr("data-client-id", id);
+		$("#confirm-client-entry-id").text($(this).data('client-id'));
+		$('#client-delete-confirmation').modal("show");	
+		event.preventDefault();
 	});
-}
-
-$('.table .delBtn').on('click',function(event){
-    event.preventDefault();
-    var href=$(this).attr('href');
-    $('#myModal #delRef').attr('href', href);
-    $('#myModal').modal();
+	$("#delete-client-button").click(function() {
+		var id = $(this).data("client-id");
+		$.ajax({
+			'url': '<c:url value="/admin/apps/" />' + id + "?${_csrf.parameterName}=${_csrf.token}",
+			'type': "DELETE",
+			'success': function(data) {
+				$("#tr-" + id).remove();
+				$.notify('<i class="fas fa-check-circle"></i> App successfully deleted!', {
+					type: 'success',
+					offset: {
+						x: 50,
+						y: 90
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				});
+			},
+			'error': function(data) {
+				$.notify('<i class="fas fa-exclamation-circle"></i> App could not be deleted!', {
+					type: 'danger',
+					offset: {
+						x: 50,
+						y: 90
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				});
+			}
+		});
+		$('#client-delete-confirmation').modal("hide");
+		event.preventDefault();
+	});
 });
 
 </script>
@@ -49,38 +76,29 @@ $('.table .delBtn').on('click',function(event){
 <th>Description</th>
 <th/>
 </tr>
-<c:set var="count" value="0" />
 <c:forEach items="${clientList}" var="client">
-<c:set var="count" value='${count+1}' />
-<tr id="row${count}"> 
+<tr id="tr-${client.clientId}"> 
 <td>${client.clientId}</td>
 <td>${client.name}</td>
 <td>${client.description}</td>
-<td><input type="button" value="Delete" onclick="removeRow('<c:url value="/admin/apps/${client.clientId}?page=${currentPage - 1}&${_csrf.parameterName}=${_csrf.token}" />','${count}')"/></td>
-<%--
-<td><a href="<c:url value="/auth/authority/${authority.id}/edit" />"> class="btn-sm btn-danger delBtn">Delete</a></td> --%>
+<td><a class="delete-link" href="" data-client-id="${client.clientId}"><i class="fas fa-trash-alt"></i></a></td>
 </tr>
 </c:forEach>
 </table>
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Delete Confirmation</h5>
-                <button type="button" class="close" data-dismiss="modal"
-                    aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p class="alert alert-danger">Are you sure you want to delete
-                    it?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary"
-                    data-dismiss="modal">Close</button>
-                <a href="" class="btn btn-danger" id="delRef">Delete</a>
-            </div>
-        </div>
+<div class="modal fade" id="client-delete-confirmation" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Delete App</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete app with client Id <i><span id="confirm-client-entry-id"></span></i>?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
+        <button id="delete-client-button" data-client-id="" type="button" class="btn btn-primary">Yes, delete!</button>
+      </div>
     </div>
+  </div>
 </div>
