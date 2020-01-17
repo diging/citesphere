@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
+import edu.asu.diging.citesphere.model.IUser;
 
 public interface IUploadJobManager {
 

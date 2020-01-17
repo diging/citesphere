@@ -11,15 +11,16 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollectionResult;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.core.repository.bib.CitationCollectionRepository;
-import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.data.bib.CitationCollectionRepository;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 
 @Service
 @PropertySource("classpath:/config.properties")
@@ -49,7 +50,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
         
-        CitationGroup group = groupOptional.get();
+        ICitationGroup group = groupOptional.get();
         List<ICitationCollection> collections = collectionRepository.findByParentCollectionKeyAndGroup(parentCollectionId, group);
         
         
@@ -71,7 +72,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
-        CitationGroup group = groupOptional.get();
+        ICitationGroup group = groupOptional.get();
         
         CitationCollectionResult results = zoteroManager.getCitationCollections(user, groupId, parentCollectionId, 1, "title", group.getVersion());
         return results.getTotalResults();        

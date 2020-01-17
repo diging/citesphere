@@ -25,14 +25,11 @@ import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTooBigException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTypeNotSupportedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.export.ExportFinishedCallback;
 import edu.asu.diging.citesphere.core.export.ExportType;
 import edu.asu.diging.citesphere.core.export.IExportManager;
 import edu.asu.diging.citesphere.core.export.IExportProcessor;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.model.export.ExportStatus;
 import edu.asu.diging.citesphere.core.model.export.IExportTask;
 import edu.asu.diging.citesphere.core.model.export.impl.ExportTask;
@@ -40,6 +37,10 @@ import edu.asu.diging.citesphere.core.repository.export.ExportTaskRepository;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 
 @Service
 @Transactional
@@ -80,7 +81,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
      * @see edu.asu.diging.citesphere.core.export.impl.IExportManager#runExport(edu.asu.diging.citesphere.core.export.ExportType, edu.asu.diging.citesphere.core.model.IUser, java.lang.String)
      */
     @Override
-    public void export(ExportType exportType, IUser user, String groupId, String collectionId) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException {
+    public void export(ExportType exportType, IUser user, String groupId, String collectionId) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {

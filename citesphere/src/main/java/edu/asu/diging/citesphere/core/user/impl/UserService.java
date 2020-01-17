@@ -18,12 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.asu.diging.citesphere.core.exceptions.UserAlreadyExistsException;
+import edu.asu.diging.citesphere.core.exceptions.UserDoesNotExistException;
 import edu.asu.diging.citesphere.core.factory.IUserFactory;
-import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.Role;
-import edu.asu.diging.citesphere.core.model.impl.User;
 import edu.asu.diging.citesphere.core.repository.UserRepository;
 import edu.asu.diging.citesphere.core.user.IUserManager;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.impl.User;
 
 
 @Transactional
@@ -150,5 +151,25 @@ public class UserService implements UserDetailsService, IUserManager {
             user.getRoles().remove(roleToBeRemoved);
             userRepository.save((User)user);
         }
+    }
+    
+    @Override
+    public void changePassword(IUser user, String password) throws UserDoesNotExistException {
+        Optional<User> existingUser = userRepository.findById(user.getUsername());
+        if (!existingUser.isPresent()) {
+            throw new UserDoesNotExistException("User " + user.getUsername() + " does not exist.");
+        }
+        user = existingUser.get();
+        user.setPassword(bCryptPasswordEncoder.encode(password));
+        userRepository.save((User)user);
+    }
+    
+    @Override
+    public IUser findByEmail(String email) {
+        List<User> users = userRepository.findByEmail(email);
+        if (users != null && users.size() > 0) {
+            return users.get(0);
+        }
+        return null;
     }
 }

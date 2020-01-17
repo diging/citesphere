@@ -3,8 +3,9 @@ package edu.asu.diging.citesphere.core.user;
 import java.util.List;
 
 import edu.asu.diging.citesphere.core.exceptions.UserAlreadyExistsException;
-import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.core.exceptions.UserDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.Role;
+import edu.asu.diging.citesphere.model.IUser;
 
 public interface IUserManager {
 
@@ -27,5 +28,9 @@ public interface IUserManager {
     void removeRole(String username, String initiator, String role);
 
     void disableUser(String username, String initiator);
+
+    IUser findByEmail(String email);
+
+    void changePassword(IUser user, String password) throws UserDoesNotExistException;
 
 }

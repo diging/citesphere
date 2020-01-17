@@ -64,10 +64,6 @@
           		<a href="<c:url value="/" />" >Home</a>
           	</li>
           	
-          	<li role="presentation">
-                <a href="<c:url value="/auth/exports" />" >Exports</a>
-            </li>
-          	
           	<sec:authorize access="hasRole('ADMIN')">
           	<li role="presentation">
           		<a href="<c:url value="/admin/user/list" />" >Users</a>
@@ -87,8 +83,10 @@
 		    </li>
           	</sec:authorize>
           	
-          	<sec:authorize access="isAuthenticated()">
-          	
+          	<sec:authorize access="hasAnyRole('USER', 'ADMIN')">
+          	<li role="presentation">
+                <a href="<c:url value="/auth/exports" />" >Exports</a>
+            </li>
           	<li role="presentation" class="dropdown">
 			    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
 			      Citation Concepts <span class="caret"></span>
@@ -119,6 +117,8 @@
           	<li role="presentation">
           		<a href="<c:url value="/auth/authority/list" />" >Managed Authority Entries</a>
           	</li>
+          	</sec:authorize>
+          	<sec:authorize access="isAuthenticated()">
           	<li role="presentation">
          	 	<form action="<c:url value="/logout" />" method="POST">
          	 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -163,7 +163,8 @@
   			<input placeholder="Username" class="form-control input-sm" type="text" id="username" name="username"/>        
 		    <input placeholder="Password" class="form-control input-sm" type="password" id="password" name="password"/>    
 		    <button type="submit" class="btn btn-default btn-sm">Log in</button>
-		    <a href="<c:url value="/register" />" class="btn btn-primary btn-sm">Sign Up</a>
+		    <a href="<c:url value="/register" />" class="btn btn-primary btn-sm">Sign Up</a><br>
+		    <a href="<c:url value="/login/reset" />"><small>Forgot Password?</small></a>
 		</form>
 		
 		

@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -18,17 +17,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
-import edu.asu.diging.citesphere.core.model.bib.impl.Citation;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollection;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ItemType;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller
@@ -68,7 +67,7 @@ public class AddItemController {
     }
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create", method = RequestMethod.POST)
-    public String create(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId) throws ZoteroConnectionException, GroupDoesNotExistException {
+    public String create(@ModelAttribute CitationForm form, Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId) throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
         ICitation citation = new Citation();
         List<String> collectionIds = new ArrayList<>();
         if (form.getCollectionId() != null && !form.getCollectionId().trim().isEmpty()) {

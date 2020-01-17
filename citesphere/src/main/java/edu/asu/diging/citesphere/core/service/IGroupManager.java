@@ -1,7 +1,7 @@
 package edu.asu.diging.citesphere.core.service;
 
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 
 public interface IGroupManager {
 

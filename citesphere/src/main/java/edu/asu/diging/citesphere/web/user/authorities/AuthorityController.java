@@ -6,8 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 
 @Controller
 public class AuthorityController {

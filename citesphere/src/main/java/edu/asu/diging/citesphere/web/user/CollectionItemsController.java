@@ -11,10 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 
 @Controller
 public class CollectionItemsController {
@@ -33,7 +34,7 @@ public class CollectionItemsController {
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort)
-            throws GroupDoesNotExistException {
+            throws GroupDoesNotExistException, ZoteroHttpStatusException {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
