@@ -31,7 +31,7 @@ public class ShowOAuthClientsController {
     @RequestMapping(value="/admin/apps/{clientId}", method=RequestMethod.GET)
     public String showAppDetails(Model model, @PathVariable("clientId") String clientId) {
         OAuthClient details = (OAuthClient)clientManager.loadClientByClientId(clientId);
-        model.addAttribute("name", details.getName());
+        model.addAttribute("clientName", details.getName());
         model.addAttribute("clientId", clientId);
         model.addAttribute("description", details.getDescription());
         return "admin/apps/details";

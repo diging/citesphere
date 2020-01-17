@@ -4,8 +4,6 @@
 
 <h2>Add App</h2>
 
-${clientId}: ${secret}
-
 <c:url value="/admin/apps/add" var="postUrl" />
 <form:form action="${postUrl}" method="POST" modelAttribute="appForm">
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />

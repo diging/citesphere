@@ -29,7 +29,7 @@ public class AddOAuthClientController {
         OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ));
         model.addAttribute("clientId", creds.getClientId());
         model.addAttribute("secret", creds.getSecret());
-        model.addAttribute("name", appForm.getName());
+        model.addAttribute("clientName", appForm.getName());
         model.addAttribute("description", appForm.getDescription());
         return "admin/apps/details";
     }

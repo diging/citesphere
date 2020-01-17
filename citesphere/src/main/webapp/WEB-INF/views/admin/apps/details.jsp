@@ -8,7 +8,8 @@
 	<a href="<c:url value="/admin/apps" />" class="btn btn-primary">Show All Apps</a>
 </div>
 <br/>
-<h2>${name} Details</h2>
+<h2>${clientName}</h2>
+<br/>
 <table class="table table-striped">
 <tr>
 	<td>Client Id</td>
@@ -16,11 +17,17 @@
 </tr>
 <tr>
 	<td>Client Secret</td>
-	<td>${secret}</td>
+	<c:if test="${not empty secret}">
+		<td>${secret}</td>
+	</c:if>
+	<c:if test="${empty secret}">
+		<td><I>*Secret Key is hidden*</I></td>
+	</c:if>
+	
 </tr>
 <tr>
 	<td>Name</td>
-	<td>${name}</td>
+	<td>${clientName}</td>
 </tr>
 <tr>
 	<td>Description</td>
