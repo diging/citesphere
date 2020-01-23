@@ -20,6 +20,8 @@ public class OAuthClientDetailsController {
         model.addAttribute("clientName", details.getName());
         model.addAttribute("clientId", clientId);
         model.addAttribute("description", details.getDescription());
+        model.addAttribute("redirectUrl", String.join(", ", details.getRegisteredRedirectUri()));
+        model.addAttribute("applicationType", details.getAuthorizedGrantTypes().contains("authorization_code")?"authorization_code":"client_credentials");
         return "admin/apps/details";
     }
 }

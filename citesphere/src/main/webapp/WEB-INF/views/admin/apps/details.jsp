@@ -33,4 +33,12 @@
 	<td>Description</td>
 	<td>${description}</td>
 </tr>
+<tr>
+	<td>Redirect URL</td>
+	<td>${redirectUrl}</td>
+</tr>
+<tr>
+	<td>Application Type</td>
+	<td>${applicationType}</td>
+</tr>
 </table>

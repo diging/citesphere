@@ -61,6 +61,8 @@ public class AddOAuthClientController {
         model.addAttribute("secret", creds.getSecret());
         model.addAttribute("clientName", appForm.getName());
         model.addAttribute("description", appForm.getDescription());
+        model.addAttribute("redirectUrl", appForm.getRedirectUrl());
+        model.addAttribute("applicationType", appForm.getGrantType());
         return "admin/apps/details";
     }
 }
