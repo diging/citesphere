@@ -34,8 +34,8 @@ $(function() {
 </tr>
 <c:forEach items="${clientList}" var="client">
 <tr> 
-	<td class="client-entry" data-id="${client.clientId}"> ${client.clientId} </td>
-	<td class="client-entry" data-id="${client.clientId}"> ${client.name} </td>
+	<td class="client-entry" data-id="${client.clientId}"> <a href=#>${client.clientId} </a></td>
+	<td class="client-entry" data-id="${client.clientId}"> <a href=#>${client.name} </a></td>
 	<td class="client-entry" data-id="${client.clientId}"> ${client.description} </td>
 </tr>
 </c:forEach>
