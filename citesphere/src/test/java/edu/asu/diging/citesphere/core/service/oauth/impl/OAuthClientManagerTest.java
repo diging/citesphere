@@ -31,7 +31,6 @@ public class OAuthClientManagerTest {
     @Test
     public void test_deleteClient() {
         String clientId = "clientId";
-        Mockito.doNothing().when(clientRepo).deleteById(clientId);
         managerToTest.deleteClient(clientId);
         Mockito.verify(clientRepo).deleteById(clientId);
     }
