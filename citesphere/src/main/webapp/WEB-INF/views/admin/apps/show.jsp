@@ -17,6 +17,11 @@ $(function() {
             window.location.href = "<c:url value="/admin/apps" />?page=" + (page-1);
         }
     });
+    
+    $(".client-entry").click(function() {
+		var id = $(this).data("id");
+		window.location.href = "<c:url value="/admin/apps/" />" + id;
+	});
 });
 
 $(function() {
@@ -72,17 +77,18 @@ $(function() {
 <div class="pull-right" style="margin-top: 20px;"><a href="<c:url value="/admin/apps/add" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Add App</a></div>
 <table class="table table-striped" id="table">
 <tr>
-<th>Client Id</th>
-<th>Name</th>
-<th>Description</th>
-<th/>
+	<th>Client Id</th>
+	<th>Name</th>
+	<th>Description</th>
+	<th/>
+
 </tr>
 <c:forEach items="${clientList}" var="client">
 <tr id="tr-${client.clientId}"> 
-<td>${client.clientId}</td>
-<td>${client.name}</td>
-<td>${client.description}</td>
-<td><a class="delete-link" href="" data-client-id="${client.clientId}"><i class="fas fa-trash-alt"></i></a></td>
+	<td class="client-entry" data-id="${client.clientId}"> <a href=#>${client.clientId} </a></td>
+	<td class="client-entry" data-id="${client.clientId}"> <a href=#>${client.name} </a></td>
+	<td class="client-entry" data-id="${client.clientId}"> ${client.description} </td>
+	<td><a class="delete-link" href="" data-client-id="${client.clientId}"><i class="fas fa-trash-alt"></i></a></td>
 </tr>
 </c:forEach>
 </table>

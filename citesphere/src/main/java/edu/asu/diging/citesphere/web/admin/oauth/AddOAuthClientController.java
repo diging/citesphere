@@ -16,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import edu.asu.diging.citesphere.core.service.oauth.GrantTypes;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
@@ -58,8 +57,12 @@ public class AddOAuthClientController {
             grantTypes.add(GrantTypes.REFRESH_TOKEN);
         }
         OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ), grantTypes, appForm.getRedirectUrl());
-        redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
-        redirectAttrs.addFlashAttribute("secret", creds.getSecret());
-        return "redirect:/admin/apps/add";
+        model.addAttribute("clientId", creds.getClientId());
+        model.addAttribute("secret", creds.getSecret());
+        model.addAttribute("clientName", appForm.getName());
+        model.addAttribute("description", appForm.getDescription());
+        model.addAttribute("redirectUrl", appForm.getRedirectUrl());
+        model.addAttribute("applicationType", appForm.getGrantType());
+        return "admin/apps/details";
     }
 }
