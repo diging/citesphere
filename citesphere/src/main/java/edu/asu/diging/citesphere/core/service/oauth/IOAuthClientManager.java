@@ -15,4 +15,6 @@ public interface IOAuthClientManager {
 
     OAuthClientResultPage getAllClientDetails(Pageable pageable);
 
+    void deleteClient(String clientId);
+
 }
