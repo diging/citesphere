@@ -7,6 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
+import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
+
 public interface IOAuthClientManager {
 
     ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException;
@@ -16,5 +19,7 @@ public interface IOAuthClientManager {
     OAuthClientResultPage getAllClientDetails(Pageable pageable);
 
     void deleteClient(String clientId);
+
+    OAuthClient updateClientSecret(String clientId) throws CannotFindClientException;
 
 }
