@@ -178,6 +178,10 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
         runningTasks.put(task.getId(), task);
 
         ExportJob job = new ExportJob();
+        job.setCreatedOn(OffsetDateTime.now());
+        job.setStatus(JobStatus.PREPARED);
+        job.setTaskId(task.getId());
+        job.setUsername(user.getUsername());
         job = jobRepository.save(job);
         
         String token = tokenService.generateJobApiToken(job);
