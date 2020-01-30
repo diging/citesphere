@@ -8,7 +8,7 @@ import edu.asu.diging.citesphere.core.exceptions.ExportTypeNotSupportedException
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.model.export.IExportTask;
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface IExportManager {
 

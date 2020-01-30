@@ -21,7 +21,7 @@ import edu.asu.diging.citesphere.core.exceptions.UserAlreadyExistsException;
 import edu.asu.diging.citesphere.core.factory.IUserFactory;
 import edu.asu.diging.citesphere.core.model.Role;
 import edu.asu.diging.citesphere.core.user.IUserManager;
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.UserForm;
 
 @Controller
