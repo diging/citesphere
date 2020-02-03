@@ -5,8 +5,8 @@
 <div class="pull-right" style="margin-top: 20px;">
 	<a href="<c:url value="/admin/apps/add" />" class="btn btn-primary"><i
 		class="fas fa-plus-circle"></i> Add App</a> &nbsp;&nbsp; 
-	<a href="<c:url value="/admin/apps" />" class="btn btn-primary">Show All Apps</a>
-	<form method="POST" action="<c:url value="/admin/apps/updateSecret/${clientId}" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">Regenerate Secret</button></form>
+	<a href="<c:url value="/admin/apps" />" class="btn btn-primary">Show All Apps</a> &nbsp;&nbsp; 
+	<form method="POST" action="<c:url value="/admin/apps/updateSecret/${clientId}" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-primary" type="submit">Regenerate Secret</button></form>
 </div>
 <br/>
 <h2>${clientName}</h2>
