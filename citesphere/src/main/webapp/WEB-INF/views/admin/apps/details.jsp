@@ -3,11 +3,16 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <div class="pull-right" style="margin-top: 20px;">
-	<a href="<c:url value="/admin/apps/add" />" class="btn btn-primary"><i
-		class="fas fa-plus-circle"></i> Add App</a> &nbsp;&nbsp; 
-	<a href="<c:url value="/admin/apps" />" class="btn btn-primary">Show All Apps</a> &nbsp;&nbsp; 
-	<form method="POST" action="<c:url value="/admin/apps/updateSecret/${clientId}" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-primary" type="submit">Regenerate Secret</button></form>
+	<table>
+		<tr>
+			<td><a href="<c:url value="/admin/apps/add" />" class="btn btn-primary"><i
+				class="fas fa-plus-circle"></i> Add App</a>&nbsp;</td>
+			<td><a href="<c:url value="/admin/apps" />" class="btn btn-primary">Show All Apps</a>&nbsp;</td>
+			<td><form method="POST" action="<c:url value="/admin/apps/updateSecret/${clientId}" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-primary" type="submit">Regenerate Secret</button></form></td>
+		</tr>
+	</table>
 </div>
+
 <br/>
 <h2>${clientName}</h2>
 <br/>

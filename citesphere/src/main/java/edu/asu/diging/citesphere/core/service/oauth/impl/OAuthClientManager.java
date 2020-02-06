@@ -96,15 +96,14 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
     }
     
     @Override
-    public OAuthClient updateClientSecret(String clientId) throws CannotFindClientException {
+    public OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException {
         Optional<OAuthClient> clientOptional = clientRepo.findById(clientId);
         if (clientOptional.isPresent()) {
             OAuthClient client = clientOptional.get();
             String clientSecret = UUID.randomUUID().toString();
             client.setClientSecret(bCryptPasswordEncoder.encode(clientSecret));
-            OAuthClient updatedClient = clientRepo.save(client);
-            updatedClient.setClientSecret(clientSecret);
-            return updatedClient;
+            OAuthClient storeClient = clientRepo.save(client);
+            return new OAuthCredentials(storeClient.getClientId(), clientSecret);
         }
         throw new CannotFindClientException("Client with id " + clientId + " does not exist.");
     }

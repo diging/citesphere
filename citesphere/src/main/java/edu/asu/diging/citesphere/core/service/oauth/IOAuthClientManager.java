@@ -20,6 +20,6 @@ public interface IOAuthClientManager {
 
     void deleteClient(String clientId);
 
-    OAuthClient updateClientSecret(String clientId) throws CannotFindClientException;
+    OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException;
 
 }
