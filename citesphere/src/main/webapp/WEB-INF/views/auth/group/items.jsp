@@ -29,6 +29,12 @@ $(function() {
 	
 	$('.collapse').collapse();
 	
+	$("#toggleCollection").click(function(){
+	    $("#collectionsList").toggle(); 
+	    toggleButtonText = $("#toggleCollection").text()
+	    $("#toggleCollection").text(toggleButtonText=="Show Collections" ? "Hide Collections" : "Show Collections");
+	  })
+	  
 	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
 	
 	$("#addionalColumns a").click(function(event) {
@@ -164,9 +170,15 @@ $(function() {
 		class="fas fa-sync" title="Sync Page"></i></small></a>
     </c:otherwise>
 </c:choose>
+
+<button type="button" class="btn btn-primary" id="toggleCollection">
+    	Hide Collection
+</button>
+
+
 </p>
-<ul class="list-group">
-<c:forEach items="${citationCollections}" var="collection">
+<ul class="list-group" id="collectionsList">
+<c:forEach items="${citationCollections}" var="collection" >
   <li class="list-group-item">
 	  <span class="badge">${collection.numberOfItems}</span>
 	  <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collection.key}/items" />">${collection.name}</a>
