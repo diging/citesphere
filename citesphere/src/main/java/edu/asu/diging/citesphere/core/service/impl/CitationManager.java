@@ -142,6 +142,10 @@ public class CitationManager implements ICitationManager {
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         // save updated info
         citationRepository.delete((Citation)citation);
+        
+        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
+        updatedCitation.setGroup(groupOptional.get());
+        
         citationRepository.save((Citation)updatedCitation);
     }
     
