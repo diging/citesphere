@@ -32,7 +32,9 @@ $(function() {
 	$("#toggleCollection").click(function(){
 	    $("#collectionsList").toggle(); 
 	    toggleButtonText = $("#toggleCollection").text()
+	    
 	    $("#toggleCollection").text(toggleButtonText=="Show" ? "Hide" : "Show");
+	    $("#citationBlock").attr('class', toggleButtonText=="Show" ? 'col-md-10' : 'col-md-12')
 	  })
 	  
 	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
@@ -162,9 +164,17 @@ $(function() {
     </c:if>
   </ul>
 </div>
+
+<div style="margin-top:20px">
+
+<button type="button" class="btn btn-primary" id="toggleCollection" style="display:inline; padding:4px;margin:3px">Hide</button>
+
+<p class="lead" style="display:inline">Collections</p>
 </div>
 
-<div class="col-md-2">
+</div>
+
+<div class="col-md-2" style="margin-top:42px;">
 <c:set var = "columnString" value = ""/>
 <c:forEach items="${columns}" var="column" varStatus="loop">
    <c:set var = "columnString" value = "${columnString}${column}"/>
@@ -172,17 +182,6 @@ $(function() {
    		<c:set var = "columnString" value = "${columnString},"/>
    </c:if>
 </c:forEach>
-
-<button type="button" class="btn btn-primary" id="toggleCollection" style="display:inline; padding:4px;margin:3px">
-    	Hide
-</button>
-
-<p class="lead" style="display:inline">Collections</p>
-
-
-
-
-
 
 <ul class="list-group" id="collectionsList">
 <c:forEach items="${citationCollections}" var="collection" >
@@ -194,7 +193,7 @@ $(function() {
 </ul>
 
 </div>
-<div class="col-md-10">
+<div class="col-md-10" id="citationBlock">
 <div class="dropdown pull-right" style="padding-bottom: 10px;">
   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
     Columns
