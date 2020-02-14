@@ -6,20 +6,26 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.IConceptType;
-import edu.asu.diging.citesphere.core.model.bib.impl.ConceptType;
-import edu.asu.diging.citesphere.core.repository.bib.ConceptTypeRepository;
+import edu.asu.diging.citesphere.core.repository.CustomConceptTypeRepository;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
+import edu.asu.diging.citesphere.data.bib.ConceptTypeRepository;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.IConceptType;
+import edu.asu.diging.citesphere.model.bib.impl.ConceptType;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 
 @Service
 public class ConceptTypeManager implements IConceptTypeManager {
 
+	
     @Autowired
-    private ConceptTypeRepository typeRepository;
+    private CustomConceptTypeRepository typeRepository;
+    
+    @Autowired
+    private ConceptTypeRepository conceptTypeRepo;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.impl.IConceptTypeManager#create(edu.asu.diging.citesphere.web.forms.ConceptTypeForm, edu.asu.diging.citesphere.core.model.IUser)
@@ -49,7 +55,7 @@ public class ConceptTypeManager implements IConceptTypeManager {
     
     @Override
     public IConceptType get(String id) {
-        Optional<ConceptType> type = typeRepository.findById(id);
+        Optional<ConceptType> type = conceptTypeRepo.findById(id);
         if (!type.isPresent()) {
             return null;
         }

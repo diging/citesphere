@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import edu.asu.diging.citesphere.core.model.IUser;
+
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
+import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 import edu.asu.diging.citesphere.web.validation.CitationConceptValidator;
 

@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.export.ExportType;
 import edu.asu.diging.citesphere.core.export.proc.Processor;
-import edu.asu.diging.citesphere.core.model.bib.IAffiliation;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
-import edu.asu.diging.citesphere.core.model.bib.ICreator;
-import edu.asu.diging.citesphere.core.model.bib.IPerson;
+import edu.asu.diging.citesphere.model.bib.IAffiliation;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationConceptTag;
+import edu.asu.diging.citesphere.model.bib.ICreator;
+import edu.asu.diging.citesphere.model.bib.IPerson;
 
 @Component
 public class CsvProcessor implements Processor {

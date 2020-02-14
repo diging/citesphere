@@ -20,21 +20,22 @@ import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.factory.ICitationCollectionFactory;
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.IGroupFactory;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
-import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollectionResult;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.ItemType;
+import edu.asu.diging.citesphere.model.bib.impl.BibField;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 
 @Service
 public class ZoteroManager implements IZoteroManager {
@@ -56,7 +57,7 @@ public class ZoteroManager implements IZoteroManager {
     @Autowired
     private ICitationCollectionFactory collectionFactory;
 
-    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
+    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page, sortBy, lastGroupVersion);
         return createCitationResults(response);
     }
@@ -86,7 +87,7 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public ICitation getGroupItem(IUser user, String groupId, String itemKey) {
+    public ICitation getGroupItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
         Item item = zoteroConnector.getItem(user, groupId, itemKey);
         return citationFactory.createCitation(item);
     }
@@ -134,7 +135,7 @@ public class ZoteroManager implements IZoteroManager {
 
     @Override
     public CitationResults getCollectionItems(IUser user, String groupId, String collectionId, int page, String sortBy,
-            Long lastGroupVersion) {
+            Long lastGroupVersion) throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getCollectionItems(user, groupId, collectionId, page, sortBy,
                 lastGroupVersion);
         return createCitationResults(response);
@@ -168,7 +169,7 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException {
+    public ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException {
         Item item = itemFactory.createItem(citation, new ArrayList<>());
 
         List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
@@ -189,7 +190,7 @@ public class ZoteroManager implements IZoteroManager {
 
     @Override
     public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
-            throws ZoteroConnectionException, ZoteroItemCreationFailedException {
+            throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
         Item item = itemFactory.createItem(citation, collectionIds);
 
         List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());

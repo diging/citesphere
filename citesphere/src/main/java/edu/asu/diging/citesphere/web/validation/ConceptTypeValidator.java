@@ -6,8 +6,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import edu.asu.diging.citesphere.core.model.IUser;
+
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
+import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 
 @Component

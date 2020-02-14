@@ -3,9 +3,9 @@ package edu.asu.diging.citesphere.core.factory.impl;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.factory.IZoteroTokenFactory;
-import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.model.impl.ZoteroToken;
+import edu.asu.diging.citesphere.model.IUser;
 
 @Component
 public class ZoteroTokenFactory implements IZoteroTokenFactory {
