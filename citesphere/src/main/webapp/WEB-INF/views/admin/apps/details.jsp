@@ -17,7 +17,7 @@ $(function() {
 			'type': "POST",
 			'success': function(response){
 				 $('#secretKey').text(response.secret);
-				 $.notify('<i class="fas fa-check-circle"></i> New secret key successfully generated!', {
+				 $.notify('<i class="fas fa-check-circle"></i> New secret successfully generated!', {
 						type: 'success',
 						offset: {
 							x: 50,
@@ -30,7 +30,7 @@ $(function() {
 				});
 			},
 			'error': function(data) {
-				$.notify('<i class="fas fa-exclamation-circle"></i> Error occurred. Unable to generate new secret key!', {
+				$.notify('<i class="fas fa-exclamation-circle"></i> An error occurred. A new secret could not be generated.', {
 					type: 'danger',
 					offset: {
 						x: 50,
@@ -101,7 +101,7 @@ $(function() {
         <h4 class="modal-title">Regenerate Client Secret</h4>
       </div>
       <div class="modal-body">
-        <p>Once a new secret has been generated, applications using this client id and secret won't be able to connect anymore. Are you sure you want to regenerate secret?</p>
+        <p>Once a new secret has been generated, applications using the old secret won't be able to connect anymore. Are you sure you want to regenerate secret?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
