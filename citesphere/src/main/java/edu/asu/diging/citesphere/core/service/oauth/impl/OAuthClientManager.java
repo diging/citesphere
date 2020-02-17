@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.model.oauth.IOAuthClient;
 import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
@@ -94,4 +95,16 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         }
     }
     
+    @Override
+    public OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException {
+        Optional<OAuthClient> clientOptional = clientRepo.findById(clientId);
+        if (clientOptional.isPresent()) {
+            OAuthClient client = clientOptional.get();
+            String clientSecret = UUID.randomUUID().toString();
+            client.setClientSecret(bCryptPasswordEncoder.encode(clientSecret));
+            OAuthClient storeClient = clientRepo.save(client);
+            return new OAuthCredentials(storeClient.getClientId(), clientSecret);
+        }
+        throw new CannotFindClientException("Client with id " + clientId + " does not exist.");
+    }
 }
