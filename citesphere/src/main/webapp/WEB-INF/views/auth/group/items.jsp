@@ -29,9 +29,17 @@ $(function() {
 	
 	$('.collapse').collapse();
 	
+	if(sessionStorage.getItem("collectionsHidden") == "true"){
+		$("#collectionsList").hide()
+	    $("#toggleCollection").attr('class', "fa fa-chevron-circle-right")
+	    $("#toggleCollection").attr('title', "Show Collections")	    
+	    $("#citationBlock").attr('class', 'col-md-12')
+	}
+	
 	$("#toggleCollection").click(function(){
 	    $("#collectionsList").toggle(); 
 	    collectionsHidden = $("#toggleCollection").hasClass("fa-chevron-circle-left")
+	    sessionStorage.setItem("collectionsHidden",collectionsHidden)
 	        
 	    $("#toggleCollection").attr('class', collectionsHidden ? "fa fa-chevron-circle-right" : "fa fa-chevron-circle-left")
 	    $("#toggleCollection").attr('title', collectionsHidden ? "Show Collections":"Hide Collections")
