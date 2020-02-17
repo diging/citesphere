@@ -31,10 +31,12 @@ $(function() {
 	
 	$("#toggleCollection").click(function(){
 	    $("#collectionsList").toggle(); 
-	    toggleButtonText = $("#toggleCollection").text()
+	    collectionsHidden = $("#toggleCollection").hasClass("fa-chevron-circle-left")
+	        
+	    $("#toggleCollection").attr('class', collectionsHidden ? "fa fa-chevron-circle-right" : "fa fa-chevron-circle-left")
+	    $("#toggleCollection").attr('title', collectionsHidden ? "Show Collections":"Hide Collections")
 	    
-	    $("#toggleCollection").text(toggleButtonText=="Show" ? "Hide" : "Show");
-	    $("#citationBlock").attr('class', toggleButtonText=="Show" ? 'col-md-10' : 'col-md-12')
+	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
 	  })
 	  
 	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
@@ -165,16 +167,35 @@ $(function() {
   </ul>
 </div>
 
-<div style="margin-top:20px">
+<div>
 
-<button type="button" class="btn btn-primary" id="toggleCollection" style="display:inline; padding:4px;margin:3px">Hide</button>
+<p class="lead" style="display:inline;padding-left:10px">Collections</p>
 
-<p class="lead" style="display:inline">Collections</p>
+<big><i class="fa fa-chevron-circle-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
+
+<div class="dropdown pull-right" style="padding-bottom: 10px;">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Columns
+    <span class="caret"></span>
+  </button>
+  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+  <c:forEach items="${availableColumns}" var="column">
+    <li><a href="#" data-column-name="${column}" data-is-shown="${fn:contains(columns, column) }">
+    <spring:eval expression="@labelsResource.getProperty('_item_attribute_label_' + column)"  var="columnLabel" />
+	<c:if test="${fn:contains(columns, column) }">
+	<i class="fas fa-check"></i> 
+	</c:if>
+	${columnLabel}
+    </a></li>
+  </c:forEach>
+  </ul>
 </div>
 
 </div>
 
-<div class="col-md-2" style="margin-top:42px;">
+</div>
+
+<div class="col-md-2">
 <c:set var = "columnString" value = ""/>
 <c:forEach items="${columns}" var="column" varStatus="loop">
    <c:set var = "columnString" value = "${columnString}${column}"/>
@@ -194,23 +215,8 @@ $(function() {
 
 </div>
 <div class="col-md-10" id="citationBlock">
-<div class="dropdown pull-right" style="padding-bottom: 10px;">
-  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-    Columns
-    <span class="caret"></span>
-  </button>
-  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
-  <c:forEach items="${availableColumns}" var="column">
-    <li><a href="#" data-column-name="${column}" data-is-shown="${fn:contains(columns, column) }">
-    <spring:eval expression="@labelsResource.getProperty('_item_attribute_label_' + column)"  var="columnLabel" />
-	<c:if test="${fn:contains(columns, column) }">
-	<i class="fas fa-check"></i> 
-	</c:if>
-	${columnLabel}
-    </a></li>
-  </c:forEach>
-  </ul>
-</div>
+
+
 
 <table class="table table-striped table-bordered">
 <tr>
