@@ -19,7 +19,6 @@ public class UpdateOAuthClientController {
     
     @RequestMapping(value="/admin/apps/{clientId}/secret/update", method=RequestMethod.POST)
     public @ResponseBody OAuthCredentials regenerateClientSecret(Model model, @PathVariable("clientId") String clientId) throws CannotFindClientException {
-        OAuthCredentials creds = clientManager.updateClientSecret(clientId);
-        return creds;
+        return clientManager.updateClientSecret(clientId);
     }
 }

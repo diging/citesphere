@@ -1,11 +1,11 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<script src="<c:url value="/resources/notify/bootstrap-notify.min.js" />"></script>
 <script>
 
 $(function() {
 	$('#secret').click(function() {
-		console.log('hi');
 		$('#client-update-confirmation').modal("show");	
 		event.preventDefault();
 	});
@@ -17,6 +17,30 @@ $(function() {
 			'type': "POST",
 			'success': function(response){
 				 $('#secretKey').text(response.secret);
+				 $.notify('<i class="fas fa-check-circle"></i> New secret key successfully generated!', {
+						type: 'success',
+						offset: {
+							x: 50,
+							y: 90
+						},
+						animate: {
+							enter: 'animated fadeInRight',
+							exit: 'animated fadeOutRight'
+						}
+				});
+			},
+			'error': function(data) {
+				$.notify('<i class="fas fa-exclamation-circle"></i> Error occurred. Unable to generate new secret key!', {
+					type: 'danger',
+					offset: {
+						x: 50,
+						y: 90
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				});
 			}
 		});
 		$('#client-update-confirmation').modal("hide");
@@ -77,7 +101,7 @@ $(function() {
         <h4 class="modal-title">Regenerate Client Secret</h4>
       </div>
       <div class="modal-body">
-        <p>Once regenerated, Applications using this client id and secret won't be able to connect anymore. Are you sure you want to regenerate secret?</p>
+        <p>Once a new secret has been generated, applications using this client id and secret won't be able to connect anymore. Are you sure you want to regenerate secret?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
