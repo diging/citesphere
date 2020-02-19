@@ -29,6 +29,24 @@ $(function() {
 	
 	$('.collapse').collapse();
 	
+	if(sessionStorage.getItem("collectionsHidden") == "true"){
+		$("#collectionsList").hide()
+	    $("#toggleCollection").attr('class', "fa fa-chevron-circle-right")
+	    $("#toggleCollection").attr('title', "Show Collections")	    
+	    $("#citationBlock").attr('class', 'col-md-12')
+	}
+	
+	$("#toggleCollection").click(function(){
+	    $("#collectionsList").toggle(); 
+	    collectionsHidden = $("#toggleCollection").hasClass("fa-chevron-circle-left")
+	    sessionStorage.setItem("collectionsHidden",collectionsHidden)
+	        
+	    $("#toggleCollection").attr('class', collectionsHidden ? "fa fa-chevron-circle-right" : "fa fa-chevron-circle-left")
+	    $("#toggleCollection").attr('title', collectionsHidden ? "Show Collections":"Hide Collections")
+	    
+	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
+	  })
+	  
 	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
 	
 	$("#addionalColumns a").click(function(event) {
@@ -123,6 +141,19 @@ $(function() {
 <ul id="pagination-top" class="pagination-sm"></ul>
 
 
+<div class="pull-right" style="margin-top:25px;margin-left:12px;">
+<c:choose>
+    <c:when test="${collectionId!=null}">
+        <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><big><i
+		class="fas fa-sync" title="Sync Page"></i></big></a>
+    </c:when>    
+    <c:otherwise>
+        <a href="<c:url value="/auth/group/${zoteroGroupId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><big><i
+		class="fas fa-sync" title="Sync Page"></i></big></a>
+    </c:otherwise>
+</c:choose>
+</div>
+
 <div class="pull-right" style="margin-top: 20px;">
 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/create" />" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
 </div>
@@ -143,39 +174,13 @@ $(function() {
     </c:if>
   </ul>
 </div>
-</div>
 
-<div class="col-md-2">
-<c:set var = "columnString" value = ""/>
-<c:forEach items="${columns}" var="column" varStatus="loop">
-   <c:set var = "columnString" value = "${columnString}${column}"/>
-   <c:if test="${!loop.last}">
-   		<c:set var = "columnString" value = "${columnString},"/>
-   </c:if>
-</c:forEach>
-<p class="lead">Collections &nbsp;&nbsp;
-<c:choose>
-    <c:when test="${collectionId!=null}">
-        <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><small><i
-		class="fas fa-sync" title="Sync Page"></i></small></a>
-    </c:when>    
-    <c:otherwise>
-        <a href="<c:url value="/auth/group/${zoteroGroupId}/items/sync?page=${currentPage}&sort=${sort}&columns=${columnString}" />"><small><i
-		class="fas fa-sync" title="Sync Page"></i></small></a>
-    </c:otherwise>
-</c:choose>
-</p>
-<ul class="list-group">
-<c:forEach items="${citationCollections}" var="collection">
-  <li class="list-group-item">
-	  <span class="badge">${collection.numberOfItems}</span>
-	  <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collection.key}/items" />">${collection.name}</a>
-  </li>
-</c:forEach>
-</ul>
+<div>
 
-</div>
-<div class="col-md-10">
+<p class="lead" style="display:inline;padding-left:10px">Collections</p>
+
+<big><i class="fa fa-chevron-circle-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
+
 <div class="dropdown pull-right" style="padding-bottom: 10px;">
   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
     Columns
@@ -193,6 +198,33 @@ $(function() {
   </c:forEach>
   </ul>
 </div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
+<c:set var = "columnString" value = ""/>
+<c:forEach items="${columns}" var="column" varStatus="loop">
+   <c:set var = "columnString" value = "${columnString}${column}"/>
+   <c:if test="${!loop.last}">
+   		<c:set var = "columnString" value = "${columnString},"/>
+   </c:if>
+</c:forEach>
+
+<ul class="list-group" id="collectionsList">
+<c:forEach items="${citationCollections}" var="collection" >
+  <li class="list-group-item">
+	  <span class="badge">${collection.numberOfItems}</span>
+	  <a href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collection.key}/items" />">${collection.name}</a>
+  </li>
+</c:forEach>
+</ul>
+
+</div>
+<div class="col-md-10" id="citationBlock">
+
+
 
 <table class="table table-striped table-bordered">
 <tr>
