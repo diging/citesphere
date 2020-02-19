@@ -19,5 +19,7 @@ public interface ICitationConceptManager {
     ICitationConcept save(ICitationConcept concept);
 
     ICitationConcept getByUriAndOwner(String uri, IUser owner);
+    
+    ICitationConcept getByUri(String uri);
 
 }

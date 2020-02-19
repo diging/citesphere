@@ -18,4 +18,5 @@ public interface CustomCitationConceptRepository extends PagingAndSortingReposit
 
 
     Optional<CitationConcept> findFirstByUriAndOwner(String uri, IUser user);
+    Optional<CitationConcept> findByUri(String uri);
 }

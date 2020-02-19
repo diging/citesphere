@@ -13,7 +13,9 @@ import edu.asu.diging.citesphere.core.repository.CustomConceptTypeRepository;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.data.bib.ConceptTypeRepository;
 import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitationConcept;
 import edu.asu.diging.citesphere.model.bib.IConceptType;
+import edu.asu.diging.citesphere.model.bib.impl.CitationConcept;
 import edu.asu.diging.citesphere.model.bib.impl.ConceptType;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 
@@ -71,6 +73,15 @@ public class ConceptTypeManager implements IConceptTypeManager {
         }
         return type.get();
     }
+    @Override
+    public IConceptType getByUri(String uri) {
+        Optional<ConceptType> type = typeRepository.findByUri(uri);
+        if (type.isPresent()) {
+            return type.get();
+        }
+        return null;
+    }
+    
     
     @Override
     public IConceptType save(IConceptType type) {

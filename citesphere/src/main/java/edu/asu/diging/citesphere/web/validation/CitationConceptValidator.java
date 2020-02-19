@@ -9,6 +9,7 @@ import org.springframework.validation.Validator;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitationConcept;
+import edu.asu.diging.citesphere.model.bib.IConceptType;
 import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 
 @Component
@@ -26,22 +27,24 @@ public class CitationConceptValidator implements Validator {
     public void validate(Object target, Errors errors) {
         CitationConceptForm conceptForm = (CitationConceptForm) target;
         IUser user = (IUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!errors.hasErrors() && conceptForm.getUri() != null) {
-            ICitationConcept concept = conceptManager.getByUriAndOwner(conceptForm.getUri(), user);
-            if (conceptForm.getConceptId() != null && concept != null) {
-              //edit mode
-                if (conceptManager.get(conceptForm.getConceptId()) != null
-                        && conceptManager.get(conceptForm.getConceptId()).getOwner() != null
-                        && concept.getId().equals(conceptForm.getConceptId())) {
-                    errors.rejectValue("uri", "uri", "Only the owner can edit a Concept.");
-                } else if (!conceptManager.get(conceptForm.getConceptId()).getUri()
-                                .equals(conceptForm.getUri())) {
-                    errors.rejectValue("uri", "uri", "Concept with this uri already exists!");
-                }
-            } else if(concept != null) { 
-                // add mode
-                errors.rejectValue("uri", "uri", "Concept with this uri already exists!");
-            }
+        if (!errors.hasErrors()) {
+      	  if (conceptManager.getByUri(conceptForm.getUri()) != null) {
+			  errors.rejectValue("uri", "uri", "Concept with this uri already exists!");
+			  } else {
+				  
+				  if(conceptForm.getConceptId() != null) {
+					  ICitationConcept prevConcept = conceptManager.get(conceptForm.getConceptId());  
+
+					  ICitationConcept concept = conceptManager.getByUriAndOwner(prevConcept.getUri(), user);
+						
+						  if(concept == null) {
+							  errors.rejectValue("uri", "uri", "Only the owner can edit a Concept."); }
+				  }
+			
+				
+				  
+			  }
+            
         }
     }
 

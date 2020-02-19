@@ -54,6 +54,15 @@ public class CitationConceptManager implements ICitationConceptManager {
         return null;
     }
     
+    @Override
+    public ICitationConcept getByUri(String uri) {
+        Optional<CitationConcept> concept = customConceptRepo.findByUri(uri);
+        if (concept.isPresent()) {
+            return concept.get();
+        }
+        return null;
+    }
+    
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.impl.ICitationConceptManager#create(edu.asu.diging.citesphere.web.forms.CitationConceptForm, edu.asu.diging.citesphere.core.model.IUser)
      */
