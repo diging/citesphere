@@ -94,4 +94,12 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         }
     }
     
+    @Override
+    public List<OAuthClient> getClientDetails(List<String> clientList){
+        List<OAuthClient> clients = new ArrayList<>();
+        if(clientList != null && clientList.size()>0)
+            clients = clientRepo.findAllById(clientList);
+        return clients;
+    }
+    
 }
