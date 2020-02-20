@@ -19,6 +19,6 @@ public interface IOAuthClientManager {
 
     void deleteClient(String clientId);
 
-    List<OAuthClient> getClientDetails(List<String> clientList);
+    List<OAuthClient> getClientsDetails(List<String> clientList);
 
 }

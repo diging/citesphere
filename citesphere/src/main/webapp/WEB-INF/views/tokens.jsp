@@ -7,8 +7,6 @@
 $(function() {
 	$(".revoke-access").click(function(event) {
 		var id = $(this).data('client-id');
-		console.log('hello');
-		console.log(id);
 		$("#revoke-access-button").attr("data-client-id", id);
 		$("#confirm-client-entry-name").text($(this).data('client-name'));
 		$('#revoke-access-confirmation').modal("show");	
@@ -16,8 +14,6 @@ $(function() {
 	});
 	$("#revoke-access-button").click(function() {
 		var id = $(this).data("client-id");
-		console.log('hi');
-		console.log(id);
 		$.ajax({
 			'url': '<c:url value="/tokens/" />' + id + "?${_csrf.parameterName}=${_csrf.token}",
 			'type': "DELETE",

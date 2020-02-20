@@ -27,8 +27,7 @@ public class OAuthAppsTokenController {
         List<DbAccessToken> tokens = tokenStore.findTokensByUserName(authentication.getName());
         List<String> clientList = new ArrayList<>();
         tokens.forEach(t -> clientList.add(t.getClientId()));
-        model.addAttribute("clientList",clientManager.getClientDetails(clientList));
-        //tokenStore.revokeAccessToken(clientList.get(0));
+        model.addAttribute("clientList",clientManager.getClientsDetails(clientList));
         return "tokens";
     }    
 }
