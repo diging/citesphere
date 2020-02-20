@@ -32,7 +32,7 @@ public class CitationConceptValidator implements Validator {
 			if (concept == null) {
 				String conceptId = conceptForm.getConceptId();
 				if (conceptId != null
-						&& !conceptManager.get(conceptId).getOwner().getUsername().equals(user.getUsername())) {
+					&& !conceptManager.get(conceptId).getOwner().getUsername().equals(user.getUsername())) {
 					errors.rejectValue("uri", "uri", "Only the owner can edit a Concept.");
 				}
 			} else {

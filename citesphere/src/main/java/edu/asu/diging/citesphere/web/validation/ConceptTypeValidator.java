@@ -32,7 +32,7 @@ public class ConceptTypeValidator implements Validator {
 			if (conceptType == null) {
 				String conceptTypeId = conceptTypeForm.getConceptTypeId();
 				if (conceptTypeId != null
-						&& !conceptTypeManager.get(conceptTypeId).getOwner().getUsername().equals(user.getUsername())) {
+					&& !conceptTypeManager.get(conceptTypeId).getOwner().getUsername().equals(user.getUsername())) {
 					errors.rejectValue("uri", "uri", "Only the owner can edit a Concept Type.");
 				}
 			} else {
