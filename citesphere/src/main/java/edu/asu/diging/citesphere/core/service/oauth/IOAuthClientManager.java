@@ -6,8 +6,9 @@ import java.util.Set;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
-
 import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
+import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
+
 
 public interface IOAuthClientManager {
 
@@ -19,6 +20,7 @@ public interface IOAuthClientManager {
 
     void deleteClient(String clientId);
 
-    List<OAuthClient> getClientsDetails(List<String> clientList);
+    OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException;
 
+    List<OAuthClient> getClientsDetails(List<String> clientList);
 }
