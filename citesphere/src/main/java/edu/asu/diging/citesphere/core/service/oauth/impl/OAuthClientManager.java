@@ -94,7 +94,8 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
             clientRepo.deleteById(clientId);
         }
     }
-
+    
+    @Override
     public OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException {
         Optional<OAuthClient> clientOptional = clientRepo.findById(clientId);
         if (clientOptional.isPresent()) {
