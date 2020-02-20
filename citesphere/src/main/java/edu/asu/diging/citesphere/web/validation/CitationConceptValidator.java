@@ -31,8 +31,8 @@ public class CitationConceptValidator implements Validator {
 			ICitationConcept concept = conceptManager.getByUriAndOwner(conceptForm.getUri(), user);
 			if (concept == null) {
 				String conceptId = conceptForm.getConceptId();
-				if (conceptId != null
-					&& !conceptManager.get(conceptId).getOwner().getUsername().equals(user.getUsername())) {
+				if (conceptId != null && 
+						!conceptManager.get(conceptId).getOwner().getUsername().equals(user.getUsername())) {
 					errors.rejectValue("uri", "uri", "Only the owner can edit a Concept.");
 				}
 			} else {
