@@ -25,8 +25,12 @@ public interface IAuthorityService {
     IAuthorityEntry find(String id);
 
     List<IAuthorityEntry> findByUri(IUser user, String uri);
+    
+    List<IAuthorityEntry> findByName(IUser user, String name);
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
+    
+    Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId) throws GroupDoesNotExistException;
 
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
 }

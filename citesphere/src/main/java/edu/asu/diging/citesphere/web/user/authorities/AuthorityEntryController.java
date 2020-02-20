@@ -75,4 +75,35 @@ public class AuthorityEntryController {
         entry = authorityService.create(entry, (IUser)authentication.getPrincipal());
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
+    
+    @RequestMapping("/auth/authority/getAuthorityByName")
+    public ResponseEntity<FoundAuthorities> getAuthorityByName(Authentication authentication, @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("zoteroGroupId") String zoteroGroupId) {
+ 
+            List<IAuthorityEntry> userEntries = authorityService.findByName((IUser)authentication.getPrincipal(), "%"+firstName+"%"+lastName+"%");
+            FoundAuthorities foundAuthorities = new FoundAuthorities();
+            foundAuthorities.setUserAuthorityEntries(userEntries);
+            
+//            try {
+//                IAuthorityEntry entry = authorityService.importAuthority(uri);
+//                foundAuthorities.setImportedAuthority(entry);
+//            } catch (AuthorityServiceConnectionException e) {
+//                logger.warn("Could not retrieve authority entry.", e);
+//                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//            } catch (URISyntaxException e) {
+//                logger.info("Not a valid URI: " + uri, e);
+//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//            }
+            
+            
+            Set<IAuthorityEntry> datasetEntries;
+            try {
+                datasetEntries = authorityService.findByNameInDataset("%"+firstName+"%"+lastName+"%", zoteroGroupId);
+            } catch (GroupDoesNotExistException e) {
+                logger.warn("Group does not exist: " + zoteroGroupId, e);
+                return new ResponseEntity<FoundAuthorities>(HttpStatus.BAD_REQUEST);
+            }
+            foundAuthorities.setDatasetAuthorityEntries(datasetEntries);
+            return new ResponseEntity<FoundAuthorities>(foundAuthorities, HttpStatus.OK);
+    }
+    
 }

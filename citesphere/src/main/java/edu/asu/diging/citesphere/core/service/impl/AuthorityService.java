@@ -92,12 +92,37 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
+    public List<IAuthorityEntry> findByName(IUser user, String name) {
+        List<IAuthorityEntry> results = entryRepository.findByUsernameAndNameLikeOrderByName(user.getUsername(), name);
+
+        results.addAll(entryRepository.findByUsernameAndNameLikeOrderByName(user.getUsername(), name));
+        return results;
+    }
+    
+    @Override
     public Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException {
         Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
         List<Person> persons = personRepository.findPersonsByCitationGroupAndUri((ICitationGroup)group.get(), uri);
+        Set<IAuthorityEntry> entries = new HashSet<>();
+        persons.forEach(p -> {
+            Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
+            if (optional.isPresent()) {
+                entries.add(optional.get());
+            }
+        });
+        return entries;
+    }
+    
+    @Override
+    public Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId) throws GroupDoesNotExistException {
+        Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
+        if (!group.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
+        }
+        List<Person> persons = personRepository.findPersonsByCitationGroupAndUri((ICitationGroup)group.get(), name);
         Set<IAuthorityEntry> entries = new HashSet<>();
         persons.forEach(p -> {
             Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
