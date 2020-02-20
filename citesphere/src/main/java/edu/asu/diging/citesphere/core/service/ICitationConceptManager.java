@@ -20,6 +20,4 @@ public interface ICitationConceptManager {
 
     ICitationConcept getByUriAndOwner(String uri, IUser owner);
     
-    ICitationConcept getByUri(String uri);
-
 }

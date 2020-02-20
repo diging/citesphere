@@ -19,9 +19,7 @@ public interface IConceptTypeManager {
 
     IConceptType getByUriAndOwner(String conceptTypeUri, IUser owner);
 
-    IConceptType save(IConceptType type);
-    
-    IConceptType getByUri(String uri);
+    IConceptType save(IConceptType type); 
      
     
 

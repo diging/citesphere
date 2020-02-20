@@ -15,6 +15,5 @@ import edu.asu.diging.citesphere.model.bib.impl.ConceptType;
 public interface CustomConceptTypeRepository extends PagingAndSortingRepository<ConceptType, String> {
 
     Optional<ConceptType> findFirstByUriAndOwner(String uri, IUser owner);
-    Optional<ConceptType> findByUri(String uri);
 
 }

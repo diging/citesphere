@@ -43,15 +43,13 @@ public class AddConceptTypeController {
     }
     
     @RequestMapping(value="/auth/concepts/types/add", method=RequestMethod.POST)
-    public String post(@Validated ConceptTypeForm form, Model model, Principal principal) {
-        
-        if (form.getName() != null && !form.getName().trim().isEmpty()) {
-            conceptTypeManager.create(form, userManager.findByUsername(principal.getName()));
-        } else {
+    public String post(@Validated @ModelAttribute("conceptTypeForm") ConceptTypeForm form, BindingResult result, Model model, Principal principal) {
+    	if (result.hasErrors()) {
             model.addAttribute("conceptTypeForm", form);
             return "auth/concepts/types/add";
         }
-        
+        IUser user = userManager.findByUsername(principal.getName());
+        conceptTypeManager.create(form, user);      
         return "redirect:/auth/concepts/types/list";
     }
 }
