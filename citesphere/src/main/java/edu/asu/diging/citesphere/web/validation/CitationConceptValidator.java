@@ -15,29 +15,29 @@ import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 @Component
 public class CitationConceptValidator implements Validator {
 
-	@Autowired
-	private ICitationConceptManager conceptManager;
+    @Autowired
+    private ICitationConceptManager conceptManager;
 
-	@Override
-	public boolean supports(Class<?> paramClass) {
-		return CitationConceptForm.class.equals(paramClass);
-	}
+    @Override
+    public boolean supports(Class<?> paramClass) {
+        return CitationConceptForm.class.equals(paramClass);
+    }
 
-	@Override
-	public void validate(Object target, Errors errors) {
-		CitationConceptForm conceptForm = (CitationConceptForm) target;
-		IUser user = (IUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!errors.hasErrors()) {
-			ICitationConcept concept = conceptManager.getByUriAndOwner(conceptForm.getUri(), user);
-			if (concept == null) {
-				String conceptId = conceptForm.getConceptId();
-				if (conceptId != null && 
-						!conceptManager.get(conceptId).getOwner().getUsername().equals(user.getUsername())) {
-					errors.rejectValue("uri", "uri", "Only the owner can edit a Concept.");
-				}
-			} else {
-				errors.rejectValue("uri", "uri", "Concept with this uri already exists!");
-			}
-		}
-	}
+    @Override
+    public void validate(Object target, Errors errors) {
+        CitationConceptForm conceptForm = (CitationConceptForm) target;
+        IUser user = (IUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!errors.hasErrors()) {
+            ICitationConcept concept = conceptManager.getByUriAndOwner(conceptForm.getUri(), user);
+            if (concept == null) {
+                String conceptId = conceptForm.getConceptId();
+                if (conceptId != null
+                        && !conceptManager.get(conceptId).getOwner().getUsername().equals(user.getUsername())) {
+                    errors.rejectValue("uri", "uri", "Only the owner can edit a Concept.");
+                }
+            } else {
+                errors.rejectValue("uri", "uri", "Concept with this uri already exists!");
+            }
+        }
+    }
 }
