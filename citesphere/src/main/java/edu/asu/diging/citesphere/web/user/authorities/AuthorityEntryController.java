@@ -76,33 +76,37 @@ public class AuthorityEntryController {
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
     
-    @RequestMapping("/auth/authority/getAuthorityByName")
-    public ResponseEntity<FoundAuthorities> getAuthorityByName(Authentication authentication, @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("zoteroGroupId") String zoteroGroupId) {
+    @RequestMapping("/auth/authority/getAuthoritiesByName")
+    public ResponseEntity<FoundAuthorities> getAuthoritiesByName(Authentication authentication, @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("zoteroGroupId") String zoteroGroupId) {
  
-            List<IAuthorityEntry> userEntries = authorityService.findByName((IUser)authentication.getPrincipal(), "%"+firstName+"%"+lastName+"%");
+    		String databaseSearchString = "%"+lastName+"%"+firstName+"%";
+    		String conceptpowerSearchString = "word=%25"+firstName+"%25"+lastName;
+    		
+    	    List<IAuthorityEntry> userEntries = authorityService.findByName((IUser)authentication.getPrincipal(), databaseSearchString);
             FoundAuthorities foundAuthorities = new FoundAuthorities();
             foundAuthorities.setUserAuthorityEntries(userEntries);
-            
-//            try {
-//                IAuthorityEntry entry = authorityService.importAuthority(uri);
-//                foundAuthorities.setImportedAuthority(entry);
-//            } catch (AuthorityServiceConnectionException e) {
-//                logger.warn("Could not retrieve authority entry.", e);
-//                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//            } catch (URISyntaxException e) {
-//                logger.info("Not a valid URI: " + uri, e);
-//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//            }
             
             
             Set<IAuthorityEntry> datasetEntries;
             try {
-                datasetEntries = authorityService.findByNameInDataset("%"+firstName+"%"+lastName+"%", zoteroGroupId);
+                datasetEntries = authorityService.findByNameInDataset(databaseSearchString, zoteroGroupId);
             } catch (GroupDoesNotExistException e) {
                 logger.warn("Group does not exist: " + zoteroGroupId, e);
                 return new ResponseEntity<FoundAuthorities>(HttpStatus.BAD_REQUEST);
             }
             foundAuthorities.setDatasetAuthorityEntries(datasetEntries);
+            
+            try {
+                IAuthorityEntry entry = authorityService.importAuthority(conceptpowerSearchString);
+                foundAuthorities.setImportedAuthority(entry);
+            } catch (AuthorityServiceConnectionException e) {
+                logger.warn("Could not retrieve authority entry.", e);
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (URISyntaxException e) {
+                logger.info("Not a valid URI: " + firstName, e);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            
             return new ResponseEntity<FoundAuthorities>(foundAuthorities, HttpStatus.OK);
     }
     

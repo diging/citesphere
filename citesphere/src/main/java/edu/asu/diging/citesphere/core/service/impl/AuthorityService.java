@@ -14,6 +14,8 @@ import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.repository.custom.AuthorityRepository;
+import edu.asu.diging.citesphere.core.repository.custom.PersonAuthorityRepository;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
@@ -37,6 +39,12 @@ public class AuthorityService implements IAuthorityService {
     @Autowired
     private PersonRepository personRepository;
     
+    @Autowired
+    private AuthorityRepository authorityRepository;
+    
+    @Autowired
+    private PersonAuthorityRepository personAuthorityRepository;
+      
     @Autowired
     private Set<AuthorityImporter> importers;
     
@@ -93,9 +101,7 @@ public class AuthorityService implements IAuthorityService {
     
     @Override
     public List<IAuthorityEntry> findByName(IUser user, String name) {
-        List<IAuthorityEntry> results = entryRepository.findByUsernameAndNameLikeOrderByName(user.getUsername(), name);
-
-        results.addAll(entryRepository.findByUsernameAndNameLikeOrderByName(user.getUsername(), name));
+        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameLikeOrderByName(user.getUsername(), name);
         return results;
     }
     
@@ -122,7 +128,7 @@ public class AuthorityService implements IAuthorityService {
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
-        List<Person> persons = personRepository.findPersonsByCitationGroupAndUri((ICitationGroup)group.get(), name);
+        List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLike((ICitationGroup)group.get(), name);
         Set<IAuthorityEntry> entries = new HashSet<>();
         persons.forEach(p -> {
             Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
