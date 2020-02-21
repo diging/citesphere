@@ -66,7 +66,7 @@ $(function() {
 	<tr id="tr-${client.clientId}"> 
 		<td data-id="${client.name}">${client.name}</td>
 		<td data-id="${client.clientId}">${client.clientId}</td>
-		<td class="revoke-access" data-client-id="${client.clientId}" data-client-name = "${client.name}"><div class="pull-right"><a href="#" class="btn btn-primary">Revoke Access</a></div></td>
+		<td class="revoke-access" data-client-id="${client.clientId}" data-client-name = "${client.name}"><div class="pull-right"><a href="#" class="btn btn-primary" style="font-size:11px">Revoke Access</a></div></td>
 		
 	</tr>
 	</c:forEach>
