@@ -189,8 +189,9 @@ public class DbTokenStore implements TokenStore {
         return (List<DbAccessToken>)dbAccessTokenRepository.findByUsername(userName);
     }
     
-    public void revokeAccessToken(String clientId) {
-        if(clientId != null) 
-            dbAccessTokenRepository.deleteByClientId(clientId);
+    public void revokeAccessToken(String clientId, String username) {
+        if(clientId != null) {
+            dbAccessTokenRepository.deleteByClientIdAndUsername(clientId,username);
+        }
     }
 }

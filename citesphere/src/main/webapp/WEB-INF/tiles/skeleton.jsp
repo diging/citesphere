@@ -69,7 +69,7 @@
           		<a href="<c:url value="/admin/user/list" />" >Users</a>
           	</li>
           	<li role="presentation">
-          		<a href="<c:url value="/tokens" />" >Authorized OAuth Apps</a>
+          		<a href="<c:url value="/auth/tokens" />" >Authorized OAuth Apps</a>
           	</li>
           	<li role="presentation" class="dropdown">
           	<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">

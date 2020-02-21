@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.web;
+package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import edu.asu.diging.citesphere.core.model.oauth.impl.DbAccessToken;
 import edu.asu.diging.citesphere.core.service.impl.DbTokenStore;
-import edu.asu.diging.citesphere.core.service.oauth.impl.OAuthClientManager;
+import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 
 @Controller
 public class OAuthAppsTokenController {
@@ -20,9 +20,9 @@ public class OAuthAppsTokenController {
     private DbTokenStore tokenStore;
     
     @Autowired
-    OAuthClientManager clientManager;
+    private IOAuthClientManager clientManager;
 
-    @RequestMapping(value="/tokens", method=RequestMethod.GET)
+    @RequestMapping(value="/auth/tokens", method=RequestMethod.GET)
     public String getAllAccessTokensForUser(Authentication authentication, Model model) {
         List<DbAccessToken> tokens = tokenStore.findTokensByUserName(authentication.getName());
         List<String> clientList = new ArrayList<>();

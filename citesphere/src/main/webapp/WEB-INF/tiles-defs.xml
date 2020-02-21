@@ -48,7 +48,7 @@
     </definition>
     
     <definition name="tokens" extends="base.definition">
-        <put-attribute name="content" value="/WEB-INF/views/tokens.jsp" />    
+        <put-attribute name="content" value="/WEB-INF/views/auth/tokens.jsp" />    
     </definition>
 	
 	<!-- Users -->

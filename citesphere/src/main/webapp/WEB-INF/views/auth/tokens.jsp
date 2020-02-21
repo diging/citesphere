@@ -15,7 +15,7 @@ $(function() {
 	$("#revoke-access-button").click(function() {
 		var id = $(this).data("client-id");
 		$.ajax({
-			'url': '<c:url value="/tokens/" />' + id + "?${_csrf.parameterName}=${_csrf.token}",
+			'url': '<c:url value="/auth/tokens/" />' + id + "?${_csrf.parameterName}=${_csrf.token}",
 			'type': "DELETE",
 			'success': function(data) {
 				$("#tr-" + id).remove();
