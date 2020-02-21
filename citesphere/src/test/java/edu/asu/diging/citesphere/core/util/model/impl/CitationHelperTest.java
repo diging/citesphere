@@ -44,7 +44,6 @@ public class CitationHelperTest {
     @Mock
     private IConceptTypeManager typeManager;
 
-    ICitation citation;
     ICitation updatedCitation;
     CitationForm form;
     IUser user;
@@ -58,7 +57,6 @@ public class CitationHelperTest {
         MockitoAnnotations.initMocks(this);
         user = new User();
         user.setUsername("akhil");
-
         initForm();
         initUpdatedCitation();
 
@@ -72,32 +70,25 @@ public class CitationHelperTest {
         PersonForm author = new PersonForm();
         author.setFirstName("first");
         author.setLastName("last");
-
         List<AffiliationForm> affiliationForms = new ArrayList<AffiliationForm>();
         AffiliationForm affiliationForm = new AffiliationForm();
         affiliationForm.setName("Test");
         affiliationForms.add(affiliationForm);
         author.setAffiliations(affiliationForms);
-
         authors.add(author);
-
         PersonForm author2 = new PersonForm();
         author2.setFirstName("first2");
         author2.setLastName("last2");
         authors.add(author2);
         form.setAuthors(authors);
-
         form.setDateFreetext("2019");
         form.setVolume("1.0");
-
         List<PersonForm> editors = new ArrayList<PersonForm>();
         PersonForm editor = new PersonForm();
         editor.setFirstName("editor");
         editor.setLastName("editor");
-
         editors.add(editor);
         form.setEditors(editors);
-
         List<ConceptAssignmentForm> conceptTags = new ArrayList<>();
         ConceptAssignmentForm tag = new ConceptAssignmentForm();
         tag.setConceptName("testc");
@@ -116,7 +107,6 @@ public class CitationHelperTest {
         updatedCitation.setShortTitle("updatedShortTitle");
         updatedCitation.setDateFreetext("2019");
         updatedCitation.setVolume("1.0");
-
         Set<IPerson> editorsSet = new HashSet<IPerson>();
         IPerson editor1 = new Person();
         editor1.setFirstName("editor");
@@ -124,28 +114,22 @@ public class CitationHelperTest {
         editor1.setId("1");
         editorsSet.add(editor1);
         updatedCitation.setEditors(editorsSet);
-
         Set<IPerson> authorsSet = new HashSet<IPerson>();
         IPerson author1 = new Person();
         author1.setFirstName("first");
         author1.setLastName("last");
         author1.setId("2");
-
         Set<IAffiliation> affiliations = new HashSet<IAffiliation>();
         IAffiliation affiliation = new Affiliation();
         affiliation.setName("Test");
         affiliations.add(affiliation);
         author1.setAffiliations(affiliations);
         authorsSet.add(author1);
-
         IPerson author2 = new Person();
         author2.setFirstName("first2");
         author2.setLastName("last2");
-
         authorsSet.add(author2);
-
         updatedCitation.setAuthors(authorsSet);
-
         Set<ICitationConceptTag> conceptTagsSet = new HashSet<ICitationConceptTag>();
         ICitationConceptTag tag1 = new CitationConceptTag();
         tag1.setConceptName("testc");
@@ -159,7 +143,8 @@ public class CitationHelperTest {
     }
 
     @Test
-    public void test_updateCitation_success() {
+    public void test_updateCitation() {
+        ICitation citation;
         citation = new Citation();
         citation.setTitle("title");
         citation.setShortTitle("shortTitle");
@@ -169,7 +154,6 @@ public class CitationHelperTest {
         concept.setId("CON1");
         concept.setOwner(user);
         concept.setUri("google.com");
-
         IConceptType type = new ConceptType();
         type.setId("CTY1");
         type.setOwner(user);
@@ -179,10 +163,37 @@ public class CitationHelperTest {
         IPerson author2 = new Person();
         author2.setFirstName("first2");
         author2.setLastName("last2");
-
         authorsSet.add(author2);
         citation.setAuthors(authorsSet);
+        Mockito.when(conceptManager.getByUriAndOwner(anyString(), any(IUser.class))).thenReturn(concept);
+        Mockito.when(typeManager.getByUriAndOwner(anyString(), any(IUser.class))).thenReturn(type);
+        helperToTest.updateCitation(citation, form, user);
+        assertTrue(equalsCitation(citation, updatedCitation));
+    }
 
+    @Test
+    public void test_updateCitation_getByURIANDOwner() {
+        ICitation citation;
+        citation = new Citation();
+        citation.setTitle("title");
+        citation.setShortTitle("shortTitle");
+        citation.setDateFreetext("2019");
+        citation.setVolume("1.0");
+        ICitationConcept concept = new CitationConcept();
+        concept.setId("CON1");
+        concept.setOwner(user);
+        concept.setUri("google.com");
+        IConceptType type = new ConceptType();
+        type.setId("CTY1");
+        type.setOwner(user);
+        type.setName("forum");
+        type.setUri("test.com");
+        Set<IPerson> authorsSet = new HashSet<IPerson>();
+        IPerson author2 = new Person();
+        author2.setFirstName("first2");
+        author2.setLastName("last2");
+        authorsSet.add(author2);
+        citation.setAuthors(authorsSet);
         Mockito.when(conceptManager.save(any(ICitationConcept.class))).thenReturn(concept);
         Mockito.when(typeManager.save(any(IConceptType.class))).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
@@ -192,10 +203,12 @@ public class CitationHelperTest {
     private boolean equalsCitation(ICitation c1, ICitation c2) {
         // TODO Auto-generated method stub
 
-        if (!c1.getTitle().equals(c2.getTitle()))
+        if (!c1.getTitle().equals(c2.getTitle())) {
             return false;
-        if (!c1.getShortTitle().equals(c2.getShortTitle()))
+        }
+        if (!c1.getShortTitle().equals(c2.getShortTitle())) {
             return false;
+        }
         if (c1.getAuthors() != null && c2.getAuthors() != null) {
 
             if (c1.getAuthors().size() != c2.getAuthors().size())
@@ -203,8 +216,9 @@ public class CitationHelperTest {
             Iterator<IPerson> p1 = c1.getAuthors().iterator();
             Iterator<IPerson> p2 = c2.getAuthors().iterator();
             while (p1.hasNext() && p2.hasNext()) {
-                if (!comparePerson(p1.next(), p2.next()))
+                if (!comparePerson(p1.next(), p2.next())) {
                     return false;
+                }
             }
         }
 
@@ -215,8 +229,9 @@ public class CitationHelperTest {
             Iterator<IPerson> p1 = c1.getEditors().iterator();
             Iterator<IPerson> p2 = c2.getEditors().iterator();
             while (p1.hasNext() && p2.hasNext()) {
-                if (!comparePerson(p1.next(), p2.next()))
+                if (!comparePerson(p1.next(), p2.next())) {
                     return false;
+                }
             }
         }
 
@@ -227,8 +242,9 @@ public class CitationHelperTest {
             Iterator<ICreator> p1 = c1.getOtherCreators().iterator();
             Iterator<ICreator> p2 = c2.getOtherCreators().iterator();
             while (p1.hasNext() && p2.hasNext()) {
-                if (!comparePerson(p1.next().getPerson(), p2.next().getPerson()))
+                if (!comparePerson(p1.next().getPerson(), p2.next().getPerson())) {
                     return false;
+                }
             }
 
         }
@@ -240,8 +256,9 @@ public class CitationHelperTest {
             Iterator<ICitationConceptTag> p1 = c1.getConceptTags().iterator();
             Iterator<ICitationConceptTag> p2 = c2.getConceptTags().iterator();
             while (p1.hasNext() && p2.hasNext()) {
-                if (!compareConceptTag(p1.next(), p2.next()))
+                if (!compareConceptTag(p1.next(), p2.next())) {
                     return false;
+                }
             }
         }
         return true;
@@ -249,16 +266,18 @@ public class CitationHelperTest {
 
     private boolean comparePerson(IPerson p1, IPerson p2) {
 
-        if (!p1.getFirstName().equals(p2.getFirstName()) || !p1.getLastName().equals(p2.getLastName()))
+        if (!p1.getFirstName().equals(p2.getFirstName()) || !p1.getLastName().equals(p2.getLastName())) {
             return false;
+        }
         if (p1.getAffiliations() != null && p2.getAffiliations() != null) {
             if (p1.getAffiliations().size() != p2.getAffiliations().size())
                 return false;
             Iterator<IAffiliation> i1 = p1.getAffiliations().iterator();
             Iterator<IAffiliation> i2 = p2.getAffiliations().iterator();
             while (i1.hasNext() && i2.hasNext()) {
-                if (!compareAffliattion(i1.next(), i2.next()))
+                if (!compareAffliattion(i1.next(), i2.next())) {
                     return false;
+                }
             }
         }
 
@@ -268,8 +287,9 @@ public class CitationHelperTest {
     private boolean compareAffliattion(IAffiliation a1, IAffiliation a2) {
         // TODO Auto-generated method stub
 
-        if (a1.getName().equals(a2.getName()))
+        if (a1.getName().equals(a2.getName())) {
             return true;
+        }
 
         return false;
 
@@ -278,8 +298,9 @@ public class CitationHelperTest {
     private boolean compareConceptTag(ICitationConceptTag c1, ICitationConceptTag c2) {
 
         if (c1.getLocalConceptId().equals(c2.getLocalConceptId())
-                && c1.getLocalConceptTypeId().equals(c2.getLocalConceptTypeId()))
+                && c1.getLocalConceptTypeId().equals(c2.getLocalConceptTypeId())) {
             return true;
+        }
 
         return false;
     }
