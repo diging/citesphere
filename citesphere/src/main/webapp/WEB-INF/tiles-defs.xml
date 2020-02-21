@@ -47,7 +47,7 @@
         <put-attribute name="content" value="/WEB-INF/views/auth/oauth_approve.jsp" />    
     </definition>
     
-    <definition name="tokens" extends="base.definition">
+    <definition name="oauth/tokens" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/auth/tokens.jsp" />    
     </definition>
 	

@@ -3,7 +3,6 @@ package edu.asu.diging.citesphere.core.repository.oauth;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Transactional;
 import edu.asu.diging.citesphere.core.model.oauth.impl.DbAccessToken;
 
 /**
@@ -26,7 +25,6 @@ public interface DbAccessTokenRepository extends JpaRepository<DbAccessToken, St
  
     Optional<DbAccessToken> findByAuthenticationId(String authenticationId);
    
-    @Transactional
     void deleteByClientIdAndUsername(String clientId, String username);
  
 }
