@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.util.model.impl;
 import java.util.*;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -52,7 +53,7 @@ public class CitationHelperTest {
     private CitationHelper helperToTest;
 
     @Before
-    public void setUp() {
+    public  void setUp() {
 
         MockitoAnnotations.initMocks(this);
         user = new User();
@@ -62,7 +63,7 @@ public class CitationHelperTest {
 
     }
 
-    private void initForm() {
+    private  void initForm() {
         form = new CitationForm();
         form.setTitle("updatedtitle");
         form.setShortTitle("updatedShortTitle");
@@ -76,10 +77,6 @@ public class CitationHelperTest {
         affiliationForms.add(affiliationForm);
         author.setAffiliations(affiliationForms);
         authors.add(author);
-        PersonForm author2 = new PersonForm();
-        author2.setFirstName("first2");
-        author2.setLastName("last2");
-        authors.add(author2);
         form.setAuthors(authors);
         form.setDateFreetext("2019");
         form.setVolume("1.0");
@@ -107,30 +104,26 @@ public class CitationHelperTest {
         updatedCitation.setShortTitle("updatedShortTitle");
         updatedCitation.setDateFreetext("2019");
         updatedCitation.setVolume("1.0");
-        Set<IPerson> editorsSet = new HashSet<IPerson>();
+        Set<IPerson> editorsSet = new LinkedHashSet<IPerson>();
         IPerson editor1 = new Person();
         editor1.setFirstName("editor");
         editor1.setLastName("editor");
         editor1.setId("1");
         editorsSet.add(editor1);
         updatedCitation.setEditors(editorsSet);
-        Set<IPerson> authorsSet = new HashSet<IPerson>();
+        Set<IPerson> authorsSet = new LinkedHashSet<IPerson>();
         IPerson author1 = new Person();
         author1.setFirstName("first");
         author1.setLastName("last");
         author1.setId("2");
-        Set<IAffiliation> affiliations = new HashSet<IAffiliation>();
+        Set<IAffiliation> affiliations = new LinkedHashSet<IAffiliation>();
         IAffiliation affiliation = new Affiliation();
         affiliation.setName("Test");
         affiliations.add(affiliation);
         author1.setAffiliations(affiliations);
         authorsSet.add(author1);
-        IPerson author2 = new Person();
-        author2.setFirstName("first2");
-        author2.setLastName("last2");
-        authorsSet.add(author2);
         updatedCitation.setAuthors(authorsSet);
-        Set<ICitationConceptTag> conceptTagsSet = new HashSet<ICitationConceptTag>();
+        Set<ICitationConceptTag> conceptTagsSet = new LinkedHashSet<ICitationConceptTag>();
         ICitationConceptTag tag1 = new CitationConceptTag();
         tag1.setConceptName("testc");
         tag1.setConceptUri("google.com");
@@ -159,14 +152,8 @@ public class CitationHelperTest {
         type.setOwner(user);
         type.setName("forum");
         type.setUri("test.com");
-        Set<IPerson> authorsSet = new HashSet<IPerson>();
-        IPerson author2 = new Person();
-        author2.setFirstName("first2");
-        author2.setLastName("last2");
-        authorsSet.add(author2);
-        citation.setAuthors(authorsSet);
-        Mockito.when(conceptManager.getByUriAndOwner(anyString(), any(IUser.class))).thenReturn(concept);
-        Mockito.when(typeManager.getByUriAndOwner(anyString(), any(IUser.class))).thenReturn(type);
+        Mockito.when(conceptManager.save(any(ICitationConcept.class))).thenReturn(concept);
+        Mockito.when(typeManager.save(any(IConceptType.class))).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
         assertTrue(equalsCitation(citation, updatedCitation));
     }
@@ -188,14 +175,8 @@ public class CitationHelperTest {
         type.setOwner(user);
         type.setName("forum");
         type.setUri("test.com");
-        Set<IPerson> authorsSet = new HashSet<IPerson>();
-        IPerson author2 = new Person();
-        author2.setFirstName("first2");
-        author2.setLastName("last2");
-        authorsSet.add(author2);
-        citation.setAuthors(authorsSet);
-        Mockito.when(conceptManager.save(any(ICitationConcept.class))).thenReturn(concept);
-        Mockito.when(typeManager.save(any(IConceptType.class))).thenReturn(type);
+        Mockito.when(conceptManager.getByUriAndOwner(anyString(), any(IUser.class))).thenReturn(concept);
+        Mockito.when(typeManager.getByUriAndOwner(anyString(), any(IUser.class))).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
         assertTrue(equalsCitation(citation, updatedCitation));
     }
