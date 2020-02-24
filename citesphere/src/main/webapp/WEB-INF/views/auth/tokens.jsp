@@ -85,7 +85,7 @@ $(function() {
         <h4 class="modal-title">Revoke Access</h4>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to revoke access for <i><span id="confirm-client-entry-name"></span></i>?</p>
+        <p>The app won't be able to access your data any longer. Are you sure you want to revoke access for <i><span id="confirm-client-entry-name"></span></i>?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">No</button>

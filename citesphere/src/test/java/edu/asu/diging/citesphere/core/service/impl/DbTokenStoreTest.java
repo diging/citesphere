@@ -25,11 +25,21 @@ public class DbTokenStoreTest {
     }
     
     @Test
-    public void test_findTokensByUserName() {
+    public void test_findTokensByUserName_userNotFound() {
         String username = "name";
         List<DbAccessToken> dbAccessTokenList = new ArrayList<>();
         Mockito.when(dbAccessTokenRepository.findByUsername(username)).thenReturn(dbAccessTokenList);
         Assert.assertEquals(dbAccessTokenList, managerToTest.findTokensByUserName(username));
+    }
+    
+    @Test
+    public void test_findTokensByUserName_userFound() {
+        String username = "name";
+        List<DbAccessToken> dbAccessTokenList = new ArrayList<>();
+        DbAccessToken token = new DbAccessToken();
+        dbAccessTokenList.add(token);
+        Mockito.when(dbAccessTokenRepository.findByUsername(username)).thenReturn(dbAccessTokenList);
+        Assert.assertEquals(token, managerToTest.findTokensByUserName(username).get(0));
     }
     
     @Test

@@ -52,10 +52,19 @@ public class OAuthClientManagerTest {
         List<String> clientList = new ArrayList<>();
         clientList.add("Client1");
         List<OAuthClient> clients = new ArrayList<>();
-        OAuthClient client = new OAuthClient();
-        clients.add(client);
+        OAuthClient client1 = new OAuthClient();
+        client1.setClientId("Client1");
+        clients.add(client1);
         Mockito.when(clientRepo.findAllById(clientList)).thenReturn(clients);
-        Assert.assertEquals(clients, managerToTest.getClientsDetails(clientList));
+        Assert.assertEquals(client1, managerToTest.getClientsDetails(clientList).get(0));
+    }
+    
+    @Test
+    public void test_getClientsDetails_clientNotFound() {
+        List<String> clientList = new ArrayList<>();
+        clientList.add("Client1");
+        Mockito.when(clientRepo.findAllById(clientList)).thenReturn(new ArrayList<>());
+        Assert.assertEquals(0, managerToTest.getClientsDetails(clientList).size());
     }
     
     @Test
