@@ -107,4 +107,13 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         }
         throw new CannotFindClientException("Client with id " + clientId + " does not exist.");
     }
+    
+    @Override
+    public List<OAuthClient> getClientsDetails(List<String> clientList){
+        List<OAuthClient> clients = new ArrayList<>();
+        if(clientList != null && clientList.size()>0) {
+            clients = clientRepo.findAllById(clientList);
+        }
+        return clients;
+    }
 }
