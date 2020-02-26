@@ -11,6 +11,10 @@ public interface IImportedAuthority {
     String getUri();
 
     void setUri(String uri);
+    
+    String getDescription();
+    
+    void setDescription(String description);
 
     Map<String, Object> getProperties();
 

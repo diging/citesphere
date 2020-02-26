@@ -79,6 +79,16 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
+    public List<IAuthorityEntry> importAuthorityEntries(String searchString) throws URISyntaxException, AuthorityServiceConnectionException {
+        for(AuthorityImporter importer : importers) {
+            if (importer.isResponsible(searchString)) {
+            	return importer.retrieveAuthoritiesData(searchString); 
+            }
+        }
+        return null;
+    }
+    
+    @Override
     public IAuthorityEntry find(String id) {
         Optional<AuthorityEntry> entryOptional = entryRepository.findById(id);
         if (entryOptional.isPresent()) {
@@ -161,4 +171,6 @@ public class AuthorityService implements IAuthorityService {
     public IAuthorityEntry save(IAuthorityEntry entry) {
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry)entry);
     }
+    
+
 }

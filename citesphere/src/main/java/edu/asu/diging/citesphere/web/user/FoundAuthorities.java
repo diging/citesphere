@@ -9,6 +9,7 @@ public class FoundAuthorities {
 
     private List<IAuthorityEntry> userAuthorityEntries;
     private Set<IAuthorityEntry> datasetAuthorityEntries;
+    private List<IAuthorityEntry> importedAuthorityEntries;
     private IAuthorityEntry importedAuthority;
     
     public List<IAuthorityEntry> getUserAuthorityEntries() {
@@ -28,5 +29,12 @@ public class FoundAuthorities {
     }
     public void setImportedAuthority(IAuthorityEntry importedAuthority) {
         this.importedAuthority = importedAuthority;
-    }    
+    }
+	public List<IAuthorityEntry> getImportedAuthorityEntries() {
+		return importedAuthorityEntries;
+	}
+	public void setImportedAuthorityEntries(List<IAuthorityEntry> importedAuthorityEntries) {
+		this.importedAuthorityEntries = importedAuthorityEntries;
+	}    
+    
 }

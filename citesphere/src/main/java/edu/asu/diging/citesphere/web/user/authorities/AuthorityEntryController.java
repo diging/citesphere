@@ -1,9 +1,13 @@
 package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.javers.common.collections.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,7 @@ import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
+import edu.asu.diging.citesphere.web.user.authorities.helper.AuthorityEntryControllerHelper;
 
 @Controller
 public class AuthorityEntryController {
@@ -29,6 +34,9 @@ public class AuthorityEntryController {
     
     @Autowired
     private IAuthorityService authorityService;
+    
+    @Autowired
+    private AuthorityEntryControllerHelper authorityEntryControllerHelper;
 
     @RequestMapping("/auth/authority/get")
     public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri, @RequestParam("zoteroGroupId") String zoteroGroupId) {
@@ -79,8 +87,10 @@ public class AuthorityEntryController {
     @RequestMapping("/auth/authority/getAuthoritiesByName")
     public ResponseEntity<FoundAuthorities> getAuthoritiesByName(Authentication authentication, @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("zoteroGroupId") String zoteroGroupId) {
  
-    		String databaseSearchString = "%"+lastName+"%"+firstName+"%";
-    		String conceptpowerSearchString = "word=%25"+firstName+"%25"+lastName;
+    		String[] serachStrings = authorityEntryControllerHelper.getAuthoritySearchStrings(firstName, lastName);
+    		String databaseSearchString = serachStrings[1];
+    		String conceptpowerSearchString = serachStrings[0];
+    		
     		
     	    List<IAuthorityEntry> userEntries = authorityService.findByName((IUser)authentication.getPrincipal(), databaseSearchString);
             FoundAuthorities foundAuthorities = new FoundAuthorities();
@@ -89,7 +99,8 @@ public class AuthorityEntryController {
             
             Set<IAuthorityEntry> datasetEntries;
             try {
-                datasetEntries = authorityService.findByNameInDataset(databaseSearchString, zoteroGroupId);
+                datasetEntries = authorityService.findByNameInDataset(databaseSearchString, zoteroGroupId);                
+                
             } catch (GroupDoesNotExistException e) {
                 logger.warn("Group does not exist: " + zoteroGroupId, e);
                 return new ResponseEntity<FoundAuthorities>(HttpStatus.BAD_REQUEST);
@@ -97,16 +108,18 @@ public class AuthorityEntryController {
             foundAuthorities.setDatasetAuthorityEntries(datasetEntries);
             
             try {
-                IAuthorityEntry entry = authorityService.importAuthority(conceptpowerSearchString);
-                foundAuthorities.setImportedAuthority(entry);
+            	List<IAuthorityEntry> importedEntries = authorityService.importAuthorityEntries(conceptpowerSearchString);
+                	foundAuthorities.setImportedAuthorityEntries(importedEntries);             
+                
             } catch (AuthorityServiceConnectionException e) {
-                logger.warn("Could not retrieve authority entry.", e);
+                logger.warn("Could not retrieve authority entries.", e);
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (URISyntaxException e) {
                 logger.info("Not a valid URI: " + firstName, e);
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             
+            foundAuthorities = authorityEntryControllerHelper.removeDuplicateAuthorities(foundAuthorities);
             return new ResponseEntity<FoundAuthorities>(foundAuthorities, HttpStatus.OK);
     }
     

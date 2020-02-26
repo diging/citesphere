@@ -8,6 +8,7 @@ public class ConceptpowerEntry {
 	private String id;
 	private String equal_to;
 	private String lemma;
+	private String description;
 	
 	public String getId() {
 		return id;
@@ -26,6 +27,12 @@ public class ConceptpowerEntry {
 	}
 	public void setLemma(String lemma) {
 		this.lemma = lemma;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 

@@ -15,6 +15,8 @@ public interface IAuthorityService {
     void register(AuthorityImporter importer);
 
     IAuthorityEntry importAuthority(String uri)  throws AuthorityServiceConnectionException, URISyntaxException;
+    
+    List<IAuthorityEntry> importAuthorityEntries(String uri)  throws AuthorityServiceConnectionException, URISyntaxException;
 
     IAuthorityEntry save(IAuthorityEntry entry);
 
@@ -33,4 +35,5 @@ public interface IAuthorityService {
     Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId) throws GroupDoesNotExistException;
 
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
+
 }

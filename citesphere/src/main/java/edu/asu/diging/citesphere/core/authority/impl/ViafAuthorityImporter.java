@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.authority.impl;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.authority.impl.ViafResponse.Data;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 
 @Component
 @PropertySource(value="classpath:/config.properties")
@@ -91,4 +93,11 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     public String getId() {
         return ID;
     }
+
+	@Override
+	public List<IAuthorityEntry> retrieveAuthoritiesData(String uri)
+			throws URISyntaxException, AuthorityServiceConnectionException {
+
+		return null;
+	}
 }

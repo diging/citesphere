@@ -8,6 +8,7 @@ public class ImportedAuthority implements IImportedAuthority {
 
     private String name;
     private String uri;
+    private String description;
     private Map<String, Object> properties;
     
     /* (non-Javadoc)
@@ -52,4 +53,13 @@ public class ImportedAuthority implements IImportedAuthority {
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
+	@Override
+	public String getDescription() {
+		return description;
+	}
+	@Override
+	public void setDescription(String description) {
+		this.description = description;
+		
+	}
 }
