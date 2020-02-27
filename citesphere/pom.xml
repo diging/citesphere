@@ -27,6 +27,9 @@
         <zotero.client.key></zotero.client.key>
         <zotero.client.secret></zotero.client.secret>
 
+        <distributed.exporter.download.path></distributed.exporter.download.path>
+        <citesphere.exporter.base.url></citesphere.exporter.base.url>
+        <citesphere.exporter.api.token></citesphere.exporter.api.token>
 
         <db.driver>com.mysql.jdbc.Driver</db.driver>
 

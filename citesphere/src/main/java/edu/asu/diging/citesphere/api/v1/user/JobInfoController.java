@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.core.export.IExportManager;
+import edu.asu.diging.citesphere.core.export.IExportTaskManager;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.model.export.IExportTask;
 import edu.asu.diging.citesphere.core.model.jobs.IExportJob;
@@ -35,7 +36,7 @@ public class JobInfoController extends BaseJobInfoController {
     private IUploadJobManager jobManager;
     
     @Autowired
-    private IExportManager exportManager;
+    private IExportTaskManager exportTaskManager;
     
 
     @RequestMapping(value="/job/info")
@@ -64,7 +65,7 @@ public class JobInfoController extends BaseJobInfoController {
             node.put("groupId", ((IUploadJob)job).getCitationGroup());
         }
         if (job instanceof IExportJob) {
-            IExportTask exportTask = exportManager.getTask(((IExportJob)job).getTaskId());
+            IExportTask exportTask = exportTaskManager.get(((IExportJob)job).getTaskId());
             node.put("groupId", exportTask.getGroupId());
             node.put("collectionId", exportTask.getCollectionId());
             node.put("exportType", exportTask.getExportType().name());
