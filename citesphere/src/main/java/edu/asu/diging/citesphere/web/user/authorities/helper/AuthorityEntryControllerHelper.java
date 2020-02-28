@@ -1,6 +1,8 @@
 package edu.asu.diging.citesphere.web.user.authorities.helper;
 
+import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,13 +41,21 @@ public class AuthorityEntryControllerHelper {
     	
     	ListIterator<IAuthorityEntry> iter = foundAuthorities.getImportedAuthorityEntries().listIterator();
     	
+    	List<String> uriList = foundAuthorities.getUserAuthorityEntries().stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
+    	
+    	uriList.addAll(foundAuthorities.getDatasetAuthorityEntries().stream().map(IAuthorityEntry::getUri).collect(Collectors.toList()));
+    	
+    	String uri ="";
     	while(iter.hasNext()) {
-    		if (foundAuthorities.getUserAuthorityEntries().contains(iter.next())) {
+            uri = iter.next().getUri();
+            if (!uri.trim().endsWith("/")) {
+            	uri = uri + "/";
+            }
+    		if (uriList.contains(uri) ){
     			iter.remove();;
     		}
     	}
-    	
-      
+    	      
         return foundAuthorities;
     }
 }

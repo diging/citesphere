@@ -583,8 +583,8 @@ function getPersonAuthority(uri, personType) {
 
 function getPersonAuthorityBasedOnName(modalType, personType) {
 
-	var firstName = $("#firstNameAuthor").val();
-	var lastName = $("#lastNameAuthor").val();
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
 	url = '<c:url value="/auth/authority/getAuthoritiesByName?firstName='+ firstName + '&lastName=' + lastName + '&zoteroGroupId=' + ${zoteroGroupId} + '"/>'
@@ -597,6 +597,7 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
   		success: function(data) {
 			
   			$("#authoritySearchResult").empty()
+  			$("#searchAuthorityResultSize").empty()
   			var content = '';
   			
   			if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
@@ -629,7 +630,7 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
   			}
   			
   			if (data['importedAuthorityEntries'] != null && data['importedAuthorityEntries'].length > 0) {
-  				content += '<tr><td colspan=3>Do you want to create a managed authority entry?</td></tr>';
+  				content += '<tr><td colspan=3>Authorities imported from Conceptpower:</td></tr>';
   				data['importedAuthorityEntries'].forEach(function(elem) {
   					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
@@ -642,14 +643,19 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
   				});
   			}
   			
+  		if(content==''){
+  			$("#searchAuthorityResultSize").append("0 authorites found");
+  		}
+  		
 		$("#authoritySearchResult").append(content);
+		
 		
 		$("#authoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
 			uri = $(this).closest('td').next().text()
 				
-			showPersonNameInModal(clickedElement.text(), personType)
+			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
 			
 			if($(this).closest('td').next().next().next().text()=='Do you want to create a managed authority entry? '){
@@ -1093,30 +1099,6 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
   </div>
 </div>
 
-
-<!-- 		  Select Authority Modal -->
-  <div id="selectAuthorityModel" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selectAuthorityLabel">
-    <div class="modal-dialog" style = "width:1000px"  role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="authorLabel">Authority Search Result</h4>
-      </div>
-      <div class="modal-body">
-			<div >
-				<table class="table table-striped table-bordered" >
-					<tr><th>Name</th><th>URI</th><th>Description</th><th>Status</th></tr>
-					<tbody id = "authoritySearchResult">
-					</tbody>
-				</table>
-			</div>
-      </div>
-            <div class="modal-footer">
-        	<button type="button" class="btn btn-default" id="closeAuthoritySearchResult">Close</button>
-      </div>
-    </div>
-    </div>
-  </div> 
   
 <!-- Other Creator Modal -->
 <div class="modal fade" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
@@ -1178,6 +1160,34 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
   </div>
 </div> <!-- End modal -->
 
+
+
+<!-- 		  Search and Select Authority Modal -->
+  <div id="selectAuthorityModel" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selectAuthorityLabel">
+    <div class="modal-dialog" style = "width:1000px"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="authorLabel">Authority Search Result</h4>
+      </div>
+      <div class="modal-body">
+			<div >
+				<table class="table table-striped table-bordered table-fixed" >
+					<tr><th>Name</th><th>URI</th><th>Description</th><th>Status</th></tr>
+					<tbody id = "authoritySearchResult">
+					</tbody>
+				</table>
+				<div id="searchAuthorityResultSize" class="pull-right"></div>
+			</div>
+      </div>
+            <div class="modal-footer">
+        	<button type="button" class="btn btn-default" id="closeAuthoritySearchResult">Close</button>
+      </div>
+    </div>
+    </div>
+  </div> 
+<!-- End modal -->  
+  
 <!-- Concept Modal -->
 <div class="modal fade" tabindex="-1" role="dialog" id="addConceptModal">
   <div class="modal-dialog" role="document">
