@@ -81,18 +81,20 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
         if (response.getStatusCode() == HttpStatus.OK) {
         	ConceptpowerResponse conceptEntries = response.getBody();
+        	if(conceptEntries.getConceptEntries()!=null) {
+                for(ConceptpowerEntry conceptEntry : conceptEntries.getConceptEntries()) {
 
-            for(ConceptpowerEntry conceptEntry : conceptEntries.getConceptEntries()) {
-
-            	IAuthorityEntry authority = new AuthorityEntry();
-                if(conceptEntry.getEqual_to()==null || conceptEntry.getEqual_to()=="") {
-                	continue;
+                	IAuthorityEntry authority = new AuthorityEntry();
+                    if(conceptEntry.getEqual_to()==null || conceptEntry.getEqual_to()=="") {
+                    	continue;
+                    }
+                    authority.setName(conceptEntry.getLemma());
+                    authority.setUri(conceptEntry.getEqual_to());
+                    authority.setDescription(conceptEntry.getDescription());
+                    authorityEntries.add(authority);
                 }
-                authority.setName(conceptEntry.getLemma());
-                authority.setUri(conceptEntry.getEqual_to());
-                authority.setDescription(conceptEntry.getDescription());
-                authorityEntries.add(authority);
-            }
+        	}
+
         }
         return authorityEntries;
 	}

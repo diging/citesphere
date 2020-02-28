@@ -17,6 +17,7 @@ $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
 	$("#uriLoadingFailureAuthor").hide();
 	$("#uriLoadingFoundAuthor").hide();
+	$("#searchAuthorSpinner").hide();
 	
 	$("#uriLoadingFoundAuthor").popover();
 	$("#uriLoadingFailureAuthor").popover();
@@ -24,6 +25,7 @@ $(function() {
 	$("#uriLoadingSpinnerEditor").hide();
 	$("#uriLoadingFailureEditor").hide();
 	$("#uriLoadingFoundEditor").hide();
+	$("#searchEditorSpinner").hide();
 	
 	$("#uriLoadingFoundEditor").popover();
 	$("#uriLoadingFailureEditor").popover();
@@ -31,6 +33,8 @@ $(function() {
 	$("#uriLoadingSpinnerCreator").hide();
 	$("#uriLoadingFailureCreator").hide();
 	$("#uriLoadingFoundCreator").hide();
+	$("#searchCreatorSpinner").hide();
+	
 	
 	$("#uriLoadingFoundCreator").popover();
 	$("#uriLoadingFailureCreator").popover();
@@ -59,12 +63,26 @@ $(function() {
 		$("#authorModal").modal('hide');
 		resetPersonCreationModal("Author");
 	});
-	
-	$("#closeAuthorSearchResult").click(function() {
-		$("#selectAuthorModel").modal('hide');
+		
+	$("#searchAuthor").click(function() {
+		$("#searchAuthorSpinner").show();
+		getPersonAuthorityBasedOnName('Author','Author');
+		$("#searchAuthorSpinner").hide();
 	});
 	
+	$("#searchEditor").click(function() {
+		$("#searchEditorSpinner").show();
+		getPersonAuthorityBasedOnName('Editor','Editor');
+		$("#searchEditorSpinner").hide();
+	});
 	
+	$("#searchCreator").click(function() {
+		$("#searchCreatorSpinner").show();
+		getPersonAuthorityBasedOnName('Creator','Creator');
+		$("#searchCreatorSpinner").hide();
+	});
+	
+		
 	$(".edit-author").click(function(){
 		var authorItem = $(this).parent();
 		editPerson('Author', authorItem[0]);
@@ -104,6 +122,7 @@ $(function() {
 		$("#uriLoadingFoundAuthor").popover('hide');
 		event.preventDefault();
 	});
+		
 	
 	var timer = null;
 	$("#uriAuthor").change(function() {
@@ -116,10 +135,12 @@ $(function() {
 	    }, 1000);
 	});
 	
-	$("#searchAuthor").click(function() {
-		getPersonAuthorityBasedOnName("Author");
-	});
+
 	
+	$("#closeAuthoritySearchResult").click(function() {
+		$("#selectAuthorityModel").modal('hide');
+	});
+		
 	/* Handle editor events */
 	$(".edit-editor").click(function(){
 		var editorItem = $(this).parent();
@@ -560,30 +581,28 @@ function getPersonAuthority(uri, personType) {
 
 }
 
-function getPersonAuthorityBasedOnName(personType) {
-	console.log("getPersonAuthorityBasedOnName")
+function getPersonAuthorityBasedOnName(modalType, personType) {
+
 	var firstName = $("#firstNameAuthor").val();
 	var lastName = $("#lastNameAuthor").val();
 	personType_lowerCase = personType.toLowerCase();
-	console.log(firstName)
-	console.log(lastName, ${zoteroGroupId})
+
 	url = '<c:url value="/auth/authority/getAuthoritiesByName?firstName='+ firstName + '&lastName=' + lastName + '&zoteroGroupId=' + ${zoteroGroupId} + '"/>'
-	
-	console.log(console)
-	
+		
 	$.ajax({
   		dataType: "json",
   		type: 'GET',
   		url: url ,
+  		async: false,
   		success: function(data) {
 			
-  			$("#searchAuthorityResult").empty()
-  			var content = '<table class="table table-striped table-bordered"><tr><th>Name</th><th>URI</th><th>Description</th><th>Status</th></tr>';
+  			$("#authoritySearchResult").empty()
+  			var content = '';
   			
   			if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
   				content += '<tr><td colspan=4>These authority entries have already been imported by you:</td></tr>';
   				data['userAuthorityEntries'].forEach(function(elem) {
-  					content += '<tr> <td>' + elem['name'] + '</td> <td>' + elem['uri'] + '</td> <td>' ;
+  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
   						}
@@ -598,7 +617,7 @@ function getPersonAuthorityBasedOnName(personType) {
   			if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
   				content += '<tr><td colspan=4>These authority entries have already been imported by someone else for this dataset:</td></tr>';
   				data['datasetAuthorityEntries'].forEach(function(elem) {
-  					content += '<tr> <td>' + elem['name'] + '</td> <td>' + elem['uri'] + '</td> <td>' ;
+  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
   						}
@@ -612,74 +631,57 @@ function getPersonAuthorityBasedOnName(personType) {
   			if (data['importedAuthorityEntries'] != null && data['importedAuthorityEntries'].length > 0) {
   				content += '<tr><td colspan=3>Do you want to create a managed authority entry?</td></tr>';
   				data['importedAuthorityEntries'].forEach(function(elem) {
-  					content += '<tr> <td>' + elem['name'] + '</td> <td>' + elem['uri'] + '</td> <td>' ;
+  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
   						}
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content +='<td>Create a managed authority entry? </td></tr>';
+  					content +='<td>Do you want to create a managed authority entry? </td></tr>';
   				});
   			}
   			
-
-		content += '</table>';
-		console.log(content)
-		$("#searchAuthorityResult").append(content);
+		$("#authoritySearchResult").append(content);
+		
+		$("#authoritySearchResult tr td a").click(function() {
+			
+			name = $(this).text()
+			uri = $(this).closest('td').next().text()
+				
+			showPersonNameInModal(clickedElement.text(), personType)
+			$("#uri"+modalType).val( uri);
+			
+			if($(this).closest('td').next().next().next().text()=='Do you want to create a managed authority entry? '){
+				
+				createManageAuthorityURL = '<c:url value="/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri='+ $(this).closest('td').next().text() + '"/>';
+						
+				$.ajax({
+			  		dataType: "json",
+			  		type: 'POST',
+			  		url: createManageAuthorityURL,
+			  		async:false,
+			  		success: function(data) {
+			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  		},
+				error: function(data){					
+					$("#uri"+modalType).val("");
+		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+				}
+				});				
+				
+			}
+			
+			else{
+				$("#authorAuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
+			}
+						
+			$("#selectAuthorityModel").modal('hide');
+		});	
   			
         }
-	});
 	
-/* 	$.get('<c:url value="/auth/authority/getAuthoritiesByName?firstName=" />' + firstName + '&lastName=' + lastName + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
-		
-		var content = "Authority <b>";
-		
-		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
-			content += "<br><br>This authority entry has already been imported by you:";
-			content += '<ul class="foundAuthorities">';
-			data['userAuthorityEntries'].forEach(function(elem) {
-				content += '<li>' + elem['name'];
-				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
-				content += '</li>';
-			});
-			content += "</ul>";
-		}
-		if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
-			content += "<br><br>This authority entry has already been imported by someone else for this dataset:";
-			content += '<ul class="foundAuthorities">';
-			data['datasetAuthorityEntries'].forEach(function(elem) {
-				content += '<li>' + elem['name'];
-				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
-				content += '</li>';
-			});
-			content += "</ul>";
-		}
-		
-		if (data['importedAuthorityEntries'] != null && data['importedAuthorityEntries'].length > 0) {
-			
-			content += "<br><br>Do you want to create a managed authority entry?<br>" +
-					
-			content += '<ul class="foundAuthorities">';
-			data['importedAuthorityEntries'].forEach(function(elem) {
-				content += '<li>' + elem['name'];
-				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
-				content += '</li>';
-			});
-			content += "</ul>";
-			
-			'<span id="'+personType_lowerCase+'AuthorityCreationFeedback"><button id="'+personType_lowerCase+'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
-
-		}
-		$("#selectAuthorModel"+personType).attr("model-body", content);
-
-	})
-	.fail(function() {
-		console.log("Call to get authorities failed")
-	 })
-    .always(function() {
-    	console.log("Call to get authorities failed")
-	 }); */
+	});
 
 }
 
@@ -992,7 +994,10 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		  </div>
 		  
 		  <div>
-		    <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorModel" id = "searchAuthor">Search Author</button>		  
+		    <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id = "searchAuthor" style="margin-left:80%">
+		    	Search Author
+		    	<i id="searchAuthorSpinner" class="fas fa-spinner fa-spin text-info" style="color:white"></i>
+		    </button>		  
 		  </div>
 		  
 		  
@@ -1049,6 +1054,13 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		    <input type="text" class="form-control" id="lastNameEditor" placeholder="Last Name">
 		  </div>
 		  	  
+		  <div>
+		    <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id = "searchEditor" style="margin-left:80%">
+		    	Search Editor
+		    	<i id="searchEditorSpinner" class="fas fa-spinner fa-spin text-info" style="color:white"></i>
+		    </button>		  
+		  </div>
+		  
 		  <div class="form-group">
 		    <label for="uriEditor">URI:</label>
 		    <div class="input-group">
@@ -1082,19 +1094,25 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 </div>
 
 
-<!-- 		  Select Author Modal -->
-  <div id="selectAuthorModel" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selectAuthorLabel">
+<!-- 		  Select Authority Modal -->
+  <div id="selectAuthorityModel" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selectAuthorityLabel">
     <div class="modal-dialog" style = "width:1000px"  role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="authorLabel">Author Information</h4>
+        <h4 class="modal-title" id="authorLabel">Authority Search Result</h4>
       </div>
       <div class="modal-body">
-			<div id = "searchAuthorityResult"></div>
+			<div >
+				<table class="table table-striped table-bordered" >
+					<tr><th>Name</th><th>URI</th><th>Description</th><th>Status</th></tr>
+					<tbody id = "authoritySearchResult">
+					</tbody>
+				</table>
+			</div>
       </div>
             <div class="modal-footer">
-        	<button type="button" class="btn btn-default" id="closeAuthorSearchResult">Close</button>
+        	<button type="button" class="btn btn-default" id="closeAuthoritySearchResult">Close</button>
       </div>
     </div>
     </div>
@@ -1120,6 +1138,14 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 		    <label for="lastNameCreator">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameCreator" placeholder="Last Name">
 		  </div>
+		  
+		  <div>
+		    <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id = "searchCreator" style="margin-left:80%">
+		    	Search Creator
+		    	<i id="searchCreatorSpinner" class="fas fa-spinner fa-spin text-info" style="color:white"></i>
+		    </button>		  
+		  </div>
+		  
 		  <div class="form-group">
 		    <label for="uriCreator">URI:</label>
 		    <div class="input-group">
