@@ -24,7 +24,7 @@ import edu.asu.diging.citesphere.core.model.impl.PasswordResetToken;
 import edu.asu.diging.citesphere.core.repository.PasswordResetTokenRepository;
 import edu.asu.diging.citesphere.core.service.IPasswordResetTokenService;
 import edu.asu.diging.citesphere.core.user.IUserManager;
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 public class PasswordResetTokenService implements IPasswordResetTokenService {

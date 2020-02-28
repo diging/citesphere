@@ -7,14 +7,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.asu.diging.citesphere.core.export.IExportManager;
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.core.export.IExportTaskManager;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class ListExportsController {
     
     @Autowired
-    private IExportManager exportManager;
+    private IExportTaskManager exportTaksManager;
 
     @RequestMapping(value="/auth/exports")
     public String list(Authentication authentication, Model model, @RequestParam(value="page", defaultValue="1", required=false) int page) {
@@ -23,8 +23,8 @@ public class ListExportsController {
             page = 0;
         }
         IUser user = (IUser) authentication.getPrincipal();
-        model.addAttribute("tasks", exportManager.getTasks(user, page));
-        model.addAttribute("total", exportManager.getTasksTotalPages(user));
+        model.addAttribute("tasks", exportTaksManager.getTasks(user, page));
+        model.addAttribute("total", exportTaksManager.getTasksTotalPages(user));
         model.addAttribute("page", page+1);
         return "auth/exports";
     }
