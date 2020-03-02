@@ -27,8 +27,8 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
-import edu.asu.diging.citesphere.model.IUser;
-import edu.asu.diging.citesphere.model.impl.User;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.user.impl.User;
 
 @Controller
 public class ImportReferencesController {
