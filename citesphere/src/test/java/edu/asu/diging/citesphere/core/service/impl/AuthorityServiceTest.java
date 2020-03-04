@@ -25,10 +25,10 @@ import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionExcep
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.PersonRepository;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
-import edu.asu.diging.citesphere.model.impl.User;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.user.impl.User;
 
 public class AuthorityServiceTest {
 

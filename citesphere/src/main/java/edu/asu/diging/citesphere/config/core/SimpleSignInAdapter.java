@@ -16,7 +16,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import edu.asu.diging.citesphere.core.factory.IZoteroTokenFactory;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroTokenManager;
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 
 public final class SimpleSignInAdapter implements SignInAdapter {
     

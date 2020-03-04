@@ -3,7 +3,7 @@ package edu.asu.diging.citesphere.core.model;
 
 import java.time.OffsetDateTime;
 
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface IPasswordResetToken {
 

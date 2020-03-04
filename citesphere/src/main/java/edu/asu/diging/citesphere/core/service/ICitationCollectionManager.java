@@ -3,9 +3,9 @@ package edu.asu.diging.citesphere.core.service;
 import java.util.List;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface ICitationCollectionManager {
 

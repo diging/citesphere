@@ -16,6 +16,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
+import edu.asu.diging.citesphere.core.kafka.impl.ExporterDoneListener;
 import edu.asu.diging.citesphere.core.kafka.impl.ReferenceImporterDoneListener;
 
 @Configuration
@@ -79,5 +80,10 @@ public class KafkaConfig {
     @Bean
     public ReferenceImporterDoneListener referenceImportListener() {
         return new ReferenceImporterDoneListener();
+    }
+    
+    @Bean
+    public ExporterDoneListener exportDoneListener() {
+        return new ExporterDoneListener();
     }
 }

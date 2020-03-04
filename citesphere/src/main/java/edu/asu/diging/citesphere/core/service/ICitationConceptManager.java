@@ -6,6 +6,7 @@ import java.util.List;
 import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitationConcept;
 
+
 import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 
 public interface ICitationConceptManager {

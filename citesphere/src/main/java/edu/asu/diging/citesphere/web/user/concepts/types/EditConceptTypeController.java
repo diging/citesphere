@@ -19,9 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.IConceptType;
-
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 import edu.asu.diging.citesphere.web.validation.ConceptTypeValidator;
 

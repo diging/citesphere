@@ -18,8 +18,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitationConcept;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
 import edu.asu.diging.citesphere.web.validation.CitationConceptValidator;
 
