@@ -218,68 +218,76 @@ public class CitationHelperTest {
     }
     
     
+    private boolean comparePersons(Set<IPerson> a1, Set<IPerson> a2) {
+        
+        if (a1 != null && a2 != null) {
+
+            if (a1.size() != a2.size())
+                return false;
+            Iterator<IPerson> p1 = a1.iterator();
+            Iterator<IPerson> p2 = a2.iterator();
+            while (p1.hasNext() && p2.hasNext()) {
+                if (!comparePerson(p1.next(), p2.next())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        return false;
+        
+    }
+    
+    
+  private boolean compareCreators(Set<ICreator> a1, Set<ICreator> a2) {
+        
+      if (a1 != null && a2 != null) {
+
+          if (a1.size() != a2.size())
+              return false;
+          Iterator<ICreator> p1 = a1.iterator();
+          Iterator<ICreator> p2 = a1.iterator();
+          while (p1.hasNext() && p2.hasNext()) {
+              if (!comparePerson(p1.next().getPerson(), p2.next().getPerson())) {
+                  return false;
+              }
+          }
+
+      }
+        
+        return false;
+        
+    }
+  
+  private boolean compareTags(Set<ICitationConceptTag> a1, Set<ICitationConceptTag> a2) {
+      
+      if (a1 != null && a2 != null) {
+
+          if (a1.size() != a2.size())
+              return false;
+          Iterator<ICitationConceptTag> p1 = a1.iterator();
+          Iterator<ICitationConceptTag> p2 = a2.iterator();
+          while (p1.hasNext() && p2.hasNext()) {
+              if (!compareConceptTag(p1.next(), p2.next())) {
+                  return false;
+              }
+          }
+      }
+        
+        return false;
+        
+    }
+  private boolean compareStrings(String s1, String s2) {
+      return s1.equals(s2);
+  }
 
     private boolean equalsCitation(ICitation c1, ICitation c2) {
-
-        if (!c1.getTitle().equals(c2.getTitle())) {
-            return false;
-        }
-        if (!c1.getShortTitle().equals(c2.getShortTitle())) {
-            return false;
-        }
-        if (c1.getAuthors() != null && c2.getAuthors() != null) {
-
-            if (c1.getAuthors().size() != c2.getAuthors().size())
-                return false;
-            Iterator<IPerson> p1 = c1.getAuthors().iterator();
-            Iterator<IPerson> p2 = c2.getAuthors().iterator();
-            while (p1.hasNext() && p2.hasNext()) {
-                if (!comparePerson(p1.next(), p2.next())) {
-                    return false;
-                }
-            }
-        }
-
-        if (c1.getEditors() != null && c2.getEditors() != null) {
-
-            if (c1.getEditors().size() != c2.getEditors().size())
-                return false;
-            Iterator<IPerson> p1 = c1.getEditors().iterator();
-            Iterator<IPerson> p2 = c2.getEditors().iterator();
-            while (p1.hasNext() && p2.hasNext()) {
-                if (!comparePerson(p1.next(), p2.next())) {
-                    return false;
-                }
-            }
-        }
-
-        if (c1.getOtherCreators() != null && c2.getOtherCreators() != null) {
-
-            if (c1.getOtherCreators().size() != c2.getOtherCreators().size())
-                return false;
-            Iterator<ICreator> p1 = c1.getOtherCreators().iterator();
-            Iterator<ICreator> p2 = c2.getOtherCreators().iterator();
-            while (p1.hasNext() && p2.hasNext()) {
-                if (!comparePerson(p1.next().getPerson(), p2.next().getPerson())) {
-                    return false;
-                }
-            }
-
-        }
-
-        if (c1.getConceptTags() != null && c2.getConceptTags() != null) {
-
-            if (c1.getConceptTags().size() != c2.getConceptTags().size())
-                return false;
-            Iterator<ICitationConceptTag> p1 = c1.getConceptTags().iterator();
-            Iterator<ICitationConceptTag> p2 = c2.getConceptTags().iterator();
-            while (p1.hasNext() && p2.hasNext()) {
-                if (!compareConceptTag(p1.next(), p2.next())) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        
+     if ( compareStrings(c1.getTitle(), c2.getTitle()) && compareStrings(c1.getShortTitle(), c2.getShortTitle()) && comparePersons(c1.getAuthors(), c2.getAuthors()) 
+             && comparePersons(c1.getEditors(), c2.getEditors()) &&  compareCreators(c1.getOtherCreators(), c2.getOtherCreators()) && compareTags(c1.getConceptTags(), c2.getConceptTags()))
+         return true;
+        
+        return false;
     }
 
     private boolean comparePerson(IPerson p1, IPerson p2) {
