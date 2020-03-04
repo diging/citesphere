@@ -220,7 +220,6 @@ public class CitationHelperTest {
     
 
     private boolean equalsCitation(ICitation c1, ICitation c2) {
-        // TODO Auto-generated method stub
 
         if (!c1.getTitle().equals(c2.getTitle())) {
             return false;
@@ -304,7 +303,6 @@ public class CitationHelperTest {
     }
 
     private boolean compareAffliattion(IAffiliation a1, IAffiliation a2) {
-        // TODO Auto-generated method stub
 
         if (a1.getName().equals(a2.getName())) {
             return true;
