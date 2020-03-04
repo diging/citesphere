@@ -52,7 +52,7 @@ public class AuthorityEntryControllerHelper {
             	uri = uri + "/";
             }
     		if (uriList.contains(uri) ){
-    			iter.remove();;
+    			iter.remove();
     		}
     	}
     	      
