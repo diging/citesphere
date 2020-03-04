@@ -2,13 +2,19 @@ package edu.asu.diging.citesphere.core.util.model.impl;
 
 import java.util.*;
 
+import org.apache.xml.utils.URI;
+import org.hamcrest.Matcher;
+import org.hibernate.validator.constraints.URL;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.util.UriBuilder;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Matchers.*;
@@ -45,9 +51,9 @@ public class CitationHelperTest {
     @Mock
     private IConceptTypeManager typeManager;
 
-    ICitation updatedCitation;
-    CitationForm form;
-    IUser user;
+    private ICitation updatedCitation;
+    private CitationForm form;
+    private IUser user;
 
     @InjectMocks
     private CitationHelper helperToTest;
@@ -89,11 +95,11 @@ public class CitationHelperTest {
         List<ConceptAssignmentForm> conceptTags = new ArrayList<>();
         ConceptAssignmentForm tag = new ConceptAssignmentForm();
         tag.setConceptName("testc");
-        tag.setConceptUri("google.com");
+        tag.setConceptUri("www.google.com");
         tag.setConceptId("CON1");
         tag.setConceptTypeId("CTY1");
         tag.setConceptTypeName("forum");
-        tag.setConceptTypeUri("test.com");
+        tag.setConceptTypeUri("www.test.com");
         conceptTags.add(tag);
         form.setConceptTags(conceptTags);
     }
@@ -125,12 +131,12 @@ public class CitationHelperTest {
         updatedCitation.setAuthors(authorsSet);
         Set<ICitationConceptTag> conceptTagsSet = new LinkedHashSet<ICitationConceptTag>();
         ICitationConceptTag tag1 = new CitationConceptTag();
-        tag1.setConceptName("testc");
-        tag1.setConceptUri("google.com");
+        tag1.setConceptName("testc.com");
+        tag1.setConceptUri("www.google.com");
         tag1.setLocalConceptId("CON1");
         tag1.setLocalConceptTypeId("CTY1");
         tag1.setTypeName("forum");
-        tag1.setTypeUri("test.com");
+        tag1.setTypeUri("www.test.com");
         conceptTagsSet.add(tag1);
         updatedCitation.setConceptTags(conceptTagsSet);
     }
@@ -146,12 +152,12 @@ public class CitationHelperTest {
         ICitationConcept concept = new CitationConcept();
         concept.setId("CON1");
         concept.setOwner(user);
-        concept.setUri("google.com");
+        concept.setUri("www.google.com");
         IConceptType type = new ConceptType();
         type.setId("CTY1");
         type.setOwner(user);
         type.setName("forum");
-        type.setUri("test.com");
+        type.setUri("www.test.com");
         Mockito.when(conceptManager.save(any(ICitationConcept.class))).thenReturn(concept);
         Mockito.when(typeManager.save(any(IConceptType.class))).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
@@ -159,7 +165,7 @@ public class CitationHelperTest {
     }
 
     @Test
-    public void test_updateCitation_getByURIANDOwner() {
+    public void test_updateCitation_getByURIAndOwner() {
         ICitation citation;
         citation = new Citation();
         citation.setTitle("title");
@@ -169,17 +175,49 @@ public class CitationHelperTest {
         ICitationConcept concept = new CitationConcept();
         concept.setId("CON1");
         concept.setOwner(user);
-        concept.setUri("google.com");
+        concept.setUri("www.google.com");
         IConceptType type = new ConceptType();
         type.setId("CTY1");
         type.setOwner(user);
         type.setName("forum");
-        type.setUri("test.com");
-        Mockito.when(conceptManager.getByUriAndOwner(anyString(), any(IUser.class))).thenReturn(concept);
-        Mockito.when(typeManager.getByUriAndOwner(anyString(), any(IUser.class))).thenReturn(type);
+        type.setUri("www.test.com");
+        
+        Mockito.when(conceptManager.getByUriAndOwner(Mockito.argThat(new URIMatcher()), any(IUser.class))).thenReturn(concept);
+
+        
+        Mockito.when(typeManager.getByUriAndOwner(Mockito.argThat(new URIMatcher()), any(IUser.class))).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
         assertTrue(equalsCitation(citation, updatedCitation));
     }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void test_updateCitation_getByURIAndOwner_Invalid_URI() {
+        ICitation citation;
+        citation = new Citation();
+        citation.setTitle("title");
+        citation.setShortTitle("shortTitle");
+        citation.setDateFreetext("2019");
+        citation.setVolume("1.0");
+        ICitationConcept concept = new CitationConcept();
+        concept.setId("CON1");
+        concept.setOwner(user);
+        concept.setUri("www.google.com");
+        IConceptType type = new ConceptType();
+        type.setId("CTY1");
+        type.setOwner(user);
+        type.setName("forum");
+        type.setUri("www.test.com");
+        form.getConceptTags().iterator().next().setConceptUri("google");
+        
+        Mockito.when(conceptManager.getByUriAndOwner(Mockito.argThat(new URIMatcher()), any(IUser.class))).thenReturn(concept);
+
+        
+        Mockito.when(typeManager.getByUriAndOwner(Mockito.argThat(new URIMatcher()), any(IUser.class))).thenReturn(type);
+        helperToTest.updateCitation(citation, form, user);
+        assertTrue(equalsCitation(citation, updatedCitation));
+    }
+    
+    
 
     private boolean equalsCitation(ICitation c1, ICitation c2) {
         // TODO Auto-generated method stub
@@ -285,5 +323,22 @@ public class CitationHelperTest {
 
         return false;
     }
+    
+    class URIMatcher extends ArgumentMatcher<String> {
+
+        @Override
+        public boolean matches(Object arg) {
+            
+            String regex = "((http?|https|ftp|file)://)?((W|w){3}.)?[a-zA-Z0-9]+\\.[a-zA-Z]+";
+            String uri = (String)arg;
+            
+            
+           if (uri.matches(regex))
+               return true;
+           else throw new IllegalArgumentException();
+        }
+    }
+    
+ 
 
 }
