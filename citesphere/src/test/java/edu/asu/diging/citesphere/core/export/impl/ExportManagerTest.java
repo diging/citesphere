@@ -149,6 +149,13 @@ public class ExportManagerTest {
     @Test(expected=ExportTypeNotSupportedException.class)
     public void test_export_typeNotSupported() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         Mockito.doThrow(ExportTypeNotSupportedException.class).when(processor).runExport(null, user, groupId.toString(), null, task, managerToTest);
+        
+        IExportTask newExportTask = new ExportTask();
+        newExportTask.setExportType(null);
+        newExportTask.setUsername(user.getUsername());
+        newExportTask.setStatus(ExportStatus.PENDING);
+        Mockito.when(taskManager.createExportTask(null, user.getUsername(), ExportStatus.PENDING)).thenReturn(newExportTask);
+        
         managerToTest.export(null, user, groupId.toString(), null);
     }
     
