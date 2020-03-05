@@ -5,7 +5,7 @@ import java.util.List;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import edu.asu.diging.citesphere.core.model.impl.User;
+import edu.asu.diging.citesphere.user.impl.User;
 
 @JaversSpringDataAuditable
 public interface UserRepository extends PagingAndSortingRepository<User, String> {

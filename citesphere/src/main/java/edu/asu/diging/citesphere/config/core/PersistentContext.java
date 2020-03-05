@@ -25,7 +25,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 @PropertySource("classpath:config.properties")
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "edu.asu.diging.citesphere.core.repository")
+@EnableJpaRepositories(basePackages = {"edu.asu.diging.citesphere.core.repository", "edu.asu.diging.citesphere.data"})
 public class PersistentContext {
     
     @Autowired
@@ -47,7 +47,7 @@ public class PersistentContext {
        LocalContainerEntityManagerFactoryBean em 
          = new LocalContainerEntityManagerFactoryBean();
        em.setDataSource(dataSource());
-       em.setPackagesToScan(new String[] { "edu.asu.diging.citesphere.core.model" });
+       em.setPackagesToScan(new String[] { "edu.asu.diging.citesphere.core.model", "edu.asu.diging.citesphere.model", "edu.asu.diging.citesphere.user" });
   
        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
        em.setJpaVendorAdapter(vendorAdapter);

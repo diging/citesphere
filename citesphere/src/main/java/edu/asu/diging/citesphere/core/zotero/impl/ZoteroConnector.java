@@ -26,12 +26,12 @@ import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
-import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Component
 @PropertySource("classpath:/config.properties")

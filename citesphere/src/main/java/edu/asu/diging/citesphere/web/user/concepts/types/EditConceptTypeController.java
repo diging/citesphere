@@ -1,7 +1,5 @@
 package edu.asu.diging.citesphere.web.user.concepts.types;
 
-import java.security.Principal;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationConcept;
-import edu.asu.diging.citesphere.core.model.bib.IConceptType;
-import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
-import edu.asu.diging.citesphere.core.user.IUserManager;
-import edu.asu.diging.citesphere.web.forms.CitationConceptForm;
+import edu.asu.diging.citesphere.model.bib.IConceptType;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 
 @Controller

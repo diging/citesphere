@@ -10,13 +10,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class ItemController {

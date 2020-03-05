@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.export.ExportType;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitation;
 
 public interface Processor {
 

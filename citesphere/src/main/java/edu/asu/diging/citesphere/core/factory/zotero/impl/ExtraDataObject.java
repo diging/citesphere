@@ -2,10 +2,10 @@ package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
 import java.util.Set;
 
-import edu.asu.diging.citesphere.core.model.bib.ICitationConceptTag;
-import edu.asu.diging.citesphere.core.model.bib.ICreator;
-import edu.asu.diging.citesphere.core.model.bib.IPerson;
-import edu.asu.diging.citesphere.core.model.bib.IReference;
+import edu.asu.diging.citesphere.model.bib.ICitationConceptTag;
+import edu.asu.diging.citesphere.model.bib.ICreator;
+import edu.asu.diging.citesphere.model.bib.IPerson;
+import edu.asu.diging.citesphere.model.bib.IReference;
 
 public class ExtraDataObject {
 

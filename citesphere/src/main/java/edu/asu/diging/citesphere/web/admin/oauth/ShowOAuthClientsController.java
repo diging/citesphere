@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
 
@@ -24,4 +23,5 @@ public class ShowOAuthClientsController {
         model.addAttribute("totalPages", result.getTotalPages());
         return "admin/apps/show";
     }
+    
 }

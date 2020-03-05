@@ -14,16 +14,16 @@ import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.authority.IAuthorityEntry;
-import edu.asu.diging.citesphere.core.model.authority.impl.AuthorityEntry;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.Person;
-import edu.asu.diging.citesphere.core.repository.AuthorityEntryRepository;
-import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.core.repository.bib.PersonRepository;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
+import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.data.bib.PersonRepository;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
+import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.Person;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 public class AuthorityService implements IAuthorityService {

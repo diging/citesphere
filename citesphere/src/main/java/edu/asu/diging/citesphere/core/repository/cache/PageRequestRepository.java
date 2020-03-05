@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ZoteroObjectType;
 import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
+import edu.asu.diging.citesphere.model.bib.ZoteroObjectType;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface PageRequestRepository extends PagingAndSortingRepository<PageRequest, String> {
 

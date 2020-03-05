@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class SyncGroupItemsController {

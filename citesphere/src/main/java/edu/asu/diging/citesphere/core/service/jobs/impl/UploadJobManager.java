@@ -26,13 +26,13 @@ import edu.asu.diging.citesphere.core.exceptions.FileStorageException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.MessageCreationException;
 import edu.asu.diging.citesphere.core.kafka.IKafkaRequestProducer;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
+import edu.asu.diging.citesphere.core.model.jobs.impl.Job;
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
 import edu.asu.diging.citesphere.core.model.jobs.impl.UploadJob;
+import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.repository.jobs.UploadJobRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
@@ -40,6 +40,8 @@ import edu.asu.diging.citesphere.core.service.jwt.IJwtTokenService;
 import edu.asu.diging.citesphere.core.service.upload.IFileStorageManager;
 import edu.asu.diging.citesphere.messages.KafkaTopics;
 import edu.asu.diging.citesphere.messages.model.KafkaJobMessage;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 @Transactional
@@ -52,7 +54,10 @@ public class UploadJobManager implements IUploadJobManager {
     private int jobPageSize;
 
     @Autowired
-    private UploadJobRepository jobRepository;
+    private UploadJobRepository uploadJobRepository;
+    
+    @Autowired
+    private JobRepository jobsRepository;
 
     @Autowired
     private IFileStorageManager fileManager;
@@ -74,19 +79,25 @@ public class UploadJobManager implements IUploadJobManager {
      */
     @Override
     public IUploadJob findUploadJob(String id) {
-        Optional<UploadJob> jobOptional = jobRepository.findById(id);
+        Optional<UploadJob> jobOptional = uploadJobRepository.findById(id);
         if (jobOptional.isPresent()) {
-            IJob job = jobOptional.get();
-            if (IUploadJob.class.isAssignableFrom(job.getClass())) {
-                return (IUploadJob) job;
-            }
+            return jobOptional.get();
+        }
+        return null;
+    }
+    
+    @Override
+    public IJob findJob(String id) {
+        Optional<Job> job = jobsRepository.findById(id);
+        if (job.isPresent()) {
+            return job.get();
         }
         return null;
     }
     
     @Override
     public IUploadJob findUploadJobFullyLoaded(String id) {
-        Optional<UploadJob> jobOptional = jobRepository.findById(id);
+        Optional<UploadJob> jobOptional = uploadJobRepository.findById(id);
         if (jobOptional.isPresent()) {
             IJob job = jobOptional.get();
             // load phases
@@ -133,7 +144,7 @@ public class UploadJobManager implements IUploadJobManager {
                     job.getPhases().add(new JobPhase(JobStatus.FAILURE, "There is not file content."));
                     continue;
                 }
-                job = jobRepository.save(job);
+                job = uploadJobRepository.save(job);
                 fileManager.saveFile(user.getUsername(), job.getId(), filename, bytes);
 
                 job.setStatus(JobStatus.PREPARED);
@@ -144,7 +155,7 @@ public class UploadJobManager implements IUploadJobManager {
                 continue;
             } finally {
                 i++;
-                jobRepository.save(job);
+                uploadJobRepository.save(job);
             }
 
             String contentType = null;
@@ -160,7 +171,7 @@ public class UploadJobManager implements IUploadJobManager {
 
             job.setContentType(contentType);
             job.setFileSize(f.getSize());
-            jobRepository.save(job);
+            uploadJobRepository.save(job);
             String token = tokenService.generateJobApiToken(job);
             try {
                 kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.REFERENCES_IMPORT_TOPIC);
@@ -168,7 +179,7 @@ public class UploadJobManager implements IUploadJobManager {
                 logger.error("Could not send Kafka message.", e);
                 job.setStatus(JobStatus.FAILURE);
                 job.getPhases().add(new JobPhase(JobStatus.FAILURE, e.getMessage()));
-                jobRepository.save(job);
+                uploadJobRepository.save(job);
             }
         }
 
@@ -189,7 +200,7 @@ public class UploadJobManager implements IUploadJobManager {
     @Override
     public List<IUploadJob> getUploadJobs(IUser user, int page) {
         List<IUploadJob> results = new ArrayList<>();
-        jobRepository.findByUsername(user.getUsername(), PageRequest.of(page, jobPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(job -> {
+        uploadJobRepository.findByUsername(user.getUsername(), PageRequest.of(page, jobPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(job -> {
             job.setCitationGroupDetail(groupManager.getGroup(user, job.getCitationGroup()));
             results.add(job); 
         });

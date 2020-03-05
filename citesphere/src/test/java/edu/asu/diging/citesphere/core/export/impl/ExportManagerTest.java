@@ -1,6 +1,5 @@
 package edu.asu.diging.citesphere.core.export.impl;
 
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Assert;
@@ -19,25 +18,25 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.export.ExportType;
 import edu.asu.diging.citesphere.core.export.IExportProcessor;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.core.export.IExportTaskManager;
 import edu.asu.diging.citesphere.core.model.export.ExportStatus;
 import edu.asu.diging.citesphere.core.model.export.IExportTask;
 import edu.asu.diging.citesphere.core.model.export.impl.ExportTask;
-import edu.asu.diging.citesphere.core.model.impl.User;
-import edu.asu.diging.citesphere.core.repository.export.ExportTaskRepository;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.user.impl.User;
 
 public class ExportManagerTest {
     
     @Mock
-    private ExportTaskRepository taskRepo;
+    private IExportTaskManager taskManager;
     
     @Mock
     private IExportProcessor processor;
@@ -93,9 +92,9 @@ public class ExportManagerTest {
         task = new ExportTask();
         task.setStatus(ExportStatus.STARTED);
         task.setId(EXPORT_TASK_ID);
-        Mockito.when(taskRepo.saveAndFlush(Mockito.any(ExportTask.class))).thenReturn(task);
+        Mockito.when(taskManager.saveAndFlush(Mockito.any(ExportTask.class))).thenReturn(task);
         
-        Mockito.when(taskRepo.findById(EXPORT_TASK_ID)).thenReturn(Optional.of(task));
+        Mockito.when(taskManager.get(EXPORT_TASK_ID)).thenReturn(task);
         
         collection = new CitationCollection();
         collection.setKey(COLLECTION_ID);
@@ -104,10 +103,16 @@ public class ExportManagerTest {
         
         task1 = new ExportTask();
         task1.setId(TASK1_ID);
-        Mockito.when(taskRepo.findById(TASK1_ID)).thenReturn(Optional.of(task1));
+        Mockito.when(taskManager.get(TASK1_ID)).thenReturn(task1);
+        
+        IExportTask newExportTask = new ExportTask();
+        newExportTask.setExportType(ExportType.CSV);
+        newExportTask.setUsername(user.getUsername());
+        newExportTask.setStatus(ExportStatus.PENDING);
+        Mockito.when(taskManager.createExportTask(ExportType.CSV, user.getUsername(), ExportStatus.PENDING)).thenReturn(newExportTask);
+        
         
         Whitebox.setInternalState(managerToTest, "maxExportSize", 300);
-        Whitebox.setInternalState(managerToTest, "tasksPageSize", 5);
         managerToTest.init();
     }
     
@@ -115,14 +120,14 @@ public class ExportManagerTest {
     public void test_export_group() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         managerToTest.export(ExportType.CSV, user, groupId.toString(), null);
         Mockito.verify(processor).runExport(ExportType.CSV, user, groupId.toString(), null, task, managerToTest);
-        Mockito.verify(taskRepo).saveAndFlush(Mockito.any(ExportTask.class));
+        Mockito.verify(taskManager).saveAndFlush(Mockito.any(ExportTask.class));
     }
     
     @Test
     public void test_export_collection() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         managerToTest.export(ExportType.CSV, user, groupId.toString(), COLLECTION_ID);
         Mockito.verify(processor).runExport(ExportType.CSV, user, groupId.toString(), COLLECTION_ID, task, managerToTest);
-        Mockito.verify(taskRepo).saveAndFlush(Mockito.any(ExportTask.class));
+        Mockito.verify(taskManager).saveAndFlush(Mockito.any(ExportTask.class));
     }
     
     @Test(expected=ExportTooBigException.class)
@@ -144,31 +149,14 @@ public class ExportManagerTest {
     @Test(expected=ExportTypeNotSupportedException.class)
     public void test_export_typeNotSupported() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         Mockito.doThrow(ExportTypeNotSupportedException.class).when(processor).runExport(null, user, groupId.toString(), null, task, managerToTest);
+        
+        IExportTask newExportTask = new ExportTask();
+        newExportTask.setExportType(null);
+        newExportTask.setUsername(user.getUsername());
+        newExportTask.setStatus(ExportStatus.PENDING);
+        Mockito.when(taskManager.createExportTask(null, user.getUsername(), ExportStatus.PENDING)).thenReturn(newExportTask);
+        
         managerToTest.export(null, user, groupId.toString(), null);
-    }
-    
-    @Test
-    public void test_getTask_success() {
-        IExportTask actual = managerToTest.getTask(TASK1_ID);
-        Assert.assertEquals(TASK1_ID, actual.getId());
-    }
-    
-    @Test
-    public void test_getTask_noResult() {
-        Mockito.when(taskRepo.findById("TASK2")).thenReturn(Optional.empty());
-        Assert.assertNull(managerToTest.getTask("TASK2"));
-    }
-    
-    @Test
-    public void test_getTasksTotalPages_onePage() {
-        Mockito.when(taskRepo.countByUsername(USERNAME)).thenReturn(5);
-        Assert.assertEquals(1, managerToTest.getTasksTotalPages(user));
-    }
-    
-    @Test
-    public void test_getTasksTotalPages_moreThanOnePage() {
-        Mockito.when(taskRepo.countByUsername(USERNAME)).thenReturn(24);
-        Assert.assertEquals(5, managerToTest.getTasksTotalPages(user));
     }
     
     @Test

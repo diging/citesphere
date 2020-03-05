@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import edu.asu.diging.citesphere.core.exceptions.UserDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class ChangePasswordController {

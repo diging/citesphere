@@ -10,12 +10,12 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
-import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.ItemType;
+import edu.asu.diging.citesphere.model.bib.impl.BibField;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface ICitationManager {
 

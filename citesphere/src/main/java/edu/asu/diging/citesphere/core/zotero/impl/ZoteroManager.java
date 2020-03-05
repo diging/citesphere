@@ -26,16 +26,16 @@ import edu.asu.diging.citesphere.core.factory.ICitationCollectionFactory;
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.IGroupFactory;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitation;
-import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.ItemType;
-import edu.asu.diging.citesphere.core.model.bib.impl.BibField;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollectionResult;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.ItemType;
+import edu.asu.diging.citesphere.model.bib.impl.BibField;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 public class ZoteroManager implements IZoteroManager {

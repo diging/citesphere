@@ -11,16 +11,16 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollection;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationCollectionResult;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.core.repository.bib.CitationCollectionRepository;
-import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.data.bib.CitationCollectionRepository;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 @PropertySource("classpath:/config.properties")

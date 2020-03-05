@@ -4,8 +4,8 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.core.exceptions.UserAlreadyExistsException;
 import edu.asu.diging.citesphere.core.exceptions.UserDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.model.Role;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface IUserManager {
 

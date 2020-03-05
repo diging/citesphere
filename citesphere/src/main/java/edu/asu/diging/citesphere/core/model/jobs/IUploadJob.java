@@ -2,8 +2,8 @@ package edu.asu.diging.citesphere.core.model.jobs;
 
 import java.util.List;
 
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 
 public interface IUploadJob extends IJob {
 

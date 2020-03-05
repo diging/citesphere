@@ -18,8 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import edu.asu.diging.citesphere.core.email.impl.NotSetupMailSender;
 

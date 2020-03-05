@@ -2,9 +2,8 @@ package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
 
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.IConceptType;
-import edu.asu.diging.citesphere.core.model.bib.impl.ConceptType;
+import edu.asu.diging.citesphere.model.bib.IConceptType;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 
 public interface IConceptTypeManager {

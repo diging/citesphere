@@ -5,12 +5,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.core.repository.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 public class GroupManager implements IGroupManager {

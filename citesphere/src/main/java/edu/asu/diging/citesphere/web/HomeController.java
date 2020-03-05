@@ -6,9 +6,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import edu.asu.diging.citesphere.core.model.IUser;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroTokenManager;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class HomeController {

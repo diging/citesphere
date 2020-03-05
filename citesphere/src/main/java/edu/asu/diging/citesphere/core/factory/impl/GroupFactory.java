@@ -4,8 +4,8 @@ import org.springframework.social.zotero.api.Group;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.factory.IGroupFactory;
-import edu.asu.diging.citesphere.core.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 
 @Component
 public class GroupFactory implements IGroupFactory {

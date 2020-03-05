@@ -23,13 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.asu.diging.citesphere.api.v1.V1Controller;
 import edu.asu.diging.citesphere.api.v1.model.ICollectionResult;
 import edu.asu.diging.citesphere.api.v1.model.impl.CollectionResult;
+import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
-import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
-import edu.asu.diging.citesphere.core.model.IUser;
-import edu.asu.diging.citesphere.core.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 @PropertySource("classpath:/config.properties")
