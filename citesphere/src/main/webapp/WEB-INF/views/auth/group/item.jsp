@@ -25,7 +25,14 @@
  	  </c:if>
 
 </h2>
-
+${index}
+<div class="pull-left" style="float:left;margin-top: 20px;">
+	<a href="<c:url value="/auth/group/${zoteroGroupId}/item?index=${index-1}&page=${page}"/>"> Previous</a>
+</div>
+<div class="pull-right" style="float:right;margin-top: 20px;">
+	<a href="<c:url value="/auth/group/${zoteroGroupId}/item?index=${index+1}&page=${page}"/>"> Next</a>
+</div>		
+		
 <div style="margin-bottom: 20px;">
 	<a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />"><i
@@ -374,5 +381,10 @@
             
 			$("#parsed-ref-modal").modal();
 		});
-	})
+	});
+	function goNext() {
+			
+			window.history.forward();
+		}
+	
 </script>
