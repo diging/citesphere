@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -80,12 +81,15 @@ public class AuthorityService implements IAuthorityService {
     
     @Override
     public List<IAuthorityEntry> importAuthorityEntries(String searchString) throws URISyntaxException, AuthorityServiceConnectionException {
+        List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
+        
         for(AuthorityImporter importer : importers) {
-            if (importer.isResponsible(searchString)) {
-            	return importer.retrieveAuthoritiesData(searchString); 
-            }
+
+            if(importer.retrieveAuthoritiesData(searchString) != null)
+                    authorityEntries.addAll(importer.retrieveAuthoritiesData(searchString)); 
+
         }
-        return null;
+        return authorityEntries;
     }
     
     @Override
@@ -111,7 +115,7 @@ public class AuthorityService implements IAuthorityService {
     
     @Override
     public List<IAuthorityEntry> findByName(IUser user, String name) {
-        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameLikeOrderByName(user.getUsername(), name);
+        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingOrderByName(user.getUsername(), name);
         return results;
     }
     
@@ -122,6 +126,23 @@ public class AuthorityService implements IAuthorityService {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
         List<Person> persons = personRepository.findPersonsByCitationGroupAndUri((ICitationGroup)group.get(), uri);
+        Set<IAuthorityEntry> entries = new HashSet<>();
+        persons.forEach(p -> {
+            Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
+            if (optional.isPresent()) {
+                entries.add(optional.get());
+            }
+        });
+        return entries;
+    }
+    
+    @Override
+    public Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId, List<String> uris) throws GroupDoesNotExistException {
+        Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
+        if (!group.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
+        }
+        List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn((ICitationGroup)group.get(), name, uris);
         Set<IAuthorityEntry> entries = new HashSet<>();
         persons.forEach(p -> {
             Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());

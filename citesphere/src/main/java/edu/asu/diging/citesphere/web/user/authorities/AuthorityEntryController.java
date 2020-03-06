@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.javers.common.collections.Sets;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,21 +31,22 @@ import edu.asu.diging.citesphere.web.user.authorities.helper.AuthorityEntryContr
 
 @Controller
 public class AuthorityEntryController {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     @Autowired
     private IAuthorityService authorityService;
-    
+
     @Autowired
     private AuthorityEntryControllerHelper authorityEntryControllerHelper;
 
     @RequestMapping("/auth/authority/get")
-    public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri, @RequestParam("zoteroGroupId") String zoteroGroupId) {
-        List<IAuthorityEntry> userEntries = authorityService.findByUri((IUser)authentication.getPrincipal(), uri);
+    public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication,
+            @RequestParam("uri") String uri, @RequestParam("zoteroGroupId") String zoteroGroupId) {
+        List<IAuthorityEntry> userEntries = authorityService.findByUri((IUser) authentication.getPrincipal(), uri);
         FoundAuthorities foundAuthorities = new FoundAuthorities();
         foundAuthorities.setUserAuthorityEntries(userEntries);
-        
+
         try {
             IAuthorityEntry entry = authorityService.importAuthority(uri);
             foundAuthorities.setImportedAuthority(entry);
@@ -54,8 +57,7 @@ public class AuthorityEntryController {
             logger.info("Not a valid URI: " + uri, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        
-        
+
         Set<IAuthorityEntry> datasetEntries;
         try {
             datasetEntries = authorityService.findByUriInDataset(uri, zoteroGroupId);
@@ -66,9 +68,10 @@ public class AuthorityEntryController {
         foundAuthorities.setDatasetAuthorityEntries(datasetEntries);
         return new ResponseEntity<FoundAuthorities>(foundAuthorities, HttpStatus.OK);
     }
-    
-    @RequestMapping(value="/auth/authority/create", method=RequestMethod.POST)
-    public ResponseEntity<IAuthorityEntry> createAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri) {
+
+    @RequestMapping(value = "/auth/authority/create", method = RequestMethod.POST)
+    public ResponseEntity<IAuthorityEntry> createAuthorityEntry(Authentication authentication,
+            @RequestParam("uri") String uri) {
         IAuthorityEntry entry = null;
         try {
             entry = authorityService.importAuthority(uri);
@@ -79,48 +82,57 @@ public class AuthorityEntryController {
             logger.info("Not a valid URI: " + uri, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-     
-        entry = authorityService.create(entry, (IUser)authentication.getPrincipal());
+
+        entry = authorityService.create(entry, (IUser) authentication.getPrincipal());
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
-    
-    @RequestMapping("/auth/authority/getAuthoritiesByName")
-    public ResponseEntity<FoundAuthorities> getAuthoritiesByName(Authentication authentication, @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("zoteroGroupId") String zoteroGroupId) {
- 
-    		String[] serachStrings = authorityEntryControllerHelper.getAuthoritySearchStrings(firstName, lastName);
-    		String databaseSearchString = serachStrings[1];
-    		String conceptpowerSearchString = serachStrings[0];
-    		
-    		
-    	    List<IAuthorityEntry> userEntries = authorityService.findByName((IUser)authentication.getPrincipal(), databaseSearchString);
-            FoundAuthorities foundAuthorities = new FoundAuthorities();
-            foundAuthorities.setUserAuthorityEntries(userEntries);
+
+    @RequestMapping("/auth/authority/{zoteroGroupId}/find")
+    public ResponseEntity<FoundAuthorities> getAuthoritiesByName(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId,
+            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
+
+        String[] searchStrings = authorityEntryControllerHelper.getAuthoritySearchStrings(firstName, lastName);
+        String databaseSearchString = searchStrings[1];
+        String conceptpowerSearchString = searchStrings[0];
+
+        List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
+                databaseSearchString);
+        FoundAuthorities foundAuthorities = new FoundAuthorities();
+        foundAuthorities.setUserAuthorityEntries(userEntries);
+
+        Set<IAuthorityEntry> datasetEntries;
+        try {
+            List<String> uriList = foundAuthorities.getUserAuthorityEntries().stream().map(IAuthorityEntry::getUri)
+                    .collect(Collectors.toList());
             
-            
-            Set<IAuthorityEntry> datasetEntries;
-            try {
-                datasetEntries = authorityService.findByNameInDataset(databaseSearchString, zoteroGroupId);                
-                
-            } catch (GroupDoesNotExistException e) {
-                logger.warn("Group does not exist: " + zoteroGroupId, e);
-                return new ResponseEntity<FoundAuthorities>(HttpStatus.BAD_REQUEST);
+            if(uriList==null || uriList.size()<1) {
+                datasetEntries = authorityService.findByNameInDataset(databaseSearchString, zoteroGroupId);
             }
-            foundAuthorities.setDatasetAuthorityEntries(datasetEntries);
-            
-            try {
-            	List<IAuthorityEntry> importedEntries = authorityService.importAuthorityEntries(conceptpowerSearchString);
-                	foundAuthorities.setImportedAuthorityEntries(importedEntries);             
-                
-            } catch (AuthorityServiceConnectionException e) {
-                logger.warn("Could not retrieve authority entries.", e);
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            } catch (URISyntaxException e) {
-                logger.info("Not a valid URI: " + firstName, e);
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            else {
+                datasetEntries = authorityService.findByNameInDataset(databaseSearchString, zoteroGroupId, uriList);
             }
-            
-            foundAuthorities = authorityEntryControllerHelper.removeDuplicateAuthorities(foundAuthorities);
-            return new ResponseEntity<FoundAuthorities>(foundAuthorities, HttpStatus.OK);
+
+        } catch (GroupDoesNotExistException e) {
+            logger.warn("Group does not exist: " + zoteroGroupId, e);
+            return new ResponseEntity<FoundAuthorities>(HttpStatus.BAD_REQUEST);
+        }
+        foundAuthorities.setDatasetAuthorityEntries(datasetEntries);
+
+        try {
+            List<IAuthorityEntry> importedEntries = authorityService.importAuthorityEntries(conceptpowerSearchString);
+            foundAuthorities.setImportedAuthorityEntries(importedEntries);
+
+        } catch (AuthorityServiceConnectionException e) {
+            logger.warn("Could not retrieve authority entries.", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (URISyntaxException e) {
+            logger.info("Not a valid URI: " + firstName, e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        foundAuthorities = authorityEntryControllerHelper.removeDuplicateAuthorities(foundAuthorities);
+        return new ResponseEntity<FoundAuthorities>(foundAuthorities, HttpStatus.OK);
     }
-    
+
 }

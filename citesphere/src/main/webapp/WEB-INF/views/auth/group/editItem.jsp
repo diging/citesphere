@@ -587,7 +587,7 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
-	url = '<c:url value="/auth/authority/getAuthoritiesByName?firstName='+ firstName + '&lastName=' + lastName + '&zoteroGroupId=' + ${zoteroGroupId} + '"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find?firstName='+ firstName + '&lastName=' + lastName + '"/>'
 		
 	$.ajax({
   		dataType: "json",
@@ -653,14 +653,14 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
 		$("#authoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
-			uri = $(this).closest('td').next().text()
+			uri = $(this).closest('td').next().text()+"/";
 				
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
 			
 			if($(this).closest('td').next().next().next().text()=='Do you want to create a managed authority entry? '){
 				
-				createManageAuthorityURL = '<c:url value="/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri='+ $(this).closest('td').next().text() + '"/>';
+				createManageAuthorityURL = '<c:url value="/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri='+ $(this).closest('td').next().text() + '/"/>';
 						
 				$.ajax({
 			  		dataType: "json",

@@ -11,8 +11,10 @@ import edu.asu.diging.citesphere.model.bib.impl.Person;
 
 public interface PersonAuthorityRepository extends PagingAndSortingRepository<Person, String>{
 	
+  @Query("SELECT p from Citation c LEFT JOIN c.authors p WHERE p.name like (:name) AND c.group=(:group) AND p.uri not in (:uris) AND p.localAuthorityId != ''")
+  List<Person> findPersonsByCitationGroupAndNameLikeAndUriNotIn(@Param("group") ICitationGroup group, @Param("name") String name, @Param("uris") List<String> uris);
+
   @Query("SELECT p from Citation c LEFT JOIN c.authors p WHERE p.name like (:name) AND c.group=(:group) AND p.localAuthorityId != ''")
   List<Person> findPersonsByCitationGroupAndNameLike(@Param("group") ICitationGroup group, @Param("name") String name);
-
 
 }

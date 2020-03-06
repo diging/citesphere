@@ -31,9 +31,12 @@ public interface IAuthorityService {
     List<IAuthorityEntry> findByName(IUser user, String name);
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
-    
-    Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId) throws GroupDoesNotExistException;
 
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
+
+    Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId, List<String> uris)
+            throws GroupDoesNotExistException;
+
+    Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId) throws GroupDoesNotExistException;
 
 }

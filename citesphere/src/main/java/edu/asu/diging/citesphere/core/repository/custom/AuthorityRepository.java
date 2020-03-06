@@ -11,7 +11,6 @@ import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 
 public interface AuthorityRepository extends PagingAndSortingRepository<AuthorityEntry, String>{
 	
-	@Query("SELECT ae from AuthorityEntry ae WHERE ae.username = (:username) AND ae.name like (:name)")
-    public List<IAuthorityEntry> findByUsernameAndNameLikeOrderByName(@Param("username") String username, @Param("name") String name);
+    public List<IAuthorityEntry> findByUsernameAndNameContainingOrderByName(@Param("username") String username, @Param("name") String name);
 	
 }
