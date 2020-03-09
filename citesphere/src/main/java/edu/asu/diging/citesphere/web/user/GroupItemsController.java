@@ -22,10 +22,10 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.BreadCrumb;
 import edu.asu.diging.citesphere.web.BreadCrumbType;
 

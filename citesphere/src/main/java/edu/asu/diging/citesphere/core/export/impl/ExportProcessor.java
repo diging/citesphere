@@ -40,9 +40,9 @@ import edu.asu.diging.citesphere.core.model.export.impl.ExportTask;
 import edu.asu.diging.citesphere.core.repository.export.ExportTaskRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.upload.IFileStorageManager;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Component
 @Transactional

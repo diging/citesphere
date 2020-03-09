@@ -22,12 +22,15 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
+import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
+import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 
 @Controller
@@ -50,6 +53,15 @@ public class AddItemController {
     
     @Autowired
     private ICitationCollectionManager collectionManager;
+    
+    @Autowired
+    private ICitationConceptManager conceptManager;
+    
+    @Autowired
+    private IConceptTypeManager typeManager;
+    
+    @Autowired
+    private IUserManager userManager;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create")
     public String show(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId) {
@@ -60,6 +72,8 @@ public class AddItemController {
         
         try {
             model.addAttribute("citationCollections", collectionManager.getAllCollections((IUser)authentication.getPrincipal(), zoteroGroupId, null, "title", 200));
+            model.addAttribute("concepts", conceptManager.findAll(userManager.findByUsername(authentication.getName())));
+            model.addAttribute("conceptTypes", typeManager.getAllTypes(userManager.findByUsername(authentication.getName())));
         } catch (GroupDoesNotExistException e) {
             logger.error("Could not retrieve collections.", e);
         }
