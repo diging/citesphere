@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.web.validation;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -45,6 +47,10 @@ public class ConceptTypeValidatorTest {
 
     private IConceptType dbConceptType;
 
+    private final static String URI_FORM_INPUT = "http://www.google.com";
+
+    private final static String URI_EXISTING = "http://www.google1.com";
+
     @Before
     public void setUp() {
 
@@ -58,6 +64,7 @@ public class ConceptTypeValidatorTest {
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         Mockito.when(authentication.getPrincipal()).thenReturn(user);
         SecurityContextHolder.setContext(securityContext);
+        errors = new BeanPropertyBindingResult(conceptTypeForm, "validator");
 
     }
 
@@ -65,7 +72,7 @@ public class ConceptTypeValidatorTest {
         conceptTypeForm = new ConceptTypeForm();
         conceptTypeForm.setDescription("test dec");
         conceptTypeForm.setName("name");
-        conceptTypeForm.setUri("http://wwww.google.com");
+        conceptTypeForm.setUri(URI_FORM_INPUT);
 
     }
 
@@ -73,56 +80,56 @@ public class ConceptTypeValidatorTest {
         dbConceptType = new ConceptType();
         dbConceptType.setOwner(user);
         dbConceptType.setId("CTY1");
-        dbConceptType.setUri("http://www.google.com");
+        dbConceptType.setUri(URI_FORM_INPUT);
     }
 
     @Test
-    public void validateTest_AddConceptType_Success() {
+    public void test_addConceptType_Success() {
 
-        Mockito.when(conceptTypeManager.getByUriAndOwner("http://wwww.google.com", user)).thenReturn(null);
-        errors = new BeanPropertyBindingResult(conceptTypeForm, "invalidConcept");
+        Mockito.when(conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user)).thenReturn(null);
         conceptTypeValidator.validate(conceptTypeForm, errors);
         assert (errors.getFieldError("uri") == null);
+        assertTrue(!errors.hasErrors());
 
     }
 
     @Test
-    public void validateTest_AddConceptType_Uri_Exists() {
+    public void test_addConceptType_Uri_Exists() {
 
-        Mockito.when(conceptTypeManager.getByUriAndOwner("http://wwww.google.com", user)).thenReturn(conceptType);
-        errors = new BeanPropertyBindingResult(conceptTypeForm, "validConcept");
+        Mockito.when(conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user)).thenReturn(conceptType);
         conceptTypeValidator.validate(conceptTypeForm, errors);
         assert (errors.getFieldError("uri") != null);
 
     }
 
     @Test
-    public void validateTest_EditConceptType_Success() {
+    public void test_editConceptType_Success() {
 
         conceptTypeForm.setConceptTypeId("CTY1");
-        dbConceptType.setUri("http://www.google1.com");
+        dbConceptType.setUri(URI_EXISTING);
         Mockito.when(conceptTypeManager.get("CTY1")).thenReturn(dbConceptType);
-        Mockito.when(conceptTypeManager.getByUriAndOwner("http://wwww.google.com", user)).thenReturn(null);
+        Mockito.when(conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user)).thenReturn(null);
         errors = new BeanPropertyBindingResult(conceptTypeForm, "validConcept");
         conceptTypeValidator.validate(conceptTypeForm, errors);
         assert (errors.getFieldError("uri") == null);
+        assertTrue(!errors.hasErrors());
 
     }
 
     @Test
-    public void validateTest_EditConceptType_Uri_Exists() {
+    public void test_editConceptType_Uri_Exists() {
 
         conceptTypeForm.setConceptTypeId("CTY1");
+        dbConceptType.setUri(URI_EXISTING);
         Mockito.when(conceptTypeManager.get("CTY1")).thenReturn(dbConceptType);
-        Mockito.when(conceptTypeManager.getByUriAndOwner("http://wwww.google.com", user)).thenReturn(conceptType);
-        errors = new BeanPropertyBindingResult(conceptTypeForm, "validConcept");
+        Mockito.when(conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user)).thenReturn(conceptType);
         conceptTypeValidator.validate(conceptTypeForm, errors);
         assert (errors.getFieldError("uri") != null);
 
     }
 
     @Test
-    public void validateTest_EditConceptType_Owner_Only() {
+    public void test_editConceptType_Owner_Only() {
 
         User user1 = new User();
         user1.setUsername("user1");
@@ -130,8 +137,7 @@ public class ConceptTypeValidatorTest {
         conceptTypeForm.setConceptTypeId("CTY1");
         dbConceptType.setOwner(user1);
         Mockito.when(conceptTypeManager.get("CTY1")).thenReturn(dbConceptType);
-        Mockito.when(conceptTypeManager.getByUriAndOwner("http://wwww.google.com", user)).thenReturn(conceptType);
-        errors = new BeanPropertyBindingResult(conceptTypeForm, "validConcept");
+        Mockito.when(conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user)).thenReturn(conceptType);
         conceptTypeValidator.validate(conceptTypeForm, errors);
         assert (errors.getFieldError("uri") != null);
 

@@ -176,8 +176,8 @@ public class CitationHelperTest {
     @Test
     public void test_updateCitation() {
 
-        Mockito.when(conceptManager.save(Mockito.argThat(new ConceptArgMatcher()))).thenReturn(concept);
-        Mockito.when(typeManager.save(Mockito.argThat(new ConceptTypeArgMatcher()))).thenReturn(type);
+        Mockito.when(conceptManager.save(Mockito.argThat(new ConceptArgMatcher(concept)))).thenReturn(concept);
+        Mockito.when(typeManager.save(Mockito.argThat(new ConceptTypeArgMatcher(type)))).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
         assertTrue(equalsCitation(citation, updatedCitation));
     }
@@ -333,18 +333,25 @@ public class CitationHelperTest {
 
     class ConceptArgMatcher extends ArgumentMatcher<ICitationConcept> {
 
+        private ICitationConcept conceptToBeTested;
+
+        public ConceptArgMatcher(ICitationConcept concept) {
+            conceptToBeTested = concept;
+
+        }
+
         @Override
         public boolean matches(Object arg) {
 
             ICitationConcept conceptArg = (ICitationConcept) arg;
 
-            if (!conceptArg.getName().equals(concept.getName()))
+            if (!conceptArg.getName().equals(conceptToBeTested.getName()))
                 return false;
 
-            if (!conceptArg.getUri().equals(concept.getUri()))
+            if (!conceptArg.getUri().equals(conceptToBeTested.getUri()))
                 return false;
 
-            if (!conceptArg.getOwner().equals(concept.getOwner()))
+            if (!conceptArg.getOwner().equals(conceptToBeTested.getOwner()))
                 return false;
 
             return true;
@@ -354,18 +361,25 @@ public class CitationHelperTest {
 
     class ConceptTypeArgMatcher extends ArgumentMatcher<IConceptType> {
 
+        private IConceptType conceptTypeToBeTested;
+
+        public ConceptTypeArgMatcher(IConceptType type) {
+            conceptTypeToBeTested = type;
+
+        }
+
         @Override
         public boolean matches(Object arg) {
 
             IConceptType conceptTypeArg = (IConceptType) arg;
 
-            if (!conceptTypeArg.getName().equals(type.getName()))
+            if (!conceptTypeArg.getName().equals(conceptTypeToBeTested.getName()))
                 return false;
 
-            if (!conceptTypeArg.getUri().equals(type.getUri()))
+            if (!conceptTypeArg.getUri().equals(conceptTypeToBeTested.getUri()))
                 return false;
 
-            if (!conceptTypeArg.getOwner().equals(type.getOwner()))
+            if (!conceptTypeArg.getOwner().equals(conceptTypeToBeTested.getOwner()))
                 return false;
 
             return true;
