@@ -28,15 +28,23 @@ public class ConceptTypeValidator implements Validator {
         ConceptTypeForm conceptTypeForm = (ConceptTypeForm) target;
         IUser user = (IUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!errors.hasErrors()) {
-            IConceptType conceptType = conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user);
-            if (conceptType == null) {
-                String conceptTypeId = conceptTypeForm.getConceptTypeId();
-                if (conceptTypeId != null
-                        && !conceptTypeManager.get(conceptTypeId).getOwner().getUsername().equals(user.getUsername())) {
+            IConceptType type = conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user);
+
+            if (conceptTypeForm.getConceptTypeId() != null) {
+                //edit
+                IConceptType dbConceptType = conceptTypeManager.get(conceptTypeForm.getConceptTypeId());
+                if (!dbConceptType.getOwner().getUsername().equals(user.getUsername())) {
                     errors.rejectValue("uri", "uri", "Only the owner can edit a Concept Type.");
+                } else {
+                    if (!dbConceptType.getUri().equals(conceptTypeForm.getUri()) && type != null) {
+                        errors.rejectValue("uri", "uri", "Concept Type with this uri already exists!");
+                    }
                 }
             } else {
-                errors.rejectValue("uri", "uri", "Concept type with this uri already exists!");
+                //add
+                if (type != null) {
+                    errors.rejectValue("uri", "uri", "Concept Type with this uri already exists!");
+                }
             }
         }
     }

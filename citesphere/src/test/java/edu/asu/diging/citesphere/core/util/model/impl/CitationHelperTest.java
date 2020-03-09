@@ -16,10 +16,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.web.util.UriBuilder;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.Matchers.*;
-
-import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.service.impl.CitationManager;
