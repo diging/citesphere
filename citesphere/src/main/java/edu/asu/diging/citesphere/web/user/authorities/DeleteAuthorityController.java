@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class DeleteAuthorityController {

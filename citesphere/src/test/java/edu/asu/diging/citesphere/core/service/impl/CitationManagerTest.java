@@ -26,12 +26,12 @@ import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.CustomCitationRepository;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.model.impl.User;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.user.impl.User;
 
 public class CitationManagerTest {
 

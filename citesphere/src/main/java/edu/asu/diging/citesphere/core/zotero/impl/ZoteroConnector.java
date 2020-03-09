@@ -31,7 +31,7 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Component
 @PropertySource("classpath:/config.properties")

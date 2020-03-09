@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.email.IEmailNotificationManager;
 import edu.asu.diging.citesphere.core.model.IPasswordResetToken;
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 public class EmailNotificationManager implements IEmailNotificationManager {
