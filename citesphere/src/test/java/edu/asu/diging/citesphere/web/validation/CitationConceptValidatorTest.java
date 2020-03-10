@@ -15,9 +15,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
-
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
-import edu.asu.diging.citesphere.core.service.impl.CitationManager;
 import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitationConcept;
 import edu.asu.diging.citesphere.model.bib.impl.CitationConcept;
