@@ -9,7 +9,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
@@ -34,10 +33,10 @@ import edu.asu.diging.citesphere.web.forms.PersonForm;
 
 @Component
 public class CitationHelper implements ICitationHelper {
-    
+
     @Autowired
     private ICitationConceptManager conceptManager;
-    
+
     @Autowired
     private IConceptTypeManager typeManager;
 
@@ -73,27 +72,27 @@ public class CitationHelper implements ICitationHelper {
         citation.setTitle(form.getTitle());
         citation.setUrl(form.getUrl());
         citation.setVolume(form.getVolume());
-        
+
         Map<String, IPerson> authorMap = new HashMap<>();
-        if(citation.getAuthors()!=null) {
+        if (citation.getAuthors() != null) {
             citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
         }
         citation.setAuthors(new HashSet<>());
         if (form.getAuthors() != null) {
             mapPersonFields(authorMap, form.getAuthors(), citation.getAuthors());
         }
-        
+
         Map<String, IPerson> editorMap = new HashMap<>();
-        if(citation.getEditors()!=null) {
+        if (citation.getEditors() != null) {
             citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
         }
         citation.setEditors(new HashSet<>());
         if (form.getEditors() != null) {
             mapPersonFields(editorMap, form.getEditors(), citation.getEditors());
         }
-        
+
         Map<String, ICreator> creatorMap = new HashMap<>();
-        if(citation.getOtherCreators()!=null) {
+        if (citation.getOtherCreators() != null) {
             citation.getOtherCreators().forEach(a -> creatorMap.put(a.getId(), a));
         }
         citation.setOtherCreators(new HashSet<>());
@@ -108,50 +107,50 @@ public class CitationHelper implements ICitationHelper {
                     ICitationConceptTag tag = new CitationConceptTag();
                     ICitationConcept concept = conceptManager.getByUriAndOwner(assignment.getConceptUri(), user);
                     IConceptType type = typeManager.getByUriAndOwner(assignment.getConceptTypeUri(), user);
-                    if(concept == null) {
+                    if (concept == null) {
                         concept = new CitationConcept();
                         concept.setName(assignment.getConceptName());
                         concept.setUri(assignment.getConceptUri());
                         concept.setOwner(user);
                         concept = conceptManager.save(concept);
                     }
-                    if(type == null) {
+                    if (type == null) {
                         type = new ConceptType();
                         type.setName(assignment.getConceptTypeName());
                         type.setUri(assignment.getConceptTypeUri());
                         type.setOwner(user);
                         type = typeManager.save(type);
                     }
-                    
+
                     tag.setConceptName(concept.getName());
                     tag.setConceptUri(concept.getUri());
                     tag.setLocalConceptId(concept.getId());
                     tag.setTypeName(type.getName());
                     tag.setTypeUri(type.getUri());
                     tag.setLocalConceptTypeId(type.getId());
-                    
+
                     citation.getConceptTags().add(tag);
                 }
             }
         }
     }
 
-    private void mapPersonFields(Map<String, IPerson> personMap,
-            List<PersonForm> personList, Set<IPerson> citationPersonList) {
-            for (PersonForm personForm : personList) {
-                IPerson person;
-                if (personForm.getId() != null && !personForm.getId().isEmpty()) {
-                    person = personMap.get(personForm.getId());
-                } else {
-                    person = new Person();
-                }
-                mapPersonFields(personForm, person);
-                citationPersonList.add(person);
-          }
-     }
-    
+    private void mapPersonFields(Map<String, IPerson> personMap, List<PersonForm> personList,
+            Set<IPerson> citationPersonList) {
+        for (PersonForm personForm : personList) {
+            IPerson person;
+            if (personForm.getId() != null && !personForm.getId().isEmpty()) {
+                person = personMap.get(personForm.getId());
+            } else {
+                person = new Person();
+            }
+            mapPersonFields(personForm, person);
+            citationPersonList.add(person);
+        }
+    }
+
     private void mapPersonFields(PersonForm personForm, IPerson person) {
-        
+
         person.setFirstName(personForm.getFirstName());
         person.setLastName(personForm.getLastName());
         person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
@@ -176,8 +175,9 @@ public class CitationHelper implements ICitationHelper {
         person.setUri(personForm.getUri());
         person.setLocalAuthorityId(personForm.getLocalAuthorityId());
     }
-    
-    private void mapCreatorFields(Map<String, ICreator> creatorMap, List<PersonForm> personList, Set<ICreator> citationCreatorList) {
+
+    private void mapCreatorFields(Map<String, ICreator> creatorMap, List<PersonForm> personList,
+            Set<ICreator> citationCreatorList) {
         for (PersonForm personForm : personList) {
             ICreator creator;
             if (personForm.getId() != null && !personForm.getId().isEmpty()) {
@@ -192,5 +192,5 @@ public class CitationHelper implements ICitationHelper {
             citationCreatorList.add(creator);
         }
     }
-    
+
 }

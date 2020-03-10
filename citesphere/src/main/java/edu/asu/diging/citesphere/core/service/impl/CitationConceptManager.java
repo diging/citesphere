@@ -22,12 +22,16 @@ public class CitationConceptManager implements ICitationConceptManager {
 
     @Autowired
     private CitationConceptRepository conceptRepo;
-    
+
     @Autowired
     private CustomCitationConceptRepository customConceptRepo;
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.ICitationConceptManager#findAll(edu.asu.diging.citesphere.core.model.IUser)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.impl.ICitationConceptManager#findAll(
+     * edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
     public List<ICitationConcept> findAll(IUser user) {
@@ -35,7 +39,7 @@ public class CitationConceptManager implements ICitationConceptManager {
         conceptRepo.findByOwner(user).forEach(c -> concepts.add(c));
         return concepts;
     }
-    
+
     @Override
     public ICitationConcept get(String conceptId) {
         Optional<CitationConcept> concept = conceptRepo.findById(conceptId);
@@ -44,7 +48,7 @@ public class CitationConceptManager implements ICitationConceptManager {
         }
         return null;
     }
-    
+
     @Override
     public ICitationConcept getByUriAndOwner(String uri, IUser owner) {
         Optional<CitationConcept> concept = customConceptRepo.findFirstByUriAndOwner(uri, owner);
@@ -53,9 +57,14 @@ public class CitationConceptManager implements ICitationConceptManager {
         }
         return null;
     }
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.ICitationConceptManager#create(edu.asu.diging.citesphere.web.forms.CitationConceptForm, edu.asu.diging.citesphere.core.model.IUser)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.impl.ICitationConceptManager#create(
+     * edu.asu.diging.citesphere.web.forms.CitationConceptForm,
+     * edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
     public void create(CitationConceptForm conceptForm, IUser user) {
@@ -67,9 +76,9 @@ public class CitationConceptManager implements ICitationConceptManager {
         concept.setCreatedOn(OffsetDateTime.now());
         save(concept);
     }
-    
+
     @Override
     public ICitationConcept save(ICitationConcept concept) {
-        return conceptRepo.save((CitationConcept)concept);
+        return conceptRepo.save((CitationConcept) concept);
     }
 }

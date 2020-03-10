@@ -22,15 +22,19 @@ import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 @Service
 public class ConceptTypeManager implements IConceptTypeManager {
 
-	
     @Autowired
     private CustomConceptTypeRepository typeRepository;
-    
+
     @Autowired
     private ConceptTypeRepository conceptTypeRepo;
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.IConceptTypeManager#create(edu.asu.diging.citesphere.web.forms.ConceptTypeForm, edu.asu.diging.citesphere.core.model.IUser)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.impl.IConceptTypeManager#create(edu.
+     * asu.diging.citesphere.web.forms.ConceptTypeForm,
+     * edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
     public IConceptType create(ConceptTypeForm form, IUser owner) {
@@ -40,13 +44,17 @@ public class ConceptTypeManager implements IConceptTypeManager {
         type.setUri(form.getUri());
         type.setOwner(owner);
         type.setCreatedOn(OffsetDateTime.now());
-        
+
         save(type);
         return type;
     }
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.IConceptTypeManager#getAllTypes(edu.asu.diging.citesphere.core.model.IUser)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.impl.IConceptTypeManager#getAllTypes(
+     * edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
     public List<IConceptType> getAllTypes(IUser owner) {
@@ -54,17 +62,17 @@ public class ConceptTypeManager implements IConceptTypeManager {
         typeRepository.findAll().forEach(t -> types.add(t));
         return types;
     }
-    
+
     @Override
     public IConceptType get(String id) {
         Optional<ConceptType> type = conceptTypeRepo.findById(id);
         if (!type.isPresent()) {
             return null;
         }
-        
+
         return type.get();
     }
-    
+
     @Override
     public IConceptType getByUriAndOwner(String uri, IUser owner) {
         Optional<ConceptType> type = typeRepository.findFirstByUriAndOwner(uri, owner);
@@ -73,11 +81,10 @@ public class ConceptTypeManager implements IConceptTypeManager {
         }
         return type.get();
     }
-    
-    
+
     @Override
     public IConceptType save(IConceptType type) {
-        return typeRepository.save((ConceptType)type);
+        return typeRepository.save((ConceptType) type);
     }
 
 }

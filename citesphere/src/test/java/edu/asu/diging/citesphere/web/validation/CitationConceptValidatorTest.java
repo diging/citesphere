@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.web.validation;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -50,13 +52,16 @@ public class CitationConceptValidatorTest {
 
     private Errors errors;
 
-    private final static String URI_FORM_INPUT = "http://www.google.com";
+    private static final String URI_FORM_INPUT = "http://www.google.com";
 
-    private final static String URI_EXISTING = "http://www.google1.com";
+    private static final String URI_EXISTING = "http://www.google1.com";
+
+    private static final String CONCEPT_ID = "CON1";
+
+    private static final String URI_STRING = "uri";
 
     @Before
     public void setUp() {
-
         MockitoAnnotations.initMocks(this);
 
         user = new User();
@@ -68,7 +73,6 @@ public class CitationConceptValidatorTest {
         Mockito.when(authentication.getPrincipal()).thenReturn(user);
         SecurityContextHolder.setContext(securityContext);
         errors = new BeanPropertyBindingResult(conceptForm, "validator");
-
     }
 
     private void initForm() {
@@ -76,74 +80,65 @@ public class CitationConceptValidatorTest {
         conceptForm.setDescription("test dec");
         conceptForm.setName("name");
         conceptForm.setUri(URI_FORM_INPUT);
-
     }
 
     private void initExistingConcept() {
         dbConcept = new CitationConcept();
         dbConcept.setOwner(user);
-        dbConcept.setId("CON1");
+        dbConcept.setId(CONCEPT_ID);
         dbConcept.setUri(URI_FORM_INPUT);
     }
 
     @Test
     public void test_addConcept_Success() {
-
-        // return null for adding concept
         Mockito.when(conceptManager.getByUriAndOwner(conceptForm.getUri(), user)).thenReturn(null);
         citationConceptValidator.validate(conceptForm, errors);
-        assert (errors.getFieldError("uri") == null);
+        assertNull(errors.getFieldError(URI_STRING));
         assertTrue(!errors.hasErrors());
-
     }
 
     @Test
     public void test_addConcept_Uri_Exists() {
-
         Mockito.when(conceptManager.getByUriAndOwner(conceptForm.getUri(), user)).thenReturn(concept);
         citationConceptValidator.validate(conceptForm, errors);
-        assert (errors.getFieldError("uri") != null);
-
+        assertNotNull(errors.getFieldError(URI_STRING));
     }
 
     @Test
     public void test_editConcept_Success() {
-
-        conceptForm.setConceptId("CON1");
+        conceptForm.setConceptId(CONCEPT_ID);
         dbConcept.setUri(URI_EXISTING);
-        Mockito.when(conceptManager.get("CON1")).thenReturn(dbConcept);
+
+        Mockito.when(conceptManager.get(CONCEPT_ID)).thenReturn(dbConcept);
         Mockito.when(conceptManager.getByUriAndOwner(conceptForm.getUri(), user)).thenReturn(null);
         citationConceptValidator.validate(conceptForm, errors);
-        assert (errors.getFieldError("uri") == null);
+        assertNull(errors.getFieldError(URI_STRING));
         assertTrue(!errors.hasErrors());
 
     }
 
     @Test
     public void test_editConcept_Uri_Exists() {
-
-        conceptForm.setConceptId("CON1");
+        conceptForm.setConceptId(CONCEPT_ID);
         dbConcept.setUri(URI_EXISTING);
-        Mockito.when(conceptManager.get("CON1")).thenReturn(dbConcept);
+
+        Mockito.when(conceptManager.get(CONCEPT_ID)).thenReturn(dbConcept);
         Mockito.when(conceptManager.getByUriAndOwner(conceptForm.getUri(), user)).thenReturn(concept);
         citationConceptValidator.validate(conceptForm, errors);
-        assert (errors.getFieldError("uri") != null);
-
+        assertNotNull(errors.getFieldError(URI_STRING));
     }
 
     @Test
     public void test_editConcept_Owner_Only() {
-
         User user1 = new User();
         user1.setUsername("user1");
 
-        conceptForm.setConceptId("CON1");
+        conceptForm.setConceptId(CONCEPT_ID);
         dbConcept.setOwner(user1);
-        Mockito.when(conceptManager.get("CON1")).thenReturn(dbConcept);
+
+        Mockito.when(conceptManager.get(CONCEPT_ID)).thenReturn(dbConcept);
         Mockito.when(conceptManager.getByUriAndOwner(conceptForm.getUri(), user)).thenReturn(concept);
         citationConceptValidator.validate(conceptForm, errors);
-        assert (errors.getFieldError("uri") != null);
-
+        assertNotNull(errors.getFieldError(URI_STRING));
     }
-
 }

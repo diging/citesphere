@@ -40,25 +40,29 @@ import edu.asu.diging.citesphere.web.forms.ConceptAssignmentForm;
 import edu.asu.diging.citesphere.web.forms.PersonForm;
 
 public class CitationHelperTest {
+    @InjectMocks
+    private CitationHelper helperToTest;
 
     @Mock
     private ICitationConceptManager conceptManager;
 
     @Mock
     private IConceptTypeManager typeManager;
-    private ICitation citation;
-    private ICitation updatedCitation;
-    private CitationForm form;
-    private IUser user;
-    private ICitationConcept concept;
-    private IConceptType type;
 
-    @InjectMocks
-    private CitationHelper helperToTest;
+    private ICitation citation;
+
+    private ICitation updatedCitation;
+
+    private CitationForm form;
+
+    private IUser user;
+
+    private ICitationConcept concept;
+
+    private IConceptType type;
 
     @Before
     public void setUp() {
-
         MockitoAnnotations.initMocks(this);
         user = new User();
         user.setUsername("akhil");
@@ -66,7 +70,6 @@ public class CitationHelperTest {
         initForm();
         initUpdatedCitation();
         initCitation();
-
     }
 
     private void initCitation() {
@@ -87,7 +90,6 @@ public class CitationHelperTest {
         type.setOwner(user);
         type.setName("forum");
         type.setUri("www.test.com");
-
     }
 
     private void initForm() {
@@ -127,7 +129,6 @@ public class CitationHelperTest {
         tag.setConceptTypeName("forum");
         tag.setConceptTypeUri("www.test.com");
         conceptTags.add(tag);
-
         form.setConceptTags(conceptTags);
     }
 
@@ -175,7 +176,6 @@ public class CitationHelperTest {
 
     @Test
     public void test_updateCitation() {
-
         Mockito.when(conceptManager.save(Mockito.argThat(new ConceptArgMatcher(concept)))).thenReturn(concept);
         Mockito.when(typeManager.save(Mockito.argThat(new ConceptTypeArgMatcher(type)))).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
@@ -184,7 +184,6 @@ public class CitationHelperTest {
 
     @Test
     public void test_updateCitation_getByURIAndOwner() {
-
         Mockito.when(conceptManager.getByUriAndOwner("www.google.com", user)).thenReturn(concept);
         Mockito.when(typeManager.getByUriAndOwner("www.test.com", user)).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
@@ -193,7 +192,6 @@ public class CitationHelperTest {
 
     @Test(expected = NullPointerException.class)
     public void test_updateCitation_getByURIAndOwner_Invalid_URI() {
-
         Mockito.when(conceptManager.getByUriAndOwner("www.google1.com", user)).thenReturn(concept);
         Mockito.when(typeManager.getByUriAndOwner("www.test1.com", user)).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
@@ -201,11 +199,10 @@ public class CitationHelperTest {
     }
 
     private boolean comparePersons(Set<IPerson> a1, Set<IPerson> a2) {
-
         if (a1 != null && a2 != null) {
-
-            if (a1.size() != a2.size())
+            if (a1.size() != a2.size()) {
                 return false;
+            }
             Iterator<IPerson> p1 = a1.iterator();
             Iterator<IPerson> p2 = a2.iterator();
             while (p1.hasNext() && p2.hasNext()) {
@@ -217,15 +214,13 @@ public class CitationHelperTest {
         }
 
         return false;
-
     }
 
     private boolean compareCreators(Set<ICreator> a1, Set<ICreator> a2) {
-
         if (a1 != null && a2 != null) {
-
-            if (a1.size() != a2.size())
+            if (a1.size() != a2.size()) {
                 return false;
+            }
             Iterator<ICreator> p1 = a1.iterator();
             Iterator<ICreator> p2 = a1.iterator();
             while (p1.hasNext() && p2.hasNext()) {
@@ -238,15 +233,13 @@ public class CitationHelperTest {
         }
 
         return false;
-
     }
 
     private boolean compareTags(Set<ICitationConceptTag> a1, Set<ICitationConceptTag> a2) {
-
         if (a1 != null && a2 != null) {
-
-            if (a1.size() != a2.size())
+            if (a1.size() != a2.size()) {
                 return false;
+            }
             Iterator<ICitationConceptTag> p1 = a1.iterator();
             Iterator<ICitationConceptTag> p2 = a2.iterator();
             while (p1.hasNext() && p2.hasNext()) {
@@ -258,11 +251,9 @@ public class CitationHelperTest {
         }
 
         return false;
-
     }
 
     private boolean equalsCitation(ICitation c1, ICitation c2) {
-
         if (!c1.getTitle().equals(c2.getTitle())) {
             return false;
         }
@@ -288,11 +279,9 @@ public class CitationHelperTest {
         }
 
         return true;
-
     }
 
     private boolean comparePerson(IPerson p1, IPerson p2) {
-
         if (!p1.getFirstName().equals(p2.getFirstName()) || !p1.getLastName().equals(p2.getLastName())) {
             return false;
         }
@@ -312,17 +301,14 @@ public class CitationHelperTest {
     }
 
     private boolean compareAffliattion(IAffiliation a1, IAffiliation a2) {
-
         if (a1.getName().equals(a2.getName())) {
             return true;
         }
 
         return false;
-
     }
 
     private boolean compareConceptTag(ICitationConceptTag c1, ICitationConceptTag c2) {
-
         if (c1.getLocalConceptId().equals(c2.getLocalConceptId())
                 && c1.getLocalConceptTypeId().equals(c2.getLocalConceptTypeId())) {
             return true;
@@ -337,25 +323,25 @@ public class CitationHelperTest {
 
         public ConceptArgMatcher(ICitationConcept concept) {
             conceptToBeTested = concept;
-
         }
 
         @Override
         public boolean matches(Object arg) {
-
             ICitationConcept conceptArg = (ICitationConcept) arg;
 
-            if (!conceptArg.getName().equals(conceptToBeTested.getName()))
+            if (!conceptArg.getName().equals(conceptToBeTested.getName())) {
                 return false;
+            }
 
-            if (!conceptArg.getUri().equals(conceptToBeTested.getUri()))
+            if (!conceptArg.getUri().equals(conceptToBeTested.getUri())) {
                 return false;
+            }
 
-            if (!conceptArg.getOwner().equals(conceptToBeTested.getOwner()))
+            if (!conceptArg.getOwner().equals(conceptToBeTested.getOwner())) {
                 return false;
+            }
 
             return true;
-
         }
     }
 
@@ -365,26 +351,25 @@ public class CitationHelperTest {
 
         public ConceptTypeArgMatcher(IConceptType type) {
             conceptTypeToBeTested = type;
-
         }
 
         @Override
         public boolean matches(Object arg) {
-
             IConceptType conceptTypeArg = (IConceptType) arg;
 
-            if (!conceptTypeArg.getName().equals(conceptTypeToBeTested.getName()))
+            if (!conceptTypeArg.getName().equals(conceptTypeToBeTested.getName())) {
                 return false;
+            }
 
-            if (!conceptTypeArg.getUri().equals(conceptTypeToBeTested.getUri()))
+            if (!conceptTypeArg.getUri().equals(conceptTypeToBeTested.getUri())) {
                 return false;
+            }
 
-            if (!conceptTypeArg.getOwner().equals(conceptTypeToBeTested.getOwner()))
+            if (!conceptTypeArg.getOwner().equals(conceptTypeToBeTested.getOwner())) {
                 return false;
+            }
 
             return true;
-
         }
     }
-
 }

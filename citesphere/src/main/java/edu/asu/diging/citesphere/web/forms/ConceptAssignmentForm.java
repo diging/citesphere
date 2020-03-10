@@ -1,7 +1,7 @@
 package edu.asu.diging.citesphere.web.forms;
 
 public class ConceptAssignmentForm {
-    
+
     private String id;
     private String conceptId;
     private String conceptTypeId;
@@ -10,7 +10,7 @@ public class ConceptAssignmentForm {
     private String conceptName;
     private String conceptTypeName;
     private String conceptTypeUri;
-    
+
     public String getConceptTypeUri() {
         return conceptTypeUri;
     }

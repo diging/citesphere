@@ -31,7 +31,7 @@ public class CitationConceptValidator implements Validator {
             ICitationConcept concept = conceptManager.getByUriAndOwner(conceptForm.getUri(), user);
 
             if (conceptForm.getConceptId() != null) {
-                //edit
+                // edit
                 ICitationConcept dbConcept = conceptManager.get(conceptForm.getConceptId());
                 if (!dbConcept.getOwner().getUsername().equals(user.getUsername())) {
                     errors.rejectValue("uri", "uri", "Only the owner can edit a Concept.");
@@ -41,7 +41,7 @@ public class CitationConceptValidator implements Validator {
                     }
                 }
             } else {
-                //add
+                // add
                 if (concept != null) {
                     errors.rejectValue("uri", "uri", "Concept with this uri already exists!");
                 }
