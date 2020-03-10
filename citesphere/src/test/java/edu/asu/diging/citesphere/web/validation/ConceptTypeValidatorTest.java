@@ -16,10 +16,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.IConceptType;
 import edu.asu.diging.citesphere.model.bib.impl.ConceptType;
-import edu.asu.diging.citesphere.model.impl.User;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.user.impl.User;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 
 public class ConceptTypeValidatorTest {

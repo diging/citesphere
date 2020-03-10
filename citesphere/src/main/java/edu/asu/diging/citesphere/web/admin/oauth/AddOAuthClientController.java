@@ -57,12 +57,8 @@ public class AddOAuthClientController {
             grantTypes.add(GrantTypes.REFRESH_TOKEN);
         }
         OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ), grantTypes, appForm.getRedirectUrl());
-        model.addAttribute("clientId", creds.getClientId());
-        model.addAttribute("secret", creds.getSecret());
-        model.addAttribute("clientName", appForm.getName());
-        model.addAttribute("description", appForm.getDescription());
-        model.addAttribute("redirectUrl", appForm.getRedirectUrl());
-        model.addAttribute("applicationType", appForm.getGrantType());
-        return "admin/apps/details";
+        redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
+        redirectAttrs.addFlashAttribute("secret", creds.getSecret());
+        return "redirect:/admin/apps/" + creds.getClientId();
     }
 }

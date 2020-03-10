@@ -12,8 +12,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 
 import edu.asu.diging.citesphere.core.model.IPasswordResetToken;
-import edu.asu.diging.citesphere.model.IUser;
-import edu.asu.diging.citesphere.model.impl.User;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.user.impl.User;
 
 @Entity
 public class PasswordResetToken implements IPasswordResetToken {

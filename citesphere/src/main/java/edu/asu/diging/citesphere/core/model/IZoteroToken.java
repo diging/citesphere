@@ -1,6 +1,6 @@
 package edu.asu.diging.citesphere.core.model;
 
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface IZoteroToken {
 

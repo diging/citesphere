@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 import edu.asu.diging.citesphere.web.validation.ConceptTypeValidator;
 
