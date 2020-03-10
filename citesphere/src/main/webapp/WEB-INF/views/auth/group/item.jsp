@@ -25,15 +25,17 @@
  	  </c:if>
 
 </h2>
-${index}
+
 <div class="pull-left" style="float:left;margin-top: 20px;">
-	<a href="<c:url value="/auth/group/${zoteroGroupId}/item?index=${index-1}&page=${page}"/>"> Previous</a>
+	
 </div>
+<br/>
 <div class="pull-right" style="float:right;margin-top: 20px;">
-	<a href="<c:url value="/auth/group/${zoteroGroupId}/item?index=${index+1}&page=${page}"/>"> Next</a>
+	<button id ="next" class="btn btn-primary" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}>Next</button>
 </div>		
-		
+<br/>		
 <div style="margin-bottom: 20px;">
+	<button id ="prev" class="btn btn-primary" type="submit" href="" ${ empty previous ? 'disabled="disabled"' : ''}>Previous</button>&nbsp;&nbsp;
 	<a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />"><i
 		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; <a
@@ -380,6 +382,16 @@ ${index}
 			$("#parsed-ref-ref-raw").text($(clicked).attr('data-ref-raw'));
             
 			$("#parsed-ref-modal").modal();
+		});
+		
+		$("#prev").click(function() {
+			var url = "/${zoteroGroupId}/items/${previous}?index=${prevIndex}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}";
+			window.location.href = "<c:url value="/auth/group" />" + url;
+		});
+		
+		$("#next").click(function() {
+			var url = "/${zoteroGroupId}/items/${next}?index=${nextIndex}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}";
+			window.location.href = "<c:url value="/auth/group" />" + url;
 		});
 	});
 	function goNext() {

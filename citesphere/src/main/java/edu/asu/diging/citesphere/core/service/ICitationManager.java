@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
@@ -44,5 +45,8 @@ public interface ICitationManager {
             ZoteroHttpStatusException;
 
     List<String> getValidCreatorTypes(IUser user, ItemType itemType);
+    
+    Map<String, String> getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy,
+            int index);
 
 }

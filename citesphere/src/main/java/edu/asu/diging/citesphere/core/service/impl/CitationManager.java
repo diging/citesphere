@@ -310,4 +310,33 @@ public class CitationManager implements ICitationManager {
     public List<String> getValidCreatorTypes(IUser user, ItemType itemType) {
         return zoteroManager.getValidCreatorTypes(user, itemType);
     }
+    
+    @Override
+    public Map<String,String> getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy, int index) {
+        Map<String,String> results = new HashMap<String,String>();
+        try {
+            List<PageRequest> requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortByAndCollectionId(user, groupId, page, ZoteroObjectType.GROUP, sortBy, collectionId == "" ? null:collectionId);
+            if(requests != null && requests.size()>0) {
+                List<ICitation> citations = new ArrayList<>();
+                citations.addAll(requests.get(0).getCitations());
+                citations.sort(new Comparator<ICitation>() {
+                    @Override
+                    public int compare(ICitation o1, ICitation o2) {
+                        return sortFunctions.get(sortBy).apply(o1, o2);
+                    }
+                });
+                if(index < citations.size() - 1) {
+                    results.put("next", citations.get(index+1).getKey());
+                    results.put("nextIndex", String.valueOf(index+1));
+                }
+                if(index > 0) {
+                    results.put("previous", citations.get(index-1).getKey());
+                    results.put("prevIndex", String.valueOf(index-1));
+                }
+            }
+        } catch (JpaObjectRetrievalFailureException ex) {
+            logger.warn("Could not retrieve page request.", ex);
+        }
+        return results;
+    }
 }

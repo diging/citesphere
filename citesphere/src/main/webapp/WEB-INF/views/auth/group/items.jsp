@@ -25,7 +25,7 @@ $(function() {
 	$(".bib-entry").click(function() {
 		var key = $(this).data("key");
 		var index = $(this).data("index");
-		window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key +"?index=" + index + "&page="+${currentPage};
+		window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key +"?index=" + index + "&page="+${currentPage} + "&sortBy=" + '${sort}' + "&collectionId=" + '${collectionId}';
 	});
 	
 	$('.collapse').collapse();
