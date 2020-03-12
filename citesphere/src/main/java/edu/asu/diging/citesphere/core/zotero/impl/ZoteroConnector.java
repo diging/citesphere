@@ -256,7 +256,6 @@ public class ZoteroConnector implements IZoteroConnector {
     public void deleteItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes)
             throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException {
-        // TODO Auto-generated method stub
         Zotero zotero = getApi(user);
         zotero.getGroupsOperations().deleteItem(groupId, item, ignoreFields, validCreatorTypes);
         try {

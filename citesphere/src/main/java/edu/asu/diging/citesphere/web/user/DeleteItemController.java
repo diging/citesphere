@@ -52,7 +52,6 @@ public class DeleteItemController {
                     citation);
         } catch (ZoteroConnectionException | GroupDoesNotExistException | ZoteroHttpStatusException
                 | ZoteroItemDeletionFailedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
