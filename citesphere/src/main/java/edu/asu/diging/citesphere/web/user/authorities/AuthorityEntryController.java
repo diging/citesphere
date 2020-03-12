@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -89,21 +90,15 @@ public class AuthorityEntryController {
     }
 
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/userAuthorities")
-    public ResponseEntity<List<IAuthorityEntry>> getUserAuthorities(Authentication authentication,
+    public ResponseEntity<List<IAuthorityEntry>> getUserAuthorities(Model model, Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") String page,
+            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        Integer pageNum = 1;
-        try {
-            pageNum = new Integer(page);
-        } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-        }
 
         List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
-                firstName, lastName, pageNum, pageSize);
+                firstName, lastName, page, pageSize);
 
         return new ResponseEntity<List<IAuthorityEntry>>(userEntries, HttpStatus.OK);
     }
@@ -111,8 +106,8 @@ public class AuthorityEntryController {
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/datasetAuthorities")
     public ResponseEntity<Set<IAuthorityEntry>> getDatasetAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "20", required = false, value = "pageSize") String pageSize,
+            @RequestParam(defaultValue = "0", required = false, value = "page") String page,
+            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
         Integer pageInt = 1;
@@ -125,7 +120,7 @@ public class AuthorityEntryController {
         Set<IAuthorityEntry> datasetEntries = null;
         
         try {          
-            datasetEntries = authorityService.findByNameInDataset(firstName, lastName, zoteroGroupId, pageInt);
+            datasetEntries = authorityService.findByNameInDataset(firstName, lastName, zoteroGroupId, pageInt, pageSize);
 
         } catch (GroupDoesNotExistException e) {
             logger.warn("Group does not exist: " + zoteroGroupId, e);
@@ -138,21 +133,14 @@ public class AuthorityEntryController {
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/importedAuthorities")
     public ResponseEntity<List<IAuthorityEntry>> getImportedAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "20", required = false, value = "pageSize") String pageSize,
+            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
+            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        Integer pageInt = 1;
-        try {
-            pageInt = new Integer(page);
-        } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-        }
-        
         List<IAuthorityEntry> importedEntries = null;
 
         try {
-            importedEntries = authorityService.importAuthorityEntries(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), pageInt);          
+            importedEntries = authorityService.importAuthorityEntries(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), page, pageSize);          
 
         } catch (AuthorityServiceConnectionException e) {
             logger.warn("Could not retrieve authority entries.", e);

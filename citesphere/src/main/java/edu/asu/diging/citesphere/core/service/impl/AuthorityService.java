@@ -82,13 +82,13 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public List<IAuthorityEntry> importAuthorityEntries(String searchString, int page) throws URISyntaxException, AuthorityServiceConnectionException {
+    public List<IAuthorityEntry> importAuthorityEntries(String searchString, int page, int pageSize) throws URISyntaxException, AuthorityServiceConnectionException {
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
         
         for(AuthorityImporter importer : importers) {
 
-            if(importer.retrieveAuthoritiesData(searchString, page) != null)
-                    authorityEntries.addAll(importer.retrieveAuthoritiesData(searchString, page)); 
+            if(importer.retrieveAuthoritiesData(searchString, page, pageSize) != null)
+                    authorityEntries.addAll(importer.retrieveAuthoritiesData(searchString, page, pageSize)); 
 
         }
         return authorityEntries;
@@ -118,7 +118,7 @@ public class AuthorityService implements IAuthorityService {
     @Override
     public List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
-        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName);
+        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName, paging);
         return results;
     }
     
@@ -140,12 +140,12 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, List<String> uris, int page) throws GroupDoesNotExistException {
+    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, List<String> uris, int page, int pageSize) throws GroupDoesNotExistException {
         Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
-        Pageable paging = PageRequest.of(page, 20);
+        Pageable paging = PageRequest.of(page, pageSize);
         List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn((ICitationGroup)group.get(), firstName, lastName, uris, paging);
         Set<IAuthorityEntry> entries = new HashSet<>();
         persons.forEach(p -> {
@@ -158,12 +158,12 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page) throws GroupDoesNotExistException {
+    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page, int pageSize) throws GroupDoesNotExistException {
         Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
-        Pageable paging = PageRequest.of(page, 20);
+        Pageable paging = PageRequest.of(page, pageSize);
         List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLike((ICitationGroup)group.get(), firstName, lastName, paging);
         Set<IAuthorityEntry> entries = new HashSet<>();
         persons.forEach(p -> {

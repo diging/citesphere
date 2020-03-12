@@ -1,10 +1,12 @@
-<%@ page pageEncoding="UTF-8" %>
+<%@ page pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ taglib prefix="cite" uri="https://diging.asu.edu/jps/tlds/citesphere" %>
+<%@ taglib prefix="cite"
+	uri="https://diging.asu.edu/jps/tlds/citesphere"%>
 
 <style>
 .popover {
@@ -67,6 +69,7 @@ $(function() {
 	$("#searchAuthor").click(function() {
 		$("#searchAuthorSpinner").show();
 		getPersonAuthorityBasedOnName('Author','Author');
+		getImportedAuthorities('Author','Author')
 		$("#searchAuthorSpinner").hide();
 	});
 	
@@ -587,7 +590,7 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find?firstName='+ firstName + '&lastName=' + lastName + '"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/userAuthorities?firstName='+ firstName + '&lastName=' + lastName + '"/>'
 		
 	$.ajax({
   		dataType: "json",
@@ -600,7 +603,10 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
   			$("#searchAuthorityResultSize").empty()
   			var content = '';
   			
-  			if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
+  			if (data['userAuthorityError'] != null) {
+  				content += '<tr><td colspan=4 class="text-warning">data["userAuthorityError"]</td></tr>';
+  			}
+  			else if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
   				content += '<tr><td colspan=4>These authority entries have already been imported by you:</td></tr>';
   				data['userAuthorityEntries'].forEach(function(elem) {
   					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
@@ -615,7 +621,10 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
   				});
   			}
   			
-  			if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
+  			if (data['datasetAuthorityError'] != null) {
+  				content += '<tr><td colspan=4 class="text-warning" >data["datasetAuthorityError"]</td></tr>';
+  			}
+  			else if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
   				content += '<tr><td colspan=4>These authority entries have already been imported by someone else for this dataset:</td></tr>';
   				data['datasetAuthorityEntries'].forEach(function(elem) {
   					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
@@ -629,7 +638,10 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
   				});
   			}
   			
-  			if (data['importedAuthorityEntries'] != null && data['importedAuthorityEntries'].length > 0) {
+  			if (data['importAuthorityError'] != null) {
+  				content += '<tr><td colspan=4 class="text-warning">data["importAuthorityError"]</td></tr>';
+  			}
+  			else if (data['importedAuthorityEntries'] != null && data['importedAuthorityEntries'].length > 0) {
   				content += '<tr><td colspan=3>Authorities imported from Conceptpower:</td></tr>';
   				data['importedAuthorityEntries'].forEach(function(elem) {
   					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
@@ -691,6 +703,171 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
 
 }
 
+
+function getPersonAuthorityBasedOnName(modalType, personType) {
+
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/userAuthorities?firstName='+ firstName + '&lastName=' + lastName + '"/>'
+		
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+			
+  			$("#authoritySearchResult").empty()
+  			$("#searchAuthorityResultSize").empty()
+  			var content = '';
+  			
+  			if (data['userAuthorityError'] != null) {
+  				content += '<tr><td colspan=4 class="text-warning">data["userAuthorityError"]</td></tr>';
+  			}
+  			else if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
+  				content += '<tr><td colspan=4>These authority entries have already been imported by you:</td></tr>';
+  				data['userAuthorityEntries'].forEach(function(elem) {
+  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
+  					if(elem['description']==null){
+  						content += ' - </td>';
+  						}
+  					else{
+  						content +=elem['description'] + '</td>';
+  					}
+  					content +='<td>Imported by you </td></tr>';
+  					
+  				});
+  			}
+  			
+  			if (data['datasetAuthorityError'] != null) {
+  				content += '<tr><td colspan=4 class="text-warning" >data["datasetAuthorityError"]</td></tr>';
+  			}
+  			else if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
+  				content += '<tr><td colspan=4>These authority entries have already been imported by someone else for this dataset:</td></tr>';
+  				data['datasetAuthorityEntries'].forEach(function(elem) {
+  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
+  					if(elem['description']==null){
+  						content += ' - </td>';
+  						}
+  					else{
+  						content +=elem['description'] + '</td>';
+  					}
+  					content +='<td>Imported by someone else for this dataset </td></tr>';
+  				});
+  			}
+  			
+  			if (data['importAuthorityError'] != null) {
+  				content += '<tr><td colspan=4 class="text-warning">data["importAuthorityError"]</td></tr>';
+  			}
+  			else if (data['importedAuthorityEntries'] != null && data['importedAuthorityEntries'].length > 0) {
+  				content += '<tr><td colspan=3>Authorities imported from Conceptpower:</td></tr>';
+  				data['importedAuthorityEntries'].forEach(function(elem) {
+  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
+  					if(elem['description']==null){
+  						content += ' - </td>';
+  						}
+  					else{
+  						content +=elem['description'] + '</td>';
+  					}
+  					content +='<td>Do you want to create a managed authority entry? </td></tr>';
+  				});
+  			}
+  			
+  		if(content==''){
+  			$("#searchAuthorityResultSize").append("0 authorites found");
+  		}
+  		
+		$("#authoritySearchResult").append(content);
+		
+		
+		$("#authoritySearchResult tr td a").click(function() {
+			
+			name = $(this).text()
+			uri = $(this).closest('td').next().text()+"/";
+				
+			showPersonNameInModal(name, personType)
+			$("#uri"+modalType).val( uri);
+			
+			if($(this).closest('td').next().next().next().text()=='Do you want to create a managed authority entry? '){
+				
+				createManageAuthorityURL = '<c:url value="/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri='+ $(this).closest('td').next().text() + '/"/>';
+						
+				$.ajax({
+			  		dataType: "json",
+			  		type: 'POST',
+			  		url: createManageAuthorityURL,
+			  		async:false,
+			  		success: function(data) {
+			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  		},
+				error: function(data){					
+					$("#uri"+modalType).val("");
+		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+				}
+				});				
+				
+			}
+			
+			else{
+				$("#authorAuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
+			}
+						
+			$("#selectAuthorityModel").modal('hide');
+		});	
+  			
+        }
+	
+	});
+
+}
+
+
+function getImportedAuthorities(modalType, personType) {
+
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/importedAuthorities?firstName='+ firstName + '&lastName=' + lastName + '"/>'
+		
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+			
+  			$("#importAuthoritySearchResult").empty()
+  			$("#searchAuthorityResultSize").empty()
+  			
+  			var content = '';
+  				
+  			if (data != null && data.length > 0) {
+
+  				data.forEach(function(elem) {
+  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
+  					if(elem['description']==null){
+  						content += ' - </td>';
+  						}
+  					else{
+  						content +=elem['description'] + '</td>';
+  					}
+  				});
+  			}
+  			
+  		if(content==''){
+  			$("#searchAuthorityResultSize").append("0 authorites found");
+  		}
+  		
+		$("#importAuthoritySearchResult").append(content); 			
+        }
+	
+	});
+
+}
+
 let removePerson = function removePerson(e) {
 	var deleteIcon = e.currentTarget;
 	var person = $(deleteIcon).parent();
@@ -700,22 +877,26 @@ let removePerson = function removePerson(e) {
 </script>
 
 <ol class="breadcrumb">
-  <li><a href="<c:url value="/" />">Home</a></li>
-  <li><a href="<c:url value="/auth/group/${zoteroGroupId}/items" />">Group</a></li>
-  <li class="active">${citation.key}</li>
+	<li><a href="<c:url value="/" />">Home</a></li>
+	<li><a href="<c:url value="/auth/group/${zoteroGroupId}/items" />">Group</a></li>
+	<li class="active">${citation.key}</li>
 </ol>
 
 <h2>
-	 <c:forEach items="${citation.authors}" var="author" varStatus="status">
-	 	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
-	 </c:forEach>
-	 <c:forEach items="${citation.editors}" var="editor" varStatus="status">
-	 	  <strong>${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
-	 </c:forEach> 
-	  <em>${citation.title}</em>
-	  <c:if test="${not empty citation.dateFreetext}">
+	<c:forEach items="${citation.authors}" var="author" varStatus="status">
+		<strong>${author.lastName}<c:if
+				test="${not empty author.firstName}">, ${author.firstName}</c:if></strong>
+		<c:if test="${!status.last}">; </c:if>
+	</c:forEach>
+	<c:forEach items="${citation.editors}" var="editor" varStatus="status">
+		<strong>${editor.lastName}<c:if
+				test="${not empty editor.firstName}">, ${editor.firstName}</c:if></strong>
+		<c:if test="${!status.last}">; </c:if>
+	</c:forEach>
+	<em>${citation.title}</em>
+	<c:if test="${not empty citation.dateFreetext}">
  	  (${citation.dateFreetext})
- 	  </c:if> 
+ 	  </c:if>
 </h2>
 
 <div class="modal fade" id="messageModal" tabindex="-1" role="dialog">
@@ -726,504 +907,750 @@ let removePerson = function removePerson(e) {
 	</div>
 </div>
 
-<c:if test="${not empty citation.key}" >
-<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" var="processingUrl" />
+<c:if test="${not empty citation.key}">
+	<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit"
+		var="processingUrl" />
 </c:if>
-<c:if test="${empty citation.key}" >
-<c:url value="/auth/group/${zoteroGroupId}/items/create" var="processingUrl" />
-</c:if>
-
-<form:form action="${processingUrl}" modelAttribute="form" method="POST" id="editForm">
-<table class="table table-striped">
-
 <c:if test="${empty citation.key}">
-<td width="20%">Collection</td>
-<td>
-<form:select class="form-control" path="collectionId" >
-     <option value="">&nbsp;</option>
-     <form:options itemValue="key" itemLabel="name" items="${citationCollections}" />
-</form:select>
-</td>
+	<c:url value="/auth/group/${zoteroGroupId}/items/create"
+		var="processingUrl" />
 </c:if>
 
-<tr <c:if test="${empty citation.key}" >style="display:none;"</c:if>>
-<td width="20%">Item Key</td>
-<td>${citation.key}</td>
-<form:hidden path="key" value="${citation.key}"/>
-</tr>
+<form:form action="${processingUrl}" modelAttribute="form" method="POST"
+	id="editForm">
+	<table class="table table-striped">
 
-<tr>
-<td width="20%">Citation Type</td>
-<td>
-<c:set var="enumValues" value="<%=edu.asu.diging.citesphere.model.bib.ItemType.values()%>"/>
-<form:select id="items" path="itemType" data-show-icon="true" class="form-control selectpicker">
-<c:forEach items="${enumValues}" var="enumValue">
-    <spring:eval expression="@iconsResource.getProperty(enumValue + '_label')"  var="iconLabel" />	
-    <c:if test="${empty iconLabel}">
-	<c:set var="iconLabel" value="${enumValue}" />
-	</c:if>
-	<option <c:if test="${enumValue == citation.itemType}">selected</c:if> value="${enumValue}">
-    ${iconLabel}
-    </option>
-</c:forEach>
-</form:select>
-</td>
-</tr>
+		<c:if test="${empty citation.key}">
+			<td width="20%">Collection</td>
+			<td><form:select class="form-control" path="collectionId">
+					<option value="">&nbsp;</option>
+					<form:options itemValue="key" itemLabel="name"
+						items="${citationCollections}" />
+				</form:select></td>
+		</c:if>
 
-<tr <c:if test="${not fn:contains(fields, 'title') }">style="display:none;"</c:if>>
-<td>Title</td>
-<td>
-<form:input path="title" type="text" class="form-control" placeholder="Title" value="${not empty form.title ? form.title : citation.title}" /></td>
-</tr>
+		<tr <c:if test="${empty citation.key}" >style="display:none;"</c:if>>
+			<td width="20%">Item Key</td>
+			<td>${citation.key}</td>
+			<form:hidden path="key" value="${citation.key}" />
+		</tr>
 
-<tr <c:if test="${not fn:contains(fields, 'shortTitle') }">style="display:none;"</c:if>>
-<td>Short Title</td>
-<td><form:input path="shortTitle" type="text" class="form-control" placeholder="Short title" value="${citation.shortTitle}" /></td>
-</tr>
+		<tr>
+			<td width="20%">Citation Type</td>
+			<td><c:set var="enumValues"
+					value="<%=edu.asu.diging.citesphere.model.bib.ItemType.values()%>" />
+				<form:select id="items" path="itemType" data-show-icon="true"
+					class="form-control selectpicker">
+					<c:forEach items="${enumValues}" var="enumValue">
+						<spring:eval
+							expression="@iconsResource.getProperty(enumValue + '_label')"
+							var="iconLabel" />
+						<c:if test="${empty iconLabel}">
+							<c:set var="iconLabel" value="${enumValue}" />
+						</c:if>
+						<option
+							<c:if test="${enumValue == citation.itemType}">selected</c:if>
+							value="${enumValue}">${iconLabel}</option>
+					</c:forEach>
+				</form:select></td>
+		</tr>
 
-<tr <c:if test="${fn:contains(fields, 'date') }">style="display:none;"</c:if>>
-<td>Date</td>
-<td><form:input path="dateFreetext" type="text" class="form-control" placeholder="Date" value="${not empty form.dateFreetext ? form.dateFreetext : citation.dateFreetext}" /></td>
-</tr>
+		<tr
+			<c:if test="${not fn:contains(fields, 'title') }">style="display:none;"</c:if>>
+			<td>Title</td>
+			<td><form:input path="title" type="text" class="form-control"
+					placeholder="Title"
+					value="${not empty form.title ? form.title : citation.title}" /></td>
+		</tr>
 
-<tr>
-<td class="creator" id="author">Authors</td>
-<td>
-<span id="authorList" style="font-size: 18px">
-<c:forEach items="${citation.authors}" var="author" varStatus="status">
-<span id="author${status.index}" class="label label-primary author-item" data-author-id="${author.id}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-creator-type="author" data-author-authority-id="${author.localAuthorityId}">
-<c:forEach items="${author.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
-${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if><c:forEach items="${author.affiliations}" var="aff"><c:if test="${not empty aff.name}"> (${aff.name})</c:if></c:forEach>
-&nbsp;
-<i class="far fa-edit edit-author"></i>
-&nbsp;
-<i class="fas fa-times remove-author"></i>
-</span>
+		<tr
+			<c:if test="${not fn:contains(fields, 'shortTitle') }">style="display:none;"</c:if>>
+			<td>Short Title</td>
+			<td><form:input path="shortTitle" type="text"
+					class="form-control" placeholder="Short title"
+					value="${citation.shortTitle}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${fn:contains(fields, 'date') }">style="display:none;"</c:if>>
+			<td>Date</td>
+			<td><form:input path="dateFreetext" type="text"
+					class="form-control" placeholder="Date"
+					value="${not empty form.dateFreetext ? form.dateFreetext : citation.dateFreetext}" /></td>
+		</tr>
+
+		<tr>
+			<td class="creator" id="author">Authors</td>
+			<td><span id="authorList" style="font-size: 18px"> <c:forEach
+						items="${citation.authors}" var="author" varStatus="status">
+						<span id="author${status.index}"
+							class="label label-primary author-item"
+							data-author-id="${author.id}"
+							data-author-firstname="${author.firstName}"
+							data-author-lastname="${author.lastName}"
+							data-author-uri="${author.uri}" data-creator-type="author"
+							data-author-authority-id="${author.localAuthorityId}"> <c:forEach
+								items="${author.affiliations}" var="aff">
+								<span data-affiliation-name="${aff.name}"
+									data-affiliation-id="${aff.id}"></span>
+							</c:forEach> ${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if>
+							<c:forEach items="${author.affiliations}" var="aff">
+								<c:if test="${not empty aff.name}"> (${aff.name})</c:if>
+							</c:forEach> &nbsp; <i class="far fa-edit edit-author"></i> &nbsp; <i
+							class="fas fa-times remove-author"></i>
+						</span>
 &nbsp;&nbsp;
 </c:forEach>
-</span>
-<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="fas fa-plus-circle"></i> Add Author</a></div>
-</td>
-</tr>
-<tr>
-<td class="creator" id="editor">Editors</td>
-<td>
-<span id="editorList" style="font-size: 18px">
-<c:forEach items="${citation.editors}" var="editor" varStatus="status">
-<span id="editor${status.index}" class="label label-info editor-item" data-editor-id="${editor.id}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}" data-creator-type="editor">
-<c:forEach items="${editor.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
-${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if><c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
-&nbsp;
-<i class="far fa-edit edit-editor"></i>
-&nbsp;
-<i class="fas fa-times remove-editor"></i>
-</span>
+			</span>
+				<div class="pull-right">
+					<a data-toggle="modal" data-target="#authorModal"><i
+						class="fas fa-plus-circle"></i> Add Author</a>
+				</div></td>
+		</tr>
+		<tr>
+			<td class="creator" id="editor">Editors</td>
+			<td><span id="editorList" style="font-size: 18px"> <c:forEach
+						items="${citation.editors}" var="editor" varStatus="status">
+						<span id="editor${status.index}"
+							class="label label-info editor-item"
+							data-editor-id="${editor.id}"
+							data-editor-firstname="${editor.firstName}"
+							data-editor-lastname="${editor.lastName}"
+							data-editor-uri="${editor.uri}"
+							data-editor-authority-id="${editor.localAuthorityId}"
+							data-creator-type="editor"> <c:forEach
+								items="${editor.affiliations}" var="aff">
+								<span data-affiliation-name="${aff.name}"
+									data-affiliation-id="${aff.id}"></span>
+							</c:forEach> ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstName}</c:if>
+							<c:forEach items="${editor.affiliations}" var="aff"> (${aff.name})</c:forEach>
+							&nbsp; <i class="far fa-edit edit-editor"></i> &nbsp; <i
+							class="fas fa-times remove-editor"></i>
+						</span>
 &nbsp;&nbsp;
 </c:forEach>
-</span>
-<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
-</td>
-</tr>
+			</span>
+				<div class="pull-right">
+					<a data-toggle="modal" data-target="#editorModal"><i
+						class="fas fa-plus-circle"></i> Add Editor</a>
+				</div></td>
+		</tr>
 
-<c:forEach items="${creatorMap}" var="curCreator">
-	<c:if test="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
-		<tr style="display:none;">
-			<td class="creator" id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" >${curCreator.value}
-			</td>
-			
-			<td>
-				<c:set var="role" value="${fn:toLowerCase(fn:substringAfter(curCreator.key, '_item_attribute_label_'))}" />
-				<span id="${role}List" style="font-size: 18px">
-				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
-				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
-				 		<c:forEach items="${creator.person.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
-							${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
-							<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
-							&nbsp;<i class="far fa-edit edit-creator"></i>
-						<i class="fas fa-times remove-creator"></i>
-					</span>
+		<c:forEach items="${creatorMap}" var="curCreator">
+			<c:if
+				test="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
+				<tr style="display: none;">
+					<td class="creator"
+						id="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}">${curCreator.value}
+					</td>
+
+					<td><c:set var="role"
+							value="${fn:toLowerCase(fn:substringAfter(curCreator.key, '_item_attribute_label_'))}" />
+						<span id="${role}List" style="font-size: 18px"> <cite:creators
+								citation="${citation}"
+								role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}"
+								var="creator">
+								<span id="${role}${varStatus}"
+									class="label label-info ${role}-item"
+									data-creator-id="${creator.id}"
+									data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}"
+									data-creator-firstname="${creator.person.firstName}"
+									data-creator-lastname="${creator.person.lastName}"
+									data-creator-uri="${creator.person.uri}"
+									data-creator-authority-id="${creator.person.localAuthorityId}">
+									<c:forEach items="${creator.person.affiliations}" var="aff">
+										<span data-affiliation-name="${aff.name}"
+											data-affiliation-id="${aff.id}"></span>
+									</c:forEach> ${creator.person.lastName}<c:if
+										test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+									<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
+									&nbsp;<i class="far fa-edit edit-creator"></i> <i
+									class="fas fa-times remove-creator"></i>
+								</span>
 					&nbsp;&nbsp;
 				</cite:creators>
-				</span>
-				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${curCreator.value}</a></div>
-			</td>
-		</tr>
-	</c:if>
-</c:forEach>
-<c:forEach items="${citation.otherCreatorRoles}" var="role">
-	<c:if test="${not fn:contains(creatorMap, role)}">
-		<tr class="creator-row">
-			<td style="text-transform: capitalize;">${role}s</td>
-			<td>
-				<span id="${role}List" style="font-size: 18px">
-				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
-				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
-				 		<c:forEach items="${creator.person.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
-							${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
-							<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
-							&nbsp;<i class="far fa-edit edit-creator"></i>
-						<i class="fas fa-times remove-creator"></i>
 					</span>
+						<div class="pull-right">
+							<a class="creatorModalLink" data-toggle="modal"
+								data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}"
+								data-target="#creatorModal"><i class="fas fa-plus-circle"></i>
+								Add ${curCreator.value}</a>
+						</div></td>
+				</tr>
+			</c:if>
+		</c:forEach>
+		<c:forEach items="${citation.otherCreatorRoles}" var="role">
+			<c:if test="${not fn:contains(creatorMap, role)}">
+				<tr class="creator-row">
+					<td style="text-transform: capitalize;">${role}s</td>
+					<td><span id="${role}List" style="font-size: 18px"> <cite:creators
+								citation="${citation}"
+								role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}"
+								var="creator">
+								<span id="${role}${varStatus}"
+									class="label label-info ${role}-item"
+									data-creator-id="${creator.id}"
+									data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}"
+									data-creator-firstname="${creator.person.firstName}"
+									data-creator-lastname="${creator.person.lastName}"
+									data-creator-uri="${creator.person.uri}"
+									data-creator-authority-id="${creator.person.localAuthorityId}">
+									<c:forEach items="${creator.person.affiliations}" var="aff">
+										<span data-affiliation-name="${aff.name}"
+											data-affiliation-id="${aff.id}"></span>
+									</c:forEach> ${creator.person.lastName}<c:if
+										test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+									<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
+									&nbsp;<i class="far fa-edit edit-creator"></i> <i
+									class="fas fa-times remove-creator"></i>
+								</span>
 					&nbsp;&nbsp;
 				</cite:creators>
-				</span>
-				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${role}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${role}</a></div>
+					</span>
+						<div class="pull-right">
+							<a class="creatorModalLink" data-toggle="modal"
+								data-creator-type="${role}" data-target="#creatorModal"><i
+								class="fas fa-plus-circle"></i> Add ${role}</a>
+						</div></td>
+				</tr>
+			</c:if>
+		</c:forEach>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
+			<td>Publication Title</td>
+			<td><form:input path="publicationTitle" type="text"
+					class="form-control" placeholder="Publication Title"
+					value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'journalAbbreviation') }">style="display:none;"</c:if>>
+			<td>Journal Abbreviation</td>
+			<td><form:input path="journalAbbreviation" type="text"
+					class="form-control" placeholder="Journal Abbreviation"
+					value="${not empty form.journalAbbreviation ? form.journalAbbreviation : citation.journalAbbreviation}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'volume') }">style="display:none;"</c:if>>
+			<td>Volume</td>
+			<td><form:input path="volume" type="text" class="form-control"
+					placeholder="Volume"
+					value="${not empty form.volume ? form.volume : citation.volume}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'issue') }">style="display:none;"</c:if>>
+			<td>Issue</td>
+			<td><form:input path="issue" type="text" class="form-control"
+					placeholder="Issue"
+					value="${not empty form.issue ? form.issue : citation.issue}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'pages') }">style="display:none;"</c:if>>
+			<td>Pages</td>
+			<td><form:input path="pages" type="text" class="form-control"
+					placeholder="Pages"
+					value="${not empty form.pages ? form.pages : citation.pages}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'series') }">style="display:none;"</c:if>>
+			<td>Series</td>
+			<td><form:input path="series" type="text" class="form-control"
+					placeholder="Series"
+					value="${not empty form.series ? form.series : citation.series}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'seriesTitle') }">style="display:none;"</c:if>>
+			<td>Series Title</td>
+			<td><form:input path="seriesTitle" type="text"
+					class="form-control" placeholder="Series Title"
+					value="${not empty form.seriesTitle ? form.seriesTitle : citation.seriesTitle}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'seriesText') }">style="display:none;"</c:if>>
+			<td>Series Text</td>
+			<td><form:input path="seriesText" type="text"
+					class="form-control" placeholder="Series Text"
+					value="${not empty form.seriesText ? form.seriesText : citation.seriesText}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'url') }">style="display:none;"</c:if>>
+			<td>URL</td>
+			<td><form:input path="url" type="text" class="form-control"
+					placeholder="Url"
+					value="${not empty form.url ? form.url : citation.url}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'language') }">style="display:none;"</c:if>>
+			<td>Language</td>
+			<td><form:input path="language" type="text" class="form-control"
+					placeholder="Language"
+					value="${not empty form.language ? form.language : citation.language}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'doi') }">style="display:none;"</c:if>>
+			<td>DOI</td>
+			<td><form:input path="doi" type="text" class="form-control"
+					placeholder="DOI"
+					value="${not empty form.doi ? form.doi : citation.doi}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'issn') }">style="display:none;"</c:if>>
+			<td>ISSN</td>
+			<td><form:input path="issn" type="text" class="form-control"
+					placeholder="ISSN"
+					value="${not empty form.issn ? form.issn : citation.issn}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'archive') }">style="display:none;"</c:if>>
+			<td>Archive</td>
+			<td><form:input path="archive" type="text" class="form-control"
+					placeholder="Archive"
+					value="${not empty form.archive ? form.archive : citation.archive}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'archiveLocation') }">style="display:none;"</c:if>>
+			<td>Archive Location</td>
+			<td><form:input path="archiveLocation" type="text"
+					class="form-control" placeholder="Archive Location"
+					value="${not empty form.archiveLocation ? form.archiveLocation : citation.archiveLocation}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'libraryCatalog') }">style="display:none;"</c:if>>
+			<td>Library Catalog</td>
+			<td><form:input path="libraryCatalog" type="text"
+					class="form-control" placeholder="Library Catalog"
+					value="${not empty form.libraryCatalog ? form.libraryCatalog : citation.libraryCatalog}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'callNumber') }">style="display:none;"</c:if>>
+			<td>Call Number</td>
+			<td><form:input path="callNumber" type="text"
+					class="form-control" placeholder="Call Number"
+					value="${not empty form.callNumber ? form.callNumber : citation.callNumber}" /></td>
+		</tr>
+
+		<tr
+			<c:if test="${not fn:contains(fields, 'rights') }">style="display:none;"</c:if>>
+			<td>Rights</td>
+			<td><form:input path="rights" type="text" class="form-control"
+					placeholder="Rights"
+					value="${not empty form.rights ? form.rights : citation.rights}" /></td>
+		</tr>
+
+		<tr>
+			<td>Concepts</td>
+			<td>
+				<div id="conceptTags">
+					<c:forEach items="${citation.conceptTags}" var="tag">
+						<span class="badge" data-concept-id="${tag.localConceptId}"
+							data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName}
+							| ${tag.typeName}</span>
+					</c:forEach>
+				</div>
+				<div class="pull-right">
+					<a class="addConceptModalLink" data-toggle="modal"
+						data-target="#addConceptModal"><i class="fas fa-plus-circle"></i>
+						Add Concept</a>
+				</div>
 			</td>
 		</tr>
-	</c:if>
-</c:forEach>
 
-<tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
-<td>Publication Title</td>
-<td><form:input path="publicationTitle" type="text" class="form-control" placeholder="Publication Title" value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
-</tr>
+	</table>
 
-<tr <c:if test="${not fn:contains(fields, 'journalAbbreviation') }">style="display:none;"</c:if>>
-<td>Journal Abbreviation</td>
-<td><form:input path="journalAbbreviation" type="text" class="form-control" placeholder="Journal Abbreviation" value="${not empty form.journalAbbreviation ? form.journalAbbreviation : citation.journalAbbreviation}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'volume') }">style="display:none;"</c:if>>
-<td>Volume</td>
-<td><form:input path="volume"  type="text" class="form-control" placeholder="Volume" value="${not empty form.volume ? form.volume : citation.volume}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'issue') }">style="display:none;"</c:if>>
-<td>Issue</td>
-<td><form:input path="issue" type="text" class="form-control" placeholder="Issue" value="${not empty form.issue ? form.issue : citation.issue}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'pages') }">style="display:none;"</c:if>>
-<td>Pages</td>
-<td><form:input path="pages" type="text" class="form-control" placeholder="Pages" value="${not empty form.pages ? form.pages : citation.pages}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'series') }">style="display:none;"</c:if>>
-<td>Series</td>
-<td><form:input path="series" type="text" class="form-control" placeholder="Series" value="${not empty form.series ? form.series : citation.series}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'seriesTitle') }">style="display:none;"</c:if>>
-<td>Series Title</td>
-<td><form:input path="seriesTitle" type="text" class="form-control" placeholder="Series Title" value="${not empty form.seriesTitle ? form.seriesTitle : citation.seriesTitle}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'seriesText') }">style="display:none;"</c:if>>
-<td>Series Text</td>
-<td><form:input path="seriesText" type="text" class="form-control" placeholder="Series Text" value="${not empty form.seriesText ? form.seriesText : citation.seriesText}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'url') }">style="display:none;"</c:if>>
-<td>URL</td>
-<td><form:input path="url" type="text" class="form-control" placeholder="Url" value="${not empty form.url ? form.url : citation.url}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'language') }">style="display:none;"</c:if>>
-<td>Language</td>
-<td><form:input path="language" type="text" class="form-control" placeholder="Language" value="${not empty form.language ? form.language : citation.language}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'doi') }">style="display:none;"</c:if>>
-<td>DOI</td>
-<td><form:input path="doi" type="text" class="form-control" placeholder="DOI" value="${not empty form.doi ? form.doi : citation.doi}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'issn') }">style="display:none;"</c:if>>
-<td>ISSN</td>
-<td><form:input path="issn" type="text" class="form-control" placeholder="ISSN" value="${not empty form.issn ? form.issn : citation.issn}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'archive') }">style="display:none;"</c:if>>
-<td>Archive</td>
-<td><form:input path="archive" type="text" class="form-control" placeholder="Archive" value="${not empty form.archive ? form.archive : citation.archive}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'archiveLocation') }">style="display:none;"</c:if>>
-<td>Archive Location</td>
-<td><form:input path="archiveLocation" type="text" class="form-control" placeholder="Archive Location" value="${not empty form.archiveLocation ? form.archiveLocation : citation.archiveLocation}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'libraryCatalog') }">style="display:none;"</c:if>>
-<td>Library Catalog</td>
-<td><form:input path="libraryCatalog" type="text" class="form-control" placeholder="Library Catalog" value="${not empty form.libraryCatalog ? form.libraryCatalog : citation.libraryCatalog}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'callNumber') }">style="display:none;"</c:if>>
-<td>Call Number</td>
-<td><form:input path="callNumber" type="text" class="form-control" placeholder="Call Number" value="${not empty form.callNumber ? form.callNumber : citation.callNumber}" /></td>
-</tr>
-
-<tr <c:if test="${not fn:contains(fields, 'rights') }">style="display:none;"</c:if>>
-<td>Rights</td>
-<td><form:input path="rights" type="text" class="form-control" placeholder="Rights" value="${not empty form.rights ? form.rights : citation.rights}" /></td>
-</tr>
-
-<tr>
-<td>Concepts</td>
-<td>
-<div id="conceptTags">
-<c:forEach items="${citation.conceptTags}" var="tag">
-<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName}</span>
-</c:forEach>
-</div>
-<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
-</td>
-</tr>
-
-</table>
-
-<button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
-<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />" class="btn btn-default">
-		<i class="fa fa-times"></i>&nbsp;Cancel
-</a>
+	<button id="submitForm" class="btn btn-primary" type="submit">
+		<i class="far fa-save"></i> &nbsp;Save
+	</button>
+	<a
+		href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />"
+		class="btn btn-default"> <i class="fa fa-times"></i>&nbsp;Cancel
+	</a>
 </form:form>
 
 <!-- Author Modal -->
-<div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="authorLabel">Enter Author Information</h4>
-      </div>
-      <div class="modal-body">
-      	  <div class="form-group">
-      	  	<input type="hidden" class="form-control" id="idAuthor">
-      	  </div>
-          <div class="form-group">
-		    <label for="firstNameAuthor">First Name:</label>
-		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
-		  </div>
-		  <div class="form-group">
-		    <label for="lastNameAuthor">Last Name:</label>
-		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
-		  </div>
-		  
-		  <div>
-		    <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id = "searchAuthor" style="margin-left:80%">
-		    	Search Author
-		    	<i id="searchAuthorSpinner" class="fas fa-spinner fa-spin text-info" style="color:white"></i>
-		    </button>		  
-		  </div>
-		  
-		  
-		  <div class="form-group">
-		    <label for="uriAuthor">URI:</label>
-		    <div class="input-group">
-			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
-			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundAuthor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureAuthor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
-			    </div>
-			    <input type="hidden" id="uriAuthorLocalId" />
-		    </div>
-		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
-		  </div>
-		  <div id="authorAffiliations">
-		  <div id="authorAffiliationTemplate" class="form-group">
-		    <label for="affiliationAuthor">Affiliation:</label>
-		    <input type="text" class="form-control" placeholder="Affiliation">
-		  </div>
-		  </div>
-		  <div>
-		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
-      	  </div>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" id="addAuthorModalCancel">Close</button>
-        <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
-      </div>
-    </div>
-  </div>
+<div class="modal fade" id="authorModal" tabindex="-1" role="dialog"
+	aria-labelledby="authorLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="authorLabel">Enter Author
+					Information</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<input type="hidden" class="form-control" id="idAuthor">
+				</div>
+				<div class="form-group">
+					<label for="firstNameAuthor">First Name:</label> <input type="text"
+						class="form-control" id="firstNameAuthor" placeholder="First Name">
+				</div>
+				<div class="form-group">
+					<label for="lastNameAuthor">Last Name:</label> <input type="text"
+						class="form-control" id="lastNameAuthor" placeholder="Last Name">
+				</div>
+
+				<div>
+					<button class="btn btn-primary" data-toggle="modal"
+						data-target="#selectAuthorityModel" id="searchAuthor"
+						style="margin-left: 80%">
+						Search Author <i id="searchAuthorSpinner"
+							class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+					</button>
+				</div>
+
+
+				<div class="form-group">
+					<label for="uriAuthor">URI:</label>
+					<div class="input-group">
+						<input type="text" class="form-control" id="uriAuthor"
+							placeholder="URI">
+						<div id="authorIconContainer" class="input-group-addon"
+							style="min-width: 35px;">
+							<i id="uriLoadingSpinnerAuthor"
+								class="fas fa-spinner fa-spin text-info"></i> <i
+								id="uriLoadingFoundAuthor"
+								class="fas fa-info-circle text-success" data-toggle="popover"
+								data-html="true" data-placement="right"></i> <i
+								id="uriLoadingFailureAuthor"
+								class="fas fa-exclamation-triangle text-danger"
+								data-toggle="popover" data-html="true" data-placement="right"
+								data-content="Could not find any data for this URI."></i>
+						</div>
+						<input type="hidden" id="uriAuthorLocalId" />
+					</div>
+					<div class="text-warning pull-right" id="authorAuthorityUsed"></div>
+				</div>
+				<div id="authorAffiliations">
+					<div id="authorAffiliationTemplate" class="form-group">
+						<label for="affiliationAuthor">Affiliation:</label> <input
+							type="text" class="form-control" placeholder="Affiliation">
+					</div>
+				</div>
+				<div>
+					<div class="text-right">
+						<a id="addAuthorAffiliation"><i class="fas fa-plus-circle"
+							title="Add another affiliation"></i> Add Affiliation</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default"
+					id="addAuthorModalCancel">Close</button>
+				<button id="addAuthorButton" type="button" class="btn btn-primary">Add
+					Author</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <!-- Editor Modal -->
-<div class="modal fade" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="editorLabel">Enter Editor Information</h4>
-      </div>
-      <div class="modal-body">
-      	<div class="form-group">
-      	  	<input type="hidden" class="form-control" id="idEditor">
-      	  </div>
-          <div class="form-group">
-		    <label for="firstNameEditor">First Name:</label>
-		    <input type="text" class="form-control" id="firstNameEditor" placeholder="First Name">
-		  </div>
-		  <div class="form-group">
-		    <label for="lastNameEditor">Last Name:</label>
-		    <input type="text" class="form-control" id="lastNameEditor" placeholder="Last Name">
-		  </div>
-		  	  
-		  <div>
-		    <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id = "searchEditor" style="margin-left:80%">
-		    	Search Editor
-		    	<i id="searchEditorSpinner" class="fas fa-spinner fa-spin text-info" style="color:white"></i>
-		    </button>		  
-		  </div>
-		  
-		  <div class="form-group">
-		    <label for="uriEditor">URI:</label>
-		    <div class="input-group">
-			    <input type="text" class="form-control" id="uriEditor" placeholder="URI">
-			    <div id="editorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerEditor" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundEditor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureEditor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
-			    </div>
-			    <input type="hidden" id="uriEditorLocalId" />
-		    </div>
-		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
-		  </div>
-		  <div id="editorAffiliations">
-		  <div id="editorAffiliationTemplate" class="form-group">
-		    <label for="editorAffiliation">Affiliation:</label>
-		    <input type="text" class="form-control" placeholder="Affiliation">
-		  </div>
-		  </div>
-		  <div>
-		  <div class="text-right"><a id="addEditorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
-      	  </div>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" id="addEditorModalCancel" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button id="addEditorButton" type="button" class="btn btn-primary">Add Editor</button>
-      </div>
-    </div>
-  </div>
+<div class="modal fade" id="editorModal" tabindex="-1" role="dialog"
+	aria-labelledby="editorLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="editorLabel">Enter Editor
+					Information</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<input type="hidden" class="form-control" id="idEditor">
+				</div>
+				<div class="form-group">
+					<label for="firstNameEditor">First Name:</label> <input type="text"
+						class="form-control" id="firstNameEditor" placeholder="First Name">
+				</div>
+				<div class="form-group">
+					<label for="lastNameEditor">Last Name:</label> <input type="text"
+						class="form-control" id="lastNameEditor" placeholder="Last Name">
+				</div>
+
+				<div>
+					<button class="btn btn-primary" data-toggle="modal"
+						data-target="#selectAuthorityModel" id="searchEditor"
+						style="margin-left: 80%">
+						Search Editor <i id="searchEditorSpinner"
+							class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+					</button>
+				</div>
+
+				<div class="form-group">
+					<label for="uriEditor">URI:</label>
+					<div class="input-group">
+						<input type="text" class="form-control" id="uriEditor"
+							placeholder="URI">
+						<div id="editorIconContainer" class="input-group-addon"
+							style="min-width: 35px;">
+							<i id="uriLoadingSpinnerEditor"
+								class="fas fa-spinner fa-spin text-info"></i> <i
+								id="uriLoadingFoundEditor"
+								class="fas fa-info-circle text-success" data-toggle="popover"
+								data-html="true" data-placement="right"></i> <i
+								id="uriLoadingFailureEditor"
+								class="fas fa-exclamation-triangle text-danger"
+								data-toggle="popover" data-html="true" data-placement="right"
+								data-content="Could not find any data for this URI."></i>
+						</div>
+						<input type="hidden" id="uriEditorLocalId" />
+					</div>
+					<div class="text-warning pull-right" id="editorAuthorityUsed"></div>
+				</div>
+				<div id="editorAffiliations">
+					<div id="editorAffiliationTemplate" class="form-group">
+						<label for="editorAffiliation">Affiliation:</label> <input
+							type="text" class="form-control" placeholder="Affiliation">
+					</div>
+				</div>
+				<div>
+					<div class="text-right">
+						<a id="addEditorAffiliation"><i class="fas fa-plus-circle"
+							title="Add another affiliation"></i> Add Affiliation</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" id="addEditorModalCancel"
+					class="btn btn-default" data-dismiss="modal">Close</button>
+				<button id="addEditorButton" type="button" class="btn btn-primary">Add
+					Editor</button>
+			</div>
+		</div>
+	</div>
 </div>
 
-  
+
 <!-- Other Creator Modal -->
-<div class="modal fade" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="creatorLabel">Enter Creator Information</h4>
-      </div>
-      <div class="modal-body">
-      	  <div class="form-group">
-      	  	<input type="hidden" class="form-control" id="idCreator">
-      	  </div>
-          <div class="form-group">
-		    <label for="firstNameCreator">First Name:</label>
-		    <input type="text" class="form-control" id="firstNameCreator" placeholder="First Name">
-		  </div>
-		  <div class="form-group">
-		    <label for="lastNameCreator">Last Name:</label>
-		    <input type="text" class="form-control" id="lastNameCreator" placeholder="Last Name">
-		  </div>
-		  
-		  <div>
-		    <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id = "searchCreator" style="margin-left:80%">
-		    	Search Creator
-		    	<i id="searchCreatorSpinner" class="fas fa-spinner fa-spin text-info" style="color:white"></i>
-		    </button>		  
-		  </div>
-		  
-		  <div class="form-group">
-		    <label for="uriCreator">URI:</label>
-		    <div class="input-group">
-			    <input type="text" class="form-control" id="uriCreator" placeholder="URI">
-			    <div id="creatorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerCreator" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundCreator" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureCreator" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
-			    </div>
-			    <input type="hidden" id="uriCreatorLocalId" />
-		    </div>
-		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
-		  </div>
-		  <div id="creatorAffiliations">
-		  <div id="creatorAffiliationTemplate" class="form-group">
-		    <label for="affiliationCreator">Affiliation:</label>
-		    <input type="text" class="form-control" placeholder="Affiliation">
-		  </div>
-		  </div>
-		  <div>
-		  <div class="text-right"><a id="addCreatorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
-      	  </div>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" id="addCreatorModalCancel">Close</button>
-        <button id="addCreatorButton" type="button" class="btn btn-primary">Add Creator</button>
-      </div>
-    </div>
-  </div>
-</div> <!-- End modal -->
+<div class="modal fade" id="creatorModal" tabindex="-1" role="dialog"
+	aria-labelledby="creatorLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="creatorLabel">Enter Creator
+					Information</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<input type="hidden" class="form-control" id="idCreator">
+				</div>
+				<div class="form-group">
+					<label for="firstNameCreator">First Name:</label> <input
+						type="text" class="form-control" id="firstNameCreator"
+						placeholder="First Name">
+				</div>
+				<div class="form-group">
+					<label for="lastNameCreator">Last Name:</label> <input type="text"
+						class="form-control" id="lastNameCreator" placeholder="Last Name">
+				</div>
+
+				<div>
+					<button class="btn btn-primary" data-toggle="modal"
+						data-target="#selectAuthorityModel" id="searchCreator"
+						style="margin-left: 80%">
+						Search Creator <i id="searchCreatorSpinner"
+							class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+					</button>
+				</div>
+
+				<div class="form-group">
+					<label for="uriCreator">URI:</label>
+					<div class="input-group">
+						<input type="text" class="form-control" id="uriCreator"
+							placeholder="URI">
+						<div id="creatorIconContainer" class="input-group-addon"
+							style="min-width: 35px;">
+							<i id="uriLoadingSpinnerCreator"
+								class="fas fa-spinner fa-spin text-info"></i> <i
+								id="uriLoadingFoundCreator"
+								class="fas fa-info-circle text-success" data-toggle="popover"
+								data-html="true" data-placement="right"></i> <i
+								id="uriLoadingFailureCreator"
+								class="fas fa-exclamation-triangle text-danger"
+								data-toggle="popover" data-html="true" data-placement="right"
+								data-content="Could not find any data for this URI."></i>
+						</div>
+						<input type="hidden" id="uriCreatorLocalId" />
+					</div>
+					<div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
+				</div>
+				<div id="creatorAffiliations">
+					<div id="creatorAffiliationTemplate" class="form-group">
+						<label for="affiliationCreator">Affiliation:</label> <input
+							type="text" class="form-control" placeholder="Affiliation">
+					</div>
+				</div>
+				<div>
+					<div class="text-right">
+						<a id="addCreatorAffiliation"><i class="fas fa-plus-circle"
+							title="Add another affiliation"></i> Add Affiliation</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default"
+					id="addCreatorModalCancel">Close</button>
+				<button id="addCreatorButton" type="button" class="btn btn-primary">Add
+					Creator</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- End modal -->
 
 
 
 <!-- 		  Search and Select Authority Modal -->
-  <div id="selectAuthorityModel" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selectAuthorityLabel">
-    <div class="modal-dialog" style = "width:1000px"  role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="authorLabel">Authority Search Result</h4>
-      </div>
-      <div class="modal-body">
-			<div >
-				<table class="table table-striped table-bordered table-fixed" >
-					<tr><th>Name</th><th>URI</th><th>Description</th><th>Status</th></tr>
-					<tbody id = "authoritySearchResult">
-					</tbody>
-				</table>
-				<div id="searchAuthorityResultSize" class="pull-right"></div>
+<div id="selectAuthorityModel" class="modal fade" tabindex="-1"
+	role="dialog" aria-labelledby="selectAuthorityLabel">
+	<div class="modal-dialog" style="width: 1000px" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="authorLabel">Authority Search
+					Result</h4>
 			</div>
-      </div>
-            <div class="modal-footer">
-        	<button type="button" class="btn btn-default" id="closeAuthoritySearchResult">Close</button>
-      </div>
-    </div>
-    </div>
-  </div> 
-<!-- End modal -->  
-  
+			<div class="modal-body">
+
+				<div role="tabpanel">
+					<!-- Nav tabs -->
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation" class="active"><a
+							href="#userAuthoritiesTab" aria-controls="uploadTab" role="tab"
+							data-toggle="tab">Authorities imported by you</a></li>
+						<li role="presentation"><a href="#datasetAuthoritiesTab"
+							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
+								imported by other users</a></li>
+						<li role="presentation"><a href="#importedAuthoritiesTab"
+							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
+								imported </a></li>
+					</ul>
+					<!-- Tab panes -->
+
+					<div class="tab-content">
+
+						<div class="tab-pane active" id="userAuthoritiesTabContent">
+
+							<table class="table table-striped table-bordered table-fixed">
+								<tr>
+									<th>Name</th>
+									<th>URI</th>
+									<th>Description</th>
+								</tr>
+								<tbody id="userAuthoritySearchResult">
+								</tbody>
+							</table>
+						</div>
+
+						<div class="tab-pane" id="datasetAuthoritiesTabContent">
+							<table class="table table-striped table-bordered table-fixed">
+								<tr>
+									<th>Name</th>
+									<th>URI</th>
+									<th>Description</th>
+								</tr>
+								<tbody id="datasetAuthoritySearchResult">
+								</tbody>
+							</table>
+						</div>
+
+						<div class="tab-pane" id="importedAuthoritiesTabContent">
+							<table class="table table-striped table-bordered table-fixed">
+								<tr>
+									<th>Name</th>
+									<th>URI</th>
+									<th>Description</th>
+								</tr>
+								<tbody id="importAuthoritySearchResult">
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default"
+					id="closeAuthoritySearchResult">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- End modal -->
+
 <!-- Concept Modal -->
 <div class="modal fade" tabindex="-1" role="dialog" id="addConceptModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Add Concept</h4>
-      </div>
-      <div class="modal-body">
-        <form id="conceptForm">
-        <p>
-        <label>Concept</label>
-        <select class="form-control" id="addConceptConceptSelect">
-        <c:forEach items="${concepts}" var="concept">
-        	<option value="${concept.id}">${concept.name}</option>
-        </c:forEach>
-        </select>
-        </p>
-        
-        <p style="padding-top: 20px;">
-        <label>Type of Concept</label>
-        <select class="form-control"  id="addConceptTypeSelect">
-        <c:forEach items="${conceptTypes}" var="type">
-        	<option value="${type.id}">${type.name}</option>
-        </c:forEach>
-        </select>
-        </p>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="addConceptButton">Add</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Add Concept</h4>
+			</div>
+			<div class="modal-body">
+				<form id="conceptForm">
+					<p>
+						<label>Concept</label> <select class="form-control"
+							id="addConceptConceptSelect">
+							<c:forEach items="${concepts}" var="concept">
+								<option value="${concept.id}">${concept.name}</option>
+							</c:forEach>
+						</select>
+					</p>
+
+					<p style="padding-top: 20px;">
+						<label>Type of Concept</label> <select class="form-control"
+							id="addConceptTypeSelect">
+							<c:forEach items="${conceptTypes}" var="type">
+								<option value="${type.id}">${type.name}</option>
+							</c:forEach>
+						</select>
+					</p>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="addConceptButton">Add</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 <script>
 //# sourceURL=fields.js
 $(document).ready(function() {
@@ -1340,4 +1767,5 @@ function creatorLinkHandler(target) {
 	$("#addCreatorButton").text("Add "+creatorType);
 	$("#addCreatorButton").attr("data-creator-type", target.attr("data-creator-type"));
 }
+</script>
 </script>
