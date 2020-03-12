@@ -87,7 +87,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
     }
 
     @Override
-    public List<IAuthorityEntry> retrieveAuthoritiesData(String searchString)
+    public List<IAuthorityEntry> retrieveAuthoritiesData(String searchString, int page)
             throws URISyntaxException, AuthorityServiceConnectionException {
 
         searchString = searchString.replace(conceptpowerSearchKeyword, "");

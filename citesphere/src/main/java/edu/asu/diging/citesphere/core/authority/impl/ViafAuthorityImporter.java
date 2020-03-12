@@ -95,7 +95,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     }
 
 	@Override
-	public List<IAuthorityEntry> retrieveAuthoritiesData(String uri)
+	public List<IAuthorityEntry> retrieveAuthoritiesData(String uri, int page)
 			throws URISyntaxException, AuthorityServiceConnectionException {
 
 		return null;

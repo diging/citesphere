@@ -1,8 +1,5 @@
 package edu.asu.diging.citesphere.web.user.authorities.helper;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
@@ -19,25 +16,23 @@ public class AuthorityEntryControllerHelper {
     @Value("${_conceptpower_authority_search_keyword}")
     private String conceptpowerSearchKeyword;
 
-    public String[] getAuthoritySearchStrings(String firstName, String lastName) {
+    public String getConceptpowerSearchString(String firstName, String lastName) {
 
         String conceptpowerSearchString = "";
-        String databaseSearchString = "";
+
 
         if (firstName != null && lastName != null) {
 
             conceptpowerSearchString = conceptpowerSearchKeyword + "%" + firstName + "%" +lastName;
 
-            databaseSearchString = lastName + "%" + firstName;
         } else {
 
             conceptpowerSearchString = firstName == null ? conceptpowerSearchKeyword + "%" + lastName
                     : conceptpowerSearchKeyword + "%" + firstName;
 
-            databaseSearchString = firstName == null ? lastName : firstName;
         }
 
-        return new String[] { conceptpowerSearchString, databaseSearchString };
+        return conceptpowerSearchString;
     }
 
     public FoundAuthorities removeDuplicateAuthorities(FoundAuthorities foundAuthorities) {

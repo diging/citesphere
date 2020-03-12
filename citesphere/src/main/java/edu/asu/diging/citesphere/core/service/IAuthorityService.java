@@ -16,7 +16,7 @@ public interface IAuthorityService {
 
     IAuthorityEntry importAuthority(String uri)  throws AuthorityServiceConnectionException, URISyntaxException;
     
-    List<IAuthorityEntry> importAuthorityEntries(String uri)  throws AuthorityServiceConnectionException, URISyntaxException;
+    List<IAuthorityEntry> importAuthorityEntries(String searchString, int page)  throws AuthorityServiceConnectionException, URISyntaxException;
 
     IAuthorityEntry save(IAuthorityEntry entry);
 
@@ -27,16 +27,19 @@ public interface IAuthorityService {
     IAuthorityEntry find(String id);
 
     List<IAuthorityEntry> findByUri(IUser user, String uri);
-    
-    List<IAuthorityEntry> findByName(IUser user, String name);
-
-    Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
 
-    Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId, List<String> uris)
+    List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize);
+
+    Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
+            List<String> uris, int page) throws GroupDoesNotExistException;
+
+    Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page)
             throws GroupDoesNotExistException;
 
-    Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId) throws GroupDoesNotExistException;
+    Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
+
+
 
 }

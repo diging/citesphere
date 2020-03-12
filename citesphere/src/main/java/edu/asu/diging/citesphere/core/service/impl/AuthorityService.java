@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
@@ -80,13 +82,13 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public List<IAuthorityEntry> importAuthorityEntries(String searchString) throws URISyntaxException, AuthorityServiceConnectionException {
+    public List<IAuthorityEntry> importAuthorityEntries(String searchString, int page) throws URISyntaxException, AuthorityServiceConnectionException {
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
         
         for(AuthorityImporter importer : importers) {
 
-            if(importer.retrieveAuthoritiesData(searchString) != null)
-                    authorityEntries.addAll(importer.retrieveAuthoritiesData(searchString)); 
+            if(importer.retrieveAuthoritiesData(searchString, page) != null)
+                    authorityEntries.addAll(importer.retrieveAuthoritiesData(searchString, page)); 
 
         }
         return authorityEntries;
@@ -114,8 +116,9 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public List<IAuthorityEntry> findByName(IUser user, String name) {
-        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingOrderByName(user.getUsername(), name);
+    public List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName);
         return results;
     }
     
@@ -137,12 +140,13 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId, List<String> uris) throws GroupDoesNotExistException {
+    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, List<String> uris, int page) throws GroupDoesNotExistException {
         Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
-        List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn((ICitationGroup)group.get(), name, uris);
+        Pageable paging = PageRequest.of(page, 20);
+        List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn((ICitationGroup)group.get(), firstName, lastName, uris, paging);
         Set<IAuthorityEntry> entries = new HashSet<>();
         persons.forEach(p -> {
             Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
@@ -154,12 +158,13 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public Set<IAuthorityEntry> findByNameInDataset(String name, String citationGroupId) throws GroupDoesNotExistException {
+    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page) throws GroupDoesNotExistException {
         Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
-        List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLike((ICitationGroup)group.get(), name);
+        Pageable paging = PageRequest.of(page, 20);
+        List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLike((ICitationGroup)group.get(), firstName, lastName, paging);
         Set<IAuthorityEntry> entries = new HashSet<>();
         persons.forEach(p -> {
             Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
