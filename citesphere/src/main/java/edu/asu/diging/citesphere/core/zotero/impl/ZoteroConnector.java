@@ -29,6 +29,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemDeletionFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.user.IUser;
@@ -123,9 +124,9 @@ public class ZoteroConnector implements IZoteroConnector {
     @Override
     public Item getItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
-        try  {
+        try {
             return zotero.getGroupsOperations().getGroupItem(groupId, itemKey);
-        } catch(HttpClientErrorException ex) {
+        } catch (HttpClientErrorException ex) {
             throw createException(ex.getStatusCode(), ex);
         }
     }
@@ -148,7 +149,8 @@ public class ZoteroConnector implements IZoteroConnector {
 
     @Override
     public Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
-            List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
+            List<String> validCreatorTypes)
+            throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
         ItemCreationResponse response = zotero.getGroupsOperations().createItem(groupId, item, ignoreFields,
                 validCreatorTypes);
@@ -223,9 +225,9 @@ public class ZoteroConnector implements IZoteroConnector {
             page = page - 1;
         }
         try {
-        return zotero.getGroupCollectionsOperations().getItems(groupId, collectionId, page * zoteroPageSize,
-                zoteroPageSize, sortBy, lastGroupVersion);
-        } catch(HttpClientErrorException ex) {
+            return zotero.getGroupCollectionsOperations().getItems(groupId, collectionId, page * zoteroPageSize,
+                    zoteroPageSize, sortBy, lastGroupVersion);
+        } catch (HttpClientErrorException ex) {
             throw createException(ex.getStatusCode(), ex);
         }
     }
@@ -242,11 +244,27 @@ public class ZoteroConnector implements IZoteroConnector {
         zotero.setUserId(token.getUserId());
         return zotero;
     }
-    
+
     private ZoteroHttpStatusException createException(HttpStatus status, Exception cause) {
         if (status == HttpStatus.FORBIDDEN) {
             return new AccessForbiddenException(cause);
         }
         return new ZoteroHttpStatusException(cause);
+    }
+
+    @Override
+    public void deleteItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
+            List<String> validCreatorTypes)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException {
+        // TODO Auto-generated method stub
+        Zotero zotero = getApi(user);
+        zotero.getGroupsOperations().deleteItem(groupId, item, ignoreFields, validCreatorTypes);
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not sleep.", e);
+            // well if something goes wrong here, let's just ignore it
+        }
+
     }
 }

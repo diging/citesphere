@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemDeletionFailedException;
 import edu.asu.diging.citesphere.core.factory.ICitationCollectionFactory;
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.IGroupFactory;
@@ -57,7 +58,8 @@ public class ZoteroManager implements IZoteroManager {
     @Autowired
     private ICitationCollectionFactory collectionFactory;
 
-    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) throws ZoteroHttpStatusException {
+    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion)
+            throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page, sortBy, lastGroupVersion);
         return createCitationResults(response);
     }
@@ -169,7 +171,8 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException {
+    public ICitation updateCitation(IUser user, String groupId, ICitation citation)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
         Item item = itemFactory.createItem(citation, new ArrayList<>());
 
         List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
@@ -269,5 +272,22 @@ public class ZoteroManager implements IZoteroManager {
             validTypes.add(type.getCreatorType());
         }
         return validTypes;
+    }
+
+    @Override
+    public void deleteCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
+            throws ZoteroConnectionException, ZoteroItemDeletionFailedException, ZoteroHttpStatusException {
+        Item item = itemFactory.createItem(citation, collectionIds);
+
+        List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
+        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
+        itemTypeFields.add(ZoteroFields.CREATOR);
+        itemTypeFields.add(ZoteroFields.COLLECTIONS);
+
+        List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, true);
+        List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
+
+        zoteroConnector.deleteItem(user, item, groupId, collectionIds, ignoreFields, validCreatorTypes);
+
     }
 }

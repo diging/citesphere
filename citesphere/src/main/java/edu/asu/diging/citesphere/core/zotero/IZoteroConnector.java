@@ -12,6 +12,7 @@ import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemDeletionFailedException;
 import edu.asu.diging.citesphere.user.IUser;
 
 public interface IZoteroConnector {
@@ -38,7 +39,8 @@ public interface IZoteroConnector {
     long getItemVersion(IUser user, String groupId, String itemKey);
 
     Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
-            List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException;
+            List<String> validCreatorTypes)
+            throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException;
 
     CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType);
 
@@ -54,5 +56,9 @@ public interface IZoteroConnector {
 
     void clearCollectionItemsCache(IUser user, String groupId, String collectionId, int page, String sortBy,
             Long lastGroupVersion);
+
+    void deleteItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
+            List<String> validCreatorTypes)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException;
 
 }

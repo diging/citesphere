@@ -16,6 +16,8 @@ import javax.persistence.NamedEntityGraphs;
 import javax.persistence.NamedSubgraph;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Parameter;
 
 import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
@@ -63,6 +65,7 @@ public class PageRequest implements IPageRequest {
     private String objectId;
     private long version;
     @ManyToMany(targetEntity=Citation.class)
+    @NotFound(action=NotFoundAction.IGNORE)
     private List<ICitation> citations;
     private String sortBy;
     private String collectionId;

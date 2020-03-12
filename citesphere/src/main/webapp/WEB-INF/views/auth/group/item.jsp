@@ -29,8 +29,10 @@
 <div style="margin-bottom: 20px;">
 	<a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />"><i
-		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; <a
-		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync" />"><i
+		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp;
+		<a data-toggle="modal" data-target="#deleteModal"
+		href=""><i class="fas fa-trash" title="Sync Citation"></i></a> &nbsp;&nbsp; 
+		 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync" />"><i
 		class="fas fa-sync" title="Sync Citation"></i></a>
 </div>
 
@@ -270,6 +272,22 @@
 			</c:forEach></td>
 	</tr>
 </table>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+     
+      <div class="modal-body">
+    Are you sure you want to delete Citation?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+        <a class="btn btn-primary"
+		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/delete"/>" > Yes</a> 
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="parsed-ref-modal" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
