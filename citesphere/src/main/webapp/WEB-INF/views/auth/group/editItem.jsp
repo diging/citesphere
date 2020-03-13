@@ -704,7 +704,7 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
 }
 
 
-function getPersonAuthorityBasedOnName(modalType, personType) {
+function getDatasetAuthprities(modalType, personType) {
 
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
