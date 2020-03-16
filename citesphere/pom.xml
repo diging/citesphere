@@ -40,6 +40,7 @@
         <db.user></db.user>
         <db.password></db.password>
         <db.log.queries>false</db.log.queries>
+        <db.hibernate.dialect>org.hibernate.dialect.MySQL5Dialect</db.hibernate.dialect>
 
         <upload.folder.path></upload.folder.path>
 
