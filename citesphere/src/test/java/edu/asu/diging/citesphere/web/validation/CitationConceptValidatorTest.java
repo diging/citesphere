@@ -88,35 +88,33 @@ public class CitationConceptValidatorTest {
     }
 
     @Test
-    public void test_addConcept_Success() {
+    public void test_addConcept_success() {
         Mockito.when(conceptManager.getByUriAndOwner(conceptForm.getUri(), user)).thenReturn(null);
         citationConceptValidator.validate(conceptForm, errors);
-        assertNull(errors.getFieldError(URI_STRING));
         assertTrue(!errors.hasErrors());
     }
 
     @Test
-    public void test_addConcept_Uri_Exists() {
+    public void test_addConcept_uriExists() {
         Mockito.when(conceptManager.getByUriAndOwner(conceptForm.getUri(), user)).thenReturn(concept);
         citationConceptValidator.validate(conceptForm, errors);
         assertNotNull(errors.getFieldError(URI_STRING));
     }
 
     @Test
-    public void test_editConcept_Success() {
+    public void test_editConcept_success() {
         conceptForm.setConceptId(CONCEPT_ID);
         dbConcept.setUri(URI_EXISTING);
 
         Mockito.when(conceptManager.get(CONCEPT_ID)).thenReturn(dbConcept);
         Mockito.when(conceptManager.getByUriAndOwner(conceptForm.getUri(), user)).thenReturn(null);
         citationConceptValidator.validate(conceptForm, errors);
-        assertNull(errors.getFieldError(URI_STRING));
         assertTrue(!errors.hasErrors());
 
     }
 
     @Test
-    public void test_editConcept_Uri_Exists() {
+    public void test_editConcept_uriExists() {
         conceptForm.setConceptId(CONCEPT_ID);
         dbConcept.setUri(URI_EXISTING);
 
@@ -127,7 +125,7 @@ public class CitationConceptValidatorTest {
     }
 
     @Test
-    public void test_editConcept_Owner_Only() {
+    public void test_editConcept_ownerOnly() {
         User user1 = new User();
         user1.setUsername("user1");
 

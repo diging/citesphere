@@ -88,22 +88,21 @@ public class ConceptTypeValidatorTest {
     }
 
     @Test
-    public void test_addConceptType_Success() {
+    public void test_addConceptType_success() {
         Mockito.when(conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user)).thenReturn(null);
         conceptTypeValidator.validate(conceptTypeForm, errors);
         assertTrue(!errors.hasErrors());
-        assertNull(errors.getFieldError(URI_STRING));
     }
 
     @Test
-    public void test_addConceptType_Uri_Exists() {
+    public void test_addConceptType_uriExists() {
         Mockito.when(conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user)).thenReturn(conceptType);
         conceptTypeValidator.validate(conceptTypeForm, errors);
         assertNotNull(errors.getFieldError(URI_STRING));
     }
 
     @Test
-    public void test_editConceptType_Success() {
+    public void test_editConceptType_success() {
         conceptTypeForm.setConceptTypeId(CONCEPT_TYPE_ID);
         dbConceptType.setUri(URI_EXISTING);
 
@@ -111,11 +110,10 @@ public class ConceptTypeValidatorTest {
         Mockito.when(conceptTypeManager.getByUriAndOwner(conceptTypeForm.getUri(), user)).thenReturn(null);
         conceptTypeValidator.validate(conceptTypeForm, errors);
         assertTrue(!errors.hasErrors());
-        assertNull(errors.getFieldError(URI_STRING));
     }
 
     @Test
-    public void test_editConceptType_Uri_Exists() {
+    public void test_editConceptType_uriExists() {
         conceptTypeForm.setConceptTypeId(CONCEPT_TYPE_ID);
         dbConceptType.setUri(URI_EXISTING);
 
@@ -126,7 +124,7 @@ public class ConceptTypeValidatorTest {
     }
 
     @Test
-    public void test_editConceptType_Owner_Only() {
+    public void test_editConceptType_ownerOnly() {
         User user1 = new User();
         user1.setUsername("user1");
 

@@ -61,6 +61,34 @@ public class CitationHelperTest {
 
     private IConceptType type;
 
+    private static final String CONCEPT_ID = "CON1";
+
+    private static final String TYPE_ID = "CTY1";
+
+    private static final String FORM_YEAR = "2019";
+
+    private static final String CONCEPT_NAME = "testc";
+
+    private static final String TYPE_NAME = "forum";
+
+    private static final String CONCEPT_URI = "www.google.com";
+
+    private static final String TYPE_URI = "www.test.com";
+
+    private static final String FORM_TITLE = "updatedtitle";
+
+    private static final String FORM_SHORT_TITLE = "updatedShortTitle";
+
+    private static final String CITATION_SHORT_TITLE = "Name";
+
+    private static final String CITATION_TITLE = "Name";
+
+    private static final String FORM_VOLUME = "1.0";
+
+    private static final String FORM_PERSON_NAME = "Name";
+
+    private static final String FORM_AFFILIATION_NAME = "Name";
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -74,87 +102,87 @@ public class CitationHelperTest {
 
     private void initCitation() {
         citation = new Citation();
-        citation.setTitle("title");
-        citation.setShortTitle("shortTitle");
-        citation.setDateFreetext("2019");
-        citation.setVolume("1.0");
+        citation.setTitle(CITATION_TITLE);
+        citation.setShortTitle(CITATION_SHORT_TITLE);
+        citation.setDateFreetext(FORM_YEAR);
+        citation.setVolume(FORM_VOLUME);
 
         concept = new CitationConcept();
-        concept.setId("CON1");
+        concept.setId(CONCEPT_ID);
         concept.setOwner(user);
-        concept.setName("testc");
-        concept.setUri("www.google.com");
+        concept.setName(CONCEPT_NAME);
+        concept.setUri(CONCEPT_URI);
 
         type = new ConceptType();
-        type.setId("CTY1");
+        type.setId(TYPE_ID);
         type.setOwner(user);
-        type.setName("forum");
-        type.setUri("www.test.com");
+        type.setName(TYPE_NAME);
+        type.setUri(TYPE_URI);
     }
 
     private void initForm() {
         form = new CitationForm();
-        form.setTitle("updatedtitle");
-        form.setShortTitle("updatedShortTitle");
+        form.setTitle(FORM_TITLE);
+        form.setShortTitle(FORM_SHORT_TITLE);
 
         List<PersonForm> authors = new ArrayList<PersonForm>();
         PersonForm author = new PersonForm();
-        author.setFirstName("first");
-        author.setLastName("last");
+        author.setFirstName(FORM_PERSON_NAME);
+        author.setLastName(FORM_PERSON_NAME);
 
         List<AffiliationForm> affiliationForms = new ArrayList<AffiliationForm>();
         AffiliationForm affiliationForm = new AffiliationForm();
-        affiliationForm.setName("Test");
+        affiliationForm.setName(FORM_AFFILIATION_NAME);
         affiliationForms.add(affiliationForm);
         author.setAffiliations(affiliationForms);
         authors.add(author);
 
         form.setAuthors(authors);
-        form.setDateFreetext("2019");
-        form.setVolume("1.0");
+        form.setDateFreetext(FORM_YEAR);
+        form.setVolume(FORM_VOLUME);
 
         List<PersonForm> editors = new ArrayList<PersonForm>();
         PersonForm editor = new PersonForm();
-        editor.setFirstName("editor");
-        editor.setLastName("editor");
+        editor.setFirstName(FORM_PERSON_NAME);
+        editor.setLastName(FORM_PERSON_NAME);
         editors.add(editor);
         form.setEditors(editors);
 
         List<ConceptAssignmentForm> conceptTags = new ArrayList<>();
         ConceptAssignmentForm tag = new ConceptAssignmentForm();
-        tag.setConceptName("testc");
-        tag.setConceptUri("www.google.com");
-        tag.setConceptId("CON1");
-        tag.setConceptTypeId("CTY1");
-        tag.setConceptTypeName("forum");
-        tag.setConceptTypeUri("www.test.com");
+        tag.setConceptName(CONCEPT_NAME);
+        tag.setConceptUri(CONCEPT_URI);
+        tag.setConceptId(CONCEPT_ID);
+        tag.setConceptTypeId(TYPE_ID);
+        tag.setConceptTypeName(TYPE_NAME);
+        tag.setConceptTypeUri(TYPE_URI);
         conceptTags.add(tag);
         form.setConceptTags(conceptTags);
     }
 
     private void initUpdatedCitation() {
         updatedCitation = new Citation();
-        updatedCitation.setTitle("updatedtitle");
-        updatedCitation.setShortTitle("updatedShortTitle");
-        updatedCitation.setDateFreetext("2019");
-        updatedCitation.setVolume("1.0");
+        updatedCitation.setTitle(FORM_TITLE);
+        updatedCitation.setShortTitle(FORM_SHORT_TITLE);
+        updatedCitation.setDateFreetext(FORM_YEAR);
+        updatedCitation.setVolume(FORM_VOLUME);
 
         Set<IPerson> editorsSet = new LinkedHashSet<IPerson>();
         IPerson editor1 = new Person();
-        editor1.setFirstName("editor");
-        editor1.setLastName("editor");
+        editor1.setFirstName(FORM_PERSON_NAME);
+        editor1.setLastName(FORM_PERSON_NAME);
         editor1.setId("1");
         editorsSet.add(editor1);
         updatedCitation.setEditors(editorsSet);
 
         Set<IPerson> authorsSet = new LinkedHashSet<IPerson>();
         IPerson author1 = new Person();
-        author1.setFirstName("first");
-        author1.setLastName("last");
+        author1.setFirstName(FORM_PERSON_NAME);
+        author1.setLastName(FORM_PERSON_NAME);
         author1.setId("2");
         Set<IAffiliation> affiliations = new LinkedHashSet<IAffiliation>();
         IAffiliation affiliation = new Affiliation();
-        affiliation.setName("Test");
+        affiliation.setName(FORM_AFFILIATION_NAME);
         affiliations.add(affiliation);
         author1.setAffiliations(affiliations);
         authorsSet.add(author1);
@@ -162,12 +190,12 @@ public class CitationHelperTest {
 
         Set<ICitationConceptTag> conceptTagsSet = new LinkedHashSet<ICitationConceptTag>();
         ICitationConceptTag tag1 = new CitationConceptTag();
-        tag1.setConceptName("testc.com");
-        tag1.setConceptUri("www.google.com");
-        tag1.setLocalConceptId("CON1");
-        tag1.setLocalConceptTypeId("CTY1");
-        tag1.setTypeName("forum");
-        tag1.setTypeUri("www.test.com");
+        tag1.setConceptName(CONCEPT_NAME);
+        tag1.setConceptUri(CONCEPT_URI);
+        tag1.setLocalConceptId(CONCEPT_ID);
+        tag1.setLocalConceptTypeId(TYPE_ID);
+        tag1.setTypeName(TYPE_NAME);
+        tag1.setTypeUri(TYPE_URI);
         conceptTagsSet.add(tag1);
 
         updatedCitation.setConceptTags(conceptTagsSet);
@@ -184,8 +212,8 @@ public class CitationHelperTest {
 
     @Test
     public void test_updateCitation_getByURIAndOwner() {
-        Mockito.when(conceptManager.getByUriAndOwner("www.google.com", user)).thenReturn(concept);
-        Mockito.when(typeManager.getByUriAndOwner("www.test.com", user)).thenReturn(type);
+        Mockito.when(conceptManager.getByUriAndOwner(CONCEPT_URI, user)).thenReturn(concept);
+        Mockito.when(typeManager.getByUriAndOwner(TYPE_URI, user)).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
         assertTrue(equalsCitation(citation, updatedCitation));
     }
@@ -195,7 +223,7 @@ public class CitationHelperTest {
         Mockito.when(conceptManager.getByUriAndOwner("www.google1.com", user)).thenReturn(concept);
         Mockito.when(typeManager.getByUriAndOwner("www.test1.com", user)).thenReturn(type);
         helperToTest.updateCitation(citation, form, user);
-        assertTrue(equalsCitation(citation, updatedCitation));
+        equalsCitation(citation, updatedCitation);
     }
 
     private boolean comparePersons(Set<IPerson> a1, Set<IPerson> a2) {
