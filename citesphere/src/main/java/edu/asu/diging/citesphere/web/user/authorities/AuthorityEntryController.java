@@ -28,6 +28,7 @@ import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
+import edu.asu.diging.citesphere.web.user.AuthorityResult;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
 import edu.asu.diging.citesphere.web.user.authorities.helper.AuthorityEntryControllerHelper;
 
@@ -90,57 +91,66 @@ public class AuthorityEntryController {
     }
 
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/userAuthorities")
-    public ResponseEntity<List<IAuthorityEntry>> getUserAuthorities(Model model, Authentication authentication,
+    public ResponseEntity<AuthorityResult> getUserAuthorities(Model model, Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
+            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-
+        AuthorityResult authorityResult = new AuthorityResult();
+        
         List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
                 firstName, lastName, page, pageSize);
 
-        return new ResponseEntity<List<IAuthorityEntry>>(userEntries, HttpStatus.OK);
+        authorityResult.setFoundAuthorities(userEntries);
+        authorityResult.setCurrentPage(page+1);
+        authorityResult.setTotalPages(authorityService.getTotalUserAuthorities((IUser) authentication.getPrincipal(),
+                firstName, lastName, pageSize));
+        return new ResponseEntity<AuthorityResult>(authorityResult, HttpStatus.OK);
     }
     
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/datasetAuthorities")
-    public ResponseEntity<Set<IAuthorityEntry>> getDatasetAuthorities(Authentication authentication,
+    public ResponseEntity<AuthorityResult> getDatasetAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
-            @RequestParam(defaultValue = "0", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
+            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
+            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        Integer pageInt = 1;
-        try {
-            pageInt = new Integer(page);
-        } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-        }
+        AuthorityResult authorityResult = new AuthorityResult();
         
         Set<IAuthorityEntry> datasetEntries = null;
         
         try {          
-            datasetEntries = authorityService.findByNameInDataset(firstName, lastName, zoteroGroupId, pageInt, pageSize);
+            datasetEntries = authorityService.findByNameInDataset(firstName, lastName, zoteroGroupId, page, pageSize);
+            authorityResult.setFoundAuthorities(datasetEntries.stream().collect(Collectors.toList()));
+            authorityResult.setCurrentPage(page+1);
+            authorityResult.setTotalPages(authorityService.getTotalDatasetAuthorities(zoteroGroupId,
+                    firstName, lastName, pageSize));
 
         } catch (GroupDoesNotExistException e) {
             logger.warn("Group does not exist: " + zoteroGroupId, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<Set<IAuthorityEntry>>(datasetEntries, HttpStatus.OK);
+        return new ResponseEntity<AuthorityResult>(authorityResult, HttpStatus.OK);
     }
     
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/importedAuthorities")
-    public ResponseEntity<List<IAuthorityEntry>> getImportedAuthorities(Authentication authentication,
+    public ResponseEntity<AuthorityResult> getImportedAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
+            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
+        AuthorityResult authorityResult = new AuthorityResult();
+        
         List<IAuthorityEntry> importedEntries = null;
 
         try {
-            importedEntries = authorityService.importAuthorityEntries(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), page, pageSize);          
+            importedEntries = authorityService.importAuthorityEntries(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), page, pageSize);     
+            authorityResult.setFoundAuthorities(importedEntries.stream().collect(Collectors.toList()));
+            authorityResult.setCurrentPage(page+1);
+            authorityResult.setTotalPages(authorityService.getTotalImportedAuthorities(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), pageSize));
 
         } catch (AuthorityServiceConnectionException e) {
             logger.warn("Could not retrieve authority entries.", e);
@@ -151,7 +161,7 @@ public class AuthorityEntryController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<List<IAuthorityEntry>>(importedEntries, HttpStatus.OK);
+        return new ResponseEntity<AuthorityResult>(authorityResult, HttpStatus.OK);
     }
 
 }

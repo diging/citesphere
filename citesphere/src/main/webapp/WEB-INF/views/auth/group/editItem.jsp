@@ -7,6 +7,8 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="cite"
 	uri="https://diging.asu.edu/jps/tlds/citesphere"%>
+	
+<script src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>	
 
 <style>
 .popover {
@@ -36,7 +38,6 @@ $(function() {
 	$("#uriLoadingFailureCreator").hide();
 	$("#uriLoadingFoundCreator").hide();
 	$("#searchCreatorSpinner").hide();
-	
 	
 	$("#uriLoadingFoundCreator").popover();
 	$("#uriLoadingFailureCreator").popover();
@@ -68,20 +69,25 @@ $(function() {
 		
 	$("#searchAuthor").click(function() {
 		$("#searchAuthorSpinner").show();
-		getPersonAuthorityBasedOnName('Author','Author');
-		getImportedAuthorities('Author','Author')
+		getUserAuthorities('Author','Author', 0)
+		getDatasetAuthorities('Author','Author', 0)
+		getImportedAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
 	});
 	
 	$("#searchEditor").click(function() {
 		$("#searchEditorSpinner").show();
-		getPersonAuthorityBasedOnName('Editor','Editor');
+		getUserAuthorities('Editor','Editor', 0)
+		getDatasetAuthorities('Editor','Editor', 0)
+		getImportedAuthorities('Editor','Editor',0)
 		$("#searchEditorSpinner").hide();
 	});
 	
 	$("#searchCreator").click(function() {
 		$("#searchCreatorSpinner").show();
-		getPersonAuthorityBasedOnName('Creator','Creator');
+		getUserAuthorities('Creator','Creator', 0)
+		getDatasetAuthorities('Creator','Creator', 0)
+		getImportedAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
 	});
 	
@@ -584,13 +590,14 @@ function getPersonAuthority(uri, personType) {
 
 }
 
-function getPersonAuthorityBasedOnName(modalType, personType) {
+
+function getUserAuthorities(modalType, personType, page) {
 
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/userAuthorities?firstName='+ firstName + '&lastName=' + lastName + '"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/userAuthorities?firstName='+ firstName + '&lastName=' + lastName +'&page='+page+'"/>'
 		
 	$.ajax({
   		dataType: "json",
@@ -599,16 +606,12 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
   		async: false,
   		success: function(data) {
 			
-  			$("#authoritySearchResult").empty()
+  			$("#userAuthoritySearchResult").empty()
   			$("#searchAuthorityResultSize").empty()
   			var content = '';
   			
-  			if (data['userAuthorityError'] != null) {
-  				content += '<tr><td colspan=4 class="text-warning">data["userAuthorityError"]</td></tr>';
-  			}
-  			else if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
-  				content += '<tr><td colspan=4>These authority entries have already been imported by you:</td></tr>';
-  				data['userAuthorityEntries'].forEach(function(elem) {
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {
   					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
@@ -616,17 +619,63 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content +='<td>Imported by you </td></tr>';
   					
   				});
-  			}
+  			}  			
+		
+		$("#userAuthoritySearchResult").append(content);
+		$("#userAuthoritySearchResult tr td a").click(function() {
+			
+			name = $(this).text()
+			uri = $(this).closest('td').next().text()+"/";
+				
+			showPersonNameInModal(name, personType)
+			$("#uri"+modalType).val( uri);
+			$("#authorAuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
+			$("#selectAuthorityModel").modal('hide');
+		});	
+		 
+		$('#userAuthority-pagination-top').twbsPagination({
+		    totalPages: data['totalPages'],
+		    startPage: data['currentPage'],
+		    prev: "«",
+		    next: "»",
+		    visiblePages: 5,
+		    initiateStartPageClick: false,
+		    onPageClick:function(event, page) {
+		    	   getUserAuthorities(modalType, personType, page-1)
+
+		    }
+		});
+		
+        }
+	
+	});
+
+}
+
+
+function getDatasetAuthorities(modalType, personType, page) {
+
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/datasetAuthorities?firstName='+ firstName + '&lastName=' + '&page='+page+'"/>'
+		
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+			
+  			$("#datasetAuthoritySearchResult").empty()
+  			$("#searchAuthorityResultSize").empty()
+  			var content = '';
   			
-  			if (data['datasetAuthorityError'] != null) {
-  				content += '<tr><td colspan=4 class="text-warning" >data["datasetAuthorityError"]</td></tr>';
-  			}
-  			else if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
-  				content += '<tr><td colspan=4>These authority entries have already been imported by someone else for this dataset:</td></tr>';
-  				data['datasetAuthorityEntries'].forEach(function(elem) {
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {
   					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
@@ -634,35 +683,33 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content +='<td>Imported by someone else for this dataset </td></tr>';
+  					
+  				});
+  				
+  				$('#datasetAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	   getUserAuthorities(modalType, personType, page-1)
+
+  				    }
   				});
   			}
   			
-  			if (data['importAuthorityError'] != null) {
-  				content += '<tr><td colspan=4 class="text-warning">data["importAuthorityError"]</td></tr>';
-  			}
-  			else if (data['importedAuthorityEntries'] != null && data['importedAuthorityEntries'].length > 0) {
-  				content += '<tr><td colspan=3>Authorities imported from Conceptpower:</td></tr>';
-  				data['importedAuthorityEntries'].forEach(function(elem) {
-  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
-  					if(elem['description']==null){
-  						content += ' - </td>';
-  						}
-  					else{
-  						content +=elem['description'] + '</td>';
-  					}
-  					content +='<td>Do you want to create a managed authority entry? </td></tr>';
-  				});
-  			}
   			
   		if(content==''){
   			$("#searchAuthorityResultSize").append("0 authorites found");
   		}
   		
-		$("#authoritySearchResult").append(content);
+		$("#datasetAuthoritySearchResult").append(content);
 		
+
 		
-		$("#authoritySearchResult tr td a").click(function() {
+		$("#datasetAuthoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
 			uri = $(this).closest('td').next().text()+"/";
@@ -670,11 +717,9 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
 			
-			if($(this).closest('td').next().next().next().text()=='Do you want to create a managed authority entry? '){
-				
-				createManageAuthorityURL = '<c:url value="/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri='+ $(this).closest('td').next().text() + '/"/>';
+			createManageAuthorityURL = '<c:url value="/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri='+ $(this).closest('td').next().text() + '/"/>';
 						
-				$.ajax({
+			$.ajax({
 			  		dataType: "json",
 			  		type: 'POST',
 			  		url: createManageAuthorityURL,
@@ -687,12 +732,6 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
 		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
 				}
 				});				
-				
-			}
-			
-			else{
-				$("#authorAuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
-			}
 						
 			$("#selectAuthorityModel").modal('hide');
 		});	
@@ -704,133 +743,13 @@ function getPersonAuthorityBasedOnName(modalType, personType) {
 }
 
 
-function getDatasetAuthprities(modalType, personType) {
+function getImportedAuthorities(modalType, personType, page) {
 
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/userAuthorities?firstName='+ firstName + '&lastName=' + lastName + '"/>'
-		
-	$.ajax({
-  		dataType: "json",
-  		type: 'GET',
-  		url: url ,
-  		async: false,
-  		success: function(data) {
-			
-  			$("#authoritySearchResult").empty()
-  			$("#searchAuthorityResultSize").empty()
-  			var content = '';
-  			
-  			if (data['userAuthorityError'] != null) {
-  				content += '<tr><td colspan=4 class="text-warning">data["userAuthorityError"]</td></tr>';
-  			}
-  			else if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
-  				content += '<tr><td colspan=4>These authority entries have already been imported by you:</td></tr>';
-  				data['userAuthorityEntries'].forEach(function(elem) {
-  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
-  					if(elem['description']==null){
-  						content += ' - </td>';
-  						}
-  					else{
-  						content +=elem['description'] + '</td>';
-  					}
-  					content +='<td>Imported by you </td></tr>';
-  					
-  				});
-  			}
-  			
-  			if (data['datasetAuthorityError'] != null) {
-  				content += '<tr><td colspan=4 class="text-warning" >data["datasetAuthorityError"]</td></tr>';
-  			}
-  			else if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
-  				content += '<tr><td colspan=4>These authority entries have already been imported by someone else for this dataset:</td></tr>';
-  				data['datasetAuthorityEntries'].forEach(function(elem) {
-  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
-  					if(elem['description']==null){
-  						content += ' - </td>';
-  						}
-  					else{
-  						content +=elem['description'] + '</td>';
-  					}
-  					content +='<td>Imported by someone else for this dataset </td></tr>';
-  				});
-  			}
-  			
-  			if (data['importAuthorityError'] != null) {
-  				content += '<tr><td colspan=4 class="text-warning">data["importAuthorityError"]</td></tr>';
-  			}
-  			else if (data['importedAuthorityEntries'] != null && data['importedAuthorityEntries'].length > 0) {
-  				content += '<tr><td colspan=3>Authorities imported from Conceptpower:</td></tr>';
-  				data['importedAuthorityEntries'].forEach(function(elem) {
-  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
-  					if(elem['description']==null){
-  						content += ' - </td>';
-  						}
-  					else{
-  						content +=elem['description'] + '</td>';
-  					}
-  					content +='<td>Do you want to create a managed authority entry? </td></tr>';
-  				});
-  			}
-  			
-  		if(content==''){
-  			$("#searchAuthorityResultSize").append("0 authorites found");
-  		}
-  		
-		$("#authoritySearchResult").append(content);
-		
-		
-		$("#authoritySearchResult tr td a").click(function() {
-			
-			name = $(this).text()
-			uri = $(this).closest('td').next().text()+"/";
-				
-			showPersonNameInModal(name, personType)
-			$("#uri"+modalType).val( uri);
-			
-			if($(this).closest('td').next().next().next().text()=='Do you want to create a managed authority entry? '){
-				
-				createManageAuthorityURL = '<c:url value="/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri='+ $(this).closest('td').next().text() + '/"/>';
-						
-				$.ajax({
-			  		dataType: "json",
-			  		type: 'POST',
-			  		url: createManageAuthorityURL,
-			  		async:false,
-			  		success: function(data) {
-			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
-			  		},
-				error: function(data){					
-					$("#uri"+modalType).val("");
-		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
-				}
-				});				
-				
-			}
-			
-			else{
-				$("#authorAuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
-			}
-						
-			$("#selectAuthorityModel").modal('hide');
-		});	
-  			
-        }
-	
-	});
-
-}
-
-
-function getImportedAuthorities(modalType, personType) {
-
-	var firstName = $("#firstName"+personType).val();
-	var lastName = $("#lastName"+personType).val();
-	personType_lowerCase = personType.toLowerCase();
-
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/importedAuthorities?firstName='+ firstName + '&lastName=' + lastName + '"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/importedAuthorities?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
 		
 	$.ajax({
   		dataType: "json",
@@ -844,9 +763,8 @@ function getImportedAuthorities(modalType, personType) {
   			
   			var content = '';
   				
-  			if (data != null && data.length > 0) {
-
-  				data.forEach(function(elem) {
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {
   					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
@@ -854,14 +772,56 @@ function getImportedAuthorities(modalType, personType) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
+  					
   				});
+  				
+  				$('#importedAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	   getUserAuthorities(modalType, personType, page-1)
+
+  				    }
+  				});
+  				
   			}
   			
-  		if(content==''){
-  			$("#searchAuthorityResultSize").append("0 authorites found");
-  		}
-  		
-		$("#importAuthoritySearchResult").append(content); 			
+		$("#importAuthoritySearchResult").append(content); 	
+		
+
+		
+		$("#importAuthoritySearchResult tr td a").click(function() {
+			
+			name = $(this).text()
+			uri = $(this).closest('td').next().text()+"/";
+				
+			showPersonNameInModal(name, personType)
+			$("#uri"+modalType).val( uri);
+			
+			
+			createManageAuthorityURL = '<c:url value="/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri='+ $(this).closest('td').next().text() + '/"/>';
+						
+			$.ajax({
+			  		dataType: "json",
+			  		type: 'POST',
+			  		url: createManageAuthorityURL,
+			  		async:false,
+			  		success: function(data) {
+			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  		},
+				error: function(data){					
+					$("#uri"+modalType).val("");
+		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+				}
+				});				
+						
+			$("#selectAuthorityModel").modal('hide');
+		});	
+		
         }
 	
 	});
@@ -1545,13 +1505,16 @@ let removePerson = function removePerson(e) {
 				<div role="tabpanel">
 					<!-- Nav tabs -->
 					<ul class="nav nav-tabs" role="tablist">
+					
 						<li role="presentation" class="active"><a
-							href="#userAuthoritiesTab" aria-controls="uploadTab" role="tab"
+							href="#userAuthoritiesTabContent" aria-controls="uploadTab" role="tab"
 							data-toggle="tab">Authorities imported by you</a></li>
-						<li role="presentation"><a href="#datasetAuthoritiesTab"
+							
+						<li role="presentation"><a href="#datasetAuthoritiesTabContent"
 							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
 								imported by other users</a></li>
-						<li role="presentation"><a href="#importedAuthoritiesTab"
+								
+						<li role="presentation"><a href="#importedAuthoritiesTabContent"
 							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
 								imported </a></li>
 					</ul>
@@ -1559,7 +1522,9 @@ let removePerson = function removePerson(e) {
 
 					<div class="tab-content">
 
-						<div class="tab-pane active" id="userAuthoritiesTabContent">
+						<div role="tabpanel" class="tab-pane active" id="userAuthoritiesTabContent">
+						
+						   <ul id="userAuthority-pagination-top" class="pagination-sm"></ul>
 
 							<table class="table table-striped table-bordered table-fixed">
 								<tr>
@@ -1572,7 +1537,10 @@ let removePerson = function removePerson(e) {
 							</table>
 						</div>
 
-						<div class="tab-pane" id="datasetAuthoritiesTabContent">
+						<div role="tabpanel" class="tab-pane" id="datasetAuthoritiesTabContent">
+						
+						  <ul id="datasetAuthority-pagination-top" class="pagination-sm"></ul>
+						
 							<table class="table table-striped table-bordered table-fixed">
 								<tr>
 									<th>Name</th>
@@ -1583,8 +1551,12 @@ let removePerson = function removePerson(e) {
 								</tbody>
 							</table>
 						</div>
+						
 
-						<div class="tab-pane" id="importedAuthoritiesTabContent">
+						<div role="tabpanel" class="tab-pane" id="importedAuthoritiesTabContent">
+						
+						  <ul id="importedAuthority-pagination-top" class="pagination-sm"></ul>
+						
 							<table class="table table-striped table-bordered table-fixed">
 								<tr>
 									<th>Name</th>

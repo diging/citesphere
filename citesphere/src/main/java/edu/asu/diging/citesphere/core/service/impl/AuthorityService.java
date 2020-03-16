@@ -197,6 +197,25 @@ public class AuthorityService implements IAuthorityService {
     public IAuthorityEntry save(IAuthorityEntry entry) {
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry)entry);
     }
+
+    @Override
+    public int getTotalUserAuthorities(IUser user, String firstName, String lastName, int pageSize) {
+        
+        return (int) Math.ceil(new Float(authorityRepository.countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName))/pageSize);
+    }
+
+    @Override
+    public int getTotalDatasetAuthorities(String citationGroupId, String firstName, String lastName, int pageSize) {
+        Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
+
+        return (int) Math.ceil(new Float(personAuthorityRepository.countByPersonsByCitationGroupAndNameLike((ICitationGroup)group.get(), firstName, lastName))/pageSize);
+    }
+
+    @Override
+    public int getTotalImportedAuthorities(String conceptpowerSearchString, int pageSize) {
+
+        return 5;
+    }
     
 
 }

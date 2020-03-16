@@ -40,6 +40,12 @@ public interface IAuthorityService {
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
+    int getTotalUserAuthorities(IUser user, String firstName, String lastName, int pageSize);
+
+    int getTotalDatasetAuthorities(String citationGroupId, String firstName, String lastName, int pageSize);
+
+    int getTotalImportedAuthorities(String conceptpowerSearchString, int pageSize);
+
 
 
 }
