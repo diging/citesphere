@@ -590,6 +590,10 @@ function getPersonAuthority(uri, personType) {
 
 }
 
+function getNextUserAuthorities(modalType, personType, page) {
+	
+}
+
 
 function getUserAuthorities(modalType, personType, page) {
 
@@ -694,7 +698,7 @@ function getDatasetAuthorities(modalType, personType, page) {
   				    visiblePages: 5,
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
-  				    	   getUserAuthorities(modalType, personType, page-1)
+  				    	getDatasetAuthorities(modalType, personType, page-1)
 
   				    }
   				});
@@ -783,7 +787,7 @@ function getImportedAuthorities(modalType, personType, page) {
   				    visiblePages: 5,
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
-  				    	   getUserAuthorities(modalType, personType, page-1)
+  				    	getImportedAuthorities(modalType, personType, page)
 
   				    }
   				});

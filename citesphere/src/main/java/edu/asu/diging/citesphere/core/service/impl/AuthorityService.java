@@ -212,9 +212,20 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public int getTotalImportedAuthorities(String conceptpowerSearchString, int pageSize) {
+    public int getTotalImportedAuthorities(String searchString, int pageSize) {
+        int totalData = 0;
+        
+        for(AuthorityImporter importer : importers) {
 
-        return 5;
+            try {
+                totalData += importer.totalRetrievedAuthorityData(searchString) ;
+            } catch (URISyntaxException | AuthorityServiceConnectionException e) {
+
+                totalData = 0;
+            }
+
+        }
+        return (int) Math.ceil(new Float(totalData)/pageSize);
     }
     
 

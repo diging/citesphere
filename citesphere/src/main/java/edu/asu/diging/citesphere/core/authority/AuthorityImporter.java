@@ -34,4 +34,7 @@ public interface AuthorityImporter {
 
     String getId();
 
+    long totalRetrievedAuthorityData(String searchString)
+            throws URISyntaxException, AuthorityServiceConnectionException;
+
 }

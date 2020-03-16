@@ -100,4 +100,11 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 
 		return null;
 	}
+
+    @Override
+    public long totalRetrievedAuthorityData(String searchString)
+            throws URISyntaxException, AuthorityServiceConnectionException {
+
+        return 0;
+    }
 }

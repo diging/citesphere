@@ -99,7 +99,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
         RequestEntity<Void> request;
         try {
             
-            String url = conceptpowerURL + conceptpowerSearchKeyword + URLEncoder.encode(searchString, StandardCharsets.UTF_8.toString());
+            String url = conceptpowerURL + conceptpowerSearchKeyword + URLEncoder.encode(searchString, StandardCharsets.UTF_8.toString()) +"&page="+page;
             URI uri = UriComponentsBuilder.fromUriString(url.toString()).build(true).toUri();
             
             request = RequestEntity.get(uri)
@@ -122,9 +122,9 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
                 for (ConceptpowerEntry conceptEntry : conceptEntries.getConceptEntries()) {
 
                     IAuthorityEntry authority = new AuthorityEntry();
-                    if (conceptEntry.getEqual_to() == null || !pattern.matcher(conceptEntry.getEqual_to()).matches()) {
-                        continue;
-                    }
+//                    if (conceptEntry.getEqual_to() == null || !pattern.matcher(conceptEntry.getEqual_to()).matches()) {
+//                        continue;
+//                    }
                     authority.setName(conceptEntry.getLemma());
                     authority.setUri(conceptEntry.getEqual_to());
                     authority.setDescription(conceptEntry.getDescription());
@@ -134,6 +134,45 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
         }
         return authorityEntries;
+    }
+    
+    @Override
+    public long totalRetrievedAuthorityData(String searchString)
+            throws URISyntaxException, AuthorityServiceConnectionException {
+
+        searchString = searchString.replace(conceptpowerSearchKeyword, "");
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
+        factory.setHttpClient(httpClient);
+        restTemplate.setRequestFactory(factory);
+
+        RequestEntity<Void> request;
+        try {
+            
+            String url = conceptpowerURL + conceptpowerSearchKeyword + URLEncoder.encode(searchString, StandardCharsets.UTF_8.toString());
+            URI uri = UriComponentsBuilder.fromUriString(url.toString()).build(true).toUri();
+            
+            request = RequestEntity.get(uri)
+                    .accept(MediaType.APPLICATION_JSON).build();
+        } catch (UnsupportedEncodingException e) {
+            throw new URISyntaxException(e.getMessage(),e.toString());
+            
+        }
+        ResponseEntity<ConceptpowerResponse> response = null;
+        try {
+            response = restTemplate.exchange(request, ConceptpowerResponse.class);
+        } catch (RestClientException ex) {
+            throw new AuthorityServiceConnectionException(ex);
+        }
+        
+        if (response.getStatusCode() == HttpStatus.OK) {           
+            ConceptpowerResponse conceptEntries = response.getBody();
+            if (conceptEntries.getConceptEntries() != null) {              
+               return conceptEntries.getPagination().getTotalNumberOfRecords();                               
+            }           
+        }
+        
+        return 0;
     }
 
 }

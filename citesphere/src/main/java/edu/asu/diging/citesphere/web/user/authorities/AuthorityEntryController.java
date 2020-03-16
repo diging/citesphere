@@ -139,7 +139,7 @@ public class AuthorityEntryController {
     public ResponseEntity<AuthorityResult> getImportedAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
+            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
         AuthorityResult authorityResult = new AuthorityResult();
@@ -150,8 +150,11 @@ public class AuthorityEntryController {
             importedEntries = authorityService.importAuthorityEntries(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), page, pageSize);     
             authorityResult.setFoundAuthorities(importedEntries.stream().collect(Collectors.toList()));
             authorityResult.setCurrentPage(page+1);
-            authorityResult.setTotalPages(authorityService.getTotalImportedAuthorities(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), pageSize));
-
+            if(page==0)
+            {
+                authorityResult.setTotalPages(authorityService.getTotalImportedAuthorities(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), pageSize));
+            }
+            
         } catch (AuthorityServiceConnectionException e) {
             logger.warn("Could not retrieve authority entries.", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
