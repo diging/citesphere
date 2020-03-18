@@ -252,8 +252,8 @@ $(function() {
 		var conceptType = $("#addConceptTypeSelect");
 		
 		var conceptSpan = $('<span class="badge"></span>');
-		conceptSpan.attr("data-concept-id", conceptId.val());
-		conceptSpan.attr("data-concept-type-id", conceptType.val());
+		conceptSpan.attr("data-concept-uri", conceptId.val());
+		conceptSpan.attr("data-type-uri", conceptType.val());
 		
 		var text = $("#addConceptConceptSelect option:selected").text();
 		var typeName = $("#addConceptTypeSelect option:selected").text();
@@ -463,17 +463,45 @@ function createConceptTags() {
 	$("#conceptTags").children("span").each(function (idx, tag) {
 		var conceptTagInput = $("<input>");
 		conceptTagInput.attr("type", "hidden");
-		conceptTagInput.attr("id", "conceptAssignments" + idx + ".conceptId");
-		conceptTagInput.attr("name", "conceptAssignments[" + idx + "].conceptId");
+		conceptTagInput.attr("id", "conceptTags" + idx + ".conceptId");
+		conceptTagInput.attr("name", "conceptTags[" + idx + "].conceptId");
 		conceptTagInput.attr("value", $(tag).attr("data-concept-id"));
 		$("#editForm").append(conceptTagInput);
 		
 		var conceptTagTypeInput = $("<input>");
 		conceptTagTypeInput.attr("type", "hidden");
-		conceptTagTypeInput.attr("id", "conceptAssignments" + idx + ".conceptTypeId");
-		conceptTagTypeInput.attr("name", "conceptAssignments[" + idx + "].conceptTypeId");
+		conceptTagTypeInput.attr("id", "conceptTags" + idx + ".conceptTypeId");
+		conceptTagTypeInput.attr("name", "conceptTags[" + idx + "].conceptTypeId");
 		conceptTagTypeInput.attr("value", $(tag).attr("data-concept-type-id"));
 		$("#editForm").append(conceptTagTypeInput);
+		
+		var conceptTagUri = $("<input>");
+		conceptTagUri.attr("type", "hidden");
+		conceptTagUri.attr("id", "conceptTags" + idx + ".conceptUri");
+		conceptTagUri.attr("name", "conceptTags[" + idx + "].conceptUri");
+		conceptTagUri.attr("value", $(tag).attr("data-concept-uri"));
+		$("#editForm").append(conceptTagUri);
+		
+		var conceptTagName = $("<input>");
+		conceptTagName.attr("type", "hidden");
+		conceptTagName.attr("id", "conceptTags" + idx + ".conceptName");
+		conceptTagName.attr("name", "conceptTags[" + idx + "].conceptName");
+		conceptTagName.attr("value", $(tag).attr("data-concept-name"));
+		$("#editForm").append(conceptTagName);
+		
+		var conceptTagType = $("<input>");
+		conceptTagType.attr("type", "hidden");
+		conceptTagType.attr("id", "conceptTags" + idx + ".conceptTypeName");
+		conceptTagType.attr("name", "conceptTags[" + idx + "].conceptTypeName");
+		conceptTagType.attr("value", $(tag).attr("data-type-name"));
+		$("#editForm").append(conceptTagType);
+		
+		var conceptTagTypeUri = $("<input>");
+		conceptTagTypeUri.attr("type", "hidden");
+		conceptTagTypeUri.attr("id", "conceptTags" + idx + ".conceptTypeUri");
+		conceptTagTypeUri.attr("name", "conceptTags[" + idx + "].conceptTypeUri");
+		conceptTagTypeUri.attr("value", $(tag).attr("data-type-uri"));
+		$("#editForm").append(conceptTagTypeUri);
 	});
 }
 
@@ -823,7 +851,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <td>
 <div id="conceptTags">
 <c:forEach items="${citation.conceptTags}" var="tag">
-<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName}</span>
+<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-uri="${tag.conceptUri}" data-concept-name="${tag.conceptName}" data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName}</span>
 </c:forEach>
 </div>
 <div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
@@ -1008,7 +1036,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
         <label>Concept</label>
         <select class="form-control" id="addConceptConceptSelect">
         <c:forEach items="${concepts}" var="concept">
-        	<option value="${concept.id}">${concept.name}</option>
+        	<option value="${concept.uri}">${concept.name}</option>
         </c:forEach>
         </select>
         </p>
@@ -1017,7 +1045,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
         <label>Type of Concept</label>
         <select class="form-control"  id="addConceptTypeSelect">
         <c:forEach items="${conceptTypes}" var="type">
-        	<option value="${type.id}">${type.name}</option>
+        	<option value="${type.uri}">${type.name}</option>
         </c:forEach>
         </select>
         </p>

@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
-
 import edu.asu.diging.citesphere.model.bib.IConceptType;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
@@ -14,6 +13,7 @@ public interface IConceptTypeManager {
 
     IConceptType get(String id);
 
-    void save(IConceptType type);
+    IConceptType getByUriAndOwner(String conceptTypeUri, IUser owner);
 
+    IConceptType save(IConceptType type);
 }

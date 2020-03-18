@@ -27,6 +27,8 @@
 <p></p>
 <label>URI:</label>
 <form:input path="uri" type="text" class="form-control" placeholder="URI"></form:input>
+<p class="text-danger"><form:errors path="uri"/></p>
+<form:input path="conceptId" type="hidden" class="form-control" value="${conceptId}"></form:input>
 <br>
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
 <a href="<c:url value="/auth/concepts/list" />" class="btn btn-default">
