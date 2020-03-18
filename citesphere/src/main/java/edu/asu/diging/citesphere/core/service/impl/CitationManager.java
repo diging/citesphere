@@ -235,6 +235,48 @@ public class CitationManager implements ICitationManager {
             group.getUsers().add(user.getUsername());
         }
     }
+    
+    private CitationResults getGroupItemsBasedOnLastModified(List<PageRequest> requests,  String sortBy, ICitationGroup group) {
+        IPageRequest  localPageRequest = requests.get(0);
+
+        OffsetDateTime updatedOn = localPageRequest.getLastUpdated() != null ? localPageRequest.getLastUpdated()
+                : OffsetDateTime.MIN;
+        OffsetDateTime groupLastLocallyModified = group.getLastLocallyModifiedOn() != null
+                ? group.getLastLocallyModifiedOn()
+                : OffsetDateTime.MIN;
+        if (updatedOn.plusMinutes(syncFrequencey).isAfter(OffsetDateTime.now())
+                && updatedOn.isAfter(groupLastLocallyModified)) {
+            CitationResults results = new CitationResults();
+            results.setCitations(
+                    localPageRequest.getCitations().stream().distinct().collect(Collectors.toList()));
+            results.getCitations().sort(new Comparator<ICitation>() {
+                @Override
+                public int compare(ICitation o1, ICitation o2) {
+                    return sortFunctions.get(sortBy).apply(o1, o2);
+                }
+            });
+            results.setTotalResults(localPageRequest.getTotalNumResults());
+            return results;
+        }
+        return null;
+    }
+    
+    private void updateCitations(IUser user, ICitationGroup group, String collectionId,CitationResults results, int page, String sortBy) {
+        PageRequest request = createPageRequest(user, page, sortBy, group, results);
+        request.setCollectionId(collectionId);
+        for (ICitation updatedCitation : results.getCitations()) {
+            if (citationRepository.findById(updatedCitation.getKey()).isPresent()) {
+                try {
+                    citationRepository.deleteById(updatedCitation.getKey());
+                } catch (EmptyResultDataAccessException exception) {
+                    logger.warn("Citation not found. Unable to delete it.", exception);
+                }
+            }
+            citationRepository.save((Citation) updatedCitation);
+        }
+        pageRequestRepository.save(request);
+    }
+    
 
     @Override
     public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy)
@@ -251,34 +293,16 @@ public class CitationManager implements ICitationManager {
             } catch (JpaObjectRetrievalFailureException ex) {
                 logger.warn("Could not retrieve page request.", ex);
             }
-
+            CitationResults results = null;
             IPageRequest localPageRequest = null;
             if (requests != null && requests.size() > 0) {
                 // there should be just one
-                localPageRequest = requests.get(0);
-
-                OffsetDateTime updatedOn = localPageRequest.getLastUpdated() != null ? localPageRequest.getLastUpdated()
-                        : OffsetDateTime.MIN;
-                OffsetDateTime groupLastLocallyModified = group.getLastLocallyModifiedOn() != null
-                        ? group.getLastLocallyModifiedOn()
-                        : OffsetDateTime.MIN;
-                if (updatedOn.plusMinutes(syncFrequencey).isAfter(OffsetDateTime.now())
-                        && updatedOn.isAfter(groupLastLocallyModified)) {
-                    CitationResults results = new CitationResults();
-                    results.setCitations(
-                            localPageRequest.getCitations().stream().distinct().collect(Collectors.toList()));
-                    results.getCitations().sort(new Comparator<ICitation>() {
-                        @Override
-                        public int compare(ICitation o1, ICitation o2) {
-                            return sortFunctions.get(sortBy).apply(o1, o2);
-                        }
-                    });
-                    results.setTotalResults(localPageRequest.getTotalNumResults());
-                    return results;
-                }
+                results = getGroupItemsBasedOnLastModified(requests, sortBy, group);
+                if(results != null)
+                    return results;   
             }
 
-            CitationResults results = null;
+           
             if (collectionId == null || collectionId.trim().isEmpty()) {
                 results = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getVersion());
             } else {
@@ -290,19 +314,9 @@ public class CitationManager implements ICitationManager {
                     // delete last cache
                     pageRequestRepository.deleteAll(requests);
                 }
-                PageRequest request = createPageRequest(user, page, sortBy, group, results);
-                request.setCollectionId(collectionId);
-                for (ICitation updatedCitation : results.getCitations()) {
-                    if (citationRepository.findById(updatedCitation.getKey()).isPresent()) {
-                        try {
-                            citationRepository.deleteById(updatedCitation.getKey());
-                        } catch (EmptyResultDataAccessException exception) {
-                            logger.warn("Citation not found. Unable to delete it.", exception);
-                        }
-                    }
-                    citationRepository.save((Citation) updatedCitation);
-                }
-                pageRequestRepository.save(request);
+               updateCitations(user, group, collectionId, results, page, sortBy);
+                
+             
             } else if (localPageRequest != null) {
                 localPageRequest.setLastUpdated(OffsetDateTime.now());
                 results.setCitations(localPageRequest.getCitations());
