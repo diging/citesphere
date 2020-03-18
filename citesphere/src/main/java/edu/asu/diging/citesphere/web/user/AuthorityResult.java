@@ -5,10 +5,10 @@ import java.util.List;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 
 public class AuthorityResult {
-    
+
     private int totalPages;
     private int currentPage;
-    
+
     private List<IAuthorityEntry> foundAuthorities;
 
     public int getTotalPages() {
@@ -34,6 +34,5 @@ public class AuthorityResult {
     public void setFoundAuthorities(List<IAuthorityEntry> foundAuthorities) {
         this.foundAuthorities = foundAuthorities;
     }
-    
 
 }

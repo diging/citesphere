@@ -69,6 +69,10 @@ $(function() {
 		
 	$("#searchAuthor").click(function() {
 		$("#searchAuthorSpinner").show();
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
+		$('#importedAuthority-pagination-top').twbsPagination('destroy');
+		
 		getUserAuthorities('Author','Author', 0)
 		getDatasetAuthorities('Author','Author', 0)
 		getImportedAuthorities('Author','Author',0)
@@ -77,6 +81,12 @@ $(function() {
 	
 	$("#searchEditor").click(function() {
 		$("#searchEditorSpinner").show();
+		
+
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
+		$('#importedAuthority-pagination-top').twbsPagination('destroy');
+		
 		getUserAuthorities('Editor','Editor', 0)
 		getDatasetAuthorities('Editor','Editor', 0)
 		getImportedAuthorities('Editor','Editor',0)
@@ -85,6 +95,12 @@ $(function() {
 	
 	$("#searchCreator").click(function() {
 		$("#searchCreatorSpinner").show();
+		
+
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
+		$('#importedAuthority-pagination-top').twbsPagination('destroy');
+		
 		getUserAuthorities('Creator','Creator', 0)
 		getDatasetAuthorities('Creator','Creator', 0)
 		getImportedAuthorities('Creator','Creator',0)
@@ -590,11 +606,6 @@ function getPersonAuthority(uri, personType) {
 
 }
 
-function getNextUserAuthorities(modalType, personType, page) {
-	
-}
-
-
 function getUserAuthorities(modalType, personType, page) {
 
 	var firstName = $("#firstName"+personType).val();
@@ -610,8 +621,8 @@ function getUserAuthorities(modalType, personType, page) {
   		async: false,
   		success: function(data) {
 			
-  			$("#userAuthoritySearchResult").empty()
-  			$("#searchAuthorityResultSize").empty()
+  			$("#userAuthoritySearchResult").empty();
+
   			var content = '';
   			
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
@@ -625,34 +636,39 @@ function getUserAuthorities(modalType, personType, page) {
   					}
   					
   				});
-  			}  			
+  				
+  				$('#userAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	   getUserAuthorities(modalType, personType, page-1)
+
+  				    }
+  				});
+  			}  		
+  			
 		
 		$("#userAuthoritySearchResult").append(content);
 		$("#userAuthoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
-			uri = $(this).closest('td').next().text()+"/";
+			uri = $(this).closest('td').next().text();
 				
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
 			$("#authorAuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
 			$("#selectAuthorityModel").modal('hide');
 		});	
-		 
-		$('#userAuthority-pagination-top').twbsPagination({
-		    totalPages: data['totalPages'],
-		    startPage: data['currentPage'],
-		    prev: "«",
-		    next: "»",
-		    visiblePages: 5,
-		    initiateStartPageClick: false,
-		    onPageClick:function(event, page) {
-		    	   getUserAuthorities(modalType, personType, page-1)
-
-		    }
-		});
-		
-        }
+		 	
+        },
+    	error: function(data){
+    		$('#userAuthoritySearchResult').parents('table').hide()
+    		$("#userAuthoritiesError").show();	
+    	}
 	
 	});
 
@@ -674,8 +690,7 @@ function getDatasetAuthorities(modalType, personType, page) {
   		async: false,
   		success: function(data) {
 			
-  			$("#datasetAuthoritySearchResult").empty()
-  			$("#searchAuthorityResultSize").empty()
+  			$("#datasetAuthoritySearchResult").empty();
   			var content = '';
   			
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
@@ -702,21 +717,14 @@ function getDatasetAuthorities(modalType, personType, page) {
 
   				    }
   				});
-  			}
-  			
-  			
-  		if(content==''){
-  			$("#searchAuthorityResultSize").append("0 authorites found");
-  		}
+  			}		
   		
 		$("#datasetAuthoritySearchResult").append(content);
-		
 
-		
 		$("#datasetAuthoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
-			uri = $(this).closest('td').next().text()+"/";
+			uri = $(this).closest('td').next().text();
 				
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
@@ -740,7 +748,11 @@ function getDatasetAuthorities(modalType, personType, page) {
 			$("#selectAuthorityModel").modal('hide');
 		});	
   			
-        }
+        },
+    	error: function(data){
+    		$('#datasetAuthoritySearchResult').parents('table').hide()
+    		$("#datasetAuthoritiesError").show();	
+    	}
 	
 	});
 
@@ -762,13 +774,12 @@ function getImportedAuthorities(modalType, personType, page) {
   		async: false,
   		success: function(data) {
 			
-  			$("#importAuthoritySearchResult").empty()
-  			$("#searchAuthorityResultSize").empty()
+  			$("#importAuthoritySearchResult").empty();
   			
   			var content = '';
   				
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
-  				data['foundAuthorities'].forEach(function(elem) {
+  				data['foundAuthorities'].forEach(function(elem) {	
   					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
@@ -777,7 +788,7 @@ function getImportedAuthorities(modalType, personType, page) {
   						content +=elem['description'] + '</td>';
   					}
   					
-  				});
+  				}); 				
   				
   				$('#importedAuthority-pagination-top').twbsPagination({
   				    totalPages: data['totalPages'],
@@ -795,13 +806,11 @@ function getImportedAuthorities(modalType, personType, page) {
   			}
   			
 		$("#importAuthoritySearchResult").append(content); 	
-		
 
-		
 		$("#importAuthoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
-			uri = $(this).closest('td').next().text()+"/";
+			uri = $(this).closest('td').next().text();
 				
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
@@ -826,7 +835,11 @@ function getImportedAuthorities(modalType, personType, page) {
 			$("#selectAuthorityModel").modal('hide');
 		});	
 		
-        }
+        },
+	error: function(data){
+		$('#importAuthoritySearchResult').parents('table').hide()
+		$("#importedAuthoritiesError").show();	
+	}
 	
 	});
 
@@ -1520,7 +1533,7 @@ let removePerson = function removePerson(e) {
 								
 						<li role="presentation"><a href="#importedAuthoritiesTabContent"
 							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
-								imported </a></li>
+								imported from Conceptpower</a></li>
 					</ul>
 					<!-- Tab panes -->
 
@@ -1529,6 +1542,14 @@ let removePerson = function removePerson(e) {
 						<div role="tabpanel" class="tab-pane active" id="userAuthoritiesTabContent">
 						
 						   <ul id="userAuthority-pagination-top" class="pagination-sm"></ul>
+						   
+						   
+						  <div id="userAuthoritiesError" class="text-warning" style="display:none">
+						  <span>
+								 Error occurred while importing user authorities
+						  </span>
+						  		
+						  </div>
 
 							<table class="table table-striped table-bordered table-fixed">
 								<tr>
@@ -1544,6 +1565,13 @@ let removePerson = function removePerson(e) {
 						<div role="tabpanel" class="tab-pane" id="datasetAuthoritiesTabContent">
 						
 						  <ul id="datasetAuthority-pagination-top" class="pagination-sm"></ul>
+						  
+						  <div id="datasetAuthoritiesError" class="text-warning" style="display:none">
+						  <span>
+								 Error occurred while importing dataset authorities
+						  </span>
+						  		
+						  </div>
 						
 							<table class="table table-striped table-bordered table-fixed">
 								<tr>
@@ -1560,6 +1588,13 @@ let removePerson = function removePerson(e) {
 						<div role="tabpanel" class="tab-pane" id="importedAuthoritiesTabContent">
 						
 						  <ul id="importedAuthority-pagination-top" class="pagination-sm"></ul>
+						  
+						  <div id="importedAuthoritiesError" class="text-warning" style="display:none">
+						  <span>
+								 Error occurred while importing authorities
+						  </span>
+						  		
+						  </div>
 						
 							<table class="table table-striped table-bordered table-fixed">
 								<tr>

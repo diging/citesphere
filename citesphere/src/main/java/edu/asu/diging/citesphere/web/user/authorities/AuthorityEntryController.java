@@ -1,14 +1,10 @@
 package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.javers.common.collections.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +23,6 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
-import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.web.user.AuthorityResult;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
 import edu.asu.diging.citesphere.web.user.authorities.helper.AuthorityEntryControllerHelper;
@@ -98,17 +93,17 @@ public class AuthorityEntryController {
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
         AuthorityResult authorityResult = new AuthorityResult();
-        
+
         List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
                 firstName, lastName, page, pageSize);
 
         authorityResult.setFoundAuthorities(userEntries);
-        authorityResult.setCurrentPage(page+1);
+        authorityResult.setCurrentPage(page + 1);
         authorityResult.setTotalPages(authorityService.getTotalUserAuthorities((IUser) authentication.getPrincipal(),
                 firstName, lastName, pageSize));
         return new ResponseEntity<AuthorityResult>(authorityResult, HttpStatus.OK);
     }
-    
+
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/datasetAuthorities")
     public ResponseEntity<AuthorityResult> getDatasetAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
@@ -117,15 +112,16 @@ public class AuthorityEntryController {
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
         AuthorityResult authorityResult = new AuthorityResult();
-        
+
         Set<IAuthorityEntry> datasetEntries = null;
-        
-        try {          
-            datasetEntries = authorityService.findByNameInDataset(firstName, lastName, zoteroGroupId, page, pageSize);
+
+        try {
+            datasetEntries = authorityService.findByNameInDataset((IUser) authentication.getPrincipal(), firstName,
+                    lastName, zoteroGroupId, page, pageSize);
             authorityResult.setFoundAuthorities(datasetEntries.stream().collect(Collectors.toList()));
-            authorityResult.setCurrentPage(page+1);
-            authorityResult.setTotalPages(authorityService.getTotalDatasetAuthorities(zoteroGroupId,
-                    firstName, lastName, pageSize));
+            authorityResult.setCurrentPage(page + 1);
+            authorityResult.setTotalPages(
+                    authorityService.getTotalDatasetAuthorities(zoteroGroupId, firstName, lastName, pageSize));
 
         } catch (GroupDoesNotExistException e) {
             logger.warn("Group does not exist: " + zoteroGroupId, e);
@@ -134,7 +130,7 @@ public class AuthorityEntryController {
 
         return new ResponseEntity<AuthorityResult>(authorityResult, HttpStatus.OK);
     }
-    
+
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/importedAuthorities")
     public ResponseEntity<AuthorityResult> getImportedAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
@@ -143,22 +139,24 @@ public class AuthorityEntryController {
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
         AuthorityResult authorityResult = new AuthorityResult();
-        
+
         List<IAuthorityEntry> importedEntries = null;
 
         try {
-            importedEntries = authorityService.importAuthorityEntries(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), page, pageSize);     
+            importedEntries = authorityService.importAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
+                    lastName, authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), page,
+                    pageSize);
             authorityResult.setFoundAuthorities(importedEntries.stream().collect(Collectors.toList()));
-            authorityResult.setCurrentPage(page+1);
-            if(page==0)
-            {
-                authorityResult.setTotalPages(authorityService.getTotalImportedAuthorities(authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), pageSize));
+            authorityResult.setCurrentPage(page + 1);
+            if (page == 0) {
+                authorityResult.setTotalPages(authorityService.getTotalImportedAuthorities(
+                        authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), pageSize));
             }
-            
+
         } catch (AuthorityServiceConnectionException e) {
             logger.warn("Could not retrieve authority entries.", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            
+
         } catch (URISyntaxException e) {
             logger.warn("Not a valid URI: " + firstName + lastName, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

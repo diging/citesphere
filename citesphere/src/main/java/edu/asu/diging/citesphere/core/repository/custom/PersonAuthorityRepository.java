@@ -14,12 +14,13 @@ public interface PersonAuthorityRepository extends PagingAndSortingRepository<Pe
 
     @Query("SELECT p from Citation c LEFT JOIN c.authors p WHERE p.name like (:lastName) AND p.name like (:firstName) AND c.group=(:group) AND p.uri not in (:uris) AND p.localAuthorityId != ''")
     List<Person> findPersonsByCitationGroupAndNameLikeAndUriNotIn(@Param("group") ICitationGroup group,
-            @Param("firstName") String firstName, @Param("lastName") String lastName, @Param("uris") List<String> uris, Pageable page);
+            @Param("firstName") String firstName, @Param("lastName") String lastName, @Param("uris") List<String> uris,
+            Pageable page);
 
     @Query("SELECT p from Citation c LEFT JOIN c.authors p WHERE p.name like (:lastName) AND p.name like (:firstName) AND c.group=(:group) AND p.localAuthorityId != ''")
     List<Person> findPersonsByCitationGroupAndNameLike(@Param("group") ICitationGroup group,
             @Param("firstName") String firstName, @Param("lastName") String lastName, Pageable page);
-      
+
     @Query("SELECT COUNT(p) from Citation c LEFT JOIN c.authors p WHERE p.name like (:lastName) AND p.name like (:firstName) AND c.group=(:group) AND p.localAuthorityId != ''")
     long countByPersonsByCitationGroupAndNameLike(@Param("group") ICitationGroup group,
             @Param("firstName") String firstName, @Param("lastName") String lastName);

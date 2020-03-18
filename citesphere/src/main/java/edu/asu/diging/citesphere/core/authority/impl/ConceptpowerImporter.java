@@ -7,9 +7,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.annotation.PostConstruct;
 
 import org.apache.http.client.HttpClient;
@@ -43,18 +40,15 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
     @Value("${_conceptpower_url}")
     private String conceptpowerURL;
-    
+
     @Value("${_viaf_url_regex}")
     private String viafUrlRegex;
 
     private RestTemplate restTemplate;
-    
-    private Pattern pattern;
 
     @PostConstruct
     private void postConstruct() {
         restTemplate = new RestTemplate();
-        pattern = Pattern.compile(viafUrlRegex);
     }
 
     /*
@@ -98,15 +92,15 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
         RequestEntity<Void> request;
         try {
-            
-            String url = conceptpowerURL + conceptpowerSearchKeyword + URLEncoder.encode(searchString, StandardCharsets.UTF_8.toString()) +"&page="+page;
+
+            String url = conceptpowerURL + conceptpowerSearchKeyword
+                    + URLEncoder.encode(searchString, StandardCharsets.UTF_8.toString()) + "&page=" + page;
             URI uri = UriComponentsBuilder.fromUriString(url.toString()).build(true).toUri();
-            
-            request = RequestEntity.get(uri)
-                    .accept(MediaType.APPLICATION_JSON).build();
+
+            request = RequestEntity.get(uri).accept(MediaType.APPLICATION_JSON).build();
         } catch (UnsupportedEncodingException e) {
-            throw new URISyntaxException(e.getMessage(),e.toString());
-            
+            throw new URISyntaxException(e.getMessage(), e.toString());
+
         }
         ResponseEntity<ConceptpowerResponse> response = null;
         try {
@@ -114,7 +108,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
         } catch (RestClientException ex) {
             throw new AuthorityServiceConnectionException(ex);
         }
-        
+
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
         if (response.getStatusCode() == HttpStatus.OK) {
             ConceptpowerResponse conceptEntries = response.getBody();
@@ -122,20 +116,18 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
                 for (ConceptpowerEntry conceptEntry : conceptEntries.getConceptEntries()) {
 
                     IAuthorityEntry authority = new AuthorityEntry();
-//                    if (conceptEntry.getEqual_to() == null || !pattern.matcher(conceptEntry.getEqual_to()).matches()) {
-//                        continue;
-//                    }
                     authority.setName(conceptEntry.getLemma());
                     authority.setUri(conceptEntry.getEqual_to());
                     authority.setDescription(conceptEntry.getDescription());
                     authorityEntries.add(authority);
                 }
             }
-
+        } else {
+            throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
         }
         return authorityEntries;
     }
-    
+
     @Override
     public long totalRetrievedAuthorityData(String searchString)
             throws URISyntaxException, AuthorityServiceConnectionException {
@@ -148,15 +140,15 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
         RequestEntity<Void> request;
         try {
-            
-            String url = conceptpowerURL + conceptpowerSearchKeyword + URLEncoder.encode(searchString, StandardCharsets.UTF_8.toString());
+
+            String url = conceptpowerURL + conceptpowerSearchKeyword
+                    + URLEncoder.encode(searchString, StandardCharsets.UTF_8.toString());
             URI uri = UriComponentsBuilder.fromUriString(url.toString()).build(true).toUri();
-            
-            request = RequestEntity.get(uri)
-                    .accept(MediaType.APPLICATION_JSON).build();
+
+            request = RequestEntity.get(uri).accept(MediaType.APPLICATION_JSON).build();
         } catch (UnsupportedEncodingException e) {
-            throw new URISyntaxException(e.getMessage(),e.toString());
-            
+            throw new URISyntaxException(e.getMessage(), e.toString());
+
         }
         ResponseEntity<ConceptpowerResponse> response = null;
         try {
@@ -164,14 +156,14 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
         } catch (RestClientException ex) {
             throw new AuthorityServiceConnectionException(ex);
         }
-        
-        if (response.getStatusCode() == HttpStatus.OK) {           
+
+        if (response.getStatusCode() == HttpStatus.OK) {
             ConceptpowerResponse conceptEntries = response.getBody();
-            if (conceptEntries.getConceptEntries() != null) {              
-               return conceptEntries.getPagination().getTotalNumberOfRecords();                               
-            }           
+            if (conceptEntries.getConceptEntries() != null) {
+                return conceptEntries.getPagination().getTotalNumberOfRecords();
+            }
         }
-        
+
         return 0;
     }
 
