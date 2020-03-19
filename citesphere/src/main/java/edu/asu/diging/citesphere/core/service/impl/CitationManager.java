@@ -261,21 +261,7 @@ public class CitationManager implements ICitationManager {
         return null;
     }
     
-    private void updateCitations(IUser user, ICitationGroup group, String collectionId,CitationResults results, int page, String sortBy) {
-        PageRequest request = createPageRequest(user, page, sortBy, group, results);
-        request.setCollectionId(collectionId);
-        for (ICitation updatedCitation : results.getCitations()) {
-            if (citationRepository.findById(updatedCitation.getKey()).isPresent()) {
-                try {
-                    citationRepository.deleteById(updatedCitation.getKey());
-                } catch (EmptyResultDataAccessException exception) {
-                    logger.warn("Citation not found. Unable to delete it.", exception);
-                }
-            }
-            citationRepository.save((Citation) updatedCitation);
-        }
-        pageRequestRepository.save(request);
-    }
+
     
 
     @Override
@@ -298,8 +284,12 @@ public class CitationManager implements ICitationManager {
             if (requests != null && requests.size() > 0) {
                 // there should be just one
                 results = getGroupItemsBasedOnLastModified(requests, sortBy, group);
-                if(results != null)
-                    return results;   
+                if(results != null) {
+                    return results;
+                }
+                
+                zoteroManager.clearGroupItemsCache(user, groupId, page, sortBy, group.getVersion());
+                
             }
 
            
@@ -314,7 +304,9 @@ public class CitationManager implements ICitationManager {
                     // delete last cache
                     pageRequestRepository.deleteAll(requests);
                 }
-               updateCitations(user, group, collectionId, results, page, sortBy);
+                PageRequest request = createPageRequest(user, page, sortBy, group, results);
+                request.setCollectionId(collectionId);
+                pageRequestRepository.save(request);
                 
              
             } else if (localPageRequest != null) {
