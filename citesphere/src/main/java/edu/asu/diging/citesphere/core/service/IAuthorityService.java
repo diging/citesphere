@@ -8,7 +8,7 @@ import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
-import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.model.IUser;
 
 public interface IAuthorityService {
 
