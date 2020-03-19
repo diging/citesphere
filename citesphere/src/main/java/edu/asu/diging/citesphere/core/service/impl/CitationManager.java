@@ -343,7 +343,6 @@ public class CitationManager implements ICitationManager {
     public boolean deleteCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             ZoteroItemDeletionFailedException {
-        // TODO Auto-generated method stub
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException();
