@@ -235,10 +235,10 @@ public class CitationManager implements ICitationManager {
             group.getUsers().add(user.getUsername());
         }
     }
-    
-    private CitationResults getGroupItemsBasedOnLastModified(List<PageRequest> requests,  String sortBy, ICitationGroup group) {
-        IPageRequest  localPageRequest = requests.get(0);
 
+    private CitationResults getGroupItemsBasedOnLastModified(List<PageRequest> requests, String sortBy,
+            ICitationGroup group) {
+        IPageRequest localPageRequest = requests.get(0);
         OffsetDateTime updatedOn = localPageRequest.getLastUpdated() != null ? localPageRequest.getLastUpdated()
                 : OffsetDateTime.MIN;
         OffsetDateTime groupLastLocallyModified = group.getLastLocallyModifiedOn() != null
@@ -247,8 +247,7 @@ public class CitationManager implements ICitationManager {
         if (updatedOn.plusMinutes(syncFrequencey).isAfter(OffsetDateTime.now())
                 && updatedOn.isAfter(groupLastLocallyModified)) {
             CitationResults results = new CitationResults();
-            results.setCitations(
-                    localPageRequest.getCitations().stream().distinct().collect(Collectors.toList()));
+            results.setCitations(localPageRequest.getCitations().stream().distinct().collect(Collectors.toList()));
             results.getCitations().sort(new Comparator<ICitation>() {
                 @Override
                 public int compare(ICitation o1, ICitation o2) {
@@ -260,9 +259,6 @@ public class CitationManager implements ICitationManager {
         }
         return null;
     }
-    
-
-    
 
     @Override
     public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy)
@@ -284,15 +280,12 @@ public class CitationManager implements ICitationManager {
             if (requests != null && requests.size() > 0) {
                 // there should be just one
                 results = getGroupItemsBasedOnLastModified(requests, sortBy, group);
-                if(results != null) {
+                if (results != null) {
                     return results;
                 }
-                
                 zoteroManager.clearGroupItemsCache(user, groupId, page, sortBy, group.getVersion());
-                
             }
 
-           
             if (collectionId == null || collectionId.trim().isEmpty()) {
                 results = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getVersion());
             } else {
@@ -307,13 +300,11 @@ public class CitationManager implements ICitationManager {
                 PageRequest request = createPageRequest(user, page, sortBy, group, results);
                 request.setCollectionId(collectionId);
                 pageRequestRepository.save(request);
-                
-             
+
             } else if (localPageRequest != null) {
                 localPageRequest.setLastUpdated(OffsetDateTime.now());
                 results.setCitations(localPageRequest.getCitations());
             }
-
             return results;
         }
         throw new GroupDoesNotExistException("There is no group with id " + groupId);
@@ -354,8 +345,9 @@ public class CitationManager implements ICitationManager {
             ZoteroItemDeletionFailedException {
         // TODO Auto-generated method stub
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
-        if (!groupOptional.isPresent())
+        if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException();
+        }
 
         zoteroManager.deleteCitation(user, groupId, collectionIds, citation);
         citationRepository.delete((Citation) citation);

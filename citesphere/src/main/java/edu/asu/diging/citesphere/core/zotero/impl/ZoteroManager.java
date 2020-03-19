@@ -114,8 +114,6 @@ public class ZoteroManager implements IZoteroManager {
         Collection collection = zoteroConnector.getCitationCollection(user, groupId, collectionId);
         return collectionFactory.createCitationCollection(collection);
     }
-    
-    
 
     @Override
     public CitationCollectionResult getCitationCollections(IUser user, String groupId, String parentCollectionId,
@@ -296,9 +294,7 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public void clearGroupItemsCache(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) {
 
-        
         zoteroConnector.clearGroupItemsCache(user, groupId, page, sortBy, lastGroupVersion);
-        
-        
+
     }
 }
