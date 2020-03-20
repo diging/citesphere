@@ -15,11 +15,11 @@ public interface AuthorityRepository extends PagingAndSortingRepository<Authorit
             @Param("username") String username, @Param("firstName") String firstName,
             @Param("lastName") String lastName, Pageable paging);
 
-    public long countByUsernameAndNameContainingAndNameContainingOrderByName(@Param("username") String username,
-            @Param("firstName") String firstName, @Param("lastName") String lastName);
-
     public List<IAuthorityEntry> findByUsernameAndNameContainingAndNameContainingOrderByName(
             @Param("username") String username, @Param("firstName") String firstName,
             @Param("lastName") String lastName);
+
+    public long countByUsernameAndNameContainingAndNameContainingOrderByName(@Param("username") String username,
+            @Param("firstName") String firstName, @Param("lastName") String lastName);
 
 }
