@@ -48,4 +48,6 @@ public interface IZoteroManager {
 
     List<String> getValidCreatorTypes(IUser user, ItemType itemType);
 
+    void forceRefresh(IUser user, String zoteroGroupId, String collectionId, int page, String sortBy, Long lastGroupVersion);
+
 }
