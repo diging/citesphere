@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.authority.impl;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,48 +25,53 @@ import org.springframework.web.client.RestTemplate;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.authority.impl.ViafResponse.Data;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 
 @Component
-@PropertySource(value="classpath:/config.properties")
+@PropertySource(value = "classpath:/config.properties")
 public class ViafAuthorityImporter extends BaseAuthorityImporter {
-    
+
     private final String ID = "authority.importer.viaf";
 
     @Value("${_viaf_url_regex}")
     private String viafUrlRegex;
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.authority.impl.AuthorityImporter#isResponsible(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.authority.impl.AuthorityImporter#isResponsible(java
+     * .lang.String)
      */
     @Override
     public boolean isResponsible(String uri) {
         Pattern pattern = Pattern.compile(viafUrlRegex);
         Matcher matcher = pattern.matcher(uri);
-        
+
         if (matcher.matches()) {
             return true;
         }
-        
+
         return false;
     }
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.authority.impl.AuthorityImporter#retrieveAuthorityData(java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.authority.impl.AuthorityImporter#
+     * retrieveAuthorityData(java.lang.String)
      */
     @Override
     @Cacheable("viafAuthorities")
-    public IImportedAuthority retrieveAuthorityData(String uri) throws URISyntaxException, AuthorityServiceConnectionException {
+    public IImportedAuthority retrieveAuthorityData(String uri)
+            throws URISyntaxException, AuthorityServiceConnectionException {
         RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        HttpClient httpClient = HttpClientBuilder.create()
-                                                       .setRedirectStrategy(new LaxRedirectStrategy())
-                                                       .build();
+        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
         factory.setHttpClient(httpClient);
         restTemplate.setRequestFactory(factory);
-        
-        RequestEntity<Void> request = RequestEntity
-                .get(new URI(uri))
-                .accept(MediaType.APPLICATION_JSON).build();
+
+        RequestEntity<Void> request = RequestEntity.get(new URI(uri)).accept(MediaType.APPLICATION_JSON).build();
         ResponseEntity<ViafResponse> response = null;
         try {
             response = restTemplate.exchange(request, ViafResponse.class);
@@ -86,9 +92,23 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
         }
         return null;
     }
-    
+
     @Override
     public String getId() {
         return ID;
+    }
+
+    @Override
+    public List<IAuthorityEntry> retrieveAuthoritiesData(String uri, int page, int pageSize)
+            throws URISyntaxException, AuthorityServiceConnectionException {
+
+        return null;
+    }
+
+    @Override
+    public long totalRetrievedAuthorityData(String searchString)
+            throws URISyntaxException, AuthorityServiceConnectionException {
+
+        return 0;
     }
 }

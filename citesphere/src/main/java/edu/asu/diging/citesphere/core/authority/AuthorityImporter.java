@@ -1,8 +1,10 @@
 package edu.asu.diging.citesphere.core.authority;
 
 import java.net.URISyntaxException;
+import java.util.List;
 
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 
 /**
  * This interface needs to be implemented by all importer classes that provide
@@ -27,7 +29,12 @@ public interface AuthorityImporter {
     boolean isResponsible(String uri);
 
     IImportedAuthority retrieveAuthorityData(String uri) throws URISyntaxException, AuthorityServiceConnectionException;
+    
+    List<IAuthorityEntry> retrieveAuthoritiesData(String searchString, int page, int pageSize) throws URISyntaxException, AuthorityServiceConnectionException;
 
     String getId();
+
+    long totalRetrievedAuthorityData(String searchString)
+            throws URISyntaxException, AuthorityServiceConnectionException;
 
 }
