@@ -25,12 +25,12 @@ import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.PersonRepository;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.Person;
-import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 public class AuthorityService implements IAuthorityService {
@@ -52,6 +52,9 @@ public class AuthorityService implements IAuthorityService {
 
     @Autowired
     private Set<AuthorityImporter> importers;
+
+    @Autowired
+    private AuthorityServiceHelper helper;
 
     /*
      * (non-Javadoc)
@@ -92,35 +95,32 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public List<IAuthorityEntry> importAuthorityEntries(IUser user, String firstName, String lastName,
-            String searchString, int page, int pageSize)
-            throws URISyntaxException, AuthorityServiceConnectionException {
+    public List<IAuthorityEntry> importAuthorityEntries(IUser user, String firstName, String lastName, String source,
+            int page, int pageSize) throws URISyntaxException, AuthorityServiceConnectionException {
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
 
         List<String> uriList = authorityRepository
                 .findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName)
                 .stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
 
-        for (AuthorityImporter importer : importers) {
+        List<IAuthorityEntry> importedAuthority = getAuthorityImporter(source)
+                .retrieveAuthoritiesData(getImporterSearchString(source, firstName, lastName), page, pageSize);
 
-            List<IAuthorityEntry> importedAuthority = importer.retrieveAuthoritiesData(searchString, page, pageSize);
-
-            if (importedAuthority != null) {
-                ListIterator<IAuthorityEntry> iter = importedAuthority.listIterator();
-                String uri = "";
-                while (iter.hasNext()) {
-                    uri = iter.next().getUri();
-                    if (!uri.trim().endsWith("/")) {
-                        uri = uri + "/";
-                    }
-                    if (uriList.contains(uri)) {
-                        iter.remove();
-                    }
+        if (importedAuthority != null) {
+            ListIterator<IAuthorityEntry> iter = importedAuthority.listIterator();
+            String uri = "";
+            while (iter.hasNext()) {
+                uri = iter.next().getUri();
+                if (!uri.trim().endsWith("/")) {
+                    uri = uri + "/";
                 }
-                authorityEntries.addAll(importedAuthority);
+                if (uriList.contains(uri)) {
+                    iter.remove();
+                }
             }
-
+            authorityEntries.addAll(importedAuthority);
         }
+
         return authorityEntries;
     }
 
@@ -266,20 +266,32 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public int getTotalImportedAuthorities(String searchString, int pageSize) {
+    public int getTotalImportedAuthorities(String firstName, String lastName, String source, int pageSize) {
         int totalData = 0;
 
-        for (AuthorityImporter importer : importers) {
+        try {
+            totalData += getAuthorityImporter(source)
+                    .totalRetrievedAuthorityData(getImporterSearchString(source, firstName, lastName));
+        } catch (URISyntaxException | AuthorityServiceConnectionException e) {
 
-            try {
-                totalData += importer.totalRetrievedAuthorityData(searchString);
-            } catch (URISyntaxException | AuthorityServiceConnectionException e) {
-
-                totalData = 0;
-            }
-
+            totalData = 0;
         }
+
         return (int) Math.ceil(new Float(totalData) / pageSize);
+    }
+
+    public String getImporterSearchString(String source, String firstName, String lastName) {
+        return helper.getConceptpowerSearchString(firstName, lastName);
+    }
+
+    public AuthorityImporter getAuthorityImporter(String source) {
+
+        for (AuthorityImporter importer : importers) {
+            if (importer.isResponsible(source))
+                return importer;
+        }
+
+        return null;
     }
 
 }

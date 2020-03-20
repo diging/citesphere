@@ -71,11 +71,11 @@ $(function() {
 		$("#searchAuthorSpinner").show();
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
-		$('#importedAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Author','Author', 0)
 		getDatasetAuthorities('Author','Author', 0)
-		getImportedAuthorities('Author','Author',0)
+		getconceptpowerAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
 	});
 	
@@ -85,11 +85,11 @@ $(function() {
 
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
-		$('#importedAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Editor','Editor', 0)
 		getDatasetAuthorities('Editor','Editor', 0)
-		getImportedAuthorities('Editor','Editor',0)
+		getconceptpowerAuthorities('Editor','Editor',0)
 		$("#searchEditorSpinner").hide();
 	});
 	
@@ -99,11 +99,11 @@ $(function() {
 
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
-		$('#importedAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Creator','Creator', 0)
 		getDatasetAuthorities('Creator','Creator', 0)
-		getImportedAuthorities('Creator','Creator',0)
+		getconceptpowerAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
 	});
 	
@@ -787,13 +787,13 @@ function getDatasetAuthorities(modalType, personType, page) {
 }
 
 
-function getImportedAuthorities(modalType, personType, page) {
+function getconceptpowerAuthorities(modalType, personType, page) {
 
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/importedAuthorities?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/importedAuthorities/conceptpower?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
 		
 	$.ajax({
   		dataType: "json",
@@ -802,7 +802,7 @@ function getImportedAuthorities(modalType, personType, page) {
   		async: false,
   		success: function(data) {
 			
-  			$("#importAuthoritySearchResult").empty();
+  			$("#conceptpowerAuthoritySearchResult").empty();
   			
   			var content = '';
   				
@@ -818,7 +818,7 @@ function getImportedAuthorities(modalType, personType, page) {
   					
   				}); 				
   				
-  				$('#importedAuthority-pagination-top').twbsPagination({
+  				$('#conceptpowerAuthority-pagination-top').twbsPagination({
   				    totalPages: data['totalPages'],
   				    startPage: data['currentPage'],
   				    prev: "«",
@@ -826,16 +826,16 @@ function getImportedAuthorities(modalType, personType, page) {
   				    visiblePages: 5,
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
-  				    	getImportedAuthorities(modalType, personType, page)
+  				    	getconceptpowerAuthorities(modalType, personType, page)
 
   				    }
   				});
   				
   			}
   			
-		$("#importAuthoritySearchResult").append(content); 	
+		$("#conceptpowerAuthoritySearchResult").append(content); 	
 
-		$("#importAuthoritySearchResult tr td a").click(function() {
+		$("#conceptpowerAuthoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
 			uri = $(this).closest('td').next().text();
@@ -865,8 +865,8 @@ function getImportedAuthorities(modalType, personType, page) {
 		
         },
 	error: function(data){
-		$('#importAuthoritySearchResult').parents('table').hide()
-		$("#importedAuthoritiesError").show();	
+		$('#conceptpowerAuthoritySearchResult').parents('table').hide()
+		$("#conceptpowerAuthoritiesError").show();	
 	}
 	
 	});
@@ -1511,7 +1511,7 @@ let removePerson = function removePerson(e) {
 							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
 								imported by other users</a></li>
 								
-						<li role="presentation"><a href="#importedAuthoritiesTabContent"
+						<li role="presentation"><a href="#conceptpowerAuthoritiesTabContent"
 							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
 								imported from Conceptpower</a></li>
 					</ul>
@@ -1565,11 +1565,11 @@ let removePerson = function removePerson(e) {
 						</div>
 						
 
-						<div role="tabpanel" class="tab-pane" id="importedAuthoritiesTabContent">
+						<div role="tabpanel" class="tab-pane" id="conceptpowerAuthoritiesTabContent">
 						
-						  <ul id="importedAuthority-pagination-top" class="pagination-sm"></ul>
+						  <ul id="conceptpowerAuthority-pagination-top" class="pagination-sm"></ul>
 						  
-						  <div id="importedAuthoritiesError" class="text-warning" style="display:none">
+						  <div id="conceptpowerAuthoritiesError" class="text-warning" style="display:none">
 						  <span>
 								 Error occurred while importing authorities
 						  </span>
@@ -1582,7 +1582,7 @@ let removePerson = function removePerson(e) {
 									<th>URI</th>
 									<th>Description</th>
 								</tr>
-								<tbody id="importAuthoritySearchResult">
+								<tbody id="conceptpowerAuthoritySearchResult">
 								</tbody>
 							</table>
 						</div>

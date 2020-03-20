@@ -16,8 +16,8 @@ public interface IAuthorityService {
 
     IAuthorityEntry importAuthority(String uri) throws AuthorityServiceConnectionException, URISyntaxException;
 
-    List<IAuthorityEntry> importAuthorityEntries(IUser user, String firstName, String lastName, String searchString,
-            int page, int pageSize) throws AuthorityServiceConnectionException, URISyntaxException;
+    List<IAuthorityEntry> importAuthorityEntries(IUser user, String firstName, String lastName, String source, int page,
+            int pageSize) throws AuthorityServiceConnectionException, URISyntaxException;
 
     IAuthorityEntry save(IAuthorityEntry entry);
 
@@ -36,18 +36,18 @@ public interface IAuthorityService {
     Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
             List<String> uris, int page, int pageSize) throws GroupDoesNotExistException;
 
+    Set<IAuthorityEntry> findByNameInDataset(IUser user, String firstName, String lastName, String citationGroupId,
+            int page, int pageSize) throws GroupDoesNotExistException;
+
+    Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page,
+            int pageSize) throws GroupDoesNotExistException;
+
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
     int getTotalUserAuthorities(IUser user, String firstName, String lastName, int pageSize);
 
     int getTotalDatasetAuthorities(String citationGroupId, String firstName, String lastName, int pageSize);
 
-    int getTotalImportedAuthorities(String conceptpowerSearchString, int pageSize);
-
-    Set<IAuthorityEntry> findByNameInDataset(IUser user, String firstName, String lastName, String citationGroupId,
-            int page, int pageSize) throws GroupDoesNotExistException;
-
-    Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page,
-            int pageSize) throws GroupDoesNotExistException;
+    int getTotalImportedAuthorities(String firstName, String lastName, String source, int pageSize);
 
 }

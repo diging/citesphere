@@ -41,9 +41,6 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
     @Value("${_conceptpower_url}")
     private String conceptpowerURL;
 
-    @Value("${_viaf_url_regex}")
-    private String viafUrlRegex;
-
     private RestTemplate restTemplate;
 
     @PostConstruct
@@ -59,8 +56,13 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
      * .lang.String)
      */
     @Override
-    public boolean isResponsible(String searchSyntax) {
-        return searchSyntax.contains(conceptpowerSearchKeyword);
+    public boolean isResponsible(String source) {
+
+        if (ID.contains(source)) {
+            return true;
+        }
+
+        return false;
     }
 
     /*

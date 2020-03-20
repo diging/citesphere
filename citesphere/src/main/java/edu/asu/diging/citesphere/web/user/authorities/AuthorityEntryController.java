@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
+import edu.asu.diging.citesphere.core.service.impl.AuthorityServiceHelper;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.web.user.AuthorityResult;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
-import edu.asu.diging.citesphere.web.user.authorities.helper.AuthorityEntryControllerHelper;
 
 @Controller
 public class AuthorityEntryController {
@@ -34,9 +34,6 @@ public class AuthorityEntryController {
 
     @Autowired
     private IAuthorityService authorityService;
-
-    @Autowired
-    private AuthorityEntryControllerHelper authorityEntryControllerHelper;
 
     @RequestMapping("/auth/authority/get")
     public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication,
@@ -131,9 +128,9 @@ public class AuthorityEntryController {
         return new ResponseEntity<AuthorityResult>(authorityResult, HttpStatus.OK);
     }
 
-    @RequestMapping("/auth/authority/{zoteroGroupId}/find/importedAuthorities")
-    public ResponseEntity<AuthorityResult> getImportedAuthorities(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId,
+    @RequestMapping("/auth/authority/{zoteroGroupId}/find/importedAuthorities/{source}")
+    public ResponseEntity<AuthorityResult> getConceptpowerAuthorities(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("source") String source,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
@@ -144,13 +141,12 @@ public class AuthorityEntryController {
 
         try {
             importedEntries = authorityService.importAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
-                    lastName, authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), page,
-                    pageSize);
+                    lastName, source, page, pageSize);
             authorityResult.setFoundAuthorities(importedEntries.stream().collect(Collectors.toList()));
             authorityResult.setCurrentPage(page + 1);
             if (page == 0) {
-                authorityResult.setTotalPages(authorityService.getTotalImportedAuthorities(
-                        authorityEntryControllerHelper.getConceptpowerSearchString(firstName, lastName), pageSize));
+                authorityResult.setTotalPages(
+                        authorityService.getTotalImportedAuthorities(firstName, lastName, source, pageSize));
             }
 
         } catch (AuthorityServiceConnectionException e) {

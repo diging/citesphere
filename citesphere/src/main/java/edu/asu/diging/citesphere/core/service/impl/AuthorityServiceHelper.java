@@ -1,10 +1,10 @@
-package edu.asu.diging.citesphere.web.user.authorities.helper;
+package edu.asu.diging.citesphere.core.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthorityEntryControllerHelper {
+public class AuthorityServiceHelper {
 
     @Value("${_conceptpower_authority_search_keyword}")
     private String conceptpowerSearchKeyword;
