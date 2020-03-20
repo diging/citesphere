@@ -6,23 +6,35 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.repository.CustomConceptTypeRepository;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.data.bib.ConceptTypeRepository;
-import edu.asu.diging.citesphere.model.IUser;
+import edu.asu.diging.citesphere.model.bib.ICitationConcept;
 import edu.asu.diging.citesphere.model.bib.IConceptType;
+import edu.asu.diging.citesphere.model.bib.impl.CitationConcept;
 import edu.asu.diging.citesphere.model.bib.impl.ConceptType;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.ConceptTypeForm;
 
 @Service
 public class ConceptTypeManager implements IConceptTypeManager {
 
     @Autowired
-    private ConceptTypeRepository typeRepository;
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.IConceptTypeManager#create(edu.asu.diging.citesphere.web.forms.ConceptTypeForm, edu.asu.diging.citesphere.core.model.IUser)
+    private CustomConceptTypeRepository typeRepository;
+
+    @Autowired
+    private ConceptTypeRepository conceptTypeRepo;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.impl.IConceptTypeManager#create(edu.
+     * asu.diging.citesphere.web.forms.ConceptTypeForm,
+     * edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
     public IConceptType create(ConceptTypeForm form, IUser owner) {
@@ -32,13 +44,17 @@ public class ConceptTypeManager implements IConceptTypeManager {
         type.setUri(form.getUri());
         type.setOwner(owner);
         type.setCreatedOn(OffsetDateTime.now());
-        
+
         save(type);
         return type;
     }
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.IConceptTypeManager#getAllTypes(edu.asu.diging.citesphere.core.model.IUser)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.impl.IConceptTypeManager#getAllTypes(
+     * edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
     public List<IConceptType> getAllTypes(IUser owner) {
@@ -46,19 +62,29 @@ public class ConceptTypeManager implements IConceptTypeManager {
         typeRepository.findAll().forEach(t -> types.add(t));
         return types;
     }
-    
+
     @Override
     public IConceptType get(String id) {
-        Optional<ConceptType> type = typeRepository.findById(id);
+        Optional<ConceptType> type = conceptTypeRepo.findById(id);
         if (!type.isPresent()) {
             return null;
         }
-        
+
         return type.get();
     }
-    
+
     @Override
-    public void save(IConceptType type) {
-        typeRepository.save((ConceptType)type);
+    public IConceptType getByUriAndOwner(String uri, IUser owner) {
+        Optional<ConceptType> type = typeRepository.findFirstByUriAndOwner(uri, owner);
+        if (!type.isPresent()) {
+            return null;
+        }
+        return type.get();
     }
+
+    @Override
+    public IConceptType save(IConceptType type) {
+        return typeRepository.save((ConceptType) type);
+    }
+
 }

@@ -38,7 +38,6 @@ import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.CustomCitationRepository;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
@@ -47,6 +46,7 @@ import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 @PropertySource("classpath:/config.properties")
@@ -281,6 +281,17 @@ public class CitationManager implements ICitationManager {
         }
         throw new GroupDoesNotExistException("There is no group with id " + groupId);
     }
+    
+    @Override
+    public void forceGroupItemsRefresh(IUser user, String groupId, String collectionId, int page, String sortBy) {
+        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
+        if (groupOptional.isPresent()) {
+            ICitationGroup group = groupOptional.get();
+            zoteroManager.forceRefresh(user, groupId, collectionId, page, sortBy, group.getVersion());
+            group.setLastLocallyModifiedOn(OffsetDateTime.now());
+            groupRepository.save((CitationGroup)group);
+        }
+    }
 
     private PageRequest createPageRequest(IUser user, int page, String sortBy, ICitationGroup group,
             CitationResults results) {
@@ -296,6 +307,7 @@ public class CitationManager implements ICitationManager {
         request.setSortBy(sortBy);
         results.getCitations().forEach(c -> {
             c.setGroup(group);
+            citationRepository.save((Citation)c);
         });
         request.setLastUpdated(OffsetDateTime.now());
         return request;

@@ -307,8 +307,8 @@ $(function() {
 		var conceptType = $("#addConceptTypeSelect");
 		
 		var conceptSpan = $('<span class="badge"></span>');
-		conceptSpan.attr("data-concept-id", conceptId.val());
-		conceptSpan.attr("data-concept-type-id", conceptType.val());
+		conceptSpan.attr("data-concept-uri", conceptId.val());
+		conceptSpan.attr("data-type-uri", conceptType.val());
 		
 		var text = $("#addConceptConceptSelect option:selected").text();
 		var typeName = $("#addConceptTypeSelect option:selected").text();
@@ -518,17 +518,45 @@ function createConceptTags() {
 	$("#conceptTags").children("span").each(function (idx, tag) {
 		var conceptTagInput = $("<input>");
 		conceptTagInput.attr("type", "hidden");
-		conceptTagInput.attr("id", "conceptAssignments" + idx + ".conceptId");
-		conceptTagInput.attr("name", "conceptAssignments[" + idx + "].conceptId");
+		conceptTagInput.attr("id", "conceptTags" + idx + ".conceptId");
+		conceptTagInput.attr("name", "conceptTags[" + idx + "].conceptId");
 		conceptTagInput.attr("value", $(tag).attr("data-concept-id"));
 		$("#editForm").append(conceptTagInput);
 		
 		var conceptTagTypeInput = $("<input>");
 		conceptTagTypeInput.attr("type", "hidden");
-		conceptTagTypeInput.attr("id", "conceptAssignments" + idx + ".conceptTypeId");
-		conceptTagTypeInput.attr("name", "conceptAssignments[" + idx + "].conceptTypeId");
+		conceptTagTypeInput.attr("id", "conceptTags" + idx + ".conceptTypeId");
+		conceptTagTypeInput.attr("name", "conceptTags[" + idx + "].conceptTypeId");
 		conceptTagTypeInput.attr("value", $(tag).attr("data-concept-type-id"));
 		$("#editForm").append(conceptTagTypeInput);
+		
+		var conceptTagUri = $("<input>");
+		conceptTagUri.attr("type", "hidden");
+		conceptTagUri.attr("id", "conceptTags" + idx + ".conceptUri");
+		conceptTagUri.attr("name", "conceptTags[" + idx + "].conceptUri");
+		conceptTagUri.attr("value", $(tag).attr("data-concept-uri"));
+		$("#editForm").append(conceptTagUri);
+		
+		var conceptTagName = $("<input>");
+		conceptTagName.attr("type", "hidden");
+		conceptTagName.attr("id", "conceptTags" + idx + ".conceptName");
+		conceptTagName.attr("name", "conceptTags[" + idx + "].conceptName");
+		conceptTagName.attr("value", $(tag).attr("data-concept-name"));
+		$("#editForm").append(conceptTagName);
+		
+		var conceptTagType = $("<input>");
+		conceptTagType.attr("type", "hidden");
+		conceptTagType.attr("id", "conceptTags" + idx + ".conceptTypeName");
+		conceptTagType.attr("name", "conceptTags[" + idx + "].conceptTypeName");
+		conceptTagType.attr("value", $(tag).attr("data-type-name"));
+		$("#editForm").append(conceptTagType);
+		
+		var conceptTagTypeUri = $("<input>");
+		conceptTagTypeUri.attr("type", "hidden");
+		conceptTagTypeUri.attr("id", "conceptTags" + idx + ".conceptTypeUri");
+		conceptTagTypeUri.attr("name", "conceptTags[" + idx + "].conceptTypeUri");
+		conceptTagTypeUri.attr("value", $(tag).attr("data-type-uri"));
+		$("#editForm").append(conceptTagTypeUri);
 	});
 }
 
@@ -1101,151 +1129,103 @@ let removePerson = function removePerson(e) {
 					value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
 		</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'journalAbbreviation') }">style="display:none;"</c:if>>
-			<td>Journal Abbreviation</td>
-			<td><form:input path="journalAbbreviation" type="text"
-					class="form-control" placeholder="Journal Abbreviation"
-					value="${not empty form.journalAbbreviation ? form.journalAbbreviation : citation.journalAbbreviation}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
+<td>Publication Title</td>
+<td><form:input path="publicationTitle" type="text" class="form-control" placeholder="Publication Title" value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'volume') }">style="display:none;"</c:if>>
-			<td>Volume</td>
-			<td><form:input path="volume" type="text" class="form-control"
-					placeholder="Volume"
-					value="${not empty form.volume ? form.volume : citation.volume}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'journalAbbreviation') }">style="display:none;"</c:if>>
+<td>Journal Abbreviation</td>
+<td><form:input path="journalAbbreviation" type="text" class="form-control" placeholder="Journal Abbreviation" value="${not empty form.journalAbbreviation ? form.journalAbbreviation : citation.journalAbbreviation}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'issue') }">style="display:none;"</c:if>>
-			<td>Issue</td>
-			<td><form:input path="issue" type="text" class="form-control"
-					placeholder="Issue"
-					value="${not empty form.issue ? form.issue : citation.issue}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'volume') }">style="display:none;"</c:if>>
+<td>Volume</td>
+<td><form:input path="volume"  type="text" class="form-control" placeholder="Volume" value="${not empty form.volume ? form.volume : citation.volume}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'pages') }">style="display:none;"</c:if>>
-			<td>Pages</td>
-			<td><form:input path="pages" type="text" class="form-control"
-					placeholder="Pages"
-					value="${not empty form.pages ? form.pages : citation.pages}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'issue') }">style="display:none;"</c:if>>
+<td>Issue</td>
+<td><form:input path="issue" type="text" class="form-control" placeholder="Issue" value="${not empty form.issue ? form.issue : citation.issue}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'series') }">style="display:none;"</c:if>>
-			<td>Series</td>
-			<td><form:input path="series" type="text" class="form-control"
-					placeholder="Series"
-					value="${not empty form.series ? form.series : citation.series}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'pages') }">style="display:none;"</c:if>>
+<td>Pages</td>
+<td><form:input path="pages" type="text" class="form-control" placeholder="Pages" value="${not empty form.pages ? form.pages : citation.pages}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'seriesTitle') }">style="display:none;"</c:if>>
-			<td>Series Title</td>
-			<td><form:input path="seriesTitle" type="text"
-					class="form-control" placeholder="Series Title"
-					value="${not empty form.seriesTitle ? form.seriesTitle : citation.seriesTitle}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'series') }">style="display:none;"</c:if>>
+<td>Series</td>
+<td><form:input path="series" type="text" class="form-control" placeholder="Series" value="${not empty form.series ? form.series : citation.series}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'seriesText') }">style="display:none;"</c:if>>
-			<td>Series Text</td>
-			<td><form:input path="seriesText" type="text"
-					class="form-control" placeholder="Series Text"
-					value="${not empty form.seriesText ? form.seriesText : citation.seriesText}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'seriesTitle') }">style="display:none;"</c:if>>
+<td>Series Title</td>
+<td><form:input path="seriesTitle" type="text" class="form-control" placeholder="Series Title" value="${not empty form.seriesTitle ? form.seriesTitle : citation.seriesTitle}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'url') }">style="display:none;"</c:if>>
-			<td>URL</td>
-			<td><form:input path="url" type="text" class="form-control"
-					placeholder="Url"
-					value="${not empty form.url ? form.url : citation.url}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'seriesText') }">style="display:none;"</c:if>>
+<td>Series Text</td>
+<td><form:input path="seriesText" type="text" class="form-control" placeholder="Series Text" value="${not empty form.seriesText ? form.seriesText : citation.seriesText}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'language') }">style="display:none;"</c:if>>
-			<td>Language</td>
-			<td><form:input path="language" type="text" class="form-control"
-					placeholder="Language"
-					value="${not empty form.language ? form.language : citation.language}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'url') }">style="display:none;"</c:if>>
+<td>URL</td>
+<td><form:input path="url" type="text" class="form-control" placeholder="Url" value="${not empty form.url ? form.url : citation.url}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'doi') }">style="display:none;"</c:if>>
-			<td>DOI</td>
-			<td><form:input path="doi" type="text" class="form-control"
-					placeholder="DOI"
-					value="${not empty form.doi ? form.doi : citation.doi}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'language') }">style="display:none;"</c:if>>
+<td>Language</td>
+<td><form:input path="language" type="text" class="form-control" placeholder="Language" value="${not empty form.language ? form.language : citation.language}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'issn') }">style="display:none;"</c:if>>
-			<td>ISSN</td>
-			<td><form:input path="issn" type="text" class="form-control"
-					placeholder="ISSN"
-					value="${not empty form.issn ? form.issn : citation.issn}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'doi') }">style="display:none;"</c:if>>
+<td>DOI</td>
+<td><form:input path="doi" type="text" class="form-control" placeholder="DOI" value="${not empty form.doi ? form.doi : citation.doi}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'archive') }">style="display:none;"</c:if>>
-			<td>Archive</td>
-			<td><form:input path="archive" type="text" class="form-control"
-					placeholder="Archive"
-					value="${not empty form.archive ? form.archive : citation.archive}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'issn') }">style="display:none;"</c:if>>
+<td>ISSN</td>
+<td><form:input path="issn" type="text" class="form-control" placeholder="ISSN" value="${not empty form.issn ? form.issn : citation.issn}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'archiveLocation') }">style="display:none;"</c:if>>
-			<td>Archive Location</td>
-			<td><form:input path="archiveLocation" type="text"
-					class="form-control" placeholder="Archive Location"
-					value="${not empty form.archiveLocation ? form.archiveLocation : citation.archiveLocation}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'archive') }">style="display:none;"</c:if>>
+<td>Archive</td>
+<td><form:input path="archive" type="text" class="form-control" placeholder="Archive" value="${not empty form.archive ? form.archive : citation.archive}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'libraryCatalog') }">style="display:none;"</c:if>>
-			<td>Library Catalog</td>
-			<td><form:input path="libraryCatalog" type="text"
-					class="form-control" placeholder="Library Catalog"
-					value="${not empty form.libraryCatalog ? form.libraryCatalog : citation.libraryCatalog}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'archiveLocation') }">style="display:none;"</c:if>>
+<td>Archive Location</td>
+<td><form:input path="archiveLocation" type="text" class="form-control" placeholder="Archive Location" value="${not empty form.archiveLocation ? form.archiveLocation : citation.archiveLocation}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'callNumber') }">style="display:none;"</c:if>>
-			<td>Call Number</td>
-			<td><form:input path="callNumber" type="text"
-					class="form-control" placeholder="Call Number"
-					value="${not empty form.callNumber ? form.callNumber : citation.callNumber}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'libraryCatalog') }">style="display:none;"</c:if>>
+<td>Library Catalog</td>
+<td><form:input path="libraryCatalog" type="text" class="form-control" placeholder="Library Catalog" value="${not empty form.libraryCatalog ? form.libraryCatalog : citation.libraryCatalog}" /></td>
+</tr>
 
-		<tr
-			<c:if test="${not fn:contains(fields, 'rights') }">style="display:none;"</c:if>>
-			<td>Rights</td>
-			<td><form:input path="rights" type="text" class="form-control"
-					placeholder="Rights"
-					value="${not empty form.rights ? form.rights : citation.rights}" /></td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'callNumber') }">style="display:none;"</c:if>>
+<td>Call Number</td>
+<td><form:input path="callNumber" type="text" class="form-control" placeholder="Call Number" value="${not empty form.callNumber ? form.callNumber : citation.callNumber}" /></td>
+</tr>
 
-		<tr>
-			<td>Concepts</td>
-			<td>
-				<div id="conceptTags">
-					<c:forEach items="${citation.conceptTags}" var="tag">
-						<span class="badge" data-concept-id="${tag.localConceptId}"
-							data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName}
-							| ${tag.typeName}</span>
-					</c:forEach>
-				</div>
-				<div class="pull-right">
-					<a class="addConceptModalLink" data-toggle="modal"
-						data-target="#addConceptModal"><i class="fas fa-plus-circle"></i>
-						Add Concept</a>
-				</div>
-			</td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'rights') }">style="display:none;"</c:if>>
+<td>Rights</td>
+<td><form:input path="rights" type="text" class="form-control" placeholder="Rights" value="${not empty form.rights ? form.rights : citation.rights}" /></td>
+</tr>
+
+<tr>
+<td>Concepts</td>
+<td>
+<div id="conceptTags">
+<c:forEach items="${citation.conceptTags}" var="tag">
+<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-uri="${tag.conceptUri}" data-concept-name="${tag.conceptName}" data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName}</span>
+</c:forEach>
+</div>
+<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
+</td>
+</tr>
+
 
 	</table>
 
@@ -1622,46 +1602,41 @@ let removePerson = function removePerson(e) {
 
 <!-- Concept Modal -->
 <div class="modal fade" tabindex="-1" role="dialog" id="addConceptModal">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"
-					aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">Add Concept</h4>
-			</div>
-			<div class="modal-body">
-				<form id="conceptForm">
-					<p>
-						<label>Concept</label> <select class="form-control"
-							id="addConceptConceptSelect">
-							<c:forEach items="${concepts}" var="concept">
-								<option value="${concept.id}">${concept.name}</option>
-							</c:forEach>
-						</select>
-					</p>
 
-					<p style="padding-top: 20px;">
-						<label>Type of Concept</label> <select class="form-control"
-							id="addConceptTypeSelect">
-							<c:forEach items="${conceptTypes}" var="type">
-								<option value="${type.id}">${type.name}</option>
-							</c:forEach>
-						</select>
-					</p>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" id="addConceptButton">Add</button>
-			</div>
-		</div>
-		<!-- /.modal-content -->
-	</div>
-	<!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Concept</h4>
+      </div>
+      <div class="modal-body">
+        <form id="conceptForm">
+        <p>
+        <label>Concept</label>
+        <select class="form-control" id="addConceptConceptSelect">
+        <c:forEach items="${concepts}" var="concept">
+        	<option value="${concept.uri}">${concept.name}</option>
+        </c:forEach>
+        </select>
+        </p>
+        
+        <p style="padding-top: 20px;">
+        <label>Type of Concept</label>
+        <select class="form-control"  id="addConceptTypeSelect">
+        <c:forEach items="${conceptTypes}" var="type">
+        	<option value="${type.uri}">${type.name}</option>
+        </c:forEach>
+        </select>
+        </p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="addConceptButton">Add</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <script>
 //# sourceURL=fields.js
 $(document).ready(function() {

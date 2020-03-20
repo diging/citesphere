@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +29,15 @@ import edu.asu.diging.citesphere.core.factory.IGroupFactory;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
-import edu.asu.diging.citesphere.model.IUser;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 public class ZoteroManager implements IZoteroManager {
@@ -57,7 +59,8 @@ public class ZoteroManager implements IZoteroManager {
     @Autowired
     private ICitationCollectionFactory collectionFactory;
 
-    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion) throws ZoteroHttpStatusException {
+    public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion)
+            throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page, sortBy, lastGroupVersion);
         return createCitationResults(response);
     }
@@ -141,6 +144,17 @@ public class ZoteroManager implements IZoteroManager {
         return createCitationResults(response);
     }
 
+    @Override
+    public void forceRefresh(IUser user, String zoteroGroupId, String collectionId, int page, String sortBy,
+            Long lastGroupVersion) {
+        if (collectionId == null || collectionId.trim().isEmpty()) {
+            zoteroConnector.clearGroupItemsCache(user, zoteroGroupId, new Integer(page), sortBy, lastGroupVersion);
+        } else {
+            zoteroConnector.clearCollectionItemsCache(user, zoteroGroupId, collectionId, new Integer(page), sortBy,
+                    lastGroupVersion);
+        }
+    }
+
     private CitationResults createCitationResults(ZoteroResponse<Item> response) {
         List<ICitation> citations = new ArrayList<>();
         if (response.getResults() != null) {
@@ -169,7 +183,8 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException {
+    public ICitation updateCitation(IUser user, String groupId, ICitation citation)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
         Item item = itemFactory.createItem(citation, new ArrayList<>());
 
         List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());

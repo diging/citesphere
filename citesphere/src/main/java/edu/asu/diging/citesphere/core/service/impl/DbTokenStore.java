@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AuthenticationKeyGenerator;
 import org.springframework.security.oauth2.provider.token.DefaultAuthenticationKeyGenerator;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.transaction.annotation.Transactional;
 
 import edu.asu.diging.citesphere.core.model.oauth.impl.DbAccessToken;
 import edu.asu.diging.citesphere.core.model.oauth.impl.DbRefreshToken;
@@ -27,6 +28,7 @@ import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
  * @author jdamerow
  *
  */
+@Transactional
 public class DbTokenStore implements TokenStore {
 
     private DbAccessTokenRepository dbAccessTokenRepository;
@@ -182,6 +184,16 @@ public class DbTokenStore implements TokenStore {
             } catch (UnsupportedEncodingException var4) {
                 throw new IllegalStateException("UTF-8 encoding not available.  Fatal (should be in the JDK).");
             }
+        }
+    }
+    
+    public List<DbAccessToken> findTokensByUserName(String userName) {
+        return (List<DbAccessToken>)dbAccessTokenRepository.findByUsername(userName);
+    }
+    
+    public void revokeAccessToken(String clientId, String username) {
+        if(clientId != null) {
+            dbAccessTokenRepository.deleteByClientIdAndUsername(clientId,username);
         }
     }
 }

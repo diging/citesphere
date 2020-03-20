@@ -47,7 +47,7 @@ public class PersistentContext {
        LocalContainerEntityManagerFactoryBean em 
          = new LocalContainerEntityManagerFactoryBean();
        em.setDataSource(dataSource());
-       em.setPackagesToScan(new String[] { "edu.asu.diging.citesphere.core.model", "edu.asu.diging.citesphere.model" });
+       em.setPackagesToScan(new String[] { "edu.asu.diging.citesphere.core.model", "edu.asu.diging.citesphere.model", "edu.asu.diging.citesphere.user" });
   
        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
        em.setJpaVendorAdapter(vendorAdapter);
@@ -73,8 +73,7 @@ public class PersistentContext {
     Properties additionalProperties() {
         Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
-        properties.setProperty(
-          "hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+        properties.setProperty("hibernate.dialect", env.getRequiredProperty("db.hibernate.dialect"));
         properties.setProperty("hibernate.show_sql", env.getRequiredProperty("db.log.queries"));
         properties.setProperty("hibernate.id.new_generator_mappings", "true");
         properties.setProperty("hibernate.jdbc.batch_size", env.getRequiredProperty("db.jdbc.batch_size"));
