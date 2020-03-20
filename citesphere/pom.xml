@@ -22,7 +22,7 @@
         <citesphere.messages.version>0.3</citesphere.messages.version>
         <citesphere.model.version>0.2</citesphere.model.version>
 
-        <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password> 
+        <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
         <zotero.client.key></zotero.client.key>
         <zotero.client.secret></zotero.client.secret>

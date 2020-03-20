@@ -330,7 +330,7 @@ public class CitationManager implements ICitationManager {
             List<PageRequest> requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortByAndCollectionId(user, groupId, page, ZoteroObjectType.GROUP, sortBy, collectionId == "" ? null:collectionId);
             if(requests != null && requests.size()>0) {
                 List<ICitation> citations = new ArrayList<>();
-                citations.addAll(requests.get(0).getCitations());
+                citations.addAll(requests.get(0).getCitations().stream().distinct().collect(Collectors.toList()));
                 citations.sort(new Comparator<ICitation>() {
                     @Override
                     public int compare(ICitation o1, ICitation o2) {

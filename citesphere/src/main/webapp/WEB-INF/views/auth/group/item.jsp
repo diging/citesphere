@@ -31,11 +31,11 @@
 </div>
 <br/>
 <div class="pull-right" style="float:right;margin-top: 20px;">
-	<button id ="next" class="btn btn-primary" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}>Next</button>
+	<button id ="next" class="btn btn-primary" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}>Next >></button>
 </div>		
 <br/>		
 <div style="margin-bottom: 20px;">
-	<button id ="prev" class="btn btn-primary" type="submit" href="" ${ empty previous ? 'disabled="disabled"' : ''}>Previous</button>&nbsp;&nbsp;
+	<button id ="prev" class="btn btn-primary" type="submit" href="" ${ empty previous ? 'disabled="disabled"' : ''}><< Previous</button>&nbsp;&nbsp;
 	<a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />"><i
 		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; <a
@@ -394,9 +394,5 @@
 			window.location.href = "<c:url value="/auth/group" />" + url;
 		});
 	});
-	function goNext() {
-			
-			window.history.forward();
-		}
 	
 </script>
