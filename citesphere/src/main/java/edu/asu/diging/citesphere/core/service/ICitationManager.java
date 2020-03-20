@@ -49,4 +49,6 @@ public interface ICitationManager {
     Map<String, String> getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy,
             int index);
 
+    void forceGroupItemsRefresh(IUser user, String groupId, String collectionId, int page, String sortBy);
+
 }
