@@ -37,8 +37,8 @@ public class DeleteItemController {
     @Autowired
     private ICitationHelper citationHelper;
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/delete")
-    public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model,
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}", method = RequestMethod.DELETE)
+    public String deleteItem(@ModelAttribute CitationForm form, Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId)
             throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
             ZoteroHttpStatusException {
@@ -50,9 +50,18 @@ public class DeleteItemController {
         try {
             citationManager.deleteCitation((IUser) authentication.getPrincipal(), zoteroGroupId, collectionIds,
                     citation);
-        } catch (ZoteroConnectionException | GroupDoesNotExistException | ZoteroHttpStatusException
-                | ZoteroItemDeletionFailedException e) {
-            e.printStackTrace();
+        } catch (ZoteroItemDeletionFailedException e) {
+            
+            model.addAttribute("form", form);
+            model.addAttribute("zoteroGroupId", zoteroGroupId);
+            model.addAttribute("show_alert", true);
+            model.addAttribute("alert_type", "danger");
+            String msg = e.getResponse().getFailed().get("0") != null
+                    ? e.getResponse().getFailed().get("0").getMessage()
+                    : "Sorry, item deletion failed.";
+            model.addAttribute("alert_msg", msg);
+            return "/auth/group/"+ zoteroGroupId + "/items/" + itemId;
+         
         }
 
         return "redirect:/auth/group/{zoteroGroupId}/items";

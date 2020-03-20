@@ -236,9 +236,8 @@ public class CitationManager implements ICitationManager {
         }
     }
 
-    private CitationResults getGroupItemsBasedOnLastModified(List<PageRequest> requests, String sortBy,
+    private CitationResults getGroupItemsBasedOnLastModified(IPageRequest localPageRequest, String sortBy,
             ICitationGroup group) {
-        IPageRequest localPageRequest = requests.get(0);
         OffsetDateTime updatedOn = localPageRequest.getLastUpdated() != null ? localPageRequest.getLastUpdated()
                 : OffsetDateTime.MIN;
         OffsetDateTime groupLastLocallyModified = group.getLastLocallyModifiedOn() != null
@@ -279,7 +278,8 @@ public class CitationManager implements ICitationManager {
             IPageRequest localPageRequest = null;
             if (requests != null && requests.size() > 0) {
                 // there should be just one
-                results = getGroupItemsBasedOnLastModified(requests, sortBy, group);
+                localPageRequest = requests.get(0);
+                results = getGroupItemsBasedOnLastModified(localPageRequest, sortBy, group);
                 if (results != null) {
                     return results;
                 }

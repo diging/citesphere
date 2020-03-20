@@ -29,10 +29,10 @@
 <div style="margin-bottom: 20px;">
 	<a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />"><i
-		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp;
-		<a data-toggle="modal" data-target="#deleteModal"
-		href=""><i class="fas fa-trash" title="Sync Citation"></i></a> &nbsp;&nbsp; 
-		 <a href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync" />"><i
+		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; <a
+		data-toggle="modal" data-target="#deleteModal" href=""><i
+		class="fas fa-trash" title="Sync Citation"></i></a> &nbsp;&nbsp; <a
+		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync" />"><i
 		class="fas fa-sync" title="Sync Citation"></i></a>
 </div>
 
@@ -113,32 +113,32 @@
 	</tr>
 	<c:forEach items="${citation.otherCreatorRoles}" var="role">
 		<c:if test="${role != 'editor'}">
-		<tr>
-			<td><spring:eval
-					expression="@labelsResource.getProperty('_item_attribute_label_${role}', '${role}')" />
-			</td>
-			<td><cite:creators citation="${citation}" role="${role}"
-					var="creator">
+			<tr>
+				<td><spring:eval
+						expression="@labelsResource.getProperty('_item_attribute_label_${role}', '${role}')" />
+				</td>
+				<td><cite:creators citation="${citation}" role="${role}"
+						var="creator">
  ${creator.person.lastName}<c:if
-						test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
-					<c:if test="${not empty creator.person.affiliations}">
+							test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+						<c:if test="${not empty creator.person.affiliations}">
  (<c:forEach items="${creator.person.affiliations}"
-							varStatus="affStatus" var="aff">${aff.name}<c:if
-								test="${!affStatus.last}">, </c:if>
-						</c:forEach>)<c:if test="${!status.last}">; </c:if>
-					</c:if>
-					<c:if test="${not empty creator.person.uri}">
-						<a href="${creator.person.uri}" target="_blank"><i
-							class="fas fa-link"></i></a>
-					</c:if>
-					<c:if test="${not empty creator.person.localAuthorityId}">
-						<a
-							href="<c:url value="/auth/authority/${creator.person.localAuthorityId}" />"><i
-							class="fas fa-anchor"></i></a>
-					</c:if>
-					<c:if test="${!lastIteration}">; </c:if>
-				</cite:creators></td>
-		</tr>
+								varStatus="affStatus" var="aff">${aff.name}<c:if
+									test="${!affStatus.last}">, </c:if>
+							</c:forEach>)<c:if test="${!status.last}">; </c:if>
+						</c:if>
+						<c:if test="${not empty creator.person.uri}">
+							<a href="${creator.person.uri}" target="_blank"><i
+								class="fas fa-link"></i></a>
+						</c:if>
+						<c:if test="${not empty creator.person.localAuthorityId}">
+							<a
+								href="<c:url value="/auth/authority/${creator.person.localAuthorityId}" />"><i
+								class="fas fa-anchor"></i></a>
+						</c:if>
+						<c:if test="${!lastIteration}">; </c:if>
+					</cite:creators></td>
+			</tr>
 		</c:if>
 	</c:forEach>
 	<c:if test="${fn:contains(fields, 'publicationTitle') }">
@@ -252,145 +252,175 @@
 	<tr>
 		<td>References</td>
 		<td><c:forEach items="${citation.references}" var="ref">
-				<p class="parse-ref-info" data-authors="${ref.authorString}" data-title="${ref.title}"
-                        data-year="${ref.year}"
-                        data-identifier="${ref.identifier}"
-                        data-identifier-type="${ref.identifierType}"
-                        data-first-page="${ref.firstPage}"
-                        data-last-page="${ref.endPage}"
-                        data-volume="${ref.volume}"
-                        data-source="${ref.source}"
-                        data-publication-type="${ref.publicationType}"
-                        data-reference-id="${ref.referenceId}"
-                        data-reference-label="${ref.referenceLabel}"
-                        data-citation-id="${ref.citationId}"
-                        data-ref-raw="${fn:escapeXml(ref.referenceStringRaw)}"
-                        >
-					<span class="fas fa-info-circle"></span>
-					${ref.referenceString}
+				<p class="parse-ref-info" data-authors="${ref.authorString}"
+					data-title="${ref.title}" data-year="${ref.year}"
+					data-identifier="${ref.identifier}"
+					data-identifier-type="${ref.identifierType}"
+					data-first-page="${ref.firstPage}" data-last-page="${ref.endPage}"
+					data-volume="${ref.volume}" data-source="${ref.source}"
+					data-publication-type="${ref.publicationType}"
+					data-reference-id="${ref.referenceId}"
+					data-reference-label="${ref.referenceLabel}"
+					data-citation-id="${ref.citationId}"
+					data-ref-raw="${fn:escapeXml(ref.referenceStringRaw)}">
+					<span class="fas fa-info-circle"></span> ${ref.referenceString}
 				</p>
 			</c:forEach></td>
 	</tr>
 </table>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-     
-      <div class="modal-body">
-    Are you sure you want to delete Citation?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-        <a class="btn btn-primary"
-		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/delete"/>" > Yes</a> 
-      </div>
-    </div>
-  </div>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+	aria-labelledby="deleteModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+
+			<div class="modal-body">Are you sure you want to delete
+				Citation?</div>
+			<div class="modal-footer">
+
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+				<button id="delete" type="button" class="btn btn-primary"
+					data-dismiss="modal">Yes</button>
+				<%-- <a class="btn btn-primary"
+		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/delete"/>" > Yes</a>  --%>
+			</div>
+		</div>
+	</div>
 </div>
 
-<div id="parsed-ref-modal" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Parse Reference</h4>
-      </div>
-      <div class="modal-body">
-        <p id="ref-unparsed"></p>
-        <table class="table table-striped">
-        <tr>
-            <td width="30%">Author string:</td>
-            <td id="parsed-ref-authors"></td>
-        </tr>
-        <tr>
-            <td>Title:</td>
-            <td id="parsed-ref-title"></td>
-        </tr>
-        <tr>
-            <td>Year:</td>
-            <td id="parsed-ref-year"></td>
-        </tr>
-        <tr>
-            <td>Identifier:</td>
-            <td id="parsed-ref-ident"></td>
-        </tr>
-        <tr>
-            <td>First page:</td>
-            <td id="parsed-ref-first-page"></td>
-        </tr>
-        <tr>
-            <td>Last page:</td>
-            <td id="parsed-ref-last-page"></td>
-        </tr>
-        <tr>
-            <td>Volume:</td>
-            <td id="parsed-ref-volume"></td>
-        </tr>
-        <tr>
-            <td>Source:</td>
-            <td id="parsed-ref-source"></td>
-        </tr>
-        <tr>
-            <td>Publication type:</td>
-            <td id="parsed-ref-publication-type"></td>
-        </tr>
-        <tr>
-	        <td colspan="2">
-		        
-            </td>
-        </tr>
-        <tr>
-            <td>Reference ID:</td>
-            <td id="parsed-ref-reference-id"></td>
-        </tr>
-        <tr>
-            <td>Reference label:</td>
-            <td id="parsed-ref-reference-label"></td>
-        </tr>
-        <tr>
-            <td>Citation ID:</td>
-            <td id="parsed-ref-citation-id"></td>
-        </tr>
-        <tr>
-            <td>Reference as found:</td>
-            <td id="parsed-ref-ref-raw"></td>
-        </tr>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+<div id="parsed-ref-modal" class="modal fade" tabindex="-1"
+	role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Parse Reference</h4>
+			</div>
+			<div class="modal-body">
+				<p id="ref-unparsed"></p>
+				<table class="table table-striped">
+					<tr>
+						<td width="30%">Author string:</td>
+						<td id="parsed-ref-authors"></td>
+					</tr>
+					<tr>
+						<td>Title:</td>
+						<td id="parsed-ref-title"></td>
+					</tr>
+					<tr>
+						<td>Year:</td>
+						<td id="parsed-ref-year"></td>
+					</tr>
+					<tr>
+						<td>Identifier:</td>
+						<td id="parsed-ref-ident"></td>
+					</tr>
+					<tr>
+						<td>First page:</td>
+						<td id="parsed-ref-first-page"></td>
+					</tr>
+					<tr>
+						<td>Last page:</td>
+						<td id="parsed-ref-last-page"></td>
+					</tr>
+					<tr>
+						<td>Volume:</td>
+						<td id="parsed-ref-volume"></td>
+					</tr>
+					<tr>
+						<td>Source:</td>
+						<td id="parsed-ref-source"></td>
+					</tr>
+					<tr>
+						<td>Publication type:</td>
+						<td id="parsed-ref-publication-type"></td>
+					</tr>
+					<tr>
+						<td colspan="2"></td>
+					</tr>
+					<tr>
+						<td>Reference ID:</td>
+						<td id="parsed-ref-reference-id"></td>
+					</tr>
+					<tr>
+						<td>Reference label:</td>
+						<td id="parsed-ref-reference-label"></td>
+					</tr>
+					<tr>
+						<td>Citation ID:</td>
+						<td id="parsed-ref-citation-id"></td>
+					</tr>
+					<tr>
+						<td>Reference as found:</td>
+						<td id="parsed-ref-ref-raw"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <script>
-//# sourceURL=modal.js
+	//# sourceURL=modal.js
 	$(function() {
-		$(".parse-ref-info").click(function(e) {
-			var clicked = e.target;
-			$("#ref-unparsed").text($(clicked).text());
-			$("#parsed-ref-authors").text($(clicked).attr('data-authors'));
-			$("#parsed-ref-title").text($(clicked).attr('data-title'));
-			$("#parsed-ref-year").text($(clicked).attr('data-year'));
-			var identifier = $(clicked).attr('data-identifier');
-			var identType = $(clicked).attr('data-identifier-type');
-			if (identType != undefined && identType != "") {
-				identifier = identifier + " (" + identType + ")";
-			}
-			$("#parsed-ref-ident").text(identifier);
-			$("#parsed-ref-first-page").text($(clicked).attr('data-first-page'));
-			$("#parsed-ref-last-page").text($(clicked).attr('data-last-page'));
-			$("#parsed-ref-volume").text($(clicked).attr('data-volume'));
-			$("#parsed-ref-source").text($(clicked).attr('data-source'));
-			$("#parsed-ref-publication-type").text($(clicked).attr('data-publication-type'));
-			$("#parsed-ref-reference-id").text($(clicked).attr('data-reference-id'));
-			$("#parsed-ref-reference-label").text($(clicked).attr('data-reference-label'));
-			$("#parsed-ref-citation-id").text($(clicked).attr('data-citation-id'));
-			$("#parsed-ref-ref-raw").text($(clicked).attr('data-ref-raw'));
-            
-			$("#parsed-ref-modal").modal();
-		});
+		$(".parse-ref-info").click(
+				function(e) {
+					var clicked = e.target;
+					$("#ref-unparsed").text($(clicked).text());
+					$("#parsed-ref-authors").text(
+							$(clicked).attr('data-authors'));
+					$("#parsed-ref-title").text($(clicked).attr('data-title'));
+					$("#parsed-ref-year").text($(clicked).attr('data-year'));
+					var identifier = $(clicked).attr('data-identifier');
+					var identType = $(clicked).attr('data-identifier-type');
+					if (identType != undefined && identType != "") {
+						identifier = identifier + " (" + identType + ")";
+					}
+					$("#parsed-ref-ident").text(identifier);
+					$("#parsed-ref-first-page").text(
+							$(clicked).attr('data-first-page'));
+					$("#parsed-ref-last-page").text(
+							$(clicked).attr('data-last-page'));
+					$("#parsed-ref-volume")
+							.text($(clicked).attr('data-volume'));
+					$("#parsed-ref-source")
+							.text($(clicked).attr('data-source'));
+					$("#parsed-ref-publication-type").text(
+							$(clicked).attr('data-publication-type'));
+					$("#parsed-ref-reference-id").text(
+							$(clicked).attr('data-reference-id'));
+					$("#parsed-ref-reference-label").text(
+							$(clicked).attr('data-reference-label'));
+					$("#parsed-ref-citation-id").text(
+							$(clicked).attr('data-citation-id'));
+					$("#parsed-ref-ref-raw").text(
+							$(clicked).attr('data-ref-raw'));
+
+					$("#parsed-ref-modal").modal();
+				});
+
+		$('#delete')
+				.click(
+						function(e) {
+							e.preventDefault();
+							$
+									.ajax({
+										url : 'auth/group/${zoteroGroupId}/items/${citation.key}',
+										method : 'DELETE',
+										headers : {
+											'${_csrf.parameterName}' : '${_csrf.token}'
+										}
+
+									})
+						});
 	})
 </script>
