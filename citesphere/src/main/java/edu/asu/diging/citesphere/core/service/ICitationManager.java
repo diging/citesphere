@@ -45,4 +45,6 @@ public interface ICitationManager {
 
     List<String> getValidCreatorTypes(IUser user, ItemType itemType);
 
+    void forceGroupItemsRefresh(IUser user, String groupId, String collectionId, int page, String sortBy);
+
 }

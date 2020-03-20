@@ -40,6 +40,7 @@
         <db.user></db.user>
         <db.password></db.password>
         <db.log.queries>false</db.log.queries>
+        <db.hibernate.dialect>org.hibernate.dialect.MySQL5Dialect</db.hibernate.dialect>
 
         <upload.folder.path></upload.folder.path>
 
@@ -538,15 +539,15 @@
         </plugins>
     </build>
     <repositories>
-    <repository>
-      <id>central</id>
-      <name>Central Repository</name>
-      <url>https://repo.maven.apache.org/maven2</url>
-      <layout>default</layout>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+        <repository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>
