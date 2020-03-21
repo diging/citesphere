@@ -76,7 +76,8 @@ $(function() {
 		
 		getUserAuthorities('Author','Author', 0)
 		getDatasetAuthorities('Author','Author', 0)
-		getconceptpowerAuthorities('Author','Author',0)
+		getConceptpowerAuthorities('Author','Author',0)
+		getViafAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
 	});
 	
@@ -90,7 +91,8 @@ $(function() {
 		
 		getUserAuthorities('Editor','Editor', 0)
 		getDatasetAuthorities('Editor','Editor', 0)
-		getconceptpowerAuthorities('Editor','Editor',0)
+		getConceptpowerAuthorities('Editor','Editor',0)
+		getViafAuthorities('Editor','Editor',0)
 		$("#searchEditorSpinner").hide();
 	});
 	
@@ -104,7 +106,8 @@ $(function() {
 		
 		getUserAuthorities('Creator','Creator', 0)
 		getDatasetAuthorities('Creator','Creator', 0)
-		getconceptpowerAuthorities('Creator','Creator',0)
+		getConceptpowerAuthorities('Creator','Creator',0)
+		getViafAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
 	});
 	
@@ -788,7 +791,7 @@ function getDatasetAuthorities(modalType, personType, page) {
 }
 
 
-function getconceptpowerAuthorities(modalType, personType, page) {
+function getConceptpowerAuthorities(modalType, personType, page) {
 
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
@@ -827,7 +830,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   				    visiblePages: 5,
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
-  				    	getconceptpowerAuthorities(modalType, personType, page)
+  				    	getConceptpowerAuthorities(modalType, personType, page)
 
   				    }
   				});
@@ -868,6 +871,92 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 	error: function(data){
 		$('#conceptpowerAuthoritySearchResult').parents('table').hide()
 		$("#conceptpowerAuthoritiesError").show();	
+	}
+	
+	});
+
+}
+
+function getViafAuthorities(modalType, personType, page) {
+
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/importedAuthorities/viaf?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
+		
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+			
+  			$("#viafAuthoritySearchResult").empty();
+  			
+  			var content = '';
+  				
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {	
+  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
+  					if(elem['description']==null){
+  						content += ' - </td>';
+  						}
+  					else{
+  						content +=elem['description'] + '</td>';
+  					}
+  					
+  				}); 				
+  				
+  				$('#viafAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	getViafAuthorities(modalType, personType, page)
+
+  				    }
+  				});
+  				
+  			}
+  			
+		$("#viafAuthoritySearchResult").append(content); 	
+
+		$("#viafAuthoritySearchResult tr td a").click(function() {
+			
+			name = $(this).text()
+			uri = $(this).closest('td').next().text();
+				
+			showPersonNameInModal(name, personType)
+			$("#uri"+modalType).val( uri);
+			
+			
+			createManageAuthorityURL = '<c:url value="/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri='+ $(this).closest('td').next().text() + '/"/>';
+						
+			$.ajax({
+			  		dataType: "json",
+			  		type: 'POST',
+			  		url: createManageAuthorityURL,
+			  		async:false,
+			  		success: function(data) {
+			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  		},
+				error: function(data){					
+					$("#uri"+modalType).val("");
+		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+				}
+				});				
+						
+			$("#selectAuthorityModel").modal('hide');
+		});	
+		
+        },
+	error: function(data){
+		$('#viafAuthoritySearchResult').parents('table').hide()
+		$("#viafAuthoritiesError").show();	
 	}
 	
 	});
@@ -1576,7 +1665,12 @@ let removePerson = function removePerson(e) {
 						<li role="presentation"><a
 							href="#conceptpowerAuthoritiesTabContent"
 							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
-								imported from Conceptpower</a></li>
+								imported <br> from  Conceptpower</a></li>
+								
+						<li role="presentation"><a
+							href="#viafAuthoritiesTabContent"
+							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
+								imported <br> from Viaf</a></li>
 					</ul>
 					<!-- Tab panes -->
 
@@ -1648,6 +1742,29 @@ let removePerson = function removePerson(e) {
 									<th>Description</th>
 								</tr>
 								<tbody id="conceptpowerAuthoritySearchResult">
+								</tbody>
+							</table>
+						</div>
+						
+						<div role="tabpanel" class="tab-pane"
+							id="viafAuthoritiesTabContent">
+
+							<ul id="viafAuthority-pagination-top"
+								class="pagination-sm"></ul>
+
+							<div id="viafAuthoritiesError" class="text-warning"
+								style="display: none">
+								<span> Error occurred while importing authorities from Viaf</span>
+
+							</div>
+
+							<table class="table table-striped table-bordered table-fixed">
+								<tr>
+									<th>Name</th>
+									<th>URI</th>
+									<th>Description</th>
+								</tr>
+								<tbody id="viafAuthoritySearchResult">
 								</tbody>
 							</table>
 						</div>
