@@ -281,7 +281,13 @@ public class AuthorityService implements IAuthorityService {
     }
 
     public String getImporterSearchString(String source, String firstName, String lastName) {
-        return helper.getConceptpowerSearchString(firstName, lastName);
+        if(source.equals(AuthorityImporter.CONCEPTPOWER)) {
+            return helper.getConceptpowerSearchString(firstName, lastName);    
+        }
+        else if(source.equals(AuthorityImporter.VIAF)) {
+            return helper.getViafSearchString(firstName, lastName);
+        }
+        return null;
     }
 
     public AuthorityImporter getAuthorityImporter(String source) {

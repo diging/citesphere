@@ -25,6 +25,9 @@ import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
  *
  */
 public interface AuthorityImporter {
+    
+    public static String CONCEPTPOWER="conceptpower";
+    public static String VIAF="viaf";
 
     boolean isResponsible(String uri);
 
