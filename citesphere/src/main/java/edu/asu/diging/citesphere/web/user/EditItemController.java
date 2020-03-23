@@ -108,9 +108,7 @@ public class EditItemController {
             ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         // load authors and editors before detaching
-        citation.getAuthors().forEach(a -> a.getAffiliations().size());
-        citation.getEditors().forEach(e -> e.getAffiliations().size());
-        citation.getOtherCreators().forEach(e -> e.getPerson().getAffiliations().size());
+        loadRelations(citation);
         citationManager.detachCitation(citation);
         citationHelper.updateCitation(citation, form, (IUser) authentication.getPrincipal());
         try {
@@ -142,6 +140,13 @@ public class EditItemController {
             return "auth/group/items/item/edit/conflict";
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
+    }
+    
+    private void loadRelations(ICitation citation) {
+        citation.getAuthors().forEach(a -> a.getAffiliations().size());
+        citation.getEditors().forEach(e -> e.getAffiliations().size());
+        citation.getOtherCreators().forEach(e -> e.getPerson().getAffiliations().size());
+        citation.getConceptTags().size();
     }
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/conflict/resolve", method = RequestMethod.POST)

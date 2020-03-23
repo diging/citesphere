@@ -39,6 +39,13 @@
     <logger name="org.springframework.security">
         <level value="${log.level}" />
     </logger>
+    
+    <logger name="org.hibernate.SQL">
+        <level value="${log.level}" />
+    </logger>
+    <logger name="org.hibernate.type.descriptor.sql">
+        <level value="${log.level}" />
+    </logger>
 
 	<!-- Root Logger -->
 	<root>
