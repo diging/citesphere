@@ -351,6 +351,6 @@ public class CitationManager implements ICitationManager {
         } catch (JpaObjectRetrievalFailureException ex) {
             logger.warn("Could not retrieve page request.", ex);
         }
-        return results;
+        return results; 
     }
 }
