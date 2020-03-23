@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
@@ -37,30 +38,33 @@ public class DeleteItemController {
     @Autowired
     private ICitationHelper citationHelper;
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}", method = RequestMethod.DELETE)
-    public String deleteItem(@ModelAttribute CitationForm form, Authentication authentication, Model model,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId)
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/delete/{itemId}", method = RequestMethod.DELETE)
+    public String deleteItem(@PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
+            Authentication authentication, Model model )
             throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
             ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
+       
+       
         List<String> collectionIds = new ArrayList<>();
-        if (form.getCollectionId() != null && !form.getCollectionId().trim().isEmpty()) {
-            collectionIds.add(form.getCollectionId());
-        }
+       //collectionIds.add(collectionId);
+      
         try {
             citationManager.deleteCitation((IUser) authentication.getPrincipal(), zoteroGroupId, collectionIds,
                     citation);
         } catch (ZoteroItemDeletionFailedException e) {
             
-            model.addAttribute("form", form);
-            model.addAttribute("zoteroGroupId", zoteroGroupId);
-            model.addAttribute("show_alert", true);
-            model.addAttribute("alert_type", "danger");
-            String msg = e.getResponse().getFailed().get("0") != null
-                    ? e.getResponse().getFailed().get("0").getMessage()
-                    : "Sorry, item deletion failed.";
-            model.addAttribute("alert_msg", msg);
-            return "/auth/group/"+ zoteroGroupId + "/items/" + itemId;
+              model.addAttribute("citation", citation);
+              List<String> fields = new ArrayList<>();
+              citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
+              model.addAttribute("fields", fields);
+              model.addAttribute("zoteroGroupId", zoteroGroupId);
+              model.addAttribute("show_alert", true); model.addAttribute("alert_type",
+              "danger"); String msg = e.getResponse().getFailed().get("0") != null ?
+              e.getResponse().getFailed().get("0").getMessage() :
+              "Sorry, item deletion failed."; model.addAttribute("alert_msg", msg); 
+              return "/auth/group/"+ zoteroGroupId + "/items/" + itemId;
+             
          
         }
 

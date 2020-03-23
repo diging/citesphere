@@ -287,7 +287,7 @@ public class ZoteroManager implements IZoteroManager {
         List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, true);
         List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
 
-        zoteroConnector.deleteItem(user, item, groupId, collectionIds, ignoreFields, validCreatorTypes);
+        zoteroConnector.deleteItem(user, item, groupId, ignoreFields, validCreatorTypes);
 
     }
 

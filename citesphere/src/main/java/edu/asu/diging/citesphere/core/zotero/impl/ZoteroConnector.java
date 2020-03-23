@@ -253,7 +253,7 @@ public class ZoteroConnector implements IZoteroConnector {
     }
 
     @Override
-    public void deleteItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
+    public void deleteItem(IUser user, Item item, String groupId, List<String> ignoreFields,
             List<String> validCreatorTypes)
             throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException {
         Zotero zotero = getApi(user);

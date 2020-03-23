@@ -412,13 +412,12 @@
 				.click(
 						function(e) {
 							e.preventDefault();
-							$
-									.ajax({
-										url : 'auth/group/${zoteroGroupId}/items/${citation.key}',
-										method : 'DELETE',
-										headers : {
-											'${_csrf.parameterName}' : '${_csrf.token}'
-										}
+						
+							
+							$.ajax({
+										url : '<c:url value="/auth/group/${zoteroGroupId}/items/delete/${citation.key}"/>' + "?${_csrf.parameterName}=${_csrf.token}",
+										method : 'DELETE'
+										
 
 									})
 						});
