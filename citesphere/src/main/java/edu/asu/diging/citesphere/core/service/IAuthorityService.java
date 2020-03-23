@@ -9,6 +9,7 @@ import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionExcep
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 
 public interface IAuthorityService {
 
@@ -16,7 +17,7 @@ public interface IAuthorityService {
 
     IAuthorityEntry importAuthority(String uri) throws AuthorityServiceConnectionException, URISyntaxException;
 
-    List<IAuthorityEntry> importAuthorityEntries(IUser user, String firstName, String lastName, String source, int page,
+    AuthoritySearchResult searchAuthorityEntries(IUser user, String firstName, String lastName, String source, int page,
             int pageSize) throws AuthorityServiceConnectionException, URISyntaxException;
 
     IAuthorityEntry save(IAuthorityEntry entry);
@@ -44,10 +45,8 @@ public interface IAuthorityService {
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
-    int getTotalUserAuthorities(IUser user, String firstName, String lastName, int pageSize);
+    int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize);
 
-    int getTotalDatasetAuthorities(String citationGroupId, String firstName, String lastName, int pageSize);
-
-    int getTotalImportedAuthorities(String firstName, String lastName, String source, int pageSize);
+    int getTotalDatasetAuthoritiesPages(String citationGroupId, String firstName, String lastName, int pageSize);
 
 }

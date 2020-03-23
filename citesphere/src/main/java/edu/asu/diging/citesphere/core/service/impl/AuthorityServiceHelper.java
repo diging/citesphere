@@ -21,7 +21,6 @@ public class AuthorityServiceHelper {
 
             conceptpowerSearchString = firstName == null ? conceptpowerSearchKeyword + "%" + lastName
                     : conceptpowerSearchKeyword + "%" + firstName;
-
         }
 
         return conceptpowerSearchString;

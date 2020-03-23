@@ -28,6 +28,7 @@ import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 
 @Component
 @PropertySource(value = "classpath:/config.properties")
@@ -83,7 +84,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
     }
 
     @Override
-    public List<IAuthorityEntry> retrieveAuthoritiesData(String searchString, int page, int pageSize)
+    public AuthoritySearchResult searchAuthorities(String searchString, int page, int pageSize)
             throws URISyntaxException, AuthorityServiceConnectionException {
 
         searchString = searchString.replace(conceptpowerSearchKeyword, "");
@@ -101,7 +102,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
             request = RequestEntity.get(uri).accept(MediaType.APPLICATION_JSON).build();
         } catch (UnsupportedEncodingException e) {
-            throw new URISyntaxException(e.getMessage(), e.toString());
+            throw new AssertionError(StandardCharsets.UTF_8.toString() + " is not supported");
 
         }
         ResponseEntity<ConceptpowerResponse> response = null;
@@ -112,6 +113,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
         }
 
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
+        AuthoritySearchResult searchResult = new AuthoritySearchResult();
         if (response.getStatusCode() == HttpStatus.OK) {
             ConceptpowerResponse conceptEntries = response.getBody();
             if (conceptEntries.getConceptEntries() != null) {
@@ -122,51 +124,16 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
                     authority.setUri(conceptEntry.getEqual_to());
                     authority.setDescription(conceptEntry.getDescription());
                     authorityEntries.add(authority);
+
                 }
+                searchResult.setFoundAuthorities(authorityEntries);
+                searchResult.setTotalPages((int) Math
+                        .ceil(conceptEntries.getPagination().getTotalNumberOfRecords() / new Float(pageSize)));
             }
         } else {
             throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
         }
-        return authorityEntries;
-    }
-
-    @Override
-    public long totalRetrievedAuthorityData(String searchString)
-            throws URISyntaxException, AuthorityServiceConnectionException {
-
-        searchString = searchString.replace(conceptpowerSearchKeyword, "");
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
-        factory.setHttpClient(httpClient);
-        restTemplate.setRequestFactory(factory);
-
-        RequestEntity<Void> request;
-        try {
-
-            String url = conceptpowerURL + conceptpowerSearchKeyword
-                    + URLEncoder.encode(searchString, StandardCharsets.UTF_8.toString());
-            URI uri = UriComponentsBuilder.fromUriString(url.toString()).build(true).toUri();
-
-            request = RequestEntity.get(uri).accept(MediaType.APPLICATION_JSON).build();
-        } catch (UnsupportedEncodingException e) {
-            throw new URISyntaxException(e.getMessage(), e.toString());
-
-        }
-        ResponseEntity<ConceptpowerResponse> response = null;
-        try {
-            response = restTemplate.exchange(request, ConceptpowerResponse.class);
-        } catch (RestClientException ex) {
-            throw new AuthorityServiceConnectionException(ex);
-        }
-
-        if (response.getStatusCode() == HttpStatus.OK) {
-            ConceptpowerResponse conceptEntries = response.getBody();
-            if (conceptEntries.getConceptEntries() != null) {
-                return conceptEntries.getPagination().getTotalNumberOfRecords();
-            }
-        }
-
-        return 0;
+        return searchResult;
     }
 
 }

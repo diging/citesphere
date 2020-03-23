@@ -794,7 +794,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/importedAuthorities/conceptpower?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/searchAuthorities/conceptpower?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
 		
 	$.ajax({
   		dataType: "json",

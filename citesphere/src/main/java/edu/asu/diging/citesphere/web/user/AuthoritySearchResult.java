@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 
-public class AuthorityResult {
+public class AuthoritySearchResult {
 
     private int totalPages;
     private int currentPage;
