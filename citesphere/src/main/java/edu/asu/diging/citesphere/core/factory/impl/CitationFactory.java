@@ -145,6 +145,7 @@ public class CitationFactory implements ICitationFactory {
     }
 
     private void parseExtra(Data data, ICitation citation) {
+        initializeExtraCollections(citation);
         if (data.getExtra() == null) {
             return;
         }
@@ -163,6 +164,12 @@ public class CitationFactory implements ICitationFactory {
                 processFunction.accept(jObj, citation);
             }
         }
+    }
+    
+    private void initializeExtraCollections(ICitation citation) {
+        citation.setReferences(new HashSet<>());
+        citation.setConceptTags(new HashSet<>());
+        
     }
 
     private void processAuthors(JsonObject jObj, ICitation citation) {
@@ -187,7 +194,6 @@ public class CitationFactory implements ICitationFactory {
     }
 
     private void processConceptTags(JsonObject jObj, ICitation citation) {
-        citation.setConceptTags(new HashSet<>());
         if (jObj.has("conceptTags") && !jObj.get("conceptTags").isJsonNull()) {
             JsonArray conceptTags = jObj.get("conceptTags").getAsJsonArray();
             mapConceptTags(conceptTags, citation.getConceptTags());
@@ -195,7 +201,6 @@ public class CitationFactory implements ICitationFactory {
     }
 
     private void processReferences(JsonObject jObj, ICitation citation) {
-        citation.setReferences(new HashSet<>());
         if (jObj.has("references") && !jObj.get("references").isJsonNull()) {
             JsonArray references = jObj.get("references").getAsJsonArray();
             references.forEach(ref -> {
