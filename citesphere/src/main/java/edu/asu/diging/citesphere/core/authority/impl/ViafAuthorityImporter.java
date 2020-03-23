@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -16,9 +17,14 @@ import javax.annotation.PostConstruct;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -49,6 +55,14 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 
     @Value("${_viaf_search_query}")
     private String viafsearchquery;
+    
+    private String viafURL="http://viaf.org/viaf/search";
+
+    private String searchViafURLPath="?query=local.names%20all";
+
+    private String searchViafURLPath1="+&amp;maximumRecords=30&amp;startRecord=";
+
+    private String searchViafURLPath2="&amp;sortKeys=holdingscount";
 
     private RestTemplate restTemplate;
 
@@ -127,45 +141,80 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
         HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
         factory.setHttpClient(httpClient);
         restTemplate.setRequestFactory(factory);
+       
+        String startIndex = "1";
+        String fullUrl="";
 
-        RequestEntity<Void> request;
         try {
-
-            String url = viafsearchUrl
-                    + URLEncoder.encode(searchString + "maximumRecords=" + pageSize + ";startRecord=" + page,
-                            StandardCharsets.UTF_8.toString())
-                    + viafsearchquery;
-            URI uri = UriComponentsBuilder.fromUriString(url.toString()).build(true).toUri();
-
-            request = RequestEntity.get(uri).accept(MediaType.APPLICATION_JSON).build();
-        } catch (UnsupportedEncodingException e) {
-            throw new URISyntaxException(e.getMessage(), e.toString());
-
-        }
-        ResponseEntity<ViafResponse> response = null;
-        try {
-            response = restTemplate.exchange(request, ViafResponse.class);
-        } catch (RestClientException ex) {
-            throw new AuthorityServiceConnectionException(ex);
-        }
-
-        List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
-        if (response.getStatusCode() == HttpStatus.OK) {
-
-            ViafResponse viaf = response.getBody();
-            Iterator<Data> iterator = viaf.getMainHeadings().getData().iterator();
-            if (iterator.hasNext()) {
-
-                String name = iterator.next().getText();
-                IAuthorityEntry authority = new AuthorityEntry();
-                authority.setName(name);
-                authority.setUri(viaf.getDocument().get("@about") + "");
-                authorityEntries.add(authority);
-
+             fullUrl = viafURL.trim() + searchViafURLPath.trim() + "%20" + URLEncoder.encode(searchString.trim(), "UTF-8")
+             + searchViafURLPath1.trim() + startIndex.trim()+ searchViafURLPath2.trim();
+            } catch (UnsupportedEncodingException e1) {
+                      
             }
-        } else {
-            throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_RSS_XML));
+
+        HttpEntity<ViafReply> entity = new HttpEntity<ViafReply>(headers);
+        ResponseEntity<ViafReply> reply ;
+                  reply = restTemplate.exchange(new URI(fullUrl),HttpMethod.GET, entity, ViafReply.class);
+                  ViafReply rep = reply.getBody();
+
+        
+        List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
+        List<Item> items = null;
+        items = rep.getChannel().getItems();
+
+        if (items != null) {
+            for (Item i : items) {
+                IAuthorityEntry authority = new AuthorityEntry();
+                authority.setDescription(i.getTitle());
+                authority.setUri(i.getLink());
+                authority.setName(i.getTitle());
+                authorityEntries.add(authority);
+            }
         }
+
+//        try {
+////
+////            String url = viafsearchUrl
+////                    + URLEncoder.encode(searchString + ";maximumRecords=" + pageSize + ";startRecord=" + page,
+////                            StandardCharsets.UTF_8.toString())
+////                    + viafsearchquery;
+//
+//            String url = "http://viaf.org/viaf/search?query=local.names all "+searchString+"+&amp;maximumRecords=100&amp;startRecord=1&amp;sortKeys=holdingscount&amp;httpAccept=application/rss+xml";
+////            URI uri = UriComponentsBuilder.fromUriString(url.toString()).build(true).toUri();
+//           // URI uri = UriComponentsBuilder.fromUriString(url).build(true).toUri();
+//
+//            request = RequestEntity.get(new URI(url)).accept(MediaType.APPLICATION_JSON).build();
+//        } catch (Exception e) {
+//            throw new URISyntaxException(e.getMessage(), e.toString());
+//
+//        }
+//        ResponseEntity<ViafResponse> response = null;
+//        try {
+//            response = restTemplate.exchange(request, ViafResponse.class);
+//        } catch (RestClientException ex) {
+//            throw new AuthorityServiceConnectionException(ex);
+//        }
+//
+//        List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
+//        if (response.getStatusCode() == HttpStatus.OK) {
+//
+//            ViafResponse viaf = response.getBody();
+//            Iterator<Data> iterator = viaf.getMainHeadings().getData().iterator();
+//            if (iterator.hasNext()) {
+//
+//                String name = iterator.next().getText();
+//                IAuthorityEntry authority = new AuthorityEntry();
+//                authority.setName(name);
+//                authority.setUri(viaf.getDocument().get("@about") + "");
+//                authorityEntries.add(authority);
+//
+//            }
+//        } else {
+//            throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
+//        }
+//        return authorityEntries;
         return authorityEntries;
     }
 
