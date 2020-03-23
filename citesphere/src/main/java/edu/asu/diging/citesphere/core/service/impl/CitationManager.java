@@ -140,8 +140,6 @@ public class CitationManager implements ICitationManager {
         }
         citation = customCitationRepository.mergeCitation(citation);
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
-        // save updated info
-        citationRepository.delete((Citation)citation);
         
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         updatedCitation.setGroup(groupOptional.get());
@@ -295,6 +293,13 @@ public class CitationManager implements ICitationManager {
 
     private PageRequest createPageRequest(IUser user, int page, String sortBy, ICitationGroup group,
             CitationResults results) {
+        List<Citation> citations = new ArrayList<>();
+        results.getCitations().forEach(c -> {
+            c.setGroup(group);
+            citations.add((Citation)c);
+        });
+        citationRepository.saveAll(citations);
+        
         PageRequest request = new PageRequest();
         request.setCitations(results.getCitations());
         request.setObjectId(group.getId() + "");
@@ -305,10 +310,7 @@ public class CitationManager implements ICitationManager {
         request.setVersion(group.getVersion());
         request.setZoteroObjectType(ZoteroObjectType.GROUP);
         request.setSortBy(sortBy);
-        results.getCitations().forEach(c -> {
-            c.setGroup(group);
-            citationRepository.save((Citation)c);
-        });
+        
         request.setLastUpdated(OffsetDateTime.now());
         return request;
     }
