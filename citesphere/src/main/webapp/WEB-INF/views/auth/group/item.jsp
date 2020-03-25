@@ -279,8 +279,8 @@
 			<div class="modal-footer">
 
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-				<button id="delete" type="button" class="btn btn-primary"
-					data-dismiss="modal">Yes</button>
+				<button id="delete" type="button" class="btn btn-primary enableOnInput"
+					 >Yes</button>
 				<%-- <a class="btn btn-primary"
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/delete"/>" > Yes</a>  --%>
 			</div>
@@ -413,13 +413,33 @@
 						function(e) {
 							e.preventDefault();
 						
-							
+							$('.enableOnInput').prop('disabled', true);
 							$.ajax({
-										url : '<c:url value="/auth/group/${zoteroGroupId}/items/delete/${citation.key}"/>' + "?${_csrf.parameterName}=${_csrf.token}",
-										method : 'DELETE'
+										url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}"/>' + "?${_csrf.parameterName}=${_csrf.token}",
+										method : 'DELETE',
+										'success': function(data) {
+											window.location.href = '<c:url value="/auth/group/${zoteroGroupId}/items"/>'
+											
+										},
+										'error': function(data) {
+											$('#deleteModal').modal("hide");
+											$.notify('<i class="fas fa-exclamation-circle"></i> Citation could not be deleted!', {
+												type: 'danger',
+												offset: {
+													x: 50,
+													y: 90
+												},
+												animate: {
+													enter: 'animated fadeInRight',
+													exit: 'animated fadeOutRight'
+												}
+											});
+										}
 										
 
 									})
 						});
+		
+	
 	})
 </script>

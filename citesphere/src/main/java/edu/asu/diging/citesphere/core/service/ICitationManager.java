@@ -44,7 +44,7 @@ public interface ICitationManager {
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException,
             ZoteroHttpStatusException;
 
-    boolean deleteCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
+    boolean deleteCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             ZoteroItemDeletionFailedException;
 

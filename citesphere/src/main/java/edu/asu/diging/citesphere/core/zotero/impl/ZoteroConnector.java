@@ -253,11 +253,10 @@ public class ZoteroConnector implements IZoteroConnector {
     }
 
     @Override
-    public void deleteItem(IUser user, Item item, String groupId, List<String> ignoreFields,
-            List<String> validCreatorTypes)
+   public void deleteItem(IUser user,String groupId,String citationKey, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException {
         Zotero zotero = getApi(user);
-        zotero.getGroupsOperations().deleteItem(groupId, item, ignoreFields, validCreatorTypes);
+        zotero.getGroupsOperations().deleteItem(groupId, citationKey, citationVersion);
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {

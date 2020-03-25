@@ -6,6 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -38,37 +40,22 @@ public class DeleteItemController {
     @Autowired
     private ICitationHelper citationHelper;
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/delete/{itemId}", method = RequestMethod.DELETE)
-    public String deleteItem(@PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            Authentication authentication, Model model )
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteItem(@PathVariable("zoteroGroupId") String zoteroGroupId,
+            @PathVariable("itemId") String itemId, Authentication authentication, Model model)
             throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
             ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
-       
-       
-        List<String> collectionIds = new ArrayList<>();
-       //collectionIds.add(collectionId);
-      
+
         try {
-            citationManager.deleteCitation((IUser) authentication.getPrincipal(), zoteroGroupId, collectionIds,
-                    citation);
+            citationManager.deleteCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
         } catch (ZoteroItemDeletionFailedException e) {
-            
-              model.addAttribute("citation", citation);
-              List<String> fields = new ArrayList<>();
-              citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
-              model.addAttribute("fields", fields);
-              model.addAttribute("zoteroGroupId", zoteroGroupId);
-              model.addAttribute("show_alert", true); model.addAttribute("alert_type",
-              "danger"); String msg = e.getResponse().getFailed().get("0") != null ?
-              e.getResponse().getFailed().get("0").getMessage() :
-              "Sorry, item deletion failed."; model.addAttribute("alert_msg", msg); 
-              return "/auth/group/"+ zoteroGroupId + "/items/" + itemId;
-             
-         
+
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
         }
 
-        return "redirect:/auth/group/{zoteroGroupId}/items";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

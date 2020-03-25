@@ -50,7 +50,7 @@ public interface IZoteroManager {
 
     List<String> getValidCreatorTypes(IUser user, ItemType itemType);
 
-    void deleteCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
+    void deleteCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemDeletionFailedException, ZoteroHttpStatusException;
     
     public void clearGroupItemsCache(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion);

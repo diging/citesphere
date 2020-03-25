@@ -275,19 +275,10 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public void deleteCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
+    public void deleteCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemDeletionFailedException, ZoteroHttpStatusException {
-        Item item = itemFactory.createItem(citation, collectionIds);
-
-        List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
-        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
-        itemTypeFields.add(ZoteroFields.CREATOR);
-        itemTypeFields.add(ZoteroFields.COLLECTIONS);
-
-        List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, true);
-        List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
-
-        zoteroConnector.deleteItem(user, item, groupId, ignoreFields, validCreatorTypes);
+    
+        zoteroConnector.deleteItem( user, groupId, citation.getKey(), citation.getVersion());
 
     }
 
