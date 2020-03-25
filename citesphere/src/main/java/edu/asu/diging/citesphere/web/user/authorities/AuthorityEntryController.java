@@ -135,6 +135,10 @@ public class AuthorityEntryController {
 
         AuthoritySearchResult authorityResult;
 
+        if (null == firstName && null == lastName) {
+            throw new IllegalArgumentException("{\"error\":\"At least one parameter is invalid or not supplied\"}");
+        }
+
         try {
             authorityResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
