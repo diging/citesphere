@@ -22,7 +22,7 @@ import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionExcep
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
-import edu.asu.diging.citesphere.web.user.AuthorityResult;
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
 
@@ -82,71 +82,67 @@ public class AuthorityEntryController {
     }
 
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/userAuthorities")
-    public ResponseEntity<AuthorityResult> getUserAuthorities(Model model, Authentication authentication,
+    public ResponseEntity<AuthoritySearchResult> getUserAuthorities(Model model, Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        AuthorityResult authorityResult = new AuthorityResult();
+        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
 
         List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
                 firstName, lastName, page, pageSize);
 
         authorityResult.setFoundAuthorities(userEntries);
         authorityResult.setCurrentPage(page + 1);
-        authorityResult.setTotalPages(authorityService.getTotalUserAuthorities((IUser) authentication.getPrincipal(),
-                firstName, lastName, pageSize));
-        return new ResponseEntity<AuthorityResult>(authorityResult, HttpStatus.OK);
+        authorityResult.setTotalPages(authorityService
+                .getTotalUserAuthoritiesPages((IUser) authentication.getPrincipal(), firstName, lastName, pageSize));
+        return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
 
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/datasetAuthorities")
-    public ResponseEntity<AuthorityResult> getDatasetAuthorities(Authentication authentication,
+    public ResponseEntity<AuthoritySearchResult> getDatasetAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        AuthorityResult authorityResult = new AuthorityResult();
-
-        Set<IAuthorityEntry> datasetEntries = null;
+        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
 
         try {
+            Set<IAuthorityEntry> datasetEntries = null;
             datasetEntries = authorityService.findByNameInDataset((IUser) authentication.getPrincipal(), firstName,
                     lastName, zoteroGroupId, page, pageSize);
             authorityResult.setFoundAuthorities(datasetEntries.stream().collect(Collectors.toList()));
             authorityResult.setCurrentPage(page + 1);
             authorityResult.setTotalPages(
-                    authorityService.getTotalDatasetAuthorities(zoteroGroupId, firstName, lastName, pageSize));
+                    authorityService.getTotalDatasetAuthoritiesPages(zoteroGroupId, firstName, lastName, pageSize));
 
         } catch (GroupDoesNotExistException e) {
             logger.warn("Group does not exist: " + zoteroGroupId, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<AuthorityResult>(authorityResult, HttpStatus.OK);
+        return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
 
-    @RequestMapping("/auth/authority/{zoteroGroupId}/find/importedAuthorities/{source}")
-    public ResponseEntity<AuthorityResult> getConceptpowerAuthorities(Authentication authentication,
+    @RequestMapping("/auth/authority/{zoteroGroupId}/find/searchAuthorities/{source}")
+    public ResponseEntity<AuthoritySearchResult> getConceptpowerAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("source") String source,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        AuthorityResult authorityResult = new AuthorityResult();
+        AuthoritySearchResult authorityResult;
 
-        List<IAuthorityEntry> importedEntries = null;
+        if (null == firstName && null == lastName) {
+            throw new IllegalArgumentException("{\"error\":\"At least one parameter is invalid or not supplied\"}");
+        }
 
         try {
-            importedEntries = authorityService.importAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
+            authorityResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
-            authorityResult.setFoundAuthorities(importedEntries.stream().collect(Collectors.toList()));
             authorityResult.setCurrentPage(page + 1);
-            if (page == 0) {
-                authorityResult.setTotalPages(
-                        authorityService.getTotalImportedAuthorities(firstName, lastName, source, pageSize));
-            }
 
         } catch (AuthorityServiceConnectionException e) {
             logger.warn("Could not retrieve authority entries.", e);
@@ -157,7 +153,7 @@ public class AuthorityEntryController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<AuthorityResult>(authorityResult, HttpStatus.OK);
+        return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
 
 }

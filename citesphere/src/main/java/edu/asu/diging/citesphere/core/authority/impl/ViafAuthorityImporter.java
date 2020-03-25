@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,8 +37,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.authority.impl.ViafResponse.Data;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
+<<<<<<< HEAD
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
+=======
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
+>>>>>>> f5198cfc164346275a5aef9e82e77f124bcdfa1e
 
 @Component
 @PropertySource(value = "classpath:/config.properties")
@@ -134,7 +137,11 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     }
 
     @Override
+<<<<<<< HEAD
     public List<IAuthorityEntry> retrieveAuthoritiesData(String searchString, int page, int pageSize)
+=======
+    public AuthoritySearchResult searchAuthorities(String uri, int page, int pageSize)
+>>>>>>> f5198cfc164346275a5aef9e82e77f124bcdfa1e
             throws URISyntaxException, AuthorityServiceConnectionException {
 
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -217,6 +224,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 //        return authorityEntries;
         return authorityEntries;
     }
+<<<<<<< HEAD
 
     @Override
     public long totalRetrievedAuthorityData(String searchString)
@@ -224,4 +232,6 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 
         return 30;
     }
+=======
+>>>>>>> f5198cfc164346275a5aef9e82e77f124bcdfa1e
 }

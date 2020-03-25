@@ -67,7 +67,35 @@ $(function() {
 		$("#authorModal").modal('hide');
 		resetPersonCreationModal("Author");
 	});
+	
+	/* Disable search authority button when first name and last name fields are empty*/
+    $("#firstNameAuthor").keyup(function(e){
+           if($("#firstNameAuthor").val() == "" && $("#lastNameAuthor").val()==""){
+               $("#searchAuthor").prop("disabled", true);
+           }
+           else{
+               $("#searchAuthor").prop("disabled", false);
+           }
+     });
 		
+    $("#firstNameEditor").keyup(function(e){
+        if($("#firstNameEditor").val() == "" && $("#lastNameEditor").val()==""){
+            $("#searchEditor").prop("disabled", true);
+        }
+        else{
+            $("#searchEditor").prop("disabled", false);
+        }
+  });
+   
+    $("#firstNameCreator").keyup(function(e){
+        if($("#firstNameCreator").val() == "" && $("#lastNameCreator").val()==""){
+            $("#searchCreator").prop("disabled", true);
+        }
+        else{
+            $("#searchCreator").prop("disabled", false);
+        }
+  });
+
 	$("#searchAuthor").click(function() {
 		$("#searchAuthorSpinner").show();
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
@@ -797,7 +825,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/importedAuthorities/conceptpower?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/searchAuthorities/conceptpower?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
 		
 	$.ajax({
   		dataType: "json",
@@ -1417,7 +1445,7 @@ let removePerson = function removePerson(e) {
 				<div>
 					<button class="btn btn-primary" data-toggle="modal"
 						data-target="#selectAuthorityModel" id="searchAuthor"
-						style="margin-left: 80%">
+						style="margin-left: 80%" disabled>
 						Search Author <i id="searchAuthorSpinner"
 							class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 					</button>
@@ -1498,7 +1526,7 @@ let removePerson = function removePerson(e) {
 				<div>
 					<button class="btn btn-primary" data-toggle="modal"
 						data-target="#selectAuthorityModel" id="searchEditor"
-						style="margin-left: 80%">
+						style="margin-left: 80%" disabled>
 						Search Editor <i id="searchEditorSpinner"
 							class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 					</button>
@@ -1580,7 +1608,7 @@ let removePerson = function removePerson(e) {
 				<div>
 					<button class="btn btn-primary" data-toggle="modal"
 						data-target="#selectAuthorityModel" id="searchCreator"
-						style="margin-left: 80%">
+						style="margin-left: 80%" disabled>
 						Search Creator <i id="searchCreatorSpinner"
 							class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 					</button>

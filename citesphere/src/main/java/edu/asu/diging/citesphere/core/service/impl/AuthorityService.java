@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -26,6 +25,7 @@ import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.PersonRepository;
 import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -95,19 +95,19 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public List<IAuthorityEntry> importAuthorityEntries(IUser user, String firstName, String lastName, String source,
+    public AuthoritySearchResult searchAuthorityEntries(IUser user, String firstName, String lastName, String source,
             int page, int pageSize) throws URISyntaxException, AuthorityServiceConnectionException {
-        List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
 
-        List<String> uriList = authorityRepository
-                .findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName)
-                .stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
+        AuthoritySearchResult searchResult = getAuthorityImporter(source)
+                .searchAuthorities(getImporterSearchString(source, firstName, lastName), page, pageSize);
 
-        List<IAuthorityEntry> importedAuthority = getAuthorityImporter(source)
-                .retrieveAuthoritiesData(getImporterSearchString(source, firstName, lastName), page, pageSize);
+        if (searchResult.getFoundAuthorities() != null && searchResult.getFoundAuthorities().size() > 0) {
+            List<String> uriList = authorityRepository
+                    .findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName,
+                            lastName)
+                    .stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
 
-        if (importedAuthority != null) {
-            ListIterator<IAuthorityEntry> iter = importedAuthority.listIterator();
+            ListIterator<IAuthorityEntry> iter = searchResult.getFoundAuthorities().listIterator();
             String uri = "";
             while (iter.hasNext()) {
                 uri = iter.next().getUri();
@@ -118,10 +118,9 @@ public class AuthorityService implements IAuthorityService {
                     iter.remove();
                 }
             }
-            authorityEntries.addAll(importedAuthority);
         }
 
-        return authorityEntries;
+        return searchResult;
     }
 
     @Override
@@ -249,7 +248,7 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public int getTotalUserAuthorities(IUser user, String firstName, String lastName, int pageSize) {
+    public int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize) {
 
         return (int) Math.ceil(new Float(authorityRepository
                 .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName))
@@ -257,27 +256,13 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public int getTotalDatasetAuthorities(String citationGroupId, String firstName, String lastName, int pageSize) {
+    public int getTotalDatasetAuthoritiesPages(String citationGroupId, String firstName, String lastName,
+            int pageSize) {
         Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
 
         return (int) Math.ceil(new Float(personAuthorityRepository
                 .countByPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(), firstName, lastName))
                 / pageSize);
-    }
-
-    @Override
-    public int getTotalImportedAuthorities(String firstName, String lastName, String source, int pageSize) {
-        int totalData = 0;
-
-        try {
-            totalData += getAuthorityImporter(source)
-                    .totalRetrievedAuthorityData(getImporterSearchString(source, firstName, lastName));
-        } catch (URISyntaxException | AuthorityServiceConnectionException e) {
-
-            totalData = 0;
-        }
-
-        return (int) Math.ceil(new Float(totalData) / pageSize);
     }
 
     public String getImporterSearchString(String source, String firstName, String lastName) {
