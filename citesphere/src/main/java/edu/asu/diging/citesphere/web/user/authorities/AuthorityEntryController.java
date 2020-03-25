@@ -135,8 +135,10 @@ public class AuthorityEntryController {
 
         AuthoritySearchResult authorityResult;
 
-        if (null == firstName && null == lastName) {
-            throw new IllegalArgumentException("{\"error\":\"At least one parameter is invalid or not supplied\"}");
+        if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
+            logger.warn(
+                    "Atleast one of the fields must be non-empty. firstName and lastName are empty" + zoteroGroupId);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         try {
