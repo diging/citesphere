@@ -142,7 +142,6 @@ public class AuthorityEntryController {
         try {
             authorityResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
-            authorityResult.setCurrentPage(page + 1);
 
         } catch (AuthorityServiceConnectionException e) {
             logger.warn("Could not retrieve authority entries.", e);

@@ -129,6 +129,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
                 searchResult.setFoundAuthorities(authorityEntries);
                 searchResult.setTotalPages((int) Math
                         .ceil(conceptEntries.getPagination().getTotalNumberOfRecords() / new Float(pageSize)));
+                searchResult.setCurrentPage(page + 1);
             }
         } else {
             throw new AuthorityServiceConnectionException(response.getStatusCode().toString());

@@ -911,7 +911,7 @@ function getViafAuthorities(modalType, personType, page) {
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/importedAuthorities/viaf?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/searchAuthorities/viaf?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
 		
 	$.ajax({
   		dataType: "json",
@@ -1687,18 +1687,20 @@ let removePerson = function removePerson(e) {
 
 						<li role="presentation"><a
 							href="#datasetAuthoritiesTabContent" aria-controls="browseTab"
-							role="tab" data-toggle="tab">Authorities imported by other
-								users</a></li>
+							role="tab" data-toggle="tab">Authorities imported <br>by
+								other users
+						</a></li>
 
 						<li role="presentation"><a
 							href="#conceptpowerAuthoritiesTabContent"
 							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
-								imported <br> from  Conceptpower</a></li>
-								
-						<li role="presentation"><a
-							href="#viafAuthoritiesTabContent"
+								<br> from Conceptpower
+						</a></li>
+
+						<li role="presentation"><a href="#viafAuthoritiesTabContent"
 							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
-								imported <br> from Viaf</a></li>
+								<br> from Viaf
+						</a></li>
 					</ul>
 					<!-- Tab panes -->
 
@@ -1759,7 +1761,8 @@ let removePerson = function removePerson(e) {
 
 							<div id="conceptpowerAuthoritiesError" class="text-warning"
 								style="display: none">
-								<span> Error occurred while importing authorities </span>
+								<span> Error occurred while searching authorities in
+									conceptpower </span>
 
 							</div>
 
@@ -1773,16 +1776,15 @@ let removePerson = function removePerson(e) {
 								</tbody>
 							</table>
 						</div>
-						
+
 						<div role="tabpanel" class="tab-pane"
 							id="viafAuthoritiesTabContent">
 
-							<ul id="viafAuthority-pagination-top"
-								class="pagination-sm"></ul>
+							<ul id="viafAuthority-pagination-top" class="pagination-sm"></ul>
 
 							<div id="viafAuthoritiesError" class="text-warning"
 								style="display: none">
-								<span> Error occurred while importing authorities from Viaf</span>
+								<span> Error occurred while searching authorities in Viaf</span>
 
 							</div>
 

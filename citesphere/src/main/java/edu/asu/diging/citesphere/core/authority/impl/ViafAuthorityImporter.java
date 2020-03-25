@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,8 +17,6 @@ import javax.annotation.PostConstruct;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
@@ -37,12 +36,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.authority.impl.ViafResponse.Data;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
-<<<<<<< HEAD
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
-=======
 import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
->>>>>>> f5198cfc164346275a5aef9e82e77f124bcdfa1e
 
 @Component
 @PropertySource(value = "classpath:/config.properties")
@@ -58,14 +54,21 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 
     @Value("${_viaf_search_query}")
     private String viafsearchquery;
-    
-    private String viafURL="http://viaf.org/viaf/search";
 
-    private String searchViafURLPath="?query=local.names%20all";
+    @Value("${_viaf_page_size}")
+    private String viafPageSizequery;
 
-    private String searchViafURLPath1="+&amp;maximumRecords=30&amp;startRecord=";
+    @Value("${_viaf_record_start_index}")
+    private String viafStartIndexQuery;
 
-    private String searchViafURLPath2="&amp;sortKeys=holdingscount";
+    @Value("${search_viaf_url_path2}")
+    private String searchViafURLPath2;
+
+    @Value("${_viaf_max_results}")
+    private String viafMaxResults;
+
+    @Value("${_viaf_max_page}")
+    private int viafTotalPages;
 
     private RestTemplate restTemplate;
 
@@ -137,36 +140,35 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     }
 
     @Override
-<<<<<<< HEAD
-    public List<IAuthorityEntry> retrieveAuthoritiesData(String searchString, int page, int pageSize)
-=======
-    public AuthoritySearchResult searchAuthorities(String uri, int page, int pageSize)
->>>>>>> f5198cfc164346275a5aef9e82e77f124bcdfa1e
+    public AuthoritySearchResult searchAuthorities(String searchString, int page, int pageSize)
+
             throws URISyntaxException, AuthorityServiceConnectionException {
 
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
         factory.setHttpClient(httpClient);
         restTemplate.setRequestFactory(factory);
-       
-        String startIndex = "1";
-        String fullUrl="";
+
+        String startIndex = page == 0 ? "1" : Integer.toString(page * pageSize);
+        String fullUrl = "";
 
         try {
-             fullUrl = viafURL.trim() + searchViafURLPath.trim() + "%20" + URLEncoder.encode(searchString.trim(), "UTF-8")
-             + searchViafURLPath1.trim() + startIndex.trim()+ searchViafURLPath2.trim();
-            } catch (UnsupportedEncodingException e1) {
-                      
-            }
+            fullUrl = viafsearchUrl.trim() + viafsearchquery.trim() + URLEncoder.encode(searchString.trim(), "UTF-8")
+                    + viafPageSizequery.trim() + viafMaxResults.trim() + viafStartIndexQuery.trim() + startIndex.trim()
+                    + searchViafURLPath2.trim();
+            System.out.println(fullUrl);
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError(StandardCharsets.UTF_8.toString() + " is not supported");
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_RSS_XML));
 
         HttpEntity<ViafReply> entity = new HttpEntity<ViafReply>(headers);
-        ResponseEntity<ViafReply> reply ;
-                  reply = restTemplate.exchange(new URI(fullUrl),HttpMethod.GET, entity, ViafReply.class);
-                  ViafReply rep = reply.getBody();
+        ResponseEntity<ViafReply> reply;
+        reply = restTemplate.exchange(new URI(fullUrl), HttpMethod.GET, entity, ViafReply.class);
+        ViafReply rep = reply.getBody();
 
-        
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
         List<Item> items = null;
         items = rep.getChannel().getItems();
@@ -181,6 +183,10 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
             }
         }
 
+        AuthoritySearchResult searchResult = new AuthoritySearchResult();
+        searchResult.setFoundAuthorities(authorityEntries);
+        searchResult.setTotalPages(viafTotalPages);
+        searchResult.setCurrentPage(page + 1);
 //        try {
 ////
 ////            String url = viafsearchUrl
@@ -222,16 +228,6 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 //            throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
 //        }
 //        return authorityEntries;
-        return authorityEntries;
+        return searchResult;
     }
-<<<<<<< HEAD
-
-    @Override
-    public long totalRetrievedAuthorityData(String searchString)
-            throws URISyntaxException, AuthorityServiceConnectionException {
-
-        return 30;
-    }
-=======
->>>>>>> f5198cfc164346275a5aef9e82e77f124bcdfa1e
 }

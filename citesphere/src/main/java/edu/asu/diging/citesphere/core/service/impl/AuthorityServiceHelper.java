@@ -27,6 +27,6 @@ public class AuthorityServiceHelper {
     }
 
     public String getViafSearchString(String firstName, String lastName) {
-        return firstName + lastName;
+        return " " + firstName + " " + lastName;
     }
 }
