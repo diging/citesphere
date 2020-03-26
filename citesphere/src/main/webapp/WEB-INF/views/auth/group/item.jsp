@@ -37,9 +37,9 @@
 <div style="margin-bottom: 20px;">
 	<button id ="prev" class="btn btn-primary" type="submit" href="" ${ empty previous ? 'disabled="disabled"' : ''}><< Previous</button>&nbsp;&nbsp;
 	<a
-		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" />"><i
+		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />"><i
 		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; <a
-		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync" />"><i
+		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />"><i
 		class="fas fa-sync" title="Sync Citation"></i></a>
 </div>
 

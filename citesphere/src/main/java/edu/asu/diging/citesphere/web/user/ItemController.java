@@ -27,7 +27,7 @@ public class ItemController {
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @RequestParam(required = true, value = "index") int index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
+            @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
@@ -37,14 +37,17 @@ public class ItemController {
             List<String> fields = new ArrayList<>();
             citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
             model.addAttribute("fields", fields);
-            Map<String,String> results = citationManager.getPrevAndNextCitation((IUser)authentication.getPrincipal(), zoteroGroupId, collectionId, page, sortBy, index);
-            if(results.containsKey("next")) {
-                model.addAttribute("next", results.get("next"));
-                model.addAttribute("nextIndex", results.get("nextIndex"));
-            }
-            if(results.containsKey("previous")) {
-                model.addAttribute("previous", results.get("previous"));
-                model.addAttribute("prevIndex", results.get("prevIndex"));
+            if(index != null) {
+                model.addAttribute("index", index);
+                Map<String,String> results = citationManager.getPrevAndNextCitation((IUser)authentication.getPrincipal(), zoteroGroupId, collectionId, page, sortBy, Integer.valueOf(index));
+                if(results.containsKey("next")) {
+                    model.addAttribute("next", results.get("next"));
+                    model.addAttribute("nextIndex", results.get("nextIndex"));
+                }
+                if(results.containsKey("previous")) {
+                    model.addAttribute("previous", results.get("previous"));
+                    model.addAttribute("prevIndex", results.get("prevIndex"));
+                }
             }
             model.addAttribute("page", page);
             model.addAttribute("collectionId", collectionId);
