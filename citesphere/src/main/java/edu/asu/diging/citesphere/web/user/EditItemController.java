@@ -63,7 +63,7 @@ public class EditItemController {
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/edit")
     public String showPage(Authentication authentication, Model model, CitationForm form,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
-            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy, RedirectAttributes redirectAttrs)
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
         ICitation citation;
         try {
