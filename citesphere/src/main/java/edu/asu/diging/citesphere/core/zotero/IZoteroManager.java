@@ -52,7 +52,7 @@ public interface IZoteroManager {
 
     void deleteCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemDeletionFailedException, ZoteroHttpStatusException;
-    
+
     public void clearGroupItemsCache(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion);
 
 }

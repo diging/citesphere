@@ -57,7 +57,7 @@ public interface IZoteroConnector {
     void clearCollectionItemsCache(IUser user, String groupId, String collectionId, int page, String sortBy,
             Long lastGroupVersion);
 
-    void deleteItem(IUser user,String groupId,String citationKey, Long citationVersion)
+    void deleteItem(IUser user, String groupId, String citationKey, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException;
 
 }

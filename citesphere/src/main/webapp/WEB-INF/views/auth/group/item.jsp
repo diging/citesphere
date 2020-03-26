@@ -7,6 +7,11 @@
 <%@ taglib prefix="cite"
 	uri="https://diging.asu.edu/jps/tlds/citesphere"%>
 
+<script
+	src="<c:url value="/resources/notify/bootstrap-notify.min.js" />"></script>
+<link href="<c:url value="/resources/notify/animate.css" />"
+	rel="stylesheet">
+
 <ol class="breadcrumb">
 	<li><a href="<c:url value="/" />">Home</a></li>
 	<li><a href="<c:url value="/auth/group/${zoteroGroupId}/items" />">Group</a></li>
@@ -279,11 +284,27 @@
 			<div class="modal-footer">
 
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-				<button id="delete" type="button" class="btn btn-primary enableOnInput"
-					 >Yes</button>
+				<button id="delete" type="button" class="btn btn-primary">Yes</button>
 				<%-- <a class="btn btn-primary"
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/delete"/>" > Yes</a>  --%>
 			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="loadModal" tabindex="-1" role="dialog"
+	aria-labelledby="loadModalLabal" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+
+			<div class="modal-body">
+
+				<div>
+					<span><i class="fas fa-spinner text-center"></i> Deleting...</span>
+				</div>
+
+			</div>
+
 		</div>
 	</div>
 </div>
@@ -408,38 +429,56 @@
 					$("#parsed-ref-modal").modal();
 				});
 
-		$('#delete')
-				.click(
-						function(e) {
-							e.preventDefault();
-						
-							$('.enableOnInput').prop('disabled', true);
-							$.ajax({
-										url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}"/>' + "?${_csrf.parameterName}=${_csrf.token}",
-										method : 'DELETE',
-										'success': function(data) {
-											window.location.href = '<c:url value="/auth/group/${zoteroGroupId}/items"/>'
-											
-										},
-										'error': function(data) {
-											$('#deleteModal').modal("hide");
-											$.notify('<i class="fas fa-exclamation-circle"></i> Citation could not be deleted!', {
-												type: 'danger',
-												offset: {
-													x: 50,
-													y: 90
-												},
-												animate: {
-													enter: 'animated fadeInRight',
-													exit: 'animated fadeOutRight'
-												}
-											});
-										}
-										
-
-									})
-						});
 		
-	
+	$('#delete').click(function(e) {
+		e.preventDefault();
+		 
+
+		$('#deleteModal').modal("hide");
+		$('#loadModal').modal("show");
+
+		$.ajax({
+			url : '<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}"/>'+ "?${_csrf.parameterName}=${_csrf.token}",
+			method : 'DELETE',
+			'success' : function(data) {
+				
+
+				$('#loadModal').modal("hide");
+				$.notify('<i class="fas fa-check-circle"></i> Citation successfully deleted!',
+					{
+						type : 'success',
+						offset : {
+							x : 50,
+							y : 90
+						},
+						animate : {
+							enter : 'animated fadeInRight',
+							exit : 'animated fadeOutRight'
+						}
+					});
+					setTimeout(function() {
+						
+						window.location.href = '<c:url value="/auth/group/${zoteroGroupId}/items"/>'
+					}, 2);
+
+					},
+			'error' : function(data) {
+				$('#loadModal').modal("hide");
+				$.notify('<i class="fas fa-exclamation-circle"></i> Citation could not be deleted!',
+					{ type : 'danger',
+					  offset : {
+					  x : 50,
+					  y : 90
+					},
+				    animate : {
+						enter : 'animated fadeInRight',
+						exit : 'animated fadeOutRight'
+					}
+					});
+				}
+
+			})
+		});
+
 	})
 </script>

@@ -340,15 +340,14 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public boolean deleteCitation(IUser user, String groupId,  ICitation citation)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
-            ZoteroItemDeletionFailedException {
+    public boolean deleteCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
+            GroupDoesNotExistException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException();
         }
 
-        zoteroManager.deleteCitation(user, groupId,citation);
+        zoteroManager.deleteCitation(user, groupId, citation);
         citationRepository.delete((Citation) citation);
         CitationGroup group = groupOptional.get();
         group.setLastLocallyModifiedOn(OffsetDateTime.now());

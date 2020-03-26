@@ -277,8 +277,8 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public void deleteCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemDeletionFailedException, ZoteroHttpStatusException {
-    
-        zoteroConnector.deleteItem( user, groupId, citation.getKey(), citation.getVersion());
+
+        zoteroConnector.deleteItem(user, groupId, citation.getKey(), citation.getVersion());
 
     }
 
