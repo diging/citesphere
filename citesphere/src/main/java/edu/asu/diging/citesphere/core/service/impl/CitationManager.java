@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -272,7 +273,7 @@ public class CitationManager implements ICitationManager {
                 pageRequestRepository.save(request);
             } else if (localPageRequest != null) {
                 localPageRequest.setLastUpdated(OffsetDateTime.now());
-                results.setCitations(localPageRequest.getCitations());
+                results.setCitations(new ArrayList<ICitation>(localPageRequest.getCitations()));
             }
             
             return results;
@@ -301,7 +302,7 @@ public class CitationManager implements ICitationManager {
         citationRepository.saveAll(citations);
         
         PageRequest request = new PageRequest();
-        request.setCitations(results.getCitations());
+        request.setCitations(new HashSet<>(results.getCitations()));
         request.setObjectId(group.getId() + "");
         request.setPageNumber(page);
         request.setPageSize(zoteroPageSize);

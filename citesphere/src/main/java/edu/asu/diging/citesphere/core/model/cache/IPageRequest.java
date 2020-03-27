@@ -1,7 +1,7 @@
 package edu.asu.diging.citesphere.core.model.cache;
 
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Set;
 
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ZoteroObjectType;
@@ -37,9 +37,9 @@ public interface IPageRequest {
 
     void setVersion(long version);
 
-    void setCitations(List<ICitation> citations);
+    void setCitations(Set<ICitation> citations);
 
-    List<ICitation> getCitations();
+    Set<ICitation> getCitations();
 
     void setSortBy(String sortBy);
 
