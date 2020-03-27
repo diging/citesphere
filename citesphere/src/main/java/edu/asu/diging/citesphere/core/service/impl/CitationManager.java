@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
+import edu.asu.diging.citesphere.core.model.CitationEnum;
 import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
 import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
@@ -82,6 +84,9 @@ public class CitationManager implements ICitationManager {
     private IGroupManager groupManager;
     
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
+    
+    @Autowired
+    private Environment env;
     
     @PostConstruct
     public void init() {
@@ -327,31 +332,35 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public Map<String,String> getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy, int index) {
-        Map<String,String> results = new HashMap<String,String>();
-        try {
-            List<PageRequest> requests = pageRequestRepository.findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortByAndCollectionId(user, groupId, page, ZoteroObjectType.GROUP, sortBy, collectionId == "" ? null:collectionId);
-            if(requests != null && requests.size()>0) {
-                List<ICitation> citations = new ArrayList<>();
-                citations.addAll(requests.get(0).getCitations().stream().distinct().collect(Collectors.toList()));
-                citations.sort(new Comparator<ICitation>() {
-                    @Override
-                    public int compare(ICitation o1, ICitation o2) {
-                        return sortFunctions.get(sortBy).apply(o1, o2);
-                    }
-                });
-                if(index < citations.size() - 1) {
-                    results.put("next", citations.get(index+1).getKey());
-                    results.put("nextIndex", String.valueOf(index+1));
-                }
-                if(index > 0) {
-                    results.put("previous", citations.get(index-1).getKey());
-                    results.put("prevIndex", String.valueOf(index-1));
-                }
+    public Map<CitationEnum,String> getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy, int index) throws GroupDoesNotExistException, ZoteroHttpStatusException {
+        Map<CitationEnum,String> results = new HashMap<CitationEnum,String>();
+        CitationResults citationResults = getGroupItems(user, groupId, collectionId, page, sortBy);
+        List<ICitation> citations = citationResults.getCitations();
+        if(citations != null && citations.size()>0) {
+            int maxPage = (int) Math.ceil((citationResults.getTotalResults() / Float.valueOf(env.getRequiredProperty("_zotero_page_size"))));
+            if(index == citations.size() - 1 && page < maxPage) {
+                CitationResults nextPageCitationResults = getGroupItems(user, groupId, collectionId, page+1, sortBy);
+                results.put(CitationEnum.NEXT, nextPageCitationResults.getCitations().get(0).getKey());
+                results.put(CitationEnum.NEXTINDEX, String.valueOf(0));
+                results.put(CitationEnum.NEXTPAGE, String.valueOf(page+1));
+            }else if(index < citations.size() - 1) {
+                results.put(CitationEnum.NEXT, citations.get(index+1).getKey());
+                results.put(CitationEnum.NEXTINDEX, String.valueOf(index+1));
+                results.put(CitationEnum.NEXTPAGE, String.valueOf(page));
             }
-        } catch (JpaObjectRetrievalFailureException ex) {
-            logger.warn("Could not retrieve page request.", ex);
+            if(index > 0) {
+                results.put(CitationEnum.PREVIOUS, citations.get(index-1).getKey());
+                results.put(CitationEnum.PREVINDEX, String.valueOf(index-1));
+                results.put(CitationEnum.PREVPAGE, String.valueOf(page));
+            } else if(index == 0 && page>1) {
+                CitationResults prevPageCitationResults = getGroupItems(user, groupId, collectionId, page-1, sortBy);
+                int pageSize = prevPageCitationResults.getCitations().size();
+                results.put(CitationEnum.PREVIOUS, prevPageCitationResults.getCitations().get(pageSize-1).getKey());
+                results.put(CitationEnum.PREVINDEX, String.valueOf(pageSize-1));
+                results.put(CitationEnum.PREVPAGE, String.valueOf(page-1));
+            }
         }
+        
         return results; 
     }
 }

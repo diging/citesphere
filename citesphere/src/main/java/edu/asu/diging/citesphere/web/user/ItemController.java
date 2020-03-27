@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.model.CitationEnum;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
@@ -39,14 +39,16 @@ public class ItemController {
             model.addAttribute("fields", fields);
             if(index != null) {
                 model.addAttribute("index", index);
-                Map<String,String> results = citationManager.getPrevAndNextCitation((IUser)authentication.getPrincipal(), zoteroGroupId, collectionId, page, sortBy, Integer.valueOf(index));
-                if(results.containsKey("next")) {
-                    model.addAttribute("next", results.get("next"));
-                    model.addAttribute("nextIndex", results.get("nextIndex"));
+                Map<CitationEnum,String> results = citationManager.getPrevAndNextCitation((IUser)authentication.getPrincipal(), zoteroGroupId, collectionId, page, sortBy, Integer.valueOf(index));
+                if(results.containsKey(CitationEnum.NEXT)) {
+                    model.addAttribute("next", results.get(CitationEnum.NEXT));
+                    model.addAttribute("nextIndex", results.get(CitationEnum.NEXTINDEX));
+                    model.addAttribute("nextPage", results.get(CitationEnum.NEXTPAGE));
                 }
-                if(results.containsKey("previous")) {
-                    model.addAttribute("previous", results.get("previous"));
-                    model.addAttribute("prevIndex", results.get("prevIndex"));
+                if(results.containsKey(CitationEnum.PREVIOUS)) {
+                    model.addAttribute("previous", results.get(CitationEnum.PREVIOUS));
+                    model.addAttribute("prevIndex", results.get(CitationEnum.PREVINDEX));
+                    model.addAttribute("prevPage", results.get(CitationEnum.PREVPAGE));
                 }
             }
             model.addAttribute("page", page);
