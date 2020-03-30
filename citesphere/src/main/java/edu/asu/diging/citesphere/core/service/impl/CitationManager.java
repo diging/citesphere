@@ -336,27 +336,31 @@ public class CitationManager implements ICitationManager {
         Map<CitationEnum,String> results = new HashMap<CitationEnum,String>();
         CitationResults citationResults = getGroupItems(user, groupId, collectionId, page, sortBy);
         List<ICitation> citations = citationResults.getCitations();
-        int maxPage = (int) Math.ceil((citationResults.getTotalResults() / Float.valueOf(zoteroPageSize)));
-        if(index == citations.size() - 1 && page < maxPage) {
-            CitationResults nextPageCitationResults = getGroupItems(user, groupId, collectionId, page+1, sortBy);
-            results.put(CitationEnum.NEXT, nextPageCitationResults.getCitations().get(0).getKey());
-            results.put(CitationEnum.NEXT_INDEX, String.valueOf(0));
-            results.put(CitationEnum.NEXT_PAGE, String.valueOf(page+1));
-        }else if(index < citations.size() - 1) {
-            results.put(CitationEnum.NEXT, citations.get(index+1).getKey());
-            results.put(CitationEnum.NEXT_INDEX, String.valueOf(index+1));
-            results.put(CitationEnum.NEXT_PAGE, String.valueOf(page));
-        }
-        if(index > 0) {
-            results.put(CitationEnum.PREVIOUS, citations.get(index-1).getKey());
-            results.put(CitationEnum.PREV_INDEX, String.valueOf(index-1));
-            results.put(CitationEnum.PREV_PAGE, String.valueOf(page));
-        } else if(index == 0 && page>1) {
-            CitationResults prevPageCitationResults = getGroupItems(user, groupId, collectionId, page-1, sortBy);
-            int pageSize = prevPageCitationResults.getCitations().size();
-            results.put(CitationEnum.PREVIOUS, prevPageCitationResults.getCitations().get(pageSize-1).getKey());
-            results.put(CitationEnum.PREV_INDEX, String.valueOf(pageSize-1));
-            results.put(CitationEnum.PREV_PAGE, String.valueOf(page-1));
+        if(citations != null && citations.size()>0) {
+            int maxPage = (int) Math.ceil((citationResults.getTotalResults() / Float.valueOf(zoteroPageSize)));
+            if(index == citations.size() - 1 && page < maxPage) {
+                CitationResults nextPageCitationResults = getGroupItems(user, groupId, collectionId, page+1, sortBy);
+                if(nextPageCitationResults != null && nextPageCitationResults.getCitations().size()>0) {
+                    results.put(CitationEnum.NEXT, nextPageCitationResults.getCitations().get(0).getKey());
+                    results.put(CitationEnum.NEXT_INDEX, String.valueOf(0));
+                    results.put(CitationEnum.NEXT_PAGE, String.valueOf(page+1));
+                }
+            }else if(index < citations.size() - 1) {
+                results.put(CitationEnum.NEXT, citations.get(index+1).getKey());
+                results.put(CitationEnum.NEXT_INDEX, String.valueOf(index+1));
+                results.put(CitationEnum.NEXT_PAGE, String.valueOf(page));
+            }
+            if(index > 0) {
+                results.put(CitationEnum.PREVIOUS, citations.get(index-1).getKey());
+                results.put(CitationEnum.PREV_INDEX, String.valueOf(index-1));
+                results.put(CitationEnum.PREV_PAGE, String.valueOf(page));
+            } else if(index == 0 && page>1) {
+                CitationResults prevPageCitationResults = getGroupItems(user, groupId, collectionId, page-1, sortBy);
+                int pageSize = prevPageCitationResults.getCitations().size();
+                results.put(CitationEnum.PREVIOUS, prevPageCitationResults.getCitations().get(pageSize-1).getKey());
+                results.put(CitationEnum.PREV_INDEX, String.valueOf(pageSize-1));
+                results.put(CitationEnum.PREV_PAGE, String.valueOf(page-1));
+            }
         }
         
         return results; 
