@@ -42,13 +42,13 @@ public class ItemController {
                 Map<CitationEnum,String> results = citationManager.getPrevAndNextCitation((IUser)authentication.getPrincipal(), zoteroGroupId, collectionId, page, sortBy, Integer.valueOf(index));
                 if(results.containsKey(CitationEnum.NEXT)) {
                     model.addAttribute("next", results.get(CitationEnum.NEXT));
-                    model.addAttribute("nextIndex", results.get(CitationEnum.NEXTINDEX));
-                    model.addAttribute("nextPage", results.get(CitationEnum.NEXTPAGE));
+                    model.addAttribute("nextIndex", results.get(CitationEnum.NEXT_INDEX));
+                    model.addAttribute("nextPage", results.get(CitationEnum.NEXT_PAGE));
                 }
                 if(results.containsKey(CitationEnum.PREVIOUS)) {
                     model.addAttribute("previous", results.get(CitationEnum.PREVIOUS));
-                    model.addAttribute("prevIndex", results.get(CitationEnum.PREVINDEX));
-                    model.addAttribute("prevPage", results.get(CitationEnum.PREVPAGE));
+                    model.addAttribute("prevIndex", results.get(CitationEnum.PREV_INDEX));
+                    model.addAttribute("prevPage", results.get(CitationEnum.PREV_PAGE));
                 }
             }
             model.addAttribute("page", page);
