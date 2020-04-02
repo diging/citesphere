@@ -145,11 +145,11 @@ public class CitationManager implements ICitationManager {
         }
         citation = customCitationRepository.mergeCitation(citation);
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
-        
+
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         updatedCitation.setGroup(groupOptional.get());
-        
-        citationRepository.save((Citation)updatedCitation);
+
+        citationRepository.save((Citation) updatedCitation);
     }
 
     @Override
@@ -307,7 +307,7 @@ public class CitationManager implements ICitationManager {
         }
         throw new GroupDoesNotExistException("There is no group with id " + groupId);
     }
-    
+
     @Override
     public void forceGroupItemsRefresh(IUser user, String groupId, String collectionId, int page, String sortBy) {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
@@ -315,7 +315,7 @@ public class CitationManager implements ICitationManager {
             ICitationGroup group = groupOptional.get();
             zoteroManager.forceRefresh(user, groupId, collectionId, page, sortBy, group.getVersion());
             group.setLastLocallyModifiedOn(OffsetDateTime.now());
-            groupRepository.save((CitationGroup)group);
+            groupRepository.save((CitationGroup) group);
         }
     }
 
@@ -324,10 +324,10 @@ public class CitationManager implements ICitationManager {
         List<Citation> citations = new ArrayList<>();
         results.getCitations().forEach(c -> {
             c.setGroup(group);
-            citations.add((Citation)c);
+            citations.add((Citation) c);
         });
         citationRepository.saveAll(citations);
-        
+
         PageRequest request = new PageRequest();
         request.setCitations(results.getCitations());
         request.setObjectId(group.getId() + "");
@@ -338,7 +338,7 @@ public class CitationManager implements ICitationManager {
         request.setVersion(group.getVersion());
         request.setZoteroObjectType(ZoteroObjectType.GROUP);
         request.setSortBy(sortBy);
-        
+
         request.setLastUpdated(OffsetDateTime.now());
         return request;
     }
@@ -362,6 +362,13 @@ public class CitationManager implements ICitationManager {
         }
 
         zoteroManager.deleteCitation(user, groupId, citation);
+
+        List<PageRequest> requests = pageRequestRepository.findPageRequestByKey(citation.getKey());
+        for (PageRequest request : requests) {
+            boolean delete = request.getCitations().remove(citation);
+            pageRequestRepository.save(request);
+        }
+
         citationRepository.delete((Citation) citation);
         CitationGroup group = groupOptional.get();
         group.setLastLocallyModifiedOn(OffsetDateTime.now());
