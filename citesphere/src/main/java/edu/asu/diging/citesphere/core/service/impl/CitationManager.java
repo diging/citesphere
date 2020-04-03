@@ -30,7 +30,6 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.exceptions.ZoteroItemDeletionFailedException;
 import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
 import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
@@ -354,8 +353,8 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public boolean deleteCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
-            GroupDoesNotExistException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException {
+    public boolean deleteCitation(IUser user, String groupId, ICitation citation)
+            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException();
@@ -365,7 +364,7 @@ public class CitationManager implements ICitationManager {
 
         List<PageRequest> requests = pageRequestRepository.findPageRequestByKey(citation.getKey());
         for (PageRequest request : requests) {
-            boolean delete = request.getCitations().remove(citation);
+            request.getCitations().remove(citation);
             pageRequestRepository.save(request);
         }
 

@@ -29,7 +29,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.exceptions.ZoteroItemDeletionFailedException;
+
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.user.IUser;
@@ -254,11 +254,9 @@ public class ZoteroConnector implements IZoteroConnector {
 
     @Override
     public void deleteItem(IUser user, String groupId, String citationKey, Long citationVersion)
-            throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException {
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
-        if (!zotero.getGroupsOperations().deleteItem(groupId, citationKey, citationVersion)) {
-            throw new ZoteroItemDeletionFailedException("Deletion of Citation failed");
-        }
+        zotero.getGroupsOperations().deleteItem(groupId, citationKey, citationVersion);
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {

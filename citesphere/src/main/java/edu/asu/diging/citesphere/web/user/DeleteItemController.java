@@ -22,7 +22,6 @@ import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
-import edu.asu.diging.citesphere.core.exceptions.ZoteroItemDeletionFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 
@@ -46,14 +45,7 @@ public class DeleteItemController {
             throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
             ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
-
-        try {
-            citationManager.deleteCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
-        } catch (ZoteroItemDeletionFailedException e) {
-
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
-        }
+        citationManager.deleteCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

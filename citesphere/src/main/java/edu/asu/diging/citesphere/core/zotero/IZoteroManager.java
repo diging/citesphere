@@ -7,7 +7,6 @@ import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.exceptions.ZoteroItemDeletionFailedException;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -51,7 +50,7 @@ public interface IZoteroManager {
     List<String> getValidCreatorTypes(IUser user, ItemType itemType);
 
     void deleteCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, ZoteroItemDeletionFailedException, ZoteroHttpStatusException;
+            throws ZoteroConnectionException, ZoteroHttpStatusException;
 
     public void clearGroupItemsCache(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion);
 

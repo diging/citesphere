@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.exceptions.ZoteroItemDeletionFailedException;
 import edu.asu.diging.citesphere.core.factory.ICitationCollectionFactory;
 import edu.asu.diging.citesphere.core.factory.ICitationFactory;
 import edu.asu.diging.citesphere.core.factory.IGroupFactory;
@@ -289,7 +288,7 @@ public class ZoteroManager implements IZoteroManager {
 
     @Override
     public void deleteCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, ZoteroItemDeletionFailedException, ZoteroHttpStatusException {
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
 
         zoteroConnector.deleteItem(user, groupId, citation.getKey(), citation.getVersion());
 

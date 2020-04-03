@@ -12,7 +12,6 @@ import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.exceptions.ZoteroItemDeletionFailedException;
 import edu.asu.diging.citesphere.user.IUser;
 
 public interface IZoteroConnector {
@@ -58,6 +57,6 @@ public interface IZoteroConnector {
             Long lastGroupVersion);
 
     void deleteItem(IUser user, String groupId, String citationKey, Long citationVersion)
-            throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemDeletionFailedException;
+            throws ZoteroConnectionException, ZoteroHttpStatusException;
 
 }

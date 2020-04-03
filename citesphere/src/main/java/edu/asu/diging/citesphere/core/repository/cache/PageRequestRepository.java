@@ -24,4 +24,5 @@ public interface PageRequestRepository extends PagingAndSortingRepository<PageRe
 
     @Query(value = "SELECT PageRequest.* FROM PageRequest INNER JOIN PageRequest_Citation ON PageRequest.id = PageRequest_Citation.PageRequest_id where PageRequest_Citation.citations_citationKey = ?1", nativeQuery = true)
     List<PageRequest> findPageRequestByKey(String citationKey);
+    
 }
