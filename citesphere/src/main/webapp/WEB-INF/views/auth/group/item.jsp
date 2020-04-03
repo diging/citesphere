@@ -25,16 +25,11 @@
  	  </c:if>
 
 </h2>
-
-<div class="pull-left" style="float:left;margin-top: 20px;">
-	
-</div>
-<br/>
 <div class="pull-right" style="float:right;margin-top: 20px;">
 	<button id ="next" class="btn btn-primary" style="font-size:10px;" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}>Next >></button>
 </div>		
 <br/>		
-<div style="margin-bottom: 20px;">
+<div class="pull-left" style="margin-bottom: 20px;">
 	<button id ="prev" class="btn btn-primary" style="font-size:10px;" type="submit" href="" ${ empty previous ? 'disabled="disabled"' : ''}><< Previous</button>&nbsp;&nbsp;
 	<a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />"><i
@@ -384,15 +379,31 @@
 			$("#parsed-ref-modal").modal();
 		});
 		
-		$("#prev").click(function() {
-			var url = "/${zoteroGroupId}/items/${previous}?index=${prevIndex}&page=${prevPage}&sortBy=${sortBy}&collectionId=${collectionId}";
-			window.location.href = "<c:url value="/auth/group" />" + url;
-		});
-		
-		$("#next").click(function() {
-			var url = "/${zoteroGroupId}/items/${next}?index=${nextIndex}&page=${nextPage}&sortBy=${sortBy}&collectionId=${collectionId}";
-			window.location.href = "<c:url value="/auth/group" />" + url;
-		});
+	});
+	
+	$(document).ready(function(){
+		var urlVar = "/${zoteroGroupId}/items/${citation.key}/prevAndNext?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}";
+		$.ajax({ 
+			url: '<c:url value="/auth/group" />' + urlVar,
+			type: "GET",
+			success: function(response){
+				if(response.next != null){
+					console.log(response.next);
+					console.log("hi ");
+					$('#next').attr("disabled", false);
+					document.getElementById("next").addEventListener("click", function(e) {
+						var url = "/${zoteroGroupId}/items/" + response.next + "?index=" + response.nextIndex + "&page=" + response.nextPage + "&sortBy=" + response.sortBy + "&collectionId=" + response.collectionId;
+						window.location.href = "<c:url value="/auth/group" />" + url;
+					});
+				}
+				if(response.prev != null){
+					$('#prev').attr("disabled", false);
+					document.getElementById("prev").addEventListener("click", function(e) {
+						var url = "/${zoteroGroupId}/items/" + response.prev + "?index=" + response.prevIndex + "&page=" + response.prevPage + "&sortBy=" + response.sortBy + "&collectionId=" + response.collectionId;
+						window.location.href = "<c:url value="/auth/group" />" + url;
+					});
+				}
+		}});
 	});
 	
 </script>

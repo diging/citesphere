@@ -1,8 +1,11 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,6 +33,7 @@ import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
@@ -56,6 +60,8 @@ public class CitationManagerTest {
     @InjectMocks
     private CitationManager managerToTest;
     
+    CitationManager managerToTestSpy;
+    
     private final String EXISTING_ID = "ID";
     private final Citation existingCitation = new Citation();
     Long currentVersion = new Long(1);
@@ -75,7 +81,7 @@ public class CitationManagerTest {
     public void setUp() throws ZoteroHttpStatusException {
         MockitoAnnotations.initMocks(this);
         managerToTest.init();
-        
+        managerToTestSpy  = Mockito.spy(managerToTest);
         user = new User();
         user.setUsername("USERNAME");
         
@@ -249,5 +255,26 @@ public class CitationManagerTest {
         Mockito.when(zoteroManager.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation)).thenThrow(new ZoteroItemCreationFailedException());
         
         managerToTest.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation);
+    }
+    
+    @Test
+    public void test_getPrevAndNextCitation_prevAndNextPresent() throws GroupDoesNotExistException, ZoteroHttpStatusException {
+        String sortBy = "title";
+        int page = 1;
+        int index = 1;
+        CitationResults citationResults = new CitationResults();
+        List<ICitation> citations = new ArrayList<ICitation>();
+        Citation citation;
+        for(int i=0;i<10;i++) {
+            citation = new  Citation();
+            citation.setKey("key"+i);
+            citations.add(citation);
+        }
+        citationResults.setCitations(citations);
+        citationResults.setTotalResults(10);
+        Mockito.doReturn(citationResults).when(managerToTestSpy).getGroupItems(user, GROUP_ID, "", page, sortBy);
+        CitationPage actualResult= managerToTestSpy.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index);
+        Assert.assertEquals("key2", actualResult.getNext());
+        Assert.assertEquals("key0", actualResult.getPrev());
     }
 }

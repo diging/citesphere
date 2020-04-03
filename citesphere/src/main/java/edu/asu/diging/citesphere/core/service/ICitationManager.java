@@ -1,8 +1,6 @@
 package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
-import java.util.Map;
-
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
@@ -11,7 +9,7 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.CitationEnum;
+import edu.asu.diging.citesphere.core.service.impl.CitationPage;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
@@ -47,7 +45,7 @@ public interface ICitationManager {
 
     List<String> getValidCreatorTypes(IUser user, ItemType itemType);
     
-    Map<CitationEnum, String> getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy,
+    CitationPage getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy,
             int index) throws GroupDoesNotExistException, ZoteroHttpStatusException;
 
     void forceGroupItemsRefresh(IUser user, String groupId, String collectionId, int page, String sortBy);

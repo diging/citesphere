@@ -31,7 +31,6 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.CitationEnum;
 import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
 import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
@@ -332,37 +331,36 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public Map<CitationEnum,String> getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy, int index) throws GroupDoesNotExistException, ZoteroHttpStatusException {
-        Map<CitationEnum,String> results = new HashMap<CitationEnum,String>();
+    public CitationPage getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy, int index) throws GroupDoesNotExistException, ZoteroHttpStatusException {
         CitationResults citationResults = getGroupItems(user, groupId, collectionId, page, sortBy);
         List<ICitation> citations = citationResults.getCitations();
+        CitationPage result = new CitationPage();
         if(citations != null && citations.size()>0) {
             int maxPage = (int) Math.ceil((citationResults.getTotalResults() / Float.valueOf(zoteroPageSize)));
             if(index == citations.size() - 1 && page < maxPage) {
                 CitationResults nextPageCitationResults = getGroupItems(user, groupId, collectionId, page+1, sortBy);
                 if(nextPageCitationResults != null && nextPageCitationResults.getCitations().size()>0) {
-                    results.put(CitationEnum.NEXT, nextPageCitationResults.getCitations().get(0).getKey());
-                    results.put(CitationEnum.NEXT_INDEX, String.valueOf(0));
-                    results.put(CitationEnum.NEXT_PAGE, String.valueOf(page+1));
+                    result.setNext(nextPageCitationResults.getCitations().get(0).getKey());
+                    result.setNextIndex(String.valueOf(0));
+                    result.setNextPage(String.valueOf(page+1));
                 }
             }else if(index < citations.size() - 1) {
-                results.put(CitationEnum.NEXT, citations.get(index+1).getKey());
-                results.put(CitationEnum.NEXT_INDEX, String.valueOf(index+1));
-                results.put(CitationEnum.NEXT_PAGE, String.valueOf(page));
+                result.setNext(citations.get(index+1).getKey());
+                result.setNextIndex(String.valueOf(index+1));
+                result.setNextPage(String.valueOf(page));
             }
             if(index > 0) {
-                results.put(CitationEnum.PREVIOUS, citations.get(index-1).getKey());
-                results.put(CitationEnum.PREV_INDEX, String.valueOf(index-1));
-                results.put(CitationEnum.PREV_PAGE, String.valueOf(page));
+                result.setPrev(citations.get(index-1).getKey());
+                result.setPrevIndex(String.valueOf(index-1));
+                result.setPrevPage(String.valueOf(page));
             } else if(index == 0 && page>1) {
                 CitationResults prevPageCitationResults = getGroupItems(user, groupId, collectionId, page-1, sortBy);
                 int pageSize = prevPageCitationResults.getCitations().size();
-                results.put(CitationEnum.PREVIOUS, prevPageCitationResults.getCitations().get(pageSize-1).getKey());
-                results.put(CitationEnum.PREV_INDEX, String.valueOf(pageSize-1));
-                results.put(CitationEnum.PREV_PAGE, String.valueOf(page-1));
+                result.setPrev(prevPageCitationResults.getCitations().get(pageSize-1).getKey());
+                result.setPrevIndex(String.valueOf(pageSize-1));
+                result.setPrevPage(String.valueOf(page-1));
             }
         }
-        
-        return results; 
+        return result; 
     }
 }
