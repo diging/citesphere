@@ -353,7 +353,7 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public boolean deleteCitation(IUser user, String groupId, ICitation citation)
+    public void deleteCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (!groupOptional.isPresent()) {
@@ -362,7 +362,7 @@ public class CitationManager implements ICitationManager {
 
         zoteroManager.deleteCitation(user, groupId, citation);
 
-        List<PageRequest> requests = pageRequestRepository.findPageRequestByKey(citation.getKey());
+        List<PageRequest> requests = pageRequestRepository.findByCitations(citation);
         for (PageRequest request : requests) {
             request.getCitations().remove(citation);
             pageRequestRepository.save(request);
@@ -373,6 +373,5 @@ public class CitationManager implements ICitationManager {
         group.setLastLocallyModifiedOn(OffsetDateTime.now());
         groupRepository.save(group);
 
-        return true;
     }
 }

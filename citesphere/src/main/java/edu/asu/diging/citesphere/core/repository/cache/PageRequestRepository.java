@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
+import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ZoteroObjectType;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -21,8 +22,7 @@ public interface PageRequestRepository extends PagingAndSortingRepository<PageRe
 //    @EntityGraph(value="requestsWithFullCitations")
     List<PageRequest> findPageRequestWithCitations(IUser user, String objectId, int page,
             ZoteroObjectType zoteroObjectType);
-
-    @Query(value = "SELECT PageRequest.* FROM PageRequest INNER JOIN PageRequest_Citation ON PageRequest.id = PageRequest_Citation.PageRequest_id where PageRequest_Citation.citations_citationKey = ?1", nativeQuery = true)
-    List<PageRequest> findPageRequestByKey(String citationKey);
+    
+    List<PageRequest> findByCitations(ICitation citation);
     
 }
