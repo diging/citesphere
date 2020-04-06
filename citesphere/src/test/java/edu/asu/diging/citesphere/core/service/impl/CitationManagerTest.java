@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+
 import org.mockito.MockitoAnnotations;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
@@ -20,6 +21,7 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
+import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
@@ -156,6 +158,41 @@ public class CitationManagerTest {
         Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(new Long(2));
         managerToTest.updateCitation(user, GROUP_ID, existingCitation);
     }
+    @Test
+    public void test_deleteCitation_success()  throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
+        ICitation deleteCitation = new Citation();
+        deleteCitation.setKey(EXISTING_ID);
+        deleteCitation.setVersion(new Long(2));
+        
+        Long group3Id = new Long(GROUP_ID);
+        CitationGroup group = new CitationGroup();
+        group.setId(group3Id);
+        group.setVersion(new Long(2));
+        Optional<CitationGroup> optionalGroup =  Optional.of(group); 
+        
+        List<ICitation> citations = new ArrayList<>();
+        citations.add(deleteCitation);
+        
+        List<PageRequest> requests = new ArrayList<PageRequest>();
+        PageRequest request = new PageRequest();
+        request.setCitations(citations);
+        requests.add(request);
+        
+        managerToTest.deleteCitation(user, GROUP_ID, deleteCitation);
+        
+        Mockito.when(groupRepository.findById(new Long(GROUP_ID))).thenReturn(optionalGroup);
+        Mockito.verify(zoteroManager).deleteCitation(user, GROUP_ID, deleteCitation);
+        Mockito.verify(citationRepository).delete((Citation) deleteCitation);
+      //  Mockito.verify(groupRepository).save(optionalGroup.get());
+       // Mockito.when( pageRequestRepository.findByCitations(any(ICitation.class))).thenReturn(requests);
+        Mockito.verify(pageRequestRepository).save(request);
+        
+
+        
+        
+      
+        
+    }
     
     @Test
     public void test_detachCitation_success() {
@@ -250,4 +287,6 @@ public class CitationManagerTest {
         
         managerToTest.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation);
     }
+    
+    
 }
