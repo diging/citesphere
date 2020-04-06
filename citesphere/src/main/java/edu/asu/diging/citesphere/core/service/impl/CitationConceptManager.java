@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.repository.CustomCitationConceptRepository;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.data.bib.CitationConceptRepository;
 import edu.asu.diging.citesphere.model.bib.ICitationConcept;
@@ -20,9 +22,16 @@ public class CitationConceptManager implements ICitationConceptManager {
 
     @Autowired
     private CitationConceptRepository conceptRepo;
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.ICitationConceptManager#findAll(edu.asu.diging.citesphere.core.model.IUser)
+
+    @Autowired
+    private CustomCitationConceptRepository customConceptRepo;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.impl.ICitationConceptManager#findAll(
+     * edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
     public List<ICitationConcept> findAll(IUser user) {
@@ -30,7 +39,7 @@ public class CitationConceptManager implements ICitationConceptManager {
         conceptRepo.findByOwner(user).forEach(c -> concepts.add(c));
         return concepts;
     }
-    
+
     @Override
     public ICitationConcept get(String conceptId) {
         Optional<CitationConcept> concept = conceptRepo.findById(conceptId);
@@ -39,9 +48,23 @@ public class CitationConceptManager implements ICitationConceptManager {
         }
         return null;
     }
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.ICitationConceptManager#create(edu.asu.diging.citesphere.web.forms.CitationConceptForm, edu.asu.diging.citesphere.core.model.IUser)
+
+    @Override
+    public ICitationConcept getByUriAndOwner(String uri, IUser owner) {
+        Optional<CitationConcept> concept = customConceptRepo.findFirstByUriAndOwner(uri, owner);
+        if (concept.isPresent()) {
+            return concept.get();
+        }
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.impl.ICitationConceptManager#create(
+     * edu.asu.diging.citesphere.web.forms.CitationConceptForm,
+     * edu.asu.diging.citesphere.core.model.IUser)
      */
     @Override
     public void create(CitationConceptForm conceptForm, IUser user) {
@@ -53,9 +76,9 @@ public class CitationConceptManager implements ICitationConceptManager {
         concept.setCreatedOn(OffsetDateTime.now());
         save(concept);
     }
-    
+
     @Override
-    public void save(ICitationConcept concept) {
-        conceptRepo.save((CitationConcept)concept);
+    public ICitationConcept save(ICitationConcept concept) {
+        return conceptRepo.save((CitationConcept) concept);
     }
 }

@@ -25,9 +25,9 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 @PropertySource("classpath:config.properties")
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = {"edu.asu.diging.citesphere.core.repository", "edu.asu.diging.citesphere.data"})
+@EnableJpaRepositories(basePackages = { "edu.asu.diging.citesphere.core.repository", "edu.asu.diging.citesphere.data" })
 public class PersistentContext {
-    
+
     @Autowired
     private Environment env;
 
@@ -41,44 +41,42 @@ public class PersistentContext {
 
         return new HikariDataSource(dataSourceConfig);
     }
-    
+
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-       LocalContainerEntityManagerFactoryBean em 
-         = new LocalContainerEntityManagerFactoryBean();
-       em.setDataSource(dataSource());
-       em.setPackagesToScan(new String[] { "edu.asu.diging.citesphere.core.model", "edu.asu.diging.citesphere.model", "edu.asu.diging.citesphere.user" });
-  
-       JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-       em.setJpaVendorAdapter(vendorAdapter);
-       em.setJpaProperties(additionalProperties());
-  
-       return em;
+        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+        em.setDataSource(dataSource());
+        em.setPackagesToScan(new String[] { "edu.asu.diging.citesphere.core.model", "edu.asu.diging.citesphere.model",
+                "edu.asu.diging.citesphere.user" });
+
+        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        em.setJpaVendorAdapter(vendorAdapter);
+        em.setJpaProperties(additionalProperties());
+
+        return em;
     }
-    
+
     @Bean
-    public PlatformTransactionManager transactionManager(
-      EntityManagerFactory emf){
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(emf);
-  
+
         return transactionManager;
     }
-  
+
     @Bean
-    public PersistenceExceptionTranslationPostProcessor exceptionTranslation(){
+    public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
         return new PersistenceExceptionTranslationPostProcessor();
     }
-  
+
     Properties additionalProperties() {
         Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
-        properties.setProperty(
-          "hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+        properties.setProperty("hibernate.dialect", env.getRequiredProperty("db.hibernate.dialect"));
         properties.setProperty("hibernate.show_sql", env.getRequiredProperty("db.log.queries"));
         properties.setProperty("hibernate.id.new_generator_mappings", "true");
         properties.setProperty("hibernate.jdbc.batch_size", env.getRequiredProperty("db.jdbc.batch_size"));
-         
+        properties.setProperty("hibernate.ejb.naming_strategy", "org.hibernate.cfg.ImprovedNamingStrategy");
         return properties;
     }
 }

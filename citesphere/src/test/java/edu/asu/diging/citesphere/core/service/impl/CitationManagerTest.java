@@ -148,7 +148,6 @@ public class CitationManagerTest {
         Mockito.when(zoteroManager.updateCitation(user, GROUP_ID, existingCitation)).thenReturn(updatedCitation);
         
         managerToTest.updateCitation(user, GROUP_ID, existingCitation);
-        Mockito.verify(citationRepository).delete(existingCitation);
         Mockito.verify(citationRepository).save((Citation)updatedCitation);
     }
     

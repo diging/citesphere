@@ -20,7 +20,7 @@
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
         <spring-social-zotero.version>0.1</spring-social-zotero.version>
         <citesphere.messages.version>0.3</citesphere.messages.version>
-        <citesphere.model.version>0.2</citesphere.model.version>
+        <citesphere.model.version>0.4</citesphere.model.version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -40,6 +40,7 @@
         <db.user></db.user>
         <db.password></db.password>
         <db.log.queries>false</db.log.queries>
+        <db.hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.hibernate.dialect>
 
         <upload.folder.path></upload.folder.path>
 
@@ -47,7 +48,7 @@
         <tomcat.app.name>citesphere</tomcat.app.name>
         <tomcat.server.id>TomcatServer</tomcat.server.id>
 
-        <log.level>debug</log.level>
+        <log.level>info</log.level>
 
         <email.host></email.host>
         <email.port></email.port>
@@ -538,15 +539,15 @@
         </plugins>
     </build>
     <repositories>
-    <repository>
-      <id>central</id>
-      <name>Central Repository</name>
-      <url>https://repo.maven.apache.org/maven2</url>
-      <layout>default</layout>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+        <repository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>
