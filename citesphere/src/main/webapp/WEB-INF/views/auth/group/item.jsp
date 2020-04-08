@@ -9,8 +9,10 @@
 
 <script
 	src="<c:url value="/resources/notify/bootstrap-notify.min.js" />"></script>
+	
 <link href="<c:url value="/resources/notify/animate.css" />"
 	rel="stylesheet">
+
 
 <ol class="breadcrumb">
 	<li><a href="<c:url value="/" />">Home</a></li>
@@ -305,6 +307,7 @@
 				<div>
 					<span><i class="fas fa-spinner text-center"></i> Deleting...</span>
 				</div>
+		
 
 			</div>
 
@@ -396,41 +399,40 @@
 <script>
 	//# sourceURL=modal.js
 	$(function() {
-		$(".parse-ref-info").click(
-				function(e) {
-					var clicked = e.target;
-					$("#ref-unparsed").text($(clicked).text());
-					$("#parsed-ref-authors").text(
-							$(clicked).attr('data-authors'));
-					$("#parsed-ref-title").text($(clicked).attr('data-title'));
-					$("#parsed-ref-year").text($(clicked).attr('data-year'));
-					var identifier = $(clicked).attr('data-identifier');
-					var identType = $(clicked).attr('data-identifier-type');
-					if (identType != undefined && identType != "") {
-						identifier = identifier + " (" + identType + ")";
-					}
-					$("#parsed-ref-ident").text(identifier);
-					$("#parsed-ref-first-page").text(
-							$(clicked).attr('data-first-page'));
-					$("#parsed-ref-last-page").text(
-							$(clicked).attr('data-last-page'));
-					$("#parsed-ref-volume")
-							.text($(clicked).attr('data-volume'));
-					$("#parsed-ref-source")
-							.text($(clicked).attr('data-source'));
-					$("#parsed-ref-publication-type").text(
-							$(clicked).attr('data-publication-type'));
-					$("#parsed-ref-reference-id").text(
-							$(clicked).attr('data-reference-id'));
-					$("#parsed-ref-reference-label").text(
-							$(clicked).attr('data-reference-label'));
-					$("#parsed-ref-citation-id").text(
-							$(clicked).attr('data-citation-id'));
-					$("#parsed-ref-ref-raw").text(
-							$(clicked).attr('data-ref-raw'));
+		$(".parse-ref-info").click(function(e) {
+			var clicked = e.target;
+			$("#ref-unparsed").text($(clicked).text());
+			$("#parsed-ref-authors").text(
+				$(clicked).attr('data-authors'));
+				$("#parsed-ref-title").text($(clicked).attr('data-title'));
+				$("#parsed-ref-year").text($(clicked).attr('data-year'));
+				var identifier = $(clicked).attr('data-identifier');
+				var identType = $(clicked).attr('data-identifier-type');
+				if (identType != undefined && identType != "") {
+					identifier = identifier + " (" + identType + ")";
+				}
+				$("#parsed-ref-ident").text(identifier);
+				$("#parsed-ref-first-page").text(
+						$(clicked).attr('data-first-page'));
+				$("#parsed-ref-last-page").text(
+						$(clicked).attr('data-last-page'));
+				$("#parsed-ref-volume")
+						.text($(clicked).attr('data-volume'));
+				$("#parsed-ref-source")
+						.text($(clicked).attr('data-source'));
+				$("#parsed-ref-publication-type").text(
+						$(clicked).attr('data-publication-type'));
+				$("#parsed-ref-reference-id").text(
+						$(clicked).attr('data-reference-id'));
+				$("#parsed-ref-reference-label").text(
+						$(clicked).attr('data-reference-label'));
+				$("#parsed-ref-citation-id").text(
+						$(clicked).attr('data-citation-id'));
+				$("#parsed-ref-ref-raw").text(
+						$(clicked).attr('data-ref-raw'));
 
-					$("#parsed-ref-modal").modal();
-				});
+				$("#parsed-ref-modal").modal();
+			});
 
 		
 	$('#delete').click(function(e) {
@@ -458,14 +460,12 @@
 							exit : 'animated fadeOutRight'
 						} 
 					}, {
-						  clickToHide: false,
-							
-						  autoHide: false,
+						 delay: 300000
 					});
 					setTimeout(function() {
 						
 						window.location.href = '<c:url value="/auth/group/${zoteroGroupId}/items"/>'
-					}, 3);
+					}, 1);
 
 					},
 			'error' : function(data) {

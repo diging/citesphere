@@ -239,7 +239,7 @@ public class ZoteroConnector implements IZoteroConnector {
     }
 
     private Zotero getApi(IUser user) {
-        IZoteroToken token = tokenManager.getToken(user);
+        IZoteroToken token = tokenManager.getToken(user); 
         Zotero zotero = zoteroFactory.createConnection(new OAuthToken(token.getToken(), token.getSecret())).getApi();
         zotero.setUserId(token.getUserId());
         return zotero;
