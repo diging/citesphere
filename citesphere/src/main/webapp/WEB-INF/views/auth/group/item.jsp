@@ -305,7 +305,7 @@
 			<div class="modal-body">
 
 				<div>
-					<span><i class="fas fa-spinner text-center"></i> Deleting...</span>
+					<span><i class="fas fa-spinner fa-spin text-center"></i> Deleting...</span>
 				</div>
 		
 
