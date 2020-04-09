@@ -45,7 +45,13 @@ public class DeleteItemController {
             throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
             ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
-        citationManager.deleteCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+        try {
+            citationManager.deleteCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+        } catch (CitationIsOutdatedException e) {
+            return new ResponseEntity<>(
+                    "Deletion Failed. Citation isn't the latest version. Please sync the citation and try again",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

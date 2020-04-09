@@ -447,7 +447,6 @@
 			method : 'DELETE',
 			'success' : function(data) {
 				$('#loadModal').modal("hide");
-				console.log('deletion done');
 				$.notify('<i class="fas fa-check-circle"></i> Citation successfully deleted. You will be redirected to the citation list page.',
 					{
 						type : 'success',
@@ -469,8 +468,15 @@
 
 					},
 			'error' : function(data) {
+				console.log(data);
+			
+				if (data.status == 500) {
+					msg = data.responseText;
+				} else {
+					msg = 'Citation could not be deleted';
+				}
 				$('#loadModal').modal("hide");
-				$.notify('<i class="fas fa-exclamation-circle"></i> Citation could not be deleted!',
+				$.notify('<i class="fas fa-exclamation-circle"></i>' + msg,
 					{ type : 'danger',
 					  offset : {
 					  x : 50,

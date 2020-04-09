@@ -353,11 +353,19 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public void deleteCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
+    public void deleteCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
+            GroupDoesNotExistException, CitationIsOutdatedException, ZoteroHttpStatusException {
         Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException();
+        }
+        long citationVersion = zoteroManager.getGroupItemVersion(user, groupId, citation.getKey());
+        Optional<Citation> storedCitationOptional = citationRepository.findById(citation.getKey());
+        if (storedCitationOptional.isPresent()) {
+            ICitation storedCitation = storedCitationOptional.get();
+            if (storedCitation.getVersion() != citationVersion) {
+                throw new CitationIsOutdatedException();
+            }
         }
 
         zoteroManager.deleteCitation(user, groupId, citation);
