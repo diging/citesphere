@@ -258,7 +258,9 @@ $(function() {
 		var text = $("#addConceptConceptSelect option:selected").text();
 		var typeName = $("#addConceptTypeSelect option:selected").text();
 		conceptSpan.text(text + " | " + typeName + " ");
-	
+		var deleteIcon = $('<i class="fas fa-times remove-concept"></i>');
+		deleteIcon.click(removeConcept);
+		conceptSpan.append(deleteIcon);
 		$("#conceptTags").append(conceptSpan);
 		
 		$("#addConceptModal").modal('hide');
@@ -583,6 +585,12 @@ let removePerson = function removePerson(e) {
 	var deleteIcon = e.currentTarget;
 	var person = $(deleteIcon).parent();
 	person.remove();
+}
+
+let removeConcept = function removeConcept(e) {
+	var deleteIcon = e.currentTarget;
+	var concept = $(deleteIcon).parent();
+	concept.remove();
 }
 
 </script>
