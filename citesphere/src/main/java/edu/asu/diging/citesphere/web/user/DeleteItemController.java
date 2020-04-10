@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -42,15 +43,23 @@ public class DeleteItemController {
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteItem(@PathVariable("zoteroGroupId") String zoteroGroupId,
             @PathVariable("itemId") String itemId, Authentication authentication, Model model)
-            throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
-            ZoteroHttpStatusException {
-        ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
+
+    {
+
         try {
+            ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
+                    itemId);
             citationManager.deleteCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
         } catch (CitationIsOutdatedException e) {
-            return new ResponseEntity<>(
-                    "Deletion Failed. Citation isn't the latest version. Please sync the citation and try again",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+        } catch (GroupDoesNotExistException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (CannotFindCitationException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (ZoteroHttpStatusException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (ZoteroConnectionException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);

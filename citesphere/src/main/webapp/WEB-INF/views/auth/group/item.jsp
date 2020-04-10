@@ -282,7 +282,7 @@
 		<div class="modal-content">
 	<div class="modal-header">
 			
-				<h4 class="modal-title">Warning</h4>
+				<h4 class="modal-title">Delete Citation</h4>
 			</div>
 			<div class="modal-body">Are you sure you want to delete
 				Citation?</div>
@@ -290,8 +290,7 @@
 
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
 				<button id="delete" type="button" class="btn btn-primary">Yes</button>
-				<%-- <a class="btn btn-primary"
-		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/delete"/>" > Yes</a>  --%>
+	
 			</div>
 		</div>
 	</div>
@@ -470,11 +469,15 @@
 			'error' : function(data) {
 				console.log(data);
 			
-				if (data.status == 500) {
-					msg = data.responseText;
-				} else {
-					msg = 'Citation could not be deleted';
-				}
+			if (data.status == 412) {
+				msg = 'Citation is outdated. Please Sync the citation and try again';
+				
+			} else if (data.status == 404) {
+				msg = 'Group or Citation not found';
+			} else {
+				msg = 'Citation deletion failed. Please try again';
+				
+			}
 				$('#loadModal').modal("hide");
 				$.notify('<i class="fas fa-exclamation-circle"></i>' + msg,
 					{ type : 'danger',
