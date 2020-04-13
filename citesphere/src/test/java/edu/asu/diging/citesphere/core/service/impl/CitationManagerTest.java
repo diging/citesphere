@@ -289,9 +289,8 @@ public class CitationManagerTest {
         ReflectionTestUtils.setField(managerToTestSpy, "zoteroPageSize", 9);
         CitationResults citationResults = new CitationResults();
         List<ICitation> citations = new ArrayList<ICitation>();
-        Citation citationOnPage1;
         for(int i=0;i<9;i++) {
-            citationOnPage1 = new  Citation();
+            Citation citationOnPage1 = new  Citation();
             citationOnPage1.setKey("key"+i);
             citations.add(citationOnPage1);
         }
@@ -320,9 +319,8 @@ public class CitationManagerTest {
         ReflectionTestUtils.setField(managerToTestSpy, "zoteroPageSize", 9);
         CitationResults citationResultsPage1 = new CitationResults();
         List<ICitation> citations = new ArrayList<ICitation>();
-        Citation citationOnPage1;
         for(int i=0;i<9;i++) {
-            citationOnPage1 = new  Citation();
+            Citation citationOnPage1 = new  Citation();
             citationOnPage1.setKey("key"+i);
             citations.add(citationOnPage1);
         }

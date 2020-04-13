@@ -382,7 +382,7 @@
 	});
 	
 	$(document).ready(function(){
-		var urlVar = "/${zoteroGroupId}/items/${citation.key}/prevAndNext?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}";
+		var urlVar = "/${zoteroGroupId}/items/${citation.key}/paging?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}";
 		$.ajax({ 
 			url: '<c:url value="/auth/group" />' + urlVar,
 			type: "GET",

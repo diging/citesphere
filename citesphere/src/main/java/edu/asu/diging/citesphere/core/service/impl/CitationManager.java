@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
@@ -83,9 +82,6 @@ public class CitationManager implements ICitationManager {
     private IGroupManager groupManager;
     
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
-    
-    @Autowired
-    private Environment env;
     
     @PostConstruct
     public void init() {
@@ -335,6 +331,10 @@ public class CitationManager implements ICitationManager {
         CitationResults citationResults = getGroupItems(user, groupId, collectionId, page, sortBy);
         List<ICitation> citations = citationResults.getCitations();
         CitationPage result = new CitationPage();
+        result.setIndex(String.valueOf(index));
+        result.setZoteroGroupId(groupId);
+        result.setCollectionId(collectionId);
+        result.setSortBy(sortBy);
         if(citations != null && citations.size()>0) {
             int maxPage = (int) Math.ceil((citationResults.getTotalResults() / Float.valueOf(zoteroPageSize)));
             if(index == citations.size() - 1 && page < maxPage) {
