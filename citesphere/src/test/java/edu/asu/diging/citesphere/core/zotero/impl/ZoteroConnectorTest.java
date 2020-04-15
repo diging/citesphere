@@ -44,7 +44,7 @@ public class ZoteroConnectorTest {
 
     private IUser user;
 
-    Long currentVersion = new Long(1);
+    private Long currentVersion = new Long(1);
 
     @Mock
     private ZoteroConnector connectorToTest;

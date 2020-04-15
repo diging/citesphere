@@ -42,9 +42,7 @@ public class DeleteItemController {
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteItem(@PathVariable("zoteroGroupId") String zoteroGroupId,
-            @PathVariable("itemId") String itemId, Authentication authentication, Model model)
-
-    {
+            @PathVariable("itemId") String itemId, Authentication authentication, Model model)  {
 
         try {
             ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId,

@@ -284,7 +284,7 @@
 			
 				<h4 class="modal-title">Delete Citation</h4>
 			</div>
-			<div class="modal-body">Are you sure you want to delete
+			<div class="modal-body">Are you sure you want to delete this
 				Citation?</div>
 			<div class="modal-footer">
 
@@ -402,35 +402,35 @@
 			var clicked = e.target;
 			$("#ref-unparsed").text($(clicked).text());
 			$("#parsed-ref-authors").text(
-				$(clicked).attr('data-authors'));
-				$("#parsed-ref-title").text($(clicked).attr('data-title'));
-				$("#parsed-ref-year").text($(clicked).attr('data-year'));
-				var identifier = $(clicked).attr('data-identifier');
-				var identType = $(clicked).attr('data-identifier-type');
-				if (identType != undefined && identType != "") {
-					identifier = identifier + " (" + identType + ")";
+					$(clicked).attr('data-authors'));
+			$("#parsed-ref-title").text($(clicked).attr('data-title'));
+			$("#parsed-ref-year").text($(clicked).attr('data-year'));
+			var identifier = $(clicked).attr('data-identifier');
+			var identType = $(clicked).attr('data-identifier-type');
+			if (identType != undefined && identType != "") {
+				identifier = identifier + " (" + identType + ")";
 				}
-				$("#parsed-ref-ident").text(identifier);
-				$("#parsed-ref-first-page").text(
-						$(clicked).attr('data-first-page'));
-				$("#parsed-ref-last-page").text(
-						$(clicked).attr('data-last-page'));
-				$("#parsed-ref-volume")
-						.text($(clicked).attr('data-volume'));
-				$("#parsed-ref-source")
-						.text($(clicked).attr('data-source'));
-				$("#parsed-ref-publication-type").text(
-						$(clicked).attr('data-publication-type'));
-				$("#parsed-ref-reference-id").text(
-						$(clicked).attr('data-reference-id'));
-				$("#parsed-ref-reference-label").text(
-						$(clicked).attr('data-reference-label'));
-				$("#parsed-ref-citation-id").text(
-						$(clicked).attr('data-citation-id'));
-				$("#parsed-ref-ref-raw").text(
-						$(clicked).attr('data-ref-raw'));
+			$("#parsed-ref-ident").text(identifier);
+			$("#parsed-ref-first-page").text(
+					$(clicked).attr('data-first-page'));
+			$("#parsed-ref-last-page").text(
+					$(clicked).attr('data-last-page'));
+			$("#parsed-ref-volume")
+					.text($(clicked).attr('data-volume'));
+			$("#parsed-ref-source")
+					.text($(clicked).attr('data-source'));
+			$("#parsed-ref-publication-type").text(
+					$(clicked).attr('data-publication-type'));
+			$("#parsed-ref-reference-id").text(
+					$(clicked).attr('data-reference-id'));
+			$("#parsed-ref-reference-label").text(
+					$(clicked).attr('data-reference-label'));
+			$("#parsed-ref-citation-id").text(
+					$(clicked).attr('data-citation-id'));
+			$("#parsed-ref-ref-raw").text(
+					$(clicked).attr('data-ref-raw'));
 
-				$("#parsed-ref-modal").modal();
+			$("#parsed-ref-modal").modal();
 			});
 
 		
@@ -470,12 +470,13 @@
 				console.log(data);
 			
 			if (data.status == 412) {
-				msg = 'Citation is outdated. Please Sync the citation and try again';
+				msg =  '<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync" />">Citation is outdated. Please sync the citation and try again. </a>'
+				;
 				
 			} else if (data.status == 404) {
 				msg = 'Group or Citation not found';
 			} else {
-				msg = 'Citation deletion failed. Please try again';
+				msg = 'Citation deletion failed. Please try again.';
 				
 			}
 				$('#loadModal').modal("hide");
