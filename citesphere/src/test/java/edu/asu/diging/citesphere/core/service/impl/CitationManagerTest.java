@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.doThrow;
 
 import org.mockito.MockitoAnnotations;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
@@ -127,7 +126,7 @@ public class CitationManagerTest {
 
     @Test
     public void test_getCitation_doesNotExist() {
-        // FIXME: implement when bug is removed
+        //  
     }
 
     @Test
@@ -217,7 +216,7 @@ public class CitationManagerTest {
         Mockito.verify(zoteroManager).deleteCitation(user, GROUP_ID, existingCitation);
         Mockito.verify(citationRepository).delete((Citation) existingCitation);
 
-        Assert.assertTrue(requests.get(0).getCitations().size() == 0);
+        Assert.assertEquals(requests.get(0).getCitations().size(), 0);
     }
 
     @Test(expected = ZoteroHttpStatusException.class)
@@ -235,6 +234,25 @@ public class CitationManagerTest {
         Mockito.when(citationRepository.findById(existingCitation.getKey())).thenReturn(Optional.of(existingCitation));
         Mockito.when(groupRepository.findById(new Long(GROUP_ID))).thenReturn(optionalGroup);
         Mockito.doThrow(ZoteroHttpStatusException.class).when(zoteroManager).deleteCitation(user, GROUP_ID,
+                existingCitation);
+
+        managerToTest.deleteCitation(user, GROUP_ID, existingCitation);
+    }
+    @Test(expected = ZoteroConnectionException.class)
+    public void test_deleteCitation_connectionFailed() throws ZoteroConnectionException, ZoteroHttpStatusException,
+            GroupDoesNotExistException, CitationIsOutdatedException {
+
+        Long group3Id = new Long(GROUP_ID);
+        CitationGroup group = new CitationGroup();
+        group.setId(group3Id);
+        group.setVersion(new Long(2));
+        Optional<CitationGroup> optionalGroup = Optional.of(group);
+
+        Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, existingCitation.getKey()))
+                .thenReturn(currentVersion);
+        Mockito.when(citationRepository.findById(existingCitation.getKey())).thenReturn(Optional.of(existingCitation));
+        Mockito.when(groupRepository.findById(new Long(GROUP_ID))).thenReturn(optionalGroup);
+        Mockito.doThrow(ZoteroConnectionException.class).when(zoteroManager).deleteCitation(user, GROUP_ID,
                 existingCitation);
 
         managerToTest.deleteCitation(user, GROUP_ID, existingCitation);

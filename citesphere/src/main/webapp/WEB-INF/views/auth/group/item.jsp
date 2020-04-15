@@ -469,16 +469,13 @@
 			'error' : function(data) {
 				console.log(data);
 			
-			if (data.status == 412) {
-				msg =  '<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync" />">Citation is outdated. Please sync the citation and try again. </a>'
-				;
-				
-			} else if (data.status == 404) {
-				msg = 'Group or Citation not found';
-			} else {
+			    if (data.status == 412) {
+				msg =  'Citation is outdated. Please <a href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync" />">sync the citation </a> and try again. ';
+				} else if (data.status == 404) {
+				msg = 'Group or Citation not found.';
+				} else {
 				msg = 'Citation deletion failed. Please try again.';
-				
-			}
+				}
 				$('#loadModal').modal("hide");
 				$.notify('<i class="fas fa-exclamation-circle"></i>' + msg,
 					{ type : 'danger',
