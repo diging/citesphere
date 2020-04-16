@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.core.service.impl.GetItemsManager;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
@@ -49,6 +51,9 @@ public class GroupItemsController {
     
     @Autowired
     private IGroupManager groupManager;
+    
+    @Autowired
+    private GetItemsManager getItemsManager;
 
     @RequestMapping(value= { "/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
@@ -56,7 +61,7 @@ public class GroupItemsController {
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns)
-            throws GroupDoesNotExistException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, ZoteroHttpStatusException, InterruptedException, ExecutionException {
         
         Integer pageInt = 1;
         try {
@@ -66,7 +71,7 @@ public class GroupItemsController {
         }
 
         IUser user = (IUser) authentication.getPrincipal();
-        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+        CitationResults results = getItemsManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
         model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
