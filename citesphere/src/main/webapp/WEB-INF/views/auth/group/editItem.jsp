@@ -9,13 +9,15 @@
 	uri="https://diging.asu.edu/jps/tlds/citesphere"%>
 
 <script
-	src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>
+	src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />">
+</script>
 
 <style>
 .popover {
 	min-width: 300px;
 }
 </style>
+
 <script>
 //@ sourceURL=submit.js
 $(function() {
@@ -146,6 +148,8 @@ $(function() {
 	
 	$(".remove-author").click(removePerson);
 	$(".remove-author").css('cursor', 'pointer');
+	$(".remove-concept").click(removeConcept);
+	$(".remove-concept").css('cursor', 'pointer');
 	
 	$("#addAuthorAffiliation").click(function() {
 		var affiliationCopy = $("#authorAffiliationTemplate").clone();
@@ -176,7 +180,6 @@ $(function() {
 		$("#uriLoadingFoundAuthor").popover('hide');
 		event.preventDefault();
 	});
-		
 	
 	var timer = null;
 	$("#uriAuthor").change(function() {
@@ -342,7 +345,9 @@ $(function() {
 		var text = $("#addConceptConceptSelect option:selected").text();
 		var typeName = $("#addConceptTypeSelect option:selected").text();
 		conceptSpan.text(text + " | " + typeName + " ");
-	
+		var deleteIcon = $('<i class="fas fa-times remove-concept"></i>');
+		deleteIcon.click(removeConcept);
+		conceptSpan.append(deleteIcon);
 		$("#conceptTags").append(conceptSpan);
 		
 		$("#addConceptModal").modal('hide');
@@ -908,6 +913,12 @@ let removePerson = function removePerson(e) {
 	person.remove();
 }
 
+let removeConcept = function removeConcept(e) {
+	var deleteIcon = e.currentTarget;
+	var concept = $(deleteIcon).parent();
+	concept.remove();
+}
+
 </script>
 
 <ol class="breadcrumb">
@@ -1315,6 +1326,28 @@ let removePerson = function removePerson(e) {
 			</td>
 		</tr>
 
+
+		<tr>
+			<td>Concepts</td>
+			<td>
+				<div id="conceptTags">
+					<c:forEach items="${citation.conceptTags}" var="tag">
+						<span class="badge" data-concept-id="${tag.localConceptId}"
+							data-concept-uri="${tag.conceptUri}"
+							data-concept-name="${tag.conceptName}"
+							data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}"
+							data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName}
+							| ${tag.typeName} <i class="fas fa-times remove-concept"></i>
+						</span>
+					</c:forEach>
+				</div>
+				<div class="pull-right">
+					<a class="addConceptModalLink" data-toggle="modal"
+						data-target="#addConceptModal"><i class="fas fa-plus-circle"></i>
+						Add Concept</a>
+				</div>
+			</td>
+		</tr>
 
 	</table>
 
@@ -1852,5 +1885,4 @@ function creatorLinkHandler(target) {
 	$("#addCreatorButton").text("Add "+creatorType);
 	$("#addCreatorButton").attr("data-creator-type", target.attr("data-creator-type"));
 }
-</script>
 </script>
