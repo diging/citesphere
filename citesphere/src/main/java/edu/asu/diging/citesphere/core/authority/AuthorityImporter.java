@@ -33,7 +33,7 @@ public interface AuthorityImporter {
 
     IImportedAuthority retrieveAuthorityData(String uri) throws URISyntaxException, AuthorityServiceConnectionException;
 
-    AuthoritySearchResult searchAuthorities(String searchString, int page, int pageSize)
+    AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
             throws URISyntaxException, AuthorityServiceConnectionException;
 
     String getId();

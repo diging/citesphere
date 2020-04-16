@@ -53,9 +53,6 @@ public class AuthorityService implements IAuthorityService {
     @Autowired
     private Set<AuthorityImporter> importers;
 
-    @Autowired
-    private AuthorityServiceHelper helper;
-
     /*
      * (non-Javadoc)
      * 
@@ -98,8 +95,8 @@ public class AuthorityService implements IAuthorityService {
     public AuthoritySearchResult searchAuthorityEntries(IUser user, String firstName, String lastName, String source,
             int page, int pageSize) throws URISyntaxException, AuthorityServiceConnectionException {
 
-        AuthoritySearchResult searchResult = getAuthorityImporter(source)
-                .searchAuthorities(getImporterSearchString(source, firstName, lastName), page, pageSize);
+        AuthoritySearchResult searchResult = getAuthorityImporter(source).searchAuthorities(firstName, lastName, page,
+                pageSize);
 
         if (searchResult.getFoundAuthorities() != null && searchResult.getFoundAuthorities().size() > 0) {
             List<String> uriList = authorityRepository
@@ -171,35 +168,21 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
-            List<String> uris, int page, int pageSize) throws GroupDoesNotExistException {
-        Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
-        if (!group.isPresent()) {
-            throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
-        }
-        Pageable paging = PageRequest.of(page, pageSize);
-        List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn(
-                (ICitationGroup) group.get(), firstName, lastName, uris, paging);
-        Set<IAuthorityEntry> entries = new HashSet<>();
-        persons.forEach(p -> {
-            Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
-            if (optional.isPresent()) {
-                entries.add(optional.get());
-            }
-        });
-        return entries;
-    }
-
-    @Override
     public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page,
-            int pageSize) throws GroupDoesNotExistException {
+            int pageSize, List<String> uris) throws GroupDoesNotExistException {
         Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
         Pageable paging = PageRequest.of(page, pageSize);
-        List<Person> persons = personAuthorityRepository
-                .findPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(), firstName, lastName, paging);
+        List<Person> persons = null;
+        if (uris != null && uris.size() > 0) {
+            persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn(
+                    (ICitationGroup) group.get(), firstName, lastName, uris, paging);
+        } else {
+            persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(),
+                    firstName, lastName, paging);
+        }
         Set<IAuthorityEntry> entries = new HashSet<>();
         persons.forEach(p -> {
             Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
@@ -217,11 +200,8 @@ public class AuthorityService implements IAuthorityService {
                 .findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName)
                 .stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
 
-        if (uriList != null && uriList.size() > 0) {
-            return this.findByNameInDataset(firstName, lastName, citationGroupId, uriList, page, pageSize);
-        } else {
-            return this.findByNameInDataset(firstName, lastName, citationGroupId, page, pageSize);
-        }
+        return this.findByNameInDataset(firstName, lastName, citationGroupId, page, pageSize, uriList);
+
     }
 
     @Override
@@ -265,15 +245,7 @@ public class AuthorityService implements IAuthorityService {
                 / pageSize);
     }
 
-    public String getImporterSearchString(String source, String firstName, String lastName) {
-        if (source.equals(AuthorityImporter.CONCEPTPOWER)) {
-            return helper.getConceptpowerSearchString(firstName, lastName);
-        }
-
-        return null;
-    }
-
-    public AuthorityImporter getAuthorityImporter(String source) {
+    private AuthorityImporter getAuthorityImporter(String source) {
 
         for (AuthorityImporter importer : importers) {
             if (importer.isResponsible(source))

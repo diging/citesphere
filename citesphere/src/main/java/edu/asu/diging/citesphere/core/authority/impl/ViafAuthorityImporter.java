@@ -98,7 +98,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     }
 
     @Override
-    public AuthoritySearchResult searchAuthorities(String uri, int page, int pageSize)
+    public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
             throws URISyntaxException, AuthorityServiceConnectionException {
 
         return null;
