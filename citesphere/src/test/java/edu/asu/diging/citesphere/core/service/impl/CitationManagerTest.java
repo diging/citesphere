@@ -264,9 +264,8 @@ public class CitationManagerTest {
         ReflectionTestUtils.setField(managerToTest, "zoteroPageSize", 50);
         CitationResults citationResults = new CitationResults();
         List<ICitation> citations = new ArrayList<ICitation>();
-        Citation citation;
         for(int i=0;i<10;i++) {
-            citation = new  Citation();
+            Citation citation = new  Citation();
             citation.setKey("key"+i);
             citations.add(citation);
         }
