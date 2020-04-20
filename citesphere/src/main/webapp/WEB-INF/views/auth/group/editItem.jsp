@@ -69,6 +69,8 @@ $(function() {
 	
 	$(".remove-author").click(removePerson);
 	$(".remove-author").css('cursor', 'pointer');
+	$(".remove-concept").click(removeConcept);
+	$(".remove-concept").css('cursor', 'pointer');
 	
 	$("#addAuthorAffiliation").click(function() {
 		var affiliationCopy = $("#authorAffiliationTemplate").clone();
@@ -258,7 +260,9 @@ $(function() {
 		var text = $("#addConceptConceptSelect option:selected").text();
 		var typeName = $("#addConceptTypeSelect option:selected").text();
 		conceptSpan.text(text + " | " + typeName + " ");
-	
+		var deleteIcon = $('<i class="fas fa-times remove-concept"></i>');
+		deleteIcon.click(removeConcept);
+		conceptSpan.append(deleteIcon);
 		$("#conceptTags").append(conceptSpan);
 		
 		$("#addConceptModal").modal('hide');
@@ -585,6 +589,12 @@ let removePerson = function removePerson(e) {
 	person.remove();
 }
 
+let removeConcept = function removeConcept(e) {
+	var deleteIcon = e.currentTarget;
+	var concept = $(deleteIcon).parent();
+	concept.remove();
+}
+
 </script>
 
 <ol class="breadcrumb">
@@ -851,7 +861,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 <td>
 <div id="conceptTags">
 <c:forEach items="${citation.conceptTags}" var="tag">
-<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-uri="${tag.conceptUri}" data-concept-name="${tag.conceptName}" data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName}</span>
+<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-uri="${tag.conceptUri}" data-concept-name="${tag.conceptName}" data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName} <i class="fas fa-times remove-concept"></i></span>
 </c:forEach>
 </div>
 <div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
