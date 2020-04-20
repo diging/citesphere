@@ -34,7 +34,7 @@
 </div>
 <div id="pull-right" class="pull-right" style="min-width: 35px;">
 	<button id ="prev" class="btn btn-default" style="font-size:10px;"type="submit"  href="" ${ empty previous ? 'disabled="disabled"' : ''}><i id="prevSpinner" class="fas fa-spinner fa-spin text-info"></i> < Previous</button>&nbsp;&nbsp;
-	<button id ="next" class="btn btn-default" style="font-size:10px;" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}><i id="nextSpinner" class="fas fa-spinner fa-spin text-info"></i>Next ></button>	
+	<button id ="next" class="btn btn-default" style="font-size:10px;" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}><i id="nextSpinner" class="fas fa-spinner fa-spin text-info"></i>Next ></button>
 </div>
 <table class="table table-striped">
 	<tr>
