@@ -24,20 +24,18 @@
  	  (${citation.dateFreetext})
  	  </c:if>
 
-</h2>
-<div class="pull-right" style="float:right;margin-top: 20px;">
-	<button id ="next" class="btn btn-primary" style="font-size:10px;" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}>Next >></button>
-</div>		
-<br/>		
+</h2>	
 <div class="pull-left" style="margin-bottom: 20px;">
-	<button id ="prev" class="btn btn-primary" style="font-size:10px;" type="submit" href="" ${ empty previous ? 'disabled="disabled"' : ''}><< Previous</button>&nbsp;&nbsp;
 	<a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />"><i
 		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; <a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />"><i
 		class="fas fa-sync" title="Sync Citation"></i></a>
 </div>
-
+<div id="pull-right" class="pull-right" style="min-width: 35px;">
+	<button id ="prev" class="btn btn-default" style="font-size:10px;"type="submit"  href="" ${ empty previous ? 'disabled="disabled"' : ''}><i id="prevSpinner" class="fas fa-spinner fa-spin text-info"></i> < Previous</button>&nbsp;&nbsp;
+	<button id ="next" class="btn btn-default" style="font-size:10px;" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}><i id="nextSpinner" class="fas fa-spinner fa-spin text-info"></i>Next ></button>	
+</div>
 <table class="table table-striped">
 	<tr>
 		<td width="20%">Item Key</td>
@@ -379,6 +377,7 @@
 			$("#parsed-ref-modal").modal();
 		});
 		
+		
 	});
 	
 	$(document).ready(function(){
@@ -388,20 +387,22 @@
 			type: "GET",
 			success: function(response){
 				if(response.next != null){
-					console.log(response.next);
-					console.log("hi ");
-					$('#next').attr("disabled", false);
 					document.getElementById("next").addEventListener("click", function(e) {
 						var url = "/${zoteroGroupId}/items/" + response.next + "?index=" + response.nextIndex + "&page=" + response.nextPage + "&sortBy=" + response.sortBy + "&collectionId=" + response.collectionId;
 						window.location.href = "<c:url value="/auth/group" />" + url;
 					});
+					$("#nextSpinner").hide();
+					$('#next').attr("disabled", false);
+					$('#next').removeClass("btn btn-default").addClass("btn btn-primary");
 				}
 				if(response.prev != null){
-					$('#prev').attr("disabled", false);
 					document.getElementById("prev").addEventListener("click", function(e) {
 						var url = "/${zoteroGroupId}/items/" + response.prev + "?index=" + response.prevIndex + "&page=" + response.prevPage + "&sortBy=" + response.sortBy + "&collectionId=" + response.collectionId;
 						window.location.href = "<c:url value="/auth/group" />" + url;
 					});
+					$("#prevSpinner").hide();
+					$('#prev').attr("disabled", false);
+					$('#prev').removeClass("btn btn-default").addClass("btn btn-primary");
 				}
 		}});
 	});
