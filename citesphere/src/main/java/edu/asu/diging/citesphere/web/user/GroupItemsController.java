@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import edu.asu.diging.citesphere.api.v1.model.impl.CitationView;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
@@ -140,11 +142,14 @@ public class GroupItemsController {
        IUser user = (IUser) authentication.getPrincipal();
        CitationResults results = getItemsManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
        if (results == null) {
-           responseMap.put("items", new CitationResults());
+           responseMap.put("items", null);
            responseMap.put("total", 0);
            responseMap.put("totalPages", 0);
        }else {  
-           responseMap.put("items", results.getCitations().get(0));
+           
+           
+           
+           responseMap.put("items", results.getCitations().stream().map(obj -> new CitationView(obj.getAuthors(), obj.getTitle(), obj.getKey(), obj.getDateFreetext(), obj.getUrl())).collect(Collectors.toList()));
            responseMap.put("total", results.getTotalResults());
            responseMap.put("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
        }

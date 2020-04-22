@@ -78,6 +78,17 @@ $(function() {
 	    }
 	});
 });
+///AJAX request
+	function doPoll(){
+	    $.post('<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}"/>'+ "?${_csrf.parameterName}=${_csrf.token}", function(data) {
+	        console.log(data);  
+	        if (data.items == null) {
+	        setTimeout(doPoll,1000);
+	        } else {
+	        	// process results here
+	        }
+	    });
+	}
 </script>
 
 <ol class="breadcrumb">
