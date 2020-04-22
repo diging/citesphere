@@ -1,4 +1,4 @@
-<%@ page pageEncoding="UTF-8"%>
+<%@ page pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="sec"
 	uri="http://www.springframework.org/security/tags"%>
@@ -1074,7 +1074,7 @@ let removeConcept = function removeConcept(e) {
 						</span>
 &nbsp;&nbsp;
 </c:forEach>
-			</span>
+</span>
 				<div class="pull-right">
 					<a data-toggle="modal" data-target="#editorModal"><i
 						class="fas fa-plus-circle"></i> Add Editor</a>
@@ -1114,331 +1114,190 @@ let removeConcept = function removeConcept(e) {
 								</span>
 					&nbsp;&nbsp;
 				</cite:creators>
+				</span>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${curCreator.value}</a></div>
+			</td>
+		</tr>
+	</c:if>
+</c:forEach>
+<c:forEach items="${citation.otherCreatorRoles}" var="role">
+	<c:if test="${not fn:contains(creatorMap, role)}">
+		<tr class="creator-row">
+			<td style="text-transform: capitalize;">${role}s</td>
+			<td>
+				<span id="${role}List" style="font-size: 18px">
+				<cite:creators citation="${citation}" role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" var="creator">
+				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+				 		<c:forEach items="${creator.person.affiliations}" var="aff"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></c:forEach>
+							${creator.person.lastName}<c:if test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
+							<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
+							&nbsp;<i class="far fa-edit edit-creator"></i>
+						<i class="fas fa-times remove-creator"></i>
 					</span>
-						<div class="pull-right">
-							<a class="creatorModalLink" data-toggle="modal"
-								data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}"
-								data-target="#creatorModal"><i class="fas fa-plus-circle"></i>
-								Add ${curCreator.value}</a>
-						</div></td>
-				</tr>
-			</c:if>
-		</c:forEach>
-		<c:forEach items="${citation.otherCreatorRoles}" var="role">
-			<c:if test="${not fn:contains(creatorMap, role)}">
-				<tr class="creator-row">
-					<td style="text-transform: capitalize;">${role}s</td>
-					<td><span id="${role}List" style="font-size: 18px"> <cite:creators
-								citation="${citation}"
-								role="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}"
-								var="creator">
-								<span id="${role}${varStatus}"
-									class="label label-info ${role}-item"
-									data-creator-id="${creator.id}"
-									data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}"
-									data-creator-firstname="${creator.person.firstName}"
-									data-creator-lastname="${creator.person.lastName}"
-									data-creator-uri="${creator.person.uri}"
-									data-creator-authority-id="${creator.person.localAuthorityId}">
-									<c:forEach items="${creator.person.affiliations}" var="aff">
-										<span data-affiliation-name="${aff.name}"
-											data-affiliation-id="${aff.id}"></span>
-									</c:forEach> ${creator.person.lastName}<c:if
-										test="${not empty creator.person.firstName}">, ${creator.person.firstName}</c:if>
-									<c:forEach items="${creator.person.affiliations}" var="aff"> (${aff.name})</c:forEach>
-									&nbsp;<i class="far fa-edit edit-creator"></i> <i
-									class="fas fa-times remove-creator"></i>
-								</span>
 					&nbsp;&nbsp;
 				</cite:creators>
-					</span>
-						<div class="pull-right">
-							<a class="creatorModalLink" data-toggle="modal"
-								data-creator-type="${role}" data-target="#creatorModal"><i
-								class="fas fa-plus-circle"></i> Add ${role}</a>
-						</div></td>
-				</tr>
-			</c:if>
-		</c:forEach>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
-			<td>Publication Title</td>
-			<td><form:input path="publicationTitle" type="text"
-					class="form-control" placeholder="Publication Title"
-					value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
-			<td>Publication Title</td>
-			<td><form:input path="publicationTitle" type="text"
-					class="form-control" placeholder="Publication Title"
-					value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'journalAbbreviation') }">style="display:none;"</c:if>>
-			<td>Journal Abbreviation</td>
-			<td><form:input path="journalAbbreviation" type="text"
-					class="form-control" placeholder="Journal Abbreviation"
-					value="${not empty form.journalAbbreviation ? form.journalAbbreviation : citation.journalAbbreviation}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'volume') }">style="display:none;"</c:if>>
-			<td>Volume</td>
-			<td><form:input path="volume" type="text" class="form-control"
-					placeholder="Volume"
-					value="${not empty form.volume ? form.volume : citation.volume}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'issue') }">style="display:none;"</c:if>>
-			<td>Issue</td>
-			<td><form:input path="issue" type="text" class="form-control"
-					placeholder="Issue"
-					value="${not empty form.issue ? form.issue : citation.issue}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'pages') }">style="display:none;"</c:if>>
-			<td>Pages</td>
-			<td><form:input path="pages" type="text" class="form-control"
-					placeholder="Pages"
-					value="${not empty form.pages ? form.pages : citation.pages}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'series') }">style="display:none;"</c:if>>
-			<td>Series</td>
-			<td><form:input path="series" type="text" class="form-control"
-					placeholder="Series"
-					value="${not empty form.series ? form.series : citation.series}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'seriesTitle') }">style="display:none;"</c:if>>
-			<td>Series Title</td>
-			<td><form:input path="seriesTitle" type="text"
-					class="form-control" placeholder="Series Title"
-					value="${not empty form.seriesTitle ? form.seriesTitle : citation.seriesTitle}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'seriesText') }">style="display:none;"</c:if>>
-			<td>Series Text</td>
-			<td><form:input path="seriesText" type="text"
-					class="form-control" placeholder="Series Text"
-					value="${not empty form.seriesText ? form.seriesText : citation.seriesText}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'url') }">style="display:none;"</c:if>>
-			<td>URL</td>
-			<td><form:input path="url" type="text" class="form-control"
-					placeholder="Url"
-					value="${not empty form.url ? form.url : citation.url}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'language') }">style="display:none;"</c:if>>
-			<td>Language</td>
-			<td><form:input path="language" type="text" class="form-control"
-					placeholder="Language"
-					value="${not empty form.language ? form.language : citation.language}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'doi') }">style="display:none;"</c:if>>
-			<td>DOI</td>
-			<td><form:input path="doi" type="text" class="form-control"
-					placeholder="DOI"
-					value="${not empty form.doi ? form.doi : citation.doi}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'issn') }">style="display:none;"</c:if>>
-			<td>ISSN</td>
-			<td><form:input path="issn" type="text" class="form-control"
-					placeholder="ISSN"
-					value="${not empty form.issn ? form.issn : citation.issn}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'archive') }">style="display:none;"</c:if>>
-			<td>Archive</td>
-			<td><form:input path="archive" type="text" class="form-control"
-					placeholder="Archive"
-					value="${not empty form.archive ? form.archive : citation.archive}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'archiveLocation') }">style="display:none;"</c:if>>
-			<td>Archive Location</td>
-			<td><form:input path="archiveLocation" type="text"
-					class="form-control" placeholder="Archive Location"
-					value="${not empty form.archiveLocation ? form.archiveLocation : citation.archiveLocation}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'libraryCatalog') }">style="display:none;"</c:if>>
-			<td>Library Catalog</td>
-			<td><form:input path="libraryCatalog" type="text"
-					class="form-control" placeholder="Library Catalog"
-					value="${not empty form.libraryCatalog ? form.libraryCatalog : citation.libraryCatalog}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'callNumber') }">style="display:none;"</c:if>>
-			<td>Call Number</td>
-			<td><form:input path="callNumber" type="text"
-					class="form-control" placeholder="Call Number"
-					value="${not empty form.callNumber ? form.callNumber : citation.callNumber}" /></td>
-		</tr>
-
-		<tr
-			<c:if test="${not fn:contains(fields, 'rights') }">style="display:none;"</c:if>>
-			<td>Rights</td>
-			<td><form:input path="rights" type="text" class="form-control"
-					placeholder="Rights"
-					value="${not empty form.rights ? form.rights : citation.rights}" /></td>
-		</tr>
-
-		<tr>
-			<td>Concepts</td>
-			<td>
-				<div id="conceptTags">
-					<c:forEach items="${citation.conceptTags}" var="tag">
-						<span class="badge" data-concept-id="${tag.localConceptId}"
-							data-concept-uri="${tag.conceptUri}"
-							data-concept-name="${tag.conceptName}"
-							data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}"
-							data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName}
-							| ${tag.typeName}</span>
-					</c:forEach>
-				</div>
-				<div class="pull-right">
-					<a class="addConceptModalLink" data-toggle="modal"
-						data-target="#addConceptModal"><i class="fas fa-plus-circle"></i>
-						Add Concept</a>
-				</div>
+				</span>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${role}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${role}</a></div>
 			</td>
 		</tr>
+	</c:if>
+</c:forEach>
 
+<tr <c:if test="${not fn:contains(fields, 'publicationTitle') }">style="display:none;"</c:if>>
+<td>Publication Title</td>
+<td><form:input path="publicationTitle" type="text" class="form-control" placeholder="Publication Title" value="${not empty form.publicationTitle ? form.publicationTitle : citation.publicationTitle}" /></td>
+</tr>
 
-		<tr>
-			<td>Concepts</td>
-			<td>
-				<div id="conceptTags">
-					<c:forEach items="${citation.conceptTags}" var="tag">
-						<span class="badge" data-concept-id="${tag.localConceptId}"
-							data-concept-uri="${tag.conceptUri}"
-							data-concept-name="${tag.conceptName}"
-							data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}"
-							data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName}
-							| ${tag.typeName} <i class="fas fa-times remove-concept"></i>
-						</span>
-					</c:forEach>
-				</div>
-				<div class="pull-right">
-					<a class="addConceptModalLink" data-toggle="modal"
-						data-target="#addConceptModal"><i class="fas fa-plus-circle"></i>
-						Add Concept</a>
-				</div>
-			</td>
-		</tr>
+<tr <c:if test="${not fn:contains(fields, 'journalAbbreviation') }">style="display:none;"</c:if>>
+<td>Journal Abbreviation</td>
+<td><form:input path="journalAbbreviation" type="text" class="form-control" placeholder="Journal Abbreviation" value="${not empty form.journalAbbreviation ? form.journalAbbreviation : citation.journalAbbreviation}" /></td>
+</tr>
 
-	</table>
+<tr <c:if test="${not fn:contains(fields, 'volume') }">style="display:none;"</c:if>>
+<td>Volume</td>
+<td><form:input path="volume"  type="text" class="form-control" placeholder="Volume" value="${not empty form.volume ? form.volume : citation.volume}" /></td>
+</tr>
 
-	<button id="submitForm" class="btn btn-primary" type="submit">
-		<i class="far fa-save"></i> &nbsp;Save
-	</button>
-	<a
-		href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />"
-		class="btn btn-default"> <i class="fa fa-times"></i>&nbsp;Cancel
-	</a>
+<tr <c:if test="${not fn:contains(fields, 'issue') }">style="display:none;"</c:if>>
+<td>Issue</td>
+<td><form:input path="issue" type="text" class="form-control" placeholder="Issue" value="${not empty form.issue ? form.issue : citation.issue}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'pages') }">style="display:none;"</c:if>>
+<td>Pages</td>
+<td><form:input path="pages" type="text" class="form-control" placeholder="Pages" value="${not empty form.pages ? form.pages : citation.pages}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'series') }">style="display:none;"</c:if>>
+<td>Series</td>
+<td><form:input path="series" type="text" class="form-control" placeholder="Series" value="${not empty form.series ? form.series : citation.series}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'seriesTitle') }">style="display:none;"</c:if>>
+<td>Series Title</td>
+<td><form:input path="seriesTitle" type="text" class="form-control" placeholder="Series Title" value="${not empty form.seriesTitle ? form.seriesTitle : citation.seriesTitle}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'seriesText') }">style="display:none;"</c:if>>
+<td>Series Text</td>
+<td><form:input path="seriesText" type="text" class="form-control" placeholder="Series Text" value="${not empty form.seriesText ? form.seriesText : citation.seriesText}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'url') }">style="display:none;"</c:if>>
+<td>URL</td>
+<td><form:input path="url" type="text" class="form-control" placeholder="Url" value="${not empty form.url ? form.url : citation.url}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'language') }">style="display:none;"</c:if>>
+<td>Language</td>
+<td><form:input path="language" type="text" class="form-control" placeholder="Language" value="${not empty form.language ? form.language : citation.language}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'doi') }">style="display:none;"</c:if>>
+<td>DOI</td>
+<td><form:input path="doi" type="text" class="form-control" placeholder="DOI" value="${not empty form.doi ? form.doi : citation.doi}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'issn') }">style="display:none;"</c:if>>
+<td>ISSN</td>
+<td><form:input path="issn" type="text" class="form-control" placeholder="ISSN" value="${not empty form.issn ? form.issn : citation.issn}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'archive') }">style="display:none;"</c:if>>
+<td>Archive</td>
+<td><form:input path="archive" type="text" class="form-control" placeholder="Archive" value="${not empty form.archive ? form.archive : citation.archive}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'archiveLocation') }">style="display:none;"</c:if>>
+<td>Archive Location</td>
+<td><form:input path="archiveLocation" type="text" class="form-control" placeholder="Archive Location" value="${not empty form.archiveLocation ? form.archiveLocation : citation.archiveLocation}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'libraryCatalog') }">style="display:none;"</c:if>>
+<td>Library Catalog</td>
+<td><form:input path="libraryCatalog" type="text" class="form-control" placeholder="Library Catalog" value="${not empty form.libraryCatalog ? form.libraryCatalog : citation.libraryCatalog}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'callNumber') }">style="display:none;"</c:if>>
+<td>Call Number</td>
+<td><form:input path="callNumber" type="text" class="form-control" placeholder="Call Number" value="${not empty form.callNumber ? form.callNumber : citation.callNumber}" /></td>
+</tr>
+
+<tr <c:if test="${not fn:contains(fields, 'rights') }">style="display:none;"</c:if>>
+<td>Rights</td>
+<td><form:input path="rights" type="text" class="form-control" placeholder="Rights" value="${not empty form.rights ? form.rights : citation.rights}" /></td>
+</tr>
+
+<tr>
+<td>Concepts</td>
+<td>
+<div id="conceptTags">
+<c:forEach items="${citation.conceptTags}" var="tag">
+<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-uri="${tag.conceptUri}" data-concept-name="${tag.conceptName}" data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName} <i class="fas fa-times remove-concept"></i></span>
+</c:forEach>
+</div>
+<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
+</td>
+</tr>
+
+</table>
+
+<button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
+<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />" class="btn btn-default">
+		<i class="fa fa-times"></i>&nbsp;Cancel
+</a>
 </form:form>
 
 <!-- Author Modal -->
-<div class="modal fade" id="authorModal" tabindex="-1" role="dialog"
-	aria-labelledby="authorLabel">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"
-					aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title" id="authorLabel">Enter Author
-					Information</h4>
-			</div>
-			<div class="modal-body">
-				<div class="form-group">
-					<input type="hidden" class="form-control" id="idAuthor">
-				</div>
-				<div class="form-group">
-					<label for="firstNameAuthor">First Name:</label> <input type="text"
-						class="form-control" id="firstNameAuthor" placeholder="First Name">
-				</div>
-				<div class="form-group">
-					<label for="lastNameAuthor">Last Name:</label> <input type="text"
-						class="form-control" id="lastNameAuthor" placeholder="Last Name">
-				</div>
-
-				<div>
-					<button class="btn btn-primary" data-toggle="modal"
-						data-target="#selectAuthorityModel" id="searchAuthor"
-						style="margin-left: 80%" disabled>
-						Search Author <i id="searchAuthorSpinner"
-							class="fas fa-spinner fa-spin text-info" style="color: white"></i>
-					</button>
-				</div>
-
-
-				<div class="form-group">
-					<label for="uriAuthor">URI:</label>
-					<div class="input-group">
-						<input type="text" class="form-control" id="uriAuthor"
-							placeholder="URI">
-						<div id="authorIconContainer" class="input-group-addon"
-							style="min-width: 35px;">
-							<i id="uriLoadingSpinnerAuthor"
-								class="fas fa-spinner fa-spin text-info"></i> <i
-								id="uriLoadingFoundAuthor"
-								class="fas fa-info-circle text-success" data-toggle="popover"
-								data-html="true" data-placement="right"></i> <i
-								id="uriLoadingFailureAuthor"
-								class="fas fa-exclamation-triangle text-danger"
-								data-toggle="popover" data-html="true" data-placement="right"
-								data-content="Could not find any data for this URI."></i>
-						</div>
-						<input type="hidden" id="uriAuthorLocalId" />
-					</div>
-					<div class="text-warning pull-right" id="authorAuthorityUsed"></div>
-				</div>
-				<div id="authorAffiliations">
-					<div id="authorAffiliationTemplate" class="form-group">
-						<label for="affiliationAuthor">Affiliation:</label> <input
-							type="text" class="form-control" placeholder="Affiliation">
-					</div>
-				</div>
-				<div>
-					<div class="text-right">
-						<a id="addAuthorAffiliation"><i class="fas fa-plus-circle"
-							title="Add another affiliation"></i> Add Affiliation</a>
-					</div>
-				</div>
-			</div>
-
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default"
-					id="addAuthorModalCancel">Close</button>
-				<button id="addAuthorButton" type="button" class="btn btn-primary">Add
-					Author</button>
-			</div>
-		</div>
-	</div>
+<div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="authorLabel">Enter Author Information</h4>
+      </div>
+      <div class="modal-body">
+      	  <div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idAuthor">
+      	  </div>
+          <div class="form-group">
+		    <label for="firstNameAuthor">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameAuthor">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="uriAuthor">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
+			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundAuthor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureAuthor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriAuthorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
+		  </div>
+		  <div id="authorAffiliations">
+		  <div id="authorAffiliationTemplate" class="form-group">
+		    <label for="affiliationAuthor">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="addAuthorModalCancel">Close</button>
+        <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Editor Modal -->

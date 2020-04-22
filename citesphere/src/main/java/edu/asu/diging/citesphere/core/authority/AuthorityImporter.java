@@ -12,13 +12,17 @@ import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
  * Three methods need to be implemented:
  * <ul>
  * <li><code>isResponsible</code>: this method should return true if the
- * importer can import the provided URI (e.g. by check against a regex
- * pattern).</li>
+ * importer can import the provided URI (e.g. by check against a regex pattern)
+ * or if the importer is related to the source(authority service) for authority
+ * search</li>
  * <li><code>retrieveAuthority</code>: this method should retrieve information
  * about the authority that belongs to the provided URI.</li>
  * <li><code>getId</code>: the id of this importer. There should be an entry in
  * config.properties under <code>_importer_name_[importerId]</code> for a human
  * readable name (e.g. VIAF for the VIAF authority service).
+ * <li><code>searchAuthorities</code>: this method should search authorities
+ * from sources like viaf or conceptpower based on the first name and last name
+ * of the authority</li>
  * </ul>
  * 
  * @author jdamerow

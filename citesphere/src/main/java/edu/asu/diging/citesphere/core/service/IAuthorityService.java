@@ -34,9 +34,6 @@ public interface IAuthorityService {
 
     List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize);
 
-    Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page,
-            int pageSize, List<String> uris) throws GroupDoesNotExistException;
-
     Set<IAuthorityEntry> findByNameInDataset(IUser user, String firstName, String lastName, String citationGroupId,
             int page, int pageSize) throws GroupDoesNotExistException;
 
