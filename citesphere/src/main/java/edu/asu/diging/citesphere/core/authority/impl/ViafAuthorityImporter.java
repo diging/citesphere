@@ -103,4 +103,9 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 
         return null;
     }
+
+    @Override
+    public boolean isResponsibleForSearch(String source) {
+        return false;
+    }
 }

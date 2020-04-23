@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
@@ -153,6 +154,10 @@ public class AuthorityEntryController {
         } catch (URISyntaxException e) {
             logger.warn("Not a valid URI: " + firstName + lastName, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        } catch (AuthorityImporterNotFoundException e) {
+            logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);

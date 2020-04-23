@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
+import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
@@ -18,7 +19,7 @@ public interface IAuthorityService {
     IAuthorityEntry importAuthority(String uri) throws AuthorityServiceConnectionException, URISyntaxException;
 
     AuthoritySearchResult searchAuthorityEntries(IUser user, String firstName, String lastName, String source, int page,
-            int pageSize) throws AuthorityServiceConnectionException, URISyntaxException;
+            int pageSize) throws AuthorityServiceConnectionException, URISyntaxException, AuthorityImporterNotFoundException;
 
     IAuthorityEntry save(IAuthorityEntry entry);
 

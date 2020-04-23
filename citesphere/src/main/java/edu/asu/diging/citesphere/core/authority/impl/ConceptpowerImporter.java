@@ -46,7 +46,13 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
     @PostConstruct
     private void postConstruct() {
+
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
+        factory.setHttpClient(httpClient);
+
         restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(factory);
     }
 
     /*
@@ -59,10 +65,14 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
     @Override
     public boolean isResponsible(String source) {
 
-        if (CONCEPTPOWER.equals(source)) {
+        return false;
+    }
+
+    @Override
+    public boolean isResponsibleForSearch(String source) {
+        if (source.equals(CONCEPTPOWER)) {
             return true;
         }
-
         return false;
     }
 
@@ -86,11 +96,6 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
     @Override
     public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
             throws URISyntaxException, AuthorityServiceConnectionException {
-
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
-        factory.setHttpClient(httpClient);
-        restTemplate.setRequestFactory(factory);
 
         RequestEntity<Void> request;
         try {
@@ -153,4 +158,5 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
         return conceptpowerSearchString;
     }
+
 }
