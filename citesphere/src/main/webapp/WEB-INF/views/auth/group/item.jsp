@@ -383,28 +383,35 @@
 	$(document).ready(function(){
 		var urlVar = "/${zoteroGroupId}/items/${citation.key}/paging?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}";
 		$.ajax({ 
-			url: '<c:url value="/auth/group" />' + urlVar,
-			type: "GET",
-			success: function(response){
+			'url': '<c:url value="/auth/group" />' + urlVar,
+			'type': "GET",
+			'success': function(response){
 				if(response.next != null){
 					document.getElementById("next").addEventListener("click", function(e) {
 						var url = "/${zoteroGroupId}/items/" + response.next + "?index=" + response.nextIndex + "&page=" + response.nextPage + "&sortBy=" + response.sortBy + "&collectionId=" + response.collectionId;
 						window.location.href = "<c:url value="/auth/group" />" + url;
 					});
-					$("#nextSpinner").hide();
 					$('#next').attr("disabled", false);
 					$('#next').removeClass("btn btn-default").addClass("btn btn-primary");
 				}
+				
 				if(response.prev != null){
 					document.getElementById("prev").addEventListener("click", function(e) {
 						var url = "/${zoteroGroupId}/items/" + response.prev + "?index=" + response.prevIndex + "&page=" + response.prevPage + "&sortBy=" + response.sortBy + "&collectionId=" + response.collectionId;
 						window.location.href = "<c:url value="/auth/group" />" + url;
 					});
-					$("#prevSpinner").hide();
 					$('#prev').attr("disabled", false);
 					$('#prev').removeClass("btn btn-default").addClass("btn btn-primary");
 				}
-		}});
+				$("#nextSpinner").hide(),
+				$("#prevSpinner").hide();
+			},
+			'error': function(data) {
+				$("#nextSpinner").hide(),
+				$("#prevSpinner").hide();
+			}
+		});
+		
 	});
 	
 </script>
