@@ -69,31 +69,26 @@ $(function() {
 	
 	/* Disable search authority button when first name and last name fields are empty*/
     $("#firstNameAuthor").keyup(function(e){
-           if($("#firstNameAuthor").val() == "" && $("#lastNameAuthor").val()==""){
-               $("#searchAuthor").prop("disabled", true);
-           }
-           else{
-               $("#searchAuthor").prop("disabled", false);
-           }
+    	allowAuthoritySearch("Author");
      });
 		
+    $("#lastNameAuthor").keyup(function(e){
+    	allowAuthoritySearch("Author");
+     });
     $("#firstNameEditor").keyup(function(e){
-        if($("#firstNameEditor").val() == "" && $("#lastNameEditor").val()==""){
-            $("#searchEditor").prop("disabled", true);
-        }
-        else{
-            $("#searchEditor").prop("disabled", false);
-        }
-  });
-   
+    	allowAuthoritySearch("Editor");
+     });
+		
+    $("#lastNameEditor").keyup(function(e){
+    	allowAuthoritySearch("Editor");
+     });
     $("#firstNameCreator").keyup(function(e){
-        if($("#firstNameCreator").val() == "" && $("#lastNameCreator").val()==""){
-            $("#searchCreator").prop("disabled", true);
-        }
-        else{
-            $("#searchCreator").prop("disabled", false);
-        }
-  });
+    	allowAuthoritySearch("Creator");
+     });
+		
+    $("#lastNameCreator").keyup(function(e){
+    	allowAuthoritySearch("Creator");
+     });
 
 	$("#searchAuthor").click(function() {
 		$("#searchAuthorSpinner").show();
@@ -350,6 +345,16 @@ $(function() {
 		$("#addConceptModal").modal('hide');
 	});
 });
+
+function allowAuthoritySearch(element){
+    if($("#firstName"+element).val() == "" && $("#lastName"+element).val()==""){
+        $("#search"+element).prop("disabled", true);
+    }
+    else{
+        $("#search"+element).prop("disabled", false);
+    }
+}
+
 
 /* Function to populate name in modal fetched from uri */
 function showPersonNameInModal(name, personType){
@@ -796,11 +801,11 @@ function getDatasetAuthorities(modalType, personType, page) {
 			  		url: createManageAuthorityURL,
 			  		async:false,
 			  		success: function(data) {
-			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  			$("#editorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
 			  		},
 				error: function(data){					
 					$("#uri"+modalType).val("");
-		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+		  			$("#editorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
 				}
 				});				
 						
@@ -883,11 +888,11 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			  		url: createManageAuthorityURL,
 			  		async:false,
 			  		success: function(data) {
-			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
 			  		},
 				error: function(data){					
 					$("#uri"+modalType).val("");
-		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+		  			$("#creatorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
 				}
 				});				
 						
