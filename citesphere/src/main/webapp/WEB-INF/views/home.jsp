@@ -37,11 +37,29 @@ If you try and take a cat apart to see how it works, the first thing you have on
 <div class="col-md-12">
 <c:forEach items="${groups}" var="group">
 <div class="panel panel-default">
-  <div class="panel-body">
-    <a href="<c:url value="/auth/group/${group.id}/items" />">${group.name} (${group.numItems})</a>
+  <div id = "groups" class="panel-body">
   </div>
 </div>
 </c:forEach>
 </div>
 </c:if>
 </sec:authorize>
+
+<script>
+$(document).ready(function(){
+	var urlVar = "/${zoteroGroupId}/items/${citation.key}/paging?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}";
+	$.ajax({ 
+		'url': '<c:url value="/groups?isZoteroConnected=${isZoteroConnected}" />',
+		'type': "GET",
+		'success': function(response){
+			var link = $("<a>");
+            link.attr("href", "<c:url value="/auth/group/${group.id}/items" />");
+            link.text(${group.name} (${group.numItems}));
+            link.addClass("link");
+			$('#groups').html(link);
+			
+		}
+	});
+	
+});
+</script>

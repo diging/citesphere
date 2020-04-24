@@ -1,13 +1,21 @@
 package edu.asu.diging.citesphere.web;
 
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroTokenManager;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
@@ -26,12 +34,18 @@ public class HomeController {
             boolean isConnected = tokenManager.getToken(user) != null;
             model.addAttribute("isZoteroConnected", isConnected);
             model.addAttribute("user", user);
-            if (isConnected) {
-                model.addAttribute("groups", citationManager.getGroups(user));
-            }
         }
         
         return "home";
+    }
+    
+    @RequestMapping(value = "/groups")
+    public List<ICitationGroup> getGroups(Authentication authentication, @RequestParam(defaultValue = "false", required = true, value = "isConnected") String isConnected) {
+       boolean isZoteroConnected = Boolean.parseBoolean(isConnected);
+        if (isZoteroConnected) {
+           return citationManager.getGroups((IUser) authentication.getPrincipal());
+       }
+        return new ArrayList<ICitationGroup>(); 
     }
     
     @RequestMapping(value ="/login")
