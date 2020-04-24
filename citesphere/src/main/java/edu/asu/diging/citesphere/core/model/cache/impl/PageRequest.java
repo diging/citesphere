@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.model.cache.impl;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,6 +17,8 @@ import javax.persistence.NamedEntityGraphs;
 import javax.persistence.NamedSubgraph;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Parameter;
 
 import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
@@ -62,8 +65,9 @@ public class PageRequest implements IPageRequest {
     private IUser user;
     private String objectId;
     private long version;
+    @NotFound(action=NotFoundAction.IGNORE)
     @ManyToMany(targetEntity=Citation.class)
-    private List<ICitation> citations;
+    private Set<ICitation> citations;
     private String sortBy;
     private String collectionId;
     
@@ -176,11 +180,11 @@ public class PageRequest implements IPageRequest {
         this.version = version;
     }
     @Override
-    public List<ICitation> getCitations() {
+    public Set<ICitation> getCitations() {
         return citations;
     }
     @Override
-    public void setCitations(List<ICitation> citations) {
+    public void setCitations(Set<ICitation> citations) {
         this.citations = citations;
     }
     @Override
