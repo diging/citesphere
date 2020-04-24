@@ -107,8 +107,8 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
             request = RequestEntity.get(uri).accept(MediaType.APPLICATION_JSON).build();
         } catch (UnsupportedEncodingException e) {
-            throw new AssertionError(StandardCharsets.UTF_8.toString() + " is not supported");
-
+            throw new AuthorityServiceConnectionException("Exception occured while creating URI for authority search",
+                    e);
         }
         ResponseEntity<ConceptpowerResponse> response = null;
         try {
