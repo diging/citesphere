@@ -98,6 +98,7 @@ public class GroupItemsController {
         ICitationCollection collection = null;
         if (collectionId != null) {
             collection = collectionManager.getCollection(user, groupId, collectionId);
+            model.addAttribute("collectionName", collection.getName());
         }
         while(collection != null) {
             breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));

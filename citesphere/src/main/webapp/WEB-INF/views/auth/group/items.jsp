@@ -99,9 +99,17 @@ $(function() {
 </c:forEach>
 </ol>
 
-
-<h2>Items in Group ${group.name}<br>
-<small>${total} records </small>
+<h2>
+	<c:choose>
+	    <c:when test="${collectionId!=null}">
+	        Items in Collection ${collectionName}</br>
+	    </c:when>    
+	    <c:otherwise>
+	        Items in Group ${group.name}</br>
+	    </c:otherwise>
+	</c:choose>
+	
+	<small>${total} records </small>
 </h2>
 
 <div class="form-group">
