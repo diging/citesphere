@@ -374,8 +374,12 @@ public class AuthorityServiceTest {
     @Test
     public void test_findByName_withInterchangedFirstNameAndLastName() {
 
+        entriesAlbert.remove(1);
+        Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
+                "Einstein", "Albert", paging)).thenReturn(entriesAlbert);
+
         // Testing authority search by full name with first and last name interchanged
-        List<IAuthorityEntry> searchFullNameReverseOrder = managerToTest.findByName(user, "Albert", "Einstein", page,
+        List<IAuthorityEntry> searchFullNameReverseOrder = managerToTest.findByName(user, "Einstein", "Albert", page,
                 pageSize);
 
         Assert.assertEquals(2, searchFullNameReverseOrder.size());
@@ -406,7 +410,7 @@ public class AuthorityServiceTest {
         Mockito.when(authorityRepository
                 .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), "Peter", "Doe"))
                 .thenReturn((long) 0);
-        Assert.assertEquals(managerToTest.getTotalUserAuthoritiesPages(user, "Peter", "Doe", pageSize), 0);
+        Assert.assertEquals(0, managerToTest.getTotalUserAuthoritiesPages(user, "Peter", "Doe", pageSize));
     }
 
     @Test
@@ -417,7 +421,7 @@ public class AuthorityServiceTest {
         Mockito.when(authorityRepository
                 .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), "", "Albert"))
                 .thenReturn((long) 3);
-        Assert.assertEquals(managerToTest.getTotalUserAuthoritiesPages(user, "", "Albert", pageSize), 1);
+        Assert.assertEquals(1, managerToTest.getTotalUserAuthoritiesPages(user, "", "Albert", pageSize));
     }
 
     @Test
@@ -429,7 +433,7 @@ public class AuthorityServiceTest {
         Mockito.when(authorityRepository
                 .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), "", "Albert"))
                 .thenReturn((long) 3);
-        Assert.assertEquals(managerToTest.getTotalUserAuthoritiesPages(user, "", "Albert", pageSize), 2);
+        Assert.assertEquals(2, managerToTest.getTotalUserAuthoritiesPages(user, "", "Albert", pageSize));
     }
 
     @Test
@@ -437,23 +441,32 @@ public class AuthorityServiceTest {
 
         List<String> uriList = new ArrayList<String>();
         uriList.add("http://test1.uri/");
+        uriList.add("http://test2.uri/");
+        uriList.add("http://test1.uri/");
 
-        // user has imported authorities with last 'Albert' and uri 'http://test1.uri/'
+        // user has imported authorities with first 'Albert' and uri 'http://test1.uri/'
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
-                "", "Albert", paging)).thenReturn(entriesAlbert);
+                "Albert", "")).thenReturn(entriesAlbert);
 
         Person p = new Person();
         p.setUri("http://test22.uri/");
+        p.setLocalAuthorityId("6");
         List<Person> personList = new ArrayList<Person>();
         personList.add(p);
 
-        // returning authorities imported by other users for last name 'Albert'
-        Mockito.when(personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn(group, "", "Albert",
+        AuthorityEntry albertEntry = new AuthorityEntry();
+        albertEntry.setUri(p.getUri());
+
+        Optional<AuthorityEntry> entry_op = Optional.of((AuthorityEntry) albertEntry);
+        Mockito.when(entryRepository.findById(p.getLocalAuthorityId())).thenReturn(entry_op);
+
+        // returning authorities imported by other users for first name 'Albert'
+        Mockito.when(personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn(group, "Albert", "",
                 uriList, paging)).thenReturn(personList);
 
-        Set<IAuthorityEntry> searchResult = managerToTest.findByNameInDataset(user, "", "Albert", "5", page, pageSize);
+        Set<IAuthorityEntry> searchResult = managerToTest.findByNameInDataset(user, "Albert", "", "5", page, pageSize);
 
-        Assert.assertEquals(searchResult.size(), 1);
+        Assert.assertEquals(1, searchResult.size());
 
         // assert search results does not contain authority imported by user
         for (IAuthorityEntry entry : searchResult) {
@@ -467,7 +480,7 @@ public class AuthorityServiceTest {
         // user has not imported any authority with name 'Albert' and uri
         // 'http://test1.uri/'
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
-                "", "Albert", paging)).thenReturn(new ArrayList<IAuthorityEntry>());
+                "Albert", "")).thenReturn(new ArrayList<IAuthorityEntry>());
 
         Person p = new Person();
         p.setUri("http://test1.uri/");
@@ -480,18 +493,18 @@ public class AuthorityServiceTest {
         Optional<AuthorityEntry> entry_op = Optional.of((AuthorityEntry) entriesAlbert.get(0));
         Mockito.when(entryRepository.findById(p.getLocalAuthorityId())).thenReturn(entry_op);
 
-        Mockito.when(personAuthorityRepository.findPersonsByCitationGroupAndNameLike(group, "", "Albert", paging))
+        Mockito.when(personAuthorityRepository.findPersonsByCitationGroupAndNameLike(group, "Albert", "", paging))
                 .thenReturn(personList);
 
         // search for authority by name 'Albert'
-        Set<IAuthorityEntry> searchResult = managerToTest.findByNameInDataset(user, "", "Albert", "5", page, pageSize);
+        Set<IAuthorityEntry> searchResult = managerToTest.findByNameInDataset(user, "Albert", "", "5", page, pageSize);
 
-        Assert.assertEquals(searchResult.size(), 1);
+        Assert.assertEquals(1, searchResult.size());
 
         // assert search result contains authority with uri 'http://test1.uri/'
         Assert.assertFalse(searchResult.isEmpty());
         for (IAuthorityEntry entry : searchResult) {
-            Assert.assertEquals(entry.getUri(), "http://test1.uri/");
+            Assert.assertEquals("http://test1.uri/", entry.getUri());
             Assert.assertTrue(entry.getName().contains("Einstein"));
             Assert.assertTrue(entry.getName().contains("Albert"));
         }
@@ -504,7 +517,7 @@ public class AuthorityServiceTest {
         Mockito.when(personAuthorityRepository.countByPersonsByCitationGroupAndNameLike(group, "Peter", "Doe"))
                 .thenReturn((long) 0);
 
-        Assert.assertEquals(managerToTest.getTotalDatasetAuthoritiesPages("5", "Peter", "Doe", pageSize), 0);
+        Assert.assertEquals(0, managerToTest.getTotalDatasetAuthoritiesPages("5", "Peter", "Doe", pageSize));
     }
 
     @Test
@@ -513,7 +526,7 @@ public class AuthorityServiceTest {
         Mockito.when(personAuthorityRepository.countByPersonsByCitationGroupAndNameLike(group, "Jane", "Rose"))
                 .thenReturn((long) 1);
 
-        Assert.assertEquals(managerToTest.getTotalDatasetAuthoritiesPages("5", "Jane", "Rose", pageSize), 1);
+        Assert.assertEquals(1, managerToTest.getTotalDatasetAuthoritiesPages("5", "Jane", "Rose", pageSize));
     }
 
     @Test
@@ -524,7 +537,7 @@ public class AuthorityServiceTest {
 
         pageSize = 20;
 
-        Assert.assertEquals(managerToTest.getTotalDatasetAuthoritiesPages("5", "", "Albert", pageSize), 2);
+        Assert.assertEquals(2, managerToTest.getTotalDatasetAuthoritiesPages("5", "", "Albert", pageSize));
     }
 
     @Test
@@ -551,7 +564,7 @@ public class AuthorityServiceTest {
         importers.add(testImporter);
 
         managerToTest.register(testImporter);
-        Mockito.when(testImporter.isResponsible(source)).thenReturn(true);
+        Mockito.when(testImporter.isResponsibleForSearch(source)).thenReturn(true);
 
         Mockito.when(testImporter.searchAuthorities("", "Albert", page, pageSize)).thenReturn(searchResult);
 
@@ -559,10 +572,10 @@ public class AuthorityServiceTest {
 
         Assert.assertNotNull(result);
 
-        Assert.assertEquals(result.getFoundAuthorities().size(), 1);
+        Assert.assertEquals(1, result.getFoundAuthorities().size());
 
         // assert search result contains authority with uri 'http://test1.uri/'
-        Assert.assertEquals(result.getFoundAuthorities().get(0).getUri(), "http://test1.uri/");
+        Assert.assertEquals("http://test1.uri/", result.getFoundAuthorities().get(0).getUri());
     }
 
     @Test
@@ -589,18 +602,18 @@ public class AuthorityServiceTest {
         importers.add(testImporter);
 
         managerToTest.register(testImporter);
-        Mockito.when(testImporter.isResponsible(source)).thenReturn(true);
+        Mockito.when(testImporter.isResponsibleForSearch(source)).thenReturn(true);
 
         Mockito.when(testImporter.searchAuthorities("", "Albert", page, pageSize)).thenReturn(searchResult);
 
         // call searchAuthorityEntries
         AuthoritySearchResult result = managerToTest.searchAuthorityEntries(user, "", "Albert", source, page, pageSize);
         Assert.assertNotNull(result);
-        Assert.assertEquals(result.getFoundAuthorities().size(), 1);
+        Assert.assertEquals(1, result.getFoundAuthorities().size());
 
         // assert search result does not contain authority with uri 'http://test1.uri/'
-        Assert.assertNotEquals(result.getFoundAuthorities().get(0).getUri(), "http://test1.uri/");
-        Assert.assertEquals(result.getFoundAuthorities().get(0).getUri(), "http://test198.uri/");
+        Assert.assertNotEquals("http://test1.uri/", result.getFoundAuthorities().get(0).getUri());
+        Assert.assertEquals("http://test198.uri/", result.getFoundAuthorities().get(0).getUri());
     }
 
 }

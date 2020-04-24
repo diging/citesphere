@@ -745,7 +745,7 @@ function getDatasetAuthorities(modalType, personType, page) {
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/datasetAuthorities?firstName='+ firstName + '&lastName=' + '&page='+page+'"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/datasetAuthorities?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
 		
 	$.ajax({
   		dataType: "json",
