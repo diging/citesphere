@@ -47,7 +47,7 @@ public class PersistentContext {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
         em.setPackagesToScan(new String[] { "edu.asu.diging.citesphere.core.model", "edu.asu.diging.citesphere.model",
-                "edu.asu.diging.citesphere.user" });
+            "edu.asu.diging.citesphere.user" });
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
