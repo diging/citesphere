@@ -70,7 +70,12 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 
     @PostConstruct
     private void postConstruct() {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
+        factory.setHttpClient(httpClient);
+
         restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(factory);
     }
 
     /*
@@ -81,14 +86,28 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
      * .lang.String)
      */
     @Override
-    public boolean isResponsible(String source) {
+    public boolean isResponsible(String uri) {
         Pattern pattern = Pattern.compile(viafUrlRegex);
-        Matcher matcher = pattern.matcher(source);
+        Matcher matcher = pattern.matcher(uri);
 
-        if (matcher.matches() || ID.contains(source)) {
+        if (matcher.matches()) {
             return true;
         }
 
+        return false;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.authority.impl.AuthorityImporter#
+     * isResponsibleForSearch(java .lang.String)
+     */
+    @Override
+    public boolean isResponsibleForSearch(String source) {
+        if (source.equals(VIAF)) {
+            return true;
+        }
         return false;
     }
 
@@ -102,11 +121,6 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     @Cacheable("viafAuthorities")
     public IImportedAuthority retrieveAuthorityData(String uri)
             throws URISyntaxException, AuthorityServiceConnectionException {
-
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
-        factory.setHttpClient(httpClient);
-        restTemplate.setRequestFactory(factory);
 
         RequestEntity<Void> request = RequestEntity.get(new URI(uri)).accept(MediaType.APPLICATION_JSON).build();
         ResponseEntity<ViafResponse> response = null;
@@ -136,30 +150,29 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     }
 
     @Override
-    public AuthoritySearchResult searchAuthorities(String searchString, String source, int page, int pageSize)
-
-            throws  AuthorityServiceConnectionException {
-
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
-        factory.setHttpClient(httpClient);
-        restTemplate.setRequestFactory(factory);
+    public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
+            throws AuthorityServiceConnectionException {
 
         String startIndex = page == 0 ? "1" : Integer.toString(page * pageSize);
         String fullUrl = "";
         RequestEntity<Void> request;
+        
         try {
             fullUrl = viafsearchUrl.trim() + viafsearchquery.trim()
-                    + URLEncoder.encode(searchString.trim(), StandardCharsets.UTF_8.toString())
+                    + URLEncoder.encode(getViafSearchString(firstName, lastName), StandardCharsets.UTF_8.toString())
                     + viafPageSizequery.trim() + viafMaxResults.trim() + viafStartIndexQuery.trim() + startIndex.trim()
                     + searchViafURLPath2.trim();
+            
             URI uri = UriComponentsBuilder.fromUriString(fullUrl).build(true).toUri();
             request = RequestEntity.get(uri).accept(MediaType.APPLICATION_RSS_XML).build();
+            
         } catch (UnsupportedEncodingException e) {
-            throw new AssertionError(StandardCharsets.UTF_8.toString() + " is not supported");
+            throw new AuthorityServiceConnectionException("Exception occured while creating URI for authority search",
+                    e);
         }
 
         ResponseEntity<ViafReply> response = null;
+        
         try {
             response = restTemplate.exchange(request, ViafReply.class);
         } catch (RestClientException ex) {
@@ -192,9 +205,10 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
         return searchResult;
     }
 
-    @Override
-    public boolean isResponsibleForSearch(String source) {
-        // TODO Auto-generated method stub
-        return false;
+    // This method takes is responsible for creating search string based on the
+    // first name and last name.
+    private String getViafSearchString(String firstName, String lastName) {
+
+        return " " + firstName + " " + lastName;
     }
 }

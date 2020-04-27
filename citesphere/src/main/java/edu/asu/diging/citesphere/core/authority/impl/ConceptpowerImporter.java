@@ -63,7 +63,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
      * .lang.String)
      */
     @Override
-    public boolean isResponsible(String source) {
+    public boolean isResponsible(String uri) {
 
         return false;
     }

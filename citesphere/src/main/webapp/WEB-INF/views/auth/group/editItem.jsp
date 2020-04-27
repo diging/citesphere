@@ -159,6 +159,7 @@ $(function() {
 	
 	$("#closeAuthoritySearchResult").click(function() {
 		$("#selectAuthorityModel").modal('hide');
+		$('#selectAuthorityModel a:first').tab('show');
 	});
 		
 	/* Handle editor events */
@@ -327,12 +328,15 @@ function allowAuthoritySearch(element){
 }
 
 function onClickAuthoritySearch(element){
+	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+		$('#selectAuthorityModel a:first').tab('show');
+	})  
 	$("#search"+element+"Spinner").show();
 	$('#userAuthority-pagination-top').twbsPagination('destroy');
 	$('#datasetAuthority-pagination-top').twbsPagination('destroy');
 	$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 	
-	getAuthoritiesBySource("userAuthority", element,element, 0)
+	getUserAuthorities(element,element, 0)
 	getDatasetAuthorities(element,element, 0)
 	getConceptpowerAuthorities(element,element,0)
 	getViafAuthorities(element,element,0)
@@ -653,13 +657,10 @@ function getPersonAuthority(uri, personType) {
 
 }
 
-function getAuthoritiesBySource(source, modalType, personType, page) {
-
-	source = "userAuthority";
+function getUserAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
-
 	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/userAuthorities?firstName='+ firstName + '&lastName=' + lastName +'&page='+page+'"/>'
 		
 	$.ajax({
@@ -669,8 +670,7 @@ function getAuthoritiesBySource(source, modalType, personType, page) {
   		async: false,
   		success: function(data) {
 			
-  			$("#"+source+"SearchResult").empty();
-
+  			$("#userAuthoritySearchResult").empty();
   			var content = '';
   			
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
@@ -685,7 +685,7 @@ function getAuthoritiesBySource(source, modalType, personType, page) {
   					
   				});
   				
-  				$("#"+source+"-pagination-top").twbsPagination({
+  				$('#userAuthority-pagination-top').twbsPagination({
   				    totalPages: data['totalPages'],
   				    startPage: data['currentPage'],
   				    prev: "«",
@@ -694,42 +694,36 @@ function getAuthoritiesBySource(source, modalType, personType, page) {
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
   				    	   getUserAuthorities(modalType, personType, page-1)
-
   				    }
   				});
   			}  		
   			
 		
-		$("#"+source+"SearchResult").append(content);
-		$("#"+source+"SearchResult").click(function() {
+		$("#userAuthoritySearchResult").append(content);
+		$("#userAuthoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
 			uri = $(this).closest('td').next().text();
 				
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
-			$("#authorAuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
+			$("#"+personType_lowerCase+"AuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
 			$("#selectAuthorityModel").modal('hide');
 		});	
 		 	
         },
     	error: function(data){
-    		$("#"+source+"SearchResult").parents('table').hide()
-    		$("#"+source+"Error").show();	
+    		$('#userAuthoritySearchResult').parents('table').hide()
+    		$("#userAuthoritiesError").show();	
     	}
 	
 	});
-
 }
-
-
 function getDatasetAuthorities(modalType, personType, page) {
-
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
-
-	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/datasetAuthorities?firstName='+ firstName + '&lastName=' + '&page='+page+'"/>'
+	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/datasetAuthorities?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
 		
 	$.ajax({
   		dataType: "json",
@@ -762,13 +756,11 @@ function getDatasetAuthorities(modalType, personType, page) {
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
   				    	getDatasetAuthorities(modalType, personType, page-1)
-
   				    }
   				});
   			}		
   		
 		$("#datasetAuthoritySearchResult").append(content);
-
 		$("#datasetAuthoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
@@ -785,11 +777,11 @@ function getDatasetAuthorities(modalType, personType, page) {
 			  		url: createManageAuthorityURL,
 			  		async:false,
 			  		success: function(data) {
-			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  			$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
 			  		},
 				error: function(data){					
 					$("#uri"+modalType).val("");
-		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
 				}
 				});				
 						
@@ -803,16 +795,11 @@ function getDatasetAuthorities(modalType, personType, page) {
     	}
 	
 	});
-
 }
-
-
-function getConceptpowerAuthorities(modalType, personType, page) {
-
+function getconceptpowerAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
-
 	url = '<c:url value="/auth/authority/'+ ${zoteroGroupId} +'/find/searchAuthorities/conceptpower?firstName='+ firstName + '&lastName=' + lastName + '&page='+page+'"/>'
 		
 	$.ajax({
@@ -846,15 +833,13 @@ function getConceptpowerAuthorities(modalType, personType, page) {
   				    visiblePages: 5,
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
-  				    	getConceptpowerAuthorities(modalType, personType, page)
-
+  				    	getconceptpowerAuthorities(modalType, personType, page)
   				    }
   				});
   				
   			}
   			
 		$("#conceptpowerAuthoritySearchResult").append(content); 	
-
 		$("#conceptpowerAuthoritySearchResult tr td a").click(function() {
 			
 			name = $(this).text()
@@ -872,11 +857,11 @@ function getConceptpowerAuthorities(modalType, personType, page) {
 			  		url: createManageAuthorityURL,
 			  		async:false,
 			  		success: function(data) {
-			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  			$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
 			  		},
 				error: function(data){					
 					$("#uri"+modalType).val("");
-		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
 				}
 				});				
 						
@@ -890,8 +875,8 @@ function getConceptpowerAuthorities(modalType, personType, page) {
 	}
 	
 	});
-
 }
+
 
 function getViafAuthorities(modalType, personType, page) {
 
@@ -958,11 +943,11 @@ function getViafAuthorities(modalType, personType, page) {
 			  		url: createManageAuthorityURL,
 			  		async:false,
 			  		success: function(data) {
-			  			$("#authorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  			$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
 			  		},
 				error: function(data){					
 					$("#uri"+modalType).val("");
-		  			$("#authorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
 				}
 				});				
 						
@@ -1453,12 +1438,10 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 	<div class="modal-dialog" style="width: 1000px" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"
-					aria-label="Close">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title" id="authorLabel">Authority Search
-					Result</h4>
+				<h4 class="modal-title" id="authorLabel">Authority Search Result</h4>
 			</div>
 			<div class="modal-body">
 
@@ -1466,125 +1449,88 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 					<!-- Nav tabs -->
 					<ul class="nav nav-tabs" role="tablist">
 
-						<li role="presentation" class="active"><a
-							href="#userAuthoritiesTabContent" aria-controls="uploadTab"
-							role="tab" data-toggle="tab">Authorities imported by you</a></li>
+						<li role="presentation" class="active">
+							<a href="#userAuthoritiesTabContent" aria-controls="uploadTab"
+								role="tab" data-toggle="tab">Authorities imported by you</a>
+						</li>
 
-						<li role="presentation"><a
-							href="#datasetAuthoritiesTabContent" aria-controls="browseTab"
-							role="tab" data-toggle="tab">Authorities imported <br>by
-								other users
-						</a></li>
+						<li role="presentation">
+							<a href="#datasetAuthoritiesTabContent" aria-controls="browseTab"
+								role="tab" data-toggle="tab">Authorities imported <br>by other users</a>
+						</li>
 
-						<li role="presentation"><a
-							href="#conceptpowerAuthoritiesTabContent"
-							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
-								<br> from Conceptpower
-						</a></li>
+						<li role="presentation">
+							<a href="#conceptpowerAuthoritiesTabContent" aria-controls="browseTab" 
+								role="tab" data-toggle="tab">Authorities <br> from Conceptpower</a>
+						</li>
 
-						<li role="presentation"><a href="#viafAuthoritiesTabContent"
-							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
-								<br> from Viaf
-						</a></li>
+						<li role="presentation">
+							<a href="#viafAuthoritiesTabContent" aria-controls="browseTab" 
+								role="tab" data-toggle="tab">Authorities <br> from Viaf</a>
+						</li>
+						
 					</ul>
 					<!-- Tab panes -->
 
 					<div class="tab-content">
 
-						<div role="tabpanel" class="tab-pane active"
-							id="userAuthoritiesTabContent">
-
+						<div role="tabpanel" class="tab-pane active" id="userAuthoritiesTabContent">
 							<ul id="userAuthority-pagination-top" class="pagination-sm"></ul>
 
-
-							<div id="userAuthoritiesError" class="text-warning"
-								style="display: none">
+							<div id="userAuthoritiesError" class="text-warning" style="display: none">
 								<span> Error occurred while importing user authorities </span>
-
 							</div>
 
 							<table class="table table-striped table-bordered table-fixed">
-								<tr>
-									<th>Name</th>
-									<th>URI</th>
-									<th>Description</th>
-								</tr>
+								<tr><th>Name</th><th>URI</th><th>Description</th></tr>
 								<tbody id="userAuthoritySearchResult">
 								</tbody>
 							</table>
 						</div>
 
-						<div role="tabpanel" class="tab-pane"
-							id="datasetAuthoritiesTabContent">
-
+						<div role="tabpanel" class="tab-pane" id="datasetAuthoritiesTabContent">
 							<ul id="datasetAuthority-pagination-top" class="pagination-sm"></ul>
 
-							<div id="datasetAuthoritiesError" class="text-warning"
-								style="display: none">
-								<span> Error occurred while importing dataset authorities
-								</span>
-
+							<div id="datasetAuthoritiesError" class="text-warning" style="display: none">
+								<span> Error occurred while importing dataset authorities</span>
 							</div>
 
 							<table class="table table-striped table-bordered table-fixed">
-								<tr>
-									<th>Name</th>
-									<th>URI</th>
-									<th>Description</th>
-								</tr>
+								<tr><th>Name</th><th>URI</th><th>Description</th></tr>
 								<tbody id="datasetAuthoritySearchResult">
 								</tbody>
 							</table>
 						</div>
 
 
-						<div role="tabpanel" class="tab-pane"
-							id="conceptpowerAuthoritiesTabContent">
+						<div role="tabpanel" class="tab-pane" id="conceptpowerAuthoritiesTabContent">
+							<ul id="conceptpowerAuthority-pagination-top" class="pagination-sm"></ul>
 
-							<ul id="conceptpowerAuthority-pagination-top"
-								class="pagination-sm"></ul>
-
-							<div id="conceptpowerAuthoritiesError" class="text-warning"
-								style="display: none">
-								<span> Error occurred while searching authorities in
-									conceptpower </span>
-
+							<div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
+								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
 
 							<table class="table table-striped table-bordered table-fixed">
-								<tr>
-									<th>Name</th>
-									<th>URI</th>
-									<th>Description</th>
-								</tr>
+								<tr><th>Name</th><th>URI</th><th>Description</th></tr>
 								<tbody id="conceptpowerAuthoritySearchResult">
 								</tbody>
 							</table>
 						</div>
 
-						<div role="tabpanel" class="tab-pane"
-							id="viafAuthoritiesTabContent">
-
+						<div role="tabpanel" class="tab-pane" id="viafAuthoritiesTabContent">
 							<ul id="viafAuthority-pagination-top" class="pagination-sm"></ul>
 
-							<div id="viafAuthoritiesError" class="text-warning"
-								style="display: none">
+							<div id="viafAuthoritiesError" class="text-warning" style="display: none">
 								<span> Error occurred while searching authorities in Viaf</span>
-
 							</div>
 
 							<table class="table table-striped table-bordered table-fixed">
-								<tr>
-									<th>Name</th>
-									<th>URI</th>
-									<th>Description</th>
-								</tr>
+								<tr><th>Name</th><th>URI</th><th>Description</th></tr>
 								<tbody id="viafAuthoritySearchResult">
 								</tbody>
 							</table>
 						</div>
 					</div>
-
 
 				</div>
 			</div>
