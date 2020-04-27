@@ -111,9 +111,8 @@ public class AuthorityEntryController {
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
 
         try {
-            Set<IAuthorityEntry> datasetEntries = null;
-            datasetEntries = authorityService.findByNameInDataset((IUser) authentication.getPrincipal(), firstName,
-                    lastName, zoteroGroupId, page, pageSize);
+            Set<IAuthorityEntry> datasetEntries = authorityService.findByNameInDataset(
+                    (IUser) authentication.getPrincipal(), firstName, lastName, zoteroGroupId, page, pageSize);
             authorityResult.setFoundAuthorities(datasetEntries.stream().collect(Collectors.toList()));
             authorityResult.setCurrentPage(page + 1);
             authorityResult.setTotalPages(
@@ -138,7 +137,7 @@ public class AuthorityEntryController {
 
         if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
             logger.warn(
-                    "Atleast one of the fields must be non-empty. firstName and lastName are empty" + zoteroGroupId);
+                    "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -151,13 +150,9 @@ public class AuthorityEntryController {
             logger.warn("Could not retrieve authority entries.", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        } catch (URISyntaxException e) {
-            logger.warn("Not a valid URI: " + firstName + lastName, e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
         } catch (AuthorityImporterNotFoundException e) {
             logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);

@@ -70,8 +70,10 @@ public class AuthorityServiceTest {
 
     private CitationGroup group;
 
-    private List<IAuthorityEntry> entriesAlbert;
-    private List<IAuthorityEntry> entriesJane;
+    private IAuthorityEntry entry1;
+    private IAuthorityEntry entry2;
+    private IAuthorityEntry entry3;
+    private IAuthorityEntry entry4;
     private int page;
     private int pageSize;
     private Pageable paging;
@@ -99,35 +101,28 @@ public class AuthorityServiceTest {
         group = new CitationGroup();
         group.setId(5);
 
-        entriesAlbert = new ArrayList<>();
-        entriesJane = new ArrayList<>();
-
-        IAuthorityEntry entry1 = new AuthorityEntry();
+        entry1 = new AuthorityEntry();
         entry1.setUri("http://test1.uri/");
         entry1.setName("Albert Einstein");
         entry1.setId("1");
-        entriesAlbert.add(entry1);
 
-        IAuthorityEntry entry2 = new AuthorityEntry();
+        entry2 = new AuthorityEntry();
         entry2.setUri("http://test2.uri/");
         entry2.setName("Albert Sam");
         entry2.setId("2");
         entry2.setUsername("chandana");
-        entriesAlbert.add(entry2);
 
-        IAuthorityEntry entry3 = new AuthorityEntry();
+        entry3 = new AuthorityEntry();
         entry3.setUri("http://test1.uri/");
         entry3.setName("Albert Einstein 2");
         entry3.setId("3");
         entry2.setUsername("chandana");
-        entriesAlbert.add(entry3);
 
-        IAuthorityEntry entry4 = new AuthorityEntry();
+        entry4 = new AuthorityEntry();
         entry4.setUri("http://test4.uri/");
         entry4.setName("Rose Jane");
         entry4.setId("4");
         entry2.setUsername("chandana");
-        entriesJane.add(entry4);
 
         Optional<CitationGroup> group_op = Optional.of(group);
         Mockito.when(groupRepository.findById(new Long(5))).thenReturn(group_op);
@@ -321,6 +316,12 @@ public class AuthorityServiceTest {
     @Test
     public void test_findByName_onlyOnFirstName() {
 
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+
+        entriesAlbert.add(entry1);
+        entriesAlbert.add(entry2);
+        entriesAlbert.add(entry3);
+
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
                 "", "Albert", paging)).thenReturn(entriesAlbert);
 
@@ -336,8 +337,10 @@ public class AuthorityServiceTest {
     @Test
     public void test_findByName_onlyOnLastName() {
 
-        // removing authority who does not have 'Einstein' as last name
-        entriesAlbert.remove(1);
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+
+        entriesAlbert.add(entry1);
+        entriesAlbert.add(entry3);
 
         // Testing authority search with just last name
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
@@ -357,7 +360,10 @@ public class AuthorityServiceTest {
     public void test_findByName_withFullName() {
 
         // Testing authority search with full name 'Albert Einstein'
-        entriesAlbert.remove(1);
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+
+        entriesAlbert.add(entry1);
+        entriesAlbert.add(entry3);
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
                 "Albert", "Einstein", paging)).thenReturn(entriesAlbert);
 
@@ -374,7 +380,11 @@ public class AuthorityServiceTest {
     @Test
     public void test_findByName_withInterchangedFirstNameAndLastName() {
 
-        entriesAlbert.remove(1);
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+
+        entriesAlbert.add(entry1);
+        entriesAlbert.add(entry3);
+
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
                 "Einstein", "Albert", paging)).thenReturn(entriesAlbert);
 
@@ -444,6 +454,12 @@ public class AuthorityServiceTest {
         uriList.add("http://test2.uri/");
         uriList.add("http://test1.uri/");
 
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+
+        entriesAlbert.add(entry1);
+        entriesAlbert.add(entry2);
+        entriesAlbert.add(entry3);
+
         // user has imported authorities with first 'Albert' and uri 'http://test1.uri/'
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
                 "Albert", "")).thenReturn(entriesAlbert);
@@ -476,6 +492,12 @@ public class AuthorityServiceTest {
 
     @Test
     public void test_findByNameInDataset_withoutUris() throws GroupDoesNotExistException {
+
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+
+        entriesAlbert.add(entry1);
+        entriesAlbert.add(entry2);
+        entriesAlbert.add(entry3);
 
         // user has not imported any authority with name 'Albert' and uri
         // 'http://test1.uri/'
@@ -581,6 +603,12 @@ public class AuthorityServiceTest {
     @Test
     public void test_searchAuthorityEntries_withUserImportedAuthority()
             throws URISyntaxException, AuthorityServiceConnectionException, AuthorityImporterNotFoundException {
+
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+
+        entriesAlbert.add(entry1);
+        entriesAlbert.add(entry2);
+        entriesAlbert.add(entry3);
 
         // user has imported authority with uri 'http://test1.uri/'
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),

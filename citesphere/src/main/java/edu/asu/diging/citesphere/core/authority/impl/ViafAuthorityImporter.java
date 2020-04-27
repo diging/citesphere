@@ -99,7 +99,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 
     @Override
     public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
-            throws URISyntaxException, AuthorityServiceConnectionException {
+            throws AuthorityServiceConnectionException {
 
         return null;
     }

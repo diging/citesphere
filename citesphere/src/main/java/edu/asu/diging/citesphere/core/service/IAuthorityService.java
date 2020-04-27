@@ -19,7 +19,7 @@ public interface IAuthorityService {
     IAuthorityEntry importAuthority(String uri) throws AuthorityServiceConnectionException, URISyntaxException;
 
     AuthoritySearchResult searchAuthorityEntries(IUser user, String firstName, String lastName, String source, int page,
-            int pageSize) throws AuthorityServiceConnectionException, URISyntaxException, AuthorityImporterNotFoundException;
+            int pageSize) throws AuthorityServiceConnectionException, AuthorityImporterNotFoundException;
 
     IAuthorityEntry save(IAuthorityEntry entry);
 

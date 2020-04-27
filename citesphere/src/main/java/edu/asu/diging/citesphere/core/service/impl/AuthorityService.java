@@ -101,8 +101,7 @@ public class AuthorityService implements IAuthorityService {
      */
     @Override
     public AuthoritySearchResult searchAuthorityEntries(IUser user, String firstName, String lastName, String source,
-            int page, int pageSize)
-            throws URISyntaxException, AuthorityServiceConnectionException, AuthorityImporterNotFoundException {
+            int page, int pageSize) throws AuthorityServiceConnectionException, AuthorityImporterNotFoundException {
 
         AuthorityImporter importer = getAuthorityImporter(source);
 

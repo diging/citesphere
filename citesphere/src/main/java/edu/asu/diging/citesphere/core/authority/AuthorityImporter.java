@@ -41,7 +41,7 @@ public interface AuthorityImporter {
     IImportedAuthority retrieveAuthorityData(String uri) throws URISyntaxException, AuthorityServiceConnectionException;
 
     AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
-            throws URISyntaxException, AuthorityServiceConnectionException;
+            throws AuthorityServiceConnectionException;
 
     String getId();
 }
