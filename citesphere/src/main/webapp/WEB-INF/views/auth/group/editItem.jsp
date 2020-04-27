@@ -99,8 +99,8 @@ $(function() {
 		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
-		getUserAuthorities('Author','Author', 0)
-		getDatasetAuthorities('Author','Author', 0)
+		getUserAuthorities('Author','Author', 0, true)
+		getDatasetAuthorities('Author','Author', 0, true)
 		getconceptpowerAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
 	});
@@ -115,8 +115,8 @@ $(function() {
 		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
-		getUserAuthorities('Editor','Editor', 0)
-		getDatasetAuthorities('Editor','Editor', 0)
+		getUserAuthorities('Editor','Editor', 0, true)
+		getDatasetAuthorities('Editor','Editor', 0, true)
 		getconceptpowerAuthorities('Editor','Editor',0)
 		$("#searchEditorSpinner").hide();
 	});
@@ -132,8 +132,8 @@ $(function() {
 		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
-		getUserAuthorities('Creator','Creator', 0)
-		getDatasetAuthorities('Creator','Creator', 0)
+		getUserAuthorities('Creator','Creator', 0, true)
+		getDatasetAuthorities('Creator','Creator', 0, true)
 		getconceptpowerAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
 	});
@@ -678,9 +678,12 @@ function getPersonAuthority(uri, personType) {
 
 }
 
-function getUserAuthorities(modalType, personType, page) {
+function getUserAuthorities(modalType, personType, page, onFullname) {
 
-	var firstName = $("#firstName"+personType).val();
+	var firstName = "";
+	if(onFullname){
+		firstName = $("#firstName"+personType).val();
+	}
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
@@ -717,12 +720,14 @@ function getUserAuthorities(modalType, personType, page) {
   				    visiblePages: 5,
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
-  				    	   getUserAuthorities(modalType, personType, page-1)
+  				    	   getUserAuthorities(modalType, personType, page-1, onFullname)
 
   				    }
   				});
   			}  		
-  			
+  			else if(page==0 && firstName!= ""){
+  				getUserAuthorities(modalType, personType, page, false)
+  			}
 		
 		$("#userAuthoritySearchResult").append(content);
 		$("#userAuthoritySearchResult tr td a").click(function() {
@@ -743,13 +748,16 @@ function getUserAuthorities(modalType, personType, page) {
     	}
 	
 	});
-
+	
 }
 
 
-function getDatasetAuthorities(modalType, personType, page) {
+function getDatasetAuthorities(modalType, personType, page, onFullname) {
 
-	var firstName = $("#firstName"+personType).val();
+	var firstName = "";
+	if(onFullname){
+		firstName = $("#firstName"+personType).val();
+	}
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
 
@@ -785,11 +793,14 @@ function getDatasetAuthorities(modalType, personType, page) {
   				    visiblePages: 5,
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
-  				    	getDatasetAuthorities(modalType, personType, page-1)
+  				    	getDatasetAuthorities(modalType, personType, page-1, onFullname)
 
   				    }
   				});
-  			}		
+  			}	
+  			else if(page==0 && firstName!= ""){
+  				getDatasetAuthorities(modalType, personType, page, false)
+  			}
   		
 		$("#datasetAuthoritySearchResult").append(content);
 
@@ -1426,6 +1437,11 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 								<tbody id="userAuthoritySearchResult">
 								</tbody>
 							</table>
+							
+							<div id="userAuthoritiesLastName" class="text-warning"
+								style="display: none">
+								<span> 0 results found </span>
+							</div>
 						</div>
 
 						<div role="tabpanel" class="tab-pane" id="datasetAuthoritiesTabContent">
