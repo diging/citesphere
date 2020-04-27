@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
@@ -110,9 +111,8 @@ public class AuthorityEntryController {
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
 
         try {
-            Set<IAuthorityEntry> datasetEntries = null;
-            datasetEntries = authorityService.findByNameInDataset((IUser) authentication.getPrincipal(), firstName,
-                    lastName, zoteroGroupId, page, pageSize);
+            Set<IAuthorityEntry> datasetEntries = authorityService.findByNameInDataset(
+                    (IUser) authentication.getPrincipal(), firstName, lastName, zoteroGroupId, page, pageSize);
             authorityResult.setFoundAuthorities(datasetEntries.stream().collect(Collectors.toList()));
             authorityResult.setCurrentPage(page + 1);
             authorityResult.setTotalPages(
@@ -135,8 +135,10 @@ public class AuthorityEntryController {
 
         AuthoritySearchResult authorityResult;
 
-        if (null == firstName && null == lastName) {
-            throw new IllegalArgumentException("{\"error\":\"At least one parameter is invalid or not supplied\"}");
+        if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
+            logger.warn(
+                    "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -147,8 +149,8 @@ public class AuthorityEntryController {
             logger.warn("Could not retrieve authority entries.", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        } catch (URISyntaxException e) {
-            logger.warn("Not a valid URI: " + firstName + lastName, e);
+        } catch (AuthorityImporterNotFoundException e) {
+            logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 

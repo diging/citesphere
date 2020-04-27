@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
+import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.repository.custom.AuthorityRepository;
@@ -52,9 +53,6 @@ public class AuthorityService implements IAuthorityService {
 
     @Autowired
     private Set<AuthorityImporter> importers;
-
-    @Autowired
-    private AuthorityServiceHelper helper;
 
     /*
      * (non-Javadoc)
@@ -94,12 +92,24 @@ public class AuthorityService implements IAuthorityService {
         return null;
     }
 
+    /**
+     * This method returns all the authorities found by searching a source based on
+     * first name and/or last name of authority and excludes the authorities that
+     * are imported by the user in citesphere
+     * 
+     * @throws AuthorityImporterNotFoundException
+     */
     @Override
     public AuthoritySearchResult searchAuthorityEntries(IUser user, String firstName, String lastName, String source,
-            int page, int pageSize) throws URISyntaxException, AuthorityServiceConnectionException {
+            int page, int pageSize) throws AuthorityServiceConnectionException, AuthorityImporterNotFoundException {
 
-        AuthoritySearchResult searchResult = getAuthorityImporter(source)
-                .searchAuthorities(getImporterSearchString(source, firstName, lastName), page, pageSize);
+        AuthorityImporter importer = getAuthorityImporter(source);
+
+        if (importer == null) {
+            throw new AuthorityImporterNotFoundException("Authority importer not found for " + source);
+        }
+
+        AuthoritySearchResult searchResult = importer.searchAuthorities(firstName, lastName, page, pageSize);
 
         if (searchResult.getFoundAuthorities() != null && searchResult.getFoundAuthorities().size() > 0) {
             List<String> uriList = authorityRepository
@@ -144,6 +154,10 @@ public class AuthorityService implements IAuthorityService {
         return results;
     }
 
+    /**
+     * This method returns all the Authorities that are imported by the user based
+     * on first name and/or last name
+     */
     @Override
     public List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
@@ -170,16 +184,24 @@ public class AuthorityService implements IAuthorityService {
         return entries;
     }
 
-    @Override
-    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
-            List<String> uris, int page, int pageSize) throws GroupDoesNotExistException {
+    // This method queries database and retrieves authorities based on the first
+    // name and/or last name of the authority, and based on the specified citation
+    // group ID
+    private Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
+            int page, int pageSize, List<String> uris) throws GroupDoesNotExistException {
         Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
         Pageable paging = PageRequest.of(page, pageSize);
-        List<Person> persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn(
-                (ICitationGroup) group.get(), firstName, lastName, uris, paging);
+        List<Person> persons = null;
+        if (uris != null && uris.size() > 0) {
+            persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn(
+                    (ICitationGroup) group.get(), firstName, lastName, uris, paging);
+        } else {
+            persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(),
+                    firstName, lastName, paging);
+        }
         Set<IAuthorityEntry> entries = new HashSet<>();
         persons.forEach(p -> {
             Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
@@ -190,26 +212,10 @@ public class AuthorityService implements IAuthorityService {
         return entries;
     }
 
-    @Override
-    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page,
-            int pageSize) throws GroupDoesNotExistException {
-        Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
-        if (!group.isPresent()) {
-            throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
-        }
-        Pageable paging = PageRequest.of(page, pageSize);
-        List<Person> persons = personAuthorityRepository
-                .findPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(), firstName, lastName, paging);
-        Set<IAuthorityEntry> entries = new HashSet<>();
-        persons.forEach(p -> {
-            Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
-            if (optional.isPresent()) {
-                entries.add(optional.get());
-            }
-        });
-        return entries;
-    }
-
+    /**
+     * This method returns all the Authorities that are imported by the other users
+     * of citesphere and excludes that authorities that are imported by user
+     */
     @Override
     public Set<IAuthorityEntry> findByNameInDataset(IUser user, String firstName, String lastName,
             String citationGroupId, int page, int pageSize) throws GroupDoesNotExistException {
@@ -217,11 +223,8 @@ public class AuthorityService implements IAuthorityService {
                 .findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName)
                 .stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
 
-        if (uriList != null && uriList.size() > 0) {
-            return this.findByNameInDataset(firstName, lastName, citationGroupId, uriList, page, pageSize);
-        } else {
-            return this.findByNameInDataset(firstName, lastName, citationGroupId, page, pageSize);
-        }
+        return this.findByNameInDataset(firstName, lastName, citationGroupId, page, pageSize, uriList);
+
     }
 
     @Override
@@ -265,23 +268,14 @@ public class AuthorityService implements IAuthorityService {
                 / pageSize);
     }
 
-    public String getImporterSearchString(String source, String firstName, String lastName) {
-        if(source.equals(AuthorityImporter.CONCEPTPOWER)) {
-            return helper.getConceptpowerSearchString(firstName, lastName);    
-        }
-        else if(source.equals(AuthorityImporter.VIAF)) {
-            return helper.getViafSearchString(firstName, lastName);
-        }
-        return null;
-    }
-
-    public AuthorityImporter getAuthorityImporter(String source) {
+    // Given a source like viaf or conceptpower, this method returns authority
+    // importer responsible for search and import
+    private AuthorityImporter getAuthorityImporter(String source) {
 
         for (AuthorityImporter importer : importers) {
-            if (importer.isResponsible(source))
+            if (importer.isResponsibleForSearch(source))
                 return importer;
         }
-
         return null;
     }
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
+import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
@@ -18,7 +19,7 @@ public interface IAuthorityService {
     IAuthorityEntry importAuthority(String uri) throws AuthorityServiceConnectionException, URISyntaxException;
 
     AuthoritySearchResult searchAuthorityEntries(IUser user, String firstName, String lastName, String source, int page,
-            int pageSize) throws AuthorityServiceConnectionException, URISyntaxException;
+            int pageSize) throws AuthorityServiceConnectionException, AuthorityImporterNotFoundException;
 
     IAuthorityEntry save(IAuthorityEntry entry);
 
@@ -34,14 +35,8 @@ public interface IAuthorityService {
 
     List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize);
 
-    Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
-            List<String> uris, int page, int pageSize) throws GroupDoesNotExistException;
-
     Set<IAuthorityEntry> findByNameInDataset(IUser user, String firstName, String lastName, String citationGroupId,
             int page, int pageSize) throws GroupDoesNotExistException;
-
-    Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId, int page,
-            int pageSize) throws GroupDoesNotExistException;
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 

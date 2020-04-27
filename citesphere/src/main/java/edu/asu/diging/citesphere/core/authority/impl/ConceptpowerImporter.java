@@ -46,7 +46,13 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
     @PostConstruct
     private void postConstruct() {
+
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
+        factory.setHttpClient(httpClient);
+
         restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(factory);
     }
 
     /*
@@ -59,10 +65,14 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
     @Override
     public boolean isResponsible(String source) {
 
-        if (ID.contains(source)) {
+        return false;
+    }
+
+    @Override
+    public boolean isResponsibleForSearch(String source) {
+        if (source.equals(CONCEPTPOWER)) {
             return true;
         }
-
         return false;
     }
 
@@ -84,26 +94,21 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
     }
 
     @Override
-    public AuthoritySearchResult searchAuthorities(String searchString, int page, int pageSize)
-            throws URISyntaxException, AuthorityServiceConnectionException {
-
-        searchString = searchString.replace(conceptpowerSearchKeyword, "");
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
-        factory.setHttpClient(httpClient);
-        restTemplate.setRequestFactory(factory);
+    public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
+            throws AuthorityServiceConnectionException {
 
         RequestEntity<Void> request;
         try {
 
-            String url = conceptpowerURL + conceptpowerSearchKeyword
-                    + URLEncoder.encode(searchString, StandardCharsets.UTF_8.toString()) + "&page=" + page;
+            String url = conceptpowerURL + conceptpowerSearchKeyword + URLEncoder
+                    .encode(this.getConceptpowerSearchString(firstName, lastName), StandardCharsets.UTF_8.toString())
+                    + "&page=" + page;
             URI uri = UriComponentsBuilder.fromUriString(url.toString()).build(true).toUri();
 
             request = RequestEntity.get(uri).accept(MediaType.APPLICATION_JSON).build();
         } catch (UnsupportedEncodingException e) {
-            throw new AssertionError(StandardCharsets.UTF_8.toString() + " is not supported");
-
+            throw new AuthorityServiceConnectionException("Exception occured while creating URI for authority search",
+                    e);
         }
         ResponseEntity<ConceptpowerResponse> response = null;
         try {
@@ -135,6 +140,24 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
             throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
         }
         return searchResult;
+    }
+
+    // This method takes is responsible for creating search string based on the
+    // first name and last name.
+    private String getConceptpowerSearchString(String firstName, String lastName) {
+
+        String conceptpowerSearchString = "";
+
+        if (firstName != null && lastName != null) {
+
+            conceptpowerSearchString = "%" + firstName + "%" + lastName;
+
+        } else {
+
+            conceptpowerSearchString = firstName == null ? conceptpowerSearchKeyword + "%" + lastName : "%" + firstName;
+        }
+
+        return conceptpowerSearchString;
     }
 
 }

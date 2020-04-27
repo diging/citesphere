@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -20,9 +19,6 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -140,9 +136,9 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     }
 
     @Override
-    public AuthoritySearchResult searchAuthorities(String searchString, int page, int pageSize)
+    public AuthoritySearchResult searchAuthorities(String searchString, String source, int page, int pageSize)
 
-            throws URISyntaxException, AuthorityServiceConnectionException {
+            throws  AuthorityServiceConnectionException {
 
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
@@ -194,5 +190,11 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
         }
 
         return searchResult;
+    }
+
+    @Override
+    public boolean isResponsibleForSearch(String source) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }
