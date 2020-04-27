@@ -91,6 +91,9 @@ $(function() {
      });
 
 	$("#searchAuthor").click(function() {
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})  
 		$("#searchAuthorSpinner").show();
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
@@ -103,9 +106,11 @@ $(function() {
 	});
 	
 	$("#searchEditor").click(function() {
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})  
 		$("#searchEditorSpinner").show();
 		
-
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#datasetAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
@@ -117,6 +122,9 @@ $(function() {
 	});
 	
 	$("#searchCreator").click(function() {
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})  
 		$("#searchCreatorSpinner").show();
 		
 
@@ -184,10 +192,10 @@ $(function() {
 	    }, 1000);
 	});
 	
-
 	
 	$("#closeAuthoritySearchResult").click(function() {
 		$("#selectAuthorityModel").modal('hide');
+		$('#selectAuthorityModel a:first').tab('show');
 	});
 		
 	/* Handle editor events */
@@ -724,7 +732,7 @@ function getUserAuthorities(modalType, personType, page) {
 				
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
-			$("#authorAuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
+			$("#"+personType_lowerCase+"AuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
 			$("#selectAuthorityModel").modal('hide');
 		});	
 		 	
@@ -801,11 +809,11 @@ function getDatasetAuthorities(modalType, personType, page) {
 			  		url: createManageAuthorityURL,
 			  		async:false,
 			  		success: function(data) {
-			  			$("#editorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  			$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
 			  		},
 				error: function(data){					
 					$("#uri"+modalType).val("");
-		  			$("#editorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
 				}
 				});				
 						
@@ -888,11 +896,11 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			  		url: createManageAuthorityURL,
 			  		async:false,
 			  		success: function(data) {
-			  			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  			$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
 			  		},
 				error: function(data){					
 					$("#uri"+modalType).val("");
-		  			$("#creatorAuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
 				}
 				});				
 						
@@ -1380,111 +1388,73 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 	<div class="modal-dialog" style="width: 1000px" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"
-					aria-label="Close">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title" id="authorLabel">Authority Search
-					Result</h4>
+				<h4 class="modal-title" id="authorLabel">Authority Search Result</h4>
 			</div>
 			<div class="modal-body">
-
 				<div role="tabpanel">
 					<!-- Nav tabs -->
 					<ul class="nav nav-tabs" role="tablist">
-
-						<li role="presentation" class="active"><a
-							href="#userAuthoritiesTabContent" aria-controls="uploadTab"
-							role="tab" data-toggle="tab">Authorities imported by you</a></li>
-
-						<li role="presentation"><a
-							href="#datasetAuthoritiesTabContent" aria-controls="browseTab"
-							role="tab" data-toggle="tab">Authorities imported <br>by
-								other users
-						</a></li>
-
-						<li role="presentation"><a
-							href="#conceptpowerAuthoritiesTabContent"
-							aria-controls="browseTab" role="tab" data-toggle="tab">Authorities
-								<br> from Conceptpower
-						</a></li>
-
+						<li role="presentation" class="active">
+							<a href="#userAuthoritiesTabContent" aria-controls="uploadTab"
+								role="tab" data-toggle="tab">Authorities imported by you</a>
+						</li>
+						<li role="presentation">
+							<a href="#datasetAuthoritiesTabContent" aria-controls="browseTab"
+								role="tab" data-toggle="tab">Authorities imported by other users</a>
+						</li>
+						<li role="presentation">
+							<a href="#conceptpowerAuthoritiesTabContent"
+								aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from Conceptpower</a>
+						</li>
 					</ul>
 					<!-- Tab panes -->
 
 					<div class="tab-content">
-
-						<div role="tabpanel" class="tab-pane active"
-							id="userAuthoritiesTabContent">
-
+						<div role="tabpanel" class="tab-pane active" id="userAuthoritiesTabContent">
 							<ul id="userAuthority-pagination-top" class="pagination-sm"></ul>
-
 
 							<div id="userAuthoritiesError" class="text-warning"
 								style="display: none">
 								<span> Error occurred while importing user authorities </span>
-
 							</div>
 
 							<table class="table table-striped table-bordered table-fixed">
-								<tr>
-									<th>Name</th>
-									<th>URI</th>
-									<th>Description</th>
-								</tr>
+								<tr><th>Name</th><th>URI</th><th>Description</th></tr>
 								<tbody id="userAuthoritySearchResult">
 								</tbody>
 							</table>
 						</div>
 
-						<div role="tabpanel" class="tab-pane"
-							id="datasetAuthoritiesTabContent">
-
+						<div role="tabpanel" class="tab-pane" id="datasetAuthoritiesTabContent">
 							<ul id="datasetAuthority-pagination-top" class="pagination-sm"></ul>
 
-							<div id="datasetAuthoritiesError" class="text-warning"
-								style="display: none">
-								<span> Error occurred while importing dataset authorities
-								</span>
-
+							<div id="datasetAuthoritiesError" class="text-warning" style="display: none">
+								<span> Error occurred while importing dataset authorities</span>
 							</div>
 
 							<table class="table table-striped table-bordered table-fixed">
-								<tr>
-									<th>Name</th>
-									<th>URI</th>
-									<th>Description</th>
-								</tr>
+								<tr><th>Name</th><th>URI</th><th>Description</th></tr>
 								<tbody id="datasetAuthoritySearchResult">
 								</tbody>
 							</table>
 						</div>
 
+						<div role="tabpanel" class="tab-pane" id="conceptpowerAuthoritiesTabContent">
+							<ul id="conceptpowerAuthority-pagination-top" class="pagination-sm"></ul>
 
-						<div role="tabpanel" class="tab-pane"
-							id="conceptpowerAuthoritiesTabContent">
-
-							<ul id="conceptpowerAuthority-pagination-top"
-								class="pagination-sm"></ul>
-
-							<div id="conceptpowerAuthoritiesError" class="text-warning"
-								style="display: none">
-								<span> Error occurred while searching authorities in
-									conceptpower </span>
-
+							<div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
+								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
 
 							<table class="table table-striped table-bordered table-fixed">
-								<tr>
-									<th>Name</th>
-									<th>URI</th>
-									<th>Description</th>
-								</tr>
+								<tr><th>Name</th><th>URI</th><th>Description</th></tr>
 								<tbody id="conceptpowerAuthoritySearchResult">
 								</tbody>
 							</table>
 						</div>
-
 				</div>
 			</div>
 			<div class="modal-footer">
