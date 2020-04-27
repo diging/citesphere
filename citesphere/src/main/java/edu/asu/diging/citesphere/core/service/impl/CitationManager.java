@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -272,7 +273,7 @@ public class CitationManager implements ICitationManager {
                 pageRequestRepository.save(request);
             } else if (localPageRequest != null) {
                 localPageRequest.setLastUpdated(OffsetDateTime.now());
-                results.setCitations(localPageRequest.getCitations());
+                results.setCitations(new ArrayList<ICitation>(localPageRequest.getCitations()));
             }
             
             return results;
@@ -301,7 +302,7 @@ public class CitationManager implements ICitationManager {
         citationRepository.saveAll(citations);
         
         PageRequest request = new PageRequest();
-        request.setCitations(results.getCitations());
+        request.setCitations(new HashSet<>(results.getCitations()));
         request.setObjectId(group.getId() + "");
         request.setPageNumber(page);
         request.setPageSize(zoteroPageSize);
@@ -323,5 +324,43 @@ public class CitationManager implements ICitationManager {
     @Override
     public List<String> getValidCreatorTypes(IUser user, ItemType itemType) {
         return zoteroManager.getValidCreatorTypes(user, itemType);
+    }
+    
+    @Override
+    public CitationPage getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy, int index) throws GroupDoesNotExistException, ZoteroHttpStatusException {
+        CitationResults citationResults = getGroupItems(user, groupId, collectionId, page, sortBy);
+        List<ICitation> citations = citationResults.getCitations();
+        CitationPage result = new CitationPage();
+        result.setIndex(String.valueOf(index));
+        result.setZoteroGroupId(groupId);
+        result.setCollectionId(collectionId);
+        result.setSortBy(sortBy);
+        if(citations != null && citations.size()>0) {
+            int maxPage = (int) Math.ceil((citationResults.getTotalResults() / Float.valueOf(zoteroPageSize)));
+            if(index == citations.size() - 1 && page < maxPage) {
+                CitationResults nextPageCitationResults = getGroupItems(user, groupId, collectionId, page+1, sortBy);
+                if(nextPageCitationResults != null && nextPageCitationResults.getCitations().size()>0) {
+                    result.setNext(nextPageCitationResults.getCitations().get(0).getKey());
+                    result.setNextIndex(String.valueOf(0));
+                    result.setNextPage(String.valueOf(page+1));
+                }
+            }else if(index < citations.size() - 1) {
+                result.setNext(citations.get(index+1).getKey());
+                result.setNextIndex(String.valueOf(index+1));
+                result.setNextPage(String.valueOf(page));
+            }
+            if(index > 0) {
+                result.setPrev(citations.get(index-1).getKey());
+                result.setPrevIndex(String.valueOf(index-1));
+                result.setPrevPage(String.valueOf(page));
+            } else if(index == 0 && page>1) {
+                CitationResults prevPageCitationResults = getGroupItems(user, groupId, collectionId, page-1, sortBy);
+                int pageSize = prevPageCitationResults.getCitations().size();
+                result.setPrev(prevPageCitationResults.getCitations().get(pageSize-1).getKey());
+                result.setPrevIndex(String.valueOf(pageSize-1));
+                result.setPrevPage(String.valueOf(page-1));
+            }
+        }
+        return result; 
     }
 }

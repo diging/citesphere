@@ -1021,7 +1021,7 @@ let removeConcept = function removeConcept(e) {
 </div>
 
 <c:if test="${not empty citation.key}" >
-<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit" var="processingUrl" />
+<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" var="processingUrl" />
 </c:if>
 <c:if test="${empty citation.key}" >
 <c:url value="/auth/group/${zoteroGroupId}/items/create" var="processingUrl" />
@@ -1267,7 +1267,7 @@ ${editor.lastName}<c:if test="${not empty editor.firstName}">, ${editor.firstNam
 </table>
 
 <button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
-<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}" />" class="btn btn-default">
+<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${itemId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />" class="btn btn-default">
 		<i class="fa fa-times"></i>&nbsp;Cancel
 </a>
 </form:form>

@@ -1,8 +1,11 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
@@ -30,8 +34,10 @@ import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
+
 
 public class CitationManagerTest {
 
@@ -75,7 +81,6 @@ public class CitationManagerTest {
     public void setUp() throws ZoteroHttpStatusException {
         MockitoAnnotations.initMocks(this);
         managerToTest.init();
-        
         user = new User();
         user.setUsername("USERNAME");
         
@@ -249,5 +254,112 @@ public class CitationManagerTest {
         Mockito.when(zoteroManager.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation)).thenThrow(new ZoteroItemCreationFailedException());
         
         managerToTest.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation);
+    }
+    
+    @Test
+    public void test_getPrevAndNextCitation_prevAndNextOnCurrentPage() throws GroupDoesNotExistException, ZoteroHttpStatusException {
+        String sortBy = "title";
+        int page = 1;
+        int index = 1;
+        ReflectionTestUtils.setField(managerToTest, "zoteroPageSize", 50);
+        CitationResults citationResults = new CitationResults();
+        List<ICitation> citations = new ArrayList<ICitation>();
+        for(int i=0;i<10;i++) {
+            Citation citation = new  Citation();
+            citation.setKey("key"+i);
+            citations.add(citation);
+        }
+        citationResults.setCitations(citations);
+        citationResults.setTotalResults(10);
+        citationResults.setNotModified(true);
+        Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page, sortBy, new Long(0))).thenReturn(citationResults);
+        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index);
+        Assert.assertEquals("key2", actualResult.getNext());
+        Assert.assertEquals("key0", actualResult.getPrev());
+    }
+    
+    @Test
+    public void test_getPrevAndNextCitation_prevOnCurrentPageAndNextOnNextPage() throws GroupDoesNotExistException, ZoteroHttpStatusException {
+        String sortBy = "title";
+        int page = 1;
+        int index = 8;
+        ReflectionTestUtils.setField(managerToTest, "zoteroPageSize", 9);
+        CitationResults citationResults = new CitationResults();
+        List<ICitation> citations = new ArrayList<ICitation>();
+        for(int i=0;i<9;i++) {
+            Citation citationOnPage1 = new  Citation();
+            citationOnPage1.setKey("key"+i);
+            citations.add(citationOnPage1);
+        }
+        citationResults.setCitations(citations);
+        citationResults.setTotalResults(10);
+        citationResults.setNotModified(true);
+        Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page, sortBy, new Long(0))).thenReturn(citationResults);
+        CitationResults citationResultsPage2 = new CitationResults();
+        List<ICitation> citationsPage2 = new ArrayList<ICitation>();
+        Citation citationOnPage2;
+        citationOnPage2 = new  Citation();
+        citationOnPage2.setKey("key"+9);
+        citationsPage2.add(citationOnPage2);
+        citationResultsPage2.setCitations(citationsPage2);
+        citationResultsPage2.setTotalResults(10);
+        citationResultsPage2.setNotModified(true);
+        Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page+1, sortBy, new Long(0))).thenReturn(citationResultsPage2);
+        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index);
+        Assert.assertEquals("key9", actualResult.getNext());
+        Assert.assertEquals("key7", actualResult.getPrev());
+    }
+    
+    @Test
+    public void test_getPrevAndNextCitation_prevOnPrevPageAndNextOnCurrentPage() throws GroupDoesNotExistException, ZoteroHttpStatusException {
+        String sortBy = "title";
+        int page = 2;
+        int index = 0;
+        ReflectionTestUtils.setField(managerToTest, "zoteroPageSize", 9);
+        CitationResults citationResultsPage1 = new CitationResults();
+        List<ICitation> citations = new ArrayList<ICitation>();
+        for(int i=0;i<9;i++) {
+            Citation citationOnPage1 = new  Citation();
+            citationOnPage1.setKey("key"+i);
+            citations.add(citationOnPage1);
+        }
+        citationResultsPage1.setCitations(citations);
+        citationResultsPage1.setTotalResults(10);
+        citationResultsPage1.setNotModified(true);
+        CitationResults citationResultsPage2 = new CitationResults();
+        List<ICitation> citationsPage2 = new ArrayList<ICitation>();
+        Citation citationOnPage2;
+        citationOnPage2 = new  Citation();
+        citationOnPage2.setKey("key"+9);
+        citationsPage2.add(citationOnPage2);
+        citationResultsPage2.setCitations(citationsPage2);
+        citationResultsPage2.setTotalResults(10);
+        citationResultsPage2.setNotModified(true);
+        Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page, sortBy, new Long(0))).thenReturn(citationResultsPage2);
+        Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page-1, sortBy, new Long(0))).thenReturn(citationResultsPage1);
+        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index);
+        Assert.assertNull(actualResult.getNext());
+        Assert.assertEquals("key8", actualResult.getPrev());
+    }
+    
+    @Test
+    public void test_getPrevAndNextCitation_noPrevAndNext() throws GroupDoesNotExistException, ZoteroHttpStatusException {
+        String sortBy = "title";
+        int page = 1;
+        int index = 0;
+        ReflectionTestUtils.setField(managerToTest, "zoteroPageSize", 50);
+        CitationResults citationResults = new CitationResults();
+        List<ICitation> citations = new ArrayList<ICitation>();
+        Citation citation;
+        citation = new  Citation();
+        citation.setKey("key"+0);
+        citations.add(citation);
+        citationResults.setCitations(citations);
+        citationResults.setTotalResults(10);
+        citationResults.setNotModified(true);
+        Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page, sortBy, new Long(0))).thenReturn(citationResults);
+        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index);
+        Assert.assertNull(actualResult.getNext());
+        Assert.assertNull(actualResult.getPrev());
     }
 }

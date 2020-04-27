@@ -508,7 +508,7 @@ Do you want to proceed?
 </div>
 
 <div class="col-md-12">
-<c:url value="/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}/conflict/resolve" var="editUrl" />
+<c:url value="/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}/conflict/resolve?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" var="editUrl" />
 <form:form action="${editUrl}" modelAttribute="form" method="POST">
 <form:hidden path="key" value="${form.key}" />
 <form:hidden path="itemType" value="${form.itemType}" />
@@ -534,6 +534,6 @@ Do you want to proceed?
 <form:hidden path="rights" value="${form.rights}" />
 
 <button type="submit" class="btn btn-primary">Sounds good, proceed!</button>
-<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}" />" class="btn btn-default">No, cancel.</a>
+<a href="<c:url value="/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />" class="btn btn-default">No, cancel.</a>
 </form:form>
 </div>
