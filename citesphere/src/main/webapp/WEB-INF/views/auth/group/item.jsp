@@ -26,7 +26,15 @@
 
 </h2>	
 <div class="pull-left" style="margin-bottom: 20px;">
-	<a
+	<c:choose>
+		<c:when test="${not empty collectionId}">
+			<a class ="btn btn-primary" style="font-size:10px;" href="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items?page=${page}&sortBy=${sortBy}" />">Back</a> &nbsp;&nbsp;
+		</c:when>
+		<c:otherwise>
+			<a class ="btn btn-primary" style="font-size:10px;" href="<c:url value="/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}" />">Back</a> &nbsp;&nbsp;
+		</c:otherwise>
+	</c:choose>	
+	 <a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />"><i
 		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; <a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />"><i
