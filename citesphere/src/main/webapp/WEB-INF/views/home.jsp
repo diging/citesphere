@@ -50,10 +50,10 @@ $(document).ready(function(){
 		'success': function(response){
 			for (var i=0; i<response.length; i++) {
 				var link = $("<a>");
-	            link.attr("href", "<c:url value="/auth/group/" />" +response[i].id+"/items");
-	            link.text(response[i].name + " ("+ response[i].numItems +")");
-	            link.addClass("link");
-	            var groupId = "group" + i;
+				link.attr("href", "<c:url value="/auth/group/" />" +response[i].id+"/items");
+				link.text(response[i].name + " ("+ response[i].numItems +")");
+				link.addClass("link");
+				var groupId = "group" + i;
 				$('#groups').append($('<div class="panel panel-default panel-body" id="'+groupId+'"></div>'));
 				$("#group"+i).html(link);
 			}
