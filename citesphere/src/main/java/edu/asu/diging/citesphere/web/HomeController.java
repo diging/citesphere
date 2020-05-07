@@ -39,10 +39,10 @@ public class HomeController {
     
     @RequestMapping(value = "/groups")
     public @ResponseBody List<ICitationGroup> getGroups(Authentication authentication, @RequestParam(defaultValue = "false", required = true, value = "isZoteroConnected") String isConnected) {
-       boolean isZoteroConnected = Boolean.parseBoolean(isConnected);
+        boolean isZoteroConnected = Boolean.parseBoolean(isConnected);
         if (isZoteroConnected) {
-           return citationManager.getGroups((IUser) authentication.getPrincipal());
-       }
+            return citationManager.getGroups((IUser) authentication.getPrincipal());
+        }
         return new ArrayList<ICitationGroup>(); 
     }
     
