@@ -1,6 +1,5 @@
 package edu.asu.diging.citesphere.web;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroTokenManager;
-import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
