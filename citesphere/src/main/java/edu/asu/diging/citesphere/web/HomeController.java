@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroTokenManager;
@@ -40,7 +41,7 @@ public class HomeController {
     }
     
     @RequestMapping(value = "/groups")
-    public List<ICitationGroup> getGroups(Authentication authentication, @RequestParam(defaultValue = "false", required = true, value = "isConnected") String isConnected) {
+    public @ResponseBody List<ICitationGroup> getGroups(Authentication authentication, @RequestParam(defaultValue = "false", required = true, value = "isZoteroConnected") String isConnected) {
        boolean isZoteroConnected = Boolean.parseBoolean(isConnected);
         if (isZoteroConnected) {
            return citationManager.getGroups((IUser) authentication.getPrincipal());

@@ -35,28 +35,31 @@ If you try and take a cat apart to see how it works, the first thing you have on
 <h2>Welcome back, ${user.firstName}!</h2>
 </div>
 <div class="col-md-12">
-<c:forEach items="${groups}" var="group">
-<div class="panel panel-default">
-  <div id = "groups" class="panel-body">
-  </div>
-</div>
-</c:forEach>
+	<div class="panel panel-default">
+	  <div id = "groups" class="panel-body">
+	  </div>
+	</div>
 </div>
 </c:if>
 </sec:authorize>
 
 <script>
 $(document).ready(function(){
-	var urlVar = "/${zoteroGroupId}/items/${citation.key}/paging?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}";
+	//var urlVar = "/${zoteroGroupId}/items/${citation.key}/paging?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}";
 	$.ajax({ 
 		'url': '<c:url value="/groups?isZoteroConnected=${isZoteroConnected}" />',
 		'type': "GET",
 		'success': function(response){
-			var link = $("<a>");
-            link.attr("href", "<c:url value="/auth/group/${group.id}/items" />");
-            link.text(${group.name} (${group.numItems}));
-            link.addClass("link");
-			$('#groups').html(link);
+			for (var i=0; i<response.length; i++) {
+				var link = $("<a>");
+				console.log(response[i]);
+	            link.attr("href", "<c:url value="/auth/group/" />" +response[i].id+"/items");
+	            link.text(response[i].name + "("+ response[i].numItems +")");
+	            link.addClass("link");
+	            var groupId = "group" + i;
+				$('#groups').append($('<div id="'+groupId+'"></div>'));
+				$("#group"+i).html(link);
+			}
 			
 		}
 	});
