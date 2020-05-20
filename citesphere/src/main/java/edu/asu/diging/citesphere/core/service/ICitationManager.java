@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 

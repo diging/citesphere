@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -227,7 +225,6 @@ public class CitationManager implements ICitationManager {
             if (groupOptional.isPresent()) {
                 ICitationGroup group = groupOptional.get();
                 if (group.getVersion() != groupVersions.get(id)) {
-                    //grouop.setrequest(time)
                     group = zoteroManager.getGroup(user, id + "", true);
                     group.setUpdatedOn(OffsetDateTime.now());
                 }
