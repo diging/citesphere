@@ -6,5 +6,9 @@ import edu.asu.diging.citesphere.user.IUser;
 public interface IGroupManager {
 
     ICitationGroup getGroup(IUser user, String groupId);
+    
+    void updateGroup(IUser user, Long id, ICitationGroup group);
+
+    void addGroup(IUser user, Long id);
 
 }

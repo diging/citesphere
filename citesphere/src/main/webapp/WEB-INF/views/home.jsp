@@ -45,21 +45,45 @@ If you try and take a cat apart to see how it works, the first thing you have on
 <script>
 $(document).ready(function(){
 	$.ajax({ 
-		'url': '<c:url value="/groups?isZoteroConnected=${isZoteroConnected}" />',
+		'url': '<c:url value="/groups" />',
 		'type': "GET",
 		'success': function(response){
-			for (var i=0; i<response.length; i++) {
-				var link = $("<a>");
-				link.attr("href", "<c:url value="/auth/group/" />" +response[i].id+"/items");
-				link.text(response[i].name + " ("+ response[i].numItems +")");
-				link.addClass("link");
+			console.log(response);
+			$.map( response, function( val, i ) {
 				var groupId = "group" + i;
 				$('#groups').append($('<div class="panel panel-default panel-body" id="'+groupId+'"></div>'));
-				$("#group"+i).html(link);
-			}
-			
+				$("#group"+i).append($('<div class="fas fa-spinner fa-spin"></div>'));
+				var groupInfo = $.getGroupInfo(i, val);
+				if(groupInfo.id != 0){
+					var link = $("<a>");
+					link.attr("href", "<c:url value="/auth/group/" />" +groupInfo.id+"/items");
+					link.text(groupInfo.name + " ("+ groupInfo.numItems +")");
+					link.addClass("link");
+					$("#group"+i).removeClass("fas fa-spinner fa-spin");
+					$("#group"+i).html(link);
+				}
+			});
 		}
 	});
 	
+});
+	
+jQuery.extend({
+	getGroupInfo: function(groupId, version) {
+    	var info = null;
+    	$.ajax({ 
+    		'url': '<c:url value="/group/'+groupId+'/info?version=" />' + version,
+    		'type': "GET",
+    		'async': false,
+    		'success': function(response){
+    			if(response.id != 0){
+    				info = response;
+    			} else{
+    				$.getGroupInfo(groupId, version);
+    			}
+    		}
+    	});
+    	return info;
+    	}
 });
 </script>

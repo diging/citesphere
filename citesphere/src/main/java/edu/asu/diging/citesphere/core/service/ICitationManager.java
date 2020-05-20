@@ -1,6 +1,9 @@
 package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
@@ -49,5 +52,11 @@ public interface ICitationManager {
             int index) throws GroupDoesNotExistException, ZoteroHttpStatusException;
 
     void forceGroupItemsRefresh(IUser user, String groupId, String collectionId, int page, String sortBy);
+
+    Map<Long, Long> getGroupsId(IUser user);
+
+    void addUserToGroup(ICitationGroup group, IUser user);
+
+    ICitationGroup getGroupInfo(IUser user, Long groupId, Long version);
 
 }

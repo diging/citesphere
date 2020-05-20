@@ -1,10 +1,13 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
@@ -20,6 +23,9 @@ public class GroupManager implements IGroupManager {
 
     @Autowired
     private IZoteroManager zoteroManager;
+    
+    @Autowired
+    private ICitationManager citationManager;
 
     /*
      * (non-Javadoc)
@@ -42,5 +48,26 @@ public class GroupManager implements IGroupManager {
             return group;
         }
         return null;
+    }
+    
+    @Async
+    @Override
+    public void updateGroup(IUser user, Long id, ICitationGroup group) {
+        group.setUpdateRequestedOn(OffsetDateTime.now());
+        group = zoteroManager.getGroup(user, id + "", true);
+        group.setUpdatedOn(OffsetDateTime.now());
+        citationManager.addUserToGroup(group, user);
+        groupRepository.save((CitationGroup)group);
+    }
+    
+    @Async
+    @Override
+    public void addGroup(IUser user, Long id) {
+        ICitationGroup group = new CitationGroup();
+        group.setUpdateRequestedOn(OffsetDateTime.now());
+        group = zoteroManager.getGroup(user, id + "", false);
+        group.setUpdatedOn(OffsetDateTime.now());
+        citationManager.addUserToGroup(group, user);
+        groupRepository.save((CitationGroup)group);
     }
 }

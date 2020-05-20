@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -188,6 +190,31 @@ public class CitationManager implements ICitationManager {
         
     }
 
+    @Override 
+    public Map<Long, Long> getGroupsId(IUser user) {
+        Map<Long, Long> groupVersions = zoteroManager.getGroupsVersion(user);
+        return groupVersions;
+    }
+    
+    @Override
+    public ICitationGroup getGroupInfo(IUser user, Long groupId, Long version) {
+        ICitationGroup group = new CitationGroup();
+        Optional<CitationGroup> groupOptional = groupRepository.findById(groupId);
+        if (groupOptional.isPresent()) {
+            group = groupOptional.get();
+            if (group.getVersion() != version) {
+                group = new CitationGroup();
+                if(group.getUpdateRequestedOn() == null || (group.getUpdatedOn() != null && group.getUpdateRequestedOn().compareTo(group.getUpdatedOn()) < 0)) {
+                    groupManager.updateGroup(user, groupId, group);
+                }   
+            }
+        } else {
+            groupManager.addGroup(user, groupId);
+        }
+        return group;
+    }
+    
+    
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.impl.ICitationManager#getGroups(edu.asu.diging.citesphere.core.model.IUser)
      */
@@ -200,6 +227,7 @@ public class CitationManager implements ICitationManager {
             if (groupOptional.isPresent()) {
                 ICitationGroup group = groupOptional.get();
                 if (group.getVersion() != groupVersions.get(id)) {
+                    //grouop.setrequest(time)
                     group = zoteroManager.getGroup(user, id + "", true);
                     group.setUpdatedOn(OffsetDateTime.now());
                 }
@@ -217,7 +245,8 @@ public class CitationManager implements ICitationManager {
         return groups;
     }
     
-    private void addUserToGroup(ICitationGroup group, IUser user) {
+    @Override
+    public void addUserToGroup(ICitationGroup group, IUser user) {
         if (!group.getUsers().contains(user.getUsername())) {
             group.getUsers().add(user.getUsername());
         }
