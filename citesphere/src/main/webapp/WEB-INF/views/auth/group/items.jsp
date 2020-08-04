@@ -24,7 +24,8 @@ $(function() {
 	
 	$(".bib-entry").click(function() {
 		var key = $(this).data("key");
-		window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+		var index = $(this).data("index");
+		window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key +"?index=" + index + "&page="+${currentPage} + "&sortBy=" + '${sort}' + "&collectionId=" + '${collectionId}';
 	});
 	
 	$('.collapse').collapse();
@@ -98,9 +99,17 @@ $(function() {
 </c:forEach>
 </ol>
 
-
-<h2>Items in Group ${group.name}<br>
-<small>${total} records </small>
+<h2>
+	<c:choose>
+	    <c:when test="${collectionId!=null}">
+	        Items in Collection <i>${collectionName}</i> in Group <i>${group.name}</i></br> 
+	    </c:when>    
+	    <c:otherwise>
+	        Items in Group ${group.name}</br>
+	    </c:otherwise>
+	</c:choose>
+	
+	<small>${total} records </small>
 </h2>
 
 <div class="form-group">
@@ -246,7 +255,7 @@ $(function() {
 	</c:forEach>
 	</th>
 </tr>
-<c:forEach items="${items}" var="entry">
+<c:forEach items="${items}" var="entry" varStatus="loop">
 <tr>
 	<td>
 	  <span class="text-warning">
@@ -261,15 +270,15 @@ $(function() {
 		<i class="${iconClass}" title="${iconLabel}"></i> ${iconLabel}
 	  </span>
 	</td>
-	<td class="bib-entry" data-key="${entry.key}">
+	<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}">
 	 <c:forEach items="${entry.authors}" var="author" varStatus="status">
  	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
  	 </c:forEach>
  	</td>
- 	<td class="bib-entry" data-key="${entry.key}">
+ 	<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}">
  		<em>${entry.title}</em>
  	</td>
- 	<td class="bib-entry" data-key="${entry.key}">
+ 	<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}">
  		${entry.dateFreetext}
  	</td>
  	<td>
