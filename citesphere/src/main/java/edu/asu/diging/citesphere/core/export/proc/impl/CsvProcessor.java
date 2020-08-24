@@ -3,23 +3,30 @@ package edu.asu.diging.citesphere.core.export.proc.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.export.ExportType;
 import edu.asu.diging.citesphere.core.export.proc.Processor;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationConceptTag;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ICreator;
 import edu.asu.diging.citesphere.model.bib.IPerson;
 
 @Component
 public class CsvProcessor implements Processor {
+    
+    @Autowired
+    private CitationGroupRepository groupRepo;
 
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.export.proc.impl.Processor#getSupportedType()
@@ -50,8 +57,11 @@ public class CsvProcessor implements Processor {
                 List<String> row = new ArrayList<>();
                 row.add(citation.getKey());
                 if (citation.getGroup() != null) {
-                    row.add(citation.getGroup().getId() + "");
-                    row.add(citation.getGroup().getName());
+                    Optional<ICitationGroup> group = groupRepo.findByGroupId(new Long(citation.getGroup()));
+                    if (group.isPresent()) {
+                        row.add(group.get().getGroupId() + "");
+                        row.add(group.get().getName());
+                    }
                 } else {
                     row.add("");
                     row.add("");

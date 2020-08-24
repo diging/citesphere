@@ -24,8 +24,8 @@
 	<context:component-scan
 		base-package="edu.asu.diging.citesphere.web, edu.asu.diging.citesphere.api, edu.asu.diging.citesphere.config.web"></context:component-scan>
 	
-	<beans:bean
-		class="org.springframework.data.web.config.SpringDataWebConfiguration" />
+	<!-- <beans:bean
+		class="org.springframework.data.web.config.SpringDataWebConfiguration" /> -->
 	<mvc:annotation-driven>
 		<mvc:argument-resolvers>
 			<ref bean="sortResolver" />

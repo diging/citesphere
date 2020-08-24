@@ -74,27 +74,27 @@ public class CitationHelper implements ICitationHelper {
         citation.setVolume(form.getVolume());
 
         Map<String, IPerson> authorMap = new HashMap<>();
-        if (citation.getAuthors() != null) {
-            citation.getAuthors().forEach(a -> authorMap.put(a.getId(), a));
-        }
+//        if (citation.getAuthors() != null) {
+//            citation.getAuthors().forEach(a -> authorMap.put(a.get, a));
+//        }
         citation.setAuthors(new HashSet<>());
         if (form.getAuthors() != null) {
             mapPersonFields(authorMap, form.getAuthors(), citation.getAuthors());
         }
 
         Map<String, IPerson> editorMap = new HashMap<>();
-        if (citation.getEditors() != null) {
-            citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
-        }
+//        if (citation.getEditors() != null) {
+//            citation.getEditors().forEach(a -> editorMap.put(a.getId(), a));
+//        }
         citation.setEditors(new HashSet<>());
         if (form.getEditors() != null) {
             mapPersonFields(editorMap, form.getEditors(), citation.getEditors());
         }
 
         Map<String, ICreator> creatorMap = new HashMap<>();
-        if (citation.getOtherCreators() != null) {
-            citation.getOtherCreators().forEach(a -> creatorMap.put(a.getId(), a));
-        }
+//        if (citation.getOtherCreators() != null) {
+//            citation.getOtherCreators().forEach(a -> creatorMap.put(a.getId(), a));
+//        }
         citation.setOtherCreators(new HashSet<>());
         if (form.getOtherCreators() != null) {
             mapCreatorFields(creatorMap, form.getOtherCreators(), citation.getOtherCreators());
@@ -156,9 +156,9 @@ public class CitationHelper implements ICitationHelper {
         person.setName(String.join(" ", personForm.getFirstName(), personForm.getLastName()));
 
         Map<String, IAffiliation> affiliationMap = new HashMap<>();
-        if (person.getAffiliations() != null) {
-            person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
-        }
+//        if (person.getAffiliations() != null) {
+//            person.getAffiliations().forEach(a -> affiliationMap.put(a.getId(), a));
+//        }
         person.setAffiliations(new HashSet<>());
         if (personForm.getAffiliations() != null) {
             for (AffiliationForm affiliationForm : personForm.getAffiliations()) {

@@ -13,11 +13,11 @@ import edu.asu.diging.citesphere.user.IUser;
 
 public interface PageRequestRepository extends PagingAndSortingRepository<PageRequest, String> {
 
-    @EntityGraph(value="requestsWithFullCitations", type=EntityGraphType.LOAD)
-    List<PageRequest> findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortByAndCollectionId(IUser user, String objectId, int page, ZoteroObjectType zoteroObjectType, String sortBy, String collectionId);
-
-    @Query(value="SELECT DISTINCT pr from PageRequest pr LEFT JOIN FETCH pr.citations c LEFT JOIN FETCH c.authors a WHERE pr.objectId = ?2 AND pr.user = ?1 AND pr.pageNumber = ?3 AND pr.zoteroObjectType = ?4")
-//    @EntityGraph(value="requestsWithFullCitations")
-    List<PageRequest> findPageRequestWithCitations(IUser user, String objectId, int page, ZoteroObjectType zoteroObjectType);
+//    @EntityGraph(value="requestsWithFullCitations", type=EntityGraphType.LOAD)
+//    List<PageRequest> findByUserAndObjectIdAndPageNumberAndZoteroObjectTypeAndSortByAndCollectionId(IUser user, String objectId, int page, ZoteroObjectType zoteroObjectType, String sortBy, String collectionId);
+//
+//    @Query(value="SELECT DISTINCT pr from PageRequest pr LEFT JOIN FETCH pr.citations c LEFT JOIN FETCH c.authors a WHERE pr.objectId = ?2 AND pr.user = ?1 AND pr.pageNumber = ?3 AND pr.zoteroObjectType = ?4")
+////    @EntityGraph(value="requestsWithFullCitations")
+//    List<PageRequest> findPageRequestWithCitations(IUser user, String objectId, int page, ZoteroObjectType zoteroObjectType);
 } 
 

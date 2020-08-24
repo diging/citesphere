@@ -55,4 +55,6 @@ public interface IZoteroConnector {
     void clearCollectionItemsCache(IUser user, String groupId, String collectionId, int page, String sortBy,
             Long lastGroupVersion);
 
+    boolean isGroupModified(IUser user, String groupId, Long lastGroupVersion) throws ZoteroHttpStatusException;
+
 }

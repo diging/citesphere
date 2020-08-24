@@ -104,7 +104,7 @@ public class CitationFactory implements ICitationFactory {
         citation.setOtherCreators(creators);
         citation.setDateFreetext(item.getData().getDate());
         if (item.getData().getDate() != null) {
-            citation.setDate(dateParser.parse(item.getData().getDate()));
+            citation.setDate(dateParser.parse(item.getData().getDate()).toString());
         }
         citation.setUrl(item.getData().getUrl());
 

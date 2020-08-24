@@ -37,9 +37,9 @@ public interface IPageRequest {
 
     void setVersion(long version);
 
-    void setCitations(Set<ICitation> citations);
-
-    Set<ICitation> getCitations();
+//    void setCitations(Set<ICitation> citations);
+//
+//    Set<ICitation> getCitations();
 
     void setSortBy(String sortBy);
 

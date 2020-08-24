@@ -75,6 +75,16 @@ public class ZoteroConnector implements IZoteroConnector {
             throw createException(ex.getStatusCode(), ex);
         }
     }
+    
+    @Override
+    public boolean isGroupModified(IUser user, String groupId, Long lastGroupVersion) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            return !zotero.getGroupsOperations().getGroupItemsTop(groupId, 1, 1, "title", lastGroupVersion).getNotModified();
+        } catch (HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
 
     @Override
     @CacheEvict(value = "groupItems", key = "#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")

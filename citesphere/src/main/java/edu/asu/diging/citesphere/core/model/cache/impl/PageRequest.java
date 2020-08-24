@@ -29,24 +29,24 @@ import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
 @Entity
-@NamedEntityGraphs({
-        @NamedEntityGraph(
-                name="requestsWithFullCitations", 
-                attributeNodes={@NamedAttributeNode(value="citations", subgraph="requestCitations")},
-                subgraphs={
-                        @NamedSubgraph(
-                                name="requestCitations",
-                                attributeNodes={
-                                        @NamedAttributeNode(value="authors", subgraph="authorAffiliations"),
-                                }                                
-                        ),
-                        @NamedSubgraph(
-                                name="authorAffiliations",
-                                attributeNodes={@NamedAttributeNode("affiliations")}
-                        )
-                }
-          )
-    })
+//@NamedEntityGraphs({
+//        @NamedEntityGraph(
+//                name="requestsWithFullCitations", 
+//                attributeNodes={@NamedAttributeNode(value="citations", subgraph="requestCitations")},
+//                subgraphs={
+//                        @NamedSubgraph(
+//                                name="requestCitations",
+//                                attributeNodes={
+//                                        @NamedAttributeNode(value="authors", subgraph="authorAffiliations"),
+//                                }                                
+//                        ),
+//                        @NamedSubgraph(
+//                                name="authorAffiliations",
+//                                attributeNodes={@NamedAttributeNode("affiliations")}
+//                        )
+//                }
+//          )
+//    })
 public class PageRequest implements IPageRequest {
 
     @Id
@@ -65,9 +65,7 @@ public class PageRequest implements IPageRequest {
     private IUser user;
     private String objectId;
     private long version;
-    @NotFound(action=NotFoundAction.IGNORE)
-    @ManyToMany(targetEntity=Citation.class)
-    private Set<ICitation> citations;
+//    private Set<ICitation> citations;
     private String sortBy;
     private String collectionId;
     
@@ -179,14 +177,14 @@ public class PageRequest implements IPageRequest {
     public void setVersion(long version) {
         this.version = version;
     }
-    @Override
-    public Set<ICitation> getCitations() {
-        return citations;
-    }
-    @Override
-    public void setCitations(Set<ICitation> citations) {
-        this.citations = citations;
-    }
+//    @Override
+//    public Set<ICitation> getCitations() {
+//        return citations;
+//    }
+//    @Override
+//    public void setCitations(Set<ICitation> citations) {
+//        this.citations = citations;
+//    }
     @Override
     public String getSortBy() {
         return sortBy;

@@ -19,7 +19,6 @@ import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
-import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
@@ -44,14 +43,14 @@ public class CitationCollectionManager implements ICitationCollectionManager {
      */
     @Override
     public CitationCollectionResult getCitationCollections(IUser user, String groupId, String parentCollectionId, int page, String sortBy) throws GroupDoesNotExistException {
-        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
+        Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
         CitationCollectionResult collectionResult = new CitationCollectionResult();
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
         
         ICitationGroup group = groupOptional.get();
-        List<ICitationCollection> collections = collectionRepository.findByParentCollectionKeyAndGroup(parentCollectionId, group);
+        List<ICitationCollection> collections = collectionRepository.findByParentCollectionKeyAndGroupId(parentCollectionId, group.getGroupId() + "");
         
         
         CitationCollectionResult results = zoteroManager.getCitationCollections(user, groupId, parentCollectionId, page, sortBy, group.getVersion());
@@ -68,7 +67,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
     
     @Override
     public long getTotalCitationCollections(IUser user, String groupId, String parentCollectionId) throws GroupDoesNotExistException {
-        Optional<CitationGroup> groupOptional = groupRepository.findById(new Long(groupId));
+        Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
@@ -103,7 +102,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         if (collectionId == null) {
             return null;
         }
-        Optional<CitationCollection> collectionOptional = collectionRepository.findById(collectionId);
+        Optional<ICitationCollection> collectionOptional = collectionRepository.findByKey(collectionId);
         if (collectionOptional.isPresent()) {
             return (ICitationCollection) collectionOptional.get();
         }

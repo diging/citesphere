@@ -50,4 +50,6 @@ public interface IZoteroManager {
 
     void forceRefresh(IUser user, String zoteroGroupId, String collectionId, int page, String sortBy, Long lastGroupVersion);
 
+    boolean isGroupModified(IUser user, String groupId, long lastGroupVersion) throws ZoteroHttpStatusException;
+
 }
