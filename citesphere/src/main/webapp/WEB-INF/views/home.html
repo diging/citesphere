@@ -1,0 +1,30 @@
+<html layout:decorate="~{layouts/main}">
+  <head>
+    <title>Authority Matcher</title>
+  </head>
+  <body>
+   <div layout:fragment="content">
+      <div class="jumbotron col-md-12">
+
+		<h1>Welcome to Citesphere!</h1>
+		<p>
+		If you try and take a cat apart to see how it works, the first thing you have on your hands 
+		is a nonworking cat.
+		</p>
+      </div>
+      <div class="jumbotron col-md-12">
+<center>
+<!--  Need to fix the CSS and layout -->
+<h2>Please connect your Zotero account before continuing!</h2>
+<form action="<c:url value="/signin/zotero" />" method="POST">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	<input type="hidden" name="all_groups" value="write" />
+	<button class="btn btn-primary btn-lg" type="submit">
+		Connect Zotero
+	</button>
+</form>
+</center>
+</div>
+   </div>
+  </body>
+</html>
