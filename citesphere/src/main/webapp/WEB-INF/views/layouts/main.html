@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     
-    <link rel="stylesheet" th:href="@{/resources/font-awesome-5.7.2/css/all.css}" type="text/css"  />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" type="text/css"  />
     <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
     
     <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Citesphere</title>
@@ -49,8 +49,18 @@
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
 	          		<a th:href="@{/admin/user/list}" >Users</a>
 	          	</li>
-	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
-                    <a th:href="@{/admin/app/list}" >Apps</a>
+	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+                	<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+			      		Apps <span class="caret"></span>
+			    	</a>
+	          		<ul class="dropdown-menu">
+	          	  		<li role="presentation">
+		          			<a th:href="@{/admin/apps}" />" >See all Apps</a>
+		          		</li>
+			      		<li role="presentation">
+		          			<a th:href="@{/admin/apps/add}" />" >Add</a>
+		          		</li>
+			    	</ul>
                 </li>
 	          	
 	          	<li sec:authorize="isAuthenticated()" role="presentation">
@@ -66,6 +76,52 @@
 	          	<li sec:authorize="isAnonymous()" role="presentation">
 	         	 	<a title="Sign Up" th:href="@{/register}"><i class="fas fa-user-plus"></i></a>
 	          	</li>
+	          	
+
+          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
+                <a th:href="@{/auth/exports}"> Exports</a>
+            </li>
+          	<li sec:authorize="hasRole('ADMIN')"  role="presentation" class="dropdown">
+			    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+			      Citation Concepts <span class="caret"></span>
+			    </a>
+			    <ul class="dropdown-menu">
+			      <li  role="presentation">
+		          	<a href="@{/auth/concepts/list}">Concepts</a>
+		          </li>
+		          <li role="presentation">
+		          	<a href="@{/auth/concepts/types/list}">Concept Types</a>
+		          </li>
+			    </ul>
+			</li>
+			<li sec:authorize="hasRole('ADMIN')"  role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                  Import <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+					<li role="presentation">
+		          		<a href="@{/auth/import/upload}">Import from File</a>
+		          	</li>
+		          	<li  role="separator" class="divider"></li>
+		          	<li  role="presentation">
+                        <a href="@{/auth/import/jobs}">See all Imports</a>
+                    </li>
+	          	</ul>
+	        </li>
+          	<li sec:authorize="hasRole('ADMIN')"  role="presentation">
+          		<a href="@{/auth/authority/list}">Managed Authority Entries</a>
+          	</li>
+          	<li sec:authorize="hasRole('ADMIN')"  role="presentation" class="dropdown">
+			    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+			      Profile <span class="caret"></span>
+			    </a>
+			    <ul class="dropdown-menu">
+				    <li role="presentation">
+	          			<a href="@{/auth/tokens}">Authorized OAuth Apps</a>
+	          		</li>
+          		</ul>
+			</li>
+
 	          </ul>
 	         
 	        </nav>
@@ -76,7 +132,7 @@
       
       
 	    <div th:if="${show_alert}" class="alert alert-${alert_type}" role="alert">${alert_msg}</div>
-		
+
 	    <!-- Content -->
 	    <div layout:fragment="content">
 	        <!-- ============================================================================ -->
@@ -90,6 +146,35 @@
 	          a bug. Either way, just move on my friend.
 	        </p>
 	    </div>
+	    
+	   <footer class="footer">
+      <div class="container">
+        <div>
+
+		<hr style="margin-bottom: 25px;">
+		<p class="text-muted pull-left">
+		<th:set var="PR" value="${pullrequest}" />
+            Version: ${buildNumber}<th:if test="${not empty PR}">, Pull Request: ${pullrequest}</th:if> 
+        </p>
+		
+	    <p class="text-muted">
+	    
+	         
+	   	
+		<form sec:authorize="isAnonymous()" name='f' class="form-inline pull-right" action="@{/login/authenticate}" method="POST">
+			Login:
+			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+  			<input placeholder="Username" class="form-control input-sm" type="text" id="username" name="username"/>        
+		    <input placeholder="Password" class="form-control input-sm" type="password" id="password" name="password"/>    
+		    <button type="submit" class="btn btn-default btn-sm">Log in</button>
+		    <a href="@{/register}"class="btn btn-primary btn-sm">Sign Up</a><br>
+		    <a href="@{/login/reset}"><small>Forgot Password?</small></a>
+		</form>
+		
+        </p>
+        </div>
+      </div>
+    </footer>
 	    
    </div>
   </body>
