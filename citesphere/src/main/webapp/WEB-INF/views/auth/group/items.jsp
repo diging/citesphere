@@ -132,7 +132,8 @@ $(function() {
       <div class="panel-body">
       	${group.description}
         <div class="col-md-6">
-        <b>Local Version:</b> ${group.version}<br>
+        <b>Local Metadata Version:</b> ${group.metadataVersion}<br>
+        <b>Local Library Version:</b> ${group.contentVersion}<br>
         <b>Created on:</b> <span class="date">${group.created}</span><br>
         <b>Last Modified on:</b> <span class="date">${group.lastModified}</span>
         </div>

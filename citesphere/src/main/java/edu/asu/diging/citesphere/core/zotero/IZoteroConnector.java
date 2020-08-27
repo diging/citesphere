@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
+import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
@@ -56,5 +57,15 @@ public interface IZoteroConnector {
             Long lastGroupVersion);
 
     boolean isGroupModified(IUser user, String groupId, Long lastGroupVersion) throws ZoteroHttpStatusException;
+
+    ZoteroResponse<Item> getGroupItemVersions(IUser user, String groupId, long version);
+
+    ZoteroResponse<Item> getGroupItemsByKey(IUser user, String groupId, List<String> keys);
+
+    DeletedElements getDeletedElements(IUser user, String groupId, long version);
+
+    ZoteroResponse<Collection> getCitationCollectionVersions(IUser user, String groupId, Long lastGroupVersion);
+
+    ZoteroResponse<Collection> getCitationCollectionsByKey(IUser user, String groupId, List<String> keys);
 
 }

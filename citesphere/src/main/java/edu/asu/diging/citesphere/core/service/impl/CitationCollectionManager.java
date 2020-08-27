@@ -15,6 +15,7 @@ import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationCollectionRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.data.bib.ICollectionMongoDao;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
@@ -27,6 +28,9 @@ public class CitationCollectionManager implements ICitationCollectionManager {
 
     @Autowired
     private CitationCollectionRepository collectionRepository;
+    
+    @Autowired
+    private ICollectionMongoDao collectionDao;
     
     @Autowired
     private CitationGroupRepository groupRepository;
@@ -44,25 +48,15 @@ public class CitationCollectionManager implements ICitationCollectionManager {
     @Override
     public CitationCollectionResult getCitationCollections(IUser user, String groupId, String parentCollectionId, int page, String sortBy) throws GroupDoesNotExistException {
         Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
-        CitationCollectionResult collectionResult = new CitationCollectionResult();
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
         
         ICitationGroup group = groupOptional.get();
-        List<ICitationCollection> collections = collectionRepository.findByParentCollectionKeyAndGroupId(parentCollectionId, group.getGroupId() + "");
-        
-        
-        CitationCollectionResult results = zoteroManager.getCitationCollections(user, groupId, parentCollectionId, page, sortBy, group.getVersion());
-        List<ICitationCollection> updatedCollections = results.getCitationCollections();
-        if (!results.isNotModified()) {
-            collectionRepository.deleteAll(Arrays.asList(collections.toArray(new CitationCollection[collections.size()])));
-            collectionRepository.saveAll(Arrays.asList(updatedCollections.toArray(new CitationCollection[updatedCollections.size()])));
-            collections = updatedCollections;
-        } 
-        
+        List<ICitationCollection> collections = (List<ICitationCollection>) collectionDao.findByGroupIdAndParentKey(group.getGroupId() + "", parentCollectionId);
+        CitationCollectionResult collectionResult = new CitationCollectionResult();
         collectionResult.setCitationCollections(collections);
-        return results;
+        return collectionResult;
     }
     
     @Override
@@ -73,7 +67,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         }
         ICitationGroup group = groupOptional.get();
         
-        CitationCollectionResult results = zoteroManager.getCitationCollections(user, groupId, parentCollectionId, 1, "title", group.getVersion());
+        CitationCollectionResult results = zoteroManager.getCitationCollections(user, groupId, parentCollectionId, 1, "title", group.getContentVersion());
         return results.getTotalResults();        
     }
     
@@ -82,7 +76,9 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         int page = 1;
         CitationCollectionResult result = getCitationCollections(user, groupId, parentCollectionId, page, sortBy);
         List<ICitationCollection> collections = new ArrayList<>();
-        collections.addAll(result.getCitationCollections());
+        if (result.getCitationCollections() != null) {
+            collections.addAll(result.getCitationCollections());
+        }
         int idx = 1;
         while (result.getTotalResults() > collections.size() && idx*zoteroCollectionsMaxNumber < maxCollections) {
             page++;

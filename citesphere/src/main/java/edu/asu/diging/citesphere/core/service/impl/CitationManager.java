@@ -30,12 +30,14 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedExcepti
 import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
 import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
 import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
+import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.CustomCitationRepository;
+import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
@@ -70,13 +72,16 @@ public class CitationManager implements ICitationManager {
     private CitationRepository citationRepository;
     
     @Autowired
-    private CustomCitationRepository customCitationRepository;
+    private ICitationDao citationDao;
     
     @Autowired
-    private PageRequestRepository pageRequestRepository;
-    
+    private CustomCitationRepository customCitationRepository;
+     
     @Autowired
     private IGroupManager groupManager;
+    
+    @Autowired
+    private IAsyncCitationProcessor asyncCitationProcessor;
     
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
     
@@ -196,7 +201,8 @@ public class CitationManager implements ICitationManager {
             Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(id);
             if (groupOptional.isPresent()) {
                 ICitationGroup group = groupOptional.get();
-                if (group.getVersion() != groupVersions.get(id)) {
+                if (group.getMetadataVersion() != groupVersions.get(id)) {
+                    groupRepository.delete((CitationGroup)group);
                     group = zoteroManager.getGroup(user, id + "", true);
                     group.setUpdatedOn(OffsetDateTime.now().toString());
                 }
@@ -225,29 +231,15 @@ public class CitationManager implements ICitationManager {
         Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
         if (groupOptional.isPresent()) {
             ICitationGroup group = groupOptional.get();
-            boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getVersion());
-            
+            boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
+            if (isModified) {
+                asyncCitationProcessor.loadCitations(user, group, collectionId, sortBy);
+            }
            
-            CitationResults results = null;
-//            if (collectionId == null || collectionId.trim().isEmpty()) {
-//                results = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getVersion());
-//            } else {
-//                results = zoteroManager.getCollectionItems(user, groupId, collectionId, page, sortBy, group.getVersion());
-//            }
-//            if (!results.isNotModified()) {
-//                if (requests != null && requests.size() > 0) {
-//                    // delete last cache
-//                    pageRequestRepository.deleteAll(requests);
-//                }
-//                PageRequest request = createPageRequest(user, page, sortBy, group, results);
-//                request.setCollectionId(collectionId);
-//                pageRequestRepository.save(request);
-//            } else if (localPageRequest != null) {
-//                localPageRequest.setLastUpdated(OffsetDateTime.now());
-////                results.setCitations(new ArrayList<ICitation>(localPageRequest.getCitations()));
-//            }
-            
-            return results;
+          CitationResults results = new CitationResults();
+          List<ICitation> citations = (List<ICitation>) citationDao.findCitations(groupId, (page-1)*zoteroPageSize, zoteroPageSize);
+          results.setCitations(citations);
+          return results;
         }
         throw new GroupDoesNotExistException("There is no group with id " + groupId);
     }
@@ -257,7 +249,7 @@ public class CitationManager implements ICitationManager {
         Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
         if (groupOptional.isPresent()) {
             ICitationGroup group = groupOptional.get();
-            zoteroManager.forceRefresh(user, groupId, collectionId, page, sortBy, group.getVersion());
+            zoteroManager.forceRefresh(user, groupId, collectionId, page, sortBy, group.getContentVersion());
             group.setLastLocallyModifiedOn(OffsetDateTime.now().toString());
             groupRepository.save((CitationGroup)group);
         }
@@ -279,7 +271,7 @@ public class CitationManager implements ICitationManager {
         request.setPageSize(zoteroPageSize);
         request.setTotalNumResults(results.getTotalResults());
         request.setUser(user);
-        request.setVersion(group.getVersion());
+        request.setVersion(group.getMetadataVersion());
         request.setZoteroObjectType(ZoteroObjectType.GROUP);
         request.setSortBy(sortBy);
         

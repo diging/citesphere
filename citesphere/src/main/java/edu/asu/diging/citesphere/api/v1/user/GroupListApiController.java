@@ -68,7 +68,7 @@ public class GroupListApiController extends V1Controller {
         jsonGroup.setOwner(group.getOwner());
         jsonGroup.setType(group.getType());
         jsonGroup.setUrl(group.getUrl());
-        jsonGroup.setVersion(group.getVersion());
+        jsonGroup.setVersion(group.getMetadataVersion());
         return jsonGroup;
     }
     
