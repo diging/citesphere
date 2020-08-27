@@ -1,181 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" type="text/css"  />
-    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
-    
-    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Citesphere</title>
-    
-    <!-- Bootstrap core CSS -->
-    <link th:href="@{/resources/bootstrap/css/bootstrap.min.css}" type="text/css" rel="stylesheet">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<meta name="description" content="">
+<meta name="author" content="">
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link th:href="@{/resources/bootstrap/assets/css/ie10-viewport-bug-workaround.css}" type="text/css" rel="stylesheet">
+<link rel="stylesheet"
+	href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+	type="text/css" />
+<link href='https://fonts.googleapis.com/css?family=Raleway'
+	rel='stylesheet' type='text/css'>
 
-    <!-- Custom styles for this template -->
-    <link th:href="@{/resources/bootstrap/grid.css}" type="text/css" rel="stylesheet">
+<title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Citesphere</title>
 
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="<c:url value="/resources/bootstrap/assets/js/ie8-responsive-file-warning.js" />"></script><![endif]-->
-    <script th:src="@{/resources/bootstrap/assets/js/ie-emulation-modes-warning.js}"></script>
+<!-- Bootstrap core CSS -->
+<link th:href="@{/resources/bootstrap/css/bootstrap.min.css}"
+	type="text/css" rel="stylesheet">
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<link
+	th:href="@{/resources/bootstrap/assets/css/ie10-viewport-bug-workaround.css}"
+	type="text/css" rel="stylesheet">
+
+<!-- Custom styles for this template -->
+<link th:href="@{/resources/bootstrap/grid.css}" type="text/css"
+	rel="stylesheet">
+
+<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+<!--[if lt IE 9]><script src="<c:url value="/resources/bootstrap/assets/js/ie8-responsive-file-warning.js" />"></script><![endif]-->
+<script
+	th:src="@{/resources/bootstrap/assets/js/ie-emulation-modes-warning.js}"></script>
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
- 	<script th:src="@{/resources/bootstrap/js/bootstrap.min.js}"></script>
-	<script th:src="@{/resources/bootstrap/js/main.js}"></script>
-  </head>
 
-  <body style="padding-bottom: 20px;">
-    <div class="container">
+<script
+	src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script th:src="@{/resources/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/resources/bootstrap/js/main.js}"></script>
+</head>
+
+<body style="padding-bottom: 20px;">
+	<div class="container">
 		<div class="page-header">
-	      	<nav>
-	          <ul class="nav nav-pills pull-right">
-	          	<li role="presentation">
-	          		<a th:href="@{/}" >Home</a>
-	          	</li>
-	          	
-	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
-	          		<a th:href="@{/admin/user/list}" >Users</a>
-	          	</li>
-	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
-                	<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-			      		Apps <span class="caret"></span>
-			    	</a>
-	          		<ul class="dropdown-menu">
-	          	  		<li role="presentation">
-		          			<a th:href="@{/admin/apps}" />" >See all Apps</a>
-		          		</li>
-			      		<li role="presentation">
-		          			<a th:href="@{/admin/apps/add}" />" >Add</a>
-		          		</li>
-			    	</ul>
-                </li>
-	          	
-	          	<li sec:authorize="isAuthenticated()" role="presentation">
-	         	 	<form th:action="@{/logout}" method="POST">
-	         	 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-	  				<button class="btn-link" type="submit" title="Logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i></button>
-	         	 	</form>
-	         	 </li>
-	         	 
-	         	 <li sec:authorize="isAnonymous()" role="presentation">
-	          		<a title="Login" th:href="@{/login}" ><i class="fas fa-sign-in-alt"></i></a>
-	          	</li>
-	          	<li sec:authorize="isAnonymous()" role="presentation">
-	         	 	<a title="Sign Up" th:href="@{/register}"><i class="fas fa-user-plus"></i></a>
-	          	</li>
-	          	
+			<nav>
+				<ul class="nav nav-pills pull-right">
+					<li role="presentation"><a th:href="@{/}">Home</a></li>
 
-          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
-                <a th:href="@{/auth/exports}"> Exports</a>
-            </li>
-          	<li sec:authorize="hasRole('ADMIN')"  role="presentation" class="dropdown">
-			    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-			      Citation Concepts <span class="caret"></span>
-			    </a>
-			    <ul class="dropdown-menu">
-			      <li  role="presentation">
-		          	<a href="@{/auth/concepts/list}">Concepts</a>
-		          </li>
-		          <li role="presentation">
-		          	<a href="@{/auth/concepts/types/list}">Concept Types</a>
-		          </li>
-			    </ul>
-			</li>
-			<li sec:authorize="hasRole('ADMIN')"  role="presentation" class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                  Import <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-					<li role="presentation">
-		          		<a href="@{/auth/import/upload}">Import from File</a>
-		          	</li>
-		          	<li  role="separator" class="divider"></li>
-		          	<li  role="presentation">
-                        <a href="@{/auth/import/jobs}">See all Imports</a>
-                    </li>
-	          	</ul>
-	        </li>
-          	<li sec:authorize="hasRole('ADMIN')"  role="presentation">
-          		<a href="@{/auth/authority/list}">Managed Authority Entries</a>
-          	</li>
-          	<li sec:authorize="hasRole('ADMIN')"  role="presentation" class="dropdown">
-			    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-			      Profile <span class="caret"></span>
-			    </a>
-			    <ul class="dropdown-menu">
-				    <li role="presentation">
-	          			<a href="@{/auth/tokens}">Authorized OAuth Apps</a>
-	          		</li>
-          		</ul>
-			</li>
+					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
+						th:href="@{/admin/user/list}">Users</a></li>
+					<li sec:authorize="hasRole('ADMIN')" role="presentation"
+						class="dropdown"><a class="dropdown-toggle"
+						data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+						aria-expanded="false"> Apps <span class="caret"></span>
+					</a>
+						<ul class="dropdown-menu">
+							<li role="presentation"><a th:href="@{/admin/apps}" />"
+								>See all Apps</a></li>
+							<li role="presentation"><a th:href="@{/admin/apps/add}" />"
+								>Add</a></li>
+						</ul></li>
 
-	          </ul>
-	         
-	        </nav>
-        
-	        <h1><a class="appName" href="/">Citesphere</a></h1>
-	        <p class="lead">Your citations to somewhere else.</p>   
-	    </div>
-      
-      
-	    <div th:if="${show_alert}" class="alert alert-${alert_type}" role="alert">${alert_msg}</div>
+					<li sec:authorize="isAuthenticated()" role="presentation">
+						<form th:action="@{/logout}" method="POST">
+							<input type="hidden" name="${_csrf.parameterName}"
+								value="${_csrf.token}" />
+							<button class="btn-link" type="submit" title="Logout">
+								<i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+							</button>
+						</form>
+					</li>
 
-	    <!-- Content -->
-	    <div layout:fragment="content">
-	        <!-- ============================================================================ -->
-	        <!-- This content is only used for static prototyping purposes (natural templates)-->
-	        <!-- and is therefore entirely optional, as this markup fragment will be included -->
-	        <!-- from "fragments/header.html" at runtime.                                     -->
-	        <!-- ============================================================================ -->
-	        <h1>Ups, something went wrong.</h1>
-	        <p>
-	          You should not see this. Who knows what magic you did you get here; or maybe it's just
-	          a bug. Either way, just move on my friend.
-	        </p>
-	    </div>
-	    
-	   <footer class="footer">
-      <div class="container">
-        <div>
 
-		<hr style="margin-bottom: 25px;">
-		<p class="text-muted pull-left">
-		<th:set var="PR" value="${pullrequest}" />
-            Version: ${buildNumber}<th:if test="${not empty PR}">, Pull Request: ${pullrequest}</th:if> 
-        </p>
-		
-	    <p class="text-muted">
-	    
-	         
-	   	
-		<form sec:authorize="isAnonymous()" name='f' class="form-inline pull-right" action="@{/login/authenticate}" method="POST">
-			Login:
-			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-  			<input placeholder="Username" class="form-control input-sm" type="text" id="username" name="username"/>        
-		    <input placeholder="Password" class="form-control input-sm" type="password" id="password" name="password"/>    
-		    <button type="submit" class="btn btn-default btn-sm">Log in</button>
-		    <a href="@{/register}"class="btn btn-primary btn-sm">Sign Up</a><br>
-		    <a href="@{/login/reset}"><small>Forgot Password?</small></a>
-		</form>
-		
-        </p>
-        </div>
-      </div>
-    </footer>
-	    
-   </div>
-  </body>
+					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
+						th:href="@{/auth/exports}"> Exports</a></li>
+					<li sec:authorize="hasRole('ADMIN')" role="presentation"
+						class="dropdown"><a class="dropdown-toggle"
+						data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+						aria-expanded="false"> Citation Concepts <span class="caret"></span>
+					</a>
+						<ul class="dropdown-menu">
+							<li role="presentation"><a href="@{/auth/concepts/list}">Concepts</a>
+							</li>
+							<li role="presentation"><a
+								href="@{/auth/concepts/types/list}">Concept Types</a></li>
+						</ul></li>
+					<li sec:authorize="hasRole('ADMIN')" role="presentation"
+						class="dropdown"><a class="dropdown-toggle"
+						data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+						aria-expanded="false"> Import <span class="caret"></span>
+					</a>
+						<ul class="dropdown-menu">
+							<li role="presentation"><a href="@{/auth/import/upload}">Import
+									from File</a></li>
+							<li role="separator" class="divider"></li>
+							<li role="presentation"><a href="@{/auth/import/jobs}">See
+									all Imports</a></li>
+						</ul></li>
+					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
+						href="@{/auth/authority/list}">Managed Authority Entries</a></li>
+					<li sec:authorize="hasRole('ADMIN')" role="presentation"
+						class="dropdown"><a class="dropdown-toggle"
+						data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+						aria-expanded="false"> Profile <span class="caret"></span>
+					</a>
+						<ul class="dropdown-menu">
+							<li role="presentation"><a href="@{/auth/tokens}">Authorized
+									OAuth Apps</a></li>
+						</ul></li>
+
+				</ul>
+
+			</nav>
+
+			<h1>
+				<a class="appName" href="/">Citesphere</a>
+			</h1>
+		</div>
+
+
+		<div th:if="${show_alert}" class="alert alert-${alert_type}"
+			role="alert">${alert_msg}</div>
+
+		<!-- Content -->
+		<div layout:fragment="content">
+			<!-- ============================================================================ -->
+			<!-- This content is only used for static prototyping purposes (natural templates)-->
+			<!-- and is therefore entirely optional, as this markup fragment will be included -->
+			<!-- from "fragments/header.html" at runtime.                                     -->
+			<!-- ============================================================================ -->
+			<h1>Ups, something went wrong.</h1>
+			<p>You should not see this. Who knows what magic you did you get
+				here; or maybe it's just a bug. Either way, just move on my friend.
+			</p>
+		</div>
+	</div>
+	<footer class="footer">
+		<div class="container">
+
+			<div class="row">
+				<div class="col-md-12">
+					<hr style="margin-bottom: 25px;">
+					<p class="text-muted pull-left" th:with="PR=${pullRequest}">
+						Version: ${buildNumber}<span th:if="!${#strings.isEmpty(PR)}">,
+							Pull Request: ${pullRequest}</span>
+					</p>
+
+					<p class="text-muted">
+					<form sec:authorize="isAnonymous()" name='f'
+						class="form-inline pull-right" action="@{/login/authenticate}"
+						method="POST">
+						Login: <input type="hidden" name="${_csrf.parameterName}"
+							value="${_csrf.token}" /> <input placeholder="Username"
+							class="form-control input-sm" type="text" id="username"
+							name="username" /> <input placeholder="Password"
+							class="form-control input-sm" type="password" id="password"
+							name="password" />
+						<button type="submit" class="btn btn-default btn-sm">Log
+							in</button>
+						<a href="@{/register}" class="btn btn-primary btn-sm">Sign Up</a><br>
+						<a href="@{/login/reset}"><small>Forgot Password?</small></a>
+					</form>
+					</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+</body>
 </html>
