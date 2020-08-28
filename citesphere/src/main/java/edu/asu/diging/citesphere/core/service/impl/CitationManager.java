@@ -232,13 +232,19 @@ public class CitationManager implements ICitationManager {
         if (groupOptional.isPresent()) {
             ICitationGroup group = groupOptional.get();
             boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
+            CitationResults results = new CitationResults();
             if (isModified) {
+                results.setNotModified(false);
                 asyncCitationProcessor.loadCitations(user, group, collectionId, sortBy);
             }
            
-          CitationResults results = new CitationResults();
           List<ICitation> citations = (List<ICitation>) citationDao.findCitations(groupId, (page-1)*zoteroPageSize, zoteroPageSize);
           results.setCitations(citations);
+          if (groupOptional.isPresent()) {
+              results.setTotalResults(groupOptional.get().getNumItems());
+          } else {
+              results.setTotalResults(citations.size());
+          }
           return results;
         }
         throw new GroupDoesNotExistException("There is no group with id " + groupId);
