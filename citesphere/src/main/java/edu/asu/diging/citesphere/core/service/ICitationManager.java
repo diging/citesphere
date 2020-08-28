@@ -34,8 +34,6 @@ public interface ICitationManager {
 
     ICitation getCitationFromZotero(IUser user, String groupId, String key) throws ZoteroHttpStatusException;
 
-    void detachCitation(ICitation citation);
-
     ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 

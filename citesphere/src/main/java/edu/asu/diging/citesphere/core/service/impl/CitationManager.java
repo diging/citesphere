@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,21 +26,16 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.cache.IPageRequest;
-import edu.asu.diging.citesphere.core.model.cache.impl.PageRequest;
-import edu.asu.diging.citesphere.core.repository.cache.PageRequestRepository;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.CitationRepository;
-import edu.asu.diging.citesphere.data.bib.CustomCitationRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
-import edu.asu.diging.citesphere.model.bib.ZoteroObjectType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
@@ -74,9 +68,6 @@ public class CitationManager implements ICitationManager {
     @Autowired
     private ICitationDao citationDao;
     
-    @Autowired
-    private CustomCitationRepository customCitationRepository;
-     
     @Autowired
     private IGroupManager groupManager;
     
@@ -140,13 +131,10 @@ public class CitationManager implements ICitationManager {
             if (storedCitation.getVersion() != citationVersion) {
                 throw new CitationIsOutdatedException();
             }
+            citationRepository.delete((Citation)storedCitationOptional.get());
         }
-        citation = customCitationRepository.mergeCitation(citation);
+        
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
-        
-        Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
-        updatedCitation.setGroup(groupOptional.get().getGroupId() + "");
-        
         citationRepository.save((Citation)updatedCitation);
     }
     
@@ -166,11 +154,6 @@ public class CitationManager implements ICitationManager {
         groupRepository.save((CitationGroup)group);
         
         return newCitation;
-    }
-    
-    @Override
-    public void detachCitation(ICitation citation) {
-        customCitationRepository.detachCitation(citation);
     }
     
     @Override
@@ -259,30 +242,6 @@ public class CitationManager implements ICitationManager {
             group.setLastLocallyModifiedOn(OffsetDateTime.now().toString());
             groupRepository.save((CitationGroup)group);
         }
-    }
-
-    private PageRequest createPageRequest(IUser user, int page, String sortBy, ICitationGroup group,
-            CitationResults results) {
-        List<Citation> citations = new ArrayList<>();
-        results.getCitations().forEach(c -> {
-            c.setGroup(group.getGroupId()+"");
-            citations.add((Citation)c);
-        });
-        citationRepository.saveAll(citations);
-        
-        PageRequest request = new PageRequest();
-//        request.setCitations(new HashSet<>(results.getCitations()));
-        request.setObjectId(group.getId() + "");
-        request.setPageNumber(page);
-        request.setPageSize(zoteroPageSize);
-        request.setTotalNumResults(results.getTotalResults());
-        request.setUser(user);
-        request.setVersion(group.getMetadataVersion());
-        request.setZoteroObjectType(ZoteroObjectType.GROUP);
-        request.setSortBy(sortBy);
-        
-        request.setLastUpdated(OffsetDateTime.now());
-        return request;
     }
     
     @Override
