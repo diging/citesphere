@@ -1,0 +1,57 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+	<div class="row">
+		<div class="col-md-3">&nbsp;</div>
+		<div class="col-md-6">
+			<span th:if = "${param.error != null}">
+				<div class="alert alert-danger" role="alert">Invalid Username
+					or Password.</div>
+			</span>
+	
+			<div class="jumbotron col-md-12">
+				<div sec:authorize="isAnonymous()">
+					
+					<h2>Login to Citesphere</h2>
+		
+					<form action="#" th:action="@{/login/authenticate}" method="POST" name='f' class="">
+						<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+						<div class="row">
+							<div class="form-group">
+								<label class="control-label col-sm-12" for="username">Username:</label>
+								<div class="col-sm-12">
+									<input placeholder="Username" class="form-control input-sm"
+										type="text" id="username" name="username" />
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<label class="control-label col-sm-12" for="password">Password:</label>
+								<div class="col-sm-12">
+									<input placeholder="Password" class="form-control input-sm"
+										type="password" id="password" name="password" />
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-sm-12">
+									<button type="submit" class="btn btn-primary bg-dark-blue">Submit</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+	
+				<div sec:authorize="isAuthenticated()">
+					<h1>You are logged in to Citesphere!</h1>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3"></div>
+	</div>
+</div>
+</body>

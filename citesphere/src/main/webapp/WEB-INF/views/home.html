@@ -10,7 +10,7 @@
 				thing you have on your hands is a nonworking cat.</p>
 		</div>
 		<div sec:authorize="isAuthenticated()">
-		<div  class="jumbotron col-md-12" th:if="!${isZoteroConnected}">
+		<div class="jumbotron col-md-12" th:if="!${isZoteroConnected}">
 			<center>
 				<h2>Please connect your Zotero account before continuing!</h2>
 				<form action="@{/signin/zotero}" method="POST">
@@ -24,16 +24,19 @@
 		</div>
 		<div class="jumbotron col-md-12" style="margin-bottom: 20px;"
 			th:if="${isZoteroConnected}">
-			<h2>Welcome back, ${user.firstName}!</h2>
+			<h2>Welcome back, <span th:text="${user.firstName}"></span>!</h2>
 		</div>
 		<div class="col-md-12" th:if="${isZoteroConnected}">
-			<div class="panel panel-default" th:each="group: ${groups}">
+		<tbody th:each="group: ${groups}">
+			<div class="panel panel-default">
 				<div class="panel-body">
-					<a href="@{/auth/group/${group.id}/items}" />">${group.name}
-					(${group.numItems})</a>
+					<a th:href="@{/auth/group/${group.id}/items}"><span th:text="${group.name}"/>
+					(<span th:text="${group.numItems}"/>)</a>
 				</div>
 			</div>
+		</tbody>
 		</div>
+		
 		</div>
 	</div>
 </body>
