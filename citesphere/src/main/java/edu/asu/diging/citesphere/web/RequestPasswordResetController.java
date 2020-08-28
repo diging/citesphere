@@ -49,7 +49,7 @@ public class RequestPasswordResetController {
     
     @RequestMapping(value="/login/reset", method=RequestMethod.GET)
     public String handleGet() {
-        return "login/reset";
+        return "resetPassword";
     }
 
 }
