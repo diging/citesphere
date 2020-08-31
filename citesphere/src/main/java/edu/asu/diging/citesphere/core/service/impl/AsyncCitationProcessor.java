@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
+import edu.asu.diging.citesphere.core.service.jobs.impl.SyncJobManager;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
@@ -51,18 +53,28 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     
     @Autowired
     private JobRepository jobRepo;
+    
+    @Autowired
+    private SyncJobManager jobManager;
 
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.impl.IAsyncCitationProcessor#loadCitations(edu.asu.diging.citesphere.user.IUser, edu.asu.diging.citesphere.model.bib.ICitationGroup, java.lang.String, java.lang.String)
      */
     @Override
     @Async
-    public void loadCitations(IUser user, ICitationGroup group, String collectionId, String sortBy) {
+    public void syncCitations(IUser user, ICitationGroup group, String collectionId, String sortBy) {
+        GroupSyncJob prevJob = jobManager.getMostRecentJob(group.getGroupId() + "");
+        if (prevJob != null && prevJob.getStatus() != JobStatus.DONE && prevJob.getStatus() != JobStatus.FAILURE) {
+            // there is already a job running, let's not start another one
+            return;
+        }
+        
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
         job.setGroupId(group.getGroupId() + "");
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save(job);
+        jobManager.addJob(job);
         
         DeletedZoteroElements deletedElements = zoteroManager.getDeletedElements(user, group.getGroupId() + "", group.getContentVersion());
         Map<String, Long> versions = zoteroManager.getGroupItemVersions(user, group.getGroupId() + "",
@@ -84,10 +96,11 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         
         removeDeletedItems(deletedElements, job);
         
-        group.setContentVersion(version);
+        if(version > 0) {
+            group.setContentVersion(version);
+        }
         groupRepo.save((CitationGroup)group);
         
-        job.setCurrent(counter.longValue());
         job.setStatus(JobStatus.DONE);
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
@@ -167,12 +180,24 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     }
 
     private long retrieveCitations(IUser user, ICitationGroup group, List<String> keysToRetrieve) {
+        try {
+            // wait 1 second to not send too many requests to Zotero
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not wait.", e);
+        }
         ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, group.getGroupId() + "", keysToRetrieve);
         retrievedCitations.getCitations().forEach(c -> storeCitation(c));
         return retrievedCitations.getContentVersion();
     }
     
     private long retrieveCollections(IUser user, ICitationGroup group, List<String> keysToRetrieve) {
+        try {
+            // wait 1 second to not send too many requests to Zotero
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not wait.", e);
+        }
         ZoteroCollectionsResponse response = zoteroManager.getCollectionsByKey(user, group.getGroupId() + "", keysToRetrieve);
         response.getCollections().forEach(c -> storeCitationCollection(c));
         return response.getContentVersion();

@@ -50,7 +50,7 @@ public class GroupItemsController {
     @Autowired
     private IGroupManager groupManager;
 
-    @RequestMapping(value= { "/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
+    @RequestMapping(value= { "/auth/group/{zoteroGroupId}","/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
@@ -75,6 +75,7 @@ public class GroupItemsController {
         model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sort", sort);
+        model.addAttribute("results", results);
         // more than 200 really don't make sense here, this needs to be changed
         model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, null, "title", 200));
         

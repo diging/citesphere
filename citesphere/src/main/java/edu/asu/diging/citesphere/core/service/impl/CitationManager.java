@@ -218,7 +218,9 @@ public class CitationManager implements ICitationManager {
             CitationResults results = new CitationResults();
             if (isModified) {
                 results.setNotModified(false);
-                asyncCitationProcessor.loadCitations(user, group, collectionId, sortBy);
+                asyncCitationProcessor.syncCitations(user, group, collectionId, sortBy);
+            } else {
+                results.setNotModified(true);
             }
            
           List<ICitation> citations = (List<ICitation>) citationDao.findCitations(groupId, (page-1)*zoteroPageSize, zoteroPageSize);

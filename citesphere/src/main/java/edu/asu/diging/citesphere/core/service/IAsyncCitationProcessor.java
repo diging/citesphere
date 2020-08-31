@@ -5,7 +5,7 @@ import edu.asu.diging.citesphere.user.IUser;
 
 public interface IAsyncCitationProcessor {
 
-    void loadCitations(IUser user, ICitationGroup group, String collectionId, String sortBy);
+    void syncCitations(IUser user, ICitationGroup group, String collectionId, String sortBy);
 
     
 }
