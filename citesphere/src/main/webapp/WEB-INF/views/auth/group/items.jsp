@@ -112,6 +112,50 @@ $(function() {
 	<small>${total} records </small>
 </h2>
 
+<div class="pull-right">
+<div class="progress" style="width: 200px">
+  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">  
+  <span id="syncText">Up to date</span></div>
+</div>
+<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
+    <small><a href="."><i class="fas fa-redo-alt"></i> Reload page</a></small>
+</div>
+
+<c:url value="/auth/group/${group.groupId}/sync/info" var="syncUrl" />
+<script>
+//# sourceURL=poll.js
+$.get("${syncUrl}", pollStatus);
+
+function pollStatus(){
+    $.get('${syncUrl}', function(data) {
+        if(data['status'] == 'PREPARED' || data['status'] == 'STARTED') {
+        	if (data['total'] == 0) {
+        		$("#syncProgress").attr('style', "width:" + "100%");
+                $("#syncProgress").attr('aria-valuenow', 100);
+                $("#syncProgress").attr('aria-valuemax', 100);
+                $("#syncProgress").addClass("progress-bar-striped active");
+        	} else {
+        		var percent = data['current']/data['total']*100;
+                $("#syncProgress").attr('style', "width:" + percent + "%");
+                $("#syncProgress").attr('aria-valuenow', data['current']);
+                $("#syncProgress").attr('aria-valuemax', data['total']);
+                $("#syncProgress").addClass("progress-bar-striped active");
+                $("#syncText").text(Math.round(percent) + "% synced");
+        	}
+        	setTimeout(pollStatus,1000);
+        } else {
+        	$("#syncProgress").attr('style', "width: 100%");
+        	$("#syncProgress").attr('aria-valuenow', 100);
+            $("#syncProgress").attr('aria-valuemax', 100);
+            $("#syncProgress").removeClass("progress-bar-striped active");
+            $("#syncText").text("Up to date");
+        }
+    });
+}
+</script>
+</div>
+
+<div class="clearfix"></div>
 <div class="form-group">
 <div class="input-group">
     <input type="text" id="findItemKey" name="findItemKey" class="form-control" placeholder="Find by item key"/>
@@ -132,7 +176,8 @@ $(function() {
       <div class="panel-body">
       	${group.description}
         <div class="col-md-6">
-        <b>Local Version:</b> ${group.version}<br>
+        <b>Local Metadata Version:</b> ${group.metadataVersion}<br>
+        <b>Local Library Version:</b> ${group.contentVersion}<br>
         <b>Created on:</b> <span class="date">${group.created}</span><br>
         <b>Last Modified on:</b> <span class="date">${group.lastModified}</span>
         </div>

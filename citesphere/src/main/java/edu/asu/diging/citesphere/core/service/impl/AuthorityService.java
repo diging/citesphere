@@ -17,12 +17,9 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.PersonRepository;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.model.bib.impl.Person;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
@@ -34,8 +31,8 @@ public class AuthorityService implements IAuthorityService {
     @Autowired
     private CitationGroupRepository groupRepository;
     
-    @Autowired
-    private PersonRepository personRepository;
+//    @Autowired
+//    private PersonRepository personRepository;
     
     @Autowired
     private Set<AuthorityImporter> importers;
@@ -93,18 +90,18 @@ public class AuthorityService implements IAuthorityService {
     
     @Override
     public Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException {
-        Optional<CitationGroup> group = groupRepository.findById(new Long(citationGroupId));
+        Optional<ICitationGroup> group = groupRepository.findByGroupId(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
-        List<Person> persons = personRepository.findPersonsByCitationGroupAndUri((ICitationGroup)group.get(), uri);
+//        List<Person> persons = personRepository.findPersonsByCitationGroupAndUri((ICitationGroup)group.get(), uri);
         Set<IAuthorityEntry> entries = new HashSet<>();
-        persons.forEach(p -> {
-            Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
-            if (optional.isPresent()) {
-                entries.add(optional.get());
-            }
-        });
+//        persons.forEach(p -> {
+//            Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
+//            if (optional.isPresent()) {
+//                entries.add(optional.get());
+//            }
+//        });
         return entries;
     }
     

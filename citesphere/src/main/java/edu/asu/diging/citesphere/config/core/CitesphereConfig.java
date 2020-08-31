@@ -16,6 +16,7 @@ import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -26,6 +27,7 @@ import edu.asu.diging.citesphere.core.email.impl.NotSetupMailSender;
 @Configuration
 @EnableCaching
 @EnableAsync
+@EnableSpringDataWebSupport
 @PropertySource("classpath:/config.properties")
 public class CitesphereConfig {
     
