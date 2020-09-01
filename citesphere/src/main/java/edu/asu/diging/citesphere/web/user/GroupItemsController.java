@@ -77,7 +77,7 @@ public class GroupItemsController {
         model.addAttribute("sort", sort);
         model.addAttribute("results", results);
         // more than 200 really don't make sense here, this needs to be changed
-        model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, null, "title", 200));
+        model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
         
         List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();
@@ -111,7 +111,7 @@ public class GroupItemsController {
                 collection = null;
             }
         }
-        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getId() + "", group));
+        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
         Collections.reverse(breadCrumbs);
         model.addAttribute("breadCrumbs", breadCrumbs);
         return "auth/group/items";

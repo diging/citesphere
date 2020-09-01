@@ -102,8 +102,10 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         if (collectionOptional.isPresent()) {
             return (ICitationCollection) collectionOptional.get();
         }
-        ICitationCollection collection = zoteroManager.getCitationCollection(user, groupId, collectionId);
-        collectionRepository.save((CitationCollection)collection);
-        return collection;
+        // FIXME: load collection asynch
+        //ICitationCollection collection = zoteroManager.getCitationCollection(user, groupId, collectionId);
+        //collectionRepository.save((CitationCollection)collection);
+        return null;
+        //return collection;
     }
 }
