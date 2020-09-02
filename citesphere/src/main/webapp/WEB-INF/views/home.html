@@ -30,7 +30,7 @@
 		<tbody th:each="group: ${groups}">
 			<div class="panel panel-default">
 				<div class="panel-body">
-					<a th:href="@{/auth/group/${group.id}/items}"><span th:text="${group.name}"/>
+					<a th:href="@{'/auth/group/' + ${group.groupId} + '/items'}"><span th:text="${group.name}"/>
 					(<span th:text="${group.numItems}"/>)</a>
 				</div>
 			</div>
