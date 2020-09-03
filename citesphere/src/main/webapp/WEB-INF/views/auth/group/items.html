@@ -1,0 +1,145 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<script src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>
+
+</head>
+<body>
+	<div layout:fragment="content">
+	<script>
+//# sourceURL=page.js
+$(function() {
+	$('#pagination-top').twbsPagination({
+	    totalPages: ${totalPages},
+	    startPage: ${currentPage},
+	    prev: "«",
+	    next: "»",
+	    visiblePages: 10,
+	    initiateStartPageClick: false,
+	    onPageClick: function (event, page) {
+	    	window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items" />?page=" + page;
+	    }
+	});
+	
+	$(".bib-entry").click(function() {
+		var key = $(this).data("key");
+		var index = $(this).data("index");
+		window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key +"?index=" + index + "&page="+${currentPage} + "&sortBy=" + '${sort}' + "&collectionId=" + '${collectionId}';
+	});
+	
+	$('.collapse').collapse();
+	
+	if(sessionStorage.getItem("collectionsHidden") == "true"){
+		$("#collectionsList").hide()
+	    $("#toggleCollection").attr('class', "fa fa-chevron-circle-right")
+	    $("#toggleCollection").attr('title', "Show Collections")	    
+	    $("#citationBlock").attr('class', 'col-md-12')
+	}
+	
+	$("#toggleCollection").click(function(){
+	    $("#collectionsList").toggle(); 
+	    collectionsHidden = $("#toggleCollection").hasClass("fa-chevron-circle-left")
+	    sessionStorage.setItem("collectionsHidden",collectionsHidden)
+	        
+	    $("#toggleCollection").attr('class', collectionsHidden ? "fa fa-chevron-circle-right" : "fa fa-chevron-circle-left")
+	    $("#toggleCollection").attr('title', collectionsHidden ? "Show Collections":"Hide Collections")
+	    
+	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
+	  })
+	  
+	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
+	
+	$("#addionalColumns a").click(function(event) {
+		var isShown = $(this).data("is-shown");
+		var col = $(this).data("column-name");
+		if (isShown) {
+			shownColumns = shownColumns.filter(function(value, index, arr){
+			    return value != col;
+			});
+		} else {
+			shownColumns.push(col);
+		}
+		window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />?columns=" + shownColumns; 
+	});
+	
+	$("#findByItemKeyBtn").click(function() {
+		var key = $("#findItemKey").val();
+		if (key != undefined && key != '') {
+			window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+		}
+	});
+	
+	$("#findItemKey").on('keypress',function(e) {
+	    if(e.which == 13) {
+	    	var key = $("#findItemKey").val();
+	        if (key != undefined && key != '') {
+	            window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+	        }
+	    }
+	});
+});
+</script>
+<ol class="breadcrumb">
+<li><a th:href="@{/}">Home</a></li>
+<div th:each="crumb: ${breadCrumbs}">
+	<li th:switch="${crumb.type}"> 
+  <a th:case="'GROUP'" th:href="'/auth/group/'+${crumb.objectId}+'/items'"><span th:text="${crumb.label}"/></a>
+  <a th:case="COLLECTION" th:href="'/auth/group/'+${zoteroGroupId}+'/collection/'+${crumb.objectId}+'/items'"><span th:text="${crumb.label}"/></a>
+  <a th:case="*" th:href="'/auth/group/'+${zoteroGroupId}+'/items'"><span th:text="${crumb.label}"/></a> 
+</li>
+</div>
+</ol>
+<h2>
+<span th:if="${collectionId} != null">
+	        Items in Collection <i th:text="${collectionName}"></i> in Group <i th:text="${group.name}"></i></br> 
+</span>
+<span th:if="${collectionId} == null">
+Items in Group <span th:text="${group.name}"></span></br>
+</span>
+	
+	<small><span th:text="${total}"></span> records </small>
+</h2>
+<div class="pull-right">
+<div class="progress" style="width: 200px">
+  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">  
+  <span id="syncText">Up to date</span></div>
+</div>
+<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
+    <small><a href="."><i class="fas fa-redo-alt"></i> Reload page</a></small>
+</div>
+
+<!-- <c:url value="/auth/group/${group.groupId}/sync/info" var="syncUrl" /> -->
+<script>
+//# sourceURL=poll.js
+$.get("${syncUrl}", pollStatus);
+
+function pollStatus(){
+    $.get('${syncUrl}', function(data) {
+        if(data['status'] == 'PREPARED' || data['status'] == 'STARTED') {
+        	if (data['total'] == 0) {
+        		$("#syncProgress").attr('style', "width:" + "100%");
+                $("#syncProgress").attr('aria-valuenow', 100);
+                $("#syncProgress").attr('aria-valuemax', 100);
+                $("#syncProgress").addClass("progress-bar-striped active");
+        	} else {
+        		var percent = data['current']/data['total']*100;
+                $("#syncProgress").attr('style', "width:" + percent + "%");
+                $("#syncProgress").attr('aria-valuenow', data['current']);
+                $("#syncProgress").attr('aria-valuemax', data['total']);
+                $("#syncProgress").addClass("progress-bar-striped active");
+                $("#syncText").text(Math.round(percent) + "% synced");
+        	}
+        	setTimeout(pollStatus,1000);
+        } else {
+        	$("#syncProgress").attr('style', "width: 100%");
+        	$("#syncProgress").attr('aria-valuenow', 100);
+            $("#syncProgress").attr('aria-valuemax', 100);
+            $("#syncProgress").removeClass("progress-bar-striped active");
+            $("#syncText").text("Up to date");
+        }
+    });
+}
+</script>
+</div>
+	</div>
+</body>
+</html>
