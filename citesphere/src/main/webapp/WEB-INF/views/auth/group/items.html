@@ -140,6 +140,81 @@ function pollStatus(){
 }
 </script>
 </div>
+<div class="clearfix"></div>
+<div class="form-group">
+<div class="input-group">
+    <input type="text" id="findItemKey" name="findItemKey" class="form-control" placeholder="Find by item key"/>
+    <div class="input-group-addon" id="findByItemKeyBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
+</div>
+</div>
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingOne">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Group Info <i class="fas fa-arrows-alt-v pull-right"></i>
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+      <div class="panel-body">
+      	<span th:text="${group.description}"></span>
+        <div class="col-md-6">
+        <b>Local Metadata Version:</b> <span th:text="${group.metadataVersion}"></span><br>
+        <b>Local Library Version:</b> <span th:text="${group.contentVersion}"></span><br>
+        <b>Created on:</b> <span class="date" th:text="${group.created}"></span><br>
+        <b>Last Modified on:</b> <span class="date" th:text="${group.lastModified}"></span>
+        </div>
+        <div class="col-md-6">
+        <b>Owner:</b><span th:text="${group.owner}"></span><br>
+        <br>
+        <b>Last synced:</b> <span th:text="${group.updatedOn}" class="date"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-12">
+<ul id="pagination-top" class="pagination-sm"></ul>
+
+
+<div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} != null">
+  <a th:href="@{'/auth/group/'+${zoteroGroupId}+'/collection/'+${collectionId}+'/items/sync?page='+${currentPage}+'&sort='+${sort}+'&columns='+${columnString}}"><big><i
+		class="fas fa-sync" title="Sync Page"></i></big></a>
+</div>
+<div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} == null">
+  <a th:href="@{'/auth/group/'+${zoteroGroupId}+'/items/sync?page='+${currentPage}+'&sort='+${sort}+'&columns='+${columnString}}"><big><i
+		class="fas fa-sync" title="Sync Page"></i></big></a>
+</div>
+<div class="pull-right" style="margin-top: 20px;">
+<a th:href="@{'/auth/group/'+${zoteroGroupId}+'/items/create'}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
+</div>
+
+<div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
+  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Export <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li th:if="${collectionId}==null && ${total}<=300"><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
+    <li th:if="${collectionId} == null"><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/job/export/" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV  (for many items)</button></form></li>
+    <li th:if="${collectionId} != null && ${total}<=30"><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
+    <li th:if="${collectionId} != null"><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/job/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (for many items)</button></form></li>
+    <li th:if="${total} > 300"><a class="btn btn-disabled" style="color: #999">CSV (up to 300 items)</a></li>
+  </ul>
+</div>
+
+<div>
+
+<p class="lead" style="display:inline;padding-left:10px">Collections</p>
+
+
+<big><i class="fa fa-chevron-circle-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
+<!-- Incomplete from line 244 of items.jsp  -->
+</div>
+
+</div>
 	</div>
 </body>
 </html>
