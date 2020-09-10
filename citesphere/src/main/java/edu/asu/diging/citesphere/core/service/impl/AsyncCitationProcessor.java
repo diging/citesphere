@@ -76,6 +76,9 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         jobRepo.save(job);
         jobManager.addJob(job);
         
+        // we'll retrieve the latest group version first in case there are more changes in between
+        // this way the group version can be out-dated and trigger another sync next time
+        long groupVersion = zoteroManager.getLatestGroupVersion(user, group.getGroupId() + "");
         DeletedZoteroElements deletedElements = zoteroManager.getDeletedElements(user, group.getGroupId() + "", group.getContentVersion());
         Map<String, Long> versions = zoteroManager.getGroupItemVersions(user, group.getGroupId() + "",
                 group.getContentVersion());
@@ -87,18 +90,12 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         jobRepo.save(job);
         
         AtomicInteger counter = new AtomicInteger();
-        long version = syncCitations(user, group, job, versions, counter);
-        long collectionVersion = syncCollections(user, group, job, collectionVersions, counter);
-        if (collectionVersion > -1) {
-            version = collectionVersion;
-        }
-        
+        syncCitations(user, group, job, versions, counter);
+        syncCollections(user, group, job, collectionVersions, counter);
         
         removeDeletedItems(deletedElements, job);
         
-        if(version > 0) {
-            group.setContentVersion(version);
-        }
+        group.setContentVersion(groupVersion);
         groupRepo.save((CitationGroup)group);
         
         job.setStatus(JobStatus.DONE);
@@ -106,10 +103,9 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         jobRepo.save(job);
     }
 
-    private long syncCitations(IUser user, ICitationGroup group, GroupSyncJob job, Map<String, Long> versions,
+    private void syncCitations(IUser user, ICitationGroup group, GroupSyncJob job, Map<String, Long> versions,
             AtomicInteger counter) {
         List<String> keysToRetrieve = new ArrayList<>();
-        long version = 0;
         for (String key : versions.keySet()) {
             Optional<ICitation> citation = citationRepo.findByKey(key);
             
@@ -122,7 +118,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             }
             counter.incrementAndGet();
             if (counter.intValue()%50 == 0) {
-                version = retrieveCitations(user, group, keysToRetrieve);
+                retrieveCitations(user, group, keysToRetrieve);
                 keysToRetrieve = new ArrayList<>();
             }
             job.setCurrent(counter.intValue());
@@ -130,16 +126,13 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
         
         if (!keysToRetrieve.isEmpty()) {
-            version = retrieveCitations(user, group, keysToRetrieve);
+            retrieveCitations(user, group, keysToRetrieve);
         }
-        
-        return version;
     }
     
-    private long syncCollections(IUser user, ICitationGroup group, GroupSyncJob job, Map<String, Long> versions,
+    private void syncCollections(IUser user, ICitationGroup group, GroupSyncJob job, Map<String, Long> versions,
             AtomicInteger counter) {
         List<String> keysToRetrieve = new ArrayList<>();
-        long version = -1;
         for (String key : versions.keySet()) {
             Optional<ICitationCollection> collection = collectionRepo.findByKey(key);
             
@@ -152,7 +145,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             }
             counter.incrementAndGet();
             if (counter.intValue()%50 == 0) {
-                version = retrieveCollections(user, group, keysToRetrieve);
+                retrieveCollections(user, group, keysToRetrieve);
                 keysToRetrieve = new ArrayList<>();
             }
             job.setCurrent(counter.intValue());
@@ -160,10 +153,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
         
         if (!keysToRetrieve.isEmpty()) {
-            version = retrieveCollections(user, group, keysToRetrieve);
+            retrieveCollections(user, group, keysToRetrieve);
         }
-        
-        return version;
     }
 
     private void removeDeletedItems(DeletedZoteroElements deletedElements, GroupSyncJob job) {

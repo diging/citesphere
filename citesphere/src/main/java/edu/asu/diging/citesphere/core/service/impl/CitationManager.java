@@ -179,6 +179,11 @@ public class CitationManager implements ICitationManager {
         try {
             ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey);
             citation.setGroup(groupOptional.get().getGroupId() + "");
+            
+            Optional<ICitation> oldCitation = citationRepository.findByKey(itemKey);
+            if(oldCitation.isPresent()) {
+                citationRepository.delete((Citation)oldCitation.get());
+            }
             citationRepository.save((Citation) citation);
             return citation;
         } catch (HttpClientErrorException ex) {
