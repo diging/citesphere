@@ -1,8 +1,16 @@
 <html layout:decorate="~{layouts/main}">
+<body>
+
 <script src="<c:url value="/resources/notify/bootstrap-notify.min.js" />"></script>
 <script>
+function regenerateSecret() {
+	console.log("hello");
+	$('#client-update-confirmation').modal("show");	
+	event.preventDefault();
+}
 $(function() {
-	$('#secret').click(function() {
+	$("#secret").click(function() {
+		console.log("hi");
 		$('#client-update-confirmation').modal("show");	
 		event.preventDefault();
 	});
@@ -46,48 +54,47 @@ $(function() {
 });
 </script>
 
-
-
+<div layout:fragment="content">
 <div class="pull-right" style="float:left;margin-top: 20px;">
 	<form action="#" th:action="@{/admin/apps}" method="GET"><button class="btn btn-primary" type="submit">Show All Apps</button></form>
 </div>
 <div class="pull-right" style="float:right;margin-top: 20px;">
-	<button id ="secret" class="btn btn-primary" type="submit" href="">Regenerate Secret</button>&nbsp;&nbsp;
+	<button th:id ="secret" type="submit" class="btn btn-primary">Regenerate Secret</button>&nbsp;&nbsp;
 </div>
 
 <br/>
-<h2>${clientName}</h2>
+<h2><span th:text="${clientName}"/></h2>
 <br/>
 <table class="table table-striped">
 <tr>
 	<td>Client Id</td>
-	<td>${clientId}</td>
+	<td><span th:text="${clientId}"/></td>
 </tr>
 <tr>
 	<td>Client Secret</td>
-	<span th:if = "${not empty secret}">
-		<td id="secretKey">${secret}</td>
+	<span th:if = "${secret != null && secret != ''}">
+		<td id="secretKey"><span th:text="${secret}"/></td>
 	</span>
-	<span th:if = "${empty secret}">
+	<span th:unless = "${secret != null && secret != ''}">
 		<td id="secretKey"><I>*Secret Key is hidden*</I></td>
 	</span>
 	
 </tr>
 <tr>
 	<td>Name</td>
-	<td>${clientName}</td>
+	<td><span th:text="${clientName}"/></td>
 </tr>
 <tr>
 	<td>Description</td>
-	<td>${description}</td>
+	<td><span th:text="${description}"/></td>
 </tr>
 <tr>
 	<td>Redirect URL</td>
-	<td>${redirectUrl}</td>
+	<td><span th:text="${redirectUrl}"/></td>
 </tr>
 <tr>
 	<td>Application Type</td>
-	<td>${applicationType}</td>
+	<td><span th:text="${applicationType}"/></td>
 </tr>
 </table>
 <div class="modal fade" id="client-update-confirmation" tabindex="-1" role="dialog">
@@ -107,3 +114,6 @@ $(function() {
     </div>
   </div>
 </div>
+
+</div>
+</body>
