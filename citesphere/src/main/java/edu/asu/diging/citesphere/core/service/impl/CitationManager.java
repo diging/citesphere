@@ -242,7 +242,7 @@ public class CitationManager implements ICitationManager {
             CitationResults results = new CitationResults();
             if (isModified) {
                 results.setNotModified(false);
-                asyncCitationProcessor.syncCitations(user, group, collectionId, sortBy);
+                asyncCitationProcessor.sync(user, group, collectionId, sortBy);
             } else {
                 results.setNotModified(true);
             }
