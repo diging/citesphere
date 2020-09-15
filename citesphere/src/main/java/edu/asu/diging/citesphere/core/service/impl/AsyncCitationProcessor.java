@@ -140,7 +140,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             retrieveCitations(user, group, keysToRetrieve);
         }
     }
-
+    // contentVersion of collections not set
     private void syncCollections(IUser user, ICitationGroup group, GroupSyncJob job, Map<String, Long> versions,
             long groupVersion, AtomicInteger counter) {
         List<String> keysToRetrieve = new ArrayList<>();
@@ -149,7 +149,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         keys.addAll(versions.keySet());
         
         for (String key : keys) {
-            ICitationCollection collection = collectionRepo.findByKeyAndGroupId(key, group.getGroupId());
+            ICitationCollection collection = collectionRepo.findByKeyAndGroupId(key, group.getGroupId() + "");
             if (collection == null || (versions.containsKey(key) && collection.getVersion() != versions.get(key))
                     || collection.getContentVersion() != groupVersion) {
                 keysToRetrieve.add(key);
