@@ -174,6 +174,8 @@ public class CitationManagerTest {
         Mockito.when(zoteroManager.getGroupsVersion(user)).thenReturn(groupVersions);
         
         List<ICitationGroup> expected = new ArrayList<>();
+        group1.setMetadataVersion(20L);
+        group2.setMetadataVersion(3L);
         expected.add(group1);
         expected.add(group2);
         
@@ -187,6 +189,8 @@ public class CitationManagerTest {
         groupVersions.put(GROUP1_ID, new Long(20));
         groupVersions.put(GROUP2_ID, new Long(4));
         Mockito.when(zoteroManager.getGroupsVersion(user)).thenReturn(groupVersions);
+        
+        group1.setMetadataVersion(20L);
         
         ICitationGroup updatedGroup = new CitationGroup();
         updatedGroup.setGroupId(GROUP2_ID);
