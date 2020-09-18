@@ -2,20 +2,9 @@
 <head>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
-<script th:src="@{/resources/scripts/showApps.js}"></script>
 <link th:href="@{/resources/notify/animate.css}" rel="stylesheet"/>
 
 <script th:inline="javascript">
-$(function() {
-    
-    
-    $(".client-entry").click(function() {
-		var id = $(this).data("id");
-		//window.location.href = "<c:url value="/admin/apps/" />" + id;
-		window.location.href = '@{/apps/}' + id;
-		
-	});
-});
 
 $(function() {
     $('#pagination-top').twbsPagination({
