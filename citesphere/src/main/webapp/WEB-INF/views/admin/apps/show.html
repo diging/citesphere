@@ -1,31 +1,38 @@
 <html layout:decorate="~{layouts/main}">
+<head>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
+<script th:src="@{/resources/scripts/showApps.js}"></script>
+<link th:href="@{/resources/notify/animate.css}" rel="stylesheet"/>
 
-<script src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
-<script src="@{/resources/notify/bootstrap-notify.min.js}"></script>
-<link href="@{/resources/notify/animate.css}" rel="stylesheet">
 <script th:inline="javascript">
 $(function() {
+    
+    
+    $(".client-entry").click(function() {
+		var id = $(this).data("id");
+		//window.location.href = "<c:url value="/admin/apps/" />" + id;
+		window.location.href = '@{/apps/}' + id;
+		
+	});
+});
+
+$(function() {
     $('#pagination-top').twbsPagination({
-        startPage: ${currentPage},
-        totalPages: ${totalPages},
+        startPage: [(${currentPage})],
+        totalPages: [(${totalPages})],
         prev: "«",
         next: "»",
         visiblePages: 10,
         initiateStartPageClick: false,
         onPageClick: function (event, page) {
-            window.location.href = '@{/admin/apps}' + "?page=" + (page-1);
+            window.location.href = "apps?page=" + (page-1);
         }
     });
-    
-    $(".client-entry").click(function() {
-		var id = $(this).data("id");
-		window.location.href = '@{/admin/apps/}' + id;
-	});
 });
 
 $(function() {
 	$(".delete-link").click(function(event) {
-		console.log("function called");
 		var id = $(this).data('client-id');
 		$("#delete-client-button").attr("data-client-id", id);
 		$("#confirm-client-entry-id").text(id);
@@ -34,8 +41,9 @@ $(function() {
 	});
 	$("#delete-client-button").click(function() {
 		var id = $(this).data("client-id");
+		var baseurl = 'apps/' + id;
 		$.ajax({
-			'url': '@{/admin/apps/}' + id + "?${_csrf.parameterName}=${_csrf.token}",
+			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "DELETE",
 			'success': function(data) {
 				$("#tr-" + id).remove();
@@ -71,13 +79,16 @@ $(function() {
 	});
 });
 
+
 </script>
+</head>
+
 
 <body>
 <div layout:fragment="content">
 <h2>Apps</h2>
 <ul id="pagination-top" class="pagination-sm"></ul>
-<div class="pull-right" style="margin-top: 20px;"><a th:href="@{/admin/apps/add}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Add App</a></div>
+<div class="pull-right" style="margin-top: 20px;margin-bottom:10px"><a th:href="@{/admin/apps/add}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Add App</a></div>
 <table class="table table-striped" id="table">
 <tr>
 	<th>Client Id</th>
@@ -86,11 +97,11 @@ $(function() {
 	<th/>
 
 </tr>
-<tr id="tr-${client.clientId}" th:each="client : ${clientList}">
-	<td class="client-entry" th:data-id="${client.clientId}"> <a href=#><span th:text="${client.clientId}"/></a></td>
-	<td class="client-entry" th:data-id="${client.clientId}"> <a href=#><span th:text="${client.name}"/></a></td>
+<tr th:id="'tr-'+${client.clientId}" th:each="client : ${clientList}">
+	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.clientId}"/></a></td>
+	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.name}"/></a></td>
 	<td class="client-entry" th:data-id="${client.clientId}"> <span th:text="${client.description}"/></td>
-	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="fas fa-trash-alt"></i></a></td>
+	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="fas fa-trash-alt"></i></button></td>
 </tr>
 </table>
 <div class="modal fade" id="client-delete-confirmation" tabindex="-1" role="dialog">
@@ -113,3 +124,4 @@ $(function() {
 
 </div>
 </body>
+</html>
