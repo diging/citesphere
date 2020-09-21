@@ -1,24 +1,18 @@
 <html layout:decorate="~{layouts/main}">
-<body>
+<head>
 
-<script src="<c:url value="/resources/notify/bootstrap-notify.min.js" />"></script>
-<script>
-function regenerateSecret() {
-	console.log("hello");
-	$('#client-update-confirmation').modal("show");	
-	event.preventDefault();
-}
+<script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
+<script th:inline="javascript">
 $(function() {
 	$("#secret").click(function() {
-		console.log("hi");
 		$('#client-update-confirmation').modal("show");	
 		event.preventDefault();
 	});
 	
 	$("#update-client-button").click(function() {
-		var url = "/${clientId}/secret/update";
+		var url = "[(${clientId})]/secret/update";
 		$.ajax({
-			'url': '<c:url value= "/admin/apps"/>'+url+"?${_csrf.parameterName}=${_csrf.token}",
+			'url': url + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "POST",
 			'success': function(response){
 				 $('#secretKey').text(response.secret);
@@ -53,13 +47,14 @@ $(function() {
 	});
 });
 </script>
-
+</head>
+<body>
 <div layout:fragment="content">
 <div class="pull-right" style="float:left;margin-top: 20px;">
 	<form action="#" th:action="@{/admin/apps}" method="GET"><button class="btn btn-primary" type="submit">Show All Apps</button></form>
 </div>
 <div class="pull-right" style="float:right;margin-top: 20px;">
-	<button th:id ="secret" type="submit" class="btn btn-primary">Regenerate Secret</button>&nbsp;&nbsp;
+	<button id="secret" type="submit" class="btn btn-primary">Regenerate Secret</button>&nbsp;&nbsp;
 </div>
 
 <br/>
@@ -117,3 +112,4 @@ $(function() {
 
 </div>
 </body>
+</html>
