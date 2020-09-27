@@ -1,29 +1,26 @@
 <html layout:decorate="~{layouts/main}">
 <head>
-<script src="<c:url value="/resources/paginator/jquery.twbsPagination.min.js" />"></script>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
 
-</head>
-<body>
-	<div layout:fragment="content">
-	<script>
+<script th:inline="javascript">
 //# sourceURL=page.js
 $(function() {
 	$('#pagination-top').twbsPagination({
-	    totalPages: ${totalPages},
-	    startPage: ${currentPage},
+	    totalPages: [(${totalPages})],
+	    startPage: [(${currentPage})],
 	    prev: "«",
 	    next: "»",
 	    visiblePages: 10,
 	    initiateStartPageClick: false,
 	    onPageClick: function (event, page) {
-	    	window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items" />?page=" + page;
+	    	window.location.href = "[(${zoteroGroupId})]/items?page=" + page;
 	    }
 	});
 	
 	$(".bib-entry").click(function() {
 		var key = $(this).data("key");
 		var index = $(this).data("index");
-		window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key +"?index=" + index + "&page="+${currentPage} + "&sortBy=" + '${sort}' + "&collectionId=" + '${collectionId}';
+		window.location.href = "[(${zoteroGroupId})]/items/" + key +"?index=" + index + "&page=[(${currentPage})]&sortBy=[(${sort})]&collectionId=[(${collectionId})]";
 	});
 	
 	$('.collapse').collapse();
@@ -46,7 +43,7 @@ $(function() {
 	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
 	  })
 	  
-	var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
+	/* var shownColumns = [<c:forEach items="${columns}" var="col">"${col}",</c:forEach>];
 	
 	$("#addionalColumns a").click(function(event) {
 		var isShown = $(this).data("is-shown");
@@ -58,13 +55,13 @@ $(function() {
 		} else {
 			shownColumns.push(col);
 		}
-		window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />?columns=" + shownColumns; 
-	});
+		window.location.href="[(${zoteroGroupId})]/items?columns=" + shownColumns; 
+	}); */
 	
 	$("#findByItemKeyBtn").click(function() {
 		var key = $("#findItemKey").val();
 		if (key != undefined && key != '') {
-			window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+			window.location.href="[(${zoteroGroupId})]/items/" + key;
 		}
 	});
 	
@@ -72,19 +69,22 @@ $(function() {
 	    if(e.which == 13) {
 	    	var key = $("#findItemKey").val();
 	        if (key != undefined && key != '') {
-	            window.location.href="<c:url value="/auth/group/${zoteroGroupId}/items/" />" + key;
+	            window.location.href="[(${zoteroGroupId})]/items/" + key;
 	        }
 	    }
 	});
 });
 </script>
+</head>
+<body>
+	<div layout:fragment="content">
 <ol class="breadcrumb">
 <li><a th:href="@{/}">Home</a></li>
 <div th:each="crumb: ${breadCrumbs}">
 	<li th:switch="${crumb.type}"> 
-  <a th:case="'GROUP'" th:href="'/auth/group/'+${crumb.objectId}+'/items'"><span th:text="${crumb.label}"/></a>
-  <a th:case="COLLECTION" th:href="'/auth/group/'+${zoteroGroupId}+'/collection/'+${crumb.objectId}+'/items'"><span th:text="${crumb.label}"/></a>
-  <a th:case="*" th:href="'/auth/group/'+${zoteroGroupId}+'/items'"><span th:text="${crumb.label}"/></a> 
+  <a th:case="'GROUP'" th:href="@{${crumb.objectId} + '/items'}"><span th:text="${crumb.label}"/></a>
+  <a th:case="COLLECTION" th:href="@{${zoteroGroupId} + '/collection/' + ${crumb.objectId} + '/items'}"><span th:text="${crumb.label}"/></a>
+  <a th:case="*" th:href="@{${zoteroGroupId} + '/items'}"><span th:text="${crumb.label}"/></a> 
 </li>
 </div>
 </ol>
@@ -99,21 +99,21 @@ Items in Group <span th:text="${group.name}"></span></br>
 	<small><span th:text="${total}"></span> records </small>
 </h2>
 <div class="pull-right">
-<div class="progress" style="width: 200px">
-  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">  
-  <span id="syncText">Up to date</span></div>
-</div>
-<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
-    <small><a href="."><i class="fas fa-redo-alt"></i> Reload page</a></small>
-</div>
+	<div class="progress" style="width: 200px">
+	  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">  
+	  <span id="syncText">Up to date</span></div>
+	</div>
+	<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
+	    <small><a href="."><i class="fas fa-redo-alt"></i> Reload page</a></small>
+	</div>
 
-<!-- <c:url value="/auth/group/${group.groupId}/sync/info" var="syncUrl" /> -->
 <script>
 //# sourceURL=poll.js
-$.get("${syncUrl}", pollStatus);
+var syncUrl= "sync/info";
+$.get(syncUrl, pollStatus);
 
 function pollStatus(){
-    $.get('${syncUrl}', function(data) {
+    $.get(syncUrl, function(data) {
         if(data['status'] == 'PREPARED' || data['status'] == 'STARTED') {
         	if (data['total'] == 0) {
         		$("#syncProgress").attr('style', "width:" + "100%");
@@ -159,7 +159,7 @@ function pollStatus(){
     </div>
     <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
       <div class="panel-body">
-      	<span th:text="${group.description}"></span>
+      	[(${group.description})]
         <div class="col-md-6">
         <b>Local Metadata Version:</b> <span th:text="${group.metadataVersion}"></span><br>
         <b>Local Library Version:</b> <span th:text="${group.contentVersion}"></span><br>
@@ -181,15 +181,15 @@ function pollStatus(){
 
 
 <div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} != null">
-  <a th:href="@{'/auth/group/'+${zoteroGroupId}+'/collection/'+${collectionId}+'/items/sync?page='+${currentPage}+'&sort='+${sort}+'&columns='+${columnString}}"><big><i
+  <a th:href="@{${zoteroGroupId}+'/collection/'+${collectionId}+'/items/sync?page='+${currentPage}+'&sort='+${sort}+'&columns='+${columnString}}"><big><i
 		class="fas fa-sync" title="Sync Page"></i></big></a>
 </div>
 <div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} == null">
-  <a th:href="@{'/auth/group/'+${zoteroGroupId}+'/items/sync?page='+${currentPage}+'&sort='+${sort}+'&columns='+${columnString}}"><big><i
+  <a th:href="@{${zoteroGroupId}+'/items/sync?page='+${currentPage}+'&sort='+${sort}+'&columns='+${columnString}}"><big><i
 		class="fas fa-sync" title="Sync Page"></i></big></a>
 </div>
 <div class="pull-right" style="margin-top: 20px;">
-<a th:href="@{'/auth/group/'+${zoteroGroupId}+'/items/create'}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
+<a th:href="@{${zoteroGroupId}+'/items/create'}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
 </div>
 
 <div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
@@ -197,11 +197,11 @@ function pollStatus(){
     Export <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li th:if="${collectionId}==null && ${total}<=300"><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
-    <li th:if="${collectionId} == null"><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/job/export/" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV  (for many items)</button></form></li>
-    <li th:if="${collectionId} != null && ${total}<=30"><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
-    <li th:if="${collectionId} != null"><form method="POST" action="<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/job/export" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (for many items)</button></form></li>
-    <li th:if="${total} > 300"><a class="btn btn-disabled" style="color: #999">CSV (up to 300 items)</a></li>
+    <li th:if="${collectionId == null && total<=300}"><form method="POST" action="@{${zoteroGroupId} + '/export'}" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
+    <li th:if="${collectionId == null}"><form method="POST" action="@{${zoteroGroupId} + '/job/export'}"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV  (for many items)</button></form></li>
+    <li th:if="${collectionId != null && total <=30}"><form method="POST" action="@{${zoteroGroupId} + '/collection/' + ${collectionId} + '/export'}" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
+    <li th:if="${collectionId != null}"><form method="POST" action="@{${zoteroGroupId} + '/collection/' + ${collectionId} + '/job/export'}" />"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (for many items)</button></form></li>
+    <li th:if="${total > 300}"><a class="btn btn-disabled" style="color: #999">CSV (up to 300 items)</a></li>
   </ul>
 </div>
 
@@ -211,10 +211,104 @@ function pollStatus(){
 
 
 <big><i class="fa fa-chevron-circle-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
-<!-- Incomplete from line 244 of items.jsp  -->
+
+
+
+
+
+
+
+<div class="dropdown pull-right" style="padding-bottom: 10px;">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Columns
+    <span class="caret"></span>
+  </button>
+  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+  <tbody th:each="column:${availableColumns}">
+    <li><a data-column-name="${column}" data-is-shown="${fn:contains(columns, column) }">
+    <spring:eval expression="@labelsResource.getProperty('_item_attribute_label_' + column)"  var="columnLabel" />
+	<span th:if ="${fn:contains(columns, column)}"><i class="fas fa-check"></i> </span>
+	<span th:text="${columnLabel}"/>
+    </a></li>
+  </tbody>
+  </ul>
 </div>
 
 </div>
-	</div>
+
+</div>
+
+<div class="col-md-2" th:with="columnString=''">
+	<tbody th:each="column,loop : ${columns}">
+	   <div th:with="columnString=${columnString}${column}">
+	   <span th:if="${!loop.last}">
+	   		<c:set var = "columnString" value = "${columnString},"/>
+	   </span>
+	</c:forEach>
+	
+	<ul class="list-group" id="collectionsList">
+	<tbody th:each="collection:${citationCollections}">
+	  <li class="list-group-item">
+		  <span class="badge" th:text="${collection.numberOfItems}"/>
+		  <a th:href="@{'/auth/group/' + ${zoteroGroupId} + '/collection/' + ${collection.key} + '/items'}"><span th:text="${collection.name}"/>
+	  </li>
+	</tbody>
+	</ul>
+</div>
+
+<div class="col-md-10" id="citationBlock">
+
+	<table class="table table-striped table-bordered">
+	<tr>
+		<th>Type</th>
+		<th>Authors</th>
+		<th>Title</th>
+		<th>Date</th>
+		<th>URL</th>
+		<tbody th:each="column:${columns}">
+			<th>
+				<spring:eval expression="@labelsResource.getProperty('_item_attribute_label_' + column)"  var="columnLabel" />
+				<span th:text="${columnLabel}"/>
+			</th>
+		</tbody>
+	</tr>
+	<c:forEach items="${items}" var="entry" varStatus="loop">
+	<tr>
+		<td>
+		  <span class="text-warning">
+		  	<spring:eval expression="@iconsResource.getProperty(entry.itemType + '_icon')"  var="iconClass" />
+			<spring:eval expression="@iconsResource.getProperty(entry.itemType + '_label')"  var="iconLabel" />
+			<c:if test="${empty iconClass}">
+			<c:set var="iconClass" value="fas fa-file" />
+			</c:if>
+			<c:if test="${empty iconLabel}">
+			<c:set var="iconLabel" value="${entry.itemType}" />
+			</c:if>
+			<i class="${iconClass}" title="${iconLabel}"></i> ${iconLabel}
+		  </span>
+		</td>
+		<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}">
+		 <c:forEach items="${entry.authors}" var="author" varStatus="status">
+	 	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
+	 	 </c:forEach>
+	 	</td>
+	 	<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}">
+	 		<em>${entry.title}</em>
+	 	</td>
+	 	<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}">
+	 		${entry.dateFreetext}
+	 	</td>
+	 	<td>
+	 		<c:if test="${not empty entry.url}">
+	 		<a href="${entry.url}" target="_blank" title="${entry.url}"><i class="fas fa-globe-americas"></i></a>
+	 		</c:if>
+	 	</td>
+	 	<c:forEach items="${columns}" var="column">
+	 	<td style="max-width:300px;">${entry[column]}</td>
+	 	</c:forEach>
+	</tr>
+	</c:forEach>
+	</table>
+</div>
 </body>
 </html>
