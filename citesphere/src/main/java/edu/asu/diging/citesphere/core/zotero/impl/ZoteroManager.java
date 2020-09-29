@@ -155,8 +155,8 @@ public class ZoteroManager implements IZoteroManager {
     
     @Override
     public boolean isGroupModified(IUser user, String groupId, long lastGroupVersion) throws ZoteroHttpStatusException {
-        return zoteroConnector.isGroupModified(user, groupId, lastGroupVersion)
-;    }
+        return zoteroConnector.isGroupModified(user, groupId, lastGroupVersion);
+    }
 
     @Override
     public ICitationCollection getCitationCollection(IUser user, String groupId, String collectionId) {
