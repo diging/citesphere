@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -20,7 +21,7 @@ public class TestController extends V1Controller {
     
     @Autowired
     @Qualifier("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping")
-    private RequestMappingHandlerMapping handlerMappings;
+    private HandlerMapping handlerMappings;
   
 
     @RequestMapping("/test")
@@ -30,7 +31,7 @@ public class TestController extends V1Controller {
         ObjectNode node = mapper.createObjectNode();
         node.put("user", principal.getName());
         array.add(node);
-        for (RequestMappingInfo info : handlerMappings.getHandlerMethods().keySet()) {
+        for (RequestMappingInfo info : ((RequestMappingHandlerMapping)handlerMappings).getHandlerMethods().keySet()) {
             if (info.getPatternsCondition().getPatterns().stream().anyMatch(p -> p.startsWith("/api/v1"))) {
                 ObjectNode infoNode = mapper.createObjectNode();
                 infoNode.put("info", info.toString());

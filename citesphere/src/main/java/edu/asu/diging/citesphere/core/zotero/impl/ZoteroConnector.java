@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
+import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
@@ -75,6 +76,34 @@ public class ZoteroConnector implements IZoteroConnector {
             throw createException(ex.getStatusCode(), ex);
         }
     }
+    
+    @Override
+    public ZoteroResponse<Item> getGroupItemVersions(IUser user, String groupId, long version) {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().getGroupItemVersions(groupId, version);
+    }
+    
+    @Override
+    public ZoteroResponse<Item> getGroupItemsByKey(IUser user, String groupId, List<String> keys) {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().getGroupItemsByKey(groupId, keys);
+    }
+    
+    @Override
+    public DeletedElements getDeletedElements(IUser user, String groupId, long version) {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().getDeletedElements(groupId, version);
+    }
+    
+    @Override
+    public boolean isGroupModified(IUser user, String groupId, Long lastGroupVersion) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            return !zotero.getGroupsOperations().getGroupItemsTop(groupId, 1, 1, "title", lastGroupVersion).getNotModified();
+        } catch (HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
 
     @Override
     @CacheEvict(value = "groupItems", key = "#user.username + '_' + #groupId + '_' + #page + '_' + #sortBy + '_' + #lastGroupVersion")
@@ -82,7 +111,6 @@ public class ZoteroConnector implements IZoteroConnector {
     }
 
     @Override
-    @Cacheable(value = "groupItemsLimit", key = "#user.username + '_' + #groupId + '_' + #limit + '_' + #sortBy")
     public ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit, String sortBy,
             Long lastGroupVersion) {
         Zotero zotero = getApi(user);
@@ -210,6 +238,16 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return getApi(user).getGroupCollectionsOperations().getCollections(groupId, collectionId,
                 page * zoteroCollectionsMaxNumber, zoteroCollectionsMaxNumber, sortBy, lastGroupVersion);
+    }
+    
+    @Override
+    public ZoteroResponse<Collection> getCitationCollectionVersions(IUser user, String groupId, Long lastGroupVersion) {
+        return getApi(user).getGroupCollectionsOperations().getCollectionsVersions(groupId, lastGroupVersion);
+    }
+    
+    @Override
+    public ZoteroResponse<Collection> getCitationCollectionsByKey(IUser user, String groupId, List<String> keys) {
+        return getApi(user).getGroupCollectionsOperations().getCollectionsByKey(groupId, keys);
     }
 
     @Override

@@ -61,14 +61,14 @@ public class GroupListApiController extends V1Controller {
         JsonCitationGroup jsonGroup = new JsonCitationGroup();
         jsonGroup.setCreated(group.getCreated());
         jsonGroup.setDescription(group.getDescription());
-        jsonGroup.setId(group.getId());
+        jsonGroup.setId(group.getGroupId());
         jsonGroup.setLastModified(group.getLastModified());
         jsonGroup.setName(group.getName());
         jsonGroup.setNumItems(group.getNumItems());
         jsonGroup.setOwner(group.getOwner());
         jsonGroup.setType(group.getType());
         jsonGroup.setUrl(group.getUrl());
-        jsonGroup.setVersion(group.getVersion());
+        jsonGroup.setVersion(group.getMetadataVersion());
         return jsonGroup;
     }
     
