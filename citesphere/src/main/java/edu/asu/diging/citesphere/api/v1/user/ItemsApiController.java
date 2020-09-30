@@ -21,19 +21,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
-import edu.asu.diging.citesphere.api.v1.model.ICollectionResult;
-import edu.asu.diging.citesphere.api.v1.model.impl.CollectionResult;
+import edu.asu.diging.citesphere.api.v1.model.impl.Items;
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 @PropertySource("classpath:/config.properties")
-public class GroupItemController extends V1Controller {
+public class ItemsApiController extends V1Controller {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -45,15 +46,21 @@ public class GroupItemController extends V1Controller {
 
     @Autowired
     private ICitationManager citationManager;
+    
+    @Autowired
+    private IGroupManager groupManager;
 
     @Autowired
     private IUserManager userManager;
+
+    @Autowired
+    private JsonUtil jsonUtil;
     
     @Autowired
     private ObjectMapper objectMapper;
 
-    @RequestMapping(value = { "/group/{zoteroGroupId}/items",
-            "/group/{zoteroGroupId}/collections/{collectionId}/items" }, produces = {
+    @RequestMapping(value = { "/groups/{zoteroGroupId}/items",
+            "/groups/{zoteroGroupId}/collections/{collectionId}/items" }, produces = {
                     MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
             @PathVariable("zoteroGroupId") String groupId,
@@ -68,9 +75,15 @@ public class GroupItemController extends V1Controller {
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
         }
-
+        
         // TODO: Get logged in user, remove:
         IUser user = userManager.findByUsername(principal.getName());
+        
+        ICitationGroup group =groupManager.getGroup(user, groupId);
+        if (group == null) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+
         CitationResults results;
         try {
             results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
@@ -80,12 +93,8 @@ public class GroupItemController extends V1Controller {
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        ICollectionResult collectionResponse = new CollectionResult();
-        collectionResponse.setTotal(results.getTotalResults());
-        collectionResponse.setTotalPages(new Double(Math.ceil(new Float(results.getTotalResults()) / new Float(apiPageSize))).longValue());
-        collectionResponse.setCurrentPage(pageInt);
-        collectionResponse.setZoteroGroupId(groupId);
-        collectionResponse.setCollectionId(collectionId);
+        Items collectionResponse = new Items();
+        collectionResponse.setGroup(jsonUtil.createGroup(group));
         collectionResponse.setItems(results.getCitations());
 
         String jsonResponse = "";
