@@ -22,11 +22,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
 import edu.asu.diging.citesphere.api.v1.model.impl.Items;
+import edu.asu.diging.citesphere.api.v1.model.impl.SyncInfo;
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
@@ -83,7 +86,7 @@ public class ItemsApiController extends V1Controller {
         if (group == null) {
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         }
-
+        
         CitationResults results;
         try {
             results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
@@ -93,17 +96,19 @@ public class ItemsApiController extends V1Controller {
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Items collectionResponse = new Items();
-        collectionResponse.setGroup(jsonUtil.createGroup(group));
-        collectionResponse.setItems(results.getCitations());
-
+        Items itemsResponse = new Items();
+        itemsResponse.setGroup(jsonUtil.createGroup(group));
+        itemsResponse.getGroup().setSyncInfo(getSyncInfo(group));
+        itemsResponse.setItems(results.getCitations());
+        
         String jsonResponse = "";
         try {
-            jsonResponse = objectMapper.writeValueAsString(collectionResponse);
+            jsonResponse = objectMapper.writeValueAsString(itemsResponse);
         } catch (IOException e) {
             logger.error("Unable to process JSON response ", e);
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
     }
+
 }

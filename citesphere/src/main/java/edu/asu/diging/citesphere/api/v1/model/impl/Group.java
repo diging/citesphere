@@ -11,6 +11,7 @@ public class Group {
     private String type;
     private String description;
     private String url;
+    private SyncInfo syncInfo;
     
     public long getId() {
         return id;
@@ -71,5 +72,11 @@ public class Group {
     }
     public void setUrl(String url) {
         this.url = url;
+    }
+    public SyncInfo getSyncInfo() {
+        return syncInfo;
+    }
+    public void setSyncInfo(SyncInfo syncInfo) {
+        this.syncInfo = syncInfo;
     }
 }

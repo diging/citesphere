@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.api.v1.user;
 
 import java.security.Principal;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +21,8 @@ import edu.asu.diging.citesphere.api.v1.V1Controller;
 import edu.asu.diging.citesphere.api.v1.model.impl.Collections;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
-import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
-import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -49,6 +46,7 @@ public class CollectionsApiController extends V1Controller {
 
     @Autowired
     private IUserManager userManager;
+    
 
     @Autowired
     private JsonUtil jsonUtil;
@@ -74,8 +72,10 @@ public class CollectionsApiController extends V1Controller {
 
         Collections collectionResponse = new Collections();
         collectionResponse.setGroup(jsonUtil.createGroup(group));
+        collectionResponse.getGroup().setSyncInfo(getSyncInfo(group));
         collectionResponse.setCollections(
                 collectionManager.getAllCollections(user, groupId, collectionId, sort, new Integer(maxCollections)));
         return new ResponseEntity<Collections>(collectionResponse, HttpStatus.OK);
     }
+
 }
