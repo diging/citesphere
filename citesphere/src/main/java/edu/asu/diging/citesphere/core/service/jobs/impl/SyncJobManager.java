@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
-import edu.asu.diging.citesphere.core.repository.jobs.GroupSyncJobCustomRepository;
 import edu.asu.diging.citesphere.core.repository.jobs.GroupSyncJobRepository;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 
@@ -18,9 +17,6 @@ import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 public class SyncJobManager implements ISyncJobManager {
 
     private Map<String, GroupSyncJob> currentJobs;
-    
-    @Autowired
-    private GroupSyncJobCustomRepository customJobRepo;
     
     @Autowired
     private GroupSyncJobRepository jobRepo;
