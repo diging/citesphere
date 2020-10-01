@@ -20,7 +20,7 @@
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
         <spring-social-zotero.version>0.6</spring-social-zotero.version>
         <citesphere.messages.version>0.3</citesphere.messages.version>
-        <citesphere.model.version>1.1</citesphere.model.version>
+        <citesphere.model.version>1.2-SNAPSHOT</citesphere.model.version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -517,7 +517,6 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.9.9</version>
         </dependency>
-
 
     </dependencies>
 

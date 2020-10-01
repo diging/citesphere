@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.DownloadExportException;
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTooBigException;
@@ -119,7 +120,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
     @Override
     public void export(ExportType exportType, IUser user, String groupId, String collectionId)
             throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException,
-            ExportTooBigException, ZoteroHttpStatusException {
+            ExportTooBigException, ZoteroHttpStatusException, AccessForbiddenException {
 
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
@@ -154,7 +155,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
     @Override
     public void distributedExport(ExportType exportType, IUser user, String groupId, String collectionId)
             throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException,
-            ExportTooBigException, ZoteroHttpStatusException {
+            ExportTooBigException, ZoteroHttpStatusException, AccessForbiddenException {
 
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {

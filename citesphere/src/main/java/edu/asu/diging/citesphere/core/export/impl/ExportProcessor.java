@@ -8,9 +8,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -22,13 +20,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.util.CloseableIterator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTypeNotSupportedException;
 import edu.asu.diging.citesphere.core.exceptions.FileStorageException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.SyncInProgressException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.export.ExportFinishedCallback;
 import edu.asu.diging.citesphere.core.export.ExportType;
@@ -41,7 +42,6 @@ import edu.asu.diging.citesphere.core.repository.export.ExportTaskRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.upload.IFileStorageManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
-import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Component
@@ -83,14 +83,55 @@ public class ExportProcessor implements IExportProcessor {
      */
     @Override
     @Async
-    public void runExport(ExportType exportType, IUser user, String groupId, String collectionId, IExportTask task, ExportFinishedCallback callback) throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ZoteroHttpStatusException {
+    public void runExport(ExportType exportType, IUser user, String groupId, String collectionId, IExportTask task, ExportFinishedCallback callback) throws ExportTypeNotSupportedException, ExportFailedException {
         Processor processor = processors.get(exportType);
         if (processor == null) {
             throw new ExportTypeNotSupportedException("Export type " + exportType + " is not supported.");
         }
         
-        CitationResults initialPage = initializeTask(user, groupId, collectionId, task);
-        List<ICitation> citations = collectCitations(initialPage, user, groupId, collectionId, task);
+        CloseableIterator<ICitation> citations = null;
+        try {
+            int counter = 0;
+            while(true) {
+                try {
+                    citations = citationManager.getAllGroupItems(user, groupId, collectionId);
+                    // done syncing
+                    break;
+                } catch (SyncInProgressException e) {
+                    markTaskFailed(task, ExportStatus.SYNCING);
+                    // still syncing, let's sleep and try again
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                        counter++;
+                    } catch (InterruptedException e1) {
+                        logger.error("Could not sleep.");
+                    }
+                }
+                // if we waiting long enough, let's cancel the export
+                // TODO make counter configurable
+                if (counter >= 700) {
+                    logger.warn("Syncing took too long. Cancelling export " + task.getId());
+                    break;
+                }
+            }
+        } catch (AccessForbiddenException e1) {
+            logger.error("Unauthorized access of " + user + " on group " + groupId, e1);
+            markTaskFailed(task, ExportStatus.FAILED);
+            return;
+        } catch (ZoteroHttpStatusException e) {
+            logger.error("There was a problem when connecting to Zotero.", e);
+            markTaskFailed(task, ExportStatus.FAILED);
+            return;
+        } catch (GroupDoesNotExistException e) {
+            logger.error("Group " + groupId + " does not exist.", e);
+            markTaskFailed(task, ExportStatus.FAILED);
+            return;
+        } 
+        
+        if (citations == null) {
+            markTaskFailed(task, ExportStatus.FAILED);
+            return;
+        }
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd--HH-mm-ss");
         String time = LocalDateTime.now().format(formatter);
@@ -103,6 +144,7 @@ public class ExportProcessor implements IExportProcessor {
             throw new ExportFailedException("Could not create file.", e);
         }
         processor.write(citations, writer);
+        citations.close();
         
         // -- export finished
         task.setStatus(ExportStatus.DONE);
@@ -110,6 +152,13 @@ public class ExportProcessor implements IExportProcessor {
         task.setFilename(filename);
         taskRepo.saveAndFlush((ExportTask) task);
         callback.exportFinished(task.getId());
+    }
+
+
+    private void markTaskFailed(IExportTask task, ExportStatus status) {
+        task.setStatus(status);
+        task.setFinishedOn(OffsetDateTime.now());
+        taskRepo.saveAndFlush((ExportTask) task);
     }
 
 
@@ -128,44 +177,5 @@ public class ExportProcessor implements IExportProcessor {
         return writer;
     }
     
-    private CitationResults initializeTask(IUser user, String groupId, String collectionId, IExportTask task) throws GroupDoesNotExistException, ZoteroHttpStatusException {
-        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, 1, SORT_BY_TITLE);
-        
-        long total = results.getTotalResults();
-        task.setTotalRecords(total);
-        task.setStatus(ExportStatus.INITIALIZING);
-        taskRepo.saveAndFlush((ExportTask) task);
-        
-        return results;
-    }
-    
-    private List<ICitation> collectCitations(CitationResults initialPage, IUser user, String groupId, String collectionId, IExportTask task) throws GroupDoesNotExistException, ZoteroHttpStatusException {
-        List<ICitation> citations = new ArrayList<>();
-        
-        long total = initialPage.getTotalResults();
-        long pageTotal = total/zoteroPageSize;
-        if (total%zoteroPageSize > 0) {
-            pageTotal += 1;
-        }
-        
-        citations.addAll(initialPage.getCitations());
-        task.setProgress(citations.size());
-        task.setStatus(ExportStatus.STARTED);
-        taskRepo.saveAndFlush((ExportTask) task);
-        int page = 1;
-        while(page < pageTotal) {
-            page += 1;
-            initialPage = citationManager.getGroupItems(user, groupId, collectionId, page, SORT_BY_TITLE);
-            citations.addAll(initialPage.getCitations());
-            task.setProgress(citations.size());
-            taskRepo.save((ExportTask) task);
-            try {
-                TimeUnit.MILLISECONDS.sleep(500);
-            } catch (InterruptedException e) {
-                logger.error("Exception during sleep.", e);
-            }
-        }
-        
-        return citations;
-    }
+
 }

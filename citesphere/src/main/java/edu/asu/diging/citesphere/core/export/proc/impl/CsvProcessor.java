@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.export.proc.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class CsvProcessor implements Processor {
      * @see edu.asu.diging.citesphere.core.export.proc.impl.Processor#write(java.util.List, java.lang.Appendable)
      */
     @Override
-    public void write(List<ICitation> citations, Appendable writer) throws ExportFailedException {
+    public void write(Iterator<ICitation> citations, Appendable writer) throws ExportFailedException {
 
         CSVFormat format = CSVFormat.DEFAULT.withHeader("Key", "Group Id", "Group Name", "Type", "Title", "Date", "Authors",
                 "Editors", "Other Creators", "Publication Title", "Volume", "Issue", "Pages", "Series", "Series Title",
@@ -53,7 +54,8 @@ public class CsvProcessor implements Processor {
                 "Short Title", "Archive", "Archive Location", "Library Catalog", "Call Number", "Rights", "Date Added",
                 "Date Modified", "Concept Tags", "Extra", "Version");
         try (CSVPrinter printer = new CSVPrinter(writer, format)) {
-            for (ICitation citation : citations) {
+            while(citations.hasNext()) {
+                ICitation citation = citations.next();
                 List<String> row = new ArrayList<>();
                 row.add(citation.getKey());
                 if (citation.getGroup() != null) {
