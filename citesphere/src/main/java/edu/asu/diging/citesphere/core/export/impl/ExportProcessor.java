@@ -101,7 +101,7 @@ public class ExportProcessor implements IExportProcessor {
                     // done syncing
                     break;
                 } catch (SyncInProgressException e) {
-                    markTaskFailed(task, ExportStatus.SYNCING);
+                    setTaskStatus(task, ExportStatus.SYNCING);
                     // still syncing, let's sleep and try again
                     try {
                         TimeUnit.SECONDS.sleep(5);
@@ -118,20 +118,20 @@ public class ExportProcessor implements IExportProcessor {
             }
         } catch (AccessForbiddenException e1) {
             logger.error("Unauthorized access of " + user + " on group " + groupId, e1);
-            markTaskFailed(task, ExportStatus.FAILED);
+            setTaskStatus(task, ExportStatus.FAILED);
             return;
         } catch (ZoteroHttpStatusException e) {
             logger.error("There was a problem when connecting to Zotero.", e);
-            markTaskFailed(task, ExportStatus.FAILED);
+            setTaskStatus(task, ExportStatus.FAILED);
             return;
         } catch (GroupDoesNotExistException e) {
             logger.error("Group " + groupId + " does not exist.", e);
-            markTaskFailed(task, ExportStatus.FAILED);
+            setTaskStatus(task, ExportStatus.FAILED);
             return;
         } 
         
         if (citations == null) {
-            markTaskFailed(task, ExportStatus.FAILED);
+            setTaskStatus(task, ExportStatus.FAILED);
             return;
         }
         
@@ -157,7 +157,7 @@ public class ExportProcessor implements IExportProcessor {
     }
 
 
-    private void markTaskFailed(IExportTask task, ExportStatus status) {
+    private void setTaskStatus(IExportTask task, ExportStatus status) {
         task.setStatus(status);
         task.setFinishedOn(OffsetDateTime.now());
         taskRepo.saveAndFlush((ExportTask) task);
