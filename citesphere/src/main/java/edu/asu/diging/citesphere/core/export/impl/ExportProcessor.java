@@ -111,7 +111,6 @@ public class ExportProcessor implements IExportProcessor {
                     }
                 }
                 // if we waiting long enough, let's cancel the export
-                // TODO make counter configurable
                 if (counter >= maxExportTries) {
                     logger.warn("Syncing took too long. Cancelling export " + task.getId());
                     break;
