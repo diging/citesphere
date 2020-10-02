@@ -56,6 +56,9 @@ public class ExportProcessor implements IExportProcessor {
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
     
+    @Value("${_max_export_tries}")
+    private Integer maxExportTries;
+    
     @Autowired
     private ICitationManager citationManager;
     
@@ -109,7 +112,7 @@ public class ExportProcessor implements IExportProcessor {
                 }
                 // if we waiting long enough, let's cancel the export
                 // TODO make counter configurable
-                if (counter >= 700) {
+                if (counter >= maxExportTries) {
                     logger.warn("Syncing took too long. Cancelling export " + task.getId());
                     break;
                 }
