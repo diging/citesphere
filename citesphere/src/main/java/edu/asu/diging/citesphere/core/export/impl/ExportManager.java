@@ -188,17 +188,14 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
         IExportJob job = jobManager.createJob(JobStatus.PREPARED, task.getId(), user.getUsername());
         job = jobManager.save(job);
 
-        String token = tokenService.generateJobApiToken(job);
-        try {
-            kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.REFERENCES_EXPORT_TOPIC);
-        } catch (MessageCreationException e) {
-            logger.error("Could not send Kafka message.", e);
-            job.setStatus(JobStatus.FAILURE);
-            job.getPhases().add(new JobPhase(JobStatus.FAILURE, e.getMessage()));
-            jobManager.save(job);
-        }
+        sendJobMessage(job);
     }
-
+    
+    @Override
+    public void retryExport(IExportJob job) {
+        sendJobMessage(job);
+    }
+    
     /**
      * 
      * @param task
@@ -303,4 +300,17 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
             }
         }
     }
+    
+    private void sendJobMessage(IExportJob job) {
+        String token = tokenService.generateJobApiToken(job);
+        try {
+            kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.REFERENCES_EXPORT_TOPIC);
+        } catch (MessageCreationException e) {
+            logger.error("Could not send Kafka message.", e);
+            job.setStatus(JobStatus.FAILURE);
+            job.getPhases().add(new JobPhase(JobStatus.FAILURE, e.getMessage()));
+            jobManager.save(job);
+        }
+    }
+
 }

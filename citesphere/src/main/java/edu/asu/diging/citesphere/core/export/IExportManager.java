@@ -8,6 +8,7 @@ import edu.asu.diging.citesphere.core.exceptions.ExportTypeNotSupportedException
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.model.export.IExportTask;
+import edu.asu.diging.citesphere.core.model.jobs.IExportJob;
 import edu.asu.diging.citesphere.user.IUser;
 
 public interface IExportManager {
@@ -21,5 +22,7 @@ public interface IExportManager {
             ExportTooBigException, ZoteroHttpStatusException, AccessForbiddenException;
 
     String getDistributedExportResult(IExportTask task) throws DownloadExportException;
+
+    void retryExport(IExportJob job);
 
 }

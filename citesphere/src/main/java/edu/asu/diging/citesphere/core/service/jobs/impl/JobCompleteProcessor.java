@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.asu.diging.citesphere.core.export.ExportFinishedCallback;
 import edu.asu.diging.citesphere.core.export.IExportJobManager;
+import edu.asu.diging.citesphere.core.export.IExportManager;
 import edu.asu.diging.citesphere.core.export.IExportTaskManager;
 import edu.asu.diging.citesphere.core.model.jobs.IExportJob;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
@@ -46,6 +48,9 @@ public class JobCompleteProcessor implements IJobCompleteProcessor {
     
     @Autowired
     private IExportTaskManager exportTaskManager;
+    
+    @Autowired
+    private ExportFinishedCallback exportManager;
 
     
     /* (non-Javadoc)
@@ -104,6 +109,10 @@ public class JobCompleteProcessor implements IJobCompleteProcessor {
                 } else if (msg.getStatus() == Status.PROCESSING) {
                     job.setStatus(JobStatus.STARTED);
                     phase.setStatus(JobStatus.STARTED);
+                } else if (msg.getStatus() == Status.SYNCING_RETRY) {
+                    job.setStatus(JobStatus.SYNCING);
+                    phase.setStatus(JobStatus.SYNCING);
+                    exportManager.retryExport(job);
                 }
                 
                 job.getPhases().add(phase);
