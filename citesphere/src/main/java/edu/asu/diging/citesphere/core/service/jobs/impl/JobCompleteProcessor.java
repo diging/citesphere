@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.core.export.ExportFinishedCallback;
 import edu.asu.diging.citesphere.core.export.IExportJobManager;
-import edu.asu.diging.citesphere.core.export.IExportManager;
 import edu.asu.diging.citesphere.core.export.IExportTaskManager;
 import edu.asu.diging.citesphere.core.model.jobs.IExportJob;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;

@@ -11,6 +11,7 @@ import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -193,6 +194,11 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
     
     @Override
     public void retryExport(IExportJob job) {
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+           logger.error("Could not sleep.", e);
+        }
         sendJobMessage(job);
     }
     

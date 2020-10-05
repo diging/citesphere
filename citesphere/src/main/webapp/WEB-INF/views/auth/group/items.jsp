@@ -18,7 +18,14 @@ $(function() {
 	    visiblePages: 10,
 	    initiateStartPageClick: false,
 	    onPageClick: function (event, page) {
-	    	window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items" />?page=" + page;
+	    <c:choose>
+	    	<c:when test="${collectionId!=null}">
+	    	window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/collection/${collectionId}/items/" />?page=" + page; 
+	        </c:when>    
+	        <c:otherwise>
+	        window.location.href = "<c:url value="/auth/group/${zoteroGroupId}/items" />?page=" + page;
+	        </c:otherwise>
+	    </c:choose>
 	    }
 	});
 	
