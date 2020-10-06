@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.util.CloseableIterator;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -24,6 +25,7 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.SyncInProgressException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
@@ -231,6 +233,27 @@ public class CitationManager implements ICitationManager {
             group.getUsers().add(user.getUsername());
         }
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public CloseableIterator<ICitation> getAllGroupItems(IUser user, String groupId, String collectionId) throws ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException {
+        Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
+        if (groupOptional.isPresent()) {
+            ICitationGroup group = groupOptional.get();
+            if (!group.getUsers().contains(user.getUsername())) {
+                throw new AccessForbiddenException();
+            }
+            boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
+            if (isModified) {
+                asyncCitationProcessor.sync(user, group, collectionId);
+                throw new SyncInProgressException();
+            } 
+            
+            return (CloseableIterator<ICitation>) citationDao.getCitationIterator(groupId, collectionId);
+        }
+        
+        throw new GroupDoesNotExistException("Group " + groupId + " does not exist.");
+    }
 
     @Override
     public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy)
@@ -238,11 +261,14 @@ public class CitationManager implements ICitationManager {
         Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
         if (groupOptional.isPresent()) {
             ICitationGroup group = groupOptional.get();
+            if (!group.getUsers().contains(user.getUsername())) {
+                throw new AccessForbiddenException();
+            }
             boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
             CitationResults results = new CitationResults();
             if (isModified) {
                 results.setNotModified(false);
-                asyncCitationProcessor.sync(user, group, collectionId, sortBy);
+                asyncCitationProcessor.sync(user, group, collectionId);
             } else {
                 results.setNotModified(true);
             }

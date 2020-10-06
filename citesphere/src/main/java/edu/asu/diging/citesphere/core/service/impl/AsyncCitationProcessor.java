@@ -69,7 +69,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
      */
     @Override
     @Async
-    public void sync(IUser user, ICitationGroup group, String collectionId, String sortBy) {
+    public void sync(IUser user, ICitationGroup group, String collectionId) {
         GroupSyncJob prevJob = jobManager.getMostRecentJob(group.getGroupId() + "");
         if (prevJob != null && prevJob.getStatus() != JobStatus.DONE && prevJob.getStatus() != JobStatus.FAILURE) {
             // there is already a job running, let's not start another one
