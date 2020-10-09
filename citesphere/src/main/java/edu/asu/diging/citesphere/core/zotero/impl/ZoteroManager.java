@@ -137,6 +137,13 @@ public class ZoteroManager implements IZoteroManager {
     }
     
     @Override
+    public long getLatestGroupVersion(IUser user, String groupId) {
+        ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, groupId, 1, null,
+                null);
+        return groupItems.getLastVersion();
+    }
+    
+    @Override
     public DeletedZoteroElements getDeletedElements(IUser user, String groupId, long version) {
         DeletedElements deletedElements = zoteroConnector.getDeletedElements(user, groupId, version);
         DeletedZoteroElements deletedZoteroElems = new DeletedZoteroElements();
@@ -148,8 +155,8 @@ public class ZoteroManager implements IZoteroManager {
     
     @Override
     public boolean isGroupModified(IUser user, String groupId, long lastGroupVersion) throws ZoteroHttpStatusException {
-        return zoteroConnector.isGroupModified(user, groupId, lastGroupVersion)
-;    }
+        return zoteroConnector.isGroupModified(user, groupId, lastGroupVersion);
+    }
 
     @Override
     public ICitationCollection getCitationCollection(IUser user, String groupId, String collectionId) {

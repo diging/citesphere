@@ -24,7 +24,6 @@ import edu.asu.diging.citesphere.core.authority.impl.ImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.PersonRepository;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.user.IUser;
@@ -37,9 +36,6 @@ public class AuthorityServiceTest {
 
     @Mock
     private CitationGroupRepository groupRepository;
-
-    @Mock
-    private PersonRepository personRepository;
 
     @Mock
     private AuthorityImporter testImporter;

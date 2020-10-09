@@ -10,23 +10,23 @@ import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 
 @RestController
 public class SyncInfoController {
-    
+
     @Autowired
     private ISyncJobManager jobManager;
-    
+
     @RequestMapping("/auth/group/{zoteroGroupId}/sync/info")
     public SyncInfo getSyncInfo(@PathVariable("zoteroGroupId") String groupId) {
-       GroupSyncJob job = jobManager.getMostRecentJob(groupId);
-        
+        GroupSyncJob job = jobManager.getMostRecentJob(groupId);
+
         SyncInfo info = new SyncInfo();
-        
-        if(job != null) {
+
+        if (job != null) {
             info.createdOn = job.getCreatedOn().toString();
             info.total = job.getTotal();
             info.current = job.getCurrent();
             info.status = job.getStatus() != null ? job.getStatus().name() : "";
         }
-        
+
         return info;
     }
 
