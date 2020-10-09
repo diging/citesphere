@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
+import edu.asu.diging.citesphere.api.v1.model.impl.Group;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -35,6 +36,9 @@ public class GroupListApiController extends V1Controller {
     
     @Autowired
     private ObjectMapper objectMapper;
+    
+    @Autowired
+    private JsonUtil jsonUtil;
 
 
     @RequestMapping(value = { "/groups" }, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE } )
@@ -45,7 +49,7 @@ public class GroupListApiController extends V1Controller {
         }
         
         List<ICitationGroup> groups = citationManager.getGroups(user);
-        List<JsonCitationGroup> jsonGroups = groups.stream().map(g -> createGroup(g)).collect(Collectors.toList());
+        List<Group> jsonGroups = groups.stream().map(g -> jsonUtil.createGroup(g)).collect(Collectors.toList());
         
         String jsonResponse = "";
         try {
@@ -55,94 +59,5 @@ public class GroupListApiController extends V1Controller {
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
-    }
-    
-    private JsonCitationGroup createGroup(ICitationGroup group) {
-        JsonCitationGroup jsonGroup = new JsonCitationGroup();
-        jsonGroup.setCreated(group.getCreated());
-        jsonGroup.setDescription(group.getDescription());
-        jsonGroup.setId(group.getGroupId());
-        jsonGroup.setLastModified(group.getLastModified());
-        jsonGroup.setName(group.getName());
-        jsonGroup.setNumItems(group.getNumItems());
-        jsonGroup.setOwner(group.getOwner());
-        jsonGroup.setType(group.getType());
-        jsonGroup.setUrl(group.getUrl());
-        jsonGroup.setVersion(group.getMetadataVersion());
-        return jsonGroup;
-    }
-    
-    class JsonCitationGroup {
-        private long id;
-        private String name;
-        private long version;
-        private String created;
-        private String lastModified;
-        private long numItems;
-        private long owner;
-        private String type;
-        private String description;
-        private String url;
-        
-        public long getId() {
-            return id;
-        }
-        public void setId(long id) {
-            this.id = id;
-        }
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-        public long getVersion() {
-            return version;
-        }
-        public void setVersion(long version) {
-            this.version = version;
-        }
-        public String getCreated() {
-            return created;
-        }
-        public void setCreated(String created) {
-            this.created = created;
-        }
-        public String getLastModified() {
-            return lastModified;
-        }
-        public void setLastModified(String lastModified) {
-            this.lastModified = lastModified;
-        }
-        public long getNumItems() {
-            return numItems;
-        }
-        public void setNumItems(long numItems) {
-            this.numItems = numItems;
-        }
-        public long getOwner() {
-            return owner;
-        }
-        public void setOwner(long owner) {
-            this.owner = owner;
-        }
-        public String getType() {
-            return type;
-        }
-        public void setType(String type) {
-            this.type = type;
-        }
-        public String getDescription() {
-            return description;
-        }
-        public void setDescription(String description) {
-            this.description = description;
-        }
-        public String getUrl() {
-            return url;
-        }
-        public void setUrl(String url) {
-            this.url = url;
-        }
     }
 }
