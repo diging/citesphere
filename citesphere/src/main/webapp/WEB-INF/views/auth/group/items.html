@@ -225,9 +225,9 @@ function pollStatus(){
   </button>
   <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
   <tbody th:each="column:${availableColumns}">
-    <li><a data-column-name="${column}" data-is-shown="${fn:contains(columns, column) }">
+    <li><a data-column-name="${column}" data-is-shown="${#lists.contains(columns,column)}">
     <spring:eval expression="@labelsResource.getProperty('_item_attribute_label_' + column)"  var="columnLabel" />
-	<span th:if ="${fn:contains(columns, column)}"><i class="fas fa-check"></i> </span>
+	<span th:if ="${#lists.contains(columns,column)}"><i class="fas fa-check"></i> </span>
 	<span th:text="${columnLabel}"/>
     </a></li>
   </tbody>
@@ -239,18 +239,18 @@ function pollStatus(){
 </div>
 
 <div class="col-md-2" th:with="columnString=''">
-	<tbody th:each="column,loop : ${columns}">
-	   <div th:with="columnString=${columnString}${column}">
+	<th:block th:each="column,loop : ${columns}" th:with="columnString=${columnString}${column}">
 	   <span th:if="${!loop.last}">
 	   		<c:set var = "columnString" value = "${columnString},"/>
 	   </span>
-	</c:forEach>
+	</th:block>
+		
 	
 	<ul class="list-group" id="collectionsList">
 	<tbody th:each="collection:${citationCollections}">
 	  <li class="list-group-item">
 		  <span class="badge" th:text="${collection.numberOfItems}"/>
-		  <a th:href="@{'/auth/group/' + ${zoteroGroupId} + '/collection/' + ${collection.key} + '/items'}"><span th:text="${collection.name}"/>
+		  <a th:href="@{|/auth/group/${zoteroGroupId}/collection/${collection.key}/items|}"><span th:text="${collection.name}"/>
 	  </li>
 	</tbody>
 	</ul>
@@ -265,49 +265,43 @@ function pollStatus(){
 		<th>Title</th>
 		<th>Date</th>
 		<th>URL</th>
-		<tbody th:each="column:${columns}">
-			<th>
-				<spring:eval expression="@labelsResource.getProperty('_item_attribute_label_' + column)"  var="columnLabel" />
-				<span th:text="${columnLabel}"/>
-			</th>
-		</tbody>
+		<th>
+			<span th:each="column:${columns}" th:with="columnLabel=@environment.getProperty('_item_attribute_label_' + column)">${columnLabel}</span>
+		</th>
 	</tr>
-	<c:forEach items="${items}" var="entry" varStatus="loop">
+	<tbody th:each="entry,loop : ${items}">
 	<tr>
 		<td>
 		  <span class="text-warning">
-		  	<spring:eval expression="@iconsResource.getProperty(entry.itemType + '_icon')"  var="iconClass" />
-			<spring:eval expression="@iconsResource.getProperty(entry.itemType + '_label')"  var="iconLabel" />
-			<c:if test="${empty iconClass}">
-			<c:set var="iconClass" value="fas fa-file" />
-			</c:if>
-			<c:if test="${empty iconLabel}">
-			<c:set var="iconLabel" value="${entry.itemType}" />
-			</c:if>
-			<i class="${iconClass}" title="${iconLabel}"></i> ${iconLabel}
+		  <div th:with="iconClass=${@environment.getProperty(entry.itemType + '_icon')}
+		  , iconLabel=${@environment.getProperty(entry.itemType + '_label')}">
+			<!-- <div th:if="${#strings.isEmpty(iconClass))}" th:with="iconClass=fas fa-file">
+			<div th:if="${#strings.isEmpty(iconLabel))}" th:with="iconLabel=${entry.itemType}"> -->
+			<i class="${iconClass}" title="${iconLabel}"></i>[[${iconClass}]]  [[${iconLabel}]]
+			</div>
+			<!-- </div>
+			</div> -->
 		  </span>
 		</td>
-		<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}">
-		 <c:forEach items="${entry.authors}" var="author" varStatus="status">
-	 	  <strong>${author.lastName}<c:if test="${not empty author.firstName}">, ${author.firstName}</c:if></strong><c:if test="${!status.last}">; </c:if>
-	 	 </c:forEach>
+		<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}" th:each="author,status : ${entry.authors}">
+		 
+	 	  <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
+	 	 
 	 	</td>
 	 	<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}">
-	 		<em>${entry.title}</em>
+	 		<em>[[${entry.title}]]</em>
 	 	</td>
 	 	<td class="bib-entry" data-key="${entry.key}" data-index="${loop.index}">
-	 		${entry.dateFreetext}
+	 		[[${entry.dateFreetext}]]
 	 	</td>
 	 	<td>
-	 		<c:if test="${not empty entry.url}">
+	 		<span th:if="${!#strings.isEmpty(entry.url)}">
 	 		<a href="${entry.url}" target="_blank" title="${entry.url}"><i class="fas fa-globe-americas"></i></a>
-	 		</c:if>
+	 		</span>
 	 	</td>
-	 	<c:forEach items="${columns}" var="column">
-	 	<td style="max-width:300px;">${entry[column]}</td>
-	 	</c:forEach>
+	 	<td th:each="column:${columns}" style="max-width:300px;">[[${entry[column]}]]</td>
 	</tr>
-	</c:forEach>
+	</tbody>
 	</table>
 </div>
 </body>
