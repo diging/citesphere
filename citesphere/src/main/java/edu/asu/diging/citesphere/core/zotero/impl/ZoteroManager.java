@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.Data;
+import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
@@ -23,19 +23,21 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.factory.ICitationCollectionFactory;
-import edu.asu.diging.citesphere.core.factory.ICitationFactory;
-import edu.asu.diging.citesphere.core.factory.IGroupFactory;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
+import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
+import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
+import edu.asu.diging.citesphere.core.zotero.ZoteroGroupItemsResponse;
+import edu.asu.diging.citesphere.factory.ICitationCollectionFactory;
+import edu.asu.diging.citesphere.factory.ICitationFactory;
+import edu.asu.diging.citesphere.factory.IGroupFactory;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
-import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -78,6 +80,16 @@ public class ZoteroManager implements IZoteroManager {
         }
         return groups;
     }
+    
+    @Override
+    public Map<String, Long> getGroupItemVersions(IUser user, String groupId, long version) {
+        ZoteroResponse<Item> response = zoteroConnector.getGroupItemVersions(user, groupId, version);
+        Map<String, Long> itemVersions = new HashMap<>();
+        for (Item item : response.getResults()) {
+            itemVersions.put(item.getKey(), item.getVersion());            
+        }
+        return itemVersions;
+    }
 
     @Override
     public Map<Long, Long> getGroupsVersion(IUser user) {
@@ -94,6 +106,20 @@ public class ZoteroManager implements IZoteroManager {
         Item item = zoteroConnector.getItem(user, groupId, itemKey);
         return citationFactory.createCitation(item);
     }
+    
+    @Override
+    public ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys) {
+        ZoteroResponse<Item> response = zoteroConnector.getGroupItemsByKey(user, groupId, itemKeys);
+        
+        ZoteroGroupItemsResponse zoteroReponse = new ZoteroGroupItemsResponse();
+        zoteroReponse.setContentVersion(response.getLastVersion());
+        zoteroReponse.setCitations(new ArrayList<>());
+        for(Item item : response.getResults()) {
+            zoteroReponse.getCitations().add(citationFactory.createCitation(item));
+        }
+        
+        return zoteroReponse;
+    }
 
     @Override
     public long getGroupItemVersion(IUser user, String groupId, String itemKey) {
@@ -108,6 +134,28 @@ public class ZoteroManager implements IZoteroManager {
         ICitationGroup citGroup = groupFactory.createGroup(group);
         citGroup.setNumItems(groupItems.getTotalResults());
         return citGroup;
+    }
+    
+    @Override
+    public long getLatestGroupVersion(IUser user, String groupId) {
+        ZoteroResponse<Item> groupItems = zoteroConnector.getGroupItemsWithLimit(user, groupId, 1, null,
+                null);
+        return groupItems.getLastVersion();
+    }
+    
+    @Override
+    public DeletedZoteroElements getDeletedElements(IUser user, String groupId, long version) {
+        DeletedElements deletedElements = zoteroConnector.getDeletedElements(user, groupId, version);
+        DeletedZoteroElements deletedZoteroElems = new DeletedZoteroElements();
+        deletedZoteroElems.setCollections(deletedElements.getCollections());
+        deletedZoteroElems.setItems(deletedElements.getItems());
+        deletedZoteroElems.setTags(deletedElements.getTags());
+        return deletedZoteroElems;
+    }
+    
+    @Override
+    public boolean isGroupModified(IUser user, String groupId, long lastGroupVersion) throws ZoteroHttpStatusException {
+        return zoteroConnector.isGroupModified(user, groupId, lastGroupVersion);
     }
 
     @Override
@@ -142,6 +190,29 @@ public class ZoteroManager implements IZoteroManager {
         ZoteroResponse<Item> response = zoteroConnector.getCollectionItems(user, groupId, collectionId, page, sortBy,
                 lastGroupVersion);
         return createCitationResults(response);
+    }
+    
+    @Override
+    public Map<String, Long> getCollectionsVersions(IUser user, String groupId, String groupVersion) {
+        ZoteroResponse<Collection> response = zoteroConnector.getCitationCollectionVersions(user, groupId, new Long(groupVersion));
+        Map<String, Long> collectionVersions = new HashMap<>();
+        for (Collection collection : response.getResults()) {
+            collectionVersions.put(collection.getKey(), collection.getVersion());            
+        }
+        return collectionVersions;
+    }
+    
+    @Override
+    public ZoteroCollectionsResponse getCollectionsByKey(IUser user, String groupId, List<String> keys) {
+        ZoteroResponse<Collection> response = zoteroConnector.getCitationCollectionsByKey(user, groupId, keys);
+        List<ICitationCollection> collections = new ArrayList<>();
+        for (Collection collection : response.getResults()) {
+            collections.add(collectionFactory.createCitationCollection(collection));
+        }
+        ZoteroCollectionsResponse zoteroResponse = new ZoteroCollectionsResponse();
+        zoteroResponse.setCollections(collections);
+        zoteroResponse.setContentVersion(response.getLastVersion());
+        return zoteroResponse;
     }
 
     @Override

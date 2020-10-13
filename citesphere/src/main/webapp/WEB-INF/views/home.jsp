@@ -38,7 +38,7 @@ If you try and take a cat apart to see how it works, the first thing you have on
 <c:forEach items="${groups}" var="group">
 <div class="panel panel-default">
   <div class="panel-body">
-    <a href="<c:url value="/auth/group/${group.id}/items" />">${group.name} (${group.numItems})</a>
+    <a href="<c:url value="/auth/group/${group.groupId}/items" />">${group.name} (${group.numItems})</a>
   </div>
 </div>
 </c:forEach>
