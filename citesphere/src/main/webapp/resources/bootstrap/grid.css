@@ -25,7 +25,7 @@ hr {
 }
 
 .footer {
-	position: fixed;
+	position: relative;
 	background-color: white;
 	width: 100%;
 	bottom: 0px;
