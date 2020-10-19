@@ -82,7 +82,7 @@ public class ExportManagerTest {
         results1.setTotalResults(10);
         
         group = new CitationGroup();
-        group.setId(groupId);
+        group.setGroupId(groupId);
         group.setName(GROUP_NAME);
         
         Mockito.when(citationManager.getGroupItems(user, groupId.toString(), null, 1, SORT_BY)).thenReturn(results1);

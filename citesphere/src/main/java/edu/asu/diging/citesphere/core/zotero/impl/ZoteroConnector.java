@@ -111,7 +111,6 @@ public class ZoteroConnector implements IZoteroConnector {
     }
 
     @Override
-    @Cacheable(value = "groupItemsLimit", key = "#user.username + '_' + #groupId + '_' + #limit + '_' + #sortBy")
     public ZoteroResponse<Item> getGroupItemsWithLimit(IUser user, String groupId, int limit, String sortBy,
             Long lastGroupVersion) {
         Zotero zotero = getApi(user);

@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +17,6 @@ import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICollectionMongoDao;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -102,10 +100,6 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         if (collectionOptional.isPresent()) {
             return (ICitationCollection) collectionOptional.get();
         }
-        // FIXME: load collection asynch
-        //ICitationCollection collection = zoteroManager.getCitationCollection(user, groupId, collectionId);
-        //collectionRepository.save((CitationCollection)collection);
         return null;
-        //return collection;
     }
 }
