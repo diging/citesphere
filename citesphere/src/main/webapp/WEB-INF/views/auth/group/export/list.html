@@ -21,6 +21,7 @@
 </head>
 
 <body>
+<div layout:fragment="content">
 	<h1>Exports</h1>
 
 	<div class="alert alert-info" role="alert">Please reload the page to see updated status information.</div>
@@ -47,18 +48,19 @@
 			<td>[[${task.collectionName}]]</td>
 			<td>[[${task.totalRecords}]]</td>
 			<td>[[${task.progress}]]</td>
-			<td th:switch="${task.status}">
-				<span th:case="DONE" class="label label-success">[[${task.status}]]</span>
-				<span th:case="FAILED" class="label label-danger">[[${task.status}]]</span>
-				<span th:case="*" class="label label-warning">[[${task.status}]]</span>
+			<td>
+				<span th:if="${#strings.equals(task.status,'DONE')}" class="label label-success">[[${task.status}]]</span>
+				<span th:if="${#strings.equals(task.status,'FAILED')}" class="label label-danger">[[${task.status}]]</span>
+    			<span th:unless="${#strings.equals(task.status,'DONE') || #strings.equals(task.status,'FAILED')}" class="label label-warning">[[${task.status}]]</span>
 			</td>
 			<td>[[${task.createdOn}]]</td>
 			<td>
-				<span th:if="${task.status == 'DONE'}">
+				<span th:if="${#strings.equals(task.status,'DONE')}">
 					<a th:href="@{|exports/${task.id}/download|}"><i class="fas fa-download"></i> Download</a>
 				</span>
 			</td>
 		</tr>
 	</table>
+	</div>
 </body>
 </html>
