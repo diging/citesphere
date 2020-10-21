@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import org.springframework.security.oauth2.provider.ClientDetails;
@@ -59,7 +60,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
      * @see edu.asu.diging.citesphere.core.service.oauth.impl.IOAuthClientManager#store(org.springframework.security.oauth2.provider.ClientDetails)
      */
     @Override
-    public OAuthCredentials create(String name, String description, List<OAuthScope> scopes, Set<String> grantTypes, String redirectUrl) {
+    public OAuthCredentials create(String name, String description, List<OAuthScope> scopes, Set<String> grantTypes, String redirectUrl, List<GrantedAuthority> authorities) {
         final OAuthClient client = new OAuthClient();
         client.setName(name);
         client.setDescription(description);
@@ -71,6 +72,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         client.setScope(new HashSet<>());
         client.setRegisteredRedirectUri(new HashSet<>());
         client.getRegisteredRedirectUri().add(redirectUrl);
+        client.setAuthorities(authorities);
         scopes.forEach(s -> client.getScope().add(s.getScope()));
         OAuthClient storeClient = clientRepo.save(client);
         return new OAuthCredentials(storeClient.getClientId(), clientSecret);
