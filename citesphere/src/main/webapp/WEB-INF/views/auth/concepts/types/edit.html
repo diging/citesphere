@@ -1,4 +1,9 @@
 <html layout:decorate="~{layouts/main}">
+<ol class="breadcrumb">
+  <li><a th:href="@{/}" />Home</a></li>
+  <li><a th:href="@{/auth/concepts/list}" />">Concept Types</a></li>
+  <li class="active">${form.name}</li>
+</ol>
 <h2>
 	Edit Concept Type: ${form.name}	  
 </h2>
