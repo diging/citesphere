@@ -103,7 +103,7 @@
 									all Imports</a></li>
 						</ul></li>
 					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
-						href="@{/auth/authority/list}">Managed Authority Entries</a></li>
+						th:href="@{/auth/authority/list}">Managed Authority Entries</a></li>
 					<li sec:authorize="hasRole('ADMIN')" role="presentation"
 						class="dropdown"><a class="dropdown-toggle"
 						data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
