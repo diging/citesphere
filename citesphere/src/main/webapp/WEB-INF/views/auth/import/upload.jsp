@@ -114,7 +114,7 @@ $(document).ready(function() {
        	 <select id="groupSelect" name="group" class="form-control">
        	 	<option value="">Please select one</option>
        	 	<c:forEach items="${groups}" var="citGroup">
-       	 		<option value="${citGroup.id}">${citGroup.name}</option>
+       	 		<option value="${citGroup.groupId}">${citGroup.name}</option>
        	 	</c:forEach>
        	 </select>
        	 </div>
