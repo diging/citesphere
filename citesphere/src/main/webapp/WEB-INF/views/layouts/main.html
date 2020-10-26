@@ -124,8 +124,8 @@
 		</div>
 
 
-		<div th:if="${show_alert}" class="alert alert-${alert_type}"
-			role="alert">${alert_msg}</div>
+		<div th:if="${show_alert}" th:class="${'alert alert-'+alert_type}"
+			role="alert"><span th:text="${alert_msg}"/></div>
 
 		<!-- Content -->
 		<div layout:fragment="content">

@@ -13,7 +13,7 @@
 	
 		<label>Name:</label>
 		<input th:field="*{name}" type="text" class="form-control" placeholder="Name" th:value="${form.name}" ></input>
-		<p class="text-danger"><th:errors path="name"/></p>
+		<p class="text-danger" th:errors ="*{name}"/>
 		
 		<label>Description:</label>
 		<input th:field="*{description}" type="text" class="form-control" placeholder="Description" th:value="${form.description}" ></input>
