@@ -85,10 +85,10 @@
 						aria-expanded="false"> Citation Concepts <span class="caret"></span>
 					</a>
 						<ul class="dropdown-menu">
-							<li role="presentation"><a th:href="@{auth/concepts/list}">Concepts</a>
+							<li role="presentation"><a th:href="@{/auth/concepts/list}">Concepts</a>
 							</li>
 							<li role="presentation"><a
-								th:href="@{auth/concepts/types/list}">Concept Types</a></li>
+								th:href="@{/auth/concepts/types/list}">Concept Types</a></li>
 						</ul></li>
 					<li sec:authorize="hasRole('ADMIN')" role="presentation"
 						class="dropdown"><a class="dropdown-toggle"
@@ -124,8 +124,8 @@
 		</div>
 
 
-		<div th:if="${show_alert}" class="alert alert-${alert_type}"
-			role="alert">${alert_msg}</div>
+		<div th:if="${show_alert}" th:class="${'alert alert-'+alert_type}"
+			role="alert"><span th:text="${alert_msg}"/></div>
 
 		<!-- Content -->
 		<div layout:fragment="content">

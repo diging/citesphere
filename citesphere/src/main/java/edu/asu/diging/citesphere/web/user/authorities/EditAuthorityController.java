@@ -30,13 +30,13 @@ public class EditAuthorityController {
         form.setName(entry.getName());
         form.setDescription(entry.getDescription());
         model.addAttribute("form", form);
-        return "auth/authority/edit";
+        return "auth/authorities/edit";
     }
     @RequestMapping(value="/auth/authority/{authorityId}/edit", method=RequestMethod.POST)
     public String edit(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication, @Valid @ModelAttribute("form") AuthorityForm form, BindingResult result, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("form", form);
-            return "auth/authority/edit";
+            return "auth/authorities/edit";
         }
         IAuthorityEntry entry = authorityService.find(authorityId);
         IUser user = (IUser) authentication.getPrincipal();
