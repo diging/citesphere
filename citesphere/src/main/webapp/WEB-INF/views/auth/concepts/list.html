@@ -27,7 +27,7 @@
 		
  		<!-- <td th:text="${concept.uri}"></td>  -->
 		<td><span class="date" th:text="${concept.createdOn}"></span></td>
-		<td><a th:href="@{/auth/concepts/${concept.id}/edit}" />"><i class="far fa-edit" title="Edit"></i></a></td>
+		<td><a th:href="@{'/auth/concepts/' + ${concept.id} + '/edit'}" /><i class="far fa-edit" title="Edit"></i></a></td>
 		</tr>
 	</th:forEach>
 </table>
