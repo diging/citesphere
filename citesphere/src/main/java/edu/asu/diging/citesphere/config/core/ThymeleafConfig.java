@@ -1,4 +1,6 @@
 package edu.asu.diging.citesphere.config.core;
+import java.nio.charset.Charset;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +27,7 @@ public class ThymeleafConfig {
         templateResolver.setApplicationContext(this.applicationContext);
         templateResolver.setPrefix("/WEB-INF/views/");
         templateResolver.setSuffix(".html");
+        templateResolver.setCharacterEncoding(Charset.defaultCharset().toString());
         // HTML is the default value, added here for the sake of clarity.
         templateResolver.setTemplateMode(TemplateMode.HTML);
         // Template cache is true by default. Set to false if you want
@@ -54,6 +57,7 @@ public class ThymeleafConfig {
     public ThymeleafViewResolver viewResolver() {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
         viewResolver.setTemplateEngine(templateEngine());
+        viewResolver.setCharacterEncoding(Charset.defaultCharset().toString());
         return viewResolver;
     }
 }
