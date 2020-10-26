@@ -88,11 +88,11 @@
 	<div class="pull-left" style="margin-bottom: 20px;">
 	
 		<span th:if="${!#strings.isEmpty(collectionId)}">
-			<a class ="btn btn-primary" style="font-size:10px;" th:href="@{|items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
+			<a class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
 		</span>
 		
 		<span th:unless="${!#strings.isEmpty(collectionId)}">
-			<a class ="btn btn-primary" style="font-size:10px;" th:href="@{|items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
+			<a class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
 		</span>
 		 <a
 			th:href="@{|${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
@@ -167,10 +167,27 @@
 				 </span>
 			</span></td>
 		</tr>
-		<tr th:each="role: ${citation.otherCreatorRoles}" th:if="${!#strings.equals(role,'editor')}">
-			
-			
-		
+		<tr th:each="role,status: ${citation.otherCreatorRoles}" th:if="${!#strings.equals(role,'editor')}">
+			<td>
+				[[${#strings.capitalizeWords(@labelsResource.getProperty('_item_attribute_label_${role}', role))}]]
+			</td>
+			<td>
+				<span th:each="creator,creatorStatus: ${citation.otherCreators}" th:if="${#strings.equals(creator.role, role)}">
+ 					[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
+					<span th:if="${!#lists.isEmpty(creator.person.affiliations)}">
+ 						(<th:block th:each="aff,affStatus : ${creator.person.affiliations}">
+							${aff.name}<span th:if="${!affStatus.last}">, </span>
+						</th:block>)<span th:if="${!creatorStatus.last}">; </span>
+					</span>
+					<span th:if="${!#strings.isEmpty(creator.person.uri)}">
+						<a th:href="@{|${creator.person.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
+					</span>
+					<span th:if="${!#strings.isEmpty(creator.person.localAuthorityId)}">
+						<a th:href="@{|/auth/authority/${creator.person.localAuthorityId}|}"><i class="fas fa-anchor"></i></a>
+					</span>
+					<span th:if="${!status.last}">; </span>
+				</span>
+			</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'publicationTitle')}">
 			<td>Publication Title</td>
