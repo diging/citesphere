@@ -99,7 +99,7 @@
 							<li role="presentation"><a href="@{/auth/import/upload}">Import
 									from File</a></li>
 							<li role="separator" class="divider"></li>
-							<li role="presentation"><a href="@{/auth/import/jobs}">See
+							<li role="presentation"><a th:href="@{/auth/import/jobs}">See
 									all Imports</a></li>
 						</ul></li>
 					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
@@ -110,7 +110,7 @@
 						aria-expanded="false"> Profile <span class="caret"></span>
 					</a>
 						<ul class="dropdown-menu">
-							<li role="presentation"><a href="@{/auth/tokens}">Authorized
+							<li role="presentation"><a th:href="@{/auth/tokens}">Authorized
 									OAuth Apps</a></li>
 						</ul></li>
 
