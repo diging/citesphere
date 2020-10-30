@@ -91,7 +91,7 @@ public class EditItemController {
         model.addAttribute("page", page);
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sortBy", sortBy);
-        return "auth/group/items/item/edit";
+        return "auth/group/editItem";
     }
 
     /**
