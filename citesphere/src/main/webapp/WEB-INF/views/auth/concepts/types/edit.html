@@ -9,7 +9,7 @@
 	</ol>
 	<h2>Edit Concept Type: <span th:text="${form.name}"></span></h2>
 	
-	<form action="#" th:action="@{'/auth/concepts/types/' + ${typeId} + '/edit'}" th:object="${form}" method="POST" id="editForm">
+	<form action="#" th:action="@{'/auth/concepts/types/' + ${conceptTypeId} + '/edit'}" th:object="${form}" method="POST" id="editForm">
 	
 		<label>Name:</label>
 		<input th:field="*{name}" type="text" class="form-control" placeholder="Name" th:value="${form.name}" ></input>
