@@ -658,11 +658,26 @@ let removeConcept = function removeConcept(e) {
 				</td>
 			</tr>
 			
-			<tr th:if="${!#lists.contains(fields, 'title') }"style="display:none;">
+			<tr th:if="${#lists.contains(fields, 'title')}">
 				<td>Title</td>
 				<td>
 					<input th:field="*{title}" type="text" class="form-control" placeholder="Title" 
-							th:value="${!#strings.isEmpty(form.title) ? form.title : citation.title}" />
+							th:value="${!#strings.isEmpty(form.title)} ? ${form.title} : ${citation.title}" />
+				</td>
+			</tr>
+			
+			<tr th:if="${#lists.contains(fields, 'shortTitle') }">
+				<td>Short Title</td>
+					<td>
+					<input th:field="*{shortTitle}" type="text" class="form-control" placeholder="Short title" 
+						th:value="${citation.shortTitle}" /></td>
+			</tr>
+			
+			<tr th:if="${#lists.contains(fields, 'date')}">
+				<td>Date</td>
+				<td>
+				<input th:field="*{dateFreetext}" type="text" class="form-control" placeholder="Date" 
+					th:value="${!#strings.isEmpty(form.dateFreetext)} ? ${form.dateFreetext} : ${citation.dateFreetext}" />
 				</td>
 			</tr>
 			
@@ -718,10 +733,46 @@ let removeConcept = function removeConcept(e) {
 				</span>
 		</th:block>
 			
-			
+		<th:block th:each="role:${citation.otherCreatorRoles}" th:if test="${!#lists.contains(creatorMap, role)}">
+			<tr class="creator-row">
+			<td style="text-transform: capitalize;">[[${role}]]s</td>
+			<td>
+				<span id="${role}List" style="font-size: 18px">
+				<span th:each="creator:${citation.otherCreators}" th:with="role=${fn:substringAfter(curCreator.key, '_item_attribute_label_')}">
+				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${role}${varStatus}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+				 		<th:block th:each="aff:${creator.person.affiliations}"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></th:block>
+							[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
+							<th:block th:each="aff:${creator.person.affiliations}"> [[(${aff.name})]]</th:block>
+							&nbsp;<i class="far fa-edit edit-creator"></i>
+						<i class="fas fa-times remove-creator"></i>
+					</span>
+					&nbsp;&nbsp;
+				</span>
+				</span>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${role}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${role}</a></div>
+			</td>
+			</tr>
+	 </th:block>
+	 
+	 <tr th:if="${not #lists.contains(fields, 'publicationTitle') } " style="display:none;">
+		<td>Publication Title</td>
+		<td>
+		<input th:field="*{publicationTitle}" type="text" class="form-control" placeholder="Publication Title" 
+			th:value="${!#strings.isEmpty(form.publicationTitle)} ? ${form.publicationTitle} : ${citation.publicationTitle}" />
+		</td>
+	</tr>
+	
+	<tr th:if="${#lists.contains(fields, 'journalAbbreviation')}">
+		<td>Journal Abbreviation</td>
+		<td>
+		<input th:field="*{journalAbbreviation}" type="text" class="form-control" placeholder="Journal Abbreviation" 
+		th:value="${!#strings.isEmpty(form.journalAbbreviation)} ? ${form.journalAbbreviation} : ${citation.journalAbbreviation}" /></td>
+	</tr>
+	 
 			
 		</table>
 	</form>
 </div>
 
 </body>
+</html>
