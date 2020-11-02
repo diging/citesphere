@@ -640,23 +640,84 @@ let removeConcept = function removeConcept(e) {
 			<tr>
 				<td width="20%">Citation Type</td>
 				<td>
-					<div th:with= "enumValues = ${edu.asu.diging.citesphere.model.bib.ItemType.values()}"/>
+			
 					<select id="items" th:field="*{itemType}" data-show-icon="true" class="form-control selectpicker">
-						<th:block th:each="enumValue : &{enumValues}">
-   						 	<div th:with="iconLabel=${@iconsResource.getProperty(enumValue + '_label')}"/>	
-   						 	<span th:if="${empty iconLabel}">
-						 		<div th:with="iconLabel=${enumValue}"/>
+						<th:block th:each="enumValues : ${T(edu.asu.diging.citesphere.model.bib.ItemType).values()}">
+   						 	<div th:with="iconLabel=${@iconsResource.getProperty(enumValues + '_label')}"/>	
+   						 	<span th:if="${#strings.isEmpty(iconLabel)}">
+						 		<div th:with="iconLabel=${enumValues}"/>
 						 	</span>
-							<option th:value="${enumValue}"> 
-								<span th:if="${enumValue == citation.itemType}"> 
-									<div>selected</div>
+							<option th:value="${enumValues}"> 
+								<span th:if="${enumValues == citation.itemType}"> 
+									<div th:selected="${enumValues}"/>
 								</span> 
-    						${iconLabel}
+    						[[${iconLabel}]]
     						</option>
-						</th:block>
+    					</th:block>
 					<select>
 				</td>
 			</tr>
+			
+			<tr th:if="${!#lists.contains(fields, 'title') }"style="display:none;">
+				<td>Title</td>
+				<td>
+					<input th:field="*{title}" type="text" class="form-control" placeholder="Title" 
+							th:value="${!#strings.isEmpty(form.title) ? form.title : citation.title}" />
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="creator" id="author">Authors</td>
+				<td>
+					<span id="authorList" style="font-size: 18px">
+						<th:block th:each="author,status : ${citation.authors}">
+						<span id="author${status.index}" class="label label-primary author-item" data-author-id="author${status.index}" data-author-firstname="${author.firstName}" data-author-lastname="${author.lastName}" data-author-uri="${author.uri}" data-creator-type="author" data-author-authority-id="${author.localAuthorityId}">
+						<th:block th:each="aff,affStatus : ${author.affiliations}">
+							<span data-affiliation-name="${aff.name}" data-affiliation-id="author${status.index}-aff${affStatus.index}">
+							</span>
+						</th:block>
+								[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
+								<th:block th:each="aff:${author.affiliations}">
+									<span th:if="${!#strings.isEmpty(aff.name)}"> ${aff.name}</span>
+								</th:block>
+									&nbsp;
+							<i class="far fa-edit edit-author"></i>
+									&nbsp;
+							<i class="fas fa-times remove-author"></i>
+						</span>
+							&nbsp;&nbsp;
+						</th:block>
+					</span>
+						<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="fas fa-plus-circle"></i> Add Author</a></div>
+				</td>
+			</tr>
+			
+			<th:block th:each="curCreator:${creatorMap}">
+				<span th:if="${ (curCreator.value ne 'author') and (curCreator.value ne 'editor')}">
+				<tr style="display:none;">
+				<td class="creator" id="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" >[[${curCreator.value}]]</td>
+				<td> 
+					<div th:with="role=${#strings.toLowerCase(#strings.substringAfter(curCreator.key, '_item_attribute_label_'))}"/>
+					<span id="${role}List" style="font-size: 18px">
+					<span th:each="creator:${citation.otherCreators}" th:with="role=${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}">
+				 		<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+				 			<th:block th:each="aff:${creator.person.affiliations}"> 
+				 				<span data-affiliation-name="${aff.name}"></span>
+				 			</th:block>
+								[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
+							<th:block th:each="aff:${creator.person.affiliations}">[[(${aff.name})]]</th:block>
+							&nbsp;<i class="far fa-edit edit-creator"></i>
+									<i class="fas fa-times remove-creator"></i>
+						</span>
+							&nbsp;&nbsp;
+					</span>
+					</span>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add ${curCreator.value}</a></div>
+				</td>
+				</tr>
+				</span>
+		</th:block>
+			
 			
 			
 		</table>
