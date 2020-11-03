@@ -13,10 +13,7 @@
 		<div class="jumbotron col-md-12" th:if="!${isZoteroConnected}">
 			<center>
 				<h2>Please connect your Zotero account before continuing!</h2>
-				<form action="@{/signin/zotero}" method="POST">
-					<input type="hidden" name="${_csrf.parameterName}"
-						value="${_csrf.token}" /> <input type="hidden" name="all_groups"
-						value="write" />
+				<form th:action="@{/signin/zotero}" method="POST">
 					<button class="btn btn-primary btn-lg" type="submit">
 						Connect Zotero</button>
 				</form>
