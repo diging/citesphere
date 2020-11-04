@@ -6,41 +6,39 @@
 <div layout:fragment="content">
 <h2>Users</h2>
 
-<c:forEach items="${users}" var="user">
-	<li class="list-group-item clearfix">
-		<c:if test="${not user.enabled}"><span class="label label-default">Account Deactivated</span></c:if>
-		<c:if test="${user.admin}"><span class="label label-warning">Admin User</span></c:if>
-		${user.username} (${user.firstName} ${user.lastName})
+<ul class="list-group">
+	<li  th:each="user : ${users}" class="list-group-item clearfix">
+		<span class="label label-default" th:if="${not user.enabled}">Account Deactivated</span>
+		<span class="label label-warning" th:if="${user.admin}">Admin User</span>
+		<span th:text="${user.username}" /> 
+		<span th:text="${user.firstName}" />
+		<span th:text="${user.lastName}"/>
 		<div class="pull-right text-right">
-		<c:if test="${not user.enabled}">
-			<c:url value="/admin/user/${user.username}/approve" var="approveUrl"/>
-			<form:form action="${approveUrl}" method="POST">
+		<span th:if="${not user.enabled}">
+			<form action="#" th:action="@{'/admin/user/' + ${user.username} + '/approve'}" method="POST">
 			<button style="padding:0px" class="btn btn-link"><i class="fas fa-user-check"></i> Activate</button>
-			</form:form>
-		</c:if>
+			</form>
+		</span>
 		
-		<c:if test="${user.enabled}">
-			<c:if test="${not user.admin}">
-			<c:url value="/admin/user/${user.username}/admin" var="postUrl"/>
-			<form:form action="${postUrl}" method="POST">
+		<span th:if="${user.enabled}">
+			<span th:if="${not user.admin}">
+			<form action="#" th:action="@{'/admin/user/' + ${user.username} + '/admin'}" method="POST">
 			<button style="padding:0px" class="btn btn-link"><i class="fas fa-user-tie"></i> Make Admin</button>
-			</form:form>
-			</c:if>
-			<c:if test="${user.admin}">
-			<c:url value="/admin/user/${user.username}/admin/remove" var="removeUrl"/>
-			<form:form action="${removeUrl}" method="POST">
+			</form>
+			</span>
+			<span th:if="${user.admin}">
+			<form action="#" th:action="@{'/admin/user/' + ${user.username} + '/admin/remove'}" method="POST">
 			<button style="padding:0px" class="btn btn-link"><i class="fas fa-user"></i> Remove Admin Role</button>
-			</form:form>
-			</c:if>
+			</form>
+			</span>
 		
-			<c:url value="/admin/user/${user.username}/disable" var="disableUrl"/>
-			<form:form action="${disableUrl}" method="POST">
+			<form action="#" th:action="@{'/admin/user/' + ${user.username} + '/disable'}" method="POST">
 			<button style="padding:0px" class="btn btn-link"><i class="fas fa-user-slash"></i> Deactivate User</button>
-			</form:form>
-			</c:if>
+			</form>
+		</span>
 		</div>
 	</li>
-</c:forEach>
+</ul>
 </div>
 </body>
 </html>
