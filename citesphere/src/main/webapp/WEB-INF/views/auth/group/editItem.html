@@ -46,6 +46,7 @@ $(function() {
 	/* Handle Author events */
 	$("#addAuthorButton").click(function() {
 		savePersonDetails("Author", "Author");
+		console.log("Add author button pressed");
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
@@ -56,6 +57,7 @@ $(function() {
 	$(".edit-author").click(function(){
 		var authorItem = $(this).parent();
 		editPerson('Author', authorItem[0]);
+		console.log("edit author button pressed");
 	});
 	
 	$(".edit-author").css('cursor', 'pointer');
@@ -536,8 +538,9 @@ function resetPersonAuthorityCreation(personType) {
 }
 
 function getPersonAuthority(uri, personType) {
+	
 	personType_lowerCase = personType.toLowerCase();
-	$.get('/auth/authority/get?uri=' + uri + '&zoteroGroupId=' + ${zoteroGroupId}, function(data) {
+	$.get('/auth/authority/get?uri=' + uri + '&zoteroGroupId=' + [(${zoteroGroupId})], function(data) {
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", data['uri']);
 		var content = "Authority <b>" + uri + "</b>";
 		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
@@ -589,18 +592,20 @@ let removeConcept = function removeConcept(e) {
 }
 
 $(document).ready(function() {
-	<c:if test="${empty citation}">
-		$("#items").val("${defaultItemType}");
-	</c:if>
+	/*  console.log("document ready");
+	if([[${citation}]] != null){
+	$("#items").val("${defaultItemType}");
+	}
 	loadFields();
 	$('#items').on("change", function(e){
 		loadFields();
-	});
+	});   */
 	
 });
 
 function loadFields() {
 	var itemType = $('#items option:selected').val()
+	console.log(itemType);
 	$("#displayMessage").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
 		" Loading form fields");
 	$("#messageModal").modal('show');
@@ -630,7 +635,7 @@ function loadFields() {
 		  	}, 3000);
 			
 		}
-	});
+	}); 
 	$.ajax({
 		url : '/auth/items/'+itemType+'/creators',
 		type : 'GET',
@@ -737,7 +742,7 @@ function creatorLinkHandler(target) {
 	</div>
 	
 	<form action="#" th:action="${!#strings.isEmpty(citation.key)} ? 
-								@{|${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|} :
+								@{|/auth/group/${zoteroGroupId}/items/${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|} :
 								@{|/auth/group/${zoteroGroupId}/items/create|}" 
 				th:object="${form}" method="POST" id="editForm">
 				
@@ -752,6 +757,12 @@ function creatorLinkHandler(target) {
      							th:text="${citationCollection.name}" items="${citationCollections}" />
 					<select>
 				</td>
+			</tr>
+			
+			<tr th:style="${#strings.isEmpty(citation.key)}? 'display:none' " >
+				<td width="20%">Item Key</td>
+				<td>[[${citation.key}]]</td>
+				<input type="hidden" th:name="key" th:id="key" th:value="${citation.key}"/>
 			</tr>
 			
 			<tr>
@@ -810,9 +821,9 @@ function creatorLinkHandler(target) {
 									<span th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
 									&nbsp;
-							<i class="far fa-edit edit-author"></i>
+							<i class="far fa-edit edit-author" style="cursor: pointer;"></i>
 									&nbsp;
-							<i class="fas fa-times remove-author"></i>
+							<i class="fas fa-times remove-author" style="cursor: pointer;"></i>
 						</span>
 							&nbsp;&nbsp;
 						</th:block>
@@ -845,12 +856,12 @@ function creatorLinkHandler(target) {
 			<th:block th:each="curCreator:${creatorMap}">
 				
 				<tr th:style="${ (curCreator.value != 'author') and (curCreator.value != 'editor')} ? 'display:none'">
-				<td class="creator" id="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" >[[${curCreator.value}]]</td>
+				<td class="creator" th:id="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" >[[${curCreator.value}]]</td>
 				<td> 
 					<div th:with="role=${#strings.toLowerCase(#strings.substringAfter(curCreator.key, '_item_attribute_label_'))}">
-					<span id="${role}List" style="font-size: 18px"></div>
-					<span th:each="creator:${citation.otherCreators}" th:if="role=${#strings.th:equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
-				 		<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
+					<span th:id="|${role}List|" style="font-size: 18px"></div>
+					<span th:each="creator:${citation.otherCreators}" th:if="${#strings.th:equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
+				 		<span th:id="|${role}${varStatus}|" class="label label-info ${role}-item" th:data-creator-id="${creator.id}" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
 				 			<th:block th:each="aff:${creator.person.affiliations}"> 
 				 				<span th:data-affiliation-name="${aff.name}"></span>
 				 			</th:block>
@@ -873,9 +884,9 @@ function creatorLinkHandler(target) {
 			<tr class="creator-row">
 			<td th:style="text-transform: capitalize;">[[${role}]]s</td>
 			<td>
-				<span th:id="${role}List" th:style="font-size: 18px">
+				<span th:id="|${role}List|" th:style="font-size: 18px">
 				<span th:each="creator:${citation.otherCreators}" th:if="${#strings.equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
-				 	<span th:id="${role}${varStatus}" class="label label-info ${role}-item" th:data-creator-id="${role}${varStatus}" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
+				 	<span th:id="|${role}${varStatus}|" class="label label-info ${role}-item" th:data-creator-id="|${role}${varStatus}|" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
 				 		<th:block th:each="aff:${creator.person.affiliations}"> <span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="${aff.id}"></span></th:block>
 							[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
 							<th:block th:each="aff:${creator.person.affiliations}"> [[(${aff.name})]]</th:block>
