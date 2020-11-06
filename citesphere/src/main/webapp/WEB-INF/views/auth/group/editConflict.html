@@ -236,49 +236,49 @@ Do you want to proceed?
 <span th:if="${fn:contains(currentCitationFields, 'publicationTitle') }">
 <tr th:if="${currentCitation.publicationTitle != outdatedCitation.publicationTitle}" class="changed">
 <td>Publication Title</td>
-<td>${currentCitation.publicationTitle}</td>
+<td>[[${currentCitation.publicationTitle}zq]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'journalAbbreviation') }">
 <tr th:if="${currentCitation.journalAbbreviation != outdatedCitation.journalAbbreviation}" class="changed">
 <td>Journal Abbreviation</td>
-<td>${currentCitation.journalAbbreviation}</td>
+<td>[[${currentCitation.journalAbbreviation}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'volume') }">
 <tr th:if="${currentCitation.volume != outdatedCitation.volume}" class="changed">
 <td>Volume</td>
-<td>${currentCitation.volume}</td>
+<td>[[${currentCitation.volume}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'issue') }">
 <tr th:if="${currentCitation.issue != outdatedCitation.issue}" class="changed">
 <td>Issue</td>
-<td>${currentCitation.issue}</td>
+<td>[[${currentCitation.issue}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'pages') }">
 <tr th:if="${currentCitation.pages != outdatedCitation.pages}" class="changed">
 <td>Pages</td>
-<td>${currentCitation.pages}</td>
+<td>[[${currentCitation.pages}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'series') }">
 <tr th:if="${currentCitation.series != outdatedCitation.series}" class="changed">
 <td>Series</td>
-<td>${currentCitation.series}</td>
+<td>[[${currentCitation.series}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'seriesTitle') }">
 <tr th:if="${currentCitation.seriesTitle != outdatedCitation.seriesTitle}" class="changed">
 <td>Series Title</td>
-<td >${currentCitation.seriesTitle}</td>
+<td >[[${currentCitation.seriesTitle}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'seriesText') }">
 <tr th:if="${currentCitation.seriesText != outdatedCitation.seriesText}" class="changed">
 <td>Series Text</td>
-<td>${currentCitation.seriesText}</td>
+<td>[[${currentCitation.seriesText}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'url') }">
@@ -290,13 +290,13 @@ Do you want to proceed?
 <span th:if="${fn:contains(currentCitationFields, 'language') }">
 <tr th:if="${currentCitation.language != outdatedCitation.language}" class="changed">
 <td>Language</td>
-<td>${currentCitation.language}</td>
+<td>[[${currentCitation.language}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'doi') }">
 <tr th:if="${currentCitation.doi != outdatedCitation.doi}" class="changed">
 <td>DOI</td>
-<td>${currentCitation.doi}</td>
+<td>[[${currentCitation.doi}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'issn') }">
@@ -308,31 +308,31 @@ Do you want to proceed?
 <span th:if="${fn:contains(currentCitationFields, 'archive') }">
 <tr th:if="${currentCitation.archive != outdatedCitation.archive}" class="changed">
 <td>Archive</td>
-<td>${currentCitation.archive}</td>
+<td>[[${currentCitation.archive}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'archiveLocation') }">
 <tr th:if="${currentCitation.archiveLocation != outdatedCitation.archiveLocation}" class="changed">
 <td>Archive Location</td>
-<td>${currentCitation.archiveLocation}</td>
+<td>[[${currentCitation.archiveLocation}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'libraryCatalog') }">
 <tr th:if="${currentCitation.libraryCatalog != outdatedCitation.libraryCatalog}" class="changed">
 <td>Library Catalog</td>
-<td>${currentCitation.libraryCatalog}</td>
+<td>[[${currentCitation.libraryCatalog}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'callNumber') }">
 <tr th:if="${currentCitation.callNumber != outdatedCitation.callNumber}" class="changed">
 <td>Call Number</td>
-<td>${currentCitation.callNumber}</td>
+<td>[[${currentCitation.callNumber}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(currentCitationFields, 'rights') }">
 <tr th:if="${currentCitation.rights != outdatedCitation.rights}" class="changed">
 <td>Rights</td>
-<td>${currentCitation.rights}</td>
+<td>[[${currentCitation.rights}]]</td>
 </tr>
 </span>
 </table>
@@ -362,19 +362,19 @@ Do you want to proceed?
 <span th:if="${fn:contains(formFields, 'title') }">
 <tr th:if="${form.title != outdatedCitation.title}" class="changed">
 <td>Title</td>
-<td>${form.title}</td>
+<td>[[${form.title}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'shortTitle') }">
 <tr th:if="${form.shortTitle != outdatedCitation.shortTitle}" class="changed">
 <td>Short Title</td>
-<td>${form.shortTitle}</td>
+<td>[[${form.shortTitle}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'date') }">
 <tr th:if="${form.dateFreetext != outdatedCitation.dateFreetext}" class="changed">
 <td>Date</td>
-<td>${form.dateFreetext}</td>
+<td>[[${form.dateFreetext}]]</td>
 </tr>
 </span>
 <tr>
@@ -391,73 +391,73 @@ Do you want to proceed?
 <span th:if="${fn:contains(formFields, 'publicationTitle') }">
 <tr th:if="${form.publicationTitle != outdatedCitation.publicationTitle}" class="changed">
 <td>Publication Title</td>
-<td>${form.publicationTitle}</td>
+<td>[[${form.publicationTitle}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'journalAbbreviation') }">
 <tr th:if="${form.journalAbbreviation != outdatedCitation.journalAbbreviation}" class="changed">
 <td>Journal Abbreviation</td>
-<td>${form.journalAbbreviation}</td>
+<td>[[${form.journalAbbreviation}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'volume') }">
 <tr th:if="${form.volume != outdatedCitation.volume}" class="changed">
 <td>Volume</td>
-<td>${form.volume}</td>
+<td>[[${form.volume}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'issue') }">
 <tr th:if="${form.issue != outdatedCitation.issue}" class="changed">
 <td>Issue</td>
-<td>${form.issue}</td>
+<td>[[${form.issue}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'pages') }">
 <tr th:if="${form.pages != outdatedCitation.pages}" class="changed">
 <td>Pages</td>
-<td>${form.pages}</td>
+<td>[[${form.pages}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'series') }">
 <tr th:if="${form.series != outdatedCitation.series}" class="changed">
 <td>Series</td>
-<td>${form.series}</td>
+<td>[[${form.series}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'seriesTitle') }">
 <tr th:if="${form.seriesTitle != outdatedCitation.seriesTitle}" class="changed">
 <td>Series Title</td>
-<td >${form.seriesTitle}</td>
+<td>[[${form.seriesTitle}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'seriesText') }">
 <tr th:if="${form.seriesText != outdatedCitation.seriesText}" class="changed">
 <td>Series Text</td>
-<td>${form.seriesText}</td>
+<td>[[${form.seriesText}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'url') }">
 <tr th:if="${form.url != outdatedCitation.url}" class="changed">
 <td>URL</td>
-<td><a href="${form.url}">${form.url}</a></td>
+<td><a href="${form.url}">[[${form.url}]]</a></td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'language') }">
 <tr th:if="${form.language != outdatedCitation.language}" class="changed">
 <td>Language</td>
-<td>${form.language}</td>
+<td>[[${form.language}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'doi') }">
 <tr th:if="${form.doi != outdatedCitation.doi}" class="changed">
 <td>DOI</td>
-<td>${form.doi}</td>
+<td>[[${form.doi}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'issn') }">
 <tr th:if="${form.issn != outdatedCitation.issn}" class="changed">
 <td>ISSN</td>
-<td>${form.issn}</td>
+<td>[[${form.issn}]]</td>
 </tr>
 </span>
 <span th:if="${fn:contains(formFields, 'archive') }">
