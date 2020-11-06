@@ -1,0 +1,531 @@
+<html layout:decorate="~{layouts/main}">
+<head></head>
+<body>
+<div layout:fragment="content">
+<ol class="breadcrumb">
+  <li><a th:href="@{/}">Home</a></li>
+  <li><a th:href="@{items}" />">Group</a></li>
+  <li class="active">${outdatedCitation.key}</li>
+</ol>
+
+<div class="alert alert-warning" role="alert">
+<b>Citation has changed!</b> The citation stored in Citesphere is different than the one in Zotero. 
+If you proceed, Citesphere will first update the locally stored citation with the updated data retrieved from 
+Zotero and then apply the changes you made. You will be able to review and change your edits before data is sent to Zotero. 
+Do you want to proceed?
+</div>
+
+<h2>
+	 <th:forEach items="${outdatedCitation.authors}" var="author" varStatus="status">
+	 	  <strong>${author.lastName}<span th:if="${not empty author.firstName}">, ${author.firstName}</span></strong><span th:if="${!status.last}">; </span>
+	 </th:forEach>
+	  <em>[[${outdatedCitation.title}]]</em>
+	  <span th:if="${not empty outdatedCitation.dateFreetext}">
+ 	  [[(${outdatedCitation.dateFreetext})]]
+ 	  </span> 
+</h2>
+
+<!--  currently stored citation  -->
+<div class="col-md-4">
+<h4>Currently stored data (Version ${outdatedCitation.version})</h4>
+<table class="table table-striped">
+<tr>
+<td width="20%">Item Key</td>
+<td>[[${outdatedCitation.key}]]</td>
+</tr>
+<tr>
+<td>Citation Type</td>
+<td th:with="iconClass=${@iconsResource.getProperty(form.itemType + '_icon')}
+			  , iconLabel=${@iconsResource.getProperty(form.itemType + '_label')}">
+<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
+</td>
+</tr>
+<span th:if="${fn:contains(outdatedCitationFields, 'title') }">
+<tr>
+<td>Title</td>
+<td>[[${outdatedCitation.title}]]</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'shortTitle') }">
+<tr>
+<td>Short Title</td>
+<td>[[${outdatedCitation.shortTitle}]]</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'date') }">
+<tr>
+<td>Date</td>
+<td>[[${outdatedCitation.dateFreetext}]]</td>
+</tr>
+</span>
+<tr>
+<td>Authors</td>
+<td>
+<th:forEach items="${outdatedCitation.authors}" var="author" varStatus="status">
+ ${author.lastName}<span th:if="${not empty author.firstName}">, ${author.firstName}</span><th:forEach items="${author.affiliations}" var="aff"> (${aff.name})</th:forEach><span th:if="${!status.last}">; </span>
+</th:forEach>
+</td>
+</tr>
+<tr>
+<td>Editors</td>
+<td>
+<th:forEach items="${outdatedCitation.editors}" var="editor" varStatus="status">
+ ${editor.lastName}<span th:if="${not empty editor.firstName}">, ${editor.firstName}</span><span th:if="${!status.last}">; </span>
+</th:forEach>
+</td>
+</tr>
+<span th:if="${fn:contains(outdatedCitationFields, 'publicationTitle') }">
+<tr>
+<td>Publication Title</td>
+<td>${outdatedCitation.publicationTitle}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'journalAbbreviation') }">
+<tr>
+<td>Journal Abbreviation</td>
+<td>${outdatedCitation.journalAbbreviation}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'volume') }">
+<tr>
+<td>Volume</td>
+<td>${outdatedCitation.volume}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'issue') }">
+<tr>
+<td>Issue</td>
+<td>${outdatedCitation.issue}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'pages') }">
+<tr>
+<td>Pages</td>
+<td>${outdatedCitation.pages}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'series') }">
+<tr>
+<td>Series</td>
+<td>${outdatedCitation.series}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'seriesTitle') }">
+<tr>
+<td>Series Title</td>
+<td>${outdatedCitation.seriesTitle}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'seriesText') }">
+<tr>
+<td>Series Text</td>
+<td>${outdatedCitation.seriesText}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'url') }">
+<tr>
+<td>URL</td>
+<td><a href="${outdatedCitation.url}">${outdatedCitation.url}</a></td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'language') }">
+<tr>
+<td>Language</td>
+<td>${outdatedCitation.language}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'doi') }">
+<tr>
+<td>DOI</td>
+<td>${outdatedCitation.doi}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'issn') }">
+<tr>
+<td>ISSN</td>
+<td>${outdatedCitation.issn}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'archive') }">
+<tr>
+<td>Archive</td>
+<td>${outdatedCitation.archive}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'archiveLocation') }">
+<tr>
+<td>Archive Location</td>
+<td>${outdatedCitation.archiveLocation}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'libraryCatalog') }">
+<tr>
+<td>Library Catalog</td>
+<td>${outdatedCitation.libraryCatalog}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'callNumber') }">
+<tr>
+<td>Call Number</td>
+<td>${outdatedCitation.callNumber}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(outdatedCitationFields, 'rights') }">
+<tr>
+<td>Rights</td>
+<td>${outdatedCitation.rights}</td>
+</tr>
+</span>
+</table>
+</div>
+
+<!--  current citation fields -->
+<div class="col-md-4">
+<h4>Data retrieved from Zotero (Version ${currentCitation.version})</h4>
+<table class="table table-striped">
+<tr>
+<td width="20%">Item Key</td>
+<td>${currentCitation.key}</td>
+</tr>
+<tr>
+<td>Citation Type</td>
+<td th:with="iconClass=fas fa-file, iconLabel=${entry.itemType}">
+<spring:eval expression="@iconsResource.getProperty(currentCitation.itemType + '_icon')"  var="iconClass" />
+<spring:eval expression="@iconsResource.getProperty(currentCitation.itemType + '_label')"  var="iconLabel" />	
+<span th:if="${empty iconClass}">
+</span>
+<span th:if="${empty iconLabel}">
+</span>
+<i class="${iconClass}" title="${iconLabel}"></i> ${iconLabel}
+</td>
+</tr>
+<span th:if="${fn:contains(currentCitationFields, 'title') }">
+<tr th:if="${currentCitation.title != outdatedCitation.title}" class="changed">
+<td>Title</td>
+<td>${currentCitation.title}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'shortTitle') }">
+<tr th:if="${currentCitation.shortTitle != outdatedCitation.shortTitle}" class="changed">
+<td>Short Title</td>
+<td>${currentCitation.shortTitle}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'date') }">
+<tr th:if="${currentCitation.dateFreetext != outdatedCitation.dateFreetext}" class="changed">
+<td>Date</td>
+<td>${currentCitation.dateFreetext}</td>
+</tr>
+</span>
+<tr>
+<td>Authors</td>
+<td>
+<th:forEach items="${currentCitation.authors}" var="author" varStatus="status">
+ ${author.lastName}<span th:if="${not empty author.firstName}">, ${author.firstName}</span><th:forEach items="${author.affiliations}" var="aff"> (${aff.name})</th:forEach><span th:if="${!status.last}">; </span>
+</th:forEach>
+</td>
+</tr>
+<tr>
+<td>Editors</td>
+<td>
+<th:forEach items="${currentCitation.editors}" var="editor" varStatus="status">
+ ${editor.lastName}<span th:if="${not empty editor.firstName}">, ${editor.firstName}</span><span th:if="${!status.last}">; </span>
+</th:forEach>
+</td>
+</tr>
+<span th:if="${fn:contains(currentCitationFields, 'publicationTitle') }">
+<tr th:if="${currentCitation.publicationTitle != outdatedCitation.publicationTitle}" class="changed">
+<td>Publication Title</td>
+<td>${currentCitation.publicationTitle}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'journalAbbreviation') }">
+<tr th:if="${currentCitation.journalAbbreviation != outdatedCitation.journalAbbreviation}" class="changed">
+<td>Journal Abbreviation</td>
+<td>${currentCitation.journalAbbreviation}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'volume') }">
+<tr th:if="${currentCitation.volume != outdatedCitation.volume}" class="changed">
+<td>Volume</td>
+<td>${currentCitation.volume}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'issue') }">
+<tr th:if="${currentCitation.issue != outdatedCitation.issue}" class="changed">
+<td>Issue</td>
+<td>${currentCitation.issue}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'pages') }">
+<tr th:if="${currentCitation.pages != outdatedCitation.pages}" class="changed">
+<td>Pages</td>
+<td>${currentCitation.pages}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'series') }">
+<tr th:if="${currentCitation.series != outdatedCitation.series}" class="changed">
+<td>Series</td>
+<td>${currentCitation.series}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'seriesTitle') }">
+<tr th:if="${currentCitation.seriesTitle != outdatedCitation.seriesTitle}" class="changed">
+<td>Series Title</td>
+<td >${currentCitation.seriesTitle}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'seriesText') }">
+<tr th:if="${currentCitation.seriesText != outdatedCitation.seriesText}" class="changed">
+<td>Series Text</td>
+<td>${currentCitation.seriesText}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'url') }">
+<tr th:if="${currentCitation.url != outdatedCitation.url}" class="changed">
+<td>URL</td>
+<td><a href="${currentCitation.url}">${currentCitation.url}</a></td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'language') }">
+<tr th:if="${currentCitation.language != outdatedCitation.language}" class="changed">
+<td>Language</td>
+<td>${currentCitation.language}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'doi') }">
+<tr th:if="${currentCitation.doi != outdatedCitation.doi}" class="changed">
+<td>DOI</td>
+<td>${currentCitation.doi}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'issn') }">
+<tr th:if="${currentCitation.issn != outdatedCitation.issn}" class="changed">
+<td>ISSN</td>
+<td>${currentCitation.issn}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'archive') }">
+<tr th:if="${currentCitation.archive != outdatedCitation.archive}" class="changed">
+<td>Archive</td>
+<td>${currentCitation.archive}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'archiveLocation') }">
+<tr th:if="${currentCitation.archiveLocation != outdatedCitation.archiveLocation}" class="changed">
+<td>Archive Location</td>
+<td>${currentCitation.archiveLocation}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'libraryCatalog') }">
+<tr th:if="${currentCitation.libraryCatalog != outdatedCitation.libraryCatalog}" class="changed">
+<td>Library Catalog</td>
+<td>${currentCitation.libraryCatalog}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'callNumber') }">
+<tr th:if="${currentCitation.callNumber != outdatedCitation.callNumber}" class="changed">
+<td>Call Number</td>
+<td>${currentCitation.callNumber}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(currentCitationFields, 'rights') }">
+<tr th:if="${currentCitation.rights != outdatedCitation.rights}" class="changed">
+<td>Rights</td>
+<td>${currentCitation.rights}</td>
+</tr>
+</span>
+</table>
+</div>
+
+<!-- Form fields -->
+<div class="col-md-4">
+<h4>Your edits</h4>
+
+<table class="table table-striped">
+<tr>
+<td width="20%">Item Key</td>
+<td>${form.key}</td>
+</tr>
+<tr>
+<td>Citation Type</td>
+<td th:with="iconLabel=${entry.itemType}, iconClass=fas fa-file">
+<spring:eval expression="@iconsResource.getProperty(form.itemType + '_icon')"  var="iconClass" />
+<spring:eval expression="@iconsResource.getProperty(form.itemType + '_label')"  var="iconLabel" />	
+<span th:if="${empty iconClass}">
+</span>
+<span th:if="${empty iconLabel}">
+</span>
+<i class="${iconClass}" title="${iconLabel}"></i> ${iconLabel}
+</td>
+</tr>
+<span th:if="${fn:contains(formFields, 'title') }">
+<tr th:if="${form.title != outdatedCitation.title}" class="changed">
+<td>Title</td>
+<td>${form.title}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'shortTitle') }">
+<tr th:if="${form.shortTitle != outdatedCitation.shortTitle}" class="changed">
+<td>Short Title</td>
+<td>${form.shortTitle}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'date') }">
+<tr th:if="${form.dateFreetext != outdatedCitation.dateFreetext}" class="changed">
+<td>Date</td>
+<td>${form.dateFreetext}</td>
+</tr>
+</span>
+<tr>
+<td>Authors</td>
+<td>
+
+</td>
+</tr>
+<tr>
+<td>Editors</td>
+<td>
+
+</tr>
+<span th:if="${fn:contains(formFields, 'publicationTitle') }">
+<tr th:if="${form.publicationTitle != outdatedCitation.publicationTitle}" class="changed">
+<td>Publication Title</td>
+<td>${form.publicationTitle}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'journalAbbreviation') }">
+<tr th:if="${form.journalAbbreviation != outdatedCitation.journalAbbreviation}" class="changed">
+<td>Journal Abbreviation</td>
+<td>${form.journalAbbreviation}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'volume') }">
+<tr th:if="${form.volume != outdatedCitation.volume}" class="changed">
+<td>Volume</td>
+<td>${form.volume}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'issue') }">
+<tr th:if="${form.issue != outdatedCitation.issue}" class="changed">
+<td>Issue</td>
+<td>${form.issue}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'pages') }">
+<tr th:if="${form.pages != outdatedCitation.pages}" class="changed">
+<td>Pages</td>
+<td>${form.pages}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'series') }">
+<tr th:if="${form.series != outdatedCitation.series}" class="changed">
+<td>Series</td>
+<td>${form.series}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'seriesTitle') }">
+<tr th:if="${form.seriesTitle != outdatedCitation.seriesTitle}" class="changed">
+<td>Series Title</td>
+<td >${form.seriesTitle}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'seriesText') }">
+<tr th:if="${form.seriesText != outdatedCitation.seriesText}" class="changed">
+<td>Series Text</td>
+<td>${form.seriesText}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'url') }">
+<tr th:if="${form.url != outdatedCitation.url}" class="changed">
+<td>URL</td>
+<td><a href="${form.url}">${form.url}</a></td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'language') }">
+<tr th:if="${form.language != outdatedCitation.language}" class="changed">
+<td>Language</td>
+<td>${form.language}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'doi') }">
+<tr th:if="${form.doi != outdatedCitation.doi}" class="changed">
+<td>DOI</td>
+<td>${form.doi}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'issn') }">
+<tr th:if="${form.issn != outdatedCitation.issn}" class="changed">
+<td>ISSN</td>
+<td>${form.issn}</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'archive') }">
+<tr th:if="${form.archive != outdatedCitation.archive}" class="changed">
+<td>Archive</td>
+<td>[[${form.archive}]]</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'archiveLocation') }">
+<tr th:if="${form.archiveLocation != outdatedCitation.archiveLocation}" class="changed">
+<td>Archive Location</td>
+<td>[[${form.archiveLocation}]]</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'libraryCatalog') }">
+<tr th:if="${form.libraryCatalog != outdatedCitation.libraryCatalog}" class="changed">
+<td>Library Catalog</td>
+<td>[[${form.libraryCatalog}]]</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'callNumber') }">
+<tr th:if="${form.callNumber != outdatedCitation.callNumber}" class="changed">
+<td>Call Number</td>
+<td>[[${form.callNumber}]]</td>
+</tr>
+</span>
+<span th:if="${fn:contains(formFields, 'rights') }">
+<tr th:if="${form.rights != outdatedCitation.rights}" class="changed">
+<td>Rights</td>
+<td>${form.rights}</td>
+</tr>
+</span>
+</table>
+</div>
+
+<div class="col-md-12">
+<form:form action="#" th:action="@{/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}/conflict/resolve?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}}" th:modelAttribute="form" method="POST">
+<form:hidden path="key" value="${form.key}" />
+<form:hidden path="itemType" value="${form.itemType}" />
+<form:hidden path="title" value="${form.title}" />
+<form:hidden path="shortTitle" value="${form.shortTitle}" />
+<form:hidden path="dateFreetext" value="${form.dateFreetext}" />
+<form:hidden path="publicationTitle" value="${form.publicationTitle}" />
+<form:hidden path="journalAbbreviation" value="${form.journalAbbreviation}" />
+<form:hidden path="volume" value="${form.volume}" />
+<form:hidden path="issue" value="${form.issue}" />
+<form:hidden path="pages" value="${form.pages}" />
+<form:hidden path="series" value="${form.series}" />
+<form:hidden path="seriesTitle" value="${form.seriesTitle}" />
+<form:hidden path="seriesText" value="${form.seriesText}" />
+<form:hidden path="url" value="${form.url}" />
+<form:hidden path="language" value="${form.language}" />
+<form:hidden path="doi" value="${form.doi}" />
+<form:hidden path="issn" value="${form.issn}" />
+<form:hidden path="archive" value="${form.archive}" />
+<form:hidden path="archiveLocation" value="${form.archiveLocation}" />
+<form:hidden path="libraryCatalog" value="${form.libraryCatalog}" />
+<form:hidden path="callNumber" value="${form.callNumber}" />
+<form:hidden path="rights" value="${form.rights}" />
+
+<button type="submit" class="btn btn-primary">Sounds good, proceed!</button>
+<a th:href="@{/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}}" class="btn btn-default">No, cancel.</a>
+</form:form>
+</div>
+
+
+
+</div>
+
+</body>
+</html>
