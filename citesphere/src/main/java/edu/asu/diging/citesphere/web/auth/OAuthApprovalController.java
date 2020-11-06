@@ -14,6 +14,6 @@ public class OAuthApprovalController {
 
     @RequestMapping("/oauth/confirm_access")
     public String getAccessConfirmation(Map<String, Object> model, HttpServletRequest request) throws Exception {
-        return "oauth/approve_access";
+        return "auth/oauth_approve";
     }
 }

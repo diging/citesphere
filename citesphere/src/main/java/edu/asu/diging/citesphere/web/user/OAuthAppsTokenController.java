@@ -28,6 +28,6 @@ public class OAuthAppsTokenController {
         List<String> clientList = new ArrayList<>();
         tokens.forEach(t -> clientList.add(t.getClientId()));
         model.addAttribute("clientList",clientManager.getClientsDetails(clientList));
-        return "oauth/tokens";
+        return "auth/tokens";
     }    
 }
