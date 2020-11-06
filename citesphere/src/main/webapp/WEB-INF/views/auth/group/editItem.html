@@ -1,5 +1,10 @@
 <html layout:decorate="~{layouts/main}">
 <head>	
+<style>
+.popover {
+	min-width: 300px;
+}
+</style>
 <script th:inline="javascript">
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
@@ -582,6 +587,122 @@ let removeConcept = function removeConcept(e) {
 	var concept = $(deleteIcon).parent();
 	concept.remove();
 }
+
+$(document).ready(function() {
+	<c:if test="${empty citation}">
+		$("#items").val("${defaultItemType}");
+	</c:if>
+	loadFields();
+	$('#items').on("change", function(e){
+		loadFields();
+	});
+	
+});
+
+function loadFields() {
+	var itemType = $('#items option:selected').val()
+	$("#displayMessage").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+		" Loading form fields");
+	$("#messageModal").modal('show');
+	$.ajax({
+		url : '<c:url value="/auth/items/'+itemType+'/fields" />',
+		type : 'GET',
+		success: function(changedFields){
+			$('form input').each(function(idx, elem) {
+				$(elem).parent().closest('tr').hide();
+			});
+			for(i=0;i<changedFields.length;i++){
+				var fieldId = changedFields[i];
+				if (fieldId == "date") {
+					fieldId = "dateFreetext";
+				}
+				$('form input#'+fieldId).parent().closest('tr').show();
+			}
+			$('#messageModal').modal('hide');
+			
+		},
+		error: function(){
+			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+			"Error loading the form fields. Try again later.");
+			$('#messageModal').modal('show');
+			setTimeout(function() {
+				$('#messageModal').modal('hide');
+		  	}, 3000);
+			
+		}
+	});
+	$.ajax({
+		url : '<c:url value="/auth/items/'+itemType+'/creators" />',
+		type : 'GET',
+		success: function(creators){
+			$('.creator-row').each(function(idx, elem) {
+				$(elem).hide();
+			});
+			for(i=0;i<creators.length;i++){
+				if($('[id='+creators[i]).length > 0) {
+					$('[id='+creators[i]).parent().closest('tr').addClass("creator-row");
+					$('[id='+creators[i]).parent().closest('tr').show();
+				}
+				else if(creators[i]!= 'editor' && creators[i]!= 'author'){
+					var creatorRow = $("<tr>");
+					creatorRow.css("display", "table-row");
+					creatorRow.addClass("creator-row");
+					var creatorLabel = $("<td>");
+					creatorLabel.addClass("creator");
+					creatorLabel.css("text-transform", "capitalize");
+					creatorLabel.attr("id", creators[i]);
+					creatorLabel.append(creators[i]);
+					creatorRow.append(creatorLabel);
+					var creatorData = $("<td>");
+					var creatorList = $("<span>");
+					creatorList.attr("id",creators[i]+"List");
+					creatorList.css("font-size", "18px");
+					creatorData.append(creatorList);
+					var addIconDiv = $("<div>");
+					addIconDiv.addClass("pull-right");
+					var iconLink = $("<a>");
+					
+					iconLink.attr("data-toggle","modal");
+					iconLink.attr("data-creator-type", creators[i]);
+					iconLink.attr("data-target","#creatorModal");
+					var iconImg = $("<i>");
+					iconImg.addClass("fas fa-plus-circle");
+					iconLink.append(iconImg);
+					iconLink.append("Add "+creators[i]);
+					addIconDiv.append(iconLink);
+					creatorData.append(addIconDiv);
+					creatorRow.append(creatorData);
+					creatorRow.insertAfter($('.creator').last().parent());	
+					$("#creatorLabel").css("text-transform", "capitalize");
+					$("#creatorLabel").text("Enter "+creators[i]+" Information");
+					$("#addCreatorButton").css("text-transform", "capitalize");
+					$("#addCreatorButton").text("Add "+creators[i]);
+					$("#addCreatorButton").attr("data-creator-type", creators[i]);
+					iconLink.click(function(e) {
+						creatorLinkHandler($(e.target));
+					});
+				}
+
+			}
+		},
+		error: function(){
+			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+			"Error loading the creators. Try again later.");
+			$('#messageModal').modal('show');
+			setTimeout(function() {
+				$('#messageModal').modal('hide');
+		  	}, 3000);
+			
+		}
+	});
+}
+function creatorLinkHandler(target) {
+	var creatorType = target.attr("data-creator-type").charAt(0).toUpperCase() + target.attr("data-creator-type").slice(1);
+	$("#creatorLabel").text("Enter "+creatorType+" Information");
+	$("#addCreatorButton").text("Add "+creatorType);
+	$("#addCreatorButton").attr("data-creator-type", target.attr("data-creator-type"));
+}
+
 </script>
 </head>
 <body>
@@ -686,7 +807,7 @@ let removeConcept = function removeConcept(e) {
 						</th:block>
 								[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
 								<th:block th:each="aff:${author.affiliations}">
-									<span th:if="${!#strings.isEmpty(aff.name)}"> ${aff.name}</span>
+									<span th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
 									&nbsp;
 							<i class="far fa-edit edit-author"></i>
@@ -699,7 +820,28 @@ let removeConcept = function removeConcept(e) {
 						<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="fas fa-plus-circle"></i> Add Author</a></div>
 				</td>
 			</tr>
-			
+			<tr>
+				<td class="creator" id="editor">Editors</td>
+				<td>
+					<span id="editorList" style="font-size: 18px">
+						<th:block th:each="editor,status:${citation.editors}">
+						<span id="editor${status.index}" class="label label-info editor-item" data-editor-id="editor${status.index}" data-editor-firstname="${editor.firstName}" data-editor-lastname="${editor.lastName}" data-editor-uri="${editor.uri}" data-editor-authority-id="${editor.localAuthorityId}" data-creator-type="editor">
+						<th:block th:each="aff,affStatus:${editor.affiliations}"> 
+							<span data-affiliation-name="${aff.name}" data-affiliation-id="editor${status.index}-aff${affStatus.index}"></span>
+						</th:block>
+						  [[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
+						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
+							&nbsp;
+							<i class="far fa-edit edit-editor"></i>
+							&nbsp;
+						<i class="fas fa-times remove-editor"></i>
+								</span>
+							&nbsp;&nbsp;
+				        </th:block>
+					</span>
+							<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
+				</td>
+			</tr>
 			<th:block th:each="curCreator:${creatorMap}">
 				
 				<tr th:style="${ (curCreator.value != 'author') and (curCreator.value != 'editor')} ? display:none">
@@ -707,7 +849,7 @@ let removeConcept = function removeConcept(e) {
 				<td> 
 					<div th:with="role=${#strings.toLowerCase(#strings.substringAfter(curCreator.key, '_item_attribute_label_'))}">
 					<span id="${role}List" style="font-size: 18px"></div>
-					<span th:each="creator:${citation.otherCreators}" th:with="role=${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}">
+					<span th:each="creator:${citation.otherCreators}" th:if="role=${#strings.equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
 				 		<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${creator.id}" data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
 				 			<th:block th:each="aff:${creator.person.affiliations}"> 
 				 				<span data-affiliation-name="${aff.name}"></span>
@@ -726,14 +868,14 @@ let removeConcept = function removeConcept(e) {
 				</span>
 		</th:block>
 			
-		<th:block th:each="role:${citation.otherCreatorRoles}" >
-			<div th:if="${!#lists.contains(creatorMap, role)}">
+		<th:block th:each="role:${citation.otherCreatorRoles}" th:if="${!#lists.contains(creatorMap, role)}" >
+
 			<tr class="creator-row">
 			<td th:style="text-transform: capitalize;">[[${role}]]s</td>
 			<td>
 				<span id="${role}List" th:style="font-size: 18px">
-				<span th:each="creator:${citation.otherCreators}" th:with="role=${fn:substringAfter(curCreator.key, '_item_attribute_label_')}">
-				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${role}${varStatus}" data-creator-type="${fn:substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
+				<span th:each="creator:${citation.otherCreators}" th:if="${#strings.equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
+				 	<span id="${role}${varStatus}" class="label label-info ${role}-item" data-creator-id="${role}${varStatus}" data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-creator-firstname="${creator.person.firstName}" data-creator-lastname="${creator.person.lastName}" data-creator-uri="${creator.person.uri}" data-creator-authority-id="${creator.person.localAuthorityId}">
 				 		<th:block th:each="aff:${creator.person.affiliations}"> <span data-affiliation-name="${aff.name}" data-affiliation-id="${aff.id}"></span></th:block>
 							[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
 							<th:block th:each="aff:${creator.person.affiliations}"> [[(${aff.name})]]</th:block>
@@ -746,13 +888,13 @@ let removeConcept = function removeConcept(e) {
 				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" data-creator-type="${role}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add [[${role}]]</a></div>
 			</td>
 			</tr>
-		</div>
+		
 	 </th:block>
 	 
 	 <tr th:style="${!#lists.contains(fields, 'publicationTitle') }? 'display:none'">
 		<td>Publication Title</td>
 		<td>
-		<input th:field="*{publicationTitle}" type="text" class="form-control" placeholder="Publication Title" 
+		<input th:id="publicationTitle" th:name="publicationTitle" type="text" class="form-control" placeholder="Publication Title" 
 			th:value="${!#strings.isEmpty(form.publicationTitle)} ? ${form.publicationTitle} : ${citation.publicationTitle}" />
 		</td>
 	</tr>
@@ -760,13 +902,332 @@ let removeConcept = function removeConcept(e) {
 	<tr th:style="${!#lists.contains(fields, 'journalAbbreviation')}? 'display:none'">
 		<td>Journal Abbreviation</td>
 		<td>
-		<input th:field="*{journalAbbreviation}" type="text" class="form-control" placeholder="Journal Abbreviation" 
+		<input th:id="journalAbbreviation" th:name="journalAbbreviation" type="text" class="form-control" placeholder="Journal Abbreviation" 
 		th:value="${!#strings.isEmpty(form.journalAbbreviation)} ? ${form.journalAbbreviation} : ${citation.journalAbbreviation}" /></td>
 	</tr>
 	 
+	 <tr th:style="${!#lists.contains(fields, 'volume')}? 'display:none'">
+		<td>Volume</td>
+		<td>
+			<input th:id="volume" th:name="volume" type="text" class="form-control" placeholder="Volume" 
+			th:value="${!#strings.isEmpty(form.volume)} ? ${form.volume} : ${citation.volume}" />
+		</td>
+	</tr>
+	
+	<tr th:style="${!#lists.contains(fields, 'issue')}? 'display:none'">
+		<td>Issue</td>
+		<td>
+			<input th:id="issue" th:name="issue" type="text" class="form-control" placeholder="Issue"
+			 th:value="${!#strings.isEmpty(form.issue)} ? ${form.issue} : ${citation.issue}" /></td>
+	</tr>
+	
+	<tr th:style="${!#lists.contains(fields, 'pages')}? 'display:none'">
+		<td>Pages</td>
+		<td>
+			<input th:name="pages" th:id="pages" type="text" class="form-control" placeholder="Pages" 
+			th:value="${!#strings.isEmpty(form.pages)} ? ${form.pages} : ${citation.pages}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'series')}? 'display:none'">
+	<td>Series</td>
+		<td>
+			<input th:name="series" th:id="series" type="text" class="form-control" placeholder="Series" 
+			th:value="${!#strings.isEmpty(form.series)} ? ${form.series} : ${citation.series}" /></td>
+	</tr>
+	
+	<tr th:style="${!#lists.contains(fields, 'seriesTitle')}? 'display:none'">
+	<td>Series Title</td>
+		<td>
+			<input th:name="seriesTitle" th:id="seriesTitle" type="text" class="form-control" placeholder="Series Title" 
+			th:value="${!#strings.isEmpty(form.seriesTitle)} ? ${form.seriesTitle} : ${citation.seriesTitle}" /></td>
+	</tr>
+	<tr th:style="${!#lists.contains(fields, 'seriesText')}? 'display:none'">
+    <td>Series Text</td>
+      <td>
+      		<input th:name="seriesText" th:id="seriesText" type="text" class="form-control" placeholder="Series Text" 
+      		th:value="${!#strings.isEmpty(form.seriesText)} ? ${form.seriesText} : ${citation.seriesText}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'url')}? 'display:none'">
+	<td>URL</td>
+		<td>
+			<input th:name="url" th:id="url" type="text" class="form-control" placeholder="Url" 
+			th:value="${!#strings.isEmpty(form.url)} ? ${form.url} : ${citation.url}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'language')}? 'display:none'">
+	<td>Language</td>
+		<td>
+			<input th:name="language" th:id="language" type="text" class="form-control" placeholder="Language" 
+			th:value="${!#strings.isEmpty(form.language)} ? ${form.language} : ${citation.language}" /></td>
+	</tr>
+	
+	<tr th:style="${!#lists.contains(fields, 'doi')}? 'display:none'">
+	<td>DOI</td>
+		<td>
+			<input ht:name="doi" th:id="doi" type="text" class="form-control" placeholder="DOI" 
+			th:value="${!#strings.isEmpty(form.doi)} ? ${form.doi} : ${citation.doi}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'issn')}? 'display:none'">
+	<td>ISSN</td>
+		<td>
+			<input th:name="issn" th:id="issn" type="text" class="form-control" placeholder="ISSN" 
+			th:value="${!#strings.isEmpty(form.issn)} ? ${form.issn} : ${citation.issn}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'archive')}? 'display:none'">
+	<td>Archive</td>
+		<td>
+			<input th:name="archive" th:id="archive" type="text" class="form-control" placeholder="Archive" 
+			th:value="${!#strings.isEmpty(form.archive)} ? ${form.archive} : ${citation.archive}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'archiveLocation')}? 'display:none'">
+	<td>Archive Location</td>
+		<td>
+			<input th:name="archiveLocation" th:id="archiveLocation" type="text" class="form-control" placeholder="Archive Location" 
+			th:value="${!#strings.isEmpty(form.archiveLocation)} ? ${form.archiveLocation} : ${citation.archiveLocation}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'libraryCatalog')}? 'display:none'">
+	<td>Library Catalog</td>
+		<td>
+			<input th:name="libraryCatalog" th:id="libraryCatalog" type="text" class="form-control" placeholder="Library Catalog" 
+			th:value="${!#strings.isEmpty(form.libraryCatalog)} ? ${form.libraryCatalog} : ${citation.libraryCatalog}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'callNumber')}? 'display:none'">
+	<td>Call Number</td>
+		<td>
+			<input th:name="callNumber" th:id="callNumber" type="text" class="form-control" placeholder="Call Number" 
+			th:value="${!#strings.isEmpty(form.callNumber)} ? ${form.callNumber} : ${citation.callNumber}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'rights')}? 'display:none'">
+	<td>Rights</td>
+		<td>
+			<input th:name="rights" th:id="rights" type="text" class="form-control" placeholder="Rights" 
+			th:value="${!#strings.isEmpty(form.rights)} ? ${form.rights} : ${citation.rights}" /></td>
+	</tr>
+
+	<tr>
+		<td>Concepts</td>
+		<td>
+		<div id="conceptTags">
+			<th:block th:each= "tag:${citation.conceptTags}">
+				<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-uri="${tag.conceptUri}" data-concept-name="${tag.conceptName}" data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName} <i class="fas fa-times remove-concept"></i></span>
+			</th:block>
+		</div>
+		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
+		</td>
+	</tr>
+
+	
 			
 		</table>
+		<button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
+               <a th:href="@{/auth/group/${zoteroGroupId}/items/${itemId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}}" class="btn btn-default">
+		          <i class="fa fa-times"></i>&nbsp;Cancel
+               </a>
 	</form>
+	
+	
+	<!-- Author Modal -->
+<div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="authorLabel">Enter Author Information</h4>
+      </div>
+      <div class="modal-body">
+      	  <div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idAuthor">
+      	  </div>
+          <div class="form-group">
+		    <label for="firstNameAuthor">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameAuthor">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="uriAuthor">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
+			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundAuthor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureAuthor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriAuthorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
+		  </div>
+		  <div id="authorAffiliations">
+		  <div id="authorAffiliationTemplate" class="form-group">
+		    <label for="affiliationAuthor">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="addAuthorModalCancel">Close</button>
+        <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Editor Modal -->
+<div class="modal fade" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="editorLabel">Enter Editor Information</h4>
+      </div>
+      <div class="modal-body">
+      	<div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idEditor">
+      	  </div>
+          <div class="form-group">
+		    <label for="firstNameEditor">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameEditor" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameEditor">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameEditor" placeholder="Last Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="uriEditor">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriEditor" placeholder="URI">
+			    <div id="editorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerEditor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundEditor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureEditor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriEditorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
+		  </div>
+		  <div id="editorAffiliations">
+		  <div id="editorAffiliationTemplate" class="form-group">
+		    <label for="editorAffiliation">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addEditorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" id="addEditorModalCancel" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="addEditorButton" type="button" class="btn btn-primary">Add Editor</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Other Creator Modal -->
+<div class="modal fade" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="creatorLabel">Enter Creator Information</h4>
+      </div>
+      <div class="modal-body">
+      	  <div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idCreator">
+      	  </div>
+          <div class="form-group">
+		    <label for="firstNameCreator">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameCreator" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameCreator">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameCreator" placeholder="Last Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="uriCreator">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriCreator" placeholder="URI">
+			    <div id="creatorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerCreator" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundCreator" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureCreator" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriCreatorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
+		  </div>
+		  <div id="creatorAffiliations">
+		  <div id="creatorAffiliationTemplate" class="form-group">
+		    <label for="affiliationCreator">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addCreatorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="addCreatorModalCancel">Close</button>
+        <button id="addCreatorButton" type="button" class="btn btn-primary">Add Creator</button>
+      </div>
+    </div>
+  </div>
+</div> <!-- End modal -->
+
+<!-- Concept Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="addConceptModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Concept</h4>
+      </div>
+      <div class="modal-body">
+        <form id="conceptForm">
+        <p>
+        <label>Concept</label>
+        <select class="form-control" id="addConceptConceptSelect">
+        <c:forEach items="${concepts}" var="concept">
+        	<option value="${concept.uri}">${concept.name}</option>
+        </c:forEach>
+        </select>
+        </p>
+        
+        <p style="padding-top: 20px;">
+        <label>Type of Concept</label>
+        <select class="form-control"  id="addConceptTypeSelect">
+        <c:forEach items="${conceptTypes}" var="type">
+        	<option value="${type.uri}">${type.name}</option>
+        </c:forEach>
+        </select>
+        </p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="addConceptButton">Add</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 </div>
 
 </body>
