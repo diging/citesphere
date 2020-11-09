@@ -6,6 +6,7 @@
 }
 </style>
 <script th:inline="javascript">
+//# sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
 	$("#uriLoadingFailureAuthor").hide();
@@ -46,7 +47,6 @@ $(function() {
 	/* Handle Author events */
 	$("#addAuthorButton").click(function() {
 		savePersonDetails("Author", "Author");
-		console.log("Add author button pressed");
 	});
 	
 	$("#addAuthorModalCancel").click(function() {
@@ -355,6 +355,7 @@ function savePersonDetails(personType, modalName){
 	var affSpan = $("<span>");
 	$("#"+modalNameLCase+"Affiliations").children().each(function(idx, elem) {
 		var input = $(elem).find("input");
+		console.log("space"+input.val()+"space");
 		if(input.val().length!=0){
 			var affSpan = $("<span>");
 			affSpan.attr("data-affiliation-name", input.val());
@@ -365,7 +366,11 @@ function savePersonDetails(personType, modalName){
 	
 	var affiliationString = "";
 	if (affiliationsList.length != 0) {
+		console.log("inside");
 		affiliationString = " (" + $.grep(affiliationsList, Boolean).join(", ") + ")";
+	}
+	else{
+		console.log(affiliationsList.length);
 	}
 	
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
@@ -811,12 +816,12 @@ function creatorLinkHandler(target) {
 						<th:block th:each="author,status : ${citation.authors}">
 						<span th:id="|author${status.index}|" class="label label-primary author-item" th:data-author-id="|author${status.index}|" th:data-author-firstname="${author.firstName}" th:data-author-lastname="${author.lastName}" th:data-author-uri="${author.uri}" th:data-creator-type="author" th:data-author-authority-id="${author.localAuthorityId}">
 						<th:block th:each="aff,affStatus : ${author.affiliations}">
-							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|author${status.index}-aff${affStatus.index}|">
+							<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|author${status.index}-aff${affStatus.index}|">
 							</span>
 						</th:block>
-								[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
+								[[${author.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
 								<th:block th:each="aff:${author.affiliations}">
-									<span th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
+									<span  th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
 									&nbsp;
 							<i class="far fa-edit edit-author" style="cursor: pointer;"></i>
@@ -836,7 +841,7 @@ function creatorLinkHandler(target) {
 						<th:block th:each="editor,status:${citation.editors}">
 						<span th:id="|editor${status.index}|" class="label label-info editor-item" th:data-editor-id="|editor${status.index}|" th:data-editor-firstname="${editor.firstName}" th:data-editor-lastname="${editor.lastName}" th:data-editor-uri="${editor.uri}" th:data-editor-authority-id="${editor.localAuthorityId}" th:data-creator-type="editor">
 						<th:block th:each="aff,affStatus:${editor.affiliations}"> 
-							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="editor${status.index}-aff${affStatus.index}"></span>
+							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|editor${status.index}-aff${affStatus.index}|"></span>
 						</th:block>
 						  [[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
 						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
@@ -857,9 +862,10 @@ function creatorLinkHandler(target) {
 				<td class="creator" th:id="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" >[[${curCreator.value}]]</td>
 				<td> 
 					<div th:with="role=${#strings.toLowerCase(#strings.substringAfter(curCreator.key, '_item_attribute_label_'))}">
-					<span th:id="|${role}List|" style="font-size: 18px"></div>
-					<span th:each="creator:${citation.otherCreators}" th:if="${#strings.th:equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
-				 		<span th:id="|${role}${varStatus}|" class="label label-info ${role}-item" th:data-creator-id="${creator.id}" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
+					[[${role}]][[${curCreator.key}]]
+					<span th:id="|${role}List|" style="font-size: 18px"></span>
+					<span th:each="creator,loop:${citation.otherCreators}" th:if="${#strings.equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
+				 		<span th:id="|${role}${loop.index}|" th:class="|label label-info ${role}-item|" th:data-creator-id="${creator.id}" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
 				 			<th:block th:each="aff:${creator.person.affiliations}"> 
 				 				<span th:data-affiliation-name="${aff.name}"></span>
 				 			</th:block>
@@ -870,6 +876,7 @@ function creatorLinkHandler(target) {
 						</span>
 							&nbsp;&nbsp;
 					</span>
+					</div>
 					
 				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add [[${curCreator.value}]]</a></div>
 				</td>
@@ -877,28 +884,7 @@ function creatorLinkHandler(target) {
 				</span>
 		</th:block>
 			
-		<th:block th:each="role:${citation.otherCreatorRoles}" th:if="${!#lists.contains(creatorMap, role)}" >
-
-			<tr class="creator-row">
-			<td th:style="text-transform: capitalize;">[[${role}]]s</td>
-			<td>
-				<span th:id="|${role}List|" th:style="font-size: 18px">
-				<span th:each="creator:${citation.otherCreators}" th:if="${#strings.equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
-				 	<span th:id="|${role}${varStatus}|" class="label label-info ${role}-item" th:data-creator-id="|${role}${varStatus}|" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
-				 		<th:block th:each="aff:${creator.person.affiliations}"> <span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="${aff.id}"></span></th:block>
-							[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
-							<th:block th:each="aff:${creator.person.affiliations}"> [[${aff.name}]]</th:block>
-							&nbsp;<i class="far fa-edit edit-creator"></i>
-						<i class="fas fa-times remove-creator"></i>
-					</span>
-					&nbsp;&nbsp;
-				</span>
-				</span>
-				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" th:data-creator-type="${role}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add [[${role}]]</a></div>
-			</td>
-			</tr>
 		
-	 </th:block>
 	 
 	 <tr th:style="${!#lists.contains(fields, 'publicationTitle') }? 'display:none'">
 		<td>Publication Title</td>
@@ -1025,7 +1011,7 @@ function creatorLinkHandler(target) {
 		<td>
 		<div id="conceptTags">
 			<th:block th:each= "tag:${citation.conceptTags}">
-				<span class="badge" data-concept-id="${tag.localConceptId}" data-concept-uri="${tag.conceptUri}" data-concept-name="${tag.conceptName}" data-type-name="${tag.typeName}" data-type-uri="${tag.typeUri}" data-concept-type-id="${tag.localConceptTypeId}">${tag.conceptName} | ${tag.typeName} <i class="fas fa-times remove-concept"></i></span>
+				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="fas fa-times remove-concept"></i></span>
 			</th:block>
 		</div>
 		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
@@ -1223,7 +1209,7 @@ function creatorLinkHandler(target) {
         <label>Type of Concept</label>
         <select class="form-control"  id="addConceptTypeSelect">
         <th:block th:each="type:${conceptTypes}">
-        	<option th:value="${type.uri}">[[{${type.name}]]</option>
+        	<option th:value="${type.uri}">[[${type.name}]]</option>
         </th:block>
         </select>
         </p>
