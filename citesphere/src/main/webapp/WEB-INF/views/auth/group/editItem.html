@@ -78,7 +78,7 @@ $(function() {
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-		$.post('/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=' + uri, function(data) {
+		$.post('/auth/authority/create?[(${_csrf.parameterName})]=[(${_csrf.token})]&uri=' + uri, function(data) {
 			$("#authorCreateAuthority").hide();
 			$("#uriAuthorLocalId").val(data['id']);
 			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
@@ -149,7 +149,7 @@ $(function() {
 	
 	$("#editorIconContainer").on('click', ".popover #editorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundEditor").attr('data-authority-uri');
-		$.post('/auth/authority/create"?${_csrf.parameterName}=${_csrf.token}&uri=' + uri, function(data) {
+		$.post('/auth/authority/create?[(${_csrf.parameterName})]=[(${_csrf.token})]&uri=' + uri, function(data) {
 			$("#editorCreateAuthority").hide();
 			$("#uriEditorLocalId").val(data['id']);
 			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
@@ -222,7 +222,7 @@ $(function() {
 	
 	$("#creatorIconContainer").on('click', ".popover #creatorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundCreator").attr('data-authority-uri');
-		$.post('/auth/authority/create" />?${_csrf.parameterName}=${_csrf.token}&uri=' + uri, function(data) {
+		$.post('/auth/authority/create?[(${_csrf.parameterName})]=[(${_csrf.token})]&uri=' + uri, function(data) {
 			$("#creatorCreateAuthority").hide();
 			$("#uriCreatorLocalId").val(data['id']);
 			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
@@ -592,25 +592,23 @@ let removeConcept = function removeConcept(e) {
 }
 
 $(document).ready(function() {
-	/*  console.log("document ready");
-	if([[${citation}]] != null){
+	if([[${citation}]] == null){
 	$("#items").val("${defaultItemType}");
 	}
 	loadFields();
 	$('#items').on("change", function(e){
 		loadFields();
-	});   */
+	});   
 	
 });
 
 function loadFields() {
 	var itemType = $('#items option:selected').val()
-	console.log(itemType);
 	$("#displayMessage").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
 		" Loading form fields");
 	$("#messageModal").modal('show');
 	$.ajax({
-		url : '/auth/items/'+itemType+'/fields',
+		url : '[(${home})]/citesphere/auth/items/'+itemType+'/fields',
 		type : 'GET',
 		success: function(changedFields){
 			$('form input').each(function(idx, elem) {
@@ -637,7 +635,7 @@ function loadFields() {
 		}
 	}); 
 	$.ajax({
-		url : '/auth/items/'+itemType+'/creators',
+		url : '[(${home})]/citesphere/auth/items/'+itemType+'/creators',
 		type : 'GET',
 		success: function(creators){
 			$('.creator-row').each(function(idx, elem) {
@@ -836,7 +834,7 @@ function creatorLinkHandler(target) {
 				<td>
 					<span id="editorList" style="font-size: 18px">
 						<th:block th:each="editor,status:${citation.editors}">
-						<span th:id="editor${status.index}" class="label label-info editor-item" th:data-editor-id="editor${status.index}" th:data-editor-firstname="${editor.firstName}" th:data-editor-lastname="${editor.lastName}" th:data-editor-uri="${editor.uri}" th:data-editor-authority-id="${editor.localAuthorityId}" th:data-creator-type="editor">
+						<span th:id="|editor${status.index}|" class="label label-info editor-item" th:data-editor-id="|editor${status.index}|" th:data-editor-firstname="${editor.firstName}" th:data-editor-lastname="${editor.lastName}" th:data-editor-uri="${editor.uri}" th:data-editor-authority-id="${editor.localAuthorityId}" th:data-creator-type="editor">
 						<th:block th:each="aff,affStatus:${editor.affiliations}"> 
 							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="editor${status.index}-aff${affStatus.index}"></span>
 						</th:block>
@@ -866,7 +864,7 @@ function creatorLinkHandler(target) {
 				 				<span th:data-affiliation-name="${aff.name}"></span>
 				 			</th:block>
 								[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
-							<th:block th:each="aff:${creator.person.affiliations}">[[(${aff.name})]]</th:block>
+							<th:block th:each="aff:${creator.person.affiliations}">[[${aff.name}]]</th:block>
 							&nbsp;<i class="far fa-edit edit-creator"></i>
 									<i class="fas fa-times remove-creator"></i>
 						</span>
@@ -889,7 +887,7 @@ function creatorLinkHandler(target) {
 				 	<span th:id="|${role}${varStatus}|" class="label label-info ${role}-item" th:data-creator-id="|${role}${varStatus}|" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
 				 		<th:block th:each="aff:${creator.person.affiliations}"> <span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="${aff.id}"></span></th:block>
 							[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
-							<th:block th:each="aff:${creator.person.affiliations}"> [[(${aff.name})]]</th:block>
+							<th:block th:each="aff:${creator.person.affiliations}"> [[${aff.name}]]</th:block>
 							&nbsp;<i class="far fa-edit edit-creator"></i>
 						<i class="fas fa-times remove-creator"></i>
 					</span>
