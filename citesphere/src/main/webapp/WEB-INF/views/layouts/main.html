@@ -65,18 +65,6 @@
 									all Apps</a></li>
 							<li role="presentation"><a th:href="@{/admin/apps/add}">Add</a></li>
 						</ul></li>
-
-					<li sec:authorize="isAuthenticated()" role="presentation">
-						<form th:action="@{/logout}" method="POST">
-							<input type="hidden" name="${_csrf.parameterName}"
-								value="${_csrf.token}" />
-							<button class="btn-link" type="submit" title="Logout">
-								<i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-							</button>
-						</form>
-					</li>
-
-
 					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
 						th:href="@{/auth/exports}"> Exports</a></li>
 					<li sec:authorize="hasRole('ADMIN')" role="presentation"
@@ -96,7 +84,7 @@
 						aria-expanded="false"> Import <span class="caret"></span>
 					</a>
 						<ul class="dropdown-menu">
-							<li role="presentation"><a href="@{/auth/import/upload}">Import
+							<li role="presentation"><a th:href="@{/auth/import/upload}">Import
 									from File</a></li>
 							<li role="separator" class="divider"></li>
 							<li role="presentation"><a th:href="@{/auth/import/jobs}">See
@@ -113,6 +101,16 @@
 							<li role="presentation"><a th:href="@{/auth/tokens}">Authorized
 									OAuth Apps</a></li>
 						</ul></li>
+						
+					<li sec:authorize="isAuthenticated()" role="presentation">
+						<form th:action="@{/logout}" method="POST">
+							<input type="hidden" name="${_csrf.parameterName}"
+								value="${_csrf.token}" />
+							<button class="btn-link" type="submit" title="Logout">
+								<i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+							</button>
+						</form>
+					</li>
 
 				</ul>
 
