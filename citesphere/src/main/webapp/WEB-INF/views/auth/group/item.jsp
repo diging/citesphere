@@ -36,9 +36,12 @@
 	</c:choose>	
 	 <a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />"><i
-		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; <a
+		class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; 
+	<a
 		href="<c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}" />"><i
-		class="fas fa-sync" title="Sync Citation"></i></a>
+		class="fas fa-sync" title="Sync Citation"></i></a> &nbsp;&nbsp; 
+	
+	<a id="uploadFileIcon" href="#"><i class="fas fa-file-upload"></i></a>
 </div>
 <div id="pull-right" class="pull-right" style="min-width: 35px;">
 	<button id ="prev" class="btn btn-default" style="font-size:10px;"type="submit"  href="" ${ empty previous ? 'disabled="disabled"' : ''}><i id="prevSpinner" class="fas fa-spinner fa-spin text-info"></i> < Previous</button>&nbsp;&nbsp;
@@ -357,6 +360,25 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div id="uploadFileModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Upload File</h4>
+      </div>
+      <div class="modal-body">
+        <label>Choose file to upload</label>
+        <input type="file" id="uploadFileInput">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="uploadFileBtn" type="button" class="btn btn-primary">Upload</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <script>
 //# sourceURL=modal.js
 	$(function() {
@@ -420,6 +442,36 @@
 			}
 		});
 		
+		$("#uploadFileIcon").click(function() {
+			$("#uploadFileModal").modal('show');
+		});
+		
+		$("#uploadFileBtn").click(function(e) {
+			e.preventDefault()
+            
+			/* JQuery doesn't have a files attribute */
+			var uploadFiles = document.getElementById('uploadFileInput').files;
+	        var formData = new FormData();
+	        for (var i = 0; i < uploadFiles.length; i++) {
+	            formData.append("files", uploadFiles[i]);
+	        }
+	        <c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/files/upload?${_csrf.parameterName}=${_csrf.token}"  var="postUrl" />
+	        $.ajax({
+	            type: "POST",
+	            url: "${postUrl}",
+	            cache       : false,
+	            contentType : false,
+	            processData : false,
+	            enctype: 'multipart/form-data',
+	            data: formData, 
+	            success: function(data) {
+	                document.getElementById('uploadFileInput').value = '';
+	                $("#uploadFileModal").modal('hide');
+	            }
+	        });
+			
+			
+		});
 	});
 	
 </script>
