@@ -12,19 +12,9 @@
 
 <p class="col-sm">
 
-<span th:if="${not empty param.error}">
-<div class="alert alert-danger" role="alert">
-  <span th:if="${param.error == 'noPassword'}">
-  Please provide a password.
-  </span>
-  <span th:if="${param.error == 'notMatching'}">
-  The passwords you entered do not match.
-  </span>
-</div>
-</span>
 
-<form class="form-horizontal" th:action="@{/password/reset}" " method="POST">
-<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+<form class="form-horizontal" th:action="@{/password/reset}" method="POST">
                 
 <label>New Password:</label>
 <input class="form-control" type="password" name="password">
@@ -34,9 +24,26 @@
 
 <input style="margin-top: 20px;" type="submit" class="btn btn-primary" value="Submit" />
 </form>
-</p>
-</div>
 
+
+<span th:if="${param.error != null}">
+<div class="alert alert-danger" role="alert">
+  <span th:if="${param.error == 'noPassword'}">
+  Please provide a password.
+  </span>
+  <span th:if="${param.error == 'notMatching'}">
+  The passwords you entered do not match.
+  </span>
+  </div>
+</span>
+
+
+</p>
+
+
+
+
+</div>
 <div class="col-sm"></div>
 </div>
 
