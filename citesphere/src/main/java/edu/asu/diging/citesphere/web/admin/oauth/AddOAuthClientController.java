@@ -9,6 +9,10 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.social.oauth2.GrantType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import edu.asu.diging.citesphere.core.model.Role;
 import edu.asu.diging.citesphere.core.service.oauth.GrantTypes;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
@@ -57,7 +62,12 @@ public class AddOAuthClientController {
         if (appForm.getGrantType().equals(GrantTypes.AUTHORIZATION_CODE)) {
             grantTypes.add(GrantTypes.REFRESH_TOKEN);
         }
-        OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ), grantTypes, appForm.getRedirectUrl());
+        
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if (appForm.getGrantType().equals(GrantTypes.CLIENT_CREDENTIALS)) {
+            authorities.add(new SimpleGrantedAuthority(Role.TRUSTED_CLIENT));
+        }
+        OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ), grantTypes, appForm.getRedirectUrl(), authorities);
         redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
         redirectAttrs.addFlashAttribute("secret", creds.getSecret());
         return "redirect:/admin/apps/" + creds.getClientId();

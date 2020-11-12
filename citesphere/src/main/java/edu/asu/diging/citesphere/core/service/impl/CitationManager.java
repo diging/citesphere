@@ -264,9 +264,18 @@ public class CitationManager implements ICitationManager {
             if (!group.getUsers().contains(user.getUsername())) {
                 throw new AccessForbiddenException();
             }
+            
             boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
             CitationResults results = new CitationResults();
             if (isModified) {
+                // first update the group info
+                groupRepository.delete((CitationGroup) group);
+                group = zoteroManager.getGroup(user, groupId + "", true);
+                group.setUpdatedOn(OffsetDateTime.now().toString());
+                addUserToGroup(group, user);
+                group = groupRepository.save((CitationGroup) group);
+                
+                //  then update content
                 results.setNotModified(false);
                 asyncCitationProcessor.sync(user, group, collectionId);
             } else {
@@ -285,7 +294,7 @@ public class CitationManager implements ICitationManager {
                 }
             } else {
                 citations = (List<ICitation>) citationDao.findCitations(groupId,
-                    (page - 1) * zoteroPageSize, zoteroPageSize);
+                    (page - 1) * zoteroPageSize, zoteroPageSize, false);
                 if (groupOptional.isPresent()) {
                     total = groupOptional.get().getNumItems();
                 } else {

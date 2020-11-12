@@ -1,5 +1,9 @@
 package edu.asu.diging.citesphere.config.core;
 
+import java.util.Arrays;
+
+import javax.servlet.Filter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,9 +26,11 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
@@ -37,6 +43,10 @@ import edu.asu.diging.citesphere.core.service.oauth.impl.OAuthClientManager;
 
 @Configuration
 @EnableWebSecurity
+/* Once spring security provides the new oauth2 authentication provider
+ * we can migrate.
+ */
+@SuppressWarnings("deprecation") 
 public class SecurityContext extends WebSecurityConfigurerAdapter {
     
 
@@ -77,6 +87,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         @Autowired
         private TokenStore tokenStore;
 
+        private WebAuthenticationDetailsSource authenticationDetails = new WebAuthenticationDetailsSource();
         
         @Bean
         public TokenStore tokenStore() {
@@ -101,18 +112,22 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
             endpoints
-                    .pathMapping("/oauth/authorize", "/api/v1/oauth/authorize")
-                    .pathMapping("/oauth/check_token", "/api/v1/oauth/check_token")
+                    .pathMapping("/oauth/authorize", "/api/oauth/authorize")
+                    .pathMapping("/oauth/check_token", "/api/oauth/check_token")
                     //.pathMapping("/oauth/confirm_access", "/api/v1/oauth/confirm_access")
-                    .pathMapping("/oauth/error", "/api/v1/oauth/error")
-                    .pathMapping("/oauth/token", "/api/v1/oauth/token").tokenStore(tokenStore)
+                    .pathMapping("/oauth/error", "/api/oauth/error")
+                    .pathMapping("/oauth/token", "/api/oauth/token").tokenStore(tokenStore)
                     .userDetailsService(userDetailsService).authenticationManager(authenticationManager);
         }
 
         @Override
         public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-            oauthServer.tokenKeyAccess("isAnonymous() || hasAuthority('ROLE_TRUSTED_CLIENT')")
-                    .checkTokenAccess("hasAuthority('ROLE_TRUSTED_CLIENT')").allowFormAuthenticationForClients();
+            ClientCredentialsTokenEndpointFilter filter = new ClientCredentialsTokenEndpointFilter();
+            filter.setAuthenticationDetailsSource(authenticationDetails);
+            filter.setAuthenticationManager(authenticationManager);
+            
+            oauthServer.tokenKeyAccess("hasRole('TRUSTED_CLIENT')")
+                .allowFormAuthenticationForClients().checkTokenAccess("hasRole('TRUSTED_CLIENT')").tokenEndpointAuthenticationFilters(Arrays.asList(new Filter[] { filter }));
         }
 
     }

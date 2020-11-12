@@ -12,7 +12,7 @@
 
     <b>Do you authorize ${clientId} access to your account on Citesphere (and therefore Zotero)?</b>
     
-    <c:url value="/api/v1/oauth/authorize" var="confirmUrl" />
+    <c:url value="/api/oauth/authorize" var="confirmUrl" />
     <form id="confirmationForm" name="confirmationForm" action="${confirmUrl}" method="POST">
     <input name="user_oauth_approval" value="true" type="hidden"/>
     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />

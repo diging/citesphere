@@ -18,9 +18,9 @@
         <spring-data.version>Neumann-SR3</spring-data.version>
         <javers.version>5.0.0</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
-        <spring-social-zotero.version>0.6</spring-social-zotero.version>
+        <spring-social-zotero.version>0.7</spring-social-zotero.version>
         <citesphere.messages.version>0.4</citesphere.messages.version>
-        <citesphere.model.version>1.2</citesphere.model.version>
+        <citesphere.model.version>1.4</citesphere.model.version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -152,7 +152,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -444,7 +444,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
 

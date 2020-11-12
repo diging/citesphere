@@ -58,9 +58,9 @@ public interface IZoteroConnector {
 
     boolean isGroupModified(IUser user, String groupId, Long lastGroupVersion) throws ZoteroHttpStatusException;
 
-    ZoteroResponse<Item> getGroupItemVersions(IUser user, String groupId, long version);
+    ZoteroResponse<Item> getGroupItemsVersions(IUser user, String groupId, long version, boolean includeTrashed);
 
-    ZoteroResponse<Item> getGroupItemsByKey(IUser user, String groupId, List<String> keys);
+    ZoteroResponse<Item> getGroupItemsByKey(IUser user, String groupId, List<String> keys, boolean includeTrashed);
 
     DeletedElements getDeletedElements(IUser user, String groupId, long version);
 

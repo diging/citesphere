@@ -90,8 +90,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         long groupVersion = zoteroManager.getLatestGroupVersion(user, group.getGroupId() + "");
         DeletedZoteroElements deletedElements = zoteroManager.getDeletedElements(user, group.getGroupId() + "",
                 group.getContentVersion());
-        Map<String, Long> versions = zoteroManager.getGroupItemVersions(user, group.getGroupId() + "",
-                group.getContentVersion());
+        Map<String, Long> versions = zoteroManager.getGroupItemsVersions(user, group.getGroupId() + "",
+                group.getContentVersion(), true);
         Map<String, Long> collectionVersions = zoteroManager.getCollectionsVersions(user, group.getGroupId() + "",
                 group.getContentVersion() + "");
 
@@ -189,7 +189,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             logger.error("Could not wait.", e);
         }
         ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, group.getGroupId() + "",
-                keysToRetrieve);
+                keysToRetrieve, true);
         retrievedCitations.getCitations().forEach(c -> storeCitation(c));
         return retrievedCitations.getContentVersion();
     }

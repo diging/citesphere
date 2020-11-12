@@ -78,15 +78,15 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    public ZoteroResponse<Item> getGroupItemVersions(IUser user, String groupId, long version) {
+    public ZoteroResponse<Item> getGroupItemsVersions(IUser user, String groupId, long version, boolean includeTrashed) {
         Zotero zotero = getApi(user);
-        return zotero.getGroupsOperations().getGroupItemVersions(groupId, version);
+        return zotero.getGroupsOperations().getGroupItemsVersions(groupId, version, includeTrashed);
     }
     
     @Override
-    public ZoteroResponse<Item> getGroupItemsByKey(IUser user, String groupId, List<String> keys) {
+    public ZoteroResponse<Item> getGroupItemsByKey(IUser user, String groupId, List<String> keys, boolean includeTrashed) {
         Zotero zotero = getApi(user);
-        return zotero.getGroupsOperations().getGroupItemsByKey(groupId, keys);
+        return zotero.getGroupsOperations().getGroupItemsByKey(groupId, keys, includeTrashed);
     }
     
     @Override
@@ -99,7 +99,8 @@ public class ZoteroConnector implements IZoteroConnector {
     public boolean isGroupModified(IUser user, String groupId, Long lastGroupVersion) throws ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
         try {
-            return !zotero.getGroupsOperations().getGroupItemsTop(groupId, 1, 1, "title", lastGroupVersion).getNotModified();
+            ZoteroResponse<Item> response = zotero.getGroupsOperations().getGroupItemsTop(groupId, 1, 1, "title", lastGroupVersion);
+            return !response.getNotModified() || response.getLastVersion() != lastGroupVersion;
         } catch (HttpClientErrorException ex) {
             throw createException(ex.getStatusCode(), ex);
         }
