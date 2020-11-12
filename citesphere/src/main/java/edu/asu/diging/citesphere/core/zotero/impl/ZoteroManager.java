@@ -82,8 +82,8 @@ public class ZoteroManager implements IZoteroManager {
     }
     
     @Override
-    public Map<String, Long> getGroupItemVersions(IUser user, String groupId, long version) {
-        ZoteroResponse<Item> response = zoteroConnector.getGroupItemVersions(user, groupId, version);
+    public Map<String, Long> getGroupItemsVersions(IUser user, String groupId, long version, boolean includeTrashed) {
+        ZoteroResponse<Item> response = zoteroConnector.getGroupItemsVersions(user, groupId, version, includeTrashed);
         Map<String, Long> itemVersions = new HashMap<>();
         for (Item item : response.getResults()) {
             itemVersions.put(item.getKey(), item.getVersion());            
@@ -108,8 +108,8 @@ public class ZoteroManager implements IZoteroManager {
     }
     
     @Override
-    public ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys) {
-        ZoteroResponse<Item> response = zoteroConnector.getGroupItemsByKey(user, groupId, itemKeys);
+    public ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed) {
+        ZoteroResponse<Item> response = zoteroConnector.getGroupItemsByKey(user, groupId, itemKeys, includeTrashed);
         
         ZoteroGroupItemsResponse zoteroReponse = new ZoteroGroupItemsResponse();
         zoteroReponse.setContentVersion(response.getLastVersion());
