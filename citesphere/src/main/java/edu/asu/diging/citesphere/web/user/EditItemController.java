@@ -156,7 +156,7 @@ public class EditItemController {
             model.addAttribute("page", page);
             model.addAttribute("collectionId", collectionId);
             model.addAttribute("sortBy", sortBy);
-            return "auth/group/items/item/edit/conflict";
+            return "auth/group/editConflict";
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }

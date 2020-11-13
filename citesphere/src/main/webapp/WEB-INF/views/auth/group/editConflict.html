@@ -4,7 +4,7 @@
 <div layout:fragment="content">
 <ol class="breadcrumb">
   <li><a th:href="@{/}">Home</a></li>
-  <li><a th:href="@{items}" />">Group</a></li>
+  <li><a th:href="@{items}" />Group</a></li>
   <li class="active">[[${outdatedCitation.key}]]</li>
 </ol>
 
@@ -22,7 +22,7 @@ Do you want to proceed?
 				
 	</span>
 	  <em>[[${outdatedCitation.title}]]</em>
-	  <span th:if="${not empty outdatedCitation.dateFreetext}">
+	  <span th:if="${!#strings.isEmpty(outdatedCitation.dateFreetext)}">
  	  [[(${outdatedCitation.dateFreetext})]]
  	  </span> 
 </h2>
@@ -101,91 +101,91 @@ Do you want to proceed?
 <span th:if="${#lists.contains(outdatedCitationFields, 'volume') }">
 <tr>
 <td>Volume</td>
-<td>${outdatedCitation.volume}</td>
+<td>[[${outdatedCitation.volume}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'issue') }">
 <tr>
 <td>Issue</td>
-<td>${outdatedCitation.issue}</td>
+<td>[[${outdatedCitation.issue}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'pages') }">
 <tr>
 <td>Pages</td>
-<td>${outdatedCitation.pages}</td>
+<td>[[${outdatedCitation.pages}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'series') }">
 <tr>
 <td>Series</td>
-<td>${outdatedCitation.series}</td>
+<td>[[${outdatedCitation.series}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'seriesTitle') }">
 <tr>
 <td>Series Title</td>
-<td>${outdatedCitation.seriesTitle}</td>
+<td>[[${outdatedCitation.seriesTitle}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'seriesText') }">
 <tr>
 <td>Series Text</td>
-<td>${outdatedCitation.seriesText}</td>
+<td>[[${outdatedCitation.seriesText}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'url') }">
 <tr>
 <td>URL</td>
-<td><a href="${outdatedCitation.url}">${outdatedCitation.url}</a></td>
+<td><a href="${outdatedCitation.url}">[[${outdatedCitation.url}]]</a></td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'language') }">
 <tr>
 <td>Language</td>
-<td>${outdatedCitation.language}</td>
+<td>[[${outdatedCitation.language}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'doi') }">
 <tr>
 <td>DOI</td>
-<td>${outdatedCitation.doi}</td>
+<td>[[${outdatedCitation.doi}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'issn') }">
 <tr>
 <td>ISSN</td>
-<td>${outdatedCitation.issn}</td>
+<td>[[${outdatedCitation.issn}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'archive') }">
 <tr>
 <td>Archive</td>
-<td>${outdatedCitation.archive}</td>
+<td>[[${outdatedCitation.archive}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'archiveLocation') }">
 <tr>
 <td>Archive Location</td>
-<td>${outdatedCitation.archiveLocation}</td>
+<td>[[${outdatedCitation.archiveLocation}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'libraryCatalog') }">
 <tr>
 <td>Library Catalog</td>
-<td>${outdatedCitation.libraryCatalog}</td>
+<td>[[${outdatedCitation.libraryCatalog}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'callNumber') }">
 <tr>
 <td>Call Number</td>
-<td>${outdatedCitation.callNumber}</td>
+<td>[[${outdatedCitation.callNumber}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'rights') }">
 <tr>
 <td>Rights</td>
-<td>${outdatedCitation.rights}</td>
+<td>[[${outdatedCitation.rights}]]</td>
 </tr>
 </span>
 </table>
@@ -197,7 +197,7 @@ Do you want to proceed?
 <table class="table table-striped">
 <tr>
 <td width="20%">Item Key</td>
-<td>${currentCitation.key}</td>
+<td>[[${currentCitation.key}]]</td>
 </tr>
 <tr>
 <td>Citation Type</td>
@@ -208,25 +208,25 @@ Do you want to proceed?
 </span>
 <span th:if="${empty iconLabel}">
 </span>
-<i class="${iconClass}" title="${iconLabel}"></i> ${iconLabel}
+<i class="${iconClass}" title="${iconLabel}"></i> [[${iconLabel}]]
 </td>
 </tr>
 <span th:if="${#lists.contains(currentCitationFields, 'title') }">
 <tr th:if="${currentCitation.title != outdatedCitation.title}" class="changed">
 <td>Title</td>
-<td>${currentCitation.title}</td>
+<td>[[${currentCitation.title}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(currentCitationFields, 'shortTitle') }">
 <tr th:if="${currentCitation.shortTitle != outdatedCitation.shortTitle}" class="changed">
 <td>Short Title</td>
-<td>${currentCitation.shortTitle}</td>
+<td>[[${currentCitation.shortTitle}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(currentCitationFields, 'date') }">
 <tr th:if="${currentCitation.dateFreetext != outdatedCitation.dateFreetext}" class="changed">
 <td>Date</td>
-<td>${currentCitation.dateFreetext}</td>
+<td>[[${currentCitation.dateFreetext}]]</td>
 </tr>
 </span>
 <tr>
@@ -370,13 +370,13 @@ Do you want to proceed?
 <table class="table table-striped">
 <tr>
 <td width="20%">Item Key</td>
-<td>${form.key}</td>
+<td>[[${form.key}]]</td>
 </tr>
 <tr>
 <td>Citation Type</td>
 <td>
-	<div th:with=“iconClass=${@iconsResource.getProperty(form.itemType + ‘_icon’)}, iconLabel=${@iconsResource.getProperty(form.itemType + ‘_label’)}“>
-		<i th:classappend=“${!#strings.isEmpty(iconClass)} ? ${iconClass} : ‘fas fa-file’” th:title=“${iconLabel} ?: ${entry.itemType}“></i> [[${iconLabel} ?: ${entry.itemType}]]
+	<div th:with="iconClass=${@iconsResource.getProperty(form.itemType + '_icon')}, iconLabel=${@iconsResource.getProperty(form.itemType + '_label')}">
+		<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
 	</div>
 </td>
 </tr>
