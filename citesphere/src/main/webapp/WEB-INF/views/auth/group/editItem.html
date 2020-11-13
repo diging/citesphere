@@ -862,7 +862,7 @@ function creatorLinkHandler(target) {
 				<td class="creator" th:id="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" >[[${curCreator.value}]]</td>
 				<td> 
 					<div th:with="role=${#strings.toLowerCase(#strings.substringAfter(curCreator.key, '_item_attribute_label_'))}">
-					[[${role}]][[${curCreator.key}]]
+					
 					<span th:id="|${role}List|" style="font-size: 18px"></span>
 					<span th:each="creator,loop:${citation.otherCreators}" th:if="${#strings.equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
 				 		<span th:id="|${role}${loop.index}|" th:class="|label label-info ${role}-item|" th:data-creator-id="${creator.id}" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
