@@ -613,7 +613,7 @@ function loadFields() {
 		" Loading form fields");
 	$("#messageModal").modal('show');
 	$.ajax({
-		url : '[(${home})]/citesphere/auth/items/'+itemType+'/fields',
+		url : '../../../../items/'+itemType+'/fields',
 		type : 'GET',
 		success: function(changedFields){
 			$('form input').each(function(idx, elem) {
@@ -640,7 +640,7 @@ function loadFields() {
 		}
 	}); 
 	$.ajax({
-		url : '[(${home})]/citesphere/auth/items/'+itemType+'/creators',
+		url : '../../../../items/'+itemType+'/creators',
 		type : 'GET',
 		success: function(creators){
 			$('.creator-row').each(function(idx, elem) {
