@@ -161,14 +161,14 @@ public class CitationManager implements ICitationManager {
         }
 
         ICitation newCitation = zoteroManager.createCitation(user, groupId, collectionIds, citation);
-        citationRepository.save((Citation) newCitation);
+        return citationRepository.save((Citation) newCitation);
 
         // mark group outdated, so it'll be updated on the next loading
-        ICitationGroup group = groupOptional.get();
-        group.setLastLocallyModifiedOn(OffsetDateTime.now().toString());
-        groupRepository.save((CitationGroup) group);
+//        ICitationGroup group = groupOptional.get();
+//        group.setLastLocallyModifiedOn(OffsetDateTime.now().toString());
+//        groupRepository.save((CitationGroup) group);
 
-        return newCitation;
+//        return newCitation;
     }
 
     @Override
@@ -215,7 +215,7 @@ public class CitationManager implements ICitationManager {
                     group.setUpdatedOn(OffsetDateTime.now().toString());
                 }
                 addUserToGroup(group, user);
-                groupRepository.save((CitationGroup) group);
+                group = groupRepository.save((CitationGroup) group);
                 groups.add(group);
             } else {
                 ICitationGroup citGroup = zoteroManager.getGroup(user, id + "", false);
@@ -245,7 +245,7 @@ public class CitationManager implements ICitationManager {
             }
             boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
             if (isModified) {
-                asyncCitationProcessor.sync(user, group, collectionId);
+                asyncCitationProcessor.sync(user, group.getGroupId() + "", group.getContentVersion(), collectionId);
                 throw new SyncInProgressException();
             } 
             
@@ -259,53 +259,64 @@ public class CitationManager implements ICitationManager {
     public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
         Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
+        ICitationGroup group = null;
         if (groupOptional.isPresent()) {
-            ICitationGroup group = groupOptional.get();
+            group = groupOptional.get();
             if (!group.getUsers().contains(user.getUsername())) {
                 throw new AccessForbiddenException();
             }
+        } else {
+            group = zoteroManager.getGroup(user, groupId + "", true);
+        }
+        
+        if (group == null) {
+            throw new GroupDoesNotExistException("There is no group with id " + groupId);
+        }
             
-            boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
-            CitationResults results = new CitationResults();
-            if (isModified) {
-                // first update the group info
+        boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
+        CitationResults results = new CitationResults();
+        if (isModified) {
+            long previousVersion = group.getContentVersion();
+            // first update the group info
+            // if we are using a previously stored group, delete it
+            if (group.getId() != null) {
                 groupRepository.delete((CitationGroup) group);
                 group = zoteroManager.getGroup(user, groupId + "", true);
-                group.setUpdatedOn(OffsetDateTime.now().toString());
-                addUserToGroup(group, user);
-                group = groupRepository.save((CitationGroup) group);
-                
-                //  then update content
-                results.setNotModified(false);
-                asyncCitationProcessor.sync(user, group, collectionId);
-            } else {
-                results.setNotModified(true);
             }
-
-            List<ICitation> citations = null;
-            long total = 0;
-            if (collectionId != null && !collectionId.trim().isEmpty()) {
-                citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize);
-                ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
-                if (collection != null) {
-                    total = collection.getNumberOfItems();                            
-                } else {
-                    total = citations.size();
-                }
-            } else {
-                citations = (List<ICitation>) citationDao.findCitations(groupId,
-                    (page - 1) * zoteroPageSize, zoteroPageSize, false);
-                if (groupOptional.isPresent()) {
-                    total = groupOptional.get().getNumItems();
-                } else {
-                    total = citations.size();
-                }
-            }
-            results.setCitations(citations != null ? citations : new ArrayList<>());
-            results.setTotalResults(total);
-            return results;
+            group.setUpdatedOn(OffsetDateTime.now().toString());
+            addUserToGroup(group, user);
+            group = groupRepository.save((CitationGroup) group);
+            
+            //  then update content
+            results.setNotModified(false);
+            asyncCitationProcessor.sync(user, group.getGroupId()+"", previousVersion, collectionId);
+        } else {
+            results.setNotModified(true);
         }
-        throw new GroupDoesNotExistException("There is no group with id " + groupId);
+
+        List<ICitation> citations = null;
+        long total = 0;
+        if (collectionId != null && !collectionId.trim().isEmpty()) {
+            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize);
+            ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
+            if (collection != null) {
+                total = collection.getNumberOfItems();                            
+            } else {
+                total = citations.size();
+            }
+        } else {
+            citations = (List<ICitation>) citationDao.findCitations(groupId,
+                (page - 1) * zoteroPageSize, zoteroPageSize, false);
+            if (groupOptional.isPresent()) {
+                total = groupOptional.get().getNumItems();
+            } else {
+                total = citations.size();
+            }
+        }
+        results.setCitations(citations != null ? citations : new ArrayList<>());
+        results.setTotalResults(total);
+        return results;
+    
     }
 
     @Override
