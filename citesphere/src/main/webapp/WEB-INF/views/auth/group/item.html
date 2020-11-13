@@ -133,7 +133,7 @@
 			<td>Authors</td>
 			<td><span th:each="author,status : ${citation.authors}">
 				[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
-				<span>[[${!#lists.isEmpty(author.affiliations)}]]-[[${author.affiliations}]]</span>
+				<!-- <span>[[${!#lists.isEmpty(author.affiliations)}]]-[[${author.affiliations}]]</span> -->
 				<span th:if="${!#lists.isEmpty(author.affiliations)}">
 					 (<th:block th:each="aff,affStatus : ${author.affiliations}">
 					 	[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
