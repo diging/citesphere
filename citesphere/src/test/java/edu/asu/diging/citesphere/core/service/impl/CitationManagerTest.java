@@ -172,6 +172,8 @@ public class CitationManagerTest {
         groupVersions.put(GROUP1_ID, new Long(20));
         groupVersions.put(GROUP2_ID, new Long(3));
         Mockito.when(zoteroManager.getGroupsVersion(user)).thenReturn(groupVersions);
+        Mockito.when(groupRepository.save((CitationGroup)group1)).thenReturn((CitationGroup)group1);
+        Mockito.when(groupRepository.save((CitationGroup)group2)).thenReturn((CitationGroup)group2);
         
         List<ICitationGroup> expected = new ArrayList<>();
         group1.setMetadataVersion(20L);
@@ -192,10 +194,12 @@ public class CitationManagerTest {
         
         group1.setMetadataVersion(20L);
         
-        ICitationGroup updatedGroup = new CitationGroup();
+        CitationGroup updatedGroup = new CitationGroup();
         updatedGroup.setGroupId(GROUP2_ID);
         updatedGroup.setContentVersion(new Long(4));
         Mockito.when(zoteroManager.getGroup(user, GROUP2_ID.toString(), true)).thenReturn(updatedGroup);
+        Mockito.when(groupRepository.save(updatedGroup)).thenReturn(updatedGroup);
+        Mockito.when(groupRepository.save((CitationGroup)group1)).thenReturn((CitationGroup)group1);
         
         List<ICitationGroup> expected = new ArrayList<>();
         expected.add(group1);
@@ -229,10 +233,12 @@ public class CitationManagerTest {
     
     @Test
     public void test_createCitation_success() throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException, ZoteroHttpStatusException {
-        ICitation newCitation = new Citation();
-        ICitation createdCitation = new Citation();
+        Citation createdCitation = new Citation();
         createdCitation.setKey("KEY");
+        
+        Citation newCitation = new Citation();
         Mockito.when(zoteroManager.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation)).thenReturn(createdCitation);
+        Mockito.when(citationRepository.save(createdCitation)).thenReturn(createdCitation);
         
         ICitation actual = managerToTest.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation);
         Mockito.verify(citationRepository).save((Citation)createdCitation);
