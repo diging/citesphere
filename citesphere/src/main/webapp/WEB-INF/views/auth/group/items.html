@@ -121,6 +121,15 @@ Items in Group <span th:text="${group.name}"></span></br>
 <script>
 //# sourceURL=poll.js
 var syncUrl= "sync/info";
+var currentURL = window.location.href;
+if(currentURL.match(/collection/))
+	{
+	var syncUrl= "../../sync/info";
+	}
+else{
+	var syncUrl= "sync/info";
+	}
+
 $.get(syncUrl, pollStatus);
 
 function pollStatus(){
