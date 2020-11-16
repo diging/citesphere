@@ -20,7 +20,14 @@ $(function() {
 	$(".bib-entry").click(function() {
 		var key = $(this).data("key");
 		var index = $(this).data("index");
-		window.location.href = "items/" + key +"?index=" + index + "&page=[(${currentPage})]&sortBy=[(${sort})]&collectionId=[(${collectionId})]";
+		var currentURL = window.location.href;
+		if(currentURL.match(/collection/))
+			{
+			window.location.href = "../../items/" + key +"?index=" + index + "&page=[(${currentPage})]&sortBy=[(${sort})]&collectionId=[(${collectionId})]";
+			}
+		else{
+			window.location.href = "items/" + key +"?index=" + index + "&page=[(${currentPage})]&sortBy=[(${sort})]&collectionId=[(${collectionId})]";
+		    }
 	});
 	
 	$('.collapse').collapse();
