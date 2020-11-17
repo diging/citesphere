@@ -29,7 +29,7 @@ Do you want to proceed?
 
 <!--  currently stored citation  -->
 <div class="col-md-4">
-<h4>Currently stored data (Version ${outdatedCitation.version})</h4>
+<h4>Currently stored data (Version [[${outdatedCitation.version}]])</h4>
 <table class="table table-striped">
 <tr>
 <td width="20%">Item Key</td>
@@ -89,13 +89,13 @@ Do you want to proceed?
 <span th:if="${#lists.contains(outdatedCitationFields, 'publicationTitle') }">
 <tr>
 <td>Publication Title</td>
-<td>${outdatedCitation.publicationTitle}</td>
+<td>[[${outdatedCitation.publicationTitle}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'journalAbbreviation') }">
 <tr>
 <td>Journal Abbreviation</td>
-<td>${outdatedCitation.journalAbbreviation}</td>
+<td>[[${outdatedCitation.journalAbbreviation}]]</td>
 </tr>
 </span>
 <span th:if="${#lists.contains(outdatedCitationFields, 'volume') }">
@@ -193,7 +193,7 @@ Do you want to proceed?
 
 <!--  current citation fields -->
 <div class="col-md-4">
-<h4>Data retrieved from Zotero (Version ${currentCitation.version})</h4>
+<h4>Data retrieved from Zotero (Version [[${currentCitation.version}]])</h4>
 <table class="table table-striped">
 <tr>
 <td width="20%">Item Key</td>
@@ -201,15 +201,17 @@ Do you want to proceed?
 </tr>
 <tr>
 <td>Citation Type</td>
-<td th:with="iconClass=fas fa-file, iconLabel=${entry.itemType}">
-<spring:eval expression="@iconsResource.getProperty(currentCitation.itemType + '_icon')"  var="iconClass" />
-<spring:eval expression="@iconsResource.getProperty(currentCitation.itemType + '_label')"  var="iconLabel" />	
-<span th:if="${empty iconClass}">
-</span>
-<span th:if="${empty iconLabel}">
-</span>
-<i class="${iconClass}" title="${iconLabel}"></i> [[${iconLabel}]]
+
+
+<td>
+	<div th:with="iconClass=${@iconsResource.getProperty(currentCitation.itemType + '_icon')}
+			 , iconLabel=${@iconsResource.getProperty(currentCitation.itemType + '_label')}">
+				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${currentCitation.itemType}"></i> [[${iconLabel} ?: ${currentCitation.itemType}]]
+	</div>
 </td>
+
+
+
 </tr>
 <span th:if="${#lists.contains(currentCitationFields, 'title') }">
 <tr th:if="${currentCitation.title != outdatedCitation.title}" class="changed">
@@ -427,7 +429,7 @@ Do you want to proceed?
 <td>[[${form.volume}]]</td>
 </tr>
 </span>
-<span th:if="${#lists.contains(columns,column)#lists.contains(formFields, 'issue') }">
+<span th:if="${#lists.contains(formFields, 'issue') }">
 <tr th:if="${form.issue != outdatedCitation.issue}" class="changed">
 <td>Issue</td>
 <td>[[${form.issue}]]</td>
