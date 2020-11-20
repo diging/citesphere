@@ -613,7 +613,7 @@ function loadFields() {
 		" Loading form fields");
 	$("#messageModal").modal('show');
 	$.ajax({
-		url : '../../../../items/'+itemType+'/fields',
+		url : [[@{/auth/items/}]] + itemType + '/fields',
 		type : 'GET',
 		success: function(changedFields){
 			$('form input').each(function(idx, elem) {
@@ -640,7 +640,8 @@ function loadFields() {
 		}
 	}); 
 	$.ajax({
-		url : '../../../../items/'+itemType+'/creators',
+		url : [[@{/auth/items/}]] + itemType + '/creators',
+		
 		type : 'GET',
 		success: function(creators){
 			$('.creator-row').each(function(idx, elem) {
@@ -754,7 +755,7 @@ function creatorLinkHandler(target) {
 				<td width="20%">Collection</td>
 				<td>
 					<select class="form-control" th:field="*{collectionId}" >
-     					<option th:value="">&nbsp;</option>
+     					<option value="">&nbsp;</option>
      					<option th:each = "citationCollection: ${citationCollections}" 
      							th:value="${citationCollection.key}" 
      							th:text="${citationCollection.name}" items="${citationCollections}" />

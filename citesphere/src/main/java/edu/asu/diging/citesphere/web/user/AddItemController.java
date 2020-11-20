@@ -70,7 +70,11 @@ public class AddItemController {
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("defaultItemType", ItemType.valueOf(defaultItemType));
         model.addAttribute("creatorMap", properties.entrySet());
-
+        model.addAttribute("citation", new Citation());
+        List<String> fields = new ArrayList<>();
+        citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), ItemType.JOURNAL_ARTICLE)
+                .forEach(f -> fields.add(f.getFilename()));
+        model.addAttribute("fields", fields);
         try {
             model.addAttribute("citationCollections", collectionManager.getAllCollections((IUser)authentication.getPrincipal(), zoteroGroupId, null, "title", 200));
             model.addAttribute("concepts", conceptManager.findAll(userManager.findByUsername(authentication.getName())));
@@ -79,7 +83,7 @@ public class AddItemController {
         } catch (GroupDoesNotExistException e) {
             logger.error("Could not retrieve collections.", e);
         }
-        return "auth/group/items/create";
+        return "auth/group/editItem";
     }
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create", method = RequestMethod.POST)
@@ -104,7 +108,7 @@ public class AddItemController {
                     ? e.getResponse().getFailed().get("0").getMessage()
                     : "Sorry, item creation failed.";
             model.addAttribute("alert_msg", msg);
-            return "auth/group/items/create";
+            return "auth/group/editItem";
         }
 
         return "redirect:/auth/group/{zoteroGroupId}/items/" + citation.getKey();
