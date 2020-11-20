@@ -234,8 +234,6 @@ Do you want to proceed?
 <tr>
 <td>Authors</td>
 <td>
-
-<td>
 	<span th:each="author,status : ${currentCitation.authors}">
 				[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
 		<span th:if="${!#lists.isEmpty(author.affiliations)}">
@@ -517,29 +515,29 @@ Do you want to proceed?
 </div>
 
 <div class="col-md-12">
-<form:form action="#" th:action="@{|/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}/conflict/resolve?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}" th:object="${form}" method="POST">
-<form:hidden path="key" value="${form.key}" />
-<form:hidden path="itemType" value="${form.itemType}" />
-<form:hidden path="title" value="${form.title}" />
-<form:hidden path="shortTitle" value="${form.shortTitle}" />
-<form:hidden path="dateFreetext" value="${form.dateFreetext}" />
-<form:hidden path="publicationTitle" value="${form.publicationTitle}" />
-<form:hidden path="journalAbbreviation" value="${form.journalAbbreviation}" />
-<form:hidden path="volume" value="${form.volume}" />
-<form:hidden path="issue" value="${form.issue}" />
-<form:hidden path="pages" value="${form.pages}" />
-<form:hidden path="series" value="${form.series}" />
-<form:hidden path="seriesTitle" value="${form.seriesTitle}" />
-<form:hidden path="seriesText" value="${form.seriesText}" />
-<form:hidden path="url" value="${form.url}" />
-<form:hidden path="language" value="${form.language}" />
-<form:hidden path="doi" value="${form.doi}" />
-<form:hidden path="issn" value="${form.issn}" />
-<form:hidden path="archive" value="${form.archive}" />
-<form:hidden path="archiveLocation" value="${form.archiveLocation}" />
-<form:hidden path="libraryCatalog" value="${form.libraryCatalog}" />
-<form:hidden path="callNumber" value="${form.callNumber}" />
-<form:hidden path="rights" value="${form.rights}" />
+<form action="#" th:action="@{|/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}/conflict/resolve?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}" th:object="${form}" method="POST">
+<input type="hidden" path="key" th:value="${form.key}" />
+<input type="hidden" path="itemType" th:value="${form.itemType}" />
+<input type="hidden" path="title" th:value="${form.title}" />
+<input type="hidden" path="shortTitle" th:value="${form.shortTitle}" />
+<input type="hidden" path="dateFreetext" th:value="${form.dateFreetext}" />
+<input type="hidden" path="publicationTitle" th:value="${form.publicationTitle}" />
+<input type="hidden" path="journalAbbreviation" th:value="${form.journalAbbreviation}" />
+<input type="hidden" path="volume" th:value="${form.volume}" />
+<input type="hidden" path="issue" th:value="${form.issue}" />
+<input type="hidden" path="pages" th:value="${form.pages}" />
+<input type="hidden" path="series" th:value="${form.series}" />
+<input type="hidden" path="seriesTitle" th:value="${form.seriesTitle}" />
+<input type="hidden" path="seriesText" th:value="${form.seriesText}" />
+<input type="hidden" path="url" th:value="${form.url}" />
+<input type="hidden" path="language" th:value="${form.language}" />
+<input type="hidden" path="doi" th:value="${form.doi}" />
+<input type="hidden" path="issn" th:value="${form.issn}" />
+<input type="hidden" path="archive" th:value="${form.archive}" />
+<input type="hidden" path="archiveLocation" th:value="${form.archiveLocation}" />
+<input type="hidden" path="libraryCatalog" th:value="${form.libraryCatalog}" />
+<input type="hidden" path="callNumber" th:value="${form.callNumber}" />
+<input type="hidden" path="rights" th:value="${form.rights}" />
 
 <button type="submit" class="btn btn-primary">Sounds good, proceed!</button>
 <a th:href="@{|/auth/group/${zoteroGroupId}/items/${outdatedCitation.key}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}" class="btn btn-default">No, cancel.</a>
