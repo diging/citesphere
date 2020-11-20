@@ -178,8 +178,8 @@
 					<span th:if="${!#lists.isEmpty(creator.person.affiliations)}">
 				
  						(<th:block th:each="aff,affStatus : ${creator.person.affiliations}">
-							${aff.name}<span th:if="${!affStatus.last}">, </span>
-						</th:block>)<span th:if="${!creatorStatus.last}">; </span>
+							[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
+						</th:block>)<span th:if="${!creatorStatus.last}"></span>
 					</span>
 					<span th:if="${!#strings.isEmpty(creator.person.uri)}">
 						<a th:href="@{|${creator.person.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
