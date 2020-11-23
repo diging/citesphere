@@ -822,7 +822,7 @@ function creatorLinkHandler(target) {
 						</th:block>
 								[[${author.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
 								<th:block th:each="aff:${author.affiliations}">
-									<span  th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
+									<span th:remove="tag" th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
 									&nbsp;
 							<i class="far fa-edit edit-author" style="cursor: pointer;"></i>
@@ -844,7 +844,7 @@ function creatorLinkHandler(target) {
 						<th:block th:each="aff,affStatus:${editor.affiliations}"> 
 							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|editor${status.index}-aff${affStatus.index}|"></span>
 						</th:block>
-						  [[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
+						  [[${editor.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
 						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
 							&nbsp;
 							<i class="far fa-edit edit-editor"></i>
