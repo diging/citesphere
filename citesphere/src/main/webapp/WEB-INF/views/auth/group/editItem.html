@@ -1022,9 +1022,16 @@ function creatorLinkHandler(target) {
 			
 		</table>
 		<button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
+		<span th:if="${itemId == null}">
+			<a th:href="@{|/auth/group/${zoteroGroupId}/items|}" class="btn btn-default">
+		          <i class="fa fa-times"></i>&nbsp;Cancel
+            </a>
+		</span>
+		<span th:if="${itemId != null}">
                <a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}" class="btn btn-default">
 		          <i class="fa fa-times"></i>&nbsp;Cancel
                </a>
+        </span>
 	</form>
 	
 	
