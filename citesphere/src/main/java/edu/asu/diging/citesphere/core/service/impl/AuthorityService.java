@@ -101,7 +101,7 @@ public class AuthorityService implements IAuthorityService {
     @Override
     public Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId)
             throws GroupDoesNotExistException {
-        Optional<ICitationGroup> group = groupRepository.findByGroupId(new Long(citationGroupId));
+        Optional<ICitationGroup> group = groupRepository.findFirstByGroupId(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }

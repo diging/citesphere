@@ -110,7 +110,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         // while this thread has been running, the group might have been updated by another thread
         // so, we have to make sure there is no group with the same group id but other object id
         // or we'll end up with two groups with the same group id.
-        Optional<ICitationGroup> group = groupRepo.findByGroupId(new Long(groupId));
+        Optional<ICitationGroup> group = groupRepo.findFirstByGroupId(new Long(groupId));
         if (group.isPresent()) {
             group.get().setContentVersion(groupVersion);
             groupRepo.save((CitationGroup) group.get());

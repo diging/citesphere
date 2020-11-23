@@ -45,7 +45,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
      */
     @Override
     public CitationCollectionResult getCitationCollections(IUser user, String groupId, String parentCollectionId, int page, String sortBy) throws GroupDoesNotExistException {
-        Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
@@ -59,7 +59,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
     
     @Override
     public long getTotalCitationCollections(IUser user, String groupId, String parentCollectionId) throws GroupDoesNotExistException {
-        Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
