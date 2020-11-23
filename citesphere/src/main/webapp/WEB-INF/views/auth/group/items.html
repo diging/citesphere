@@ -301,7 +301,7 @@ function pollStatus(){
 		 	</td>
 		 	<td>
 		 		<span th:if="${!#strings.isEmpty(entry.url)}">
-		 		<a href="${entry.url}" target="_blank" title="${entry.url}"><i class="fas fa-globe-americas"></i></a>
+		 		<a href="${entry.url}" target="_blank" th:title="${entry.url} "><i class="fas fa-globe-americas"></i></a>
 		 		</span>
 		 	</td>
 		 	<td th:each="column:${columns}" style="max-width:300px;">
