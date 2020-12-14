@@ -57,7 +57,6 @@ $(function() {
 	$(".edit-author").click(function(){
 		var authorItem = $(this).parent();
 		editPerson('Author', authorItem[0]);
-		console.log("edit author button pressed");
 	});
 	
 	$(".edit-author").css('cursor', 'pointer');
@@ -78,7 +77,7 @@ $(function() {
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-		$.post('/auth/authority/create?[(${_csrf.parameterName})]=[(${_csrf.token})]&uri=' + uri, function(data) {
+		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
 			$("#authorCreateAuthority").hide();
 			$("#uriAuthorLocalId").val(data['id']);
 			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
@@ -355,7 +354,6 @@ function savePersonDetails(personType, modalName){
 	var affSpan = $("<span>");
 	$("#"+modalNameLCase+"Affiliations").children().each(function(idx, elem) {
 		var input = $(elem).find("input");
-		console.log("space"+input.val()+"space");
 		if(input.val().length!=0){
 			var affSpan = $("<span>");
 			affSpan.attr("data-affiliation-name", input.val());
@@ -366,11 +364,7 @@ function savePersonDetails(personType, modalName){
 	
 	var affiliationString = "";
 	if (affiliationsList.length != 0) {
-		console.log("inside");
 		affiliationString = " (" + $.grep(affiliationsList, Boolean).join(", ") + ")";
-	}
-	else{
-		console.log(affiliationsList.length);
 	}
 	
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
@@ -545,7 +539,7 @@ function resetPersonAuthorityCreation(personType) {
 function getPersonAuthority(uri, personType) {
 	
 	personType_lowerCase = personType.toLowerCase();
-	$.get('/auth/authority/get?uri=' + uri + '&zoteroGroupId=' + [(${zoteroGroupId})], function(data) {
+	$.get([[@{/auth/authority/get?uri=}]] + uri + '&zoteroGroupId=' + [(${zoteroGroupId})], function(data) {
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", data['uri']);
 		var content = "Authority <b>" + uri + "</b>";
 		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
