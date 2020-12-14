@@ -30,7 +30,7 @@ public class GroupManager implements IGroupManager {
      */
     @Override
     public ICitationGroup getGroup(IUser user, String groupId) {
-        Optional<ICitationGroup> groupOptional = groupRepository.findByGroupId(new Long(groupId));
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (groupOptional.isPresent() && groupOptional.get().getUsers().contains(user.getUsername())) {
             return (ICitationGroup) groupOptional.get();
         }

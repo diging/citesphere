@@ -69,8 +69,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
      */
     @Override
     @Async
-    public void sync(IUser user, ICitationGroup group, String collectionId) {
-        GroupSyncJob prevJob = jobManager.getMostRecentJob(group.getGroupId() + "");
+    public void sync(IUser user, String groupId, long contentVersion, String collectionId) {
+        GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
         if (prevJob != null && prevJob.getStatus() != JobStatus.DONE && prevJob.getStatus() != JobStatus.FAILURE) {
             // there is already a job running, let's not start another one
             return;
@@ -78,7 +78,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
-        job.setGroupId(group.getGroupId() + "");
+        job.setGroupId(groupId + "");
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save(job);
         jobManager.addJob(job);
@@ -87,13 +87,13 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         // in between
         // this way the group version can be out-dated and trigger another sync next
         // time
-        long groupVersion = zoteroManager.getLatestGroupVersion(user, group.getGroupId() + "");
-        DeletedZoteroElements deletedElements = zoteroManager.getDeletedElements(user, group.getGroupId() + "",
-                group.getContentVersion());
-        Map<String, Long> versions = zoteroManager.getGroupItemVersions(user, group.getGroupId() + "",
-                group.getContentVersion());
-        Map<String, Long> collectionVersions = zoteroManager.getCollectionsVersions(user, group.getGroupId() + "",
-                group.getContentVersion() + "");
+        long groupVersion = zoteroManager.getLatestGroupVersion(user, groupId + "");
+        DeletedZoteroElements deletedElements = zoteroManager.getDeletedElements(user, groupId + "",
+                contentVersion);
+        Map<String, Long> versions = zoteroManager.getGroupItemsVersions(user, groupId + "",
+                contentVersion, true);
+        Map<String, Long> collectionVersions = zoteroManager.getCollectionsVersions(user, groupId + "",
+                contentVersion + "");
 
         job.setTotal(versions.size() + collectionVersions.size()
                 + (deletedElements.getItems() != null ? deletedElements.getItems().size() : 0));
@@ -101,20 +101,27 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         jobRepo.save(job);
 
         AtomicInteger counter = new AtomicInteger();
-        syncCitations(user, group, job, versions, counter);
-        syncCollections(user, group, job, collectionVersions, groupVersion, counter);
+        syncCitations(user, groupId, job, versions, counter);
+        syncCollections(user, groupId, job, collectionVersions, groupVersion, counter);
 
         removeDeletedItems(deletedElements, job);
 
-        group.setContentVersion(groupVersion);
-        groupRepo.save((CitationGroup) group);
+        
+        // while this thread has been running, the group might have been updated by another thread
+        // so, we have to make sure there is no group with the same group id but other object id
+        // or we'll end up with two groups with the same group id.
+        Optional<ICitationGroup> group = groupRepo.findFirstByGroupId(new Long(groupId));
+        if (group.isPresent()) {
+            group.get().setContentVersion(groupVersion);
+            groupRepo.save((CitationGroup) group.get());
+        }
 
         job.setStatus(JobStatus.DONE);
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
     }
 
-    private void syncCitations(IUser user, ICitationGroup group, GroupSyncJob job, Map<String, Long> versions,
+    private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
             AtomicInteger counter) {
         List<String> keysToRetrieve = new ArrayList<>();
         for (String key : versions.keySet()) {
@@ -129,7 +136,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             }
             counter.incrementAndGet();
             if (counter.intValue() % 50 == 0) {
-                retrieveCitations(user, group, keysToRetrieve);
+                retrieveCitations(user, groupId, keysToRetrieve);
                 keysToRetrieve = new ArrayList<>();
             }
             job.setCurrent(counter.intValue());
@@ -137,26 +144,26 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
 
         if (!keysToRetrieve.isEmpty()) {
-            retrieveCitations(user, group, keysToRetrieve);
+            retrieveCitations(user, groupId, keysToRetrieve);
         }
     }
     // contentVersion of collections not set
-    private void syncCollections(IUser user, ICitationGroup group, GroupSyncJob job, Map<String, Long> versions,
+    private void syncCollections(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
             long groupVersion, AtomicInteger counter) {
         List<String> keysToRetrieve = new ArrayList<>();
-        List<ICitationCollection> collections = collectionRepo.findByGroupId(group.getGroupId() + "");
+        List<ICitationCollection> collections = collectionRepo.findByGroupId(groupId);
         Set<String> keys = collections.stream().map(c -> c.getKey()).collect(Collectors.toSet());
         keys.addAll(versions.keySet());
         
         for (String key : keys) {
-            ICitationCollection collection = collectionRepo.findByKeyAndGroupId(key, group.getGroupId() + "");
+            ICitationCollection collection = collectionRepo.findByKeyAndGroupId(key, groupId);
             if (collection == null || (versions.containsKey(key) && collection.getVersion() != versions.get(key))
                     || collection.getContentVersion() != groupVersion) {
                 keysToRetrieve.add(key);
             }
             counter.incrementAndGet();
             if (counter.intValue() % 50 == 0) {
-                retrieveCollections(user, group, keysToRetrieve);
+                retrieveCollections(user, groupId, keysToRetrieve);
                 keysToRetrieve = new ArrayList<>();
             }
             job.setCurrent(counter.intValue());
@@ -164,7 +171,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
 
         if (!keysToRetrieve.isEmpty()) {
-            retrieveCollections(user, group, keysToRetrieve);
+            retrieveCollections(user, groupId, keysToRetrieve);
         }
     }
 
@@ -181,27 +188,27 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
     }
 
-    private long retrieveCitations(IUser user, ICitationGroup group, List<String> keysToRetrieve) {
+    private long retrieveCitations(IUser user, String groupId, List<String> keysToRetrieve) {
         try {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             logger.error("Could not wait.", e);
         }
-        ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, group.getGroupId() + "",
-                keysToRetrieve);
+        ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, groupId,
+                keysToRetrieve, true);
         retrievedCitations.getCitations().forEach(c -> storeCitation(c));
         return retrievedCitations.getContentVersion();
     }
 
-    private long retrieveCollections(IUser user, ICitationGroup group, List<String> keysToRetrieve) {
+    private long retrieveCollections(IUser user, String groupId, List<String> keysToRetrieve) {
         try {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             logger.error("Could not wait.", e);
         }
-        ZoteroCollectionsResponse response = zoteroManager.getCollectionsByKey(user, group.getGroupId() + "",
+        ZoteroCollectionsResponse response = zoteroManager.getCollectionsByKey(user, groupId,
                 keysToRetrieve);
         response.getCollections().forEach(c -> storeCitationCollection(c));
         return response.getContentVersion();

@@ -52,9 +52,9 @@ public interface IZoteroManager {
 
     boolean isGroupModified(IUser user, String groupId, long lastGroupVersion) throws ZoteroHttpStatusException;
 
-    Map<String, Long> getGroupItemVersions(IUser user, String groupId, long version);
+    Map<String, Long> getGroupItemsVersions(IUser user, String groupId, long version, boolean includeTrashed);
 
-    ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys);
+    ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed);
 
     DeletedZoteroElements getDeletedElements(IUser user, String groupId, long version);
 
