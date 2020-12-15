@@ -69,8 +69,15 @@ public class GroupItemsController {
         logger.error("*** pageInt ****" + pageInt);
         IUser user = (IUser) authentication.getPrincipal();
         logger.error("*** user ****" + user);
-        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
-        logger.error("*** citation results ****" + results);
+        CitationResults results;
+        try {
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+        } catch(Exception e) {
+            logger.error("Exception occured", e);
+            return "error/403";
+        }
+        
+        
         model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
         logger.error("*** zoteroPageSize ****" + zoteroPageSize);
