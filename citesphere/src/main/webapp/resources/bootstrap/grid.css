@@ -2,6 +2,11 @@ body, p, table, div, input {
 	font-family: 'Fira Sans', sans-serif;
 }
 
+body{
+    margin-bottom: 100px;
+    min-height: 400px;
+}
+
 .bib-entry {
 	cursor: pointer;
 }
@@ -25,7 +30,7 @@ hr {
 }
 
 .footer {
-	position: relative;
+	position: fixed;
 	background-color: white;
 	width: 100%;
 	bottom: 0px;
