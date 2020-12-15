@@ -27,7 +27,7 @@ public class ThymeleafConfig {
         templateResolver.setApplicationContext(this.applicationContext);
         templateResolver.setPrefix("/WEB-INF/views/");
         templateResolver.setSuffix(".html");
-        templateResolver.setCharacterEncoding(Charset.defaultCharset().toString());
+        templateResolver.setCharacterEncoding(Charset.forName("UTF-8").toString());
         // HTML is the default value, added here for the sake of clarity.
         templateResolver.setTemplateMode(TemplateMode.HTML);
         // Template cache is true by default. Set to false if you want
@@ -57,7 +57,7 @@ public class ThymeleafConfig {
     public ThymeleafViewResolver viewResolver() {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
         viewResolver.setTemplateEngine(templateEngine());
-        viewResolver.setCharacterEncoding(Charset.defaultCharset().toString());
+        viewResolver.setCharacterEncoding(Charset.forName("UTF-8").toString());
         return viewResolver;
     }
 }
