@@ -68,19 +68,26 @@ public class GroupItemsController {
         }
         logger.error("*** pageInt ****" + pageInt);
         IUser user = (IUser) authentication.getPrincipal();
+        logger.error("*** user ****" + user);
         CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+        logger.error("*** citation results ****" + results);
         model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
+        logger.error("*** zoteroPageSize ****" + zoteroPageSize);
+        logger.error("*** results.getTotalResults() ****" + results.getTotalResults());
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
+        logger.error("*** total pages ****" + Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", groupId);
         model.addAttribute("group", groupManager.getGroup(user, groupId));
+        
+        logger.error("*** group ****" + groupManager.getGroup(user, groupId));
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sort", sort);
         model.addAttribute("results", results);
         // more than 200 really don't make sense here, this needs to be changed
         model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
-        logger.error("*** citation results ****" + results);
+        logger.error("*** citationCollections ****" + collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
         List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();
         if (columns != null && columns.length > 0) {
