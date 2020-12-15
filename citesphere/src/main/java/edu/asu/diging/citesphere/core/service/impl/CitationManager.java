@@ -258,15 +258,17 @@ public class CitationManager implements ICitationManager {
     @Override
     public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
-        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        
         ICitationGroup group = null;
-        if (groupOptional.isPresent()) {
-            group = groupOptional.get();
-            if (!group.getUsers().contains(user.getUsername())) {
-                throw new AccessForbiddenException();
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        if (!groupOptional.isPresent() || !groupOptional.get().getUsers().contains(user.getUsername())) {
+            group = zoteroManager.getGroup(user, groupId, false);
+            if (group != null) {
+                group.getUsers().add(user.getUsername());
+                groupRepository.save((CitationGroup) group);
             }
         } else {
-            group = zoteroManager.getGroup(user, groupId + "", true);
+            group = groupOptional.get();
         }
         
         if (group == null) {
