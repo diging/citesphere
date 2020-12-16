@@ -95,3 +95,8 @@ a.appName:hover {
 tr.changed>td {
 	background-color: #f7e8bf;
 }
+
+.drag-over{
+	background: #ddf;
+	border-color: blue ;
+}

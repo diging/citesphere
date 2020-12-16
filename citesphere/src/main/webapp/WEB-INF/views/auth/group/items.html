@@ -256,7 +256,7 @@ function pollStatus(){
 	
 	<ul class="list-group" id="collectionsList">
 	<th:block th:each="collection:${citationCollections}">
-	  <li class="list-group-item">
+	  <li class="list-group-item collections">
 		  <span class="badge" th:text="${collection.numberOfItems}"/>
 		  <a th:href="@{|/auth/group/${zoteroGroupId}/collection/${collection.key}/items|}"><span th:text="${collection.name}"/></a>
 	  </li>
@@ -279,7 +279,7 @@ function pollStatus(){
 		</tr>
 		
 		
-		<tr th:each="entry,loop : ${items}">
+		<tr draggable="true" class="items" th:each="entry,loop : ${items}">
 			<td>
 			  <span class="text-warning">
 			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
@@ -310,6 +310,48 @@ function pollStatus(){
 		</tr>
 	</table>
 </div>
+	<script>
+		const itemsList = document.querySelectorAll('.items');
+		itemsList.forEach(item =>{
+			item.addEventListener('dragstart', dragStart);
+		});
+		
+		function dragStart(e) {
+	  	  e.dataTransfer.setData('text/plain', e.target.getAttribute("key"));
+	  	  console.log("dragging key is : "+e.currentTarget.getAttribute("index"));
+	  	console.log("dragging key is : "+ $(this).data("key"));
+	  	
+		}
+		
+		const collectionsList = document.querySelectorAll('.collections');
+		collectionsList.forEach(collection => {
+			collection.addEventListener('dragenter', dragEnter);
+			collection.addEventListener('dragover', dragOver);
+			collection.addEventListener('dragleave', dragLeave);
+			collection.addEventListener('drop', drop);
+		});
+		
+		function dragEnter(e){
+			e.preventDefault();
+			e.target.classList.add('drag-over');	
+		}
+		
+		function dragOver(e) {
+		    e.preventDefault();
+		    e.target.classList.add('drag-over');
+		}
+
+		function dragLeave(e) {
+		    e.target.classList.remove('drag-over');
+		}
+
+		function drop(e) {
+		    e.target.classList.remove('drag-over');
+		    const key = e.dataTransfer.getData('text/plain');
+		    console.log(key);
+		}
+		
+	</script>
 </div>
 </body>
 </html>
