@@ -19,6 +19,7 @@ $(function() {
 	
 	$(".bib-entry").click(function() {
 		var key = $(this).data("key");
+		console.log(key);
 		var index = $(this).data("index");
 		var currentURL = window.location.href;
 		if(currentURL.match(/collection/))
@@ -310,17 +311,17 @@ function pollStatus(){
 		</tr>
 	</table>
 </div>
-	<script>
+ 
+ 
+
+	<script >
 		const itemsList = document.querySelectorAll('.items');
 		itemsList.forEach(item =>{
 			item.addEventListener('dragstart', dragStart);
 		});
 		
 		function dragStart(e) {
-	  	  e.dataTransfer.setData('text/plain', e.target.getAttribute("key"));
-	  	  console.log("dragging key is : "+e.currentTarget.getAttribute("index"));
-	  	console.log("dragging key is : "+ $(this).data("key"));
-	  	
+	  	  e.dataTransfer.setData('text/plain', e.target.getElementsByTagName('td')[1].getAttribute('data-key'));
 		}
 		
 		const collectionsList = document.querySelectorAll('.collections');
@@ -346,10 +347,30 @@ function pollStatus(){
 		}
 
 		function drop(e) {
-		    e.target.classList.remove('drag-over');
-		    const key = e.dataTransfer.getData('text/plain');
-		    console.log(key);
+			e.target.classList.remove('drag-over');
+			const key = e.dataTransfer.getData('text/plain');
+		    console.log("Dragged item key is: "+key);
+		    var href = e.target.getElementsByTagName('a')[0];
+		    console.log("Dragged on to Collection href is: "+ href);
+		    href = href +"";
+		    var segments = href.split('/');
+		    console.log("Dragged on to Collection: "+ segments[8]);
+		    
 		}
+		
+		/* $(function(){
+			$(".items").draggable();
+			$(".items").droppable( {
+			    drop: handleDropEvent
+			  } );
+		});
+		
+		function handleDropEvent(event, ui){
+			var draggedItem = ui.draggable;
+			console.log(draggedItem.data("key"));
+			console.log($(this).data('key'));
+			console.log($(this).children("a").attr("href"));
+		} */
 		
 	</script>
 </div>
