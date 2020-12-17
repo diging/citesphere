@@ -29,6 +29,9 @@
 				<div class="panel-body">
 					<a th:href="@{'/auth/group/' + ${group.groupId} + '/items'}"><span th:text="${group.name}"/>
 					(<span th:text="${group.numItems}"/>)</a>
+					<form th:action="@{'/auth/group/' + ${group.groupId} + '/mongo'}">
+					<button class="btn btn-primary btn-lg" style="float: right; "><span>Delete Local copy </span> </button>
+					</form>
 				</div>
 			</div>
 		</tbody>
