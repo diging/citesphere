@@ -91,7 +91,7 @@ public class EditItemController {
         labels.forEach(x -> labelsRoles.put(x.getKey().toString(), x.getValue().toString()));
         for (String role : citation.getOtherCreatorRoles()) {
         	if (!labelsRoles.containsKey("_item_attribute_label_" + role)) {
-        		labelsRoles.put("_item_attribute_label_" + role, org.springframework.util.StringUtils.capitalize(role));
+            labelsRoles.put("_item_attribute_label_" + role, org.springframework.util.StringUtils.capitalize(role));
         	}
         }
         model.addAttribute("creatorMap", labelsRoles.entrySet());
