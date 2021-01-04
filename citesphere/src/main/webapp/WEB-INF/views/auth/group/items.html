@@ -313,6 +313,7 @@ function pollStatus(){
  
 
 	<script >
+	//# sourceURL=move.js
 		const itemsList = document.querySelectorAll('.items');
 		itemsList.forEach(item =>{
 			item.addEventListener('dragstart', dragStart);
@@ -356,11 +357,36 @@ function pollStatus(){
 		    var groupId = segments[6];
 		    console.log("Group id is: "+ segments[6]);
 		    
-		    $.ajax({
-		    	type: "POST",
-		    	url: '[[@{/auth/group/}]]' + groupId + '/items/move',
+		    const post ={ItemKey:movedItemKey, 
+		    		CollectionKey: movedToCollectionKey };
 		    
-		    });
+		   
+		    /* $.post( '[[@{/auth/group/}]]' + groupId + '/items/move'); */
+
+		     /* $.post('[[@{/auth/group/}]]' + groupId + '/items/move', function( data ) {
+		    	  alert( "Data Loaded: " + data );
+		    	});  */
+		    
+		    	const xhr = new XMLHttpRequest;
+		    	
+		    	var itemsMoveData ={};
+		    	itemsMoveData["itemId"] = movedItemKey;
+		    	itemsMoveData["collectionId"] = movedToCollectionKey;
+		    	
+	 	      $.ajax({
+		    	type: "POST",
+		    	url: '[[@{/auth/group/}]]' + groupId + '/items/move?[(${_csrf.parameterName})]=[(${_csrf.token})]',
+		    	data: JSON.stringify(itemsMoveData),
+		    	dataType : 'json',
+		    	contentType : "application/json",
+		        success: function(data){ 
+		                alert(data);
+		        }
+		    });  
+		    	
+		    	
+		    
+		    	
 		    
 		}
 		

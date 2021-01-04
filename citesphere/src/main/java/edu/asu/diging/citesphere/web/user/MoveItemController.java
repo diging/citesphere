@@ -3,6 +3,8 @@ package edu.asu.diging.citesphere.web.user;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.api.v1.model.impl.MoveItem;
@@ -33,6 +38,7 @@ import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.forms.AuthorityForm;
 
 
 @Controller
@@ -47,12 +53,17 @@ public class MoveItemController {
     @Autowired
     private IUserManager userManager;
     
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST)
-    public String moveItemToCollection()
+
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST )
+    public @ResponseBody String moveItemToCollection(Authentication authentication,
+    		@PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody MoveItem items )
+   
     		throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException 
     {
-    	System.out.println("Succes");
-    	return null;
+    	System.out.println(items.collectionId + " "+ items.itemId);
+    
+    	return "Moved";
+    	
     }
     
     
