@@ -7,4 +7,6 @@ public interface IGroupManager {
 
     ICitationGroup getGroup(IUser user, String groupId);
 
+	ICitationGroup deleteGroup(IUser user, String groupId);
+
 }

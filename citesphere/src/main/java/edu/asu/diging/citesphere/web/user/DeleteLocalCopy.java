@@ -40,13 +40,13 @@ public class DeleteLocalCopy{
 
         IUser user = userManager.findByUsername(principal.getName());
 
-        ICitationGroup group = groupManager.getGroup(user, groupId);
-        if (group == null) {
-            return new ResponseEntity<Group>(HttpStatus.NOT_FOUND);
-        }
+        groupManager.deleteGroup(user, groupId);
+//        if (group == null) {
+//            return new ResponseEntity<Group>(HttpStatus.NOT_FOUND);
+//        }
 
-        Group jsonGroup = jsonUtil.createGroup(group);
-        System.out.println("Extracting ID from json " + jsonGroup.getId());
+//        Group jsonGroup = jsonUtil.createGroup(group);
+//        System.out.println("Extracting ID from json " + jsonGroup.getId());
         
         
          /** TODO
@@ -58,7 +58,7 @@ public class DeleteLocalCopy{
 //        groupRepository.deleteById(jsonGroup.getId());
 //        groupRepository.delete(entity);
 //        
-        return new ResponseEntity<Group>(jsonGroup, HttpStatus.OK);
+        return new ResponseEntity<Group>(HttpStatus.OK);
 		
         
     }
