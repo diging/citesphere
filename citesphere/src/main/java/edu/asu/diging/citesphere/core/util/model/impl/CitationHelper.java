@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.util.model.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -161,6 +162,26 @@ public class CitationHelper implements ICitationHelper {
             mapPersonFields(personForm, creator.getPerson());
             citationCreatorList.add(creator);
         }
+    }
+    
+    @Override
+    public void updateCitation(ICitation citation, String collection, IUser iUser) {
+    	List<String> collections = citation.getCollections();
+    	if(collections != null) {
+    		collections.add(collection);
+    	}
+    	else {
+    		collections = new ArrayList<String>();
+    		collections.add(collection);
+    	}
+    	citation.setCollections(collections);
+    	// citation.setLanguage("English");
+    	collections = citation.getCollections();
+    	System.out.print("After adding: ");
+    	for(String c :collections) {
+    		System.out.print(c+" ");
+    	}
+    	System.out.println();
     }
 
 }

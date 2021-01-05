@@ -359,28 +359,19 @@ function pollStatus(){
 		    
 		    const post ={ItemKey:movedItemKey, 
 		    		CollectionKey: movedToCollectionKey };
-		    
-		   
-		    /* $.post( '[[@{/auth/group/}]]' + groupId + '/items/move'); */
-
-		     /* $.post('[[@{/auth/group/}]]' + groupId + '/items/move', function( data ) {
-		    	  alert( "Data Loaded: " + data );
-		    	});  */
-		    
-		    	const xhr = new XMLHttpRequest;
+	    	
+		    var itemsMoveData ={};
+		    itemsMoveData["itemId"] = movedItemKey;
+		    itemsMoveData["collectionId"] = movedToCollectionKey;
 		    	
-		    	var itemsMoveData ={};
-		    	itemsMoveData["itemId"] = movedItemKey;
-		    	itemsMoveData["collectionId"] = movedToCollectionKey;
-		    	
-	 	      $.ajax({
+	 	    $.ajax({
 		    	type: "POST",
 		    	url: '[[@{/auth/group/}]]' + groupId + '/items/move?[(${_csrf.parameterName})]=[(${_csrf.token})]',
 		    	data: JSON.stringify(itemsMoveData),
 		    	dataType : 'json',
 		    	contentType : "application/json",
 		        success: function(data){ 
-		                alert(data);
+		                console.log(data);
 		        }
 		    });  
 		    	
