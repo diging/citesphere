@@ -256,16 +256,26 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public ICitation updateCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
-        Item item = itemFactory.createItem(citation, new ArrayList<>());
+        Item item = itemFactory.createItem(citation, citation.getCollections());
 
         List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
         // add fields that need to be submitted
         itemTypeFields.add(ZoteroFields.VERSION);
         itemTypeFields.add(ZoteroFields.ITEM_TYPE);
         itemTypeFields.add(ZoteroFields.CREATOR);
+        
 
         List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, false);
         // ignoreFields.add("collections");
+        
+        ignoreFields.remove("collections");
+        
+        System.out.print(" Ignoring fields ");
+        for(String c :ignoreFields) {
+    		System.out.print(c+" ");
+    	}
+        System.out.println();
+        
 
         List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
 
