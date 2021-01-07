@@ -24,6 +24,7 @@
 		<td><span th:text="${concept.uri}"></span></td>
 		<td><span th:text="${concept.name}"></span></td>
 		<td><span th:text="${concept.description}"></span></td>
+		
 		<td><span class="date" th:text="${concept.createdOn}"></span></td>
 		<td><a th:href="@{'/auth/concepts/' + ${concept.id} + '/edit'}" /><i class="far fa-edit" title="Edit"></i></a></td>
 		</tr>

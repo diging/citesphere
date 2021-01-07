@@ -23,6 +23,7 @@
 		<td><span th:text="${type.uri}"></span></td>
 		<td><span th:text="${type.name}"></span></td>
 		<td><span th:text="${type.description}"></span></td>
+		
 		<td><span class="date" th:text="${type.createdOn}"></span></td>
 		<td><a th:href="@{'/auth/concepts/types/' + ${type.id} + '/edit'}" /><i class="far fa-edit" title="Edit"></i></a></td>
 		</tr>
