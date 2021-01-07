@@ -1,6 +1,8 @@
 <html layout:decorate="~{layouts/main}">
 <head>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
+<link th:href="@{/resources/notify/animate.css}" rel="stylesheet"/>
 
 <script th:inline="javascript">
 //# sourceURL=page.js
@@ -310,9 +312,7 @@ function pollStatus(){
 	</table>
 </div>
  
- 
-
-	<script >
+<script >
 	//# sourceURL=move.js
 		const itemsList = document.querySelectorAll('.items');
 		itemsList.forEach(item =>{
@@ -320,7 +320,7 @@ function pollStatus(){
 		});
 		
 		function dragStart(e) {
-	  	  e.dataTransfer.setData('text/plain', e.target.getElementsByTagName('td')[1].getAttribute('data-key'));
+	  	    e.dataTransfer.setData('text/plain', e.target.getElementsByTagName('td')[1].getAttribute('data-key'));
 		}
 		
 		const collectionsList = document.querySelectorAll('.collections');
@@ -332,7 +332,9 @@ function pollStatus(){
 		});
 		
 		function dragEnter(e){
+			// e.currentTarget.style.cursor="copy";
 			e.preventDefault();
+			
 			e.target.classList.add('drag-over');	
 		}
 		
@@ -347,18 +349,12 @@ function pollStatus(){
 
 		function drop(e) {
 			e.target.classList.remove('drag-over');
-			const movedItemKey = e.dataTransfer.getData('text/plain');
-		    console.log("Dragged item key is: "+movedItemKey);
+			var movedItemKey = e.dataTransfer.getData('text/plain');
 		    var href = e.currentTarget.getElementsByTagName('a')[0] + "";
-		    console.log("Dragged on to Collection href is: "+ href);
+		    var collectionName = e.currentTarget.getElementsByTagName('span')[1].innerHTML;
 		    var segments = href.split('/');
-		    console.log("Dragged on to Collection: "+ segments[8]);
 		    var movedToCollectionKey = segments[8];
 		    var groupId = segments[6];
-		    console.log("Group id is: "+ segments[6]);
-		    
-		    const post ={ItemKey:movedItemKey, 
-		    		CollectionKey: movedToCollectionKey };
 	    	
 		    var itemsMoveData ={};
 		    itemsMoveData["itemId"] = movedItemKey;
@@ -367,12 +363,35 @@ function pollStatus(){
 	 	    $.ajax({
 		    	type: "POST",
 		    	url: '[[@{/auth/group/}]]' + groupId + '/items/move?[(${_csrf.parameterName})]=[(${_csrf.token})]',
-		    	data: JSON.stringify(itemsMoveData),
-		    	dataType : 'json',
-		    	contentType : "application/json",
-		        success: function(data){ 
-		                console.log(data);
-		        }
+		    	data: itemsMoveData,
+		        success: function (data){
+		        		console.log(data);
+		                $.notify('<i class="fas fa-check-circle"></i> Citation moved successfully to "'+collectionName+'" !', {
+							type: 'success',
+							offset: {
+								x: 50,
+								y: 90
+							},
+							animate: {
+								enter: 'animated fadeInRight',
+								exit: 'animated fadeOutRight'
+							}
+						});
+		        },
+	 	   		error: function (data) {
+	 	   				$.notify('<i class="fas fa-exclamation-circle"></i> Citation not moved!', {
+							type: 'danger',
+							offset: {
+								x: 50,
+								y: 90
+							},
+							animate: {
+								enter: 'animated fadeInRight',
+								exit: 'animated fadeOutRight'
+							}
+						});
+	 	      	}
+	 	    	
 		    });  
 		    	
 		    	
@@ -380,8 +399,8 @@ function pollStatus(){
 		    	
 		    
 		}
-		
-		/* $(function(){
+		/* 
+		 $(function(){
 			$(".items").draggable();
 			$(".items").droppable( {
 			    drop: handleDropEvent
@@ -393,9 +412,9 @@ function pollStatus(){
 			console.log(draggedItem.data("key"));
 			console.log($(this).data('key'));
 			console.log($(this).children("a").attr("href"));
-		} */
+		}  */
 		
-	</script>
+</script>
 </div>
 </body>
 </html>

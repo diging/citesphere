@@ -268,14 +268,9 @@ public class ZoteroManager implements IZoteroManager {
         List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, false);
         // ignoreFields.add("collections");
         
-        ignoreFields.remove("collections");
-        
-        System.out.print(" Ignoring fields ");
-        for(String c :ignoreFields) {
-    		System.out.print(c+" ");
-    	}
-        System.out.println();
-        
+        if(citation.getCollections() != null) {
+        	ignoreFields.remove("collections");
+        }
 
         List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
 

@@ -56,11 +56,11 @@ public class MoveItemController {
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST )
     public @ResponseBody String moveItemToCollection(Authentication authentication,
-    		@PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody MoveItem items )
+    		@PathVariable("zoteroGroupId") String zoteroGroupId, @RequestParam String itemId, @RequestParam String collectionId )
     		throws ZoteroConnectionException,GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
     	ICitation citation, citation1;
     	
-    	citation1 = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),zoteroGroupId , items.itemId);
+    	citation1 = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),zoteroGroupId , itemId);
     	System.out.print(" In Move Controller Before adding, getting citation from zotero: ");
     	for(String c :citation1.getCollections()) {
     		System.out.print(c+" ");
@@ -68,7 +68,7 @@ public class MoveItemController {
     	System.out.println();
     	
     	try {
-    		citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, items.itemId);
+    		citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
     	}catch(CannotFindCitationException e) {
     		return "Citation Not Found";
     	}
@@ -79,7 +79,7 @@ public class MoveItemController {
     	System.out.println();
     	
     	// updating citation
-    	citationHelper.updateCitation(citation, items.collectionId, (IUser) authentication.getPrincipal());
+    	citationHelper.updateCitation(citation, collectionId, (IUser) authentication.getPrincipal());
     	List<String> collections = citation.getCollections();
     	System.out.print(" In Move Controller After adding: ");
     	for(String c :collections) {
@@ -94,21 +94,21 @@ public class MoveItemController {
     		return "Citation outdated";
     	}
     	
-    	citation = citationManager.getCitation((IUser) authentication.getPrincipal(),zoteroGroupId , items.itemId);
+    	citation = citationManager.getCitation((IUser) authentication.getPrincipal(),zoteroGroupId , itemId);
     	System.out.print(" In Move Controller After adding, getting citation: ");
     	for(String c :citation.getCollections()) {
     		System.out.print(c+" ");
     	}
     	System.out.println();
     	
-    	citation = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),zoteroGroupId , items.itemId);
+    	citation = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),zoteroGroupId , itemId);
     	System.out.print(" In Move Controller After adding, getting citation from zotero: ");
     	for(String c :citation.getCollections()) {
     		System.out.print(c+" ");
     	}
     	System.out.println();
     	
-    	System.out.println(items.collectionId + " "+ items.itemId);
+    	System.out.println(collectionId + " "+ itemId);
     	return "Moved";
     	
     }

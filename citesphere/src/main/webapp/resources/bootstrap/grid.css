@@ -97,6 +97,7 @@ tr.changed>td {
 }
 
 .drag-over{
+	cursor: copy;
 	background: #ddf;
 	border-color: blue ;
 }
