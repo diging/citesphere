@@ -1,0 +1,314 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+
+<script th:inline="javascript">
+//# sourceURL=page.js
+$(function() {
+	$('#pagination-top').twbsPagination({
+	    totalPages: [(${totalPages})],
+	    startPage: [(${currentPage})],
+	    prev: "«",
+	    next: "»",
+	    visiblePages: 10,
+	    initiateStartPageClick: false,
+	    onPageClick: function (event, page) {
+	    	window.location.href = "items?page=" + page;
+	    }
+	});
+	
+	$(".bib-entry").click(function() {
+		var key = $(this).data("key");
+		var index = $(this).data("index");
+		var currentURL = window.location.href;
+		if(currentURL.match(/collection/))
+			{
+			window.location.href = "../../items/" + key +"?index=" + index + "&page=[(${currentPage})]&sortBy=[(${sort})]&collectionId=[(${collectionId})]";
+			}
+		else{
+			window.location.href = "items/" + key +"?index=" + index + "&page=[(${currentPage})]&sortBy=[(${sort})]&collectionId=[(${collectionId})]";
+		    }
+	});
+	
+	$('.collapse').collapse();
+	
+	if(sessionStorage.getItem("collectionsHidden") == "true"){
+		$("#collectionsList").hide()
+	    $("#toggleCollection").attr('class', "fa fa-chevron-circle-right")
+	    $("#toggleCollection").attr('title', "Show Collections")	    
+	    $("#citationBlock").attr('class', 'col-md-12')
+	}
+	
+	$("#toggleCollection").click(function(){
+	    $("#collectionsList").toggle(); 
+	    collectionsHidden = $("#toggleCollection").hasClass("fa-chevron-circle-left")
+	    sessionStorage.setItem("collectionsHidden",collectionsHidden)
+	        
+	    $("#toggleCollection").attr('class', collectionsHidden ? "fa fa-chevron-circle-right" : "fa fa-chevron-circle-left")
+	    $("#toggleCollection").attr('title', collectionsHidden ? "Show Collections":"Hide Collections")
+	    
+	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
+	  })
+
+	
+	var shownColumns = [ /*[# th:each="col : ${columns}"]*/ /*[[${col}]]*/, /*[/]*/ ];
+
+	
+	$("#addionalColumns a").click(function(event) {
+		var isShown = $(this).data("is-shown");
+		var col = $(this).data("column-name");
+		if (isShown) {
+			shownColumns = shownColumns.filter(function(value, index, arr){
+			    return value != col;
+			});
+		} else {
+			shownColumns.push(col);
+		}
+		window.location.href="items?columns=" + shownColumns; 
+	});
+	
+	$("#findByItemKeyBtn").click(function() {
+		var key = $("#findItemKey").val();
+		if (key != undefined && key != '') {
+			window.location.href="items/" + key;
+		}
+	});
+	
+	$("#findItemKey").on('keypress',function(e) {
+	    if(e.which == 13) {
+	    	var key = $("#findItemKey").val();
+	        if (key != undefined && key != '') {
+	            window.location.href="items/" + key;
+	        }
+	    }
+	});
+});
+</script>
+</head>
+<body>
+	<div layout:fragment="content">
+<ol class="breadcrumb">
+<li><a th:href="@{/}">Home</a></li>
+<th:block th:each="crumb: ${breadCrumbs}">
+	<li th:switch="${crumb.type}"> 
+	  <a th:case="GROUP" th:href="@{|/auth/group/${crumb.objectId}/items|}">[[${crumb.label}]]</a>
+	  <a th:case="COLLECTION" th:href="@{|/auth/group/${zoteroGroupId}/collection/${crumb.objectId}/items|}">[[${crumb.label}]]</a>
+	  <a th:case="*" th:href="@{|/auth/group/${zoteroGroupId}/items|}">[[${crumb.label}]]</a> 
+	</li>
+</th:block>
+</ol>
+
+<h2>
+<span th:if="${collectionId} != null">
+	        Items in Collection <i th:text="${collectionName}"></i> in Group <i th:text="${group.name}"></i></br> 
+</span>
+<span th:if="${collectionId} == null">
+Items in Group <span th:text="${group.name}"></span></br>
+</span>
+	
+	<small><span th:text="${total}"></span> records </small>
+</h2>
+<div class="pull-right">
+	<div class="progress" style="width: 200px">
+	  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">  
+	  <span id="syncText">Up to date</span></div>
+	</div>
+	<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
+	    <small><a th:href="@{items}"><i class="fas fa-redo-alt"></i> Reload page</a></small>
+	</div>
+
+<script>
+//# sourceURL=poll.js
+var syncUrl= "sync/info";
+var currentURL = window.location.href;
+if(currentURL.match(/collection/))
+	{
+	var syncUrl= "../../sync/info";
+	}
+else{
+	var syncUrl= "sync/info";
+	}
+
+$.get(syncUrl, pollStatus);
+
+function pollStatus(){
+    $.get(syncUrl, function(data) {
+        if(data['status'] == 'PREPARED' || data['status'] == 'STARTED') {
+        	if (data['total'] == 0) {
+        		$("#syncProgress").attr('style', "width:" + "100%");
+                $("#syncProgress").attr('aria-valuenow', 100);
+                $("#syncProgress").attr('aria-valuemax', 100);
+                $("#syncProgress").addClass("progress-bar-striped active");
+        	} else {
+        		var percent = data['current']/data['total']*100;
+                $("#syncProgress").attr('style', "width:" + percent + "%");
+                $("#syncProgress").attr('aria-valuenow', data['current']);
+                $("#syncProgress").attr('aria-valuemax', data['total']);
+                $("#syncProgress").addClass("progress-bar-striped active");
+                $("#syncText").text(Math.round(percent) + "% synced");
+        	}
+        	setTimeout(pollStatus,1000);
+        } else {
+        	$("#syncProgress").attr('style', "width: 100%");
+        	$("#syncProgress").attr('aria-valuenow', 100);
+            $("#syncProgress").attr('aria-valuemax', 100);
+            $("#syncProgress").removeClass("progress-bar-striped active");
+            $("#syncText").text("Up to date");
+        }
+    });
+}
+</script>
+</div>
+<div class="clearfix"></div>
+<div class="form-group">
+<div class="input-group">
+    <input type="text" id="findItemKey" name="findItemKey" class="form-control" placeholder="Find by item key"/>
+    <div class="input-group-addon" id="findByItemKeyBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
+</div>
+</div>
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingOne">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Group Info <i class="fas fa-arrows-alt-v pull-right"></i>
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+      <div class="panel-body">
+      	[(${group.description})]
+        <div class="col-md-6">
+        <b>Local Metadata Version:</b> <span th:text="${group.metadataVersion}"></span><br>
+        <b>Local Library Version:</b> <span th:text="${group.contentVersion}"></span><br>
+        <b>Created on:</b> <span class="date" th:text="${group.created}"></span><br>
+        <b>Last Modified on:</b> <span class="date" th:text="${group.lastModified}"></span>
+        </div>
+        <div class="col-md-6">
+        <b>Owner:</b><span th:text="${group.owner}"></span><br>
+        <br>
+        <b>Last synced:</b> <span th:text="${group.updatedOn}" class="date"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-12">
+<ul id="pagination-top" class="pagination-sm"></ul>
+
+
+<div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} != null">
+  <a th:href="@{|items/sync?page=${currentPage}&sort=${sort}&columns=${#strings.listJoin(columns,',')}|}"><big><i
+		class="fas fa-sync" title="Sync Page"></i></big></a>
+</div>
+<div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} == null">
+  <a th:href="@{|items/sync?page=${currentPage}&sort=${sort}&columns=${#strings.listJoin(columns,',')}|}"><big><i
+		class="fas fa-sync" title="Sync Page"></i></big></a>
+</div>
+<div class="pull-right" style="margin-top: 20px;">
+<a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
+</div>
+
+<div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
+  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Export <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li th:if="${collectionId == null && total<=300}"><form method="POST" th:action="@{export}" ><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
+    <li th:if="${collectionId == null}"><form method="POST" th:action="@{job/export}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV  (for many items)</button></form></li>
+    <li th:if="${collectionId != null && total <=30}"><form method="POST" th:action="@{export}" ><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (up to 300 items)</button></form></li>
+    <li th:if="${collectionId != null}"><form method="POST" th:action="@{job/export}" ><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /><button class="btn btn-link" type="submit">CSV (for many items)</button></form></li>
+    <li th:if="${total > 300}"><a class="btn btn-disabled" style="color: #999">CSV (up to 300 items)</a></li>
+  </ul>
+</div>
+
+<div>
+
+<p class="lead" style="display:inline;padding-left:10px">Collections</p>
+
+<big><i class="fa fa-chevron-circle-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
+
+
+<div class="dropdown pull-right" style="padding-bottom: 10px;">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Columns
+    <span class="caret"></span>
+  </button>
+  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+  <tbody th:each="column:${availableColumns}">
+    <li th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}"><a th:data-column-name="${column}" th:data-is-shown="${#lists.contains(columns,column)}">
+	<span th:if ="${#lists.contains(columns,column)}"><i class="fas fa-check"></i> </span>
+	[[${columnLabel}]]
+    </a></li>
+  </tbody>
+  </ul> 
+   
+</div>
+
+</div>  
+
+</div>
+
+<div class="col-md-2">
+	
+	<ul class="list-group" id="collectionsList">
+	<th:block th:each="collection:${citationCollections}">
+	  <li class="list-group-item">
+		  <span class="badge" th:text="${collection.numberOfItems}"/>
+		  <a th:href="@{|/auth/group/${zoteroGroupId}/collection/${collection.key}/items|}"><span th:text="${collection.name}"/></a>
+	  </li>
+	</th:block>
+	</ul>
+</div>
+
+<div class="col-md-10" id="citationBlock">
+
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th>Type</th>
+			<th>Authors</th>
+			<th>Title</th>
+			<th>Date</th>
+			<th>URL</th>
+			<th th:each="column:${columns}" th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}">
+				[[${columnLabel}]]
+			</th>
+		</tr>
+		
+		
+		<tr th:each="entry,loop : ${items}">
+			<td>
+			  <span class="text-warning">
+			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
+			  , iconLabel=${@iconsResource.getProperty(entry.itemType + '_label')}">
+				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
+				</div>
+			  </span>
+			</td>
+			<td class="bib-entry" th:data-key="${entry.key}" th:data-index="${loop.index}">
+				<th:block th:each="author,status : ${entry.authors}">
+		 			<strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
+		 		</th:block>
+		 	</td>
+		 	<td class="bib-entry" th:data-key="${entry.key}" th:data-index="${loop.index}">
+		 		<em>[[${entry.title}]]</em>
+		 	</td>
+		 	<td class="bib-entry" th:data-key="${entry.key}" th:data-index="${loop.index}">
+		 		[[${entry.dateFreetext}]]
+		 	</td>
+		 	<td>
+		 		<span th:if="${!#strings.isEmpty(entry.url)}">
+		 		<a href="${entry.url}" target="_blank" th:title="${entry.url} "><i class="fas fa-globe-americas"></i></a>
+		 		</span>
+		 	</td>
+		 	<td th:each="column:${columns}" style="max-width:300px;">
+		 		[[${entry[column]}]]
+		 	</td>
+		</tr>
+	</table>
+</div>
+</div>
+</body>
+</html>

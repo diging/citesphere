@@ -26,6 +26,7 @@ public class ListExportsController {
         model.addAttribute("tasks", exportTaksManager.getTasks(user, page));
         model.addAttribute("total", exportTaksManager.getTasksTotalPages(user));
         model.addAttribute("page", page+1);
-        return "auth/exports";
+        return "auth/group/export/list";
+        
     }
 }

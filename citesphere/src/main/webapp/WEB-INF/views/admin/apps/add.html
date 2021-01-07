@@ -1,0 +1,31 @@
+<html layout:decorate="~{layouts/main}">
+
+<h2>Add App</h2>
+<div layout:fragment="content">
+<form action="#" th:action="@{/admin/apps/add}" method="POST" th:object="${appForm}">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	
+	<label>App Name: </label>
+	<input th:field="*{name}" class="form-control input-sm"></input>
+	<p class="text-danger"><th:errors path="name"/></p>
+	
+	<label>Description: </label>
+	<input th:field="*{description}" class="form-control input-sm"></input>
+	<p class="text-danger"><th:errors path="description"/></p>
+	
+	<label>Application Type: </label>
+    <select th:field="*{grantType}" class="form-control input-sm">
+    	<option value="">Select</option>
+    	<option value="authorization_code">Apps need user information (Authorization Code)</option>
+    	<option value="client_credentials">Apps do not need user information (Client Credentials)</option>
+	</select> 
+    <p class="text-danger"><th:errors path="grantType"/></p>
+    
+    <label>Redirect URL:</label>
+    <input th:field="*{redirectUrl}" class="form-control input-sm"></input>
+	<p class="text-danger"><th:errors path="redirectUrl"/></p>
+	
+	<button type="submit" class="btn btn-primary">Add</button>
+	
+</form>
+</div>

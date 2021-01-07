@@ -1,0 +1,53 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+
+</head>
+<body>
+<div layout:fragment="content">
+
+<div class="row">
+<div class="col-sm"></div>
+<div class="jumbotron col-sm">
+<h3 class="col-sm">Enter your new Password:</h3>
+
+<p class="col-sm">
+
+
+
+<form class="form-horizontal" th:action="@{/password/reset}" method="POST">
+                
+<label>New Password:</label>
+<input class="form-control" type="password" name="password">
+
+<label style="margin-top: 20px;">Repeat new Password:</label>
+<input class="form-control" type="password" name="passwordRepeat">
+
+<input style="margin-top: 20px;" type="submit" class="btn btn-primary" value="Submit" />
+</form>
+
+
+<span th:if="${param.error != null}">
+<div class="alert alert-danger" role="alert">
+  <span th:if="${param.error == 'noPassword'}">
+  Please provide a password.
+  </span>
+  <span th:if="${param.error == 'notMatching'}">
+  The passwords you entered do not match.
+  </span>
+  </div>
+</span>
+
+
+</p>
+
+
+
+
+</div>
+<div class="col-sm"></div>
+</div>
+
+
+</div>
+</body>
+</html>

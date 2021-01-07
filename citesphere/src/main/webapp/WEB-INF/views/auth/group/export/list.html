@@ -1,0 +1,66 @@
+<html layout:decorate="~{layouts/main}">
+
+<head>
+	<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+	<script th:inline="javascript">
+
+		$(function() {
+		    $('#pagination-top').twbsPagination({
+		    	totalPages: [(${total})],
+		        startPage: [(${page})],
+		        prev: "«",
+		        next: "»",
+		        visiblePages: 10,
+		        initiateStartPageClick: false,
+		        onPageClick: function (event, page) {
+		            window.location.href = "exports?page=" + page;
+		        }
+		    });
+		});
+	</script>
+</head>
+
+<body>
+<div layout:fragment="content">
+	<h1>Exports</h1>
+
+	<div class="alert alert-info" role="alert">Please reload the page to see updated status information.</div>
+	
+	<ul id="pagination-top" class="pagination-sm"></ul>
+	
+	<table class="table table-striped">
+		<tr>
+			<th>Task ID</th>
+			<th>Export Type</th>
+			<th>Group</th>
+			<th>Collection</th>
+			<th># of records</th>
+			<th># of processed records</th>
+			<th>Status</th> 
+			<th>Created On</th>
+			<th></th>
+		</tr>
+		
+		<tr th:each="task:${tasks}">
+			<td>[[${task.id}]]</td>
+			<td><span class="label label-primary">[[${task.exportType}]]</span></td>
+			<td>[[${task.groupName}]]</td>
+			<td>[[${task.collectionName}]]</td>
+			<td>[[${task.totalRecords}]]</td>
+			<td>[[${task.progress}]]</td>
+			<td>
+				<span th:if="${#strings.equals(task.status,'DONE')}" class="label label-success">[[${task.status}]]</span>
+				<span th:if="${#strings.equals(task.status,'FAILED')}" class="label label-danger">[[${task.status}]]</span>
+    			<span th:unless="${#strings.equals(task.status,'DONE') || #strings.equals(task.status,'FAILED')}" class="label label-warning">[[${task.status}]]</span>
+			</td>
+			<td>[[${task.createdOn}]]</td>
+			<td>
+				<span th:if="${#strings.equals(task.status,'DONE')}">
+					<a th:href="@{|exports/${task.id}/download|}"><i class="fas fa-download"></i> Download</a>
+				</span>
+			</td>
+		</tr>
+	</table>
+	</div>
+</body>
+</html>
