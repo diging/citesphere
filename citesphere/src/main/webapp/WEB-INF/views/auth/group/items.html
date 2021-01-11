@@ -1,5 +1,7 @@
 <html layout:decorate="~{layouts/main}">
 <head>
+
+<script src="https://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
 <link th:href="@{/resources/notify/animate.css}" rel="stylesheet"/>
@@ -280,7 +282,7 @@ function pollStatus(){
 		</tr>
 		
 		
-		<tr draggable="true" class="items" th:each="entry,loop : ${items}">
+		<tr data-action='draggable' class="items" th:each="entry,loop : ${items}">
 			<td>
 			  <span class="text-warning">
 			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
@@ -314,7 +316,7 @@ function pollStatus(){
  
 <script >
 	//# sourceURL=move.js
-		const itemsList = document.querySelectorAll('.items');
+		/* const itemsList = document.querySelectorAll('.items');
 		itemsList.forEach(item =>{
 			item.addEventListener('dragstart', dragStart);
 		});
@@ -398,21 +400,92 @@ function pollStatus(){
 		    
 		    	
 		    
-		}
-		/* 
+		} */
+		 
+		/* $(function() {
+			  $(".items").draggable({
+			    revert: true,
+			    helper: function() {
+			   	  $('.items').click(function(event){
+			   		  if(event.altKey){
+			   			var selected = $('.items [data-action="draggable"].selected');
+					      if (selected.length === 0) {
+					        $(this).addClass('selected');
+					        selected = $(this);
+					      }
+					      var container = $('<div/>').attr('id', 'draggingContainer');
+					      container.append('<div>' + selected.length + '</div>')
+					      container.append(selected.clone());
+					      return container;
+			   		  }
+			   	  });
+			   	  
+			    }
+			  });
+			  $('items [data-action="draggable"]').click(function() {
+			    $(this).toggleClass('selected')
+			  });
+			});
+		 */
+		 
+		 $(".items").dblclick(function(){
+			    if($(this).hasClass('selected')){
+			 		$(this).removeClass('selected');
+			 	} 
+			    else{
+					$(this).addClass('selected');
+			    }
+			}) 
+			
 		 $(function(){
-			$(".items").draggable();
-			$(".items").droppable( {
-			    drop: handleDropEvent
-			  } );
+				$(".items").draggable({
+					scroll: true,
+					revert: true,
+					cursor: "grabbing",
+					helper:function(){
+						var selected = $(".selected");
+						$(".selected").each(function() {
+							  console.log($( this ).find(".bib-entry").data("key"));
+						});
+						//console.log($(".selected").data("key"));
+						console.log(selected.length);
+					      if (selected.length === 0) {
+					        $(this).addClass('selected');
+					        selected = $(this);
+					      }
+					      var container = $('<div/>').attr('id', 'draggingContainer');
+					      container.append('<div>' + selected.length + '</div>');
+					      container.append('<ul>');
+					      $(".selected").each(function() {
+					    	  container.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
+						   });
+					      container.append('</ul>');
+					      return container;
+					}
 		});
-		
-		function handleDropEvent(event, ui){
-			var draggedItem = ui.draggable;
-			console.log(draggedItem.data("key"));
-			console.log($(this).data('key'));
-			console.log($(this).children("a").attr("href"));
-		}  */
+				
+				
+				$(".list-group-item").droppable( {
+					over: function(event,ui){
+						// $(this).css('background', 'orange');
+						$(this).addClass('drag-over');
+					},
+					out: function(event, ui) {
+		                // $(this).css('background', 'cyan');
+						$(this).removeClass('drag-over');
+		            },
+					  
+					  drop: function(event, ui) {
+						  var $element = $(event.toElement);
+						  console.log($element.find("a"));
+						  $(this).removeClass('drag-over');
+						  var draggedItem = ui.draggable;
+			                console.log(draggedItem);
+			                //console.log(ui.draggable);
+			            }
+				  } );
+			});
+			
 		
 </script>
 </div>
