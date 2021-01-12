@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.mongodb.diagnostics.logging.Logger;
 
@@ -34,10 +35,8 @@ public class GroupManager implements IGroupManager {
      */
     @Override
     public ICitationGroup getGroup(IUser user, String groupId) {
-
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (groupOptional.isPresent() && groupOptional.get().getUsers().contains(user.getUsername())) {
-        	
             return (ICitationGroup) groupOptional.get();
         }
 
@@ -51,18 +50,8 @@ public class GroupManager implements IGroupManager {
     }
     
     @Override
-    public ICitationGroup deleteGroup(IUser user, String groupId) {      
-    	System.out.println(groupId);
-        ICitationGroup group = zoteroManager.getGroup(user, groupId, false);
-//        System.out.println("Group obj" + group);
-//        System.out.println("Group obj" + group.getGroupId());
-//        System.out.println("Group obj" + group.getId());
-//        System.out.println("Group obj" + group.getName());
-        group.getUsers().add(user.getUsername());       
-        groupRepository.delete((CitationGroup) group);
-       
-        return null;
-        
-        
+    public void deleteGroup(IUser user, String groupId) {         	
+    	Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+    	groupRepository.deleteById(groupOptional.get().getId());  
     }
 }
