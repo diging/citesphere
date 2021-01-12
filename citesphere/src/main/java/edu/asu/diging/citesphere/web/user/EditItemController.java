@@ -90,6 +90,7 @@ public class EditItemController {
         Map<String, String> labelsRoles = new HashMap<>();
         labels.forEach(x -> labelsRoles.put(x.getKey().toString(), x.getValue().toString()));
         for (String role : citation.getOtherCreatorRoles()) {
+
         	if (!labelsRoles.containsKey("_item_attribute_label_" + role)) {
         		labelsRoles.put("_item_attribute_label_" + role, org.springframework.util.StringUtils.capitalize(role));
         	}
