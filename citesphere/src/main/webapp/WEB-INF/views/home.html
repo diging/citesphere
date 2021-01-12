@@ -1,5 +1,59 @@
 <html layout:decorate="~{layouts/main}">
 <head>
+<script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
+<link th:href="@{/resources/notify/animate.css}" rel="stylesheet"/>
+
+<script th:inline="javascript">
+
+$(function() {
+	$(".delete-link").click(function(event) {
+		var id = $(this).data('client-id');
+		$("#delete-client-button").attr("data-client-id", id);
+		$("#confirm-client-entry-id").text(id);
+		$('#client-delete-confirmation').modal("show");	
+		event.preventDefault();
+	});
+	$("#delete-client-button").click(function() {
+		var id = $(this).data("client-id");
+		var baseurl = 'auth/group/' + id + '/mongo';
+		$.ajax({
+			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+			'type': "DELETE",
+			'success': function(data) {
+				$.notify('<i class="fas fa-check-circle"></i> Successfully deleted!', {
+					type: 'success',
+					offset: {
+						x: 50,
+						y: 90
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				});
+			},
+			'error': function(data) {
+				$.notify('<i class="fas fa-exclamation-circle"></i> App could not be deleted!', {
+					type: 'danger',
+					offset: {
+						x: 50,
+						y: 90
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				});
+			}
+		});
+		$('#client-delete-confirmation').modal("hide");
+		event.preventDefault();
+		$(this).removeData();
+	});
+});
+
+
+</script>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -29,18 +83,37 @@
 				<div class="panel-body">
 					<a th:href="@{'/auth/group/' + ${group.groupId} + '/items'}"><span th:text="${group.name}"/>
 					(<span th:text="${group.numItems}"/>)</a>
-					<!-- <a th:href="@{'/auth/group/' + ${group.groupId} + '/mongo'}">
-					<button class="btn btn-primary btn-lg" style="float: right; "><span>Delete Local copy </span> </button>
-					</a> -->
-					<form action="#" th:action="@{'/auth/group/' + ${group.groupId} + '/mongo'}" method="GET">
+					<a class="delete-link" style="float: right;" href="" th:data-client-id="${group.groupId}"><i class="fas fa-trash-alt" ></i></button>
+					</a>
+					
+					<!--  <form action="#" th:action="@{'/auth/group/' + ${group.groupId} + '/mongo'}" method="GET">
 					<button class="btn btn-primary btn-lg" style="float: right; "><span>Delete Local copy </span> </button>
 					</form>
+					-->
 				</div>
+				<div class="modal fade" id="client-delete-confirmation" tabindex="-1" role="dialog">
+  					<div class="modal-dialog" role="document">
+    					<div class="modal-content">
+      						<div class="modal-header">
+        						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        						<h4 class="modal-title">Delete App</h4>
+      						</div>
+      						<div class="modal-body">
+        						<p>Are you sure you want to delete the local copy of the group? </p>
+      						</div>
+      						<div class="modal-footer">
+        						<button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
+        						<button id="delete-client-button" data-client-id="" type="button" class="btn btn-primary">Yes, delete!</button>
+      						</div>
+    					</div>
+  					</div>
+				</div>
+				
 			</div>
+			
 		</tbody>
+		</div>	
 		</div>
-		
-		</div>
-	</div>
+	</div>	
 </body>
 </html>
