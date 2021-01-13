@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
+import edu.asu.diging.citesphere.core.dao.IPersonsMongoDao;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -46,12 +47,12 @@ public class AuthorityService implements IAuthorityService {
 
     @Autowired
     private IPersonMongoDao personDao;
+    
+    @Autowired
+    private IPersonsMongoDao personsMongoDao;
 
     @Autowired
     private AuthorityRepository authorityRepository;
-
-    @Autowired
-    private PersonAuthorityRepository personAuthorityRepository;
 
     @Autowired
     private Set<AuthorityImporter> importers;
@@ -198,21 +199,23 @@ public class AuthorityService implements IAuthorityService {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
         Pageable paging = PageRequest.of(page, pageSize);
-        List<Person> persons = null;
+        Persons persons = null;
         if (uris != null && uris.size() > 0) {
-            persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn(
+            persons = personsMongoDao.findPersonsByCitationGroupAndNameLikeAndUriNotIn(
                     (ICitationGroup) group.get(), firstName, lastName, uris, paging);
         } else {
-            persons = personAuthorityRepository.findPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(),
+            persons = personsMongoDao.findPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(),
                     firstName, lastName, paging);
         }
         Set<IAuthorityEntry> entries = new HashSet<>();
-        persons.forEach(p -> {
-            Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
-            if (optional.isPresent()) {
-                entries.add(optional.get());
-            }
-        });
+        if(persons != null) {
+            persons.getPersons().forEach(p -> {
+                Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
+                if (optional.isPresent()) {
+                    entries.add(optional.get());
+                }
+            });
+        }   
         return entries;
     }
 
@@ -267,7 +270,7 @@ public class AuthorityService implements IAuthorityService {
             int pageSize) {
         Optional<ICitationGroup> group = groupRepository.findFirstByGroupId(new Long(citationGroupId));
 
-        return (int) Math.ceil(new Float(personAuthorityRepository
+        return (int) Math.ceil(new Float(personsMongoDao
                 .countByPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(), firstName, lastName))
                 / pageSize);
     }

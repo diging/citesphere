@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -31,6 +32,7 @@ import edu.asu.diging.citesphere.core.repository.custom.AuthorityRepository;
 import edu.asu.diging.citesphere.core.repository.custom.PersonAuthorityRepository;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.data.bib.IPersonMongoDao;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -59,6 +61,9 @@ public class AuthorityServiceTest {
 
     @Mock
     private Set<AuthorityImporter> importers;
+    
+    @Autowired
+    private IPersonMongoDao personDao;
 
     @InjectMocks
     private AuthorityService managerToTest;
