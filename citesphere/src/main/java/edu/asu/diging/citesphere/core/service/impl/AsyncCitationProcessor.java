@@ -20,7 +20,7 @@ import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
-import edu.asu.diging.citesphere.core.service.jobs.impl.SyncJobManager;
+import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
@@ -57,7 +57,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     private JobRepository jobRepo;
 
     @Autowired
-    private SyncJobManager jobManager;
+    private ISyncJobManager jobManager;
 
     /*
      * (non-Javadoc)
