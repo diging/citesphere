@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.gson.Gson;
+
 import edu.asu.diging.citesphere.api.v1.model.impl.MoveItem;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
@@ -56,59 +58,31 @@ public class MoveItemController {
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST )
     public @ResponseBody String moveItemToCollection(Authentication authentication,
-    		@PathVariable("zoteroGroupId") String zoteroGroupId, @RequestParam String itemId, @RequestParam String collectionId )
+    		@PathVariable("zoteroGroupId") String zoteroGroupId, @RequestParam String itemIds, @RequestParam String collectionId )
     		throws ZoteroConnectionException,GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
     	ICitation citation, citation1;
     	
-    	citation1 = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),zoteroGroupId , itemId);
-    	System.out.print(" In Move Controller Before adding, getting citation from zotero: ");
-    	for(String c :citation1.getCollections()) {
-    		System.out.print(c+" ");
-    	}
-    	System.out.println();
+    	Gson gson = new Gson();
+    	List<String> keys = gson.fromJson(itemIds, List.class);
     	
-    	try {
-    		citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
-    	}catch(CannotFindCitationException e) {
-    		return "Citation Not Found";
+    	for(String key: keys) {
+    		try {
+    			citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, key);
+    			
+    		}catch(CannotFindCitationException e) {
+    			return "Citation Not Found";
+    		}
+        	
+    		// updating citation
+    		citationHelper.updateCitation(citation, collectionId, (IUser) authentication.getPrincipal());
+    		
+    		// citation is will be updated to zotero
+        	try {
+        		citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+        	}catch(Exception e) {
+        		return "Citation outdated";
+        	}
     	}
-    	System.out.print(" In Move Controller Before adding: ");
-    	for(String c :citation.getCollections()) {
-    		System.out.print(c+" ");
-    	}
-    	System.out.println();
-    	
-    	// updating citation
-    	citationHelper.updateCitation(citation, collectionId, (IUser) authentication.getPrincipal());
-    	List<String> collections = citation.getCollections();
-    	System.out.print(" In Move Controller After adding: ");
-    	for(String c :collections) {
-    		System.out.print(c+" ");
-    	}
-    	System.out.println();
-    	
-    	// citation is will be updated to zotero
-    	try {
-    		citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
-    	}catch(Exception e) {
-    		return "Citation outdated";
-    	}
-    	
-    	citation = citationManager.getCitation((IUser) authentication.getPrincipal(),zoteroGroupId , itemId);
-    	System.out.print(" In Move Controller After adding, getting citation: ");
-    	for(String c :citation.getCollections()) {
-    		System.out.print(c+" ");
-    	}
-    	System.out.println();
-    	
-    	citation = citationManager.getCitationFromZotero((IUser) authentication.getPrincipal(),zoteroGroupId , itemId);
-    	System.out.print(" In Move Controller After adding, getting citation from zotero: ");
-    	for(String c :citation.getCollections()) {
-    		System.out.print(c+" ");
-    	}
-    	System.out.println();
-    	
-    	System.out.println(collectionId + " "+ itemId);
     	return "Moved";
     	
     }

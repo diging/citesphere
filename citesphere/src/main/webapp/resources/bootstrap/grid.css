@@ -103,4 +103,5 @@ tr.changed>td {
 }
 
 .selected {
-  background-color: rgba(13, 173, 253, 0.37)
+  background-color: rgba(13, 173, 253, 0.37);
+}

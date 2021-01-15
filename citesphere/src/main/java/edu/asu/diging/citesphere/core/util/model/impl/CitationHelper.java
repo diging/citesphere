@@ -175,13 +175,6 @@ public class CitationHelper implements ICitationHelper {
     		collections.add(collection);
     	}
     	citation.setCollections(collections);
-    	// citation.setLanguage("English");
-    	collections = citation.getCollections();
-    	System.out.print("After adding: ");
-    	for(String c :collections) {
-    		System.out.print(c+" ");
-    	}
-    	System.out.println();
     }
 
 }
