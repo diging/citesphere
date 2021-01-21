@@ -151,10 +151,9 @@ $(function() {
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-		console.log("authorIconContainer");
 		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
 			$("#authorCreateAuthority").hide();
-			console.log("called" + data['id']);
+			
 			$("#uriAuthorLocalId").val(data['id']);
 			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
 			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
@@ -430,14 +429,11 @@ function savePersonDetails(personType, modalName){
 	
 	personSpan.attr("class", "label label-warning "+personTypeLCase +"-item");
 	personSpan.html("");
-	console.log("modal name" + modalName);
+	
 	var firstname = $("#firstName"+modalName).val();
 	var lastname = $("#lastName"+modalName).val();
 	var uri = $("#uri"+modalName).val();
-	console.log($("#"+modalName+"LocalId"));
-	var localAuthority = $("#"+modalName+"LocalId").val();
-	console.log("***");
-	console.log(localAuthority);
+	var localAuthority = $("#uri"+modalName+"LocalId").val();
 	personSpan.attr("data-"+modalNameLCase+"-firstname", firstname);
 	personSpan.attr("data-"+modalNameLCase+"-lastname", lastname);
 	personSpan.attr("data-"+modalNameLCase+"-uri", uri);
@@ -527,11 +523,6 @@ function constructPersonArray(arrayName, role, iter){
 		personAuthorityField.attr("type", "hidden");
 		personAuthorityField.attr("id", creator+"s" + creatorSubmitCount + ".localAuthorityId");
 		personAuthorityField.attr("name", creator+"s[" + creatorSubmitCount + "].localAuthorityId");
-		console.log("Hii");
-		
-		console.log($(person));
-		
-		console.log($(person).attr("data-"+arrayName+"-authority-id"));
 		
 		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
 		$("#editForm").append(personAuthorityField);
@@ -777,7 +768,7 @@ function getDatasetAuthorities(modalType, personType, page) {
   				    	getDatasetAuthorities(modalType, personType, page-1)
   				    }
   				});
-  			}		
+  			} 	
   		
 		$("#datasetAuthoritySearchResult").append(content);
 		$("#datasetAuthoritySearchResult tr td a").click(function() {

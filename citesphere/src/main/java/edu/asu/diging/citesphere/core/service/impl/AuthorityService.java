@@ -189,48 +189,49 @@ public class AuthorityService implements IAuthorityService {
         return results;
     }
     
-    // This method queries database and retrieves authorities based on the first
-    // name and/or last name of the authority, and based on the specified citation
-    // group ID
-    private Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
+    @Override
+    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
             int page, int pageSize, List<String> uris) throws GroupDoesNotExistException {
         Optional<ICitationGroup> group = groupRepository.findFirstByGroupId(new Long(citationGroupId));
         if (!group.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
         }
         Pageable paging = PageRequest.of(page, pageSize);
-        Persons persons = null;
+        Persons persons = new Persons();
+        List<Persons> personsList = null;
         if (uris != null && uris.size() > 0) {
-            persons = personsMongoDao.findPersonsByCitationGroupAndNameLikeAndUriNotIn(
+            personsList = personsMongoDao.findPersonsByCitationGroupAndNameLikeAndUriNotIn(
                     (ICitationGroup) group.get(), firstName, lastName, uris, paging);
         } else {
             persons = personsMongoDao.findPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(),
                     firstName, lastName, paging);
         }
         Set<IAuthorityEntry> entries = new HashSet<>();
+//        for(Persons per : personsList) {
+//            for(Person p: per.getPersons()) {
+//                Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
+//                if (optional.isPresent()) {
+//                    entries.add(optional.get());
+//                }
+//            }
+//        } 
         if(persons != null) {
-            persons.getPersons().forEach(p -> {
+            personsList.forEach(per -> per.getPersons().forEach(p -> {
                 Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
                 if (optional.isPresent()) {
                     entries.add(optional.get());
                 }
-            });
-        }   
+            }));
+        } 
         return entries;
     }
 
-    /**
-     * This method returns all the Authorities that are imported by the other users
-     * of citesphere and excludes that authorities that are imported by user
-     */
     @Override
-    public Set<IAuthorityEntry> findByNameInDataset(IUser user, String firstName, String lastName,
+    public List<String> getUriForUser(IUser user, String firstName, String lastName,
             String citationGroupId, int page, int pageSize) throws GroupDoesNotExistException {
-        List<String> uriList = authorityRepository
+        return authorityRepository
                 .findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName)
                 .stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
-
-        return this.findByNameInDataset(firstName, lastName, citationGroupId, page, pageSize, uriList);
 
     }
 
@@ -267,12 +268,20 @@ public class AuthorityService implements IAuthorityService {
 
     @Override
     public int getTotalDatasetAuthoritiesPages(String citationGroupId, String firstName, String lastName,
-            int pageSize) {
+            int pageSize, List<String> uriList) {
         Optional<ICitationGroup> group = groupRepository.findFirstByGroupId(new Long(citationGroupId));
-
-        return (int) Math.ceil(new Float(personsMongoDao
-                .countByPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(), firstName, lastName))
+        int totalPages;
+        if (uriList != null && uriList.size() > 0) {
+            totalPages = (int) Math.ceil(new Float(personsMongoDao
+                .countByPersonsByCitationGroupAndNameLikeAndUriNotIn((ICitationGroup) group.get(), firstName, lastName, uriList))
                 / pageSize);
+        } else {
+            totalPages = (int) Math.ceil(new Float(personsMongoDao
+                    .countByPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(), firstName, lastName))
+                    / pageSize);
+        }
+        
+        return totalPages;
     }
 
     // Given a source like viaf or conceptpower, this method returns authority

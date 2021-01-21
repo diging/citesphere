@@ -111,12 +111,13 @@ public class AuthorityEntryController {
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
 
         try {
-            Set<IAuthorityEntry> datasetEntries = authorityService.findByNameInDataset(
+            List<String> uriList  = authorityService.getUriForUser(
                     (IUser) authentication.getPrincipal(), firstName, lastName, zoteroGroupId, page, pageSize);
+            Set<IAuthorityEntry> datasetEntries = authorityService.findByNameInDataset(firstName, lastName, zoteroGroupId, page, pageSize, uriList);
             authorityResult.setFoundAuthorities(datasetEntries.stream().collect(Collectors.toList()));
             authorityResult.setCurrentPage(page + 1);
-            authorityResult.setTotalPages(
-                    authorityService.getTotalDatasetAuthoritiesPages(zoteroGroupId, firstName, lastName, pageSize));
+            //authorityResult.setTotalPages(authorityService.getTotalDatasetAuthoritiesPages(zoteroGroupId, firstName, lastName, pageSize, uriList));
+            authorityResult.setTotalPages(page + 1);
 
         } catch (GroupDoesNotExistException e) {
             logger.warn("Group does not exist: " + zoteroGroupId, e);
