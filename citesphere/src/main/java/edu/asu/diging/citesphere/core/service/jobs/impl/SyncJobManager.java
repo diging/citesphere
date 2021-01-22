@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.jobs.impl;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -81,6 +82,7 @@ public class SyncJobManager implements ISyncJobManager {
                 job = jobOptional.get();
             }
             job.setStatus(JobStatus.CANCELED);
+            job.setFinishedOn(OffsetDateTime.now());
             jobRepo.save(job);
         }
     }
