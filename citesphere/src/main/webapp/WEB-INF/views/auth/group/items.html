@@ -320,15 +320,11 @@ function pollStatus(){
 		 $(".items").dblclick(function(){
 			    if($(this).hasClass('selected')){
 			 		$(this).removeClass('selected');
-			 		$(this).addClass('table-striped');
 			 	} 
 			    else{
-			    	if($(this).hasClass('table-striped'))
-			    		$(this).removeClass('table-striped');
 					$(this).addClass('selected');
 			    }
-			}) 
-			
+		 }) 
 		 $(function(){
 				$(".items").draggable({
 					scroll: true,
@@ -336,11 +332,7 @@ function pollStatus(){
 					cursor: "grabbing",
 					helper:function(){
 						var selected = $(".selected");
-						$(".selected").each(function() {
-							  console.log($( this ).find(".bib-entry").data("key"));
-						});
-						
-					    if (selected.length === 0) {
+					    if (selected.length == 0) {
 					        $(this).addClass('selected');
 					        selected = $(this);
 					    }
@@ -350,46 +342,38 @@ function pollStatus(){
 					    $(".selected").each(function() {
 					    	  list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
 						});
-					      
 					    return container;
 					}
-		});
-				
+				});
 				
 				$(".list-group-item").droppable( {
-					
 					over: function(event,ui){
 						$(this).addClass('drag-over');
 					},
 					out: function(event, ui) {
 						$(this).removeClass('drag-over');
 		            },
-					  
 				    drop: function(event, ui) {
 						  $(this).removeClass('drag-over');
+						  var collectionName = $(this).find('a').text();
 						  var href = $(this).find('a').attr("href");
 						  var segments = href.split('/');
 						  var movedToCollectionKey = segments[6];
-						  var groupId = segments[4];
-						  
-						  var keys = [];
+						  var itemsKeys = [];
 			              ui.helper.find('ul').children().each(function(){
-			            	keys.push($(this).text());
+			            	  itemsKeys.push($(this).text());
 			              });
-			            
-			              var movedItemKeys = JSON.stringify(keys);
-			              
 			              var itemsMoveData ={};
-			  		      itemsMoveData["itemIds"] = movedItemKeys;
+			  		      itemsMoveData["itemIds"] = itemsKeys;
 			  		      itemsMoveData["collectionId"] = movedToCollectionKey;
 			              
 			              $.ajax({
 			  		    	type: "POST",
-			  		    	url: '[[@{/auth/group/}]]' + groupId + '/items/move?[(${_csrf.parameterName})]=[(${_csrf.token})]',
-			  		    	data: itemsMoveData,
+			  		    	url: 'items/move?[(${_csrf.parameterName})]=[(${_csrf.token})]',
+			  		    	data: JSON.stringify(itemsMoveData),
+			  		    	contentType : "application/json",
 			  		        success: function (data){
-			  		        		console.log(data);
-			  		                $.notify('<i class="fas fa-check-circle"></i> Citation moved successfully to "'+movedToCollectionKey+'" !', {
+			  		                $.notify('<i class="fas fa-check-circle"></i> Citation moved successfully to "'+collectionName+'" !', {
 			  							type: 'success',
 			  							offset: {
 			  								x: 50,
@@ -414,13 +398,10 @@ function pollStatus(){
 			  							}
 			  						});
 			  	 	      	}
-			  	 	    	
-			  		    });  
-			                
-			              
-			            }
-				  } );
+			  		    });    
+			        }
 			});
+		});
 			
 		
 </script>
