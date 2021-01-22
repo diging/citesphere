@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 
 @Controller
-public class MarkFailedSyncJobController {
+public class CancelSyncJobController {
     
     @Autowired
     private ISyncJobManager syncManager;
 
-    @RequestMapping(value = "/auth/jobs/sync/{jobId}/failed", method=RequestMethod.POST)
-    public String failed(@PathVariable String jobId) {
+    @RequestMapping(value = "/auth/jobs/sync/{jobId}/cancel", method=RequestMethod.POST)
+    public String cancel(@PathVariable String jobId) {
         syncManager.cancelJob(jobId);        
         return "redirect:/auth/jobs/sync/list";
     }
