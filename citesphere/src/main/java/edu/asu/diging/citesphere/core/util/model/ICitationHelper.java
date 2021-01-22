@@ -1,6 +1,5 @@
 package edu.asu.diging.citesphere.core.util.model;
 
-import java.util.List;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
