@@ -98,7 +98,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save(job);
         jobManager.addJob(job);
- 
+
         // we'll retrieve the latest group version first in case there are more changes
         // in between
         // this way the group version can be out-dated and trigger another sync next
