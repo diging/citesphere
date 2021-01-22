@@ -91,14 +91,14 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             // there is already a job running, let's not start another one
             return;
         }
- 
+
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
         job.setGroupId(groupId + "");
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save(job);
         jobManager.addJob(job);
-  
+ 
         // we'll retrieve the latest group version first in case there are more changes
         // in between
         // this way the group version can be out-dated and trigger another sync next
@@ -134,7 +134,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
         job.setStatus(JobStatus.DONE);
         job.setFinishedOn(OffsetDateTime.now());
-        jobRepo.save(job);     
+        jobRepo.save(job);
     }
 
     private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
