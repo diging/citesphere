@@ -54,7 +54,7 @@ $(function() {
         <td>
             <form th:if="${#strings.equals(job.status,'STARTED') or #strings.equals(job.status,'PREPARED')}" 
                     th:action="@{|/auth/jobs/sync/${job.id}/cancel|}" method="POST">
-	            <button style="margin: -10px;" class="btn-link" title="Cancel job">
+	            <button style="margin: -10px;" class="btn-link" title="Mark job as canceled">
 	               <i style="color: #303540;" class="fas fa-stop-circle" ></i>
 	            </button>
             </form>
