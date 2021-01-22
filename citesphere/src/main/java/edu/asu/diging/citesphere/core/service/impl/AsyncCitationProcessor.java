@@ -10,6 +10,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+import javax.management.RuntimeErrorException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +61,16 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
     @Autowired
     private ISyncJobManager jobManager;
+    
+    private List<JobStatus> inactiveJobStatuses;
+    
+    @PostConstruct
+    public void init() {
+        inactiveJobStatuses = new ArrayList<>();
+        inactiveJobStatuses.add(JobStatus.CANCELED);
+        inactiveJobStatuses.add(JobStatus.DONE);
+        inactiveJobStatuses.add(JobStatus.FAILURE);
+    }
 
     /*
      * (non-Javadoc)
@@ -71,18 +84,21 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     @Async
     public void sync(IUser user, String groupId, long contentVersion, String collectionId) {
         GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
-        if (prevJob != null && prevJob.getStatus() != JobStatus.DONE && prevJob.getStatus() != JobStatus.FAILURE) {
+        // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
+        // more activate job statuses than inactive ones, so it's less error prone to use the list that
+        // is less likely to change.
+        if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
             // there is already a job running, let's not start another one
             return;
         }
-
+        
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
         job.setGroupId(groupId + "");
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save(job);
         jobManager.addJob(job);
-
+        
         // we'll retrieve the latest group version first in case there are more changes
         // in between
         // this way the group version can be out-dated and trigger another sync next
@@ -119,6 +135,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setStatus(JobStatus.DONE);
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
+        
     }
 
     private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,

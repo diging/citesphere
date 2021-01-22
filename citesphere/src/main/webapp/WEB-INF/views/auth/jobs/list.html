@@ -33,6 +33,7 @@ $(function() {
 <th>Created On</th>
 <th>Finished On</th>
 <th></th>
+<th></th>
 </tr>
     <tr th:each="job:${jobs}"> 
         <td>[[${job.id}]]</td>
@@ -44,9 +45,19 @@ $(function() {
         <td>[[${job.createdOn}]]</td>
         <td>[[${job.finishedOn}]]</td>
         <td>
-            <span th:if="${#strings.equals(job.status,'DONE')}"><i style="color: green;" class="fas fa-check-circle"></i></span>
+            <span th:if="${#strings.equals(job.status,'DONE')}"><i style="color: #629262;" class="fas fa-check-circle"></i></span>
             <span th:if="${#strings.equals(job.status,'STARTED')}"><i style="color: orange;" class="fas fa-cogs"></i></span>
-            <span th:if="${#strings.equals(job.status,'FAILURE')}"><i style="color: red;" class="fas fa-exclamation-circle"></i></span>
+            <span th:if="${#strings.equals(job.status,'FAILURE')}"><i style="color: #d83838;" class="fas fa-exclamation-circle"></i></span>
+            <span th:if="${#strings.equals(job.status,'PREPARED')}"><i style="color: #5d97b3;" class="fas fa-clock"></i></span>
+            <span th:if="${#strings.equals(job.status,'CANCELED')}"><i title="Job was canceled" style="color: #868181;" class="fas fa-exclamation-triangle"></i></span>
+        </td>
+        <td>
+            <form th:if="${#strings.equals(job.status,'STARTED') or #strings.equals(job.status,'PREPARED')}" 
+                    th:action="@{|/auth/jobs/sync/${job.id}/failed|}" method="POST">
+	            <button style="margin: -10px;" class="btn-link" title="Cancel job">
+	               <i style="color: #303540;" class="fas fa-stop-circle" ></i>
+	            </button>
+            </form>
         </td>
     </tr>
 </table>

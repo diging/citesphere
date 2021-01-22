@@ -12,10 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.model.jobs.IJob;
+import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.GroupSyncJobRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
-import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
@@ -69,5 +70,18 @@ public class SyncJobManager implements ISyncJobManager {
     public long getJobsCount(IUser user) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
         return jobRepo.countByGroupIdIn(groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList()));
+    }
+    
+    @Override
+    public void cancelJob(String jobId) {
+        Optional<GroupSyncJob> jobOptional = jobRepo.findById(jobId);
+        if (jobOptional.isPresent()) {
+            GroupSyncJob job = currentJobs.get(jobOptional.get().getGroupId());
+            if (job == null) {
+                job = jobOptional.get();
+            }
+            job.setStatus(JobStatus.CANCELED);
+            jobRepo.save(job);
+        }
     }
 }
