@@ -24,6 +24,10 @@
 			<h2>Welcome back, <span th:text="${user.firstName}"></span>!</h2>
 		</div>
 		<div class="col-md-12" th:if="${isZoteroConnected}">
+		<div class="text-right" style="margin-bottom: 20px;">
+		<a th:href="@{/auth/jobs/sync/list}"><i class="fas fa-sync"></i> Show sync jobs</a>
+		</div>
+		
 		<tbody th:each="group: ${groups}">
 			<div class="panel panel-default">
 				<div class="panel-body">
