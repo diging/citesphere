@@ -8,5 +8,7 @@ public interface ICitationHelper {
 
     void updateCitation(ICitation citation, CitationForm form, IUser iUser);
     
-    void updateCitation(ICitation citation, String collection, IUser iUser);
+    
+    
+    void updateCitationWithCollection(ICitation citation, String collection, IUser iUser);
 }

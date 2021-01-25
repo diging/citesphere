@@ -37,16 +37,16 @@ public class MoveItemsController {
             @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String itemsData)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             CitationIsOutdatedException {
-        ICitation citation;
         Gson gson = new Gson();
         MovedItemsData itemsDataDto = gson.fromJson(itemsData, MovedItemsData.class);
+        ICitation citation;
         for (String key : itemsDataDto.getItemIds()) {
             try {
                 citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, key);
             } catch (CannotFindCitationException e) {
                 return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
             }
-            citationHelper.updateCitation(citation, itemsDataDto.getCollectionId(),
+            citationHelper.updateCitationWithCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
             citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
         }

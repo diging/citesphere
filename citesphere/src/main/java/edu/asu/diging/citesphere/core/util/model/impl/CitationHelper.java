@@ -10,6 +10,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
@@ -124,8 +125,11 @@ public class CitationHelper implements ICitationHelper {
         }
     }
     
+    /**
+     * Use updateCitationWithCollection(ICitation, String, IUser) method when moving citation to a collection
+     */
     @Override
-    public void updateCitation(ICitation citation, String collection, IUser iUser) {
+    public void updateCitationWithCollection(ICitation citation, String collection, IUser iUser) {
         List<String> collections = citation.getCollections();
         if (collections != null) {
             collections.add(collection);
