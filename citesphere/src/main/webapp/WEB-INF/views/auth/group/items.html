@@ -326,14 +326,6 @@ function pollStatus(){
 				 $(this).parents('tr').removeClass('selected');
 		     }
 		 });
-		 $(".items").dblclick(function(){
-			    if($(this).hasClass('selected')){
-			 		$(this).removeClass('selected');
-			 	} 
-			    else{
-					$(this).addClass('selected');
-			    }
-		 }) 
 		 $(function(){
 				$(".items").draggable({
 					scroll: true,
