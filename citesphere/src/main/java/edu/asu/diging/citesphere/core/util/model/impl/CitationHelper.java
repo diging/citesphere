@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
@@ -126,17 +126,18 @@ public class CitationHelper implements ICitationHelper {
     }
     
     /**
-     * Use updateCitationWithCollection(ICitation, String, IUser) method when moving citation to a collection
+     * Use updateCitationWithCollection(ICitation, String, IUser) method when moving
+     * citation to a collection
+     * 
+     * @param citation     Citation that has to be updated with collection id.
+     * @param collectionId collectionId is the id of collection that the citation is
+     *                     moved to.
+     * @param iUser        iUser who is accessing Zotero.
      */
     @Override
-    public void updateCitationWithCollection(ICitation citation, String collection, IUser iUser) {
-        List<String> collections = citation.getCollections();
-        if (collections != null) {
-            collections.add(collection);
-        } else {
-            collections = new ArrayList<String>();
-            collections.add(collection);
-        }
+    public void updateCitationWithCollection(ICitation citation, String collectionId, IUser iUser) {
+        List<String> collections = Optional.ofNullable(citation.getCollections()).orElse(new ArrayList<String>());
+        collections.add(collectionId);
         citation.setCollections(collections);
     }
 

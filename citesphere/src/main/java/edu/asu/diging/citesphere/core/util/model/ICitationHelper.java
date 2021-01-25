@@ -7,8 +7,6 @@ import edu.asu.diging.citesphere.web.forms.CitationForm;
 public interface ICitationHelper {
 
     void updateCitation(ICitation citation, CitationForm form, IUser iUser);
-    
-    
-    
+
     void updateCitationWithCollection(ICitation citation, String collection, IUser iUser);
 }
