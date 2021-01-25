@@ -754,6 +754,7 @@ function getDatasetAuthorities(modalType, personType, page) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
+  					content += '<td>' + elem['username'] + '</td>';
   					
   				});
   				
@@ -1561,7 +1562,7 @@ function creatorLinkHandler(target) {
 								<span> Error occurred while importing dataset authorities</span>
 							</div>
 							<table class="table table-striped table-bordered table-fixed">
-								<tr><th>Name</th><th>URI</th><th>Description</th></tr>
+								<tr><th>Name</th><th>URI</th><th>Description</th><th>Username</th></tr>
 								<tbody id="datasetAuthoritySearchResult">
 								</tbody>
 							</table>

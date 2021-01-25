@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -119,7 +120,7 @@ public class AuthorityService implements IAuthorityService {
                     .findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName,
                             lastName)
                     .stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
-
+  
             ListIterator<IAuthorityEntry> iter = searchResult.getFoundAuthorities().listIterator();
             String uri = "";
             while (iter.hasNext()) {
@@ -207,14 +208,6 @@ public class AuthorityService implements IAuthorityService {
                     firstName, lastName, paging);
         }
         Set<IAuthorityEntry> entries = new HashSet<>();
-//        for(Persons per : personsList) {
-//            for(Person p: per.getPersons()) {
-//                Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
-//                if (optional.isPresent()) {
-//                    entries.add(optional.get());
-//                }
-//            }
-//        } 
         if(persons != null) {
             personsList.forEach(per -> per.getPersons().forEach(p -> {
                 Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
