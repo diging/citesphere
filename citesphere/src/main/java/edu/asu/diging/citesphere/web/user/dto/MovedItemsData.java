@@ -3,6 +3,14 @@ package edu.asu.diging.citesphere.web.user.dto;
 import java.util.List;
 
 public class MovedItemsData {
-	public String collectionId;
-	public List<String> itemIds;
+    private String collectionId;
+    private List<String> itemIds;
+
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    public List<String> getItemIds() {
+        return itemIds;
+    }
 }

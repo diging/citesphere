@@ -123,6 +123,18 @@ public class CitationHelper implements ICitationHelper {
             }
         }
     }
+    
+    @Override
+    public void updateCitation(ICitation citation, String collection, IUser iUser) {
+        List<String> collections = citation.getCollections();
+        if (collections != null) {
+            collections.add(collection);
+        } else {
+            collections = new ArrayList<String>();
+            collections.add(collection);
+        }
+        citation.setCollections(collections);
+    }
 
     private void mapPersonFields(List<PersonForm> personList,
             Set<IPerson> citationPersonList) {
@@ -163,18 +175,4 @@ public class CitationHelper implements ICitationHelper {
             citationCreatorList.add(creator);
         }
     }
-    
-    @Override
-    public void updateCitation(ICitation citation, String collection, IUser iUser) {
-    	List<String> collections = citation.getCollections();
-    	if(collections != null) {
-    		collections.add(collection);
-    	}
-    	else {
-    		collections = new ArrayList<String>();
-    		collections.add(collection);
-    	}
-    	citation.setCollections(collections);
-    }
-
 }

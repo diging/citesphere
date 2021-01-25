@@ -26,30 +26,31 @@ import edu.asu.diging.citesphere.web.user.dto.MovedItemsData;
 @Controller
 public class MoveItemsController {
 
-	@Autowired
-	private ICitationManager citationManager;
+    @Autowired
+    private ICitationManager citationManager;
 
-	@Autowired
-	private ICitationHelper citationHelper;
+    @Autowired
+    private ICitationHelper citationHelper;
 
-	@RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST)
-	public ResponseEntity<String> moveItemToCollection(Authentication authentication,
-			@PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String itemsData)
-			throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
-			CitationIsOutdatedException {
-		ICitation citation;
-		Gson gson = new Gson();
-		MovedItemsData itemsDataDto = gson.fromJson(itemsData, MovedItemsData.class);
-		for (String key : itemsDataDto.itemIds) {
-			try {
-				citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, key);
-			} catch (CannotFindCitationException e) {
-				return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-			}
-			citationHelper.updateCitation(citation, itemsDataDto.collectionId, (IUser) authentication.getPrincipal());
-			citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
-		}
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST)
+    public ResponseEntity<String> moveItemToCollection(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String itemsData)
+            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
+            CitationIsOutdatedException {
+        ICitation citation;
+        Gson gson = new Gson();
+        MovedItemsData itemsDataDto = gson.fromJson(itemsData, MovedItemsData.class);
+        for (String key : itemsDataDto.getItemIds()) {
+            try {
+                citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, key);
+            } catch (CannotFindCitationException e) {
+                return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            }
+            citationHelper.updateCitation(citation, itemsDataDto.getCollectionId(),
+                    (IUser) authentication.getPrincipal());
+            citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }
