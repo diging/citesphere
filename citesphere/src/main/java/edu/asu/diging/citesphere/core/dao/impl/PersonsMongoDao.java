@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.dao.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 
 import edu.asu.diging.citesphere.core.dao.IPersonsMongoDao;
+import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.Person;
@@ -88,7 +90,14 @@ public class PersonsMongoDao implements IPersonsMongoDao {
                 .as("persons");
         AggregationResults<Persons> result = mongoTemplate.aggregate(Aggregation.newAggregation(unwind, match, group),
                 Citation.class, Persons.class);
-        return result.getUniqueMappedResult()!= null ? (long) result.getUniqueMappedResult().getPersons().size() : 0;
+       
+        long size = 0;
+        if(result.getMappedResults() != null) {
+            for(Persons persons : result.getMappedResults())  {
+                size += persons.getPersons().size();                                                       
+            }
+        } 
+        return size;
     }
     
     @Override
@@ -102,7 +111,13 @@ public class PersonsMongoDao implements IPersonsMongoDao {
                 .as("persons");
         AggregationResults<Persons> result = mongoTemplate.aggregate(Aggregation.newAggregation(unwind, match, group),
                 Citation.class, Persons.class);
-        return result.getUniqueMappedResult()!= null ? (long) result.getUniqueMappedResult().getPersons().size() : 0;
+        long size = 0;
+        if(result.getMappedResults() != null) {
+            for(Persons persons : result.getMappedResults())  {
+                size += persons.getPersons().size();                                                       
+            }
+        } 
+        return size;
     }
     
 }
