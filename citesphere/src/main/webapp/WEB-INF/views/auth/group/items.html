@@ -319,96 +319,109 @@ function pollStatus(){
  
 <script >
 	//# sourceURL=move.js
-		 $('.checkboxes').change(function(){
-			 if ($(this).is(':checked')) {
-				    $(this).parents('tr').addClass('selected');
-			 } else {
-				 $(this).parents('tr').removeClass('selected');
-		     }
-		 });
-		 $(function(){
-				$(".items").draggable({
-					scroll: true,
-					cursor: "grabbing",
-					helper:function(){
-						var selected = $(".selected");
-					    if (selected.length == 0) {
-					        $(this).addClass('selected');
-					        selected = $(this);
-					    }
-					    var container = $('<div/>').attr('id', 'draggingContainer');
-					    container.append('<div>' + selected.length + '</div>');
-					    var list = container.append('<ul></ul>').find('ul');
-					    $(".selected").each(function() {
-					    	  list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
-						});
-					    return container;
-					}
+$('.checkboxes').change(function(){
+	if ($(this).is(':checked')) {
+		$(this).parents('tr').addClass('selected');
+		} else {
+			$(this).parents('tr').removeClass('selected');
+			}
+	});
+$(function(){
+	$(".items").draggable({
+		scroll: true,
+		cursor: "grabbing",
+		helper:function(){
+			var selected = $(".selected");
+			if (selected.length == 0) {
+			$(this).addClass('selected');
+			selected = $(this);
+			}
+			var container = $('<div/>').attr('id', 'draggingContainer');
+			container.append('<div>' + selected.length + '</div>');
+			var list = container.append('<ul></ul>').find('ul');
+			$(".selected").each(function() {
+				list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
 				});
+			return container;
+			}
+	});
 				
-				$(".list-group-item").droppable( {
-					over: function(event,ui){
-						$(this).addClass('drag-over');
-					},
-					out: function(event, ui) {
-						$(this).removeClass('drag-over');
-					},
-				    drop: function(event, ui) {
-						  $(this).removeClass('drag-over');
-						  var collectionName = $(this).find('a').text();
-						  var href = $(this).find('a').attr("href");
-						  var segments = href.split('/');
-						  var movedToCollectionKey = segments[6];
-						  var itemsKeys = [];
-			              ui.helper.find('ul').children().each(function(){
-			            	  itemsKeys.push($(this).text());
-			              });
-			              var itemsMoveData ={};
-			  		      itemsMoveData["itemIds"] = itemsKeys;
-			  		      itemsMoveData["collectionId"] = movedToCollectionKey;
-			              $.ajax({
-			  		    	type: "POST",
-			  		    	url: 'items/move?[(${_csrf.parameterName})]=[(${_csrf.token})]',
-			  		    	data: JSON.stringify(itemsMoveData),
-			  		    	contentType : "application/json",
-			  		        success: function (data){
-			  		                $.notify('<i class="fas fa-check-circle"></i> Citation moved successfully to "'+collectionName+'" !', {
-			  							type: 'success',
-			  							offset: {
-			  								x: 50,
-			  								y: 90
-			  							},
-			  							animate: {
-			  								enter: 'animated fadeInRight',
-			  								exit: 'animated fadeOutRight'
-			  							}
-			  						});
-			  		                
-			  		        },
-			  	 	   		error: function (data) {
-			  	 	   				$.notify('<i class="fas fa-exclamation-circle"></i> Citation not moved!', {
-			  							type: 'danger',
-			  							offset: {
-			  								x: 50,
-			  								y: 90
-			  							},
-			  							animate: {
-			  								enter: 'animated fadeInRight',
-			  								exit: 'animated fadeOutRight'
-			  							}
-			  						});
-			  	 	      	}
-			  		    });   
-			              
-			            var checkedBoxes = $('input[type="checkbox"]:checked');
-			            checkedBoxes.each(function(){
-			            	$(this).prop('checked', false);
-			            	$(this).parents('tr').removeClass('selected');
-			            });
-			        }
+$(".list-group-item").droppable( {
+	over: function(event,ui){
+		$(this).addClass('drag-over');
+		},
+	out: function(event, ui) {
+		$(this).removeClass('drag-over');
+		},
+	drop: function(event, ui) {
+		$(this).removeClass('drag-over');
+		var collectionName = $(this).find('a').text();
+		var href = $(this).find('a').attr("href");
+		var segments = href.split('/');
+		var movedToCollectionKey = segments[6];
+		var itemsKeys = [];
+		ui.helper.find('ul').children().each(function(){
+			itemsKeys.push($(this).text());
 			});
-		});
-			
+		var itemsMoveData ={};
+		itemsMoveData["itemIds"] = itemsKeys;
+		itemsMoveData["collectionId"] = movedToCollectionKey;
+		$.ajax({
+			type: "POST",
+			url: 'items/move?[(${_csrf.parameterName})]=[(${_csrf.token})]',
+			data: JSON.stringify(itemsMoveData),
+			contentType : "application/json",
+			dataType: "json",
+			success: function (data){
+		       if(data.movedCitations != null){
+				$.notify('<i class="fas fa-check-circle"></i> Citations moved successfully to "'+collectionName+'" ! <br /> <br />  Moved Citations: "'+ data.movedCitations, {
+			  	type: 'success',
+			  	offset: {
+			  		x: 50,
+			  		y: 90
+			  	},
+			  	animate: {
+			  		enter: 'animated fadeInRight',
+			  		exit: 'animated fadeOutRight'
+			  	},
+			 	});
+		      }
+		      if(data.notMovedCitations != null){
+		    	  $.notify('<i class="fas fa-exclamation-circle"></i> Citations not moved to "'+collectionName+'" ! <br /> <br /> Not moved Citations: "'+ data.notMovedCitations, {
+					  	type: 'danger',
+					  	offset: {
+					  		x: 50,
+					  		y: 90
+					  	},
+					  	animate: {
+					  		enter: 'animated fadeInRight',
+					  		exit: 'animated fadeOutRight'
+					  	}
+				  });
+		      }
+			 },
+			 error: function (data) {
+			  	$.notify('<i class="fas fa-exclamation-circle"></i> Error while moving citations!', {
+			  	type: 'danger',
+			  	offset: {
+			  		x: 50,
+			  		y: 90
+			  	},
+			  	animate: {
+			  		enter: 'animated fadeInRight',
+			  		exit: 'animated fadeOutRight'
+			  	}
+			  	});
+			 }
+		});   
+		var checkedBoxes = $('input[type="checkbox"]:checked');
+		checkedBoxes.each(function(){
+			$(this).prop('checked', false);
+			$(this).parents('tr').removeClass('selected');
+			});
+		}
+});
+});		
 		
 </script>
 </div>

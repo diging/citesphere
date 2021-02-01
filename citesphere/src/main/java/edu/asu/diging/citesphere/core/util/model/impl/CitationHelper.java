@@ -131,11 +131,11 @@ public class CitationHelper implements ICitationHelper {
      * 
      * @param citation     Citation that has to be updated with collection id.
      * @param collectionId collectionId is the id of collection that the citation is
-     *                     moved to.
-     * @param iUser        iUser who is accessing Zotero.
+     *                     moved to. Add collection id to citation 
+     * @param iUser        user who is accessing Zotero.
      */
     @Override
-    public void updateCitationWithCollection(ICitation citation, String collectionId, IUser iUser) {
+    public void addCollection(ICitation citation, String collectionId, IUser iUser) {
         List<String> collections = Optional.ofNullable(citation.getCollections()).orElse(new ArrayList<String>());
         collections.add(collectionId);
         citation.setCollections(collections);

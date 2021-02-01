@@ -1,5 +1,10 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 
@@ -21,6 +27,7 @@ import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.user.dto.CitationStatusesData;
 import edu.asu.diging.citesphere.web.user.dto.MovedItemsData;
 
 @Controller
@@ -33,24 +40,31 @@ public class MoveItemsController {
     private ICitationHelper citationHelper;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST)
-    public ResponseEntity<String> moveItemToCollection(Authentication authentication,
+    public @ResponseBody String moveItemToCollection(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String itemsData)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             CitationIsOutdatedException {
         Gson gson = new Gson();
         MovedItemsData itemsDataDto = gson.fromJson(itemsData, MovedItemsData.class);
         ICitation citation;
+        List<String> movedCitations = new ArrayList<>();
+        List<String> notMovedCitations = new ArrayList<>();
         for (String key : itemsDataDto.getItemIds()) {
             try {
                 citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, key);
             } catch (CannotFindCitationException e) {
-                return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+                notMovedCitations.add(key);
+                continue;
             }
-            citationHelper.updateCitationWithCollection(citation, itemsDataDto.getCollectionId(),
+            citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
             citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+            movedCitations.add(key);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        CitationStatusesData statusesDto = new CitationStatusesData(); 
+        statusesDto.setMovedCitations(movedCitations);
+        statusesDto.setNotMovedCitations(notMovedCitations);
+        return gson.toJson(statusesDto, CitationStatusesData.class);
     }
 
 }
