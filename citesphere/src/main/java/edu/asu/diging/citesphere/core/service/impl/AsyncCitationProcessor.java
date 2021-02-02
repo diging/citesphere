@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
+import edu.asu.diging.citesphere.core.search.service.Indexer;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
@@ -61,6 +62,9 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
     @Autowired
     private ISyncJobManager jobManager;
+    
+    @Autowired
+    private Indexer indexer;
     
     private List<JobStatus> inactiveJobStatuses;
     
@@ -236,6 +240,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             citationRepo.delete((Citation) optional.get());
         }
         citationRepo.save((Citation) citation);
+        indexer.indexCitation(citation);
     }
 
     private void storeCitationCollection(ICitationCollection collection) {

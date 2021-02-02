@@ -82,6 +82,13 @@ $(function() {
 	        }
 	    }
 	});
+	
+	$("#searchBtn").click(function() {
+        var key = $("#search").val();
+        if (key != undefined && key != '') {
+            window.location.href="search?searchTerm=" + key;
+        }
+    });
 });
 </script>
 </head>
@@ -159,11 +166,20 @@ function pollStatus(){
 }
 </script>
 </div>
+
 <div class="clearfix"></div>
 <div class="form-group">
 <div class="input-group">
     <input type="text" id="findItemKey" name="findItemKey" class="form-control" placeholder="Find by item key"/>
     <div class="input-group-addon" id="findByItemKeyBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
+</div>
+</div>
+
+<div class="clearfix"></div>
+<div class="form-group">
+<div class="input-group">
+    <input type="text" id="search" name="search" class="form-control" placeholder="Enter search term..."/>
+    <div class="input-group-addon" id="searchBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
 </div>
 </div>
 

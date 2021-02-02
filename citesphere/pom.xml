@@ -14,7 +14,8 @@
         <spring-security-version>5.1.5.RELEASE</spring-security-version>
         <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
-   
+        <spring-elasticsearch.version>3.2.12.RELEASE</spring-elasticsearch.version>
+
         <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
 
         <spring.version>5.2.8.RELEASE</spring.version>
@@ -72,6 +73,14 @@
         <email.smtp.starttls.enable>true</email.smtp.starttls.enable>
         <email.debug>false</email.debug>
 
+        <elasticsearch.index>citesphere</elasticsearch.index>
+        <elasticsearch.host>localhost:9200</elasticsearch.host>
+        <elasticsearch.user></elasticsearch.user>
+        <elasticsearch.password></elasticsearch.password>
+        <elasticsearch.path.prefix></elasticsearch.path.prefix>
+        <!-- in ms (10000ms = 10s) -->
+        <elasticsearch.connect.timeout>60000</elasticsearch.connect.timeout>
+
         <token.signing.key></token.signing.key>
 
         <app.name>Citesphere</app.name>
@@ -91,6 +100,12 @@
                 <version>${spring.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.data</groupId>
+                        <artifactId>spring-data-elasticsearch</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-releasetrain -->
             <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-releasetrain -->
@@ -100,6 +115,12 @@
                 <version>${spring-data.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.data</groupId>
+                        <artifactId>spring-data-elasticsearch</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
         </dependencies>
@@ -171,6 +192,13 @@
             <artifactId>spring-data-jpa</artifactId>
         </dependency>
 
+        <!-- Spring data elasticsearch -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-elasticsearch</artifactId>
+            <version>${spring-elasticsearch.version}</version>
+        </dependency>
+
         <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -238,7 +266,7 @@
             <version>1.8.9</version>
         </dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf -->
+        <!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf -->
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>

@@ -39,6 +39,12 @@
     <logger name="org.springframework.security">
         <level value="${log.level}" />
     </logger>
+    <logger name="org.springframework.data">
+        <level value="debug" />
+    </logger>
+    <logger name="org.elasticsearch">
+        <level value="debug" />
+    </logger>
     
     <logger name="org.hibernate.SQL">
         <level value="${log.level}" />
