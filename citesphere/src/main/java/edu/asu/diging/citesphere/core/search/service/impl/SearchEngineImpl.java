@@ -5,20 +5,16 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.core.query.Criteria;
-import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Optional;
 
 import edu.asu.diging.citesphere.core.model.ZoteroCreatorTypes;
-import edu.asu.diging.citesphere.core.search.data.ReferenceRepository;
 import edu.asu.diging.citesphere.core.search.model.impl.Affiliation;
 import edu.asu.diging.citesphere.core.search.model.impl.Person;
 import edu.asu.diging.citesphere.core.search.model.impl.Reference;
@@ -33,37 +29,39 @@ import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationConceptTag;
 import edu.asu.diging.citesphere.model.bib.impl.Creator;
 
+/**
+ * Service class to query Elasticsearch for references.
+ * 
+ * @author Julia Damerow
+ *
+ */
 @Service
 public class SearchEngineImpl implements SearchEngine {
 
     @Autowired
-    private ReferenceRepository referenceRepo;
-
-    @Autowired
     private ElasticsearchRestTemplate template;
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
-     * @see
-     * edu.asu.diging.citesphere.core.search.service.impl.SearchEngine#search(java.
-     * lang.String, int, int)
+     * This method searches in the title and creators name field for references that are
+     * not deleted.
+     * 
      */
     @Override
-    public List<ICitation> search(String searchTerm, String groupId, int page, int pageSize) {
+    public ResultPage search(String searchTerm, String groupId, int page, int pageSize) {
         BoolQueryBuilder orFieldsBuilder = QueryBuilders.boolQuery()
                 .should(QueryBuilders.queryStringQuery(searchTerm).field("title").field("creators.name"));
         BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
         boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId));
         NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder);
 
-        List<Reference> results = template.queryForList(b.build(), Reference.class);
+        AggregatedPage<Reference> results = template.queryForPage(b.build(), Reference.class);
         List<ICitation> foundCitations = new ArrayList<ICitation>();
-        results.forEach(r -> {
+        results.get().forEach(r -> {
             foundCitations.add(mapReference(r));
         });
-
-        return foundCitations;
+        return new ResultPage(foundCitations, results.getTotalElements(), results.getTotalPages());
     }
 
     private ICitation mapReference(Reference ref) {

@@ -21,6 +21,12 @@ import edu.asu.diging.citesphere.model.bib.ICitationConceptTag;
 import edu.asu.diging.citesphere.model.bib.ICreator;
 import edu.asu.diging.citesphere.model.bib.IPerson;
 
+/**
+ * Service class to index {@link ICitation}s in Elasticsearch.
+ * 
+ * @author Julia Damerow
+ *
+ */
 @Service
 public class IndexerImpl implements Indexer {
     

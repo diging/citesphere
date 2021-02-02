@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.search.service.SearchEngine;
+import edu.asu.diging.citesphere.core.search.service.impl.ResultPage;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -66,13 +67,11 @@ public class SearchController {
         
         pageInt = pageInt > 0 ? pageInt : 1;
 
-        List<ICitation> citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
+        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
 
-        model.addAttribute("items", citations);
-        // model.addAttribute("total", results.getTotalResults());
-        // model.addAttribute("totalPages", Math.ceil(new
-        // Float(results.getTotalResults()) / new Float(zoteroPageSize)));
-        model.addAttribute("totalPages", 1);
+        model.addAttribute("items", citations.getResults());
+        model.addAttribute("totalPages", citations.getTotalPages());
+        model.addAttribute("total", citations.getTotalResults());
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("group", groupManager.getGroup(user, zoteroGroupId));
