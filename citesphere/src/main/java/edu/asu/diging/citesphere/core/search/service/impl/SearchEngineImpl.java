@@ -50,11 +50,11 @@ public class SearchEngineImpl implements SearchEngine {
      * lang.String, int, int)
      */
     @Override
-    public List<ICitation> search(String searchTerm, int page, int pageSize) {
+    public List<ICitation> search(String searchTerm, String groupId, int page, int pageSize) {
         BoolQueryBuilder orFieldsBuilder = QueryBuilders.boolQuery()
                 .should(QueryBuilders.queryStringQuery(searchTerm).field("title").field("creators.name"));
         BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
-        boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false));
+        boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId));
         NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder);
 
         List<Reference> results = template.queryForList(b.build(), Reference.class);

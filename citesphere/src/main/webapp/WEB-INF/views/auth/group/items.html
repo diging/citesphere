@@ -89,6 +89,15 @@ $(function() {
             window.location.href="search?searchTerm=" + key;
         }
     });
+	
+	$("#search").on('keypress',function(e) {
+        if(e.which == 13) {
+        	var key = $("#search").val();
+            if (key != undefined && key != '') {
+                window.location.href="search?searchTerm=" + key;
+            }
+        }
+    });
 });
 </script>
 </head>

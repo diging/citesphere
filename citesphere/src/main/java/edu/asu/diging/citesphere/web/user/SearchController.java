@@ -66,7 +66,7 @@ public class SearchController {
         
         pageInt = pageInt > 0 ? pageInt : 1;
 
-        List<ICitation> citations = engine.search(searchTerm, pageInt-1, 50);
+        List<ICitation> citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
 
         model.addAttribute("items", citations);
         // model.addAttribute("total", results.getTotalResults());

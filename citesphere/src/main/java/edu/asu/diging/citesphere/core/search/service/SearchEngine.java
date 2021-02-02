@@ -6,6 +6,6 @@ import edu.asu.diging.citesphere.model.bib.ICitation;
 
 public interface SearchEngine {
 
-    List<ICitation> search(String searchTerm, int page, int pageSize);
+    List<ICitation> search(String searchTerm, String groupId, int page, int pageSize);
 
 }
