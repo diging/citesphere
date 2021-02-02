@@ -1,0 +1,36 @@
+<html layout:decorate="~{layouts/main}">
+<head></head>
+<body>
+<div layout:fragment="content">
+	<ol class="breadcrumb">
+		<li><a th:href="@{/}">Home</a></li>
+		<li><a th:href="@{/auth/concepts/list}">Concepts</a></li>
+		<li class="active"><span th:text="${form.name}"></span></li>
+	</ol>
+	<h2>Edit Concept: <span th:text="${form.name}"></span></h2>
+	
+	<form action="#" th:action="@{'/auth/concepts/' + ${conceptId} + '/edit'}" th:object="${form}" method="POST" id="editForm">
+	
+		<label>Name:</label>
+		<input th:field="*{name}" type="text" class="form-control" placeholder="Name" th:value="${form.name}" ></input>
+		<p class="text-danger"><th:errors path="name"/></p>
+		
+		<label>Description:</label>
+		<input th:field="*{description}" type="text" class="form-control" placeholder="Description" th:value="${form.description}" ></input>
+		
+		<label>URI:</label>
+		<input th:field="*{uri}" type="text" class="form-control" placeholder="URI" th:value="${form.uri}" ></input>
+		<p class="text-danger"><th:errors path="uri"/></p>
+		<input type="hidden" class="form-control" th:value="${form.conceptId}" ></input>
+		
+		<br>
+		<button id="submitForm" class="btn btn-primary" type="submit">
+		<i class="far fa-save"></i> &nbsp;Save</button>
+		
+		<a th:href="@{/auth/concepts/list}" class="btn btn-default">
+		<i class="fa fa-times"></i>&nbsp;Cancel</a>
+		
+	</form>
+</div>
+</body>	
+</html>

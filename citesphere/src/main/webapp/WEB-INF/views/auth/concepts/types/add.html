@@ -1,0 +1,37 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+
+</head>
+<body>
+<div layout:fragment="content">
+<h1>Create Concept Type</h1>
+
+<form action="#" th:action="@{/auth/concepts/types/add}" method="POST" th:object="${conceptTypeForm}">
+
+<table class="table table-striped">
+	
+<tr>
+<td width="20%"><label>Name</label></td>
+<td><input th:field="*{name}" class="form-control"></input></td>
+</tr>
+
+<tr>
+<td width="20%"><label>Description</label></td>
+<td><input th:field="*{description}" class="form-control"></input></td>
+</tr>
+
+<tr>
+<td width="20%"><label>URI</label></td>
+<td><input th:field="*{uri}" class="form-control"></input>
+<p class="text-danger"><th:errors path="uri"/></p></td>
+</tr>
+</table>
+
+<p class="pull-right">
+<button class="btn btn-primary" type="submit">Create</button>
+</p>
+</form>
+</div>
+</body>
+
+</html>

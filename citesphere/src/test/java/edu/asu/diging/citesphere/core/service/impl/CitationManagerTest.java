@@ -81,7 +81,7 @@ public class CitationManagerTest {
         group = new CitationGroup();
         group.setGroupId(new Long(GROUP_ID));
         group.getUsers().add(user.getUsername());
-        Mockito.when(groupRepository.findByGroupId(new Long(GROUP_ID))).thenReturn(Optional.of((CitationGroup)group));
+        Mockito.when(groupRepository.findFirstByGroupId(new Long(GROUP_ID))).thenReturn(Optional.of((CitationGroup)group));
         Mockito.when(groupManager.getGroup(user, GROUP_ID)).thenReturn(group);
         
         existingCitation.setKey(EXISTING_ID);
@@ -96,12 +96,12 @@ public class CitationManagerTest {
         group1 = new CitationGroup();
         group1.setGroupId(GROUP1_ID);
         group1.setContentVersion(20L);
-        Mockito.when(groupRepository.findByGroupId(GROUP1_ID)).thenReturn(Optional.of((CitationGroup)group1));
+        Mockito.when(groupRepository.findFirstByGroupId(GROUP1_ID)).thenReturn(Optional.of((CitationGroup)group1));
         
         group2 = new CitationGroup();
         group2.setGroupId(GROUP2_ID);
         group2.setContentVersion(3L);
-        Mockito.when(groupRepository.findByGroupId(GROUP2_ID)).thenReturn(Optional.of((CitationGroup)group2));
+        Mockito.when(groupRepository.findFirstByGroupId(GROUP2_ID)).thenReturn(Optional.of((CitationGroup)group2));
         
     }
     
@@ -220,7 +220,7 @@ public class CitationManagerTest {
         Map<Long, Long> groupVersions = new HashMap<>();
         groupVersions.put(group3Id, new Long(20));
         Mockito.when(zoteroManager.getGroupsVersion(user)).thenReturn(groupVersions);
-        Mockito.when(groupRepository.findByGroupId(group3Id)).thenReturn(Optional.empty());
+        Mockito.when(groupRepository.findFirstByGroupId(group3Id)).thenReturn(Optional.empty());
         Mockito.when(zoteroManager.getGroup(user, group3Id.toString(), false)).thenReturn(group3);
         
         List<ICitationGroup> expected = new ArrayList<>();

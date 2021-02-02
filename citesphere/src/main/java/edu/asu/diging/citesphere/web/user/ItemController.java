@@ -42,7 +42,7 @@ public class ItemController {
             model.addAttribute("collectionId", collectionId);
             model.addAttribute("sortBy", sortBy);
         }
-        return "auth/group/items/item";
+        return "auth/group/item";
     }
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/paging")

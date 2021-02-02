@@ -59,7 +59,7 @@ public class CsvProcessor implements Processor {
                 List<String> row = new ArrayList<>();
                 row.add(citation.getKey());
                 if (citation.getGroup() != null) {
-                    Optional<ICitationGroup> group = groupRepo.findByGroupId(new Long(citation.getGroup()));
+                    Optional<ICitationGroup> group = groupRepo.findFirstByGroupId(new Long(citation.getGroup()));
                     if (group.isPresent()) {
                         row.add(group.get().getGroupId() + "");
                         row.add(group.get().getName());

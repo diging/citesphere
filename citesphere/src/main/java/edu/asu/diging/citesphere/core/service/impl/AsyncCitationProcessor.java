@@ -10,6 +10,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+import javax.management.RuntimeErrorException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +22,9 @@ import org.springframework.stereotype.Service;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
+import edu.asu.diging.citesphere.core.search.service.Indexer;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
-import edu.asu.diging.citesphere.core.service.jobs.impl.SyncJobManager;
+import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
@@ -57,7 +61,20 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     private JobRepository jobRepo;
 
     @Autowired
-    private SyncJobManager jobManager;
+    private ISyncJobManager jobManager;
+    
+    @Autowired
+    private Indexer indexer;
+    
+    private List<JobStatus> inactiveJobStatuses;
+    
+    @PostConstruct
+    public void init() {
+        inactiveJobStatuses = new ArrayList<>();
+        inactiveJobStatuses.add(JobStatus.CANCELED);
+        inactiveJobStatuses.add(JobStatus.DONE);
+        inactiveJobStatuses.add(JobStatus.FAILURE);
+    }
 
     /*
      * (non-Javadoc)
@@ -71,7 +88,10 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     @Async
     public void sync(IUser user, String groupId, long contentVersion, String collectionId) {
         GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
-        if (prevJob != null && prevJob.getStatus() != JobStatus.DONE && prevJob.getStatus() != JobStatus.FAILURE) {
+        // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
+        // more activate job statuses than inactive ones, so it's less error prone to use the list that
+        // is less likely to change.
+        if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
             // there is already a job running, let's not start another one
             return;
         }
@@ -110,7 +130,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         // while this thread has been running, the group might have been updated by another thread
         // so, we have to make sure there is no group with the same group id but other object id
         // or we'll end up with two groups with the same group id.
-        Optional<ICitationGroup> group = groupRepo.findByGroupId(new Long(groupId));
+        Optional<ICitationGroup> group = groupRepo.findFirstByGroupId(new Long(groupId));
         if (group.isPresent()) {
             group.get().setContentVersion(groupVersion);
             groupRepo.save((CitationGroup) group.get());
@@ -220,6 +240,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             citationRepo.delete((Citation) optional.get());
         }
         citationRepo.save((Citation) citation);
+        indexer.indexCitation(citation);
     }
 
     private void storeCitationCollection(ICitationCollection collection) {
