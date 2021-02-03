@@ -13,10 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
@@ -27,6 +30,7 @@ import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
 
+@SessionAttributes("conceptpowerAuthorities")
 @Controller
 public class AuthorityEntryController {
 
@@ -81,6 +85,14 @@ public class AuthorityEntryController {
         entry = authorityService.create(entry, (IUser) authentication.getPrincipal());
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
+    
+    @RequestMapping(value = "/auth/authority/conceptpower/create", method = RequestMethod.POST)
+    public ResponseEntity<IAuthorityEntry> createConceptpowerAuthorityEntry(Authentication authentication,
+            @RequestParam("uri") String uri, @ModelAttribute("conceptpowerAuthorities") AuthoritySearchResult conceptpowerAuthorities) {
+        IAuthorityEntry entry = null;
+      
+        return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
+    }
 
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/userAuthorities")
     public ResponseEntity<AuthoritySearchResult> getUserAuthorities(Model model, Authentication authentication,
@@ -100,33 +112,7 @@ public class AuthorityEntryController {
                 .getTotalUserAuthoritiesPages((IUser) authentication.getPrincipal(), firstName, lastName, pageSize));
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
-
-    @RequestMapping("/auth/authority/{zoteroGroupId}/find/datasetAuthorities")
-    public ResponseEntity<AuthoritySearchResult> getDatasetAuthorities(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId,
-            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
-            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-
-        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
-
-        try {
-            List<String> uriList  = authorityService.getUriForUser(
-                    (IUser) authentication.getPrincipal(), firstName, lastName, zoteroGroupId, page, pageSize);
-            Set<IAuthorityEntry> datasetEntries = authorityService.findByNameInDataset(firstName, lastName, zoteroGroupId, page, pageSize, uriList);
-            authorityResult.setFoundAuthorities(datasetEntries.stream().collect(Collectors.toList()));
-            authorityResult.setCurrentPage(page + 1);
-            authorityResult.setTotalPages(authorityService.getTotalDatasetAuthoritiesPages(zoteroGroupId, firstName, lastName, pageSize, uriList));
-            authorityResult.setTotalPages(page + 1);
-
-        } catch (GroupDoesNotExistException e) {
-            logger.warn("Group does not exist: " + zoteroGroupId, e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
-    }
-
+    
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/searchAuthorities/{source}")
     public ResponseEntity<AuthoritySearchResult> getConceptpowerAuthorities(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("source") String source,
@@ -134,18 +120,19 @@ public class AuthorityEntryController {
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        AuthoritySearchResult authorityResult;
-
         if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
             logger.warn(
                     "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        AuthoritySearchResult authorityResult;
 
         try {
             authorityResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
             authorityResult.setCurrentPage(page + 1);
+            authorityResult = test(authorityResult);
+            
 
         } catch (AuthorityServiceConnectionException e) {
             logger.warn("Could not retrieve authority entries.", e);
@@ -158,5 +145,12 @@ public class AuthorityEntryController {
 
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
+    
+    @ModelAttribute("conceptpowerAuthorities")
+    public AuthoritySearchResult test(AuthoritySearchResult result) {
+        return result;
+    }
+    
+    
 
 }
