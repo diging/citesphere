@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.context.annotation.SessionScope;
 
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
@@ -30,12 +31,14 @@ import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
 
-@SessionAttributes("conceptpowerAuthorities")
+@SessionScope
 @Controller
 public class AuthorityEntryController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private AuthoritySearchResult authorityConceptpowerResult;
+    
     @Autowired
     private IAuthorityService authorityService;
 
@@ -88,9 +91,9 @@ public class AuthorityEntryController {
     
     @RequestMapping(value = "/auth/authority/conceptpower/create", method = RequestMethod.POST)
     public ResponseEntity<IAuthorityEntry> createConceptpowerAuthorityEntry(Authentication authentication,
-            @RequestParam("uri") String uri, @ModelAttribute("conceptpowerAuthorities") AuthoritySearchResult conceptpowerAuthorities) {
+            @RequestParam("uri") String uri) {
         IAuthorityEntry entry = null;
-      
+        System.out.println(authorityConceptpowerResult);
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
 
@@ -125,13 +128,10 @@ public class AuthorityEntryController {
                     "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        AuthoritySearchResult authorityResult;
-
         try {
-            authorityResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
+            authorityConceptpowerResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
-            authorityResult.setCurrentPage(page + 1);
-            authorityResult = test(authorityResult);
+            authorityConceptpowerResult.setCurrentPage(page + 1);
             
 
         } catch (AuthorityServiceConnectionException e) {
@@ -143,14 +143,7 @@ public class AuthorityEntryController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
-    }
-    
-    @ModelAttribute("conceptpowerAuthorities")
-    public AuthoritySearchResult test(AuthoritySearchResult result) {
-        return result;
-    }
-    
-    
+        return new ResponseEntity<AuthoritySearchResult>(authorityConceptpowerResult, HttpStatus.OK);
+    } 
 
 }
