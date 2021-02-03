@@ -27,12 +27,13 @@ import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionExcep
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
+import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
 
-@SessionScope
 @Controller
+@SessionScope
 public class AuthorityEntryController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -43,8 +44,7 @@ public class AuthorityEntryController {
     private IAuthorityService authorityService;
 
     @RequestMapping("/auth/authority/get")
-    public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication,
-            @RequestParam("uri") String uri, @RequestParam("zoteroGroupId") String zoteroGroupId) {
+    public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri, @RequestParam("zoteroGroupId") String zoteroGroupId) {
         List<IAuthorityEntry> userEntries = authorityService.findByUri((IUser) authentication.getPrincipal(), uri);
         FoundAuthorities foundAuthorities = new FoundAuthorities();
         foundAuthorities.setUserAuthorityEntries(userEntries);
@@ -60,6 +60,7 @@ public class AuthorityEntryController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        
         Set<IAuthorityEntry> datasetEntries;
         try {
             datasetEntries = authorityService.findByUriInDataset(uri, zoteroGroupId);
@@ -71,9 +72,8 @@ public class AuthorityEntryController {
         return new ResponseEntity<FoundAuthorities>(foundAuthorities, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/auth/authority/create", method = RequestMethod.POST)
-    public ResponseEntity<IAuthorityEntry> createAuthorityEntry(Authentication authentication,
-            @RequestParam("uri") String uri) {
+    @RequestMapping(value="/auth/authority/create", method=RequestMethod.POST)
+    public ResponseEntity<IAuthorityEntry> createAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri) {
         IAuthorityEntry entry = null;
         try {
             entry = authorityService.importAuthority(uri);
@@ -93,7 +93,12 @@ public class AuthorityEntryController {
     public ResponseEntity<IAuthorityEntry> createConceptpowerAuthorityEntry(Authentication authentication,
             @RequestParam("uri") String uri) {
         IAuthorityEntry entry = null;
-        System.out.println(authorityConceptpowerResult);
+        for(IAuthorityEntry authorityEntry : authorityConceptpowerResult.getFoundAuthorities()) {
+            if(authorityEntry.getUri().equals(uri)) {
+                entry = authorityService.create(authorityEntry, (IUser) authentication.getPrincipal());
+                break;
+            }
+        } 
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
 

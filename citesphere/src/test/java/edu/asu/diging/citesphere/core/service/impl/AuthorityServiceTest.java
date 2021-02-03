@@ -27,9 +27,7 @@ import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.authority.impl.ImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
-import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.repository.custom.AuthorityRepository;
-import edu.asu.diging.citesphere.core.repository.custom.PersonAuthorityRepository;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.IPersonMongoDao;
@@ -37,7 +35,6 @@ import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.model.bib.impl.Person;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
@@ -51,9 +48,6 @@ public class AuthorityServiceTest {
     private CitationGroupRepository groupRepository;
 
     @Mock
-    private PersonAuthorityRepository personAuthorityRepository;
-
-    @Mock
     private AuthorityRepository authorityRepository;
 
     @Mock
@@ -61,9 +55,6 @@ public class AuthorityServiceTest {
 
     @Mock
     private Set<AuthorityImporter> importers;
-    
-    @Autowired
-    private IPersonMongoDao personDao;
 
     @InjectMocks
     private AuthorityService managerToTest;
@@ -446,122 +437,6 @@ public class AuthorityServiceTest {
                 .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), "", "Albert"))
                 .thenReturn((long) 3);
         Assert.assertEquals(2, managerToTest.getTotalUserAuthoritiesPages(user, "", "Albert", pageSize));
-    }
-
-    @Test
-    public void test_findByNameInDataset_withUris() throws GroupDoesNotExistException {
-
-        List<String> uriList = new ArrayList<String>();
-        uriList.add("http://test1.uri/");
-        uriList.add("http://test2.uri/");
-        uriList.add("http://test1.uri/");
-
-        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
-
-        entriesAlbert.add(entry1);
-        entriesAlbert.add(entry2);
-        entriesAlbert.add(entry3);
-
-        // user has imported authorities with first 'Albert' and uri 'http://test1.uri/'
-        Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
-                "Albert", "")).thenReturn(entriesAlbert);
-
-        Person p = new Person();
-        p.setUri("http://test22.uri/");
-        p.setLocalAuthorityId("6");
-        List<Person> personList = new ArrayList<Person>();
-        personList.add(p);
-
-        AuthorityEntry albertEntry = new AuthorityEntry();
-        albertEntry.setUri(p.getUri());
-
-        Optional<AuthorityEntry> entry_op = Optional.of((AuthorityEntry) albertEntry);
-        Mockito.when(entryRepository.findById(p.getLocalAuthorityId())).thenReturn(entry_op);
-
-        // returning authorities imported by other users for first name 'Albert'
-        Mockito.when(personAuthorityRepository.findPersonsByCitationGroupAndNameLikeAndUriNotIn(group, "Albert", "",
-                uriList, paging)).thenReturn(personList);
-
-        Set<IAuthorityEntry> searchResult = managerToTest.findByNameInDataset(user, "Albert", "", "5", page, pageSize);
-
-        Assert.assertEquals(1, searchResult.size());
-
-        // assert search results does not contain authority imported by user
-        for (IAuthorityEntry entry : searchResult) {
-            Assert.assertTrue(!uriList.contains(entry.getUri()));
-        }
-    }
-
-    @Test
-    public void test_findByNameInDataset_withoutUris() throws GroupDoesNotExistException {
-
-        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
-
-        entriesAlbert.add(entry1);
-        entriesAlbert.add(entry2);
-        entriesAlbert.add(entry3);
-
-        // user has not imported any authority with name 'Albert' and uri
-        // 'http://test1.uri/'
-        Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
-                "Albert", "")).thenReturn(new ArrayList<IAuthorityEntry>());
-
-        Person p = new Person();
-        p.setUri("http://test1.uri/");
-        p.setFirstName("Einstein");
-        p.setLastName("Albert");
-        p.setLocalAuthorityId("6");
-        List<Person> personList = new ArrayList<Person>();
-        personList.add(p);
-
-        Optional<AuthorityEntry> entry_op = Optional.of((AuthorityEntry) entriesAlbert.get(0));
-        Mockito.when(entryRepository.findById(p.getLocalAuthorityId())).thenReturn(entry_op);
-
-        Mockito.when(personAuthorityRepository.findPersonsByCitationGroupAndNameLike(group, "Albert", "", paging))
-                .thenReturn(personList);
-
-        // search for authority by name 'Albert'
-        Set<IAuthorityEntry> searchResult = managerToTest.findByNameInDataset(user, "Albert", "", "5", page, pageSize);
-
-        Assert.assertEquals(1, searchResult.size());
-
-        // assert search result contains authority with uri 'http://test1.uri/'
-        Assert.assertFalse(searchResult.isEmpty());
-        for (IAuthorityEntry entry : searchResult) {
-            Assert.assertEquals("http://test1.uri/", entry.getUri());
-            Assert.assertTrue(entry.getName().contains("Einstein"));
-            Assert.assertTrue(entry.getName().contains("Albert"));
-        }
-
-    }
-
-    @Test
-    public void test_getTotalDatasetAuthoritiesPages_noResults() {
-
-        Mockito.when(personAuthorityRepository.countByPersonsByCitationGroupAndNameLike(group, "Peter", "Doe"))
-                .thenReturn((long) 0);
-
-        Assert.assertEquals(0, managerToTest.getTotalDatasetAuthoritiesPages("5", "Peter", "Doe", pageSize));
-    }
-
-    @Test
-    public void test_getTotalDatasetAuthoritiesPages_oneResult() {
-
-        Mockito.when(personAuthorityRepository.countByPersonsByCitationGroupAndNameLike(group, "Jane", "Rose"))
-                .thenReturn((long) 1);
-
-        Assert.assertEquals(1, managerToTest.getTotalDatasetAuthoritiesPages("5", "Jane", "Rose", pageSize));
-    }
-
-    @Test
-    public void test_getTotalDatasetAuthoritiesPages_severalResults() {
-
-        Mockito.when(personAuthorityRepository.countByPersonsByCitationGroupAndNameLike(group, "", "Albert"))
-                .thenReturn((long) 21);
-
-        pageSize = 20;
-
-        Assert.assertEquals(2, managerToTest.getTotalDatasetAuthoritiesPages("5", "", "Albert", pageSize));
     }
 
     @Test

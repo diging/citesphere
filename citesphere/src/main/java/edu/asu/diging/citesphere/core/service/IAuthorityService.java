@@ -38,13 +38,13 @@ public interface IAuthorityService {
     List<String> getUriForUser(IUser user, String firstName, String lastName, String citationGroupId,
             int page, int pageSize) throws GroupDoesNotExistException;
     
-    Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
-            int page, int pageSize, List<String> uris) throws GroupDoesNotExistException;
+    /*Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
+            int page, int pageSize, List<String> uris) throws GroupDoesNotExistException;*/
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
     int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize);
 
-    int getTotalDatasetAuthoritiesPages(String citationGroupId, String firstName, String lastName, int pageSize, List<String> uriList);
+    //int getTotalDatasetAuthoritiesPages(String citationGroupId, String firstName, String lastName, int pageSize, List<String> uriList);
 
 }

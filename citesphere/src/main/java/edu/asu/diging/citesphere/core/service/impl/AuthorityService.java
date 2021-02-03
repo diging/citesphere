@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -14,15 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
-import edu.asu.diging.citesphere.core.dao.IPersonsMongoDao;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.repository.custom.AuthorityRepository;
-import edu.asu.diging.citesphere.core.repository.custom.PersonAuthorityRepository;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
@@ -33,9 +29,6 @@ import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.transfer.impl.Persons;
-import edu.asu.diging.citesphere.user.IUser;
-import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
-import edu.asu.diging.citesphere.model.bib.impl.Person;
 
 @Service
 public class AuthorityService implements IAuthorityService {
@@ -48,9 +41,6 @@ public class AuthorityService implements IAuthorityService {
 
     @Autowired
     private IPersonMongoDao personDao;
-    
-    @Autowired
-    private IPersonsMongoDao personsMongoDao;
 
     @Autowired
     private AuthorityRepository authorityRepository;
@@ -126,6 +116,10 @@ public class AuthorityService implements IAuthorityService {
             while (iter.hasNext()) {
                 uri = iter.next().getUri();
                 if (!uri.trim().endsWith("/")) {
+                    if (uriList.contains(uri)) {
+                        iter.remove();
+                        continue;
+                    }
                     uri = uri + "/";
                 }
                 if (uriList.contains(uri)) {
@@ -191,35 +185,6 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public Set<IAuthorityEntry> findByNameInDataset(String firstName, String lastName, String citationGroupId,
-            int page, int pageSize, List<String> uris) throws GroupDoesNotExistException {
-        Optional<ICitationGroup> group = groupRepository.findFirstByGroupId(new Long(citationGroupId));
-        if (!group.isPresent()) {
-            throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
-        }
-        Pageable paging = PageRequest.of(page, pageSize);
-        Persons persons = new Persons();
-        List<Persons> personsList = null;
-        if (uris != null && uris.size() > 0) {
-            personsList = personsMongoDao.findPersonsByCitationGroupAndNameLikeAndUriNotIn(
-                    (ICitationGroup) group.get(), firstName, lastName, uris, paging);
-        } else {
-            persons = personsMongoDao.findPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(),
-                    firstName, lastName, paging);
-        }
-        Set<IAuthorityEntry> entries = new HashSet<>();
-        if(persons != null) {
-            personsList.forEach(per -> per.getPersons().forEach(p -> {
-                Optional<AuthorityEntry> optional = entryRepository.findById(p.getLocalAuthorityId());
-                if (optional.isPresent()) {
-                    entries.add(optional.get());
-                }
-            }));
-        } 
-        return entries;
-    }
-
-    @Override
     public List<String> getUriForUser(IUser user, String firstName, String lastName,
             String citationGroupId, int page, int pageSize) throws GroupDoesNotExistException {
         return authorityRepository
@@ -257,24 +222,6 @@ public class AuthorityService implements IAuthorityService {
         return (int) Math.ceil(new Float(authorityRepository
                 .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName))
                 / pageSize);
-    }
-
-    @Override
-    public int getTotalDatasetAuthoritiesPages(String citationGroupId, String firstName, String lastName,
-            int pageSize, List<String> uriList) {
-        Optional<ICitationGroup> group = groupRepository.findFirstByGroupId(new Long(citationGroupId));
-        int totalPages;
-        if (uriList != null && uriList.size() > 0) {
-            totalPages = (int) Math.ceil(new Float(personsMongoDao
-                .countByPersonsByCitationGroupAndNameLikeAndUriNotIn((ICitationGroup) group.get(), firstName, lastName, uriList))
-                / pageSize);
-        } else {
-            totalPages = (int) Math.ceil(new Float(personsMongoDao
-                    .countByPersonsByCitationGroupAndNameLike((ICitationGroup) group.get(), firstName, lastName))
-                    / pageSize);
-        }
-        
-        return totalPages;
     }
 
     // Given a source like viaf or conceptpower, this method returns authority
