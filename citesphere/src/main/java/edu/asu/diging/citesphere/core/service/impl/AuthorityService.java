@@ -152,10 +152,6 @@ public class AuthorityService implements IAuthorityService {
         return results;
     }
 
-    /**
-     * This method returns all the Authorities that are imported by the user based
-     * on first name and/or last name
-     */
     @Override
     public Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId)
             throws GroupDoesNotExistException {
@@ -224,8 +220,6 @@ public class AuthorityService implements IAuthorityService {
                 / pageSize);
     }
 
-    // Given a source like viaf or conceptpower, this method returns authority
-    // importer responsible for search and import
     private AuthorityImporter getAuthorityImporter(String source) {
 
         for (AuthorityImporter importer : importers) {

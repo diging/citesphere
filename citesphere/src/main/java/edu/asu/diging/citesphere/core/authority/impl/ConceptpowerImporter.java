@@ -141,8 +141,6 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
         return searchResult;
     }
 
-    // This method takes is responsible for creating search string based on the
-    // first name and last name.
     private String getConceptpowerSearchString(String firstName, String lastName) {
 
         String conceptpowerSearchString = "";
