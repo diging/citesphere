@@ -45,6 +45,7 @@ public class CitationStore implements ICitationStore {
     
     @Override
     public void delete(ICitation citation) {
+        indexer.deleteCitation(citation);
         citationRepository.delete((Citation) citation);
     }
 }
