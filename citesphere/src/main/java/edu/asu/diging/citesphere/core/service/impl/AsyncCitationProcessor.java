@@ -235,6 +235,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         if (optional.isPresent()) {
             citationStore.delete((Citation) optional.get());
         }
+
         citationStore.save((Citation) citation);
     }
 
