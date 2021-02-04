@@ -31,17 +31,16 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedExcepti
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
-import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
@@ -67,8 +66,8 @@ public class CitationManager implements ICitationManager {
     private CitationGroupRepository groupRepository;
 
     @Autowired
-    private CitationRepository citationRepository;
-
+    private ICitationStore citationStore;
+    
     @Autowired
     private ICitationDao citationDao;
 
@@ -96,7 +95,7 @@ public class CitationManager implements ICitationManager {
     @Override
     public ICitation getCitation(IUser user, String groupId, String key)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
-        Optional<ICitation> optional = citationRepository.findByKey(key);
+        Optional<ICitation> optional = citationStore.findById(key);
         if (optional.isPresent()) {
             ICitation citation = optional.get();
             ICitationGroup group = groupManager.getGroup(user, groupId);
@@ -138,17 +137,17 @@ public class CitationManager implements ICitationManager {
     public void updateCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {
         long citationVersion = zoteroManager.getGroupItemVersion(user, groupId, citation.getKey());
-        Optional<ICitation> storedCitationOptional = citationRepository.findByKey(citation.getKey());
+        Optional<ICitation> storedCitationOptional = citationStore.findById(citation.getKey());
         if (storedCitationOptional.isPresent()) {
             ICitation storedCitation = storedCitationOptional.get();
             if (storedCitation.getVersion() != citationVersion) {
                 throw new CitationIsOutdatedException();
             }
-            citationRepository.delete((Citation) storedCitationOptional.get());
+            citationStore.delete(storedCitationOptional.get());
         }
 
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
-        citationRepository.save((Citation) updatedCitation);
+        citationStore.save(updatedCitation);
     }
 
     @Override
@@ -161,7 +160,7 @@ public class CitationManager implements ICitationManager {
         }
 
         ICitation newCitation = zoteroManager.createCitation(user, groupId, collectionIds, citation);
-        return citationRepository.save((Citation) newCitation);
+        return citationStore.save(newCitation);
 
         // mark group outdated, so it'll be updated on the next loading
 //        ICitationGroup group = groupOptional.get();
@@ -182,11 +181,11 @@ public class CitationManager implements ICitationManager {
             ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey);
             citation.setGroup(groupOptional.get().getGroupId() + "");
             
-            Optional<ICitation> oldCitation = citationRepository.findByKey(itemKey);
+            Optional<ICitation> oldCitation = citationStore.findById(itemKey);
             if(oldCitation.isPresent()) {
-                citationRepository.delete((Citation)oldCitation.get());
+                citationStore.delete(oldCitation.get());
             }
-            citationRepository.save((Citation) citation);
+            citationStore.save(citation);
             return citation;
         } catch (HttpClientErrorException ex) {
             throw new CannotFindCitationException(ex);
