@@ -44,6 +44,11 @@ public class IndexerImpl implements Indexer {
         referenceRepo.save(reference);        
     }
     
+    @Override
+    public void deleteCitation(ICitation citation) {
+        referenceRepo.deleteById(citation.getKey());
+    }
+    
     private void mapCitation(ICitation citation, Reference reference) {
         reference.setAbstractNote(citation.getAbstractNote());
         reference.setAccessDate(citation.getAccessDate());
