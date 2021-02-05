@@ -126,12 +126,11 @@ public class CitationHelper implements ICitationHelper {
     }
     
     /**
-     * addCollection(ICitation, String, IUser) method is used to update citation with collection id
+     * This method adds a collection id to an existing citation
      * 
      * @param citation     Citation that has to be updated with collection id.
-     * @param collectionId collectionId is the id of collection that the citation is
-     *                     moved to. Add collection id to citation.
-     * @param iUser        user who is accessing Zotero.
+     * @param collectionId unique id of the collection.
+     * @param iUser        user accessing Zotero.
      */
     @Override
     public void addCollection(ICitation citation, String collectionId, IUser iUser) {
