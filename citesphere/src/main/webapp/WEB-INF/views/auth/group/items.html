@@ -374,8 +374,8 @@ $(".list-group-item").droppable( {
 			contentType : "application/json",
 			dataType: "json",
 			success: function (data){
-		       if(data.movedCitations != null){
-				$.notify('<i class="fas fa-check-circle"></i> Citations moved successfully to "'+collectionName+'" ! <br /> <br />  Moved Citations: "'+ data.movedCitations, {
+		       if(data.movedCitations.length != 0){
+				$.notify('<i class="fas fa-check-circle"></i> Citations moved successfully to "'+collectionName+'" ! <br /> <br />'+ data.movedCitations, {
 			  	type: 'success',
 			  	offset: {
 			  		x: 50,
@@ -387,8 +387,8 @@ $(".list-group-item").droppable( {
 			  	},
 			 	});
 		      }
-		      if(data.notMovedCitations != null){
-		    	  $.notify('<i class="fas fa-exclamation-circle"></i> Citations not moved to "'+collectionName+'" ! <br /> <br /> Not moved Citations: "'+ data.notMovedCitations, {
+		      if(data.notMovedCitations.length != 0){
+		    	  $.notify('<i class="fas fa-exclamation-circle"></i> Citations not moved to "'+collectionName+'" ! <br /> <br />'+ data.notMovedCitations, {
 					  	type: 'danger',
 					  	offset: {
 					  		x: 50,
