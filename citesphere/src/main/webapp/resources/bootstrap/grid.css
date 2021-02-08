@@ -97,11 +97,15 @@ tr.changed>td {
 }
 
 .drag-over{
-	cursor: copy;
 	background: #ddf;
 	border-color: blue ;
+	transition: transform .2s;
+	transform: scale(1.15);
+	-ms-transform: scale(1.15);
+    -webkit-transform: scale(1.15); 
 }
+
 .selected > td{
-  background-color: rgba(13, 173, 253, 0.37) !important;
-  cursor: move !important;
+  background-color: rgba(13, 173, 253, 0.37);
+  cursor: move;
 }
