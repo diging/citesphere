@@ -152,10 +152,10 @@
 		<tr>
 			<td>Editors</td>
 			<td><span th:each="editor,status : ${citation.editors}">
-				[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
+				[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">; [[${editor.firstName}]]</span>
 				<span th:if="${!#lists.isEmpty(editor.affiliations)}">
 					 (<th:block th:each="aff,affStatus : ${editor.affiliations}">
-					 	[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
+					 	[[${aff.name}]]<span th:if="${!affStatus.last}">; </span>
 					 </th:block>)
 					 <span th:if="${!status.last}">; </span>
 				 </span>

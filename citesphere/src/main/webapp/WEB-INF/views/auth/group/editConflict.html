@@ -78,7 +78,7 @@ Do you want to proceed?
 <td>Editors</td>
 <td>
 <span th:each="editor,status : ${outdatedCitation.editors}">
-				[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
+				[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">; [[${editor.firstName}]]</span>
 		<span th:if="${!status.last}">; </span>
 				
 	</span>
@@ -210,7 +210,7 @@ Do you want to proceed?
 <td>Editors</td>
 <td>
 	<span th:each="editor,status : ${currentCitation.editors}">
-				[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
+				[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">; [[${editor.firstName}]]</span>
 		<span th:if="${!status.last}">; </span>
 				
 	</span>
