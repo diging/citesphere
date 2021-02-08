@@ -109,3 +109,14 @@ tr.changed>td {
   background-color: rgba(13, 173, 253, 0.37);
   cursor: move;
 }
+
+#moveitems-highlighter{
+	color:white;
+	background-color:#2554C7; 
+	font-size:150% ; 
+	padding-bottom:12px;
+	padding-top: 10px;
+  	padding-right: 10px;
+  	padding-left: 10px;
+	border-radius: 10px
+}

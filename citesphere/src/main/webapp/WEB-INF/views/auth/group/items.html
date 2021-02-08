@@ -368,12 +368,14 @@ $(function(){
 			$(this).addClass('selected');
 			selected = $(this);
 			}
-			var container = $('<div/>').attr('id', 'draggingContainer');
-			container.append('<div>' + selected.length + '</div>');
+			var container = $('<div> Move ' +selected.length+ ' citations </div>').attr('id', 'moveitems-highlighter');
+			// container.attr("style", "color:white; background-color:#2554C7; font-size:150% ; padding-bottom:12px; ");
+			container.addClass('icon-docs');
 			var list = container.append('<ul></ul>').find('ul');
 			$(".selected").each(function() {
 				list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
 				});
+			container.find('ul').hide();
 			return container;
 			}
 	});
