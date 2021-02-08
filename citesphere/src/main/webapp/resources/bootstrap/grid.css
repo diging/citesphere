@@ -101,6 +101,7 @@ tr.changed>td {
 	background: #ddf;
 	border-color: blue ;
 }
-.selected {
+.selected > td{
   background-color: rgba(13, 173, 253, 0.37) !important;
+  cursor: move !important;
 }

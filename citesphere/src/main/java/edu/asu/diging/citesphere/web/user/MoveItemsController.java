@@ -61,10 +61,9 @@ public class MoveItemsController {
             citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
             movedCitations.add(key);
         }
-        CitationStatusesData statusesDto = new CitationStatusesData(); 
+        CitationStatusesData statusesDto = new CitationStatusesData();
         statusesDto.setMovedCitations(movedCitations);
         statusesDto.setNotMovedCitations(notMovedCitations);
         return gson.toJson(statusesDto, CitationStatusesData.class);
     }
-
 }
