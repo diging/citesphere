@@ -348,8 +348,10 @@ function pollStatus(){
 $('.checkboxes').change(function(){
 	if ($(this).is(':checked')) {
 		$(this).parents('tr').addClass('selected');
+		$(this).parents('tr').attr("title", "Drag to move citations to a collecton");
 		} else {
 			$(this).parents('tr').removeClass('selected');
+			$(this).parents('tr').removeAttr("title");
 			}
 	if($('.checkboxes:checked').length > 0){
 		$('.fa-chevron-circle-left').hide();
