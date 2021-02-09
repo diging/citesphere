@@ -406,6 +406,9 @@ function editPerson(modalName, item){
 	$("#add"+modalName+"Button").text("Update "+modalName);
 	
 	$("#"+modalNameLCase+"Modal").modal('show');
+	if($("#firstName"+modalName).val() != "" || $("#lastName"+modalName).val() != ""){
+		$("#search"+modalName).prop("disabled", false);
+	}
 }
 
 /* Function to save information on closing modal */
