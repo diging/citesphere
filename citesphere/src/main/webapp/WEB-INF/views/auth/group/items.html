@@ -106,25 +106,48 @@ $(function() {
 		var ids = $(this).data("entry-key");
 		var entry = "Entry";
 		var rows = ids.split(",");
+		var baseurl = "delete/";
 
-		for(id of rows) {
-			$("#tr-" + id).remove();
-		}
-		if (ids.length > 1)
-			entry = "Entries";
-		
-		$.notify('<i class="fas fa-check-circle"></i> '+entry+' successfully deleted!', {
-			type: 'success',
-			offset: {
-				x: 50,
-				y: 90
+		$.ajax({
+			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+			'type': "POST",
+			'data': {
+				"citationList": ids
 			},
-			animate: {
-				enter: 'animated fadeInRight',
-				exit: 'animated fadeOutRight'
+			'success': function(data) {
+				for(id of rows) {
+					$("#tr-" + id).remove();
+				}
+				if (ids.length > 1)
+					entry = "Entries";
+				
+				$.notify('<i class="fas fa-check-circle"></i> '+entry+' successfully deleted!', {
+					type: 'success',
+					offset: {
+						x: 50,
+						y: 90
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				});
+			},
+			'error': function(data) {
+				console.log(data);
+				$.notify('<i class="fas fa-exclamation-circle"></i> Citation could not be deleted!', {
+					type: 'danger',
+					offset: {
+						x: 50,
+						y: 90
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				});
 			}
-		});
-		
+		});		
 		
 		$('#entry-delete-confirmation').modal("hide");
 		event.preventDefault();

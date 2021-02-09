@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,9 @@ import org.springframework.social.zotero.api.ZoteroFields;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
@@ -37,6 +40,7 @@ import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
@@ -355,5 +359,19 @@ public class ZoteroManager implements IZoteroManager {
             validTypes.add(type.getCreatorType());
         }
         return validTypes;
+    }
+
+    @Override
+    public void deleteCitations(IUser user, List<String> citationList) throws CannotFindCitationException {
+        // TODO Auto-generated method stub
+        try {
+        for(String citation : citationList) {
+//            Optional<ICitation> oldCitation = citationRepository.findByKey(citation);
+//            if(oldCitation.isPresent()) {
+//                citationRepository.delete((Citation)oldCitation.get());
+//            } 
+        } }catch (HttpClientErrorException ex) {
+            throw new CannotFindCitationException(ex);
+        }        
     }
 }

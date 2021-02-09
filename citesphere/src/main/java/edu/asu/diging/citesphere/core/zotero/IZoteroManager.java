@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.model.bib.ICitation;
@@ -63,5 +64,7 @@ public interface IZoteroManager {
     ZoteroCollectionsResponse getCollectionsByKey(IUser user, String groupId, List<String> keys);
 
     long getLatestGroupVersion(IUser user, String groupId);
+    
+    void deleteCitations(IUser user, List<String> citationList) throws CannotFindCitationException;
 
 }
