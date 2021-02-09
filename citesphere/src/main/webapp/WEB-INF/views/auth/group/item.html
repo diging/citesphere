@@ -149,15 +149,16 @@
 			</span></td>
 		</tr>
 		
+		
 		<tr>
 			<td>Editors</td>
 			<td><span th:each="editor,status : ${citation.editors}">
-				[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">; [[${editor.firstName}]]</span>
+				[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
 				<span th:if="${!#lists.isEmpty(editor.affiliations)}">
 					 (<th:block th:each="aff,affStatus : ${editor.affiliations}">
-					 	[[${aff.name}]]<span th:if="${!affStatus.last}">; </span>
+					 	[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
 					 </th:block>)
-					 <span th:if="${!status.last}">; </span>
+					 <!-- <span th:if="${!status.last}">; </span> -->
 				 </span>
 				 <span th:if="${!#strings.isEmpty(editor.uri)}">
 				 	<a th:href="@{|${editor.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
@@ -165,6 +166,7 @@
 				 <span th:if="${!#strings.isEmpty(editor.localAuthorityId)}">
 				 	<a th:href="@{|/auth/authority/${editor.localAuthorityId}|}"><i class="fas fa-anchor"></i></a>
 				 </span>
+				 <span th:if="${!status.last}">; </span>
 			</span></td>
 		</tr>
 		<tr th:each="role,status: ${citation.otherCreatorRoles}" th:if="${!#strings.equals(role,'editor')}">
@@ -173,7 +175,7 @@
 			</td>
 			<td>
 				<span th:each="creator,creatorStatus: ${citation.otherCreators}" th:if="${#strings.equals(creator.role, role)}">
- 					[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">; [[${creator.person.firstName}]]</span>
+ 					[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
 					
 					<span th:if="${!#lists.isEmpty(creator.person.affiliations)}">
 				
