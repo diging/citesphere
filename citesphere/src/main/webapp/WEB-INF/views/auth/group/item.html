@@ -173,7 +173,7 @@
 			</td>
 			<td>
 				<span th:each="creator,creatorStatus: ${citation.otherCreators}" th:if="${#strings.equals(creator.role, role)}">
- 					[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
+ 					[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">; [[${creator.person.firstName}]]</span>
 					
 					<span th:if="${!#lists.isEmpty(creator.person.affiliations)}">
 				

@@ -864,7 +864,7 @@ function creatorLinkHandler(target) {
 				 			<th:block th:each="aff:${creator.person.affiliations}"> 
 				 				<span th:data-affiliation-name="${aff.name}"></span>
 				 			</th:block>
-								[[${creator.person.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
+								[[${creator.person.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(creator.person.firstName)}">; [[${creator.person.firstName}]]</span>
 							<th:block th:each="aff:${creator.person.affiliations}">[[${aff.name}]]</th:block>
 							&nbsp;<i class="far fa-edit edit-creator"></i>
 									<i class="fas fa-times remove-creator"></i>
