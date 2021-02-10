@@ -55,5 +55,4 @@ public interface ICitationManager {
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
     
     void deleteCitations(IUser user, List<String> citationList) throws CannotFindCitationException;
-
 }

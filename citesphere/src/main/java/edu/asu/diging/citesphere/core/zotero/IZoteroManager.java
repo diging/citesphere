@@ -64,7 +64,4 @@ public interface IZoteroManager {
     ZoteroCollectionsResponse getCollectionsByKey(IUser user, String groupId, List<String> keys);
 
     long getLatestGroupVersion(IUser user, String groupId);
-    
-    void deleteCitations(IUser user, List<String> citationList) throws CannotFindCitationException;
-
 }

@@ -383,15 +383,15 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public void deleteCitations(IUser user, List<String> citationList) throws CannotFindCitationException {
-        // TODO Auto-generated method stub
         try {
-        for(String citation : citationList) {
-            Optional<ICitation> oldCitation = citationRepository.findByKey(citation);
-            if(oldCitation.isPresent()) {
-                citationRepository.delete((Citation)oldCitation.get());
-            } 
-        } }catch (HttpClientErrorException ex) {
+            for(String citation : citationList) {
+                Optional<ICitation> oldCitation = citationRepository.findByKey(citation);
+                if(oldCitation.isPresent()) {
+                    citationRepository.delete((Citation)oldCitation.get());
+                } 
+            }
+        } catch (HttpClientErrorException ex) {
             throw new CannotFindCitationException(ex);
-        }        
+        }    
     }
 }
