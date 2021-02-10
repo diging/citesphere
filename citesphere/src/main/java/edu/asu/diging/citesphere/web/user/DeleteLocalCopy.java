@@ -27,14 +27,12 @@ public class DeleteLocalCopy{
     @Autowired
     private IUserManager userManager;
     
-    
-	@RequestMapping(value = "/auth/group/{zoteroGroupId}/mongo", method = RequestMethod.DELETE )
-	public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/mongo", method = RequestMethod.DELETE )
+    public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
             @PathVariable("zoteroGroupId") String groupId, Principal principal) throws GroupDoesNotExistException {
 		
         IUser user = userManager.findByUsername(principal.getName());
         groupManager.deleteGroup(user, groupId);
         return new ResponseEntity<String>(HttpStatus.OK);        
     }	
-
 }
