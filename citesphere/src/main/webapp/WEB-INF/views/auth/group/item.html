@@ -158,7 +158,6 @@
 					 (<th:block th:each="aff,affStatus : ${editor.affiliations}">
 					 	[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
 					 </th:block>)
-					 <!-- <span th:if="${!status.last}">; </span> -->
 				 </span>
 				 <span th:if="${!#strings.isEmpty(editor.uri)}">
 				 	<a th:href="@{|${editor.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
