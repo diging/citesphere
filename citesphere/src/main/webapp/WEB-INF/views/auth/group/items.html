@@ -311,7 +311,7 @@ function pollStatus(){
 		
 		
 		<tr data-action='draggable' class="items" th:each="entry,loop : ${items}">
-			<td><input type="checkbox" class="checkboxes"/>&nbsp;</td>
+			<td><input title="Select" type="checkbox" class="checkboxes"/>&nbsp;</td>
 			<td>
 			  <span class="text-warning">
 			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
