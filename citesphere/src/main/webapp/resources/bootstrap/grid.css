@@ -96,6 +96,10 @@ tr.changed>td {
 	background-color: #f7e8bf;
 }
 
+.checkboxes{
+	cursor:pointer;
+}
+
 .drag-over{
 	background: #ddf;
 	border-color: blue ;
