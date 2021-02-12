@@ -40,10 +40,10 @@
         <level value="${log.level}" />
     </logger>
     <logger name="org.springframework.data">
-        <level value="debug" />
+        <level value="${log.level}" />
     </logger>
     <logger name="org.elasticsearch">
-        <level value="debug" />
+        <level value="${log.level}" />
     </logger>
     
     <logger name="org.hibernate.SQL">

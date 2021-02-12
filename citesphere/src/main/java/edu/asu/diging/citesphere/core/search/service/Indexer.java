@@ -6,4 +6,6 @@ public interface Indexer {
 
     void indexCitation(ICitation citation);
 
+    void deleteCitation(ICitation citation);
+
 }
