@@ -353,10 +353,7 @@ $('.checkboxes').change(function(){
 			$(this).parents('tr').removeClass('selected');
 			$(this).parents('tr').removeAttr("title");
 			}
-	if($('.checkboxes:checked').length > 0){
-		$('.fa-chevron-circle-left').hide();
-	}else
-		$('.fa-chevron-circle-left').show();
+	$('.checkboxes:checked').length > 0? $('.fa-chevron-circle-left').hide(): $('.fa-chevron-circle-left').show();
 });
 $(function(){
 	$(".items").draggable({
@@ -369,10 +366,7 @@ $(function(){
 			selected = $(this);
 			}
 			var container = $('<div> Move ' +selected.length+ ' citations </div>').attr('id', 'moveitems-highlighter');
-			if(selected.length > 1)
-				container.addClass('icon-multiple-doc');
-			else
-				container.addClass('icon-docs');
+			(selected.length > 1)? container.addClass('icon-multiple-doc'): container.addClass('icon-docs');
 			var list = container.append('<ul></ul>').find('ul');
 			$(".selected").each(function() {
 				list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
@@ -411,44 +405,16 @@ $(".list-group-item").droppable( {
 			dataType: "json",
 			success: function (data){
 		       if(data.movedCitations.length != 0){
-				$.notify('<i class="fas fa-check-circle"></i> Citations moved successfully to "'+collectionName+'" ! <br /> <br />'+ data.movedCitations, {
-			  	type: 'success',
-			  	offset: {
-			  		x: 50,
-			  		y: 90
-			  	},
-			  	animate: {
-			  		enter: 'animated fadeInRight',
-			  		exit: 'animated fadeOutRight'
-			  	}
-			 	});
+		    	   message = " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ data.movedCitations;
+				   showNotification(message, "success");
 		      }
-		      if(data.notMovedCitations.length != 0){
-		    	$.notify('<i class="fas fa-exclamation-circle"></i> Citations not moved to "'+collectionName+'" ! <br /> <br />'+ data.notMovedCitations, {
-				type: 'danger',
-				offset: {
-					 x: 50,
-					 y: 90
-				},
-				animate: {
-					 enter: 'animated fadeInRight',
-					 exit: 'animated fadeOutRight'
-				}
-				});
+		       if(data.notMovedCitations.length != 0){
+		    	   message = " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ data.notMovedCitations;
+		    	   showNotification(message, "danger");
 		      }
 			 },
 			 error: function (data) {
-			  	$.notify('<i class="fas fa-exclamation-circle"></i> Error while moving citations!', {
-			  	type: 'danger',
-			  	offset: {
-			  		x: 50,
-			  		y: 90
-			  	},
-			  	animate: {
-			  		enter: 'animated fadeInRight',
-			  		exit: 'animated fadeOutRight'
-			  	}
-			  	});
+				   showNotification(" Error while moving citations!", "danger");
 			 }
 		});   
 		$('.fa-chevron-circle-left').show();
@@ -459,7 +425,21 @@ $(".list-group-item").droppable( {
 			});
 		}
 });
-});		
+});	
+
+function showNotification(message, status){
+	$.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
+		type: status,
+		offset: {
+			 x: 50,
+			 y: 90
+		},
+		animate: {
+			 enter: 'animated fadeInRight',
+			 exit: 'animated fadeOutRight'
+		}
+	});
+}
 		
 </script>
 </div>
