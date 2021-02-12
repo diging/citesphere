@@ -406,15 +406,15 @@ $(".list-group-item").droppable( {
 			success: function (data){
 		       if(data.movedCitations.length != 0){
 		    	   message = " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ data.movedCitations;
-				   showNotification(message, "success");
+				   showNotification(message, "success", 20000);
 		      }
 		       if(data.notMovedCitations.length != 0){
 		    	   message = " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ data.notMovedCitations;
-		    	   showNotification(message, "danger");
+		    	   showNotification(message, "danger", 20000);
 		      }
 			 },
 			 error: function (data) {
-				   showNotification(" Error while moving citations!", "danger");
+				   showNotification(" Error while moving citations!", "danger", 0);
 			 }
 		});   
 		$('.fa-chevron-circle-left').show();
@@ -427,13 +427,14 @@ $(".list-group-item").droppable( {
 });
 });	
 
-function showNotification(message, status){
+function showNotification(message, status, time){
 	$.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
 		type: status,
 		offset: {
 			 x: 50,
 			 y: 90
 		},
+		timer: time,
 		animate: {
 			 enter: 'animated fadeInRight',
 			 exit: 'animated fadeOutRight'
