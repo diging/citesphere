@@ -34,7 +34,7 @@ import edu.asu.diging.citesphere.web.user.dto.MovedItemsData;
 
 @Controller
 public class MoveItemsController {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired

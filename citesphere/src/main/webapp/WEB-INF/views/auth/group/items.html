@@ -369,7 +369,10 @@ $(function(){
 			selected = $(this);
 			}
 			var container = $('<div> Move ' +selected.length+ ' citations </div>').attr('id', 'moveitems-highlighter');
-			container.addClass('icon-docs');
+			if(selected.length > 1)
+				container.addClass('icon-multiple-doc');
+			else
+				container.addClass('icon-docs');
 			var list = container.append('<ul></ul>').find('ul');
 			$(".selected").each(function() {
 				list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
