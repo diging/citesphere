@@ -789,7 +789,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
 			
-			createManageAuthorityURL = [[@{|/auth/authority/conceptpower/create?${_csrf.parameterName}=${_csrf.token}|}]]+ '&uri=' + uri;						
+			createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&uri=' + uri;						
 			$.ajax({
 			  		dataType: "json",
 			  		type: 'POST',

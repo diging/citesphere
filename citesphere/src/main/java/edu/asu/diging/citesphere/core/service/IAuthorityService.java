@@ -35,9 +35,6 @@ public interface IAuthorityService {
 
     List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize);
 
-    List<String> getUriForUser(IUser user, String firstName, String lastName, String citationGroupId,
-            int page, int pageSize) throws GroupDoesNotExistException;
-
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
     int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize);

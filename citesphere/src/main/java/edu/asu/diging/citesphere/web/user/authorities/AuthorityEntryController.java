@@ -89,16 +89,15 @@ public class AuthorityEntryController {
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
     
-    @RequestMapping(value = "/auth/authority/conceptpower/create", method = RequestMethod.POST)
-    public ResponseEntity<IAuthorityEntry> createConceptpowerAuthorityEntry(Authentication authentication,
+    @RequestMapping(value = "/auth/authority/add", method = RequestMethod.POST)
+    public ResponseEntity<IAuthorityEntry> addAuthorityEntry(Authentication authentication,
             @RequestParam("uri") String uri) {
+        List<IAuthorityEntry> authorityEntryList = authorityConceptpowerResult.getFoundAuthorities().stream()
+                .filter(authority -> authority.getUri().equals(uri)).collect(Collectors.toList());
         IAuthorityEntry entry = null;
-        for(IAuthorityEntry authorityEntry : authorityConceptpowerResult.getFoundAuthorities()) {
-            if(authorityEntry.getUri().equals(uri)) {
-                entry = authorityService.create(authorityEntry, (IUser) authentication.getPrincipal());
-                break;
-            }
-        } 
+        if (authorityEntryList.size() > 0) {
+            entry = authorityService.create(authorityEntryList.get(0), (IUser) authentication.getPrincipal());
+        }
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
 

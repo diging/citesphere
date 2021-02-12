@@ -114,15 +114,8 @@ public class AuthorityService implements IAuthorityService {
             ListIterator<IAuthorityEntry> iter = searchResult.getFoundAuthorities().listIterator();
             String uri = "";
             while (iter.hasNext()) {
-                uri = iter.next().getUri();
-                if (!uri.trim().endsWith("/")) {
-                    if (uriList.contains(uri)) {
-                        iter.remove();
-                        continue;
-                    }
-                    uri = uri + "/";
-                }
-                if (uriList.contains(uri)) {
+                uri = iter.next().getUri().trim();
+                if (uriList.contains(uri) || (!uri.trim().endsWith("/") && uriList.contains(uri + "/"))) {
                     iter.remove();
                 }
             }
@@ -179,15 +172,6 @@ public class AuthorityService implements IAuthorityService {
                 user.getUsername(), firstName, lastName, paging);
         return results;
     }
-    
-    @Override
-    public List<String> getUriForUser(IUser user, String firstName, String lastName,
-            String citationGroupId, int page, int pageSize) throws GroupDoesNotExistException {
-        return authorityRepository
-                .findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName)
-                .stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
-
-    }
 
     @Override
     public boolean deleteAuthority(String id) {
@@ -223,8 +207,9 @@ public class AuthorityService implements IAuthorityService {
     private AuthorityImporter getAuthorityImporter(String source) {
 
         for (AuthorityImporter importer : importers) {
-            if (importer.isResponsibleForSearch(source))
+            if (importer.isResponsibleForSearch(source)) {
                 return importer;
+            }
         }
         return null;
     }
