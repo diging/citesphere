@@ -17,6 +17,8 @@ public class CitationConceptForm {
     private String type;
     
     private String conceptId;
+    
+    private String owner;
 
     public String getName() {
         return name;
@@ -57,5 +59,14 @@ public class CitationConceptForm {
     public void setConceptId(String conceptId) {
         this.conceptId = conceptId;
     }
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+    
 
 }

@@ -11,6 +11,7 @@ public class ConceptTypeForm {
     private String uri;
 
     private String conceptTypeId;
+    private String owner;
 
     public String getName() {
         return name;
@@ -43,5 +44,13 @@ public class ConceptTypeForm {
     public void setConceptTypeId(String conceptTypeId) {
         this.conceptTypeId = conceptTypeId;
     }
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
 
 }

@@ -72,6 +72,7 @@ public class CitationConceptManager implements ICitationConceptManager {
         concept.setName(conceptForm.getName());
         concept.setDescription(conceptForm.getDescription());
         concept.setUri(conceptForm.getUri());
+        System.out.println(user.getFirstName() + " " + user.getLastName());
         concept.setOwner(user);
         concept.setCreatedOn(OffsetDateTime.now());
         save(concept);
