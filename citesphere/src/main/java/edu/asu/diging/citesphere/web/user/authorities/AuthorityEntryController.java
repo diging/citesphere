@@ -42,6 +42,58 @@ public class AuthorityEntryController {
     
     @Autowired
     private IAuthorityService authorityService;
+    
+    @RequestMapping("/auth/authority/{zoteroGroupId}/find/userAuthorities")
+    public ResponseEntity<AuthoritySearchResult> getUserAuthorities(Model model, Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId,
+            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
+            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
+            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
+
+        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
+
+        List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
+                firstName, lastName, page, pageSize);
+
+        authorityResult.setFoundAuthorities(userEntries);
+        authorityResult.setCurrentPage(page + 1);
+        authorityResult.setTotalPages(authorityService
+                .getTotalUserAuthoritiesPages((IUser) authentication.getPrincipal(), firstName, lastName, pageSize));
+        return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
+    }
+    
+    @RequestMapping("/auth/authority/{zoteroGroupId}/find/searchAuthorities/{source}")
+    public ResponseEntity<AuthoritySearchResult> getAuthoritiesFromAuthorityService(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("source") String source,
+            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
+            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
+            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
+
+        if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
+            logger.warn(
+                    "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        AuthoritySearchResult searchResult = null;
+        try {
+            searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
+                    lastName, source, page, pageSize);
+            searchResult.setCurrentPage(page + 1);
+            if(source.equalsIgnoreCase("conceptpower")) {
+                authorityConceptpowerResult = searchResult;
+            }
+
+        } catch (AuthorityServiceConnectionException e) {
+            logger.warn("Could not retrieve authority entries.", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        } catch (AuthorityImporterNotFoundException e) {
+            logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<AuthoritySearchResult>(searchResult, HttpStatus.OK);
+    } 
 
     @RequestMapping("/auth/authority/get")
     public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri, @RequestParam("zoteroGroupId") String zoteroGroupId) {
@@ -100,54 +152,5 @@ public class AuthorityEntryController {
         }
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
-
-    @RequestMapping("/auth/authority/{zoteroGroupId}/find/userAuthorities")
-    public ResponseEntity<AuthoritySearchResult> getUserAuthorities(Model model, Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId,
-            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
-            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-
-        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
-
-        List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
-                firstName, lastName, page, pageSize);
-
-        authorityResult.setFoundAuthorities(userEntries);
-        authorityResult.setCurrentPage(page + 1);
-        authorityResult.setTotalPages(authorityService
-                .getTotalUserAuthoritiesPages((IUser) authentication.getPrincipal(), firstName, lastName, pageSize));
-        return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
-    }
-    
-    @RequestMapping("/auth/authority/{zoteroGroupId}/find/searchAuthorities/{source}")
-    public ResponseEntity<AuthoritySearchResult> getConceptpowerAuthorities(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("source") String source,
-            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
-            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-
-        if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
-            logger.warn(
-                    "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        try {
-            authorityConceptpowerResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
-                    lastName, source, page, pageSize);
-            authorityConceptpowerResult.setCurrentPage(page + 1);
-            
-
-        } catch (AuthorityServiceConnectionException e) {
-            logger.warn("Could not retrieve authority entries.", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
-        } catch (AuthorityImporterNotFoundException e) {
-            logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<AuthoritySearchResult>(authorityConceptpowerResult, HttpStatus.OK);
-    } 
 
 }

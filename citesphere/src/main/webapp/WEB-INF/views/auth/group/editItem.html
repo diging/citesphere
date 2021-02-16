@@ -682,14 +682,14 @@ function getUserAuthorities(modalType, personType, page) {
   			
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {
-  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
+  					content += '<tr class="user-authority-entry" > <td class="name"><a href="#">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
   						}
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td><a href="#" class="btn btn-primary" style="font-size:10px; width:fit-content; height:fit-content;">Use Authority</a></td></tr>';
+  					content += '<td class="btn btn-primary"><i class="fas fa-check"></i></td></tr>';
   					
   				});
   				
@@ -708,14 +708,9 @@ function getUserAuthorities(modalType, personType, page) {
   			
 		
 		$("#userAuthoritySearchResult").append(content);
-		$("#userAuthoritySearchResult tr td a").click(function() {
-			
-			name = $(this).text()
-			uri = $(this).closest('td').next().text();
-			if(uri === '') {
-				uri = $(this).closest('td').prev().prev().text();
-				name = $(this).closest('td').prev().prev().prev().text();
-			}
+		$(".user-authority-entry").click(function() {
+			name = $(this).closest("tr").find(".name").text();
+			uri = $(this).closest("tr").find(".uri").text();
 				
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
@@ -751,14 +746,14 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   				
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {	
-  					content += '<tr> <td><a href="#">' + elem['name'] + '</td> <td>' + elem['uri'] + '</a></td> <td>' ;
+  					content += '<tr class="conceptpower-authority-entry"> <td class="name"><a href="#">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</a></td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
   						}
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td><a href="#" class="btn btn-primary" style="font-size:10px; width:fit-content; height:fit-content;">Add Authority</a></td></tr>';
+  					content += '<td class="btn btn-primary"><i class="fas fa-check"></i></td></tr>';
   					
   				}); 				
   				
@@ -777,14 +772,9 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   			}
   			
 		$("#conceptpowerAuthoritySearchResult").append(content); 	
-		$("#conceptpowerAuthoritySearchResult tr td a").click(function() {
-			
-			name = $(this).text()
-			uri = $(this).closest('td').next().text();
-			if(uri === '') {
-				uri = $(this).closest('td').prev().prev().text();
-				name = $(this).closest('td').prev().prev().prev().text();
-			}
+		$(".conceptpower-authority-entry").click(function() {
+			name = $(this).closest("tr").find(".name").text();
+			uri = $(this).closest("tr").find(".uri").text();
 			
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);

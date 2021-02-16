@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class ConceptpowerEntry {
 
     private String id;
-    private String equal_to;
+    private String concept_uri;
     private String lemma;
     private String description;
 
@@ -18,12 +18,12 @@ public class ConceptpowerEntry {
         this.id = id;
     }
 
-    public String getEqual_to() {
-        return equal_to;
+    public String getConcept_uri() {
+        return concept_uri;
     }
 
-    public void setEqual_to(String equal_to) {
-        this.equal_to = equal_to;
+    public void setConcept_uri(String concept_uri) {
+        this.concept_uri = concept_uri;
     }
 
     public String getLemma() {

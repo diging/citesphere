@@ -123,13 +123,11 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
             ConceptpowerResponse conceptEntries = response.getBody();
             if (conceptEntries.getConceptEntries() != null) {
                 for (ConceptpowerEntry conceptEntry : conceptEntries.getConceptEntries()) {
-                    if(!conceptEntry.getEqual_to().isEmpty()) {
-                        IAuthorityEntry authority = new AuthorityEntry();
-                        authority.setName(conceptEntry.getLemma());
-                        authority.setUri(conceptEntry.getEqual_to());
-                        authority.setDescription(conceptEntry.getDescription());
-                        authorityEntries.add(authority);
-                    }
+                    IAuthorityEntry authority = new AuthorityEntry();
+                    authority.setName(conceptEntry.getLemma());
+                    authority.setUri(conceptEntry.getConcept_uri());
+                    authority.setDescription(conceptEntry.getDescription());
+                    authorityEntries.add(authority);
                 }
                 searchResult.setFoundAuthorities(authorityEntries);
                 searchResult.setTotalPages((int) Math
