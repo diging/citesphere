@@ -1,5 +1,7 @@
 <html layout:decorate="~{layouts/main}">
-<head></head>
+<head>
+    <link th:href="@{/src/main/webapp/resources/bootstrap/css/diging-icons.css}" rel="stylesheet" />
+</head>
 <body>
 <div layout:fragment="content">
 	<ol class="breadcrumb">
@@ -29,6 +31,8 @@
 		
 		<a th:href="@{/auth/concepts/list}" class="btn btn-default">
 		<i class="fa fa-times"></i>&nbsp;Cancel</a>
+		
+		<span class=“icon-write”></span>
 		
 	</form>
 </div>
