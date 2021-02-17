@@ -57,7 +57,7 @@ public class CitationConceptForm {
     }
 
     public void setConceptId(String conceptId) {
-    	this.conceptId = conceptId;
+        this.conceptId = conceptId;
     }
 
     public String getOwner() {
