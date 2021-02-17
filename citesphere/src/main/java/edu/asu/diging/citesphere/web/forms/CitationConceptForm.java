@@ -61,12 +61,11 @@ public class CitationConceptForm {
     }
 
     public String getOwner() {
-    	return owner;
+        return owner;
     }
 
     public void setOwner(String owner) {
         this.owner = owner;
     }
     
-
 }

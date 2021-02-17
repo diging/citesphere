@@ -38,7 +38,7 @@ public class ConceptTypeForm {
     }
 
     public String getConceptTypeId() {
-    	return conceptTypeId;
+        return conceptTypeId;
     }
 
     public void setConceptTypeId(String conceptTypeId) {
@@ -46,11 +46,11 @@ public class ConceptTypeForm {
     }
 
     public String getOwner() {
-    	return owner;
+        return owner;
     }
 
     public void setOwner(String owner) {
-    	this.owner = owner;
+        this.owner = owner;
     }
 
 }
