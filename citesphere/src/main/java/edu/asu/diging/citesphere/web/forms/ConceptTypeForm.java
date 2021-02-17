@@ -38,19 +38,19 @@ public class ConceptTypeForm {
     }
 
     public String getConceptTypeId() {
-        return conceptTypeId;
+    	return conceptTypeId;
     }
 
     public void setConceptTypeId(String conceptTypeId) {
         this.conceptTypeId = conceptTypeId;
     }
 
-	public String getOwner() {
-		return owner;
-	}
+    public String getOwner() {
+    	return owner;
+    }
 
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
+    public void setOwner(String owner) {
+    	this.owner = owner;
+    }
 
 }
