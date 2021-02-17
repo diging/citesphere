@@ -669,7 +669,7 @@ function getUserAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
-	url = [[@{|/auth/authority/${zoteroGroupId}/find/userAuthorities|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/user|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
 	$.ajax({
   		dataType: "json",
   		type: 'GET',
@@ -682,14 +682,14 @@ function getUserAuthorities(modalType, personType, page) {
   			
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {
-  					content += '<tr class="user-authority-entry" > <td class="name"><a href="#">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</a></td> <td>' ;
+  					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
   						}
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td class="btn btn-primary"><i class="fas fa-check"></i></td></tr>';
+  					content += '<td style="vertical-align: middle;"><span class="user-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
   					
   				});
   				
@@ -731,7 +731,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
-	url = [[@{|/auth/authority/${zoteroGroupId}/find/searchAuthorities/conceptpower|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/conceptpower|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
 	$.ajax({
   		dataType: "json",
@@ -746,14 +746,14 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   				
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {	
-  					content += '<tr class="conceptpower-authority-entry"> <td class="name"><a href="#">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</a></td> <td>' ;
+  					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
   						}
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td class="btn btn-primary"><i class="fas fa-check"></i></td></tr>';
+  					content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Add Authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
   					
   				}); 				
   				
@@ -779,7 +779,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
 			
-			createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&uri=' + uri;						
+			createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&source=conceptpower&uri=' + uri;						
 			$.ajax({
 			  		dataType: "json",
 			  		type: 'POST',

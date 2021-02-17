@@ -1,10 +1,11 @@
 package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,21 +14,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.context.annotation.SessionScope;
-
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
-import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
@@ -38,12 +34,12 @@ public class AuthorityEntryController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private AuthoritySearchResult authorityConceptpowerResult;
+    private Map<String, AuthoritySearchResult> authoritySearchResult; 
     
     @Autowired
     private IAuthorityService authorityService;
     
-    @RequestMapping("/auth/authority/{zoteroGroupId}/find/userAuthorities")
+    @RequestMapping("/auth/authority/{zoteroGroupId}/find/authorities/user")
     public ResponseEntity<AuthoritySearchResult> getUserAuthorities(Model model, Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
@@ -62,7 +58,7 @@ public class AuthorityEntryController {
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     
-    @RequestMapping("/auth/authority/{zoteroGroupId}/find/searchAuthorities/{source}")
+    @RequestMapping("/auth/authority/{zoteroGroupId}/find/authorities/{source}")
     public ResponseEntity<AuthoritySearchResult> getAuthoritiesFromAuthorityService(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("source") String source,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
@@ -75,13 +71,13 @@ public class AuthorityEntryController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         AuthoritySearchResult searchResult = null;
+        authoritySearchResult = new HashMap<>();
+        
         try {
             searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
             searchResult.setCurrentPage(page + 1);
-            if(source.equalsIgnoreCase("conceptpower")) {
-                authorityConceptpowerResult = searchResult;
-            }
+            authoritySearchResult.put(source, searchResult);
 
         } catch (AuthorityServiceConnectionException e) {
             logger.warn("Could not retrieve authority entries.", e);
@@ -143,12 +139,16 @@ public class AuthorityEntryController {
     
     @RequestMapping(value = "/auth/authority/add", method = RequestMethod.POST)
     public ResponseEntity<IAuthorityEntry> addAuthorityEntry(Authentication authentication,
-            @RequestParam("uri") String uri) {
-        List<IAuthorityEntry> authorityEntryList = authorityConceptpowerResult.getFoundAuthorities().stream()
-                .filter(authority -> authority.getUri().equals(uri)).collect(Collectors.toList());
+            @RequestParam("uri") String uri, @RequestParam("source") String source) {
+        
         IAuthorityEntry entry = null;
-        if (authorityEntryList.size() > 0) {
-            entry = authorityService.create(authorityEntryList.get(0), (IUser) authentication.getPrincipal());
+        if(source != null && authoritySearchResult!= null && authoritySearchResult.containsKey(source)) {
+            Optional<IAuthorityEntry> authorityEntry = authoritySearchResult.get(source).getFoundAuthorities().stream()
+                    .filter(authority -> authority.getUri().equals(uri)).findFirst();
+            
+            if (authorityEntry.isPresent()) {
+                entry = authorityService.create(authorityEntry.get(), (IUser) authentication.getPrincipal());
+            }
         }
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }

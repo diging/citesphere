@@ -84,8 +84,8 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
      */
     @Override
     public IImportedAuthority retrieveAuthorityData(String searchString)
-            throws URISyntaxException, AuthorityServiceConnectionException {
-        return null;
+            throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -141,15 +141,15 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
     private String getConceptpowerSearchString(String firstName, String lastName) {
 
-        String conceptpowerSearchString = "";
+        String conceptpowerSearchString;
 
         if (firstName != null && lastName != null) {
 
-            conceptpowerSearchString = "%" + firstName + "%" + lastName;
+            conceptpowerSearchString = firstName + "%" + lastName;
 
         } else {
 
-            conceptpowerSearchString = firstName == null ? conceptpowerSearchKeyword + "%" + lastName : "%" + firstName;
+            conceptpowerSearchString = firstName == null ? lastName : firstName;
         }
 
         return conceptpowerSearchString;

@@ -95,9 +95,9 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 
     @Override
     public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
-            throws AuthorityServiceConnectionException {
+            throws UnsupportedOperationException {
 
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override

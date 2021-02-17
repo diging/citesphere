@@ -115,7 +115,7 @@ public class AuthorityService implements IAuthorityService {
             String uri = "";
             while (iter.hasNext()) {
                 uri = iter.next().getUri().trim();
-                if (uriList.contains(uri) || (!uri.trim().endsWith("/") && uriList.contains(uri + "/"))) {
+                if (uriList.contains(uri) || uriList.contains(uri + "/")) {
                     iter.remove();
                 }
             }
