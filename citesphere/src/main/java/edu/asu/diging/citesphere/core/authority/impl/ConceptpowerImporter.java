@@ -141,7 +141,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
     private String getConceptpowerSearchString(String firstName, String lastName) {
         String conceptpowerSearchString;
         if (firstName != null && lastName != null) {
-            conceptpowerSearchString = firstName + " " + lastName;
+            conceptpowerSearchString = firstName + "+" + lastName;
         } else {
             conceptpowerSearchString = firstName == null ? lastName : firstName;
         }
