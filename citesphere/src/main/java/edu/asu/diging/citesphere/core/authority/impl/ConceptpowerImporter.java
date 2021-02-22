@@ -83,8 +83,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
      * retrieveAuthorityData(java.lang.String)
      */
     @Override
-    public IImportedAuthority retrieveAuthorityData(String searchString)
-            throws UnsupportedOperationException {
+    public IImportedAuthority retrieveAuthorityData(String searchString) {
         throw new UnsupportedOperationException();
     }
 
