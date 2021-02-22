@@ -99,7 +99,6 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
         RequestEntity<Void> request;
         try {
-
             String url = conceptpowerURL + conceptpowerSearchKeyword + URLEncoder
                     .encode(this.getConceptpowerSearchString(firstName, lastName), StandardCharsets.UTF_8.toString())
                     + "&page=" + page;
@@ -140,18 +139,12 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
     }
 
     private String getConceptpowerSearchString(String firstName, String lastName) {
-
         String conceptpowerSearchString;
-
         if (firstName != null && lastName != null) {
-
-            conceptpowerSearchString = firstName + "%" + lastName;
-
+            conceptpowerSearchString = firstName + " " + lastName;
         } else {
-
             conceptpowerSearchString = firstName == null ? lastName : firstName;
         }
-
         return conceptpowerSearchString;
     }
 

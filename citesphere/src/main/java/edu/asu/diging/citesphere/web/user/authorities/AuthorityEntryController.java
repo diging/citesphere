@@ -34,7 +34,7 @@ public class AuthorityEntryController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Map<String, AuthoritySearchResult> authoritySearchResult; 
+    private Map<String, AuthoritySearchResult> authoritySearchResult = new HashMap<>();
     
     @Autowired
     private IAuthorityService authorityService;
@@ -70,9 +70,7 @@ public class AuthorityEntryController {
                     "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        AuthoritySearchResult searchResult = null;
-        authoritySearchResult = new HashMap<>();
-        
+        AuthoritySearchResult searchResult = null;        
         try {
             searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
