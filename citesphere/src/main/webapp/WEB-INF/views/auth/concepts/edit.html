@@ -25,6 +25,11 @@
 		<p class="text-danger"><th:errors path="uri"/></p>
 		<input type="hidden" class="form-control" th:value="${form.conceptId}" ></input>
 		
+		<label>Owner:</label>
+		<input th:field="*{owner}" type="text" class="form-control" placeholder="Owner" th:value="${form.owner}" th:readonly="readonly"></input>
+		<p class="text-danger"><th:errors path="owner"/></p>
+		<input type="hidden" class="form-control" th:value="${form.conceptId}" ></input>
+		
 		<br>
 		<button id="submitForm" class="btn btn-primary" type="submit">
 		<i class="far fa-save"></i> &nbsp;Save</button>
