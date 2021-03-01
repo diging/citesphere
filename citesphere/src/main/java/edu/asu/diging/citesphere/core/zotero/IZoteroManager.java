@@ -30,6 +30,9 @@ public interface IZoteroManager {
     ICitationGroup getGroup(IUser user, String groupId, boolean refresh);
 
     ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    
+    ZoteroUpdateItemsResponse updateCitations(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, ZoteroHttpStatusException;
 
     List<BibField> getFields(IUser user, ItemType itemType);
 

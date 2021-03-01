@@ -29,6 +29,7 @@ import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
 import edu.asu.diging.citesphere.core.zotero.ZoteroGroupItemsResponse;
+import edu.asu.diging.citesphere.core.zotero.ZoteroUpdateItemsResponse;
 import edu.asu.diging.citesphere.factory.ICitationCollectionFactory;
 import edu.asu.diging.citesphere.factory.ICitationFactory;
 import edu.asu.diging.citesphere.factory.IGroupFactory;
@@ -271,12 +272,49 @@ public class ZoteroManager implements IZoteroManager {
             ignoreFields.remove("collections");
         }
 
+        for(String field: ignoreFields)
+            System.out.print(field + " ");
         List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
 
+        System.out.println("Before updation: "+citation.getKey()+ " "+ citation.getVersion());
         Item updatedItem = zoteroConnector.updateItem(user, item, groupId, new ArrayList<>(), ignoreFields,
                 validCreatorTypes);
+        System.out.println("After updation: "+updatedItem.getKey()+ " "+ updatedItem.getVersion());
         return citationFactory.createCitation(updatedItem);
     }
+    
+    @Override
+    public ZoteroUpdateItemsResponse updateCitations(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
+        List<Item> items = new ArrayList<>();
+        List<List<String>> ignoreFieldsList = new ArrayList<>();
+        List<List<String>> validCreatorTypesList = new ArrayList<>();
+        for (ICitation citation : citations) {
+            Item item = itemFactory.createItem(citation, citation.getCollections());
+            items.add(item);
+            List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
+            // add fields that need to be submitted
+            itemTypeFields.add(ZoteroFields.VERSION);
+            itemTypeFields.add(ZoteroFields.ITEM_TYPE);
+            itemTypeFields.add(ZoteroFields.CREATOR);
+
+            List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, false);
+
+            if (citation.getCollections() != null) {
+                ignoreFields.remove("collections");
+            }
+
+            for (String field : ignoreFields)
+                System.out.print(field + " ");
+            List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
+            
+            ignoreFieldsList.add(ignoreFields);
+            validCreatorTypesList.add(validCreatorTypes);
+        }
+
+        return zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
+    }
+    
 
     @Override
     public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)

@@ -8,6 +8,7 @@
 <link th:href="@{/resources/bootstrap/css/bootstrap.css}" rel="stylesheet"/>
 <link th:href="@{/resources/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
 <link th:href="@{/resources/diging-icon-pack.css}" rel="stylesheet"/>
+<link th:href="@{/resources/bootstrap/grid.css}" rel="stylesheet"/>
 
 <script th:inline="javascript">
 //# sourceURL=page.js
@@ -321,7 +322,7 @@ function pollStatus(){
 		
 		
 		<tr data-action='draggable' class="items" th:each="entry,loop : ${items}">
-			<td><input title="Select" type="checkbox" class="checkboxes"/>&nbsp;</td>
+			<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes"/>&nbsp;</td>
 			<td>
 			  <span class="text-warning">
 			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
@@ -383,7 +384,7 @@ $(function(){
 			$(this).addClass('selected');
 			selected = $(this);
 			}
-			var container = $('<div> Move ' +selected.length+ ' citations </div>').attr('id', 'moveitems-highlighter');
+			var container = $('<div> Move ' +selected.length+ ' citations </div>').attr('id', 'moveitems-panel-highlighter');
 			(selected.length > 1)? container.addClass('icon-multiple-doc'): container.addClass('icon-docs');
 			var list = container.append('<ul></ul>').find('ul');
 			$(".selected").each(function() {

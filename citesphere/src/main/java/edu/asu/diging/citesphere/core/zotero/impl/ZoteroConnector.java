@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.zotero.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +33,7 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
+import edu.asu.diging.citesphere.core.zotero.ZoteroUpdateItemsResponse;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Component
@@ -174,6 +176,28 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return getItem(user, groupId, item.getKey());
     }
+    
+    @Override
+    public ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId, List<List<String>> ignoreFields,
+            List<List<String>> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        ItemCreationResponse response = zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFields, validCreatorTypes);
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch(InterruptedException e) {
+            logger.error("Could not sleep.", e);
+        }
+        ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
+        
+        List<String> itemsKeys = new ArrayList<>();
+        Map<String, String> success = response.getSuccess();
+        for(Map.Entry<String, String> entry: success.entrySet()) {
+            itemsKeys.add(entry.getValue());
+        }
+        statuses.setSuccessItems(itemsKeys);
+        
+        return statuses;
+    }
 
     @Override
     public Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
@@ -288,4 +312,5 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return new ZoteroHttpStatusException(cause);
     }
+
 }

@@ -245,7 +245,7 @@
         <dependency>
             <groupId>edu.asu.diging</groupId>
             <artifactId>spring-social-zotero</artifactId>
-            <version>${spring-social-zotero.version}</version>
+            <version>0.8-SNAPSHOT</version>
         </dependency>
 
         <!-- Spring AOP + AspectJ -->

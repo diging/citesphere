@@ -114,7 +114,7 @@ tr.changed>td {
   cursor: move;
 }
 
-#moveitems-highlighter{
+#moveitems-panel-highlighter{
 	color:white;
 	background-color:#2554C7; 
 	font-size:120% ;
