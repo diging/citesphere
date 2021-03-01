@@ -27,6 +27,8 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
+import edu.asu.diging.citesphere.core.zotero.ZoteroUpdateItemsResponse;
+import edu.asu.diging.citesphere.core.zotero.impl.ZoteroManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.dto.CitationStatusesData;
@@ -50,12 +52,13 @@ public class MoveItemsController {
             CitationIsOutdatedException {
         Gson gson = new Gson();
         MovedItemsData itemsDataDto = gson.fromJson(itemsData, MovedItemsData.class);
+        List<ICitation> citations = new ArrayList<>();
         ICitation citation;
-        List<String> movedCitations = new ArrayList<>();
         List<String> notMovedCitations = new ArrayList<>();
         for (String key : itemsDataDto.getItemIds()) {
             try {
                 citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, key);
+                citations.add(citation);
             } catch (CannotFindCitationException e) {
                 logger.error("Cannot find citation.", e);
                 notMovedCitations.add(key);
@@ -63,11 +66,12 @@ public class MoveItemsController {
             }
             citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
-            citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
-            movedCitations.add(key);
         }
+        ZoteroUpdateItemsResponse response = citationManager.updateCitations((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
         CitationStatusesData statusesDto = new CitationStatusesData();
-        statusesDto.setMovedCitations(movedCitations);
+        statusesDto.setMovedCitations(response.getSuccessItems());
+        for(String failedItemKey: response.getFailedItems())
+            notMovedCitations.add(failedItemKey);
         statusesDto.setNotMovedCitations(notMovedCitations);
         return gson.toJson(statusesDto, CitationStatusesData.class);
     }
