@@ -19,7 +19,7 @@ import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
-public class DeleteLocalCopy{
+public class DeleteLocalCopyController{
      
     @Autowired
     private IGroupManager groupManager;
@@ -27,12 +27,12 @@ public class DeleteLocalCopy{
     @Autowired
     private IUserManager userManager;
     
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/mongo", method = RequestMethod.DELETE )
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/resync", method = RequestMethod.POST )
     public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
             @PathVariable("zoteroGroupId") String groupId, Principal principal) throws GroupDoesNotExistException {
 		
         IUser user = userManager.findByUsername(principal.getName());
-        groupManager.deleteGroup(user, groupId);
+        groupManager.deleteLocalGroupCopy(user, groupId);
         return new ResponseEntity<String>(HttpStatus.OK);        
     }	
 }

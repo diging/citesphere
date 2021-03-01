@@ -7,5 +7,10 @@ public interface IGroupManager {
 
     ICitationGroup getGroup(IUser user, String groupId);
     
-    void deleteGroup(IUser user, String groupId);
+    /**
+     * Deletes local copy of citation group. 
+     * @param user
+     * @param groupId
+     */
+    void deleteLocalGroupCopy(IUser user, String groupId);
 }

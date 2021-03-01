@@ -8,14 +8,14 @@
 $(function() {
 	$(".delete-link").click(function(event) {
 		var id = $(this).data('client-id');
-		$("#delete-client-button").attr("data-client-id", id);
+		$("#delete-client-button").attr("group-id", id);
 		$("#confirm-client-entry-id").text(id);
 		$('#client-delete-confirmation').modal("show");	
 		event.preventDefault();
 	});
 	$("#delete-client-button").click(function() {
 		var id = $(this).data("client-id");
-		var baseurl = 'auth/group/' + id + '/mongo';
+		var baseurl = 'auth/group/' + id + '/resync';
 		$.ajax({
 			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "DELETE",
@@ -83,27 +83,22 @@ $(function() {
 				<div class="panel-body">
 					<a th:href="@{'/auth/group/' + ${group.groupId} + '/items'}"><span th:text="${group.name}"/>
 					(<span th:text="${group.numItems}"/>)</a>
-					<a class="delete-link" style="float: right;" href="" th:data-client-id="${group.groupId}"><i class="fas fa-trash-alt" ></i></button>
+					<a class="delete-link" style="float: right;" href="" th:group-id="${group.groupId}"><i class="fas fa-trash-alt" ></i></button>
 					</a>
-					
-					<!--  <form action="#" th:action="@{'/auth/group/' + ${group.groupId} + '/mongo'}" method="GET">
-					<button class="btn btn-primary btn-lg" style="float: right; "><span>Delete Local copy </span> </button>
-					</form>
-					-->
 				</div>
 				<div class="modal fade" id="client-delete-confirmation" tabindex="-1" role="dialog">
   					<div class="modal-dialog" role="document">
     					<div class="modal-content">
       						<div class="modal-header">
         						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        						<h4 class="modal-title">Delete App</h4>
+        						<h4 class="modal-title">Delete Group</h4>
       						</div>
       						<div class="modal-body">
-        						<p>Are you sure you want to delete the local copy of the group? </p>
+        						<p>Are you sure you want to delete the local copy of the group? This will trigger a resync. </p>
       						</div>
       						<div class="modal-footer">
         						<button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
-        						<button id="delete-client-button" data-client-id="" type="button" class="btn btn-primary">Yes, delete!</button>
+        						<button id="delete-client-button" group-id="" type="button" class="btn btn-primary">Yes, delete!</button>
       						</div>
     					</div>
   					</div>
