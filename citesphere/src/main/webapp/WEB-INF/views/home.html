@@ -7,18 +7,18 @@
 
 $(function() {
 	$(".delete-link").click(function(event) {
-		var id = $(this).data('client-id');
-		$("#delete-client-button").attr("group-id", id);
+		var id = $(this).data('group-id');
+		$("#delete-client-button").attr("data-group-id", id);
 		$("#confirm-client-entry-id").text(id);
 		$('#client-delete-confirmation').modal("show");	
 		event.preventDefault();
 	});
 	$("#delete-client-button").click(function() {
-		var id = $(this).data("client-id");
+		var id = $(this).data("group-id");
 		var baseurl = 'auth/group/' + id + '/resync';
 		$.ajax({
 			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
-			'type': "DELETE",
+			'type': "POST",
 			'success': function(data) {
 				$.notify('<i class="fas fa-check-circle"></i> Successfully deleted!', {
 					type: 'success',
@@ -83,7 +83,7 @@ $(function() {
 				<div class="panel-body">
 					<a th:href="@{'/auth/group/' + ${group.groupId} + '/items'}"><span th:text="${group.name}"/>
 					(<span th:text="${group.numItems}"/>)</a>
-					<a class="delete-link" style="float: right;" href="" th:group-id="${group.groupId}"><i class="fas fa-trash-alt" ></i></button>
+					<a class="delete-link" style="float: right;" href="" th:data-group-id="${group.groupId}"><i class="fas fa-trash-alt" ></i></button>
 					</a>
 				</div>
 				<div class="modal fade" id="client-delete-confirmation" tabindex="-1" role="dialog">
@@ -98,7 +98,7 @@ $(function() {
       						</div>
       						<div class="modal-footer">
         						<button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
-        						<button id="delete-client-button" group-id="" type="button" class="btn btn-primary">Yes, delete!</button>
+        						<button id="delete-client-button" data-group-id="" type="button" class="btn btn-primary">Yes, delete!</button>
       						</div>
     					</div>
   					</div>

@@ -27,7 +27,7 @@ public class DeleteLocalCopyController{
     @Autowired
     private IUserManager userManager;
     
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/resync", method = RequestMethod.POST )
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/resync", method = RequestMethod.POST)
     public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
             @PathVariable("zoteroGroupId") String groupId, Principal principal) throws GroupDoesNotExistException {
 		
