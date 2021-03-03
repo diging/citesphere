@@ -382,7 +382,7 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public void deleteCitations(IUser user, List<String> citationList) throws CannotFindCitationException {
+    public void deleteCitations(List<String> citationList) throws CannotFindCitationException {
         try {
             for(String citation : citationList) {
                 Optional<ICitation> oldCitation = citationRepository.findByKey(citation);

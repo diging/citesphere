@@ -48,20 +48,20 @@ public class DeleteCitationController {
     private ICitationManager citationManager;
 
 
-    @RequestMapping(value = "/auth/group/{groupId}/delete", method = RequestMethod.POST)
-    public String delete(Authentication authentication,@PathVariable("groupId") String groupId, @RequestParam(value="citationList", required=false) String citationList)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
-        String [] list = citationList.split(",");
-        List citations = Arrays.asList(citationList.split(","));
-        try {
-            citationManager.deleteCitations((IUser) authentication.getPrincipal(), citations);
-        } catch (CannotFindCitationException e) {
-            e.printStackTrace();
-        }
-        
-
-        return "redirect:/auth/group/"+groupId+"/items";
-    }
+//    @RequestMapping(value = "/auth/group/{groupId}/delete", method = RequestMethod.POST)
+//    public String delete(Authentication authentication,@PathVariable("groupId") String groupId, @RequestParam(value="citationList", required=false) String citationList)
+//            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
+//        String [] list = citationList.split(",");
+//        List citations = Arrays.asList(citationList.split(","));
+//        try {
+//            citationManager.deleteCitations(citations);
+//        } catch (CannotFindCitationException e) {
+//            e.printStackTrace();
+//        }
+//        
+//
+//        return "redirect:/auth/group/"+groupId+"/items";
+//    }
 
 
 }
