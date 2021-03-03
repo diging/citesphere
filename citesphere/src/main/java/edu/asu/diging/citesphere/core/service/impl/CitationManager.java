@@ -387,11 +387,11 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public void deleteCitations(List<String> citationList) throws CannotFindCitationException {
-            for(String citation : citationList) {
-                Optional<ICitation> oldCitation = citationRepository.findByKey(citation);
-                if(oldCitation.isPresent()) {
-                    citationRepository.delete((Citation)oldCitation.get());
-                } 
-            }  
+        for(String citation : citationList) {
+            Optional<ICitation> oldCitation = citationRepository.findByKey(citation);
+            if(oldCitation.isPresent()) {
+                citationRepository.delete((Citation)oldCitation.get());
+            } 
+        }  
     }
 }

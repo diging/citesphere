@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
-import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.model.bib.ICitation;
