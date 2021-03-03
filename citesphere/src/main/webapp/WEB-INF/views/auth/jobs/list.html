@@ -1,0 +1,67 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<script th:inline="javascript">
+//# sourceURL=page.js
+$(function() {
+    $('#pagination-top').twbsPagination({
+        totalPages: [(${total})],
+        startPage: [(${page})],
+        prev: "«",
+        next: "»",
+        visiblePages: 10,
+        initiateStartPageClick: false,
+        onPageClick: function (event, page) {
+            window.location.href = "[(@{|/auth/jobs/sync/list|})]?page=" + (page - 1);
+        }
+    });
+});
+</script>
+</head>
+
+<body>
+<div layout:fragment="content">
+<h1>Jobs</h1>
+
+<ul id="pagination-top" class="pagination-sm"></ul>
+
+<table class="table table-striped">
+<tr>
+<th>Job ID</th>
+<th>Group</th>
+<th>Status</th> 
+<th>Created On</th>
+<th>Finished On</th>
+<th></th>
+<th></th>
+</tr>
+    <tr th:each="job:${jobs}"> 
+        <td>[[${job.id}]]</td>
+        <td><span class="label label-default">
+                <a th:href="@{|/auth/group/${job.groupId}/items|}" style="color: #ffffff">[[${job.groupId}]] </a> 
+            </span>
+        </td>
+        <td>[[${job.status}]]</td>
+        <td>[[${job.createdOn}]]</td>
+        <td>[[${job.finishedOn}]]</td>
+        <td>
+            <span th:if="${#strings.equals(job.status,'DONE')}"><i style="color: #629262;" class="fas fa-check-circle"></i></span>
+            <span th:if="${#strings.equals(job.status,'STARTED')}"><i style="color: orange;" class="fas fa-cogs"></i></span>
+            <span th:if="${#strings.equals(job.status,'FAILURE')}"><i style="color: #d83838;" class="fas fa-exclamation-circle"></i></span>
+            <span th:if="${#strings.equals(job.status,'PREPARED')}"><i style="color: #5d97b3;" class="fas fa-clock"></i></span>
+            <span th:if="${#strings.equals(job.status,'CANCELED')}"><i title="Job was canceled" style="color: #868181;" class="fas fa-exclamation-triangle"></i></span>
+        </td>
+        <td>
+            <form th:if="${#strings.equals(job.status,'STARTED') or #strings.equals(job.status,'PREPARED')}" 
+                    th:action="@{|/auth/jobs/sync/${job.id}/cancel|}" method="POST">
+	            <button style="margin: -10px;" class="btn-link" title="Mark job as canceled">
+	               <i style="color: #303540;" class="fas fa-stop-circle" ></i>
+	            </button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+</div>
+</body>
+</html>
