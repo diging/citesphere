@@ -67,5 +67,7 @@ public interface IZoteroConnector {
     ZoteroResponse<Collection> getCitationCollectionVersions(IUser user, String groupId, Long lastGroupVersion);
 
     ZoteroResponse<Collection> getCitationCollectionsByKey(IUser user, String groupId, List<String> keys);
+    
+    void deleteItem(IUser user, String groupId, String citationKey, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
 
 }

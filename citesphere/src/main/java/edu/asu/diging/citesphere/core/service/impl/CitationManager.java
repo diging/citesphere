@@ -35,7 +35,6 @@ import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
@@ -66,9 +65,6 @@ public class CitationManager implements ICitationManager {
     // FIXME: needs to be replaced with group manager
     @Autowired
     private CitationGroupRepository groupRepository;
-    
-    @Autowired
-    private CitationRepository citationRepository;
 
     @Autowired
     private ICitationStore citationStore;
@@ -386,12 +382,13 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public void deleteCitations(List<String> citationList) throws CannotFindCitationException {
-        for(String citation : citationList) {
-            Optional<ICitation> oldCitation = citationRepository.findByKey(citation);
-            if(oldCitation.isPresent()) {
-                citationRepository.delete((Citation)oldCitation.get());
-            } 
+    public void deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException {
+        for(String element : citationList) {
+            Optional<ICitation> citation = citationStore.findById(element);
+            if(citation.isPresent()) {
+                citationStore.delete(citation.get());
+                zoteroManager.deleteCitation(user, groupId, citation.get());
+            }
         }  
     }
 }

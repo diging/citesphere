@@ -356,4 +356,10 @@ public class ZoteroManager implements IZoteroManager {
         }
         return validTypes;
     }
+
+    @Override
+    public void deleteCitation(IUser user, String groupId, ICitation citation)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
+        zoteroConnector.deleteItem(user, groupId, citation.getKey(), citation.getVersion());
+    }
 }

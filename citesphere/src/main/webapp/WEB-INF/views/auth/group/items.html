@@ -122,7 +122,7 @@ $(function() {
 		var ids = $(this).data("entry-key");
 		var entry = "Entry";
 		var rows = ids.split(",");
-		var baseurl = "delete/";
+		var baseurl = "references/delete/";
 
 		$.ajax({
 			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
@@ -436,7 +436,7 @@ function pollStatus(){
         <h4 class="modal-title">Delete Entry</h4>
       </div>
       <div class="modal-body">
-        <p>Please select at least 1 Entry !!!</p>
+        <p>Please select at least 1 entry!</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
