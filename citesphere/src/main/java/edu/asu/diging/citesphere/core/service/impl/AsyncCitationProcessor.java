@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,6 +10,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +23,14 @@ import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
-import edu.asu.diging.citesphere.core.service.jobs.impl.SyncJobManager;
+import edu.asu.diging.citesphere.core.service.ICitationStore;
+import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
 import edu.asu.diging.citesphere.core.zotero.ZoteroGroupItemsResponse;
 import edu.asu.diging.citesphere.data.bib.CitationCollectionRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -45,7 +48,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     private IZoteroManager zoteroManager;
 
     @Autowired
-    private CitationRepository citationRepo;
+    private ICitationStore citationStore;
 
     @Autowired
     private CitationGroupRepository groupRepo;
@@ -57,7 +60,17 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     private JobRepository jobRepo;
 
     @Autowired
-    private SyncJobManager jobManager;
+    private ISyncJobManager jobManager;
+    
+    private List<JobStatus> inactiveJobStatuses;
+    
+    @PostConstruct
+    public void init() {
+        inactiveJobStatuses = Collections.synchronizedList(new ArrayList<JobStatus>());
+        inactiveJobStatuses.add(JobStatus.CANCELED);
+        inactiveJobStatuses.add(JobStatus.DONE);
+        inactiveJobStatuses.add(JobStatus.FAILURE);
+    }
 
     /*
      * (non-Javadoc)
@@ -71,7 +84,10 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     @Async
     public void sync(IUser user, String groupId, long contentVersion, String collectionId) {
         GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
-        if (prevJob != null && prevJob.getStatus() != JobStatus.DONE && prevJob.getStatus() != JobStatus.FAILURE) {
+        // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
+        // more activate job statuses than inactive ones, so it's less error prone to use the list that
+        // is less likely to change.
+        if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
             // there is already a job running, let's not start another one
             return;
         }
@@ -125,7 +141,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             AtomicInteger counter) {
         List<String> keysToRetrieve = new ArrayList<>();
         for (String key : versions.keySet()) {
-            Optional<ICitation> citation = citationRepo.findByKey(key);
+            Optional<ICitation> citation = citationStore.findById(key);
 
             if (citation.isPresent()) {
                 if (citation.get().getVersion() != versions.get(key)) {
@@ -178,9 +194,9 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     private void removeDeletedItems(DeletedZoteroElements deletedElements, GroupSyncJob job) {
         if (deletedElements.getItems() != null) {
             for (String key : deletedElements.getItems()) {
-                Optional<ICitation> citation = citationRepo.findByKey(key);
+                Optional<ICitation> citation = citationStore.findById(key);
                 if (citation.isPresent()) {
-                    citationRepo.delete((Citation) citation.get());
+                    citationStore.delete((Citation) citation.get());
                 }
                 job.setCurrent(job.getCurrent() + 1);
                 jobRepo.save(job);
@@ -215,11 +231,12 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     }
 
     private void storeCitation(ICitation citation) {
-        Optional<ICitation> optional = citationRepo.findByKey(citation.getKey());
+        Optional<ICitation> optional = citationStore.findById(citation.getKey());
         if (optional.isPresent()) {
-            citationRepo.delete((Citation) optional.get());
+            citationStore.delete((Citation) optional.get());
         }
-        citationRepo.save((Citation) citation);
+
+        citationStore.save((Citation) citation);
     }
 
     private void storeCitationCollection(ICitationCollection collection) {
