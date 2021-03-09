@@ -222,7 +222,7 @@ $(function() {
 	
 	$("#editorIconContainer").on('click', ".popover #editorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundEditor").attr('data-authority-uri');
-		$.post('/auth/authority/create?[(${_csrf.parameterName})]=[(${_csrf.token})]&uri=' + uri, function(data) {
+		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
 			$("#editorCreateAuthority").hide();
 			$("#uriEditorLocalId").val(data['id']);
 			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
@@ -295,7 +295,7 @@ $(function() {
 	
 	$("#creatorIconContainer").on('click', ".popover #creatorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundCreator").attr('data-authority-uri');
-		$.post('/auth/authority/create?[(${_csrf.parameterName})]=[(${_csrf.token})]&uri=' + uri, function(data) {
+		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
 			$("#creatorCreateAuthority").hide();
 			$("#uriCreatorLocalId").val(data['id']);
 			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
