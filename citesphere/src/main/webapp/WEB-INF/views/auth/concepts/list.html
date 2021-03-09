@@ -26,7 +26,7 @@
 		
 		<td><span class="date" th:text="${concept.createdOn}"></span></td>
 		<td><span th:text="${concept.owner.firstName + ' ' + concept.owner.lastName}"></span></td>
-		<td><a th:href="@{'/auth/concepts/' + ${concept.id} + '/edit'}" /><i class="icon-edit" title="Edit"></i></a></td>
+		<td><a th:href="@{'/auth/concepts/' + ${concept.id} + '/edit'}" /><i class="icon-edit" style="color: #337ab7" title="Edit"></i></a></td>
 		</tr>
 	</th:forEach>
 </table>

@@ -28,7 +28,7 @@
 		
 		<td><span class="date" th:text="${type.createdOn}"></span></td>
 		<td><span th:text="${type.owner.firstName + ' ' + type.owner.lastName}"></span></td>
-		<td><a th:href="@{'/auth/concepts/types/' + ${type.id} + '/edit'}" /><i class="icon-edit" title="Edit"></i></a></td>
+		<td><a th:href="@{'/auth/concepts/types/' + ${type.id} + '/edit'}" /><i class="icon-edit" style="color: #337ab7" title="Edit"></i></a></td>
 		</tr>
 	</th:forEach>
 </table>
