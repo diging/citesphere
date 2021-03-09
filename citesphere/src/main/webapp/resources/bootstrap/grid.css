@@ -8,8 +8,38 @@ body{
 }
 
 [class*="icon"]{
-  font-size: 15px;
+  font-size: 18px;
+  color: #8a6d3b;
+}
+
+[class*="icon-edit"]{
+  font-size: 18px;
   color: #337ab7;
+}
+
+[class*="icon-user"]{
+  font-size: 18px;
+  color: #337ab7;
+}
+
+[class*="icon-sign-out-alt"]{
+  font-size: 18px;
+  color: #337ab7;
+}
+
+[class*="icon-save-alt"]{
+  font-size: 13px;
+  color: white;
+}
+
+[class*="icon-redo-alt"]{
+  font-size: 13px;
+  color: #337ab7;
+}
+
+[class*="icon-close-alt"]{
+  font-size: 13px;
+  color: black;
 }
 
 .bib-entry {
