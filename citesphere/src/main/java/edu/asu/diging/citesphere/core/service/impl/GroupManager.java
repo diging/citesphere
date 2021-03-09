@@ -46,7 +46,10 @@ public class GroupManager implements IGroupManager {
     
     @Override
     public void deleteLocalGroupCopy(IUser user, String groupId) {
-    	Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-    	groupRepository.deleteById(groupOptional.get().getId());
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        do {
+            groupRepository.delete((CitationGroup) groupOptional.get());
+    	    groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+    	} while (groupOptional.isPresent());
     }
 }
