@@ -28,12 +28,12 @@
 			</span>
 			<span th:if="${user.admin}">
 			<form action="#" th:action="@{'/admin/user/' + ${user.username} + '/admin/remove'}" method="POST">
-			<button style="padding:0px" class="btn btn-link"><i class="fas fa-user"></i> Remove Admin Role</button>
+			<button style="padding:0px" class="btn btn-link"><i class="icon-user"></i> Remove Admin Role</button>
 			</form>
 			</span>
 		
 			<form action="#" th:action="@{'/admin/user/' + ${user.username} + '/disable'}" method="POST">
-			<button style="padding:0px" class="btn btn-link"><i class="fas fa-user-slash"></i> Deactivate User</button>
+			<button style="padding:0px" class="btn btn-link"><i class="icon-user-slash"></i> Deactivate User</button>
 			</form>
 		</span>
 		</div>

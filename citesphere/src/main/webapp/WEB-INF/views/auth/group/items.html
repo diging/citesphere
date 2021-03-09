@@ -130,7 +130,7 @@ Items in Group <span th:text="${group.name}"></span></br>
 	  <span id="syncText">Up to date</span></div>
 	</div>
 	<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
-	    <small><a th:href="@{items}"><i class="fas fa-redo-alt"></i> Reload page</a></small>
+	    <small><a th:href="@{items}"><i class="icon-redo-alt" style="font-size: 12px"></i> Reload page</a></small>
 	</div>
 
 <script>
@@ -233,7 +233,7 @@ function pollStatus(){
 		class="fas fa-sync" title="Sync Page"></i></big></a>
 </div>
 <div class="pull-right" style="margin-top: 20px;">
-<a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
+<a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="icon-circle-add" style="color: white ;font-size: 12px"></i> Create Citation</a>
 </div>
 
 <div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">

@@ -10,8 +10,6 @@
 <p>
 <a th:href="@{add}" class="btn btn-primary btn-sm">Add</a>
 </p> 
-
-
 <table class="table table-striped table-bordered">
 	<tr>
 		<th width="20%">URI</th>
@@ -28,7 +26,7 @@
 		
 		<td><span class="date" th:text="${concept.createdOn}"></span></td>
 		<td><span th:text="${concept.owner.firstName + ' ' + concept.owner.lastName}"></span></td>
-		<td><a th:href="@{'/auth/concepts/' + ${concept.id} + '/edit'}" /><i class="far fa-edit" title="Edit"></i></a></td>
+		<td><a th:href="@{'/auth/concepts/' + ${concept.id} + '/edit'}" /><i class="icon-edit" title="Edit"></i></a></td>
 		</tr>
 	</th:forEach>
 </table>
