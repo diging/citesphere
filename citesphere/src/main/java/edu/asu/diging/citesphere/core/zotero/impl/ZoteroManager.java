@@ -275,11 +275,8 @@ public class ZoteroManager implements IZoteroManager {
         for(String field: ignoreFields)
             System.out.print(field + " ");
         List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
-
-        System.out.println("Before updation: "+citation.getKey()+ " "+ citation.getVersion());
         Item updatedItem = zoteroConnector.updateItem(user, item, groupId, new ArrayList<>(), ignoreFields,
                 validCreatorTypes);
-        System.out.println("After updation: "+updatedItem.getKey()+ " "+ updatedItem.getVersion());
         return citationFactory.createCitation(updatedItem);
     }
     
@@ -295,8 +292,7 @@ public class ZoteroManager implements IZoteroManager {
             List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
             // add fields that need to be submitted
             itemTypeFields.add(ZoteroFields.VERSION);
-            itemTypeFields.add(ZoteroFields.ITEM_TYPE);
-            itemTypeFields.add(ZoteroFields.CREATOR);
+            itemTypeFields.add(ZoteroFields.KEY);
 
             List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, false);
 
