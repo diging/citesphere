@@ -67,7 +67,8 @@ public class MoveItemsController {
             citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
         }
-        ZoteroUpdateItemsResponse response = citationManager.updateCitations((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
+        ZoteroUpdateItemsResponse response = citationManager.updateCitations((IUser) authentication.getPrincipal(),
+                zoteroGroupId, citations);
         CitationStatusesData statusesDto = new CitationStatusesData();
         statusesDto.setMovedCitations(response.getSuccessItems());
 //        for(String failedItemKey: response.getFailedItems())
