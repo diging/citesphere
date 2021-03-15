@@ -278,10 +278,20 @@ public class ZoteroManager implements IZoteroManager {
         return citationFactory.createCitation(updatedItem);
     }
     
+    /**
+     * This method creates ignore fields list that are not necessary while updating
+     * citations with collection ids.
+     * 
+     * @param user      user accessing Zotero.
+     * @param groupId   group id of citations.
+     * @param citations list of citations that has to be updated.
+     * 
+     * @return ZoteroUpdateItemsResponse returns statuses of citations.
+     */
     @Override
     public ZoteroUpdateItemsResponse updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
-        List<Item> items = new ArrayList<>();  
+        List<Item> items = new ArrayList<>();
         for (ICitation citation : citations) {
             Item item = itemFactory.createItem(citation, citation.getCollections());
             items.add(item);
@@ -290,7 +300,7 @@ public class ZoteroManager implements IZoteroManager {
         requiredFieldsList.add("key");
         requiredFieldsList.add("version");
         requiredFieldsList.add("collections");
-        
+
         List<String> ignoreFields = new ArrayList<>();
         Field[] fields = Data.class.getDeclaredFields();
         for (Field field : fields) {

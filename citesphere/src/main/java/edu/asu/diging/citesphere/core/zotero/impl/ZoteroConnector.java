@@ -178,6 +178,16 @@ public class ZoteroConnector implements IZoteroConnector {
         return getItem(user, groupId, item.getKey());
     }
     
+    /**
+     * This method makes a call to Zotero to batch update items and return back
+     * response
+     * 
+     * @param groupId      group id of citations
+     * @param items        List of items to be updated
+     * @param ignoreFields Fields that are not necessary to be updated
+     * 
+     * @return ZoteroUpdateItemsResponse returns statuses of items.
+     */
     @Override
     public ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId,
             List<String> ignoreFields) throws ZoteroConnectionException, ZoteroHttpStatusException {
