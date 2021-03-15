@@ -18,7 +18,7 @@ import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
-public class DeleteLocalCopyController{
+public class DeleteLocalGroupCopyController{
      
     @Autowired
     private IGroupManager groupManager;
