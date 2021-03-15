@@ -178,10 +178,10 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    public ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId, List<List<String>> ignoreFields,
-            List<List<String>> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException {
+    public ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId, List<String> ignoreFields)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
-        ItemCreationResponse response = zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFields, validCreatorTypes);
+        ItemCreationResponse response = zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFields);
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch(InterruptedException e) {
@@ -193,10 +193,8 @@ public class ZoteroConnector implements IZoteroConnector {
         Map<String, String> success = response.getSuccess();
         for(Map.Entry<String, String> entry: success.entrySet()) {
             itemsKeys.add(entry.getValue());
-            System.out.print(entry.getValue()+"  ");
         }
         statuses.setSuccessItems(itemsKeys);
-        
         return statuses;
     }
 

@@ -34,8 +34,8 @@ public interface IZoteroConnector {
     Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException;
     
-    ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId, List<List<String>> ignoreFields,
-            List<List<String>> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId, List<String> ignoreFields) 
+            throws ZoteroConnectionException, ZoteroHttpStatusException;
 
     FieldInfo[] getFields(IUser user, String itemType);
 

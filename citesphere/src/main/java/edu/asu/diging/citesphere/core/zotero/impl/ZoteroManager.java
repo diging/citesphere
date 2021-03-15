@@ -283,32 +283,25 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public ZoteroUpdateItemsResponse updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
-        List<Item> items = new ArrayList<>();
-        List<List<String>> ignoreFieldsList = new ArrayList<>();
-        List<List<String>> validCreatorTypesList = new ArrayList<>();
+        List<Item> items = new ArrayList<>();  
         for (ICitation citation : citations) {
             Item item = itemFactory.createItem(citation, citation.getCollections());
             items.add(item);
-            List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
-            // add fields that need to be submitted
-            itemTypeFields.add(ZoteroFields.VERSION);
-            itemTypeFields.add(ZoteroFields.KEY);
-
-            List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, false);
-
-            if (citation.getCollections() != null) {
-                ignoreFields.remove("collections");
-            }
-
-            for (String field : ignoreFields)
-                System.out.print(field + " ");
-            List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
-            
-            ignoreFieldsList.add(ignoreFields);
-            validCreatorTypesList.add(validCreatorTypes);
         }
-
-        return zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
+        List<String> requiredFieldsList = new ArrayList<>();
+        requiredFieldsList.add("key");
+        requiredFieldsList.add("version");
+        requiredFieldsList.add("collections");
+        
+        List<String> ignoreFields = new ArrayList<>();
+        Field[] fields = Data.class.getDeclaredFields();
+        for (Field field : fields) {
+            String fieldName = field.getName();
+            if (!requiredFieldsList.contains(fieldName)) {
+                ignoreFields.add(fieldName);
+            }
+        }
+        return zoteroConnector.updateItems(user, items, groupId, ignoreFields);
     }
     
 
@@ -328,6 +321,9 @@ public class ZoteroManager implements IZoteroManager {
         Item newItem = zoteroConnector.createItem(user, item, groupId, collectionIds, ignoreFields, validCreatorTypes);
         return citationFactory.createCitation(newItem);
     }
+    
+    
+    
 
     private List<String> createIgnoreFields(List<String> itemTypeFields, Item item, boolean ignoreEmpty) {
         List<String> ignoreFields = new ArrayList<>();
@@ -347,7 +343,6 @@ public class ZoteroManager implements IZoteroManager {
         Field[] fields = Data.class.getDeclaredFields();
         for (Field field : fields) {
             String fieldName = field.getName();
-
             // already ignored
             if (ignoreFields.contains(fieldName)) {
                 continue;
