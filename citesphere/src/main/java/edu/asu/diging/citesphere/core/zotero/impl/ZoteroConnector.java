@@ -21,6 +21,7 @@ import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ItemCreationResponse;
+import org.springframework.social.zotero.api.ItemCreationResponse.FailedMessage;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
@@ -178,23 +179,38 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
-    public ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId, List<String> ignoreFields)
-            throws ZoteroConnectionException, ZoteroHttpStatusException {
+    public ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId,
+            List<String> ignoreFields) throws ZoteroConnectionException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
         ItemCreationResponse response = zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFields);
         try {
             TimeUnit.SECONDS.sleep(1);
-        } catch(InterruptedException e) {
+        } catch (InterruptedException e) {
             logger.error("Could not sleep.", e);
         }
         ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
-        
-        List<String> itemsKeys = new ArrayList<>();
+
+        List<String> successItemsKeys = new ArrayList<>();
         Map<String, String> success = response.getSuccess();
-        for(Map.Entry<String, String> entry: success.entrySet()) {
-            itemsKeys.add(entry.getValue());
+        for (Map.Entry<String, String> entry : success.entrySet()) {
+            successItemsKeys.add(entry.getValue());
         }
-        statuses.setSuccessItems(itemsKeys);
+        statuses.setSuccessItems(successItemsKeys);
+
+        List<String> unchangedItemsKeys = new ArrayList<>();
+        Map<String, String> unchanged = response.getSuccess();
+        for (Map.Entry<String, String> entry : unchanged.entrySet()) {
+            unchangedItemsKeys.add(entry.getValue());
+        }
+        statuses.setUnchagedItems(unchangedItemsKeys);
+
+        List<String> failedItemsKeys = new ArrayList<>();
+        Map<String, FailedMessage> failed = response.getFailed();
+        for (Map.Entry<String, FailedMessage> entry : failed.entrySet()) {
+            failedItemsKeys.add(entry.getValue().getKey());
+        }
+        statuses.setFailedItems(failedItemsKeys);
+
         return statuses;
     }
 
