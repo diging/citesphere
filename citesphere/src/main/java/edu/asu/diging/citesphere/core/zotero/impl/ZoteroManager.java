@@ -358,8 +358,14 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public void deleteCitation(IUser user, String groupId, ICitation citation)
+    public void deleteMutipleCitations(IUser user, String groupId, String citationKeys, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
-        zoteroConnector.deleteItem(user, groupId, citation.getKey(), citation.getVersion());
+        zoteroConnector.deleteAll(user, groupId, citationKeys, citationVersion);
+    }
+
+    @Override
+    public void deleteCitation(IUser user, String groupId, String citationKey, Long citationVersion)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
+        zoteroConnector.deleteItem(user, groupId, citationKey, citationVersion);
     }
 }

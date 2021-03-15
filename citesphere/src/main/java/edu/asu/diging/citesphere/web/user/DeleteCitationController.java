@@ -22,8 +22,6 @@ import edu.asu.diging.citesphere.user.IUser;
 @Controller
 public class DeleteCitationController {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Autowired
     private ICitationManager citationManager;
 

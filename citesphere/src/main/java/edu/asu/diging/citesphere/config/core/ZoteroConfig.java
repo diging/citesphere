@@ -20,5 +20,5 @@ public class ZoteroConfig {
     @Bean
     public ZoteroConnectionFactory zoteroConnectionFactory() {
         return new ZoteroConnectionFactory(zoteroKey, zoteroSecret);
-    }
+    }    
 }

@@ -64,5 +64,7 @@ public interface IZoteroManager {
 
     long getLatestGroupVersion(IUser user, String groupId);
     
-    void deleteCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    void deleteCitation(IUser user, String groupId, String citationKey, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    
+    void deleteMutipleCitations(IUser user, String groupId, String citationKey, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
 }

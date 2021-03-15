@@ -41,7 +41,6 @@ import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
-import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
@@ -82,7 +81,7 @@ public class CitationManager implements ICitationManager {
     private IAsyncCitationProcessor asyncCitationProcessor;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
-
+    
     @PostConstruct
     public void init() {
         sortFunctions = new HashMap<>();
@@ -383,12 +382,13 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public void deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException {
+        String citations = String.join(",", citationList);      
         for(String element : citationList) {
             Optional<ICitation> citation = citationStore.findById(element);
             if(citation.isPresent()) {
                 citationStore.delete(citation.get());
-                zoteroManager.deleteCitation(user, groupId, citation.get());
             }
         }  
+        zoteroManager.deleteMutipleCitations(user, groupId, citations, zoteroManager.getLatestGroupVersion(user, groupId));
     }
 }

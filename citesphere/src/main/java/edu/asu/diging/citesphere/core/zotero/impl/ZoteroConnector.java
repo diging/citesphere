@@ -293,6 +293,12 @@ public class ZoteroConnector implements IZoteroConnector {
     public void deleteItem(IUser user, String groupId, String citationKey, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
         zotero.getGroupsOperations().deleteItem(groupId, citationKey, citationVersion);
-        
+    }
+
+    @Override
+    public void deleteAll(IUser user, String groupId, String citationKey, Long citationVersion)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        zotero.getGroupsOperations().deleteAll(groupId, citationKey, citationVersion);        
     }
 }
