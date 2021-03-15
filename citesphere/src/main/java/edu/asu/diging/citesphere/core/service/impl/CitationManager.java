@@ -386,5 +386,4 @@ public class CitationManager implements ICitationManager {
         }
         return result;
     }
-
 }

@@ -312,7 +312,6 @@ public class ZoteroManager implements IZoteroManager {
         return zoteroConnector.updateItems(user, items, groupId, ignoreFields);
     }
     
-
     @Override
     public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
@@ -329,7 +328,6 @@ public class ZoteroManager implements IZoteroManager {
         Item newItem = zoteroConnector.createItem(user, item, groupId, collectionIds, ignoreFields, validCreatorTypes);
         return citationFactory.createCitation(newItem);
     }
-    
     
     private List<String> createIgnoreFields(List<String> itemTypeFields, Item item, boolean ignoreEmpty) {
         List<String> ignoreFields = new ArrayList<>();

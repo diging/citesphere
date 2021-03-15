@@ -337,5 +337,4 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return new ZoteroHttpStatusException(cause);
     }
-
 }
