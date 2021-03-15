@@ -42,6 +42,7 @@ public class EditConceptTypeController {
         form.setName(conceptType.getName());
         form.setDescription(conceptType.getDescription());
         form.setUri(conceptType.getUri());
+        form.setOwner(conceptType.getOwner().getFirstName() + " " + conceptType.getOwner().getLastName());
         model.addAttribute("form", form);
         return "auth/concepts/types/edit";
     }

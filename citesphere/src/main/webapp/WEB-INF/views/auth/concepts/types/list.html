@@ -17,6 +17,7 @@
 		<th>Name</th>
 		<th>Description</th>
 		<th>Created on</th>
+		<th>Created by</th>
 		<th></th>
 	</tr>
 	<tr th:id="'tr-'+${type.id}" th:each="type : ${types}">
@@ -24,6 +25,7 @@
 		<td><span th:text="${type.name}"></span></td>
 		<td><span th:text="${type.description}"></span></td>
 		<td><span class="date" th:text="${type.createdOn}"></span></td>
+		<td><span th:text="${type.owner.firstName + ' ' + type.owner.lastName}"></span></td>
 		<td><a th:href="@{'/auth/concepts/types/' + ${type.id} + '/edit'}" /><i class="far fa-edit" title="Edit"></i></a></td>
 		</tr>
 	</th:forEach>

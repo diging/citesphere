@@ -43,6 +43,7 @@ public class EditConceptController {
         form.setName(citationConcept.getName());
         form.setDescription(citationConcept.getDescription());
         form.setUri(citationConcept.getUri());
+        form.setOwner(citationConcept.getOwner().getFirstName() + " " + citationConcept.getOwner().getLastName());
         model.addAttribute("form", form);
         return "auth/concepts/edit";
     }

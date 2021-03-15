@@ -4,25 +4,31 @@ import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
+import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.repository.custom.AuthorityRepository;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.IPersonMongoDao;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.transfer.impl.Persons;
-import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 public class AuthorityService implements IAuthorityService {
@@ -35,6 +41,9 @@ public class AuthorityService implements IAuthorityService {
 
     @Autowired
     private IPersonMongoDao personDao;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
     @Autowired
     private Set<AuthorityImporter> importers;
@@ -75,6 +84,44 @@ public class AuthorityService implements IAuthorityService {
             }
         }
         return null;
+    }
+
+    /**
+     * This method returns all the authorities found by searching a source based on
+     * first name and/or last name of authority and excludes the authorities that
+     * are imported by the user in citesphere
+     * 
+     * @throws AuthorityImporterNotFoundException
+     */
+    @Override
+    public AuthoritySearchResult searchAuthorityEntries(IUser user, String firstName, String lastName, String source,
+            int page, int pageSize) throws AuthorityServiceConnectionException, AuthorityImporterNotFoundException {
+
+        AuthorityImporter importer = getAuthorityImporter(source);
+
+        if (importer == null) {
+            throw new AuthorityImporterNotFoundException("Authority importer not found for " + source);
+        }
+
+        AuthoritySearchResult searchResult = importer.searchAuthorities(firstName, lastName, page, pageSize);
+
+        if (searchResult.getFoundAuthorities() != null && searchResult.getFoundAuthorities().size() > 0) {
+            List<String> uriList = authorityRepository
+                    .findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName,
+                            lastName)
+                    .stream().map(IAuthorityEntry::getUri).collect(Collectors.toList());
+  
+            ListIterator<IAuthorityEntry> iter = searchResult.getFoundAuthorities().listIterator();
+            String uri = "";
+            while (iter.hasNext()) {
+                uri = iter.next().getUri().trim();
+                if (uriList.contains(uri) || uriList.contains(uri + "/")) {
+                    iter.remove();
+                }
+            }
+        }
+
+        return searchResult;
     }
 
     @Override
@@ -118,6 +165,14 @@ public class AuthorityService implements IAuthorityService {
         return entries;
     }
 
+
+    public List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
+                user.getUsername(), firstName, lastName, paging);
+        return results;
+    }
+
     @Override
     public boolean deleteAuthority(String id) {
         entryRepository.deleteById(id);
@@ -140,4 +195,23 @@ public class AuthorityService implements IAuthorityService {
     public IAuthorityEntry save(IAuthorityEntry entry) {
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry) entry);
     }
+
+    @Override
+    public int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize) {
+
+        return (int) Math.ceil(new Float(authorityRepository
+                .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName))
+                / pageSize);
+    }
+
+    private AuthorityImporter getAuthorityImporter(String source) {
+
+        for (AuthorityImporter importer : importers) {
+            if (importer.isResponsibleForSearch(source)) {
+                return importer;
+            }
+        }
+        return null;
+    }
+
 }
