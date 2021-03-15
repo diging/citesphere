@@ -61,9 +61,9 @@
 						aria-expanded="false"> Apps <span class="caret"></span>
 					</a>
 						<ul class="dropdown-menu">
-							<li role="presentation"><a th:href="@{/admin/apps}">See
+							<li sec:authorize="isAuthenticated()" role="presentation"><a th:href="@{/admin/apps}">See
 									all Apps</a></li>
-							<li role="presentation"><a th:href="@{/admin/apps/add}">Add</a></li>
+							<li sec:authorize="isAuthenticated()" role="presentation"><a th:href="@{/admin/apps/add}">Add</a></li>
 						</ul></li>
 					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
 						th:href="@{/auth/exports}"> Exports</a></li>
@@ -73,9 +73,9 @@
 						aria-expanded="false"> Citation Concepts <span class="caret"></span>
 					</a>
 						<ul class="dropdown-menu">
-							<li role="presentation"><a th:href="@{/auth/concepts/list}">Concepts</a>
+							<li sec:authorize="isAuthenticated()" role="presentation"><a th:href="@{/auth/concepts/list}">Concepts</a>
 							</li>
-							<li role="presentation"><a
+							<li sec:authorize="isAuthenticated()" role="presentation"><a
 								th:href="@{/auth/concepts/types/list}">Concept Types</a></li>
 						</ul></li>
 					<li sec:authorize="hasRole('ADMIN')" role="presentation"
@@ -84,10 +84,10 @@
 						aria-expanded="false"> Import <span class="caret"></span>
 					</a>
 						<ul class="dropdown-menu">
-							<li role="presentation"><a th:href="@{/auth/import/upload}">Import
+							<li sec:authorize="isAuthenticated()" role="presentation"><a th:href="@{/auth/import/upload}">Import
 									from File</a></li>
-							<li role="separator" class="divider"></li>
-							<li role="presentation"><a th:href="@{/auth/import/jobs}">See
+							<li sec:authorize="isAuthenticated()" role="separator" class="divider"></li>
+							<li sec:authorize="isAuthenticated()" role="presentation"><a th:href="@{/auth/import/jobs}">See
 									all Imports</a></li>
 						</ul></li>
 					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
