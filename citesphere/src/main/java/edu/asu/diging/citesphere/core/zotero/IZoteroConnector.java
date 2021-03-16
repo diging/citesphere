@@ -70,6 +70,6 @@ public interface IZoteroConnector {
     
     void deleteItem(IUser user, String groupId, String citationKey, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
     
-    void deleteAll(IUser user, String groupId, String citationKey, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    void deleteMultipleCitations(IUser user, String groupId, String citationKey, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
 
 }
