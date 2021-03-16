@@ -299,6 +299,6 @@ public class ZoteroConnector implements IZoteroConnector {
     public void deleteMultipleCitations(IUser user, String groupId, String citationKey, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
-        zotero.getGroupsOperations().deleteAll(groupId, citationKey, citationVersion);        
+        zotero.getGroupsOperations().deleteMultipleItems(groupId, citationKey, citationVersion);        
     }
 }
