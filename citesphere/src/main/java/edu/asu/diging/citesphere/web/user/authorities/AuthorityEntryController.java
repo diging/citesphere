@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,14 +131,15 @@ public class AuthorityEntryController {
             logger.info("Not a valid URI: " + uri, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
+       
         entry = authorityService.create(entry, (IUser) authentication.getPrincipal());
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
     
     @RequestMapping(value = "/auth/authority/add", method = RequestMethod.POST)
     public ResponseEntity<IAuthorityEntry> addAuthorityEntry(Authentication authentication,
-            @RequestParam("uri") String uri, @RequestParam("source") String source) {
+            @RequestParam("uri") String uri, @RequestParam("source") String source,
+            @RequestParam(defaultValue = "", required = false, value = "zoteroGroupId") String zoteroGroupId) {
         
         IAuthorityEntry entry = null;
         if(source != null && authoritySearchResult!= null && authoritySearchResult.containsKey(source)) {
@@ -145,6 +147,15 @@ public class AuthorityEntryController {
                     .filter(authority -> authority.getUri().equals(uri)).findFirst();
             
             if (authorityEntry.isPresent()) {
+                if(!zoteroGroupId.isEmpty()) {
+                    List<Long> authorityGroups = authorityEntry.get().getGroups();
+                    if(authorityGroups == null || authorityGroups.isEmpty()) {
+                        authorityGroups = new ArrayList<>();
+                    }
+                    authorityGroups.add(Long.valueOf(zoteroGroupId));
+                    authorityEntry.get().setGroups(authorityGroups);
+                }
+                
                 entry = authorityService.create(authorityEntry.get(), (IUser) authentication.getPrincipal());
             }
         }

@@ -669,6 +669,7 @@ function getUserAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
+	
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/user|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
 	$.ajax({
   		dataType: "json",
@@ -779,7 +780,11 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
 			
-			createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&source=conceptpower&uri=' + uri;						
+			if($("#mycheckbox").is(":checked")){
+				createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&source=conceptpower&uri=' + uri + '&zoteroGroupId=' + [(${zoteroGroupId})];						
+			} else {
+				createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&source=conceptpower&uri=' + uri;						
+			}
 			$.ajax({
 			  		dataType: "json",
 			  		type: 'POST',
@@ -1471,6 +1476,8 @@ function creatorLinkHandler(target) {
 								<tbody id="userAuthoritySearchResult">
 								</tbody>
 							</table>
+							
+							
 						</div>
 			
 						<div role="tabpanel" class="tab-pane" id="conceptpowerAuthoritiesTabContent">
@@ -1483,10 +1490,14 @@ function creatorLinkHandler(target) {
 								<tbody id="conceptpowerAuthoritySearchResult">
 								</tbody>
 							</table>
+							<div>
+							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add Authority to the Group
+							</div>
 						</div>
 				</div>
 			</div>
 			<div class="modal-footer">
+				
 				<button type="button" class="btn btn-default"
 					id="closeAuthoritySearchResult">Close</button>
 			</div>

@@ -49,13 +49,24 @@ $(function() {
 		$('#authority-delete-confirmation').modal("hide");
 		event.preventDefault();
 	});
+	
+	$("#displayAuthorities").change(function () {
+	    console.log($("#displayAuthorities").val());
+	});
 });
+
+
 </script>
 </head>
 
 <body>
 <div layout:fragment="content">
 <h2>Managed Authority Entries</h2>
+<label for="displayAuthorities">Display Authorities</label>
+<select id="displayAuthorities" name="displayAuthorities" size="1">
+	<option value="all">All</option>
+    <option value="group">Group</option>
+</select><br><br>  
 <table class="table table-striped table-bordered">
 <tr>
 	<th width="20%">URI</th>
