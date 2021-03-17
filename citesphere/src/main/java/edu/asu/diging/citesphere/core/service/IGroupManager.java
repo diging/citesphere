@@ -12,5 +12,5 @@ public interface IGroupManager {
      * @param user
      * @param groupId
      */
-    void deleteLocalGroupCopy(IUser user, String groupId);
+    void deleteLocalGroupCopy(String groupId);
 }

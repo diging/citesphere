@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.mongo.CustomCitationGroupRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
@@ -20,6 +21,9 @@ public class GroupManager implements IGroupManager {
 
     @Autowired
     private IZoteroManager zoteroManager;
+    
+    @Autowired
+    private CustomCitationGroupRepository customGroupRepo;
 
     /*
      * (non-Javadoc)
@@ -45,11 +49,7 @@ public class GroupManager implements IGroupManager {
     }
     
     @Override
-    public void deleteLocalGroupCopy(IUser user, String groupId) {
-        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-        do {
-            groupRepository.delete((CitationGroup) groupOptional.get());
-    	    groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-    	} while (groupOptional.isPresent());
+    public void deleteLocalGroupCopy(String groupId) {
+        customGroupRepo.deleteByGroupId(Integer.parseInt(groupId));
     }
 }
