@@ -148,7 +148,7 @@ public class AuthorityEntryController {
             if (authorityEntry.isPresent()) {
                 if(!zoteroGroupId.isEmpty()) {
                     List<Long> authorityGroups = authorityEntry.get().getGroups();
-                    if(authorityGroups == null || authorityGroups.isEmpty()) {
+                    if(authorityGroups == null) {
                         authorityGroups = new ArrayList<>();
                     }
                     authorityGroups.add(Long.valueOf(zoteroGroupId));
