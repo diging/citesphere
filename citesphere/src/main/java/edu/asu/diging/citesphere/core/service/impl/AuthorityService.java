@@ -185,7 +185,7 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public List<IAuthorityEntry> getAllByGroup(long groupId) {
+    public List<IAuthorityEntry> getAuthoritiesByGroup(long groupId) {
         return entryRepository.findByGroups(groupId);
     }
 

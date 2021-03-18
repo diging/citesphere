@@ -6,8 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.user.IUser;
@@ -30,9 +28,9 @@ public class AuthorityListController {
     }
     
     @RequestMapping("/auth/authority/list/{zoteroGroupId}")
-    public String getAllAuthoritiesForGroup(Model model, Authentication authentication, 
+    public String getAuthoritiesForGroup(Model model, Authentication authentication, 
             @PathVariable("zoteroGroupId") String zoteroGroupId) {
-        model.addAttribute("authorities", authorityService.getAllByGroup(Long.valueOf(zoteroGroupId)));
+        model.addAttribute("authorities", authorityService.getAuthoritiesByGroup(Long.valueOf(zoteroGroupId)));
         model.addAttribute("groups", citationManager.getGroups((IUser)authentication.getPrincipal()));
         model.addAttribute("displayBy", zoteroGroupId);
         return "auth/authorities/list";

@@ -131,7 +131,6 @@ public class AuthorityEntryController {
             logger.info("Not a valid URI: " + uri, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-       
         entry = authorityService.create(entry, (IUser) authentication.getPrincipal());
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
@@ -155,7 +154,6 @@ public class AuthorityEntryController {
                     authorityGroups.add(Long.valueOf(zoteroGroupId));
                     authorityEntry.get().setGroups(authorityGroups);
                 }
-                
                 entry = authorityService.create(authorityEntry.get(), (IUser) authentication.getPrincipal());
             }
         }

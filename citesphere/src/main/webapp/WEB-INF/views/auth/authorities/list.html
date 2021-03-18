@@ -51,14 +51,10 @@ $(function() {
 	});
 	
 	$("#displayAuthorities").change(function () {
-	    console.log($("#displayAuthorities").val());
 	    if($("#displayAuthorities").val() === 'all'){
 	    	window.location.href = [[@{/auth/authority/list}]];
 	    } else {
 	    	var zoteroGroupId = $("#displayAuthorities").val();
-	    	console.log(zoteroGroupId);
-	    	console.log("Hi  " + $("#displayAuthorities").val());
-	    	console.log([[@{/auth/authority/list/}]] + zoteroGroupId);
 	    	window.location.href = [[@{/auth/authority/list/}]] + zoteroGroupId;
 	    }
 	});
