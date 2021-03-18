@@ -55,7 +55,7 @@ $(function() {
 	    	window.location.href = [[@{/auth/authority/list}]];
 	    } else {
 	    	var zoteroGroupId = $("#displayAuthorities").val();
-	    	window.location.href = [[@{/auth/authority/list/}]] + zoteroGroupId;
+	    	window.location.href = [[@{/auth/authority/}]] + zoteroGroupId + "/list";
 	    }
 	});
 });

@@ -27,7 +27,7 @@ public class AuthorityListController {
         return "auth/authorities/list";
     }
     
-    @RequestMapping("/auth/authority/list/{zoteroGroupId}")
+    @RequestMapping("/auth/authority/{zoteroGroupId}/list")
     public String getAuthoritiesForGroup(Model model, Authentication authentication, 
             @PathVariable("zoteroGroupId") String zoteroGroupId) {
         model.addAttribute("authorities", authorityService.getAuthoritiesByGroup(Long.valueOf(zoteroGroupId)));
