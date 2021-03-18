@@ -52,6 +52,15 @@ $(function() {
 	
 	$("#displayAuthorities").change(function () {
 	    console.log($("#displayAuthorities").val());
+	    if($("#displayAuthorities").val() === 'all'){
+	    	window.location.href = [[@{/auth/authority/list}]];
+	    } else {
+	    	var zoteroGroupId = $("#displayAuthorities").val();
+	    	console.log(zoteroGroupId);
+	    	console.log("Hi  " + $("#displayAuthorities").val());
+	    	console.log([[@{/auth/authority/list/}]] + zoteroGroupId);
+	    	window.location.href = [[@{/auth/authority/list/}]] + zoteroGroupId;
+	    }
 	});
 });
 
@@ -64,9 +73,12 @@ $(function() {
 <h2>Managed Authority Entries</h2>
 <label for="displayAuthorities">Display Authorities</label>
 <select id="displayAuthorities" name="displayAuthorities" size="1">
-	<option value="all">All</option>
-    <option value="group">Group</option>
-</select><br><br>  
+	<option th:selected="${#strings.equals(displayBy, 'all')}" value="all">All</option>
+	<span th:each="groupDetail:${groups}">
+		<option th:selected="${#strings.equals(displayBy, groupDetail.groupId)}" th:value="${groupDetail.groupId}">Group - [[${groupDetail.name}]]</option>
+	</span>  
+</select><br><br> 
+	
 <table class="table table-striped table-bordered">
 <tr>
 	<th width="20%">URI</th>

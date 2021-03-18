@@ -39,4 +39,6 @@ public interface IAuthorityService {
 
     int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize);
 
+    List<IAuthorityEntry> getAllByGroup(long groupId);
+
 }
