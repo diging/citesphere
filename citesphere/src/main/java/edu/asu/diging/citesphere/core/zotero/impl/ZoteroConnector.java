@@ -197,23 +197,17 @@ public class ZoteroConnector implements IZoteroConnector {
 
         List<String> successItemsKeys = new ArrayList<>();
         Map<String, String> success = response.getSuccess();
-        for (Map.Entry<String, String> entry : success.entrySet()) {
-            successItemsKeys.add(entry.getValue());
-        }
+        success.entrySet().forEach(e -> successItemsKeys.add(e.getValue()));
         statuses.setSuccessItems(successItemsKeys);
 
         List<String> unchangedItemsKeys = new ArrayList<>();
         Map<String, String> unchanged = response.getSuccess();
-        for (Map.Entry<String, String> entry : unchanged.entrySet()) {
-            unchangedItemsKeys.add(entry.getValue());
-        }
+        unchanged.entrySet().forEach(e -> unchangedItemsKeys.add(e.getValue()));
         statuses.setUnchagedItems(unchangedItemsKeys);
 
         List<String> failedItemsKeys = new ArrayList<>();
         Map<String, FailedMessage> failed = response.getFailed();
-        for (Map.Entry<String, FailedMessage> entry : failed.entrySet()) {
-            failedItemsKeys.add(entry.getValue().getKey());
-        }
+        failed.entrySet().forEach(e -> failedItemsKeys.add(e.getValue().getKey()));
         statuses.setFailedItems(failedItemsKeys);
 
         return statuses;
