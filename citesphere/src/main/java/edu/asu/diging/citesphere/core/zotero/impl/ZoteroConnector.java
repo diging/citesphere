@@ -193,11 +193,6 @@ public class ZoteroConnector implements IZoteroConnector {
             List<String> ignoreFields) throws ZoteroConnectionException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
         ItemCreationResponse response = zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFields);
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            logger.error("Could not sleep.", e);
-        }
         ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
 
         List<String> successItemsKeys = new ArrayList<>();

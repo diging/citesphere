@@ -66,8 +66,9 @@ public class MoveItemsController {
                 zoteroGroupId, citations);
         CitationStatusesData statusesDto = new CitationStatusesData();
         statusesDto.setMovedCitations(response.getSuccessItems());
-        for (String failedItemKey : response.getFailedItems())
+        for (String failedItemKey : response.getFailedItems()) {
             notMovedCitations.add(failedItemKey);
+        }
         statusesDto.setNotMovedCitations(notMovedCitations);
         return gson.toJson(statusesDto, CitationStatusesData.class);
     }

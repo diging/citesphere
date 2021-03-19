@@ -279,8 +279,9 @@ public class ZoteroManager implements IZoteroManager {
     }
     
     /**
-     * This method creates ignore fields list that are not necessary while updating
-     * citations with collection ids.
+     * We are updating only collections field of a citation. Zotero only requires
+     * citations' key, version and collections fields to update a citation with
+     * collection ids. All other fields other than these three can be ignored.
      * 
      * @param user      user accessing Zotero.
      * @param groupId   group id of citations.

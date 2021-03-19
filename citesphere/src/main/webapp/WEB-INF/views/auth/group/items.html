@@ -389,7 +389,7 @@ $(function(){
 			var list = container.append('<ul></ul>').find('ul');
 			$(".selected").each(function() {
 				list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
-				});
+			});
 			container.find('ul').hide();
 			return container;
 			},
@@ -416,6 +416,7 @@ $(".list-group-item").droppable( {
 		var itemsMoveData ={};
 		itemsMoveData["itemIds"] = itemsKeys;
 		itemsMoveData["collectionId"] = movedToCollectionKey;
+		if(itemsKeys.length <= 50){
 		$.ajax({
 			type: "POST",
 			url: 'items/move?[(${_csrf.parameterName})]=[(${_csrf.token})]',
@@ -433,9 +434,12 @@ $(".list-group-item").droppable( {
 		      }
 			 },
 			 error: function (data) {
-				   showNotification(" Error while moving citations!", "danger", 0);
+				   showNotification(" Error while moving citations!", "danger", 10000);
 			 }
-		});   
+		});
+		} else{
+			showNotification("Cannot move more than 50 citations at a time!", "warning", 5000);
+		}
 		$('.fa-chevron-circle-left').show();
 		var checkedBoxes = $('input[type="checkbox"]:checked');
 		checkedBoxes.each(function(){
