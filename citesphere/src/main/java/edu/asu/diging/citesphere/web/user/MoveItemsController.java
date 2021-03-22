@@ -27,7 +27,7 @@ import edu.asu.diging.citesphere.core.zotero.ZoteroUpdateItemsResponse;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.dto.CitationStatusesData;
-import edu.asu.diging.citesphere.web.user.dto.MovedItemsData;
+import edu.asu.diging.citesphere.web.user.dto.MoveItemsRequest;
 
 @Controller
 public class MoveItemsController {
@@ -46,7 +46,7 @@ public class MoveItemsController {
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             CitationIsOutdatedException {
         Gson gson = new Gson();
-        MovedItemsData itemsDataDto = gson.fromJson(itemsData, MovedItemsData.class);
+        MoveItemsRequest itemsDataDto = gson.fromJson(itemsData, MoveItemsRequest.class);
         List<ICitation> citations = new ArrayList<>();
         ICitation citation;
         List<String> notMovedCitations = new ArrayList<>();
