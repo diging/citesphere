@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -195,24 +198,16 @@ public class ZoteroConnector implements IZoteroConnector {
         ItemCreationResponse response = zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFields);
         ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
 
-        List<String> successItemsKeys = new ArrayList<>();
-        Map<String, String> success = response.getSuccess();
-        success.entrySet().forEach(e -> successItemsKeys.add(e.getValue()));
-        statuses.setSuccessItems(successItemsKeys);
+        Function<Map.Entry<String, String>, String> itemKeyExtractor = e -> e.getValue();
+        Function<Map.Entry<String, FailedMessage>, String> failedItemKeyExtractor = e -> e.getValue().getKey();
 
-        List<String> unchangedItemsKeys = new ArrayList<>();
-        Map<String, String> unchanged = response.getSuccess();
-        unchanged.entrySet().forEach(e -> unchangedItemsKeys.add(e.getValue()));
-        statuses.setUnchagedItems(unchangedItemsKeys);
-
-        List<String> failedItemsKeys = new ArrayList<>();
-        Map<String, FailedMessage> failed = response.getFailed();
-        failed.entrySet().forEach(e -> failedItemsKeys.add(e.getValue().getKey()));
-        statuses.setFailedItems(failedItemsKeys);
+        statuses.setSuccessItems(extractItemKeys(response.getSuccess(), itemKeyExtractor));
+        statuses.setUnchagedItems(extractItemKeys(response.getUnchanged(), itemKeyExtractor));
+        statuses.setFailedItems(extractItemKeys(response.getFailed(), failedItemKeyExtractor));
 
         return statuses;
     }
-
+    
     @Override
     public Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
@@ -326,4 +321,9 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return new ZoteroHttpStatusException(cause);
     }
+    
+    private <T> List<String> extractItemKeys(Map<String, T> map, Function<Map.Entry<String, T>, String> keyExtractor) {
+        return map.entrySet().stream().map(e -> keyExtractor.apply(e)).collect(Collectors.toList());
+    }
+
 }
