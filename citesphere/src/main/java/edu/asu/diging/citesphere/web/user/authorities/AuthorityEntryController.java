@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.web.user.authorities;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -147,12 +148,10 @@ public class AuthorityEntryController {
             
             if (authorityEntry.isPresent()) {
                 if(!zoteroGroupId.isEmpty()) {
-                    List<Long> authorityGroups = authorityEntry.get().getGroups();
-                    if(authorityGroups == null) {
-                        authorityGroups = new ArrayList<>();
+                    if(authorityEntry.get().getGroups() == null) {
+                        authorityEntry.get().setGroups(new HashSet<>());
                     }
-                    authorityGroups.add(Long.valueOf(zoteroGroupId));
-                    authorityEntry.get().setGroups(authorityGroups);
+                    authorityEntry.get().getGroups().add(Long.valueOf(zoteroGroupId));
                 }
                 entry = authorityService.create(authorityEntry.get(), (IUser) authentication.getPrincipal());
             }
