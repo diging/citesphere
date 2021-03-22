@@ -50,4 +50,18 @@ public interface IZoteroManager {
 
     void forceRefresh(IUser user, String zoteroGroupId, String collectionId, int page, String sortBy, Long lastGroupVersion);
 
+    boolean isGroupModified(IUser user, String groupId, long lastGroupVersion) throws ZoteroHttpStatusException;
+
+    Map<String, Long> getGroupItemsVersions(IUser user, String groupId, long version, boolean includeTrashed);
+
+    ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed);
+
+    DeletedZoteroElements getDeletedElements(IUser user, String groupId, long version);
+
+    Map<String, Long> getCollectionsVersions(IUser user, String groupId, String groupVersion);
+
+    ZoteroCollectionsResponse getCollectionsByKey(IUser user, String groupId, List<String> keys);
+
+    long getLatestGroupVersion(IUser user, String groupId);
+
 }

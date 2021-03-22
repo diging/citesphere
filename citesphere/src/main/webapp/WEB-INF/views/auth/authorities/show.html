@@ -1,0 +1,21 @@
+<html layout:decorate="~{layouts/main}">
+<head></head>
+<body>
+	<div layout:fragment="content">
+	<span th:if = "${entry == null}">
+		<h1>Not Found</h1>
+	</span>
+	
+	<h2>
+		<span th:text="${entry.name}"></span>
+		<br>
+		<small><span th:text="${entry.uri}"></span></small>
+	</h2>	
+	
+	<p><span th:text="${entry.description}"></span></p>
+	
+	<p>Created on: <span th:text="${entry.createdOn}" class="date"></span></p>
+	</div>
+</body>
+</html>
+	

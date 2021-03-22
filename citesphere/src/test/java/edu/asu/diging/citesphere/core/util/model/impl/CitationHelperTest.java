@@ -1,24 +1,24 @@
 package edu.asu.diging.citesphere.core.util.model.impl;
 
-import java.util.*;
+import static org.junit.Assert.assertTrue;
 
-import org.apache.xml.utils.URI;
-import org.hamcrest.Matcher;
-import org.hibernate.validator.constraints.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.web.util.UriBuilder;
 
-import static org.junit.Assert.*;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
-import edu.asu.diging.citesphere.core.service.impl.CitationManager;
 import edu.asu.diging.citesphere.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationConcept;
@@ -171,7 +171,6 @@ public class CitationHelperTest {
         IPerson editor1 = new Person();
         editor1.setFirstName(FORM_PERSON_NAME);
         editor1.setLastName(FORM_PERSON_NAME);
-        editor1.setId("1");
         editorsSet.add(editor1);
         updatedCitation.setEditors(editorsSet);
 
@@ -179,7 +178,6 @@ public class CitationHelperTest {
         IPerson author1 = new Person();
         author1.setFirstName(FORM_PERSON_NAME);
         author1.setLastName(FORM_PERSON_NAME);
-        author1.setId("2");
         Set<IAffiliation> affiliations = new LinkedHashSet<IAffiliation>();
         IAffiliation affiliation = new Affiliation();
         affiliation.setName(FORM_AFFILIATION_NAME);

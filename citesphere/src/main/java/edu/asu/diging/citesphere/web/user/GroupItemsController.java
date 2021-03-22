@@ -60,7 +60,7 @@ public class GroupItemsController {
     @Autowired
     private GetItemsManager getItemsManager;
 
-    @RequestMapping(value= { "/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
+    @RequestMapping(value= { "/auth/group/{zoteroGroupId}","/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
@@ -68,15 +68,26 @@ public class GroupItemsController {
             @RequestParam(required = false, value = "columns") String[] columns)
             throws GroupDoesNotExistException, ZoteroHttpStatusException, InterruptedException, ExecutionException {
         
+
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
         }
-
         IUser user = (IUser) authentication.getPrincipal();
-        CitationResults results = getItemsManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+
+        CitationResults results;
+        try {
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+        } catch(ZoteroHttpStatusException e) {
+            logger.error("Exception occured", e);
+            return "error/500";
+        } catch(GroupDoesNotExistException e) {
+            logger.error("Exception occured", e);
+            return "error/404";
+        }
+        
         model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
@@ -85,9 +96,14 @@ public class GroupItemsController {
         model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sort", sort);
+        model.addAttribute("results", results);
         // more than 200 really don't make sense here, this needs to be changed
-        model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, null, "title", 200));
-        
+        try {
+            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
+        } catch(GroupDoesNotExistException e) {
+            logger.error("Exception occured", e);
+            return "error/404";
+        }
         List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();
         if (columns != null && columns.length > 0) {
@@ -97,17 +113,18 @@ public class GroupItemsController {
                 }
             }
         }
-        
         model.addAttribute("columns", shownColumns);
         model.addAttribute("availableColumns", allowedColumns);
         
         
         ICitationGroup group = groupManager.getGroup(user, groupId);
         List<BreadCrumb> breadCrumbs = new ArrayList<>();
-        
         ICitationCollection collection = null;
         if (collectionId != null) {
             collection = collectionManager.getCollection(user, groupId, collectionId);
+            if(collection != null) {
+                model.addAttribute("collectionName", collection.getName()); 
+            }
         }
         while(collection != null) {
             breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
@@ -117,7 +134,7 @@ public class GroupItemsController {
                 collection = null;
             }
         }
-        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getId() + "", group));
+        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
         Collections.reverse(breadCrumbs);
         model.addAttribute("breadCrumbs", breadCrumbs);
         return "auth/group/items";

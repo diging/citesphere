@@ -2,24 +2,32 @@ package edu.asu.diging.citesphere.core.export.proc.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.export.ExportType;
 import edu.asu.diging.citesphere.core.export.proc.Processor;
+import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationConceptTag;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ICreator;
 import edu.asu.diging.citesphere.model.bib.IPerson;
 
 @Component
 public class CsvProcessor implements Processor {
+    
+    @Autowired
+    private CitationGroupRepository groupRepo;
 
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.export.proc.impl.Processor#getSupportedType()
@@ -38,7 +46,7 @@ public class CsvProcessor implements Processor {
      * @see edu.asu.diging.citesphere.core.export.proc.impl.Processor#write(java.util.List, java.lang.Appendable)
      */
     @Override
-    public void write(List<ICitation> citations, Appendable writer) throws ExportFailedException {
+    public void write(Iterator<ICitation> citations, Appendable writer) throws ExportFailedException {
 
         CSVFormat format = CSVFormat.DEFAULT.withHeader("Key", "Group Id", "Group Name", "Type", "Title", "Date", "Authors",
                 "Editors", "Other Creators", "Publication Title", "Volume", "Issue", "Pages", "Series", "Series Title",
@@ -46,12 +54,16 @@ public class CsvProcessor implements Processor {
                 "Short Title", "Archive", "Archive Location", "Library Catalog", "Call Number", "Rights", "Date Added",
                 "Date Modified", "Concept Tags", "Extra", "Version");
         try (CSVPrinter printer = new CSVPrinter(writer, format)) {
-            for (ICitation citation : citations) {
+            while(citations.hasNext()) {
+                ICitation citation = citations.next();
                 List<String> row = new ArrayList<>();
                 row.add(citation.getKey());
                 if (citation.getGroup() != null) {
-                    row.add(citation.getGroup().getId() + "");
-                    row.add(citation.getGroup().getName());
+                    Optional<ICitationGroup> group = groupRepo.findFirstByGroupId(new Long(citation.getGroup()));
+                    if (group.isPresent()) {
+                        row.add(group.get().getGroupId() + "");
+                        row.add(group.get().getName());
+                    }
                 } else {
                     row.add("");
                     row.add("");

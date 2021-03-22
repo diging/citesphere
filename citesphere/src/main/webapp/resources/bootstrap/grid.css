@@ -2,7 +2,19 @@ body, p, table, div, input {
 	font-family: 'Fira Sans', sans-serif;
 }
 
+body{
+    margin-bottom: 100px;
+    min-height: 400px;
+}
+
 .bib-entry {
+	cursor: pointer;
+}
+.conceptpower-authority-entry {
+	cursor: pointer;
+}
+
+.user-authority-entry {
 	cursor: pointer;
 }
 

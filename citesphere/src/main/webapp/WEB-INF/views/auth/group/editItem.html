@@ -1,0 +1,1538 @@
+<html layout:decorate="~{layouts/main}">
+<head>	
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<style>
+.popover {
+	min-width: 300px;
+}
+</style>
+<script th:inline="javascript">
+//# sourceURL=submit.js
+$(function() {
+	$("#uriLoadingSpinnerAuthor").hide();
+	$("#uriLoadingFailureAuthor").hide();
+	$("#uriLoadingFoundAuthor").hide();
+	$("#searchAuthorSpinner").hide();
+	
+	$("#uriLoadingFoundAuthor").popover();
+	$("#uriLoadingFailureAuthor").popover();
+	
+	$("#uriLoadingSpinnerEditor").hide();
+	$("#uriLoadingFailureEditor").hide();
+	$("#uriLoadingFoundEditor").hide();
+	$("#searchEditorSpinner").hide();
+	
+	$("#uriLoadingFoundEditor").popover();
+	$("#uriLoadingFailureEditor").popover();
+	
+	$("#uriLoadingSpinnerCreator").hide();
+	$("#uriLoadingFailureCreator").hide();
+	$("#uriLoadingFoundCreator").hide();
+	$("#searchCreatorSpinner").hide();
+	
+	$("#uriLoadingFoundCreator").popover();
+	$("#uriLoadingFailureCreator").popover();
+	
+	$("#submitForm").click(function(e) {
+		constructPersonArray("author", "author", 0);
+		constructPersonArray("editor", "editor", 0);
+		var creatorSubmitCount = 0;
+		$(".creator-row").each(function(idx, elem){
+			var ele = $(elem).children().first();
+			if(!(ele.attr("id")=="editor" || ele.attr("id")=="author")) {
+				var roleCount = constructPersonArray("creator", ele.attr("id"), creatorSubmitCount);
+				creatorSubmitCount = creatorSubmitCount + roleCount;
+			}
+		});
+		
+		createConceptTags();
+	});
+	
+	/* Handle Author events */
+	$("#addAuthorButton").click(function() {
+		savePersonDetails("Author", "Author");
+	});
+	
+	$("#addAuthorModalCancel").click(function() {
+		$("#authorModal").modal('hide');
+		resetPersonCreationModal("Author");
+	});
+	
+	/* Disable search authority button when first name and last name fields are empty*/
+    $("#firstNameAuthor").keyup(function(e){
+    	allowAuthoritySearch("Author");
+     });
+		
+    $("#lastNameAuthor").keyup(function(e){
+    	allowAuthoritySearch("Author");
+     });
+    $("#firstNameEditor").keyup(function(e){
+    	allowAuthoritySearch("Editor");
+     });
+		
+    $("#lastNameEditor").keyup(function(e){
+    	allowAuthoritySearch("Editor");
+     });
+    $("#firstNameCreator").keyup(function(e){
+    	allowAuthoritySearch("Creator");
+     });
+		
+    $("#lastNameCreator").keyup(function(e){
+    	allowAuthoritySearch("Creator");
+     });
+	$("#searchAuthor").click(function() {
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})  
+		$("#searchAuthorSpinner").show();
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		
+		getUserAuthorities('Author','Author', 0)
+		getconceptpowerAuthorities('Author','Author',0)
+		$("#searchAuthorSpinner").hide();
+	});
+	
+	$("#searchEditor").click(function() {
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})  
+		$("#searchEditorSpinner").show();
+		
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		
+		getUserAuthorities('Editor','Editor', 0)
+		getconceptpowerAuthorities('Editor','Editor',0)
+		$("#searchEditorSpinner").hide();
+	});
+	
+	$("#searchCreator").click(function() {
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})  
+		$("#searchCreatorSpinner").show();
+		
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		
+		getUserAuthorities('Creator','Creator', 0)
+		getconceptpowerAuthorities('Creator','Creator',0)
+		$("#searchCreatorSpinner").hide();
+	});
+	
+	
+	$(".edit-author").click(function(){
+		var authorItem = $(this).parent();
+		editPerson('Author', authorItem[0]);
+	});
+	
+	$(".edit-author").css('cursor', 'pointer');
+	
+	$(".remove-author").click(removePerson);
+	$(".remove-author").css('cursor', 'pointer');
+	$(".remove-concept").click(removeConcept);
+	$(".remove-concept").css('cursor', 'pointer');
+	
+	$("#addAuthorAffiliation").click(function() {
+		var affiliationCopy = $("#authorAffiliationTemplate").clone();
+		affiliationCopy.removeAttr("id");
+		affiliationCopy.addClass("aff-info");
+		affiliationCopy.find("input").val("");
+		affiliationCopy.show();
+		$("#authorAffiliations").append(affiliationCopy);
+	});
+	
+	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
+		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
+		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
+			$("#authorCreateAuthority").hide();
+			
+			$("#uriAuthorLocalId").val(data['id']);
+			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Author");
+			$("#uriLoadingFoundAuthor").popover('hide');
+		});
+	});
+	
+	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).attr('data-authority-id');
+		$("#uriAuthorLocalId").val(authId);
+		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Author");
+		$("#uriLoadingFoundAuthor").popover('hide');
+		event.preventDefault();
+	});
+	
+	var timer = null;
+	$("#uriAuthor").change(function() {
+		resetPersonAuthorityCreation("Author");
+		$("#uriLoadingSpinnerAuthor").show();
+		var uri = $("#uriAuthor").val();
+		clearTimeout(timer); 
+	    timer = setTimeout(function() {
+	    	getPersonAuthority(uri, "Author");
+	    }, 1000);
+	});
+	
+	$("#closeAuthoritySearchResult").click(function() {
+		$("#selectAuthorityModel").modal('hide');
+		$('#selectAuthorityModel a:first').tab('show');
+	});
+	
+	/* Handle editor events */
+	$(".edit-editor").click(function(){
+		var editorItem = $(this).parent();
+		editPerson('Editor', editorItem[0]);
+	});
+	
+	$(".edit-editor").css('cursor', 'pointer');
+	
+	$("#addEditorButton").click(function() {
+		savePersonDetails('Editor', 'Editor');
+	});
+
+	$("#addEditorModalCancel").click(function() {
+		$("#editorModal").modal('hide');
+		resetPersonCreationModal("Editor");
+	});
+	
+	$(".remove-editor").click(removePerson);
+	$(".remove-editor").css('cursor', 'pointer');
+	
+	$("#addEditorAffiliation").click(function() {
+		var affiliationCopy = $("#editorAffiliationTemplate").clone();
+		affiliationCopy.removeAttr("id");
+		affiliationCopy.addClass("aff-info");
+		affiliationCopy.find("input").val("");
+		affiliationCopy.show();
+		$("#editorAffiliations").append(affiliationCopy);
+	});
+	
+	$("#uriEditor").change(function() {
+		resetPersonAuthorityCreation("Editor");
+		$("#uriLoadingSpinnerEditor").show();
+		var uri = $("#uriEditor").val();
+		clearTimeout(timer); 
+	    timer = setTimeout(function() {
+	    	getPersonAuthority(uri, "Editor");
+	    }, 1000);
+	});
+	
+	$("#editorIconContainer").on('click', ".popover #editorCreateAuthority", function() {
+		var uri = $("#uriLoadingFoundEditor").attr('data-authority-uri');
+		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
+			$("#editorCreateAuthority").hide();
+			$("#uriEditorLocalId").val(data['id']);
+			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Editor");
+			$("#uriLoadingFoundEditor").popover('hide');
+		});
+	});
+	
+	$("#editorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).attr('data-authority-id');
+		$("#uriEditorLocalId").val(authId);
+		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Editor");
+		$("#uriLoadingFoundEditor").popover('hide');
+		event.preventDefault();
+	});
+	
+	/* Handle Other Creators events */
+	$("#addCreatorButton").click(function(e) {
+		var target = $(e.target);
+		if(target.attr("data-creator-type") != null) {			
+			savePersonDetails(target.attr("data-creator-type"), "Creator");
+		} else {
+			savePersonDetails("", "Creator");
+		}
+	});
+	
+	$(".creatorModalLink").click(function(e) {
+		var target = $(e.target);
+		var creatorType = target.attr("data-creator-type").charAt(0).toUpperCase() + target.attr("data-creator-type").slice(1);
+		$("#creatorLabel").text("Enter "+creatorType+" Information");
+		$("#addCreatorButton").text("Add "+creatorType);
+		$("#addCreatorButton").attr("data-creator-type", target.attr("data-creator-type"));
+	});
+	
+	$("#addCreatorModalCancel").click(function() {
+		$("#creatorModal").modal('hide');
+		resetPersonCreationModal("Creator");
+	});
+	
+	$(".edit-creator").click(function(){
+		var creatorItem = $(this).parent();
+		editPerson('Creator', creatorItem[0]);
+	});
+	
+	$(".edit-creator").css('cursor', 'pointer');
+		
+	$(".remove-creator").click(removePerson);
+	$(".remove-creator").css('cursor', 'pointer');
+
+	$("#addCreatorAffiliation").click(function() {
+		var affiliationCopy = $("#creatorAffiliationTemplate").clone();
+		affiliationCopy.removeAttr("id");
+		affiliationCopy.addClass("aff-info");
+		affiliationCopy.find("input").val("");
+		affiliationCopy.show();
+		$("#creatorAffiliations").append(affiliationCopy);
+	});
+	
+	$("#uriCreator").change(function() {
+		resetPersonAuthorityCreation("Creator");
+		$("#uriLoadingSpinnerCreator").show();
+		var uri = $("#uriCreator").val();
+		clearTimeout(timer); 
+	    timer = setTimeout(function() {
+	    	getPersonAuthority(uri, "Creator");
+	    }, 1000);
+	});
+	
+	$("#creatorIconContainer").on('click', ".popover #creatorCreateAuthority", function() {
+		var uri = $("#uriLoadingFoundCreator").attr('data-authority-uri');
+		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
+			$("#creatorCreateAuthority").hide();
+			$("#uriCreatorLocalId").val(data['id']);
+			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "Creator");
+			$("#uriLoadingFoundCreator").popover('hide');
+		});
+	});
+	
+	$("#creatorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).attr('data-authority-id');
+		$("#uriCreatorLocalId").val(authId);
+		$("#creatorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "Creator");
+		$("#uriLoadingFoundCreator").popover('hide');
+		event.preventDefault();
+	});
+	
+	/* adding concepts */
+	$("#addConceptButton").click(function(e) {
+		e.preventDefault();
+		
+		var conceptId = $("#addConceptConceptSelect");
+		var conceptType = $("#addConceptTypeSelect");
+		
+		var conceptSpan = $('<span class="badge"></span>');
+		conceptSpan.attr("data-concept-uri", conceptId.val());
+		conceptSpan.attr("data-type-uri", conceptType.val());
+		
+		var text = $("#addConceptConceptSelect option:selected").text();
+		var typeName = $("#addConceptTypeSelect option:selected").text();
+		conceptSpan.text(text + " | " + typeName + " ");
+		var deleteIcon = $('<i class="fas fa-times remove-concept"></i>');
+		deleteIcon.click(removeConcept);
+		conceptSpan.append(deleteIcon);
+		$("#conceptTags").append(conceptSpan);
+		
+		$("#addConceptModal").modal('hide');
+	});
+});
+
+function allowAuthoritySearch(element){
+    if($("#firstName"+element).val() == "" && $("#lastName"+element).val()==""){
+        $("#search"+element).prop("disabled", true);
+    }
+    else{
+        $("#search"+element).prop("disabled", false);
+    }
+}
+
+/* Function to populate name in modal fetched from uri */
+function showPersonNameInModal(name, personType){
+	var personName = name;
+	
+	/* Name containing brackets
+	example: Dempsey, Hugh A. (Hugh Aylmer), 1929- */
+	if(name.includes("(")) {
+		personName = name.substring(0, name.indexOf("("));
+	}
+	
+	/* Name containing title/year
+	example: Iqbāl, Muḥammad, Sir, 1877-1938 */
+	if(personName.split(",").length > 2) {
+		personName = personName.substring(0, personName.indexOf(',', personName.indexOf(",")+1));
+	}
+	
+	/* Name containing span
+	example: Dempsey, Patrick, 1966- */
+	if(personName.includes("-")) {
+		personName = personName.trim();
+		personName = personName.substring(0, personName.lastIndexOf(' '));
+	}
+	
+	/* Name separated by comma
+	example: Dempsey, Paul Stephen */
+	if(personName.indexOf(",") != -1) {
+		$("#firstName"+personType).val(personName.substring(personName.indexOf(',')+1).trim());
+		$("#lastName"+personType).val(personName.substring(0, personName.lastIndexOf(', ')));
+	} else {
+		$("#lastName"+personType).val(personName.substring(personName.lastIndexOf(' ')+1).trim());
+		$("#firstName"+personType).val(personName.substring(0, personName.lastIndexOf(' ')));
+	}
+}
+
+/* Function to populate modal on edit */
+function editPerson(modalName, item){
+	var personItem = $(item);
+	var modalNameLCase = modalName.toLowerCase();
+	$("#firstName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-firstname"));
+	$("#lastName"+modalName).val(personItem.attr("data-"+modalNameLCase+"-lastname"));
+	$("#uri"+modalName).val(personItem.attr("data-"+modalNameLCase+"-uri"));
+	$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
+	
+	personItem.children("span").each(function(idx, elem){
+		var affInput = $("#"+modalNameLCase+"AffiliationTemplate").clone();
+		affInput.removeAttr("id");
+		affInput.addClass("aff-info");
+		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
+		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
+		affInput.find("input").val($(elem).data("affiliationName"));
+		$("#"+modalNameLCase+"Modal #"+modalNameLCase+"Affiliations").append(affInput);
+	});
+	
+	if(personItem.children("span").length > 0) {
+		$("#"+modalNameLCase+"AffiliationTemplate").hide();
+	}
+	$("#addCreatorButton").attr("data-"+modalNameLCase+"-type", personItem.attr("data-"+modalNameLCase+"type"));
+	$("#add"+modalName+"Button").text("Update "+modalName);
+	
+	$("#"+modalNameLCase+"Modal").modal('show');
+	if($("#firstName"+modalName).val() != "" || $("#lastName"+modalName).val() != ""){
+		$("#search"+modalName).prop("disabled", false);
+	}
+}
+
+/* Function to save information on closing modal */
+function savePersonDetails(personType, modalName){
+	var modalNameLCase = modalName.toLowerCase();
+	var personSpan;
+	var personTypeLCase = personType.toLowerCase();
+	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id") != null && $("#id"+modalName).attr("data-"+modalNameLCase+"-id").length > 0) {
+		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
+		personTypeLCase = personSpan.attr("data-creator-type").toLowerCase();
+	} else {
+		var id = personTypeLCase + $("."+personTypeLCase+"-item").length;
+		personSpan = $('<span id='+id+'>');
+	}
+	
+	personSpan.attr("class", "label label-warning "+personTypeLCase +"-item");
+	personSpan.html("");
+	
+	var firstname = $("#firstName"+modalName).val();
+	var lastname = $("#lastName"+modalName).val();
+	var uri = $("#uri"+modalName).val();
+	var localAuthority = $("#uri"+modalName+"LocalId").val();
+	personSpan.attr("data-"+modalNameLCase+"-firstname", firstname);
+	personSpan.attr("data-"+modalNameLCase+"-lastname", lastname);
+	personSpan.attr("data-"+modalNameLCase+"-uri", uri);
+	personSpan.attr("data-"+modalNameLCase+"-authority-id", localAuthority);
+	
+	var affiliationsList = [];
+	var affSpan = $("<span>");
+	$("#"+modalNameLCase+"Affiliations").children().each(function(idx, elem) {
+		var input = $(elem).find("input");
+		if(input.val().length!=0){
+			var affSpan = $("<span>");
+			affSpan.attr("data-affiliation-name", input.val());
+			affiliationsList.push(input.val());
+			personSpan.append(affSpan);
+		}
+	});
+	
+	var affiliationString = "";
+	if (affiliationsList.length != 0) {
+		affiliationString = " (" + $.grep(affiliationsList, Boolean).join(", ") + ")";
+	}
+	
+	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
+	var editIcon = $('<i class="far fa-edit edit-'+modalNameLCase+'"></i>')
+	var deleteIcon = $('<i class="fas fa-times remove-'+modalNameLCase+'"></i>');
+	editIcon.click(function(){
+		var personItem = $(this).parent();
+		editPerson(modalName, personItem[0]);
+	});
+	deleteIcon.click(removePerson);
+	personSpan.append(editIcon);
+	personSpan.append(deleteIcon);
+	$("#"+personTypeLCase+"List").append(personSpan);
+	$("#"+personTypeLCase+"List").append("&nbsp;&nbsp; ");
+	$("#"+modalNameLCase+"Modal").modal('hide');
+	resetPersonCreationModal(modalName);
+}
+
+
+/* Function to append final information for form submission */
+function constructPersonArray(arrayName, role, iter){
+	var creator, otherCreatorCount = 0;
+	var roleLC = role.toLowerCase();
+	if(arrayName == "creator"){
+		creator = "otherCreator";
+	} else {
+		creator = arrayName;
+	}
+	$('.'+roleLC+'-item').each(function(idx, person) {
+		var creatorSubmitCount = idx + iter;
+		var personIdField = $("<input>");
+		personIdField.attr("type", "hidden");
+		personIdField.attr("id", creator+"s" + creatorSubmitCount + ".id");
+		personIdField.attr("name", creator+"s[" + creatorSubmitCount + "].id");
+		personIdField.attr("value", $(person).attr("data-"+arrayName+"-id"));
+		$("#editForm").append(personIdField);
+		
+		var personFirstNameField = $("<input>");
+		personFirstNameField.attr("type", "hidden");
+		personFirstNameField.attr("id", creator+"s" + creatorSubmitCount + ".firstName");
+		personFirstNameField.attr("name", creator+"s[" + creatorSubmitCount + "].firstName");
+		personFirstNameField.attr("value", $(person).attr("data-"+arrayName+"-firstname"));
+		$("#editForm").append(personFirstNameField);
+		
+		var personLastNameField = $("<input>");
+		personLastNameField.attr("type", "hidden");
+		personLastNameField.attr("id", creator+"s" + creatorSubmitCount + ".lastName");
+		personLastNameField.attr("name", creator+"s[" + creatorSubmitCount + "].lastName");
+		personLastNameField.attr("value", $(person).attr("data-"+arrayName+"-lastname"));
+		$("#editForm").append(personLastNameField);
+		
+		var personRoleField = $("<input>");
+		personRoleField.attr("type", "hidden");
+		personRoleField.attr("id", creator+"s" + creatorSubmitCount + ".role");
+		personRoleField.attr("name", creator+"s[" + creatorSubmitCount + "].role");
+		personRoleField.attr("value", role);
+		$("#editForm").append(personRoleField);
+		
+		var personUriField = $("<input>");
+		personUriField.attr("type", "hidden");
+		personUriField.attr("id", creator+"s" + creatorSubmitCount + ".uri");
+		personUriField.attr("name", creator+"s[" + creatorSubmitCount + "].uri");
+		personUriField.attr("value", $(person).attr("data-"+arrayName+"-uri"));
+		$("#editForm").append(personUriField);
+		
+		var personAuthorityField = $("<input>");
+		personAuthorityField.attr("type", "hidden");
+		personAuthorityField.attr("id", creator+"s" + creatorSubmitCount + ".localAuthorityId");
+		personAuthorityField.attr("name", creator+"s[" + creatorSubmitCount + "].localAuthorityId");
+		
+		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
+		$("#editForm").append(personAuthorityField);
+		
+		$(person).children("span").each(function(idx2, affiliation) {
+			var affiliationField = $("<input>");
+			affiliationField.attr("type", "hidden");
+			affiliationField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".name");
+			affiliationField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].name");
+			affiliationField.attr("value", $(affiliation).attr("data-affiliation-name"));
+			$("#editForm").append(affiliationField);
+			
+			var affiliationIdField = $("<input>");
+			affiliationIdField.attr("type", "hidden");
+			affiliationIdField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".id");
+			affiliationIdField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].id");
+			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
+			$("#editForm").append(affiliationIdField);
+		});
+		otherCreatorCount += 1;
+	});
+	return otherCreatorCount;
+}
+
+function createConceptTags() {
+	$("#conceptTags").children("span").each(function (idx, tag) {
+		var conceptTagInput = $("<input>");
+		conceptTagInput.attr("type", "hidden");
+		conceptTagInput.attr("id", "conceptTags" + idx + ".conceptId");
+		conceptTagInput.attr("name", "conceptTags[" + idx + "].conceptId");
+		conceptTagInput.attr("value", $(tag).attr("data-concept-id"));
+		$("#editForm").append(conceptTagInput);
+		
+		var conceptTagTypeInput = $("<input>");
+		conceptTagTypeInput.attr("type", "hidden");
+		conceptTagTypeInput.attr("id", "conceptTags" + idx + ".conceptTypeId");
+		conceptTagTypeInput.attr("name", "conceptTags[" + idx + "].conceptTypeId");
+		conceptTagTypeInput.attr("value", $(tag).attr("data-concept-type-id"));
+		$("#editForm").append(conceptTagTypeInput);
+		
+		var conceptTagUri = $("<input>");
+		conceptTagUri.attr("type", "hidden");
+		conceptTagUri.attr("id", "conceptTags" + idx + ".conceptUri");
+		conceptTagUri.attr("name", "conceptTags[" + idx + "].conceptUri");
+		conceptTagUri.attr("value", $(tag).attr("data-concept-uri"));
+		$("#editForm").append(conceptTagUri);
+		
+		var conceptTagName = $("<input>");
+		conceptTagName.attr("type", "hidden");
+		conceptTagName.attr("id", "conceptTags" + idx + ".conceptName");
+		conceptTagName.attr("name", "conceptTags[" + idx + "].conceptName");
+		conceptTagName.attr("value", $(tag).attr("data-concept-name"));
+		$("#editForm").append(conceptTagName);
+		
+		var conceptTagType = $("<input>");
+		conceptTagType.attr("type", "hidden");
+		conceptTagType.attr("id", "conceptTags" + idx + ".conceptTypeName");
+		conceptTagType.attr("name", "conceptTags[" + idx + "].conceptTypeName");
+		conceptTagType.attr("value", $(tag).attr("data-type-name"));
+		$("#editForm").append(conceptTagType);
+		
+		var conceptTagTypeUri = $("<input>");
+		conceptTagTypeUri.attr("type", "hidden");
+		conceptTagTypeUri.attr("id", "conceptTags" + idx + ".conceptTypeUri");
+		conceptTagTypeUri.attr("name", "conceptTags[" + idx + "].conceptTypeUri");
+		conceptTagTypeUri.attr("value", $(tag).attr("data-type-uri"));
+		$("#editForm").append(conceptTagTypeUri);
+	});
+}
+
+function resetPersonCreationModal(modalType) {
+	var modalNameLCase = modalType.toLowerCase();
+	$("#firstName"+modalType).val("");
+	$("#lastName"+modalType).val("");
+	$("#id"+modalType).attr("data-"+modalType+"-id", "");
+	var affTemplate = $("#"+modalNameLCase+"AffiliationTemplate");
+	$("#"+modalNameLCase+"Affiliations").children().remove();
+	$("#"+modalNameLCase+"Affiliations").append(affTemplate);
+	$("#"+modalNameLCase+"AffiliationTemplate").find("input").val("");
+	$("#"+modalNameLCase+"AffiliationTemplate").show();
+	$(".aff-info").remove();
+	$("#uri"+modalType).val("");
+	if(modalType == "Creator") {
+		$("#addCreatorButton").attr("data-creator-type", "");
+		$("#creatorLabel").text("Enter Creator Information");
+		$("#addCreatorButton").text("Add Creator");
+	}
+	
+	$("#add"+modalType+"Button").text("Add "+modalType);
+	resetPersonAuthorityCreation(modalType);
+}
+
+function resetPersonAuthorityCreation(personType) {
+	$("#uriLoadingFound"+personType).hide();
+	$("#uriLoadingFailure"+personType).hide();
+	$("#uriLoadingSpinner"+personType).hide();
+	$("#uriLoadingFound"+personType).popover('hide');
+	$("#uriLoadingFailure"+personType).popover('hide');
+	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
+	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").html("");
+	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").hide();
+}
+
+function getPersonAuthority(uri, personType) {
+	
+	personType_lowerCase = personType.toLowerCase();
+	$.get([[@{/auth/authority/get?uri=}]] + uri + '&zoteroGroupId=' + [(${zoteroGroupId})], function(data) {
+		$("#uriLoadingFound"+personType).attr("data-authority-uri", data['uri']);
+		var content = "Authority <b>" + uri + "</b>";
+		if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by you:";
+			content += '<ul class="foundAuthorities">';
+			data['userAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
+		if (data['datasetAuthorityEntries'] != null && data['datasetAuthorityEntries'].length > 0) {
+			content += "<br><br>This authority entry has already been imported by someone else for this dataset:";
+			content += '<ul class="foundAuthorities">';
+			data['datasetAuthorityEntries'].forEach(function(elem) {
+				content += '<li>' + elem['name'];
+				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
+				content += '</li>';
+			});
+			content += "</ul>";
+		}
+		content += "<br><br>Do you want to create a managed authority entry?<br>" +
+					'<span id="'+personType_lowerCase+'AuthorityCreationFeedback"><button id="'+personType_lowerCase+'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+		$("#uriLoadingFound"+personType).attr("data-content", content);
+		$("#uriLoadingFound"+personType).attr("data-authority-uri", uri);
+		$("#uriLoadingFound"+personType).show();
+		$("#uriLoadingFound"+personType).popover('show');
+	})
+	.fail(function() {
+		$("#uriLoadingFailure"+personType).show();
+	 })
+    .always(function() {
+    	$("#uriLoadingSpinner"+personType).hide();
+	 });
+
+}
+
+function getUserAuthorities(modalType, personType, page) {
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/user|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+			
+  			$("#userAuthoritySearchResult").empty();
+  			var content = '';
+  			
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {
+  					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
+  					if(elem['description']==null){
+  						content += ' - </td>';
+  						}
+  					else{
+  						content +=elem['description'] + '</td>';
+  					}
+  					content += '<td style="vertical-align: middle;"><span class="user-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
+  					
+  				});
+  				
+  				$('#userAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	   getUserAuthorities(modalType, personType, page-1)
+  				    }
+  				});
+  			}  		
+  			
+		
+		$("#userAuthoritySearchResult").append(content);
+		$(".user-authority-entry").click(function() {
+			name = $(this).closest("tr").find(".name").text();
+			uri = $(this).closest("tr").find(".uri").text();
+				
+			showPersonNameInModal(name, personType)
+			$("#uri"+modalType).val( uri);
+			$("#"+personType_lowerCase+"AuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
+			$("#selectAuthorityModel").modal('hide');
+		});	
+		 	
+        },
+    	error: function(data){
+    		$('#userAuthoritySearchResult').parents('table').hide()
+    		$("#userAuthoritiesError").show();	
+    	}
+	
+	});
+}
+
+function getconceptpowerAuthorities(modalType, personType, page) {
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/conceptpower|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
+
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+			
+  			$("#conceptpowerAuthoritySearchResult").empty();
+  			
+  			var content = '';
+  				
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {	
+  					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
+  					if(elem['description']==null){
+  						content += ' - </td>';
+  						}
+  					else{
+  						content +=elem['description'] + '</td>';
+  					}
+  					content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
+  					
+  				}); 				
+  				
+  				$('#conceptpowerAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	getconceptpowerAuthorities(modalType, personType, page)
+  				    }
+  				});
+  				
+  			}
+  			
+		$("#conceptpowerAuthoritySearchResult").append(content); 	
+		$(".conceptpower-authority-entry").click(function() {
+			name = $(this).closest("tr").find(".name").text();
+			uri = $(this).closest("tr").find(".uri").text();
+			
+			showPersonNameInModal(name, personType)
+			$("#uri"+modalType).val( uri);
+			
+			createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&source=conceptpower&uri=' + uri;						
+			$.ajax({
+			  		dataType: "json",
+			  		type: 'POST',
+			  		url: createManageAuthorityURL,
+			  		async:false,
+			  		success: function(data) {
+			  			$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+			  		},
+				error: function(data){					
+					$("#uri"+modalType).val("");
+		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+				}
+				});				
+						
+			$("#selectAuthorityModel").modal('hide');
+		});	
+		
+        },
+	error: function(data){
+		$('#conceptpowerAuthoritySearchResult').parents('table').hide()
+		$("#conceptpowerAuthoritiesError").show();	
+	}
+	
+	});
+}
+
+let removePerson = function removePerson(e) {
+	var deleteIcon = e.currentTarget;
+	var person = $(deleteIcon).parent();
+	person.remove();
+}
+
+let removeConcept = function removeConcept(e) {
+	var deleteIcon = e.currentTarget;
+	var concept = $(deleteIcon).parent();
+	concept.remove();
+}
+
+$(document).ready(function() {
+	if([[${citation}]] == null){
+	$("#items").val("${defaultItemType}");
+	}
+	loadFields();
+	$('#items').on("change", function(e){
+		loadFields();
+	});   
+	
+});
+
+function loadFields() {
+	var itemType = $('#items option:selected').val()
+	$("#displayMessage").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+		" Loading form fields");
+	$("#messageModal").modal('show');
+	$.ajax({
+		url : [[@{/auth/items/}]] + itemType + '/fields',
+		type : 'GET',
+		success: function(changedFields){
+			$('form input').each(function(idx, elem) {
+				$(elem).parent().closest('tr').hide();
+			});
+			for(i=0;i<changedFields.length;i++){
+				var fieldId = changedFields[i];
+				if (fieldId == "date") {
+					fieldId = "dateFreetext";
+				}
+				$('form input#'+fieldId).parent().closest('tr').show();
+			}
+			$('#messageModal').modal('hide');
+			
+		},
+		error: function(){
+			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+			"Error loading the form fields. Try again later.");
+			$('#messageModal').modal('show');
+			setTimeout(function() {
+				$('#messageModal').modal('hide');
+		  	}, 3000);
+			
+		}
+	}); 
+	$.ajax({
+		url : [[@{/auth/items/}]] + itemType + '/creators',
+		
+		type : 'GET',
+		success: function(creators){
+			$('.creator-row').each(function(idx, elem) {
+				$(elem).hide();
+			});
+			for(i=0;i<creators.length;i++){
+				if($('[id='+creators[i]).length > 0) {
+					$('[id='+creators[i]).parent().closest('tr').addClass("creator-row");
+					$('[id='+creators[i]).parent().closest('tr').show();
+				}
+				else if(creators[i]!= 'editor' && creators[i]!= 'author'){
+					var creatorRow = $("<tr>");
+					creatorRow.css("display", "table-row");
+					creatorRow.addClass("creator-row");
+					var creatorLabel = $("<td>");
+					creatorLabel.addClass("creator");
+					creatorLabel.css("text-transform", "capitalize");
+					creatorLabel.attr("id", creators[i]);
+					creatorLabel.append(creators[i]);
+					creatorRow.append(creatorLabel);
+					var creatorData = $("<td>");
+					var creatorList = $("<span>");
+					creatorList.attr("id",creators[i]+"List");
+					creatorList.css("font-size", "18px");
+					creatorData.append(creatorList);
+					var addIconDiv = $("<div>");
+					addIconDiv.addClass("pull-right");
+					var iconLink = $("<a>");
+					
+					iconLink.attr("data-toggle","modal");
+					iconLink.attr("data-creator-type", creators[i]);
+					iconLink.attr("data-target","#creatorModal");
+					var iconImg = $("<i>");
+					iconImg.addClass("fas fa-plus-circle");
+					iconLink.append(iconImg);
+					iconLink.append("Add "+creators[i]);
+					addIconDiv.append(iconLink);
+					creatorData.append(addIconDiv);
+					creatorRow.append(creatorData);
+					creatorRow.insertAfter($('.creator').last().parent());	
+					$("#creatorLabel").css("text-transform", "capitalize");
+					$("#creatorLabel").text("Enter "+creators[i]+" Information");
+					$("#addCreatorButton").css("text-transform", "capitalize");
+					$("#addCreatorButton").text("Add "+creators[i]);
+					$("#addCreatorButton").attr("data-creator-type", creators[i]);
+					iconLink.click(function(e) {
+						creatorLinkHandler($(e.target));
+					});
+				}
+
+			}
+		},
+		error: function(){
+			$("#displayMessage").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+			"Error loading the creators. Try again later.");
+			$('#messageModal').modal('show');
+			setTimeout(function() {
+				$('#messageModal').modal('hide');
+		  	}, 3000);
+			
+		}
+	});
+}
+function creatorLinkHandler(target) {
+	var creatorType = target.attr("data-creator-type").charAt(0).toUpperCase() + target.attr("data-creator-type").slice(1);
+	$("#creatorLabel").text("Enter "+creatorType+" Information");
+	$("#addCreatorButton").text("Add "+creatorType);
+	$("#addCreatorButton").attr("data-creator-type", target.attr("data-creator-type"));
+}
+
+</script>
+</head>
+<body>
+<div layout:fragment="content">
+	<ol class="breadcrumb">
+		<li><a th:href="@{/}">Home</a></li>
+		<li><a th:href="@{|/auth/group/${zoteroGroupId}/items|}">Group</a></li>
+		<li class="active">[[${citation.key}]]</li>
+	</ol>
+	
+	<h2>
+		<th:block th:each="author,status : ${citation.authors}">
+			<strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
+			<span th:if="${!status.last}">; </span>
+		</th:block>
+		<th:block th:each="editor,status : ${citation.editors}">
+			<strong>[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span></strong>
+			<span th:if="${!status.last}">; </span>
+		</th:block>
+		<em>[[${citation.title}]]</em>
+		<span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
+	 	  [[(${citation.dateFreetext})]]
+	 	</span>
+	</h2>
+
+	<div class="modal fade" id="messageModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div id="displayMessage" class="modal-body"></div>
+			</div>
+		</div>
+	</div>
+	
+	<form action="#" th:action="${!#strings.isEmpty(citation.key)} ? 
+								@{|/auth/group/${zoteroGroupId}/items/${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|} :
+								@{|/auth/group/${zoteroGroupId}/items/create|}" 
+				th:object="${form}" method="POST" id="editForm">
+				
+		<table class="table table-striped">
+			<tr th:if = "${#strings.isEmpty(citation.key)}">
+				<td width="20%">Collection</td>
+				<td>
+					<select class="form-control" th:field="*{collectionId}" >
+     					<option value="">&nbsp;</option>
+     					<option th:each = "citationCollection: ${citationCollections}" 
+     							th:value="${citationCollection.key}" 
+     							th:text="${citationCollection.name}" items="${citationCollections}" />
+					<select>
+				</td>
+			</tr>
+			
+			<tr th:style="${#strings.isEmpty(citation.key)}? 'display:none' " >
+				<td width="20%">Item Key</td>
+				<td>[[${citation.key}]]</td>
+				<input type="hidden" th:name="key" th:id="key" th:value="${citation.key}"/>
+			</tr>
+			
+			<tr>
+				<td width="20%">Citation Type</td>
+				<td>
+					
+					<select id="items" name="itemType" data-show-icon="true" class="form-control selectpicker">
+						<th:block th:each="enumValues : ${T(edu.asu.diging.citesphere.model.bib.ItemType).values()}">
+   						 	<div th:with="iconLabel=${@iconsResource.getProperty(enumValues + '_label')}">	
+							<option th:selected="${enumValues == citation.itemType}" th:value="${enumValues}" 
+								th:text="${#strings.isEmpty(iconLabel)} ? ${enumValues}: ${iconLabel}"> 
+			
+    						</option>
+    			
+    						</div>
+    					</th:block>
+					<select>
+				</td>
+			</tr>
+			
+			<tr th:style="${!#lists.contains(fields,'title')}? 'display:none'">
+				<td>Title</td>
+				<td>
+					<input  th:id="title" th:name="title" type="text" class="form-control" placeholder="Title" 
+							th:value="${!#strings.isEmpty(form.title)} ? ${form.title} : ${citation.title}" />
+				</td>
+			</tr>
+			
+			<tr th:style="${!#lists.contains(fields, 'shortTitle') }? 'display:none'">
+				<td>Short Title</td>
+					<td>
+					<input th:id="shortTitle" th:name="shortTitle" type="text" class="form-control" placeholder="Short title" 
+						th:value="${citation.shortTitle}" /></td>
+			</tr>
+			
+			<tr th:style="${!#lists.contains(fields, 'date')}? 'display:none'">
+				<td>Date</td>
+				<td>
+				<input th:id="dateFreetext" th:name="dateFreetext" type="text" class="form-control" placeholder="Date" 
+					th:value="${!#strings.isEmpty(form.dateFreetext)} ? ${form.dateFreetext} : ${citation.dateFreetext}" />
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="creator" id="author">Authors</td>
+				<td>
+					<span id="authorList" style="font-size: 18px">
+						<th:block th:each="author,status : ${citation.authors}">	
+						<span th:id="|author${status.index}|" class="label label-primary author-item" th:data-author-id="|author${status.index}|" th:data-author-firstname="${author.firstName}" th:data-author-lastname="${author.lastName}" th:data-author-uri="${author.uri}" th:data-creator-type="author" th:data-author-authority-id="${author.localAuthorityId}">
+						<th:block th:each="aff,affStatus : ${author.affiliations}">
+							<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|author${status.index}-aff${affStatus.index}|">
+							</span>
+						</th:block>
+								[[${author.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
+								<th:block th:each="aff:${author.affiliations}">
+									<span th:remove="tag" th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
+								</th:block>
+									&nbsp;
+							<i class="far fa-edit edit-author" style="cursor: pointer;"></i>
+									&nbsp;
+							<i class="fas fa-times remove-author" style="cursor: pointer;"></i>
+						</span>
+							&nbsp;&nbsp;
+						</th:block>
+					</span>
+						<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="fas fa-plus-circle"></i> Add Author</a></div>
+				</td>
+			</tr>
+			<tr>
+				<td class="creator" id="editor">Editors</td>
+				<td>
+					<span id="editorList" style="font-size: 18px">
+						<th:block th:each="editor,status:${citation.editors}">
+						<span th:id="|editor${status.index}|" class="label label-info editor-item" th:data-editor-id="|editor${status.index}|" th:data-editor-firstname="${editor.firstName}" th:data-editor-lastname="${editor.lastName}" th:data-editor-uri="${editor.uri}" th:data-editor-authority-id="${editor.localAuthorityId}" th:data-creator-type="editor">
+						<th:block th:each="aff,affStatus:${editor.affiliations}"> 
+							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|editor${status.index}-aff${affStatus.index}|"></span>
+						</th:block>
+						  [[${editor.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
+						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
+							&nbsp;
+							<i class="far fa-edit edit-editor"></i>
+							&nbsp;
+						<i class="fas fa-times remove-editor"></i>
+								</span>
+							&nbsp;&nbsp;
+				        </th:block>
+					</span>
+							<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
+				</td>
+			</tr>
+			<th:block th:each="curCreator:${creatorMap}">
+				
+				<tr th:style="${ (curCreator.value != 'author') and (curCreator.value != 'editor')} ? 'display:none'">
+				<td class="creator" th:id="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" >[[${curCreator.value}]]</td>
+				<td> 
+					<div th:with="role=${#strings.toLowerCase(#strings.substringAfter(curCreator.key, '_item_attribute_label_'))}">
+					
+					<span th:id="|${role}List|" style="font-size: 18px">
+					<span th:each="creator,loop:${citation.otherCreators}" th:if="${#strings.equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
+				 		<span th:id="|${role}${loop.index}|" th:class="|label label-info ${role}-item|" th:data-creator-id="${creator.id}" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
+				 			<th:block th:each="aff:${creator.person.affiliations}"> 
+				 				<span th:data-affiliation-name="${aff.name}"></span>
+				 			</th:block>
+								[[${creator.person.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
+							<th:block th:each="aff:${creator.person.affiliations}">[[${aff.name}]]</th:block>
+							&nbsp;<i class="far fa-edit edit-creator"></i>
+									<i class="fas fa-times remove-creator"></i>
+						</span>
+							&nbsp;&nbsp;
+					</span>
+					</span>
+					</div>
+					
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add [[${curCreator.value}]]</a></div>
+				</td>
+				</tr>
+				</span>
+		</th:block>
+			
+		
+	 <tr th:style="${!#lists.contains(fields, 'publicationTitle') }? 'display:none'">
+		<td>Publication Title</td>
+		<td>
+		<input th:id="publicationTitle" th:name="publicationTitle" type="text" class="form-control" placeholder="Publication Title" 
+			th:value="${!#strings.isEmpty(form.publicationTitle)} ? ${form.publicationTitle} : ${citation.publicationTitle}" />
+		</td>
+	</tr>
+	
+	<tr th:style="${!#lists.contains(fields, 'journalAbbreviation')}? 'display:none'">
+		<td>Journal Abbreviation</td>
+		<td>
+		<input th:id="journalAbbreviation" th:name="journalAbbreviation" type="text" class="form-control" placeholder="Journal Abbreviation" 
+		th:value="${!#strings.isEmpty(form.journalAbbreviation)} ? ${form.journalAbbreviation} : ${citation.journalAbbreviation}" /></td>
+	</tr>
+	 
+	 <tr th:style="${!#lists.contains(fields, 'volume')}? 'display:none'">
+		<td>Volume</td>
+		<td>
+			<input th:id="volume" th:name="volume" type="text" class="form-control" placeholder="Volume" 
+			th:value="${!#strings.isEmpty(form.volume)} ? ${form.volume} : ${citation.volume}" />
+		</td>
+	</tr>
+	
+	<tr th:style="${!#lists.contains(fields, 'issue')}? 'display:none'">
+		<td>Issue</td>
+		<td>
+			<input th:id="issue" th:name="issue" type="text" class="form-control" placeholder="Issue"
+			 th:value="${!#strings.isEmpty(form.issue)} ? ${form.issue} : ${citation.issue}" /></td>
+	</tr>
+	
+	<tr th:style="${!#lists.contains(fields, 'pages')}? 'display:none'">
+		<td>Pages</td>
+		<td>
+			<input th:name="pages" th:id="pages" type="text" class="form-control" placeholder="Pages" 
+			th:value="${!#strings.isEmpty(form.pages)} ? ${form.pages} : ${citation.pages}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'series')}? 'display:none'">
+	<td>Series</td>
+		<td>
+			<input th:name="series" th:id="series" type="text" class="form-control" placeholder="Series" 
+			th:value="${!#strings.isEmpty(form.series)} ? ${form.series} : ${citation.series}" /></td>
+	</tr>
+	
+	<tr th:style="${!#lists.contains(fields, 'seriesTitle')}? 'display:none'">
+	<td>Series Title</td>
+		<td>
+			<input th:name="seriesTitle" th:id="seriesTitle" type="text" class="form-control" placeholder="Series Title" 
+			th:value="${!#strings.isEmpty(form.seriesTitle)} ? ${form.seriesTitle} : ${citation.seriesTitle}" /></td>
+	</tr>
+	<tr th:style="${!#lists.contains(fields, 'seriesText')}? 'display:none'">
+    <td>Series Text</td>
+      <td>
+      		<input th:name="seriesText" th:id="seriesText" type="text" class="form-control" placeholder="Series Text" 
+      		th:value="${!#strings.isEmpty(form.seriesText)} ? ${form.seriesText} : ${citation.seriesText}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'url')}? 'display:none'">
+	<td>URL</td>
+		<td>
+			<input th:name="url" th:id="url" type="text" class="form-control" placeholder="Url" 
+			th:value="${!#strings.isEmpty(form.url)} ? ${form.url} : ${citation.url}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'language')}? 'display:none'">
+	<td>Language</td>
+		<td>
+			<input th:name="language" th:id="language" type="text" class="form-control" placeholder="Language" 
+			th:value="${!#strings.isEmpty(form.language)} ? ${form.language} : ${citation.language}" /></td>
+	</tr>
+	
+	<tr th:style="${!#lists.contains(fields, 'doi')}? 'display:none'">
+	<td>DOI</td>
+		<td>
+			<input ht:name="doi" th:id="doi" type="text" class="form-control" placeholder="DOI" 
+			th:value="${!#strings.isEmpty(form.doi)} ? ${form.doi} : ${citation.doi}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'issn')}? 'display:none'">
+	<td>ISSN</td>
+		<td>
+			<input th:name="issn" th:id="issn" type="text" class="form-control" placeholder="ISSN" 
+			th:value="${!#strings.isEmpty(form.issn)} ? ${form.issn} : ${citation.issn}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'archive')}? 'display:none'">
+	<td>Archive</td>
+		<td>
+			<input th:name="archive" th:id="archive" type="text" class="form-control" placeholder="Archive" 
+			th:value="${!#strings.isEmpty(form.archive)} ? ${form.archive} : ${citation.archive}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'archiveLocation')}? 'display:none'">
+	<td>Archive Location</td>
+		<td>
+			<input th:name="archiveLocation" th:id="archiveLocation" type="text" class="form-control" placeholder="Archive Location" 
+			th:value="${!#strings.isEmpty(form.archiveLocation)} ? ${form.archiveLocation} : ${citation.archiveLocation}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'libraryCatalog')}? 'display:none'">
+	<td>Library Catalog</td>
+		<td>
+			<input th:name="libraryCatalog" th:id="libraryCatalog" type="text" class="form-control" placeholder="Library Catalog" 
+			th:value="${!#strings.isEmpty(form.libraryCatalog)} ? ${form.libraryCatalog} : ${citation.libraryCatalog}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'callNumber')}? 'display:none'">
+	<td>Call Number</td>
+		<td>
+			<input th:name="callNumber" th:id="callNumber" type="text" class="form-control" placeholder="Call Number" 
+			th:value="${!#strings.isEmpty(form.callNumber)} ? ${form.callNumber} : ${citation.callNumber}" /></td>
+	</tr>
+
+	<tr th:style="${!#lists.contains(fields, 'rights')}? 'display:none'">
+	<td>Rights</td>
+		<td>
+			<input th:name="rights" th:id="rights" type="text" class="form-control" placeholder="Rights" 
+			th:value="${!#strings.isEmpty(form.rights)} ? ${form.rights} : ${citation.rights}" /></td>
+	</tr>
+
+	<tr>
+		<td>Concepts</td>
+		<td>
+		<div id="conceptTags">
+			<th:block th:each= "tag:${citation.conceptTags}">
+				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="fas fa-times remove-concept"></i></span>
+			</th:block>
+		</div>
+		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
+		</td>
+	</tr>
+
+			
+		</table>
+		<button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
+		<span th:if="${itemId == null}">
+			<a th:href="@{|/auth/group/${zoteroGroupId}/items|}" class="btn btn-default">
+		          <i class="fa fa-times"></i>&nbsp;Cancel
+            </a>
+		</span>
+		<span th:if="${itemId != null}">
+               <a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}" class="btn btn-default">
+		          <i class="fa fa-times"></i>&nbsp;Cancel
+               </a>
+        </span>
+	</form>
+	
+	
+	<!-- Author Modal -->
+<div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="authorLabel">Enter Author Information</h4>
+      </div>
+      <div class="modal-body">
+      	  <div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idAuthor">
+      	  </div>
+          <div class="form-group">
+		    <label for="firstNameAuthor">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameAuthor">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
+		  </div>
+		  <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
+						style="margin-left: 80%" disabled>Search Author 
+						<i id="searchAuthorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+		  </button>
+		  <div class="form-group">
+		    <label for="uriAuthor">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
+			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundAuthor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureAuthor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriAuthorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
+		  </div>
+		  <div id="authorAffiliations">
+		  <div id="authorAffiliationTemplate" class="form-group">
+		    <label for="affiliationAuthor">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="addAuthorModalCancel">Close</button>
+        <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Editor Modal -->
+<div class="modal fade" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="editorLabel">Enter Editor Information</h4>
+      </div>
+      <div class="modal-body">
+      	<div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idEditor">
+      	  </div>
+          <div class="form-group">
+		    <label for="firstNameEditor">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameEditor" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameEditor">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameEditor" placeholder="Last Name">
+		  </div>
+		  
+		  <div>
+			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchEditor"
+						style="margin-left: 80%" disabled>Search Editor 
+						<i id="searchEditorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+			</button>
+		  </div>
+		  
+		  <div class="form-group">
+		    <label for="uriEditor">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriEditor" placeholder="URI">
+			    <div id="editorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerEditor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundEditor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureEditor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriEditorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
+		  </div>
+		  <div id="editorAffiliations">
+		  <div id="editorAffiliationTemplate" class="form-group">
+		    <label for="editorAffiliation">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addEditorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" id="addEditorModalCancel" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="addEditorButton" type="button" class="btn btn-primary">Add Editor</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Other Creator Modal -->
+<div class="modal fade" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="creatorLabel">Enter Creator Information</h4>
+      </div>
+      <div class="modal-body">
+      	  <div class="form-group">
+      	  	<input type="hidden" class="form-control" id="idCreator">
+      	  </div>
+          <div class="form-group">
+		    <label for="firstNameCreator">First Name:</label>
+		    <input type="text" class="form-control" id="firstNameCreator" placeholder="First Name">
+		  </div>
+		  <div class="form-group">
+		    <label for="lastNameCreator">Last Name:</label>
+		    <input type="text" class="form-control" id="lastNameCreator" placeholder="Last Name">
+		  </div>
+		  <div>
+			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchCreator"
+				style="margin-left: 80%" disabled> Search Creator 
+				<i id="searchCreatorSpinner" class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+			</button>
+		  </div>
+		  <div class="form-group">
+		    <label for="uriCreator">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control" id="uriCreator" placeholder="URI">
+			    <div id="creatorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerCreator" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundCreator" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureCreator" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriCreatorLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
+		  </div>
+		  <div id="creatorAffiliations">
+		  <div id="creatorAffiliationTemplate" class="form-group">
+		    <label for="affiliationCreator">Affiliation:</label>
+		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div>
+		  <div>
+		  <div class="text-right"><a id="addCreatorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+      	  </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="addCreatorModalCancel">Close</button>
+        <button id="addCreatorButton" type="button" class="btn btn-primary">Add Creator</button>
+      </div>
+    </div>
+  </div>
+</div> <!-- End modal -->
+
+
+<!-- 		  Search and Select Authority Modal -->
+<div id="selectAuthorityModel" class="modal fade" tabindex="-1"
+	role="dialog" aria-labelledby="selectAuthorityLabel">
+	<div class="modal-dialog" style="width: 1000px" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="authorLabel">Authority Search Result</h4>
+			</div>
+			<div class="modal-body">
+				<div role="tabpanel">
+					<!-- Nav tabs -->
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation" class="active">
+							<a href="#userAuthoritiesTabContent" aria-controls="uploadTab"
+								role="tab" data-toggle="tab">Authorities imported by you</a>
+						</li>
+						<li role="presentation">
+							<a href="#conceptpowerAuthoritiesTabContent"
+								aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from Conceptpower</a>
+						</li>
+					</ul>
+					<!-- Tab panes -->
+					<div class="tab-content">
+						<div role="tabpanel" class="tab-pane active" id="userAuthoritiesTabContent">
+							<ul id="userAuthority-pagination-top" class="pagination-sm"></ul>
+							<div id="userAuthoritiesError" class="text-warning"
+								style="display: none">
+								<span> Error occurred while importing user authorities </span>
+							</div>
+							<table class="table table-striped table-bordered table-fixed">
+								<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+								<tbody id="userAuthoritySearchResult">
+								</tbody>
+							</table>
+						</div>
+			
+						<div role="tabpanel" class="tab-pane" id="conceptpowerAuthoritiesTabContent">
+							<ul id="conceptpowerAuthority-pagination-top" class="pagination-sm"></ul>
+							<div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
+								<span> Error occurred while searching authorities in conceptpower </span>
+							</div>
+							<table class="table table-striped table-bordered table-fixed">
+								<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+								<tbody id="conceptpowerAuthoritySearchResult">
+								</tbody>
+							</table>
+						</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default"
+					id="closeAuthoritySearchResult">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- End modal -->
+
+<!-- Concept Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="addConceptModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Concept</h4>
+      </div>
+      <div class="modal-body">
+        <form id="conceptForm">
+        <p>
+        <label>Concept</label>
+        <select class="form-control" id="addConceptConceptSelect">
+        <th:block th:each="concept:${concepts}">
+        	<option th:value="${concept.uri}">[[${concept.name}]]</option>
+        </th:block>
+        </select>
+        </p>
+        
+        <p style="padding-top: 20px;">
+        <label>Type of Concept</label>
+        <select class="form-control"  id="addConceptTypeSelect">
+        <th:block th:each="type:${conceptTypes}">
+        	<option th:value="${type.uri}">[[${type.name}]]</option>
+        </th:block>
+        </select>
+        </p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="addConceptButton">Add</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+</div>
+
+</body>
+</html>

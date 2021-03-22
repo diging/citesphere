@@ -24,8 +24,6 @@
 	<context:component-scan
 		base-package="edu.asu.diging.citesphere.web, edu.asu.diging.citesphere.api, edu.asu.diging.citesphere.config.web"></context:component-scan>
 	
-	<beans:bean
-		class="org.springframework.data.web.config.SpringDataWebConfiguration" />
 	<mvc:annotation-driven>
 		<mvc:argument-resolvers>
 			<ref bean="sortResolver" />
@@ -39,19 +37,5 @@
 		class="org.springframework.data.web.PageableHandlerMethodArgumentResolver">
 		<constructor-arg ref="sortResolver" />
 	</bean>
-	
-	<beans:bean id="tilesViewResolver"
-		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
-		<beans:property name="viewClass"
-			value="org.springframework.web.servlet.view.tiles3.TilesView" />
-	</beans:bean>
-	<beans:bean id="tilesConfigurer"
-		class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
-		<beans:property name="definitions">
-			<beans:list>
-				<beans:value>/WEB-INF/tiles-defs.xml</beans:value>
-			</beans:list>
-		</beans:property>
-	</beans:bean>
 
 </beans:beans>

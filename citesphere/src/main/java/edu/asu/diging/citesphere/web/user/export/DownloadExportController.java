@@ -66,7 +66,7 @@ public class DownloadExportController {
             }
         } else {
             filename = task.getFilename();
-            exportFile = storageManager.getFolderPath(authentication.getName(), id);
+            exportFile = storageManager.getFolderPath(authentication.getName(), id) + File.separator + filename;
         }
         
         if (exportFile == null || exportFile.trim().isEmpty() || filename == null || filename.trim().isEmpty()) {

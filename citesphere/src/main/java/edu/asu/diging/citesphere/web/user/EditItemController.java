@@ -2,8 +2,12 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
@@ -61,13 +66,14 @@ public class EditItemController {
 
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/edit")
     public String showPage(Authentication authentication, Model model, CitationForm form,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId)
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
         ICitation citation;
         try {
             citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         } catch (CannotFindCitationException e) {
-            return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
+            return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
         }
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("citation", citation);
@@ -80,13 +86,24 @@ public class EditItemController {
         citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
                 .forEach(f -> fields.add(f.getFilename()));
         model.addAttribute("fields", fields);
-        model.addAttribute("creatorMap", properties.entrySet());
+        Set<Entry<Object, Object>> labels = properties.entrySet();
+        Map<String, String> labelsRoles = new HashMap<>();
+        labels.forEach(x -> labelsRoles.put(x.getKey().toString(), x.getValue().toString()));
+        for (String role : citation.getOtherCreatorRoles()) {
+            if (!labelsRoles.containsKey("_item_attribute_label_" + role)) {
+                labelsRoles.put("_item_attribute_label_" + role, org.springframework.util.StringUtils.capitalize(role));
+            }
+        }
+        model.addAttribute("creatorMap", labelsRoles.entrySet());
 
         model.addAttribute("concepts", conceptManager.findAll(userManager.findByUsername(authentication.getName())));
         model.addAttribute("conceptTypes",
                 typeManager.getAllTypes(userManager.findByUsername(authentication.getName())));
-
-        return "auth/group/items/item/edit";
+        model.addAttribute("index", index);
+        model.addAttribute("page", page);
+        model.addAttribute("collectionId", collectionId);
+        model.addAttribute("sortBy", sortBy);
+        return "auth/group/editItem";
     }
 
     /**
@@ -103,13 +120,12 @@ public class EditItemController {
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
     public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId)
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
             throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
             ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         // load authors and editors before detaching
-        loadRelations(citation);
-        citationManager.detachCitation(citation);
         citationHelper.updateCitation(citation, form, (IUser) authentication.getPrincipal());
         try {
             citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
@@ -136,23 +152,20 @@ public class EditItemController {
             citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), form.getItemType())
                     .forEach(f -> formFields.add(f.getFilename()));
             model.addAttribute("formFields", formFields);
-
-            return "auth/group/items/item/edit/conflict";
+            model.addAttribute("index", index);
+            model.addAttribute("page", page);
+            model.addAttribute("collectionId", collectionId);
+            model.addAttribute("sortBy", sortBy);
+            return "auth/group/editConflict";
         }
-        return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}";
-    }
-    
-    private void loadRelations(ICitation citation) {
-        citation.getAuthors().forEach(a -> a.getAffiliations().size());
-        citation.getEditors().forEach(e -> e.getAffiliations().size());
-        citation.getOtherCreators().forEach(e -> e.getPerson().getAffiliations().size());
-        citation.getConceptTags().size();
+        return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/conflict/resolve", method = RequestMethod.POST)
     public String resolveConflict(@ModelAttribute CitationForm form, Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            RedirectAttributes redirectAttrs)
+            RedirectAttributes redirectAttrs, @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ICitation outdatedCitation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
                 itemId);
@@ -162,7 +175,7 @@ public class EditItemController {
         updateForm(citation, form, changedFields);
 
         redirectAttrs.addFlashAttribute("resolvedForm", form);
-        return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}/edit";
+        return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}/edit?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }
 
     private List<String> compare(ICitation citation, CitationForm form) {

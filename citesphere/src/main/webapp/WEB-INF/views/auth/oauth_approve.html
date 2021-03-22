@@ -1,0 +1,33 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+	<link th:href="@{/resources/bootstrap-4.1.2/login.css}" rel="stylesheet"/>
+</head>
+<body>
+<div layout:fragment="content">
+	<div class="row">
+	<div class="col-sm"></div>
+	<div class="jumbotron col-sm">
+	<b>Do you authorize [[${clientId}]] access to your account on Citesphere (and therefore Zotero)?</b>
+	<form action="#" th:action="@{/api/oauth/authorize}" method="POST" name="confirmationForm" id="confirmationForm">
+		<input name="user_oauth_approval" value="true" type="hidden"/>
+	    <input type="hidden" name="client_id" th:value="${authorizationRequest.clientId}" />
+	    <span th:each="responseType : ${authorizationRequest.responseTypes}">
+	    	<input type="hidden" name="response_type" th:value="${responseType}" />
+	    </span>
+	    
+	    <div style="margin-top: 15px; margin-bottom: 15px;">
+		    <span th:each="scope : ${scopes}">
+			    <input type="radio" th:name="${scope.key}" value="true">  Approve
+			    &nbsp; &nbsp; &nbsp;
+			    <input type="radio" th:name="${scope.key}" value="false">  Deny
+		    </span>
+	    </div>
+	    <input class="form-control" name="authorize" value="Authorize" type="submit"/>
+	</form>
+    
+</div>
+<div class="col-sm"></div>
+</div>
+</div>
+</body>
+</html>

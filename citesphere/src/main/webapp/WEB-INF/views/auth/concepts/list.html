@@ -1,0 +1,39 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
+<link th:href="@{/resources/notify/animate.css}" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content">
+<h2>Concepts</h2>
+
+<p>
+<a th:href="@{add}" class="btn btn-primary btn-sm">Add</a>
+</p> 
+
+
+<table class="table table-striped table-bordered">
+	<tr>
+		<th width="20%">URI</th>
+		<th>Name</th>
+		<th>Description</th>
+		<th>Created on</th>
+		<th>Created by</th>
+		<th></th>
+	</tr>
+	<tr th:id="'tr-'+${concept.id}" th:each="concept : ${concepts}">
+		<td><span th:text="${concept.uri}"></span></td>
+		<td><span th:text="${concept.name}"></span></td>
+		<td><span th:text="${concept.description}"></span></td>
+		
+		<td><span class="date" th:text="${concept.createdOn}"></span></td>
+		<td><span th:text="${concept.owner.firstName + ' ' + concept.owner.lastName}"></span></td>
+		<td><a th:href="@{'/auth/concepts/' + ${concept.id} + '/edit'}" /><i class="far fa-edit" title="Edit"></i></a></td>
+		</tr>
+	</th:forEach>
+</table>
+</div>
+</body>
+</html>
+
+

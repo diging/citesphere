@@ -11,6 +11,7 @@ import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.DownloadExportException;
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTooBigException;
@@ -75,7 +77,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
 
     @Value("${_citesphere_exporter_api_token}")
     private String citesphereExporterToken;
-    
+
     @Value("${_distributed_exporter_download_path}")
     private String exportDownloadFolder;
 
@@ -119,7 +121,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
     @Override
     public void export(ExportType exportType, IUser user, String groupId, String collectionId)
             throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException,
-            ExportTooBigException, ZoteroHttpStatusException {
+            ExportTooBigException, ZoteroHttpStatusException, AccessForbiddenException {
 
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
@@ -154,7 +156,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
     @Override
     public void distributedExport(ExportType exportType, IUser user, String groupId, String collectionId)
             throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException,
-            ExportTooBigException, ZoteroHttpStatusException {
+            ExportTooBigException, ZoteroHttpStatusException, AccessForbiddenException {
 
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
@@ -187,15 +189,17 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
         IExportJob job = jobManager.createJob(JobStatus.PREPARED, task.getId(), user.getUsername());
         job = jobManager.save(job);
 
-        String token = tokenService.generateJobApiToken(job);
+        sendJobMessage(job);
+    }
+
+    @Override
+    public void retryExport(IExportJob job) {
         try {
-            kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.REFERENCES_EXPORT_TOPIC);
-        } catch (MessageCreationException e) {
-            logger.error("Could not send Kafka message.", e);
-            job.setStatus(JobStatus.FAILURE);
-            job.getPhases().add(new JobPhase(JobStatus.FAILURE, e.getMessage()));
-            jobManager.save(job);
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not sleep.", e);
         }
+        sendJobMessage(job);
     }
 
     /**
@@ -205,7 +209,9 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
      * @throws DownloadExportException
      */
     /*
-     * Adapted from: https://www.codejava.net/java-se/networking/use-httpurlconnection-to-download-file-from-an-http-url
+     * Adapted from:
+     * https://www.codejava.net/java-se/networking/use-httpurlconnection-to-download
+     * -file-from-an-http-url
      */
     @Override
     public String getDistributedExportResult(IExportTask task) throws DownloadExportException {
@@ -225,24 +231,23 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
         } catch (IOException e1) {
             throw new DownloadExportException(e1);
         }
-        
+
         if (responseCode == HttpURLConnection.HTTP_OK) {
             String fileName = "";
             String disposition = httpConn.getHeaderField("Content-Disposition");
-            
+
             if (disposition != null) {
                 // extracts file name from header field
                 int index = disposition.indexOf("filename=");
                 if (index > -1) {
-                    fileName = disposition.substring(index + 10,
-                            disposition.length() - 1);
+                    fileName = disposition.substring(index + 10, disposition.length() - 1);
                 }
-            } 
-            
+            }
+
             if (fileName.trim().isEmpty()) {
                 fileName = task.getId() + "_" + task.getCreatedOn() + "." + task.getExportType().getFileExtension();
             }
- 
+
             InputStream inputStream;
             try {
                 inputStream = httpConn.getInputStream();
@@ -256,7 +261,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
             } catch (FileNotFoundException e) {
                 throw new DownloadExportException(e);
             }
- 
+
             int bytesRead = -1;
             byte[] buffer = new byte[1024];
             try {
@@ -302,4 +307,17 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
             }
         }
     }
+
+    private void sendJobMessage(IExportJob job) {
+        String token = tokenService.generateJobApiToken(job);
+        try {
+            kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.REFERENCES_EXPORT_TOPIC);
+        } catch (MessageCreationException e) {
+            logger.error("Could not send Kafka message.", e);
+            job.setStatus(JobStatus.FAILURE);
+            job.getPhases().add(new JobPhase(JobStatus.FAILURE, e.getMessage()));
+            jobManager.save(job);
+        }
+    }
+
 }

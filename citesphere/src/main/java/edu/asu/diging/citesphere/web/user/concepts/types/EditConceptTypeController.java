@@ -35,19 +35,20 @@ public class EditConceptTypeController {
         binder.addValidators(conceptValidator);
     }
 
-    @RequestMapping(value = "/auth/concepts/types/{typeId}/edit")
-    public String show(Model model, @PathVariable("typeId") String typeId, Authentication authentication,
+    @RequestMapping(value = "/auth/concepts/types/{conceptTypeId}/edit")
+    public String show(Model model, @PathVariable("conceptTypeId") String typeId, Authentication authentication,
             ConceptTypeForm form) {
         IConceptType conceptType = conceptTypeManager.get(typeId);
         form.setName(conceptType.getName());
         form.setDescription(conceptType.getDescription());
         form.setUri(conceptType.getUri());
+        form.setOwner(conceptType.getOwner().getFirstName() + " " + conceptType.getOwner().getLastName());
         model.addAttribute("form", form);
         return "auth/concepts/types/edit";
     }
 
-    @RequestMapping(value = "/auth/concepts/types/{typeId}/edit", method = RequestMethod.POST)
-    public String post(Model model, @PathVariable("typeId") String typeId, Authentication authentication,
+    @RequestMapping(value = "/auth/concepts/types/{conceptTypeId}/edit", method = RequestMethod.POST)
+    public String post(Model model, @PathVariable("conceptTypeId") String typeId, Authentication authentication,
             @Validated @ModelAttribute("form") ConceptTypeForm form, BindingResult result,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
