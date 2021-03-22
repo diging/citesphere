@@ -20,7 +20,7 @@ $(function() {
 			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "POST",
 			'success': function(data) {
-				$.notify('<i class="fas fa-check-circle"></i> Successfully deleted!', {
+				$.notify('<i class="fas fa-check-circle"></i> Local copy of group has been deleted. Re-sync will start as soon as group is accessed again.', {
 					type: 'success',
 					offset: {
 						x: 50,
@@ -33,7 +33,7 @@ $(function() {
 				});
 			},
 			'error': function(data) {
-				$.notify('<i class="fas fa-exclamation-circle"></i> Group not found in local!', {
+				$.notify('<i class="fas fa-exclamation-circle"></i> Group not found.', {
 					type: 'danger',
 					offset: {
 						x: 50,
