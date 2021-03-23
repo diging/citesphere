@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
