@@ -30,7 +30,7 @@ public class DeleteCitationController {
             throws ZoteroConnectionException, ZoteroHttpStatusException, GroupDoesNotExistException {
         ResponseEntity<String> response = citationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
         if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
-           throw new ZoteroHttpStatusException("Could not delete item");  
+            throw new ZoteroHttpStatusException("Could not delete item");  
         }
         return "redirect:/auth/group/{groupId}/items";
     }
