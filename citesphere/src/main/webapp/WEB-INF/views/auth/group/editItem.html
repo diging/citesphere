@@ -826,7 +826,7 @@ function creatorLinkHandler(target) {
 							&nbsp;&nbsp;
 						</th:block>
 					</span>
-						<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="fas fa-plus-circle"></i> Add Author</a></div>
+						<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="icon-circle-add"></i> Add Author</a></div>
 				</td>
 			</tr>
 			<tr>
@@ -848,7 +848,7 @@ function creatorLinkHandler(target) {
 							&nbsp;&nbsp;
 				        </th:block>
 					</span>
-							<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
+							<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="icon-circle-add"></i> Add Editor</a></div>
 				</td>
 			</tr>
 			<th:block th:each="curCreator:${creatorMap}">
@@ -874,7 +874,7 @@ function creatorLinkHandler(target) {
 					</span>
 					</div>
 					
-				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add [[${curCreator.value}]]</a></div>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="icon-circle-add"></i> Add [[${curCreator.value}]]</a></div>
 				</td>
 				</tr>
 				</span>
@@ -1009,21 +1009,21 @@ function creatorLinkHandler(target) {
 				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="fas fa-times remove-concept"></i></span>
 			</th:block>
 		</div>
-		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
+		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="icon-circle-add"></i> Add Concept</a></div>
 		</td>
 	</tr>
 
 			
 		</table>
-		<button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
+		<button id="submitForm" class="btn btn-primary" type="submit"><i class="icon-save-alt"></i> &nbsp;Save</button>
 		<span th:if="${itemId == null}">
 			<a th:href="@{|/auth/group/${zoteroGroupId}/items|}" class="btn btn-default">
-		          <i class="fa fa-times"></i>&nbsp;Cancel
+		          <i class="icon-close-alt"></i>&nbsp;Cancel
             </a>
 		</span>
 		<span th:if="${itemId != null}">
                <a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}" class="btn btn-default">
-		          <i class="fa fa-times"></i>&nbsp;Cancel
+		          <i class="icon-close-alt"></i>&nbsp;Cancel
                </a>
         </span>
 	</form>
@@ -1069,7 +1069,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addAuthorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
@@ -1122,7 +1122,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addEditorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addEditorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
@@ -1175,7 +1175,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addCreatorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addCreatorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       

@@ -201,9 +201,6 @@
 .fa-star-o:before {
   content: "\f006";
 }
-.fa-user:before {
-  content: "\f007";
-}
 .fa-film:before {
   content: "\f008";
 }
@@ -220,8 +217,7 @@
   content: "\f00c";
 }
 .fa-remove:before,
-.fa-close:before,
-.fa-times:before {
+.fa-close:before{
   content: "\f00d";
 }
 .fa-search-plus:before {
@@ -427,9 +423,6 @@
 }
 .fa-chevron-right:before {
   content: "\f054";
-}
-.fa-plus-circle:before {
-  content: "\f055";
 }
 .fa-minus-circle:before {
   content: "\f056";
@@ -723,7 +716,6 @@
 .fa-paperclip:before {
   content: "\f0c6";
 }
-.fa-save:before,
 .fa-floppy-o:before {
   content: "\f0c7";
 }
