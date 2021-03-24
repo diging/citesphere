@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.service;
 import java.util.List;
 
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.http.ResponseEntity;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
@@ -54,5 +55,5 @@ public interface ICitationManager {
     CloseableIterator<ICitation> getAllGroupItems(IUser user, String groupId, String collectionId) throws
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
     
-    void deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    ResponseEntity<String> deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException;
 }

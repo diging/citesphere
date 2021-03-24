@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.http.ResponseEntity;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -381,13 +382,13 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public void deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException {    
+    public ResponseEntity<String> deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException {    
         for(String element : citationList) {
             Optional<ICitation> citation = citationStore.findById(element);
             if(citation.isPresent()) {
                 citationStore.delete(citation.get());
             }
         }  
-        zoteroManager.deleteMultipleItems(user, groupId, citationList, zoteroManager.getLatestGroupVersion(user, groupId));
+        return zoteroManager.deleteMultipleItems(user, groupId, citationList, zoteroManager.getLatestGroupVersion(user, groupId));
     }
 }

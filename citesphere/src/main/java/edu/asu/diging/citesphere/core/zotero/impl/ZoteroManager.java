@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.Data;
@@ -358,14 +359,14 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public void deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
+    public ResponseEntity<String> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
-        zoteroConnector.deleteMultipleItems(user, groupId, citationKeys, citationVersion);
+        return zoteroConnector.deleteMultipleItems(user, groupId, citationKeys, citationVersion);
     }
 
     @Override
-    public void deleteItem(IUser user, String groupId, String citationKey, Long citationVersion)
+    public void deleteItem(IUser user, String groupId, String citationKeys, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
-        zoteroConnector.deleteItem(user, groupId, citationKey, citationVersion);
+        zoteroConnector.deleteItem(user, groupId, citationKeys, citationVersion);
     }
 }

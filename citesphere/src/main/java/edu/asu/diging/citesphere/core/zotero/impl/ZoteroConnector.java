@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -296,9 +297,9 @@ public class ZoteroConnector implements IZoteroConnector {
     }
 
     @Override
-    public void deleteMultipleItems(IUser user, String groupId, List<String> citationKey, Long citationVersion)
+    public ResponseEntity<String> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
-        zotero.getGroupsOperations().deleteMultipleItems(groupId, citationKey, citationVersion);        
+        return zotero.getGroupsOperations().deleteMultipleItems(groupId, citationKeys, citationVersion);        
     }
 }
