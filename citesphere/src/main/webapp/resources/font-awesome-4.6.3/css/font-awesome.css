@@ -263,9 +263,6 @@
 .fa-inbox:before {
   content: "\f01c";
 }
-.fa-play-circle-o:before {
-  content: "\f01d";
-}
 .fa-rotate-right:before,
 .fa-repeat:before {
   content: "\f01e";
@@ -507,9 +504,6 @@
 .fa-plane:before {
   content: "\f072";
 }
-.fa-calendar:before {
-  content: "\f073";
-}
 .fa-random:before {
   content: "\f074";
 }
@@ -524,12 +518,6 @@
 }
 .fa-chevron-down:before {
   content: "\f078";
-}
-.fa-retweet:before {
-  content: "\f079";
-}
-.fa-shopping-cart:before {
-  content: "\f07a";
 }
 .fa-folder:before {
   content: "\f07b";
@@ -547,9 +535,6 @@
 .fa-bar-chart:before {
   content: "\f080";
 }
-.fa-twitter-square:before {
-  content: "\f081";
-}
 .fa-facebook-square:before {
   content: "\f082";
 }
@@ -562,9 +547,6 @@
 .fa-gears:before,
 .fa-cogs:before {
   content: "\f085";
-}
-.fa-comments:before {
-  content: "\f086";
 }
 .fa-thumbs-o-up:before {
   content: "\f087";
@@ -596,9 +578,6 @@
 .fa-trophy:before {
   content: "\f091";
 }
-.fa-github-square:before {
-  content: "\f092";
-}
 .fa-upload:before {
   content: "\f093";
 }
@@ -617,21 +596,12 @@
 .fa-phone-square:before {
   content: "\f098";
 }
-.fa-twitter:before {
-  content: "\f099";
-}
 .fa-facebook-f:before,
 .fa-facebook:before {
   content: "\f09a";
 }
-.fa-github:before {
-  content: "\f09b";
-}
 .fa-unlock:before {
   content: "\f09c";
-}
-.fa-credit-card:before {
-  content: "\f09d";
 }
 .fa-feed:before,
 .fa-rss:before {
@@ -639,9 +609,6 @@
 }
 .fa-hdd-o:before {
   content: "\f0a0";
-}
-.fa-bullhorn:before {
-  content: "\f0a1";
 }
 .fa-bell:before {
   content: "\f0f3";
@@ -660,18 +627,6 @@
 }
 .fa-hand-o-down:before {
   content: "\f0a7";
-}
-.fa-arrow-circle-left:before {
-  content: "\f0a8";
-}
-.fa-arrow-circle-right:before {
-  content: "\f0a9";
-}
-.fa-arrow-circle-up:before {
-  content: "\f0aa";
-}
-.fa-arrow-circle-down:before {
-  content: "\f0ab";
 }
 .fa-globe:before {
   content: "\f0ac";
@@ -733,9 +688,6 @@
 .fa-list-ol:before {
   content: "\f0cb";
 }
-.fa-strikethrough:before {
-  content: "\f0cc";
-}
 .fa-underline:before {
   content: "\f0cd";
 }
@@ -747,18 +699,6 @@
 }
 .fa-truck:before {
   content: "\f0d1";
-}
-.fa-pinterest:before {
-  content: "\f0d2";
-}
-.fa-pinterest-square:before {
-  content: "\f0d3";
-}
-.fa-google-plus-square:before {
-  content: "\f0d4";
-}
-.fa-google-plus:before {
-  content: "\f0d5";
 }
 .fa-money:before {
   content: "\f0d6";
@@ -811,18 +751,12 @@
 .fa-comment-o:before {
   content: "\f0e5";
 }
-.fa-comments-o:before {
-  content: "\f0e6";
-}
 .fa-flash:before,
 .fa-bolt:before {
   content: "\f0e7";
 }
 .fa-sitemap:before {
   content: "\f0e8";
-}
-.fa-umbrella:before {
-  content: "\f0e9";
 }
 .fa-paste:before,
 .fa-clipboard:before {
@@ -843,9 +777,7 @@
 .fa-user-md:before {
   content: "\f0f0";
 }
-.fa-stethoscope:before {
-  content: "\f0f1";
-}
+
 .fa-suitcase:before {
   content: "\f0f2";
 }
@@ -941,9 +873,6 @@
 .fa-reply:before {
   content: "\f112";
 }
-.fa-github-alt:before {
-  content: "\f113";
-}
 .fa-folder-o:before {
   content: "\f114";
 }
@@ -1008,12 +937,6 @@
 .fa-exclamation:before {
   content: "\f12a";
 }
-.fa-superscript:before {
-  content: "\f12b";
-}
-.fa-subscript:before {
-  content: "\f12c";
-}
 .fa-eraser:before {
   content: "\f12d";
 }
@@ -1028,9 +951,6 @@
 }
 .fa-shield:before {
   content: "\f132";
-}
-.fa-calendar-o:before {
-  content: "\f133";
 }
 .fa-fire-extinguisher:before {
   content: "\f134";
@@ -1076,9 +996,6 @@
 }
 .fa-rss-square:before {
   content: "\f143";
-}
-.fa-play-circle:before {
-  content: "\f144";
 }
 .fa-ticket:before {
   content: "\f145";
@@ -1712,12 +1629,6 @@
 .fa-skyatlas:before {
   content: "\f216";
 }
-.fa-cart-plus:before {
-  content: "\f217";
-}
-.fa-cart-arrow-down:before {
-  content: "\f218";
-}
 .fa-diamond:before {
   content: "\f219";
 }
@@ -1736,15 +1647,7 @@
 .fa-heartbeat:before {
   content: "\f21e";
 }
-.fa-venus:before {
-  content: "\f221";
-}
-.fa-mars:before {
-  content: "\f222";
-}
-.fa-mercury:before {
-  content: "\f223";
-}
+
 .fa-intersex:before,
 .fa-transgender:before {
   content: "\f224";
@@ -1752,38 +1655,14 @@
 .fa-transgender-alt:before {
   content: "\f225";
 }
-.fa-venus-double:before {
-  content: "\f226";
-}
-.fa-mars-double:before {
-  content: "\f227";
-}
-.fa-venus-mars:before {
-  content: "\f228";
-}
-.fa-mars-stroke:before {
-  content: "\f229";
-}
-.fa-mars-stroke-v:before {
-  content: "\f22a";
-}
-.fa-mars-stroke-h:before {
-  content: "\f22b";
-}
 .fa-neuter:before {
   content: "\f22c";
 }
 .fa-genderless:before {
   content: "\f22d";
 }
-.fa-facebook-official:before {
-  content: "\f230";
-}
 .fa-pinterest-p:before {
   content: "\f231";
-}
-.fa-whatsapp:before {
-  content: "\f232";
 }
 .fa-server:before {
   content: "\f233";
@@ -1803,9 +1682,6 @@
 }
 .fa-train:before {
   content: "\f238";
-}
-.fa-subway:before {
-  content: "\f239";
 }
 .fa-medium:before {
   content: "\f23a";
@@ -1972,18 +1848,6 @@
 .fa-amazon:before {
   content: "\f270";
 }
-.fa-calendar-plus-o:before {
-  content: "\f271";
-}
-.fa-calendar-minus-o:before {
-  content: "\f272";
-}
-.fa-calendar-times-o:before {
-  content: "\f273";
-}
-.fa-calendar-check-o:before {
-  content: "\f274";
-}
 .fa-industry:before {
   content: "\f275";
 }
@@ -2022,9 +1886,6 @@
 }
 .fa-edge:before {
   content: "\f282";
-}
-.fa-credit-card-alt:before {
-  content: "\f283";
 }
 .fa-codiepie:before {
   content: "\f284";
@@ -2110,17 +1971,9 @@
 .fa-braille:before {
   content: "\f2a1";
 }
-.fa-assistive-listening-systems:before {
-  content: "\f2a2";
-}
 .fa-asl-interpreting:before,
 .fa-american-sign-language-interpreting:before {
   content: "\f2a3";
-}
-.fa-deafness:before,
-.fa-hard-of-hearing:before,
-.fa-deaf:before {
-  content: "\f2a4";
 }
 .fa-glide:before {
   content: "\f2a5";
@@ -2135,21 +1988,6 @@
 .fa-low-vision:before {
   content: "\f2a8";
 }
-.fa-viadeo:before {
-  content: "\f2a9";
-}
-.fa-viadeo-square:before {
-  content: "\f2aa";
-}
-.fa-snapchat:before {
-  content: "\f2ab";
-}
-.fa-snapchat-ghost:before {
-  content: "\f2ac";
-}
-.fa-snapchat-square:before {
-  content: "\f2ad";
-}
 .fa-pied-piper:before {
   content: "\f2ae";
 }
@@ -2161,10 +1999,6 @@
 }
 .fa-themeisle:before {
   content: "\f2b2";
-}
-.fa-google-plus-circle:before,
-.fa-google-plus-official:before {
-  content: "\f2b3";
 }
 .fa-fa:before,
 .fa-font-awesome:before {
