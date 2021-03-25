@@ -382,13 +382,14 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public ResponseEntity<String> deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException {    
-        for(String element : citationList) {
-            Optional<ICitation> citation = citationStore.findById(element);
+    public ResponseEntity<String> deleteCitations(IUser user, String groupId, List<String> citationIdList) throws ZoteroConnectionException, ZoteroHttpStatusException {
+        ResponseEntity<String> response = zoteroManager.deleteMultipleItems(user, groupId, citationIdList, zoteroManager.getLatestGroupVersion(user, groupId));
+        for(String citationId : citationIdList) {
+            Optional<ICitation> citation = citationStore.findById(citationId);
             if(citation.isPresent()) {
                 citationStore.delete(citation.get());
             }
         }  
-        return zoteroManager.deleteMultipleItems(user, groupId, citationList, zoteroManager.getLatestGroupVersion(user, groupId));
+        return response;
     }
 }
