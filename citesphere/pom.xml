@@ -207,12 +207,6 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-elasticsearch</artifactId>
             <version>${spring-elasticsearch.version}</version>
-            <!-- <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j-api</artifactId>
-                </exclusion>
-            </exclusions> -->
         </dependency>
 
         <!-- Spring Security -->
