@@ -191,9 +191,9 @@ public class ZoteroConnector implements IZoteroConnector {
      */
     @Override
     public ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId,
-            List<String> ignoreFields) throws ZoteroConnectionException, ZoteroHttpStatusException {
+            List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList) throws ZoteroConnectionException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
-        ItemCreationResponse response = zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFields);
+        ItemCreationResponse response = zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList);
         ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
 
         Function<Map.Entry<String, String>, String> itemKeyExtractor = e -> e.getValue();
