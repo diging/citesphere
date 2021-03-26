@@ -60,7 +60,7 @@
         <tomcat.app.name>citesphere</tomcat.app.name>
         <tomcat.server.id>TomcatServer</tomcat.server.id>
 
-        <log.level>debug</log.level>
+        <log.level>info</log.level>
 
         <email.host></email.host>
         <email.port></email.port>
@@ -356,37 +356,6 @@
             <artifactId>log4j-core</artifactId>
             <version>2.11.1</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
-   <!--  <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.11.0</version>
-        </dependency>-->
-        <!-- <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.15</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.jms</groupId>
-                    <artifactId>jms</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.jdmk</groupId>
-                    <artifactId>jmxtools</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.jmx</groupId>
-                    <artifactId>jmxri</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>runtime</scope>
-        </dependency> -->
 
         <!-- DataSource (HikariCP) -->
         <dependency>

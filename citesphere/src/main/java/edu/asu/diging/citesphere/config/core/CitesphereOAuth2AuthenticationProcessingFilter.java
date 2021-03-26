@@ -43,12 +43,16 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.util.Assert;
 
 /**
- * A pre-authentication filter for OAuth2 protected resources. Extracts an OAuth2 token from the incoming request and
- * uses it to populate the Spring Security context with an {@link OAuth2Authentication} (if used in conjunction with an
- * {@link OAuth2AuthenticationManager}).
+ * A pre-authentication filter for OAuth2 protected resources. Extracts an
+ * OAuth2 token from the incoming request and uses it to populate the Spring
+ * Security context with an {@link OAuth2Authentication} (if used in conjunction
+ * with an {@link OAuth2AuthenticationManager}).
  *
  * <p>
- * @deprecated See the <a href="https://github.com/spring-projects/spring-security/wiki/OAuth-2.0-Migration-Guide">OAuth 2.0 Migration Guide</a> for Spring Security 5.
+ * 
+ * @deprecated See the <a href=
+ *             "https://github.com/spring-projects/spring-security/wiki/OAuth-2.0-Migration-Guide">OAuth
+ *             2.0 Migration Guide</a> for Spring Security 5.
  *
  * @author Dave Syer; adjusted jdamerow
  * 
@@ -56,60 +60,62 @@ import org.springframework.util.Assert;
 @Deprecated
 public class CitesphereOAuth2AuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
 
- private final static Log logger = LogFactory.getLog(CitesphereOAuth2AuthenticationProcessingFilter.class);
+    private final static Log logger = LogFactory.getLog(CitesphereOAuth2AuthenticationProcessingFilter.class);
 
-	private AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
+    private AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
 
-	private AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
-	private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new OAuth2AuthenticationDetailsSource();
+    private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new OAuth2AuthenticationDetailsSource();
 
-	private TokenExtractor tokenExtractor = new BearerTokenExtractor();
+    private TokenExtractor tokenExtractor = new BearerTokenExtractor();
 
-	protected CitesphereOAuth2AuthenticationProcessingFilter(String defaultFilterProcessesUrl) {
+    protected CitesphereOAuth2AuthenticationProcessingFilter(String defaultFilterProcessesUrl) {
         super(defaultFilterProcessesUrl);
     }
 
-	/**
-	 * @param authenticationEntryPoint the authentication entry point to set
-	 */
-	public void setAuthenticationEntryPoint(AuthenticationEntryPoint authenticationEntryPoint) {
-		this.authenticationEntryPoint = authenticationEntryPoint;
-	}
+    /**
+     * @param authenticationEntryPoint
+     *            the authentication entry point to set
+     */
+    public void setAuthenticationEntryPoint(AuthenticationEntryPoint authenticationEntryPoint) {
+        this.authenticationEntryPoint = authenticationEntryPoint;
+    }
 
-	/**
-	 * @param authenticationManager the authentication manager to set (mandatory with no default)
-	 */
-	public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-		this.authenticationManager = authenticationManager;
-	}
-	
-	
-	/**
-	 * @param tokenExtractor the tokenExtractor to set
-	 */
-	public void setTokenExtractor(TokenExtractor tokenExtractor) {
-		this.tokenExtractor = tokenExtractor;
-	}
-	
-	/**
-	 * @param authenticationDetailsSource The AuthenticationDetailsSource to use
-	 */
-	public void setAuthenticationDetailsSource(
-			AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource) {
-		Assert.notNull(authenticationDetailsSource, "AuthenticationDetailsSource required");
-		this.authenticationDetailsSource = authenticationDetailsSource;
-	}
+    /**
+     * @param authenticationManager
+     *            the authentication manager to set (mandatory with no default)
+     */
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
 
-	
-	@Override
+    /**
+     * @param tokenExtractor
+     *            the tokenExtractor to set
+     */
+    public void setTokenExtractor(TokenExtractor tokenExtractor) {
+        this.tokenExtractor = tokenExtractor;
+    }
+
+    /**
+     * @param authenticationDetailsSource
+     *            The AuthenticationDetailsSource to use
+     */
+    public void setAuthenticationDetailsSource(
+            AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource) {
+        Assert.notNull(authenticationDetailsSource, "AuthenticationDetailsSource required");
+        this.authenticationDetailsSource = authenticationDetailsSource;
+    }
+
+    @Override
     public void afterPropertiesSet() {
-        //super.afterPropertiesSet();
         setAuthenticationFailureHandler(new AuthenticationFailureHandler() {
             public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                     AuthenticationException exception) throws IOException, ServletException {
                 if (exception instanceof BadCredentialsException) {
-                    exception = new BadCredentialsException(exception.getMessage(), new BadClientCredentialsException());
+                    exception = new BadCredentialsException(exception.getMessage(),
+                            new BadClientCredentialsException());
                 }
                 authenticationEntryPoint.commence(request, response, exception);
             }
@@ -122,41 +128,40 @@ public class CitesphereOAuth2AuthenticationProcessingFilter extends AbstractAuth
         });
     }
 
-	
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException, IOException, ServletException {
         final boolean debug = logger.isDebugEnabled();
-        
+
         Authentication authentication = tokenExtractor.extract(request);
-        
+
         if (authentication == null) {
             throw new BadCredentialsException("No token provided.");
         }
-        
-         try {
-                request.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_VALUE, authentication.getPrincipal());
-                if (authentication instanceof AbstractAuthenticationToken) {
-                    AbstractAuthenticationToken needsDetails = (AbstractAuthenticationToken) authentication;
-                    needsDetails.setDetails(authenticationDetailsSource.buildDetails(request));
-                }
-                Authentication authResult = authenticationManager.authenticate(authentication);
 
-                if (debug) {
-                    logger.debug("Authentication success: " + authResult);
-                }
+        try {
+            request.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_VALUE, authentication.getPrincipal());
+            if (authentication instanceof AbstractAuthenticationToken) {
+                AbstractAuthenticationToken needsDetails = (AbstractAuthenticationToken) authentication;
+                needsDetails.setDetails(authenticationDetailsSource.buildDetails(request));
+            }
+            Authentication authResult = authenticationManager.authenticate(authentication);
 
-                return authResult;
-         }    catch (InvalidTokenException ex) {
-             throw new BadCredentialsException(ex.getMessage());
-         }
+            if (debug) {
+                logger.debug("Authentication success: " + authResult);
+            }
+
+            return authResult;
+        } catch (InvalidTokenException ex) {
+            throw new BadCredentialsException(ex.getMessage());
+        }
     }
-    
+
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-            FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+            Authentication authResult) throws IOException, ServletException {
         super.successfulAuthentication(request, response, chain, authResult);
         chain.doFilter(request, response);
     }
-    
+
 }

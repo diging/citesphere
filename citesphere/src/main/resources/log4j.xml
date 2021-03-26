@@ -41,7 +41,7 @@
         <level value="${log.level}" />
     </logger> 
     <logger name="org.springframework.data">
-        <level value="info" />
+        <level value="${log.level}" />
     </logger>
     
     <logger name="org.elasticsearch">
@@ -55,7 +55,7 @@
         <level value="${log.level}" />
     </logger>
     <logger name="org.apache.kafka">
-        <level value="warn" />
+        <level value="${log.level}" />
     </logger>
 
 	<!-- Root Logger -->
