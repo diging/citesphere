@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <!-- Application Loggers -->
+    <Logger name="edu.asu.diging" level="${log.level}">
+    </Logger>
+    
+    <Logger name="org.springframework.scheduling" level="info">
+    </Logger>
+    
+    
+    <Logger name="org.springframework.core" level="info">
+        
+    </Logger>
+    
+    <Logger name="org.springframework.beans" level="info">
+        
+    </Logger>
+    
+    <Logger name="org.springframework.context" level="info">
+        
+    </Logger>
+
+    <Logger name="org.springframework.web" level="info">
+        
+    </Logger>
+    
+    
+    <Logger name="org.springframework.security" level="${log.level}">
+        
+    </Logger> 
+    <Logger name="org.springframework.data" level="info">
+        
+    </Logger>
+    
+    <Logger name="org.elasticsearch" level="info}">
+        
+    </Logger>
+    
+    <Logger name="org.hibernate.SQL" level="info">
+        
+    </Logger>
+    <Logger name="org.hibernate.type.descriptor.sql" level="info">
+        
+    </Logger>
+    <Logger name="org.apache.kafka" level="warn">
+        
+    </Logger>
+    <Root level="info">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>

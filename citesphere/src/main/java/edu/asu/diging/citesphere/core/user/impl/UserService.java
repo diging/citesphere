@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.PropertySource;
@@ -32,6 +34,8 @@ import edu.asu.diging.citesphere.user.impl.User;
 @PropertySource("classpath:/user.properties")
 public class UserService implements UserDetailsService, IUserManager {
     
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     @Autowired
     @Qualifier("usersFile")
     private Properties properties;
@@ -47,6 +51,7 @@ public class UserService implements UserDetailsService, IUserManager {
 
     @Override
     public UserDetails loadUserByUsername(String arg0) throws UsernameNotFoundException {
+        logger.debug("Loading user: " + arg0);
         Optional<User> foundUser = userRepository.findById(arg0);
         if (foundUser.isPresent()) {
             return foundUser.get();
