@@ -141,7 +141,7 @@
 					 <span th:if="${!status.last}">; </span>
 				 </span>
 				 <span th:if="${!#strings.isEmpty(author.uri)}">
-				 	<a th:href="@{|${author.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
+				 	<a th:href="@{|${author.uri}|}" target="_blank"><i class="icon-link"></i></a>
 				 </span>
 				 <span th:if="${!#strings.isEmpty(author.localAuthorityId)}">
 				 	<a th:href="@{|/auth/authority/${author.localAuthorityId}|}"><i class="icon-anchor"></i></a>
@@ -159,7 +159,7 @@
 					 </th:block>)
 				 </span>
 				 <span th:if="${!#strings.isEmpty(editor.uri)}">
-				 	<a th:href="@{|${editor.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
+				 	<a th:href="@{|${editor.uri}|}" target="_blank"><i class="icon-link"></i></a>
 				 </span>
 				 <span th:if="${!#strings.isEmpty(editor.localAuthorityId)}">
 				 	<a th:href="@{|/auth/authority/${editor.localAuthorityId}|}"><i class="icon-anchor"></i></a>
@@ -182,7 +182,7 @@
 						</th:block>)<span th:if="${!creatorStatus.last}">;</span>
 					</span>
 					<span th:if="${!#strings.isEmpty(creator.person.uri)}">
-						<a th:href="@{|${creator.person.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
+						<a th:href="@{|${creator.person.uri}|}" target="_blank"><i class="icon-link"></i></a>
 					</span>
 					<span th:if="${!#strings.isEmpty(creator.person.localAuthorityId)}">
 						<a th:href="@{|/auth/authority/${creator.person.localAuthorityId}|}"><i class="icon-anchor"></i></a>

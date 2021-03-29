@@ -62,6 +62,21 @@ body{
   color: black;
 }
 
+[class*="icon-www"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-warning"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-link"]{
+  font-size: 13px;
+  color: black;
+}
+
 [class*="icon-gear"]{
   font-size: 13px;
   color: black;
