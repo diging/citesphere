@@ -36,7 +36,7 @@ $(function() {
 			'type': "DELETE",
 			'success': function(data) {
 				$("#tr-" + id).remove();
-				$.notify('<i class="fas fa-check-circle"></i> App successfully deleted!', {
+				$.notify('<i class="icon-checkmark-alt"></i> App successfully deleted!', {
 					type: 'success',
 					offset: {
 						x: 50,
@@ -90,7 +90,7 @@ $(function() {
 	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.clientId}"/></a></td>
 	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.name}"/></a></td>
 	<td class="client-entry" th:data-id="${client.clientId}"> <span th:text="${client.description}"/></td>
-	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="fas fa-trash-alt"></i></button></td>
+	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="icon-trash-alt"></i></button></td>
 </tr>
 </table>
 <div class="modal fade" id="client-delete-confirmation" tabindex="-1" role="dialog">

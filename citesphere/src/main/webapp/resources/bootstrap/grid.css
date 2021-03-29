@@ -37,9 +37,34 @@ body{
   color: #337ab7;
 }
 
+[class*="icon-time"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-download"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-trash-alt"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-info-circle"]{
+  font-size: 13px;
+  color: green;
+}
+
 [class*="icon-close-alt"]{
   font-size: 13px;
   color: black;
+}
+
+[class*="icon-checkmark-alt"]{
+  font-size: 18px;
+  color: #337ab7;
 }
 
 .bib-entry {
