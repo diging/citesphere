@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +20,11 @@ import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
+import org.springframework.social.zotero.api.ItemCreationResponse;
+import org.springframework.social.zotero.api.ItemCreationResponse.FailedMessage;
 import org.springframework.social.zotero.api.ZoteroFields;
 import org.springframework.social.zotero.api.ZoteroResponse;
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 
@@ -286,10 +293,11 @@ public class ZoteroManager implements IZoteroManager {
      * @param citations list of citations that has to be updated.
      * 
      * @return ZoteroUpdateItemsResponse returns statuses of citations.
+     * @throws ExecutionException 
      */
     @Override
-    public ZoteroUpdateItemsResponse updateCitations(IUser user, String groupId, List<ICitation> citations)
-            throws ZoteroConnectionException, ZoteroHttpStatusException {
+    public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, InterruptedException, ExecutionException {
         List<Item> items = new ArrayList<>();
         List<String> itemTypeFields = new ArrayList<>();
         List<List<String>> ignoreFieldsList = new ArrayList<>();
@@ -308,8 +316,40 @@ public class ZoteroManager implements IZoteroManager {
             ignoreFieldsList.add(ignoreFields);
             validCreatorTypesList.add(validCreatorTypes);
         }
-        return zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
+        Future<ZoteroUpdateItemsStatuses> future = zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
+        //ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
+        while (true) {
+            if (future.isDone()) {
+//                List<ZoteroUpdateItemsStatuses> responses = future.get();
+//                statuses = getStatusesFromResponse(responses);
+                return future.get();
+            }
+            Thread.sleep(1000);
+        }
     }
+    
+//    private ZoteroUpdateItemsResponse getStatusesFromResponse(List<ItemCreationResponse> responses) {
+//        ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
+//        List<String> successKeys = new ArrayList<>();
+//        List<String> failedKeys = new ArrayList<>();
+//        List<String> unchangedKeys = new ArrayList<>();
+//        for (ItemCreationResponse response : responses) {
+//            Function<Map.Entry<String, String>, String> itemKeyExtractor = e -> e.getValue();
+//            Function<Map.Entry<String, FailedMessage>, String> failedItemKeyExtractor = e -> e.getValue().getKey();
+//
+//            successKeys.addAll(extractItemKeys(response.getSuccess(), itemKeyExtractor));
+//            failedKeys.addAll(extractItemKeys(response.getFailed(), failedItemKeyExtractor));
+//            unchangedKeys.addAll(extractItemKeys(response.getUnchanged(), itemKeyExtractor));
+//        }
+//        statuses.setSuccessItems(successKeys);
+//        statuses.setFailedItems(failedKeys);
+//        statuses.setUnchangedItems(unchangedKeys);
+//        return statuses;
+//    }
+//    
+//    private <T> List<String> extractItemKeys(Map<String, T> map, Function<Map.Entry<String, T>, String> keyExtractor) {
+//        return map.entrySet().stream().map(e -> keyExtractor.apply(e)).collect(Collectors.toList());
+//    }
     
     @Override
     public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)

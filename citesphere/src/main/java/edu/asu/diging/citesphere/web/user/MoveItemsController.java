@@ -2,11 +2,13 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +46,7 @@ public class MoveItemsController {
     public @ResponseBody String moveItemToCollection(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String itemsData)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
-            CitationIsOutdatedException {
+            CitationIsOutdatedException, InterruptedException, ExecutionException {
         Gson gson = new Gson();
         MoveItemsRequest itemsDataDto = gson.fromJson(itemsData, MoveItemsRequest.class);
         List<ICitation> citations = new ArrayList<>();
@@ -62,7 +64,7 @@ public class MoveItemsController {
             citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
         }
-        ZoteroUpdateItemsResponse response = citationManager.updateCitations((IUser) authentication.getPrincipal(),
+        ZoteroUpdateItemsStatuses response = citationManager.updateCitations((IUser) authentication.getPrincipal(),
                 zoteroGroupId, citations);
         CitationStatusesData statusesDto = new CitationStatusesData();
         statusesDto.setMovedCitations(response.getSuccessItems());

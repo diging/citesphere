@@ -23,11 +23,11 @@ public class ZoteroUpdateItemsResponse{
         return failedItems;
     }
     
-    public void setUnchagedItems(List<String> unchagedItems) {
+    public void setUnchangedItems(List<String> unchagedItems) {
         this.unchagedItems = unchagedItems;
     }
     
-    public List<String> getUnchagedItems() {
+    public List<String> getUnchangedItems() {
         return unchagedItems;
     }
     

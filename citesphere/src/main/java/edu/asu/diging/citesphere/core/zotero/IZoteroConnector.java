@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -8,7 +9,9 @@ import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
+import org.springframework.social.zotero.api.ItemCreationResponse;
 import org.springframework.social.zotero.api.ZoteroResponse;
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
@@ -34,9 +37,9 @@ public interface IZoteroConnector {
     Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException;
     
-    ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId,
+    Future<ZoteroUpdateItemsStatuses> updateItems(IUser user, List<Item> items, String groupId,
             List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
-            throws ZoteroConnectionException, ZoteroHttpStatusException;
+            throws ZoteroConnectionException, ZoteroHttpStatusException, InterruptedException;
 
     FieldInfo[] getFields(IUser user, String itemType);
 

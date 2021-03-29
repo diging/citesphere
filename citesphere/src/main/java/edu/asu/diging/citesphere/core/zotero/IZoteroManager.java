@@ -2,7 +2,9 @@ package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
@@ -31,8 +33,8 @@ public interface IZoteroManager {
 
     ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException;
     
-    ZoteroUpdateItemsResponse updateCitations(IUser user, String groupId, List<ICitation> citations)
-            throws ZoteroConnectionException, ZoteroHttpStatusException;
+    ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, ZoteroHttpStatusException,InterruptedException, ExecutionException;
 
     List<BibField> getFields(IUser user, ItemType itemType);
 

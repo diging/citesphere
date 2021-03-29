@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -152,8 +154,8 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public ZoteroUpdateItemsResponse updateCitations(IUser user, String groupId, List<ICitation> citations)
-            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {
+    public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, InterruptedException, ExecutionException  {
         return zoteroManager.updateCitations(user, groupId, citations);
     }
 

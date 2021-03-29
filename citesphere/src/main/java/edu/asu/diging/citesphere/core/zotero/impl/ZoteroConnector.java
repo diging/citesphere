@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -25,6 +28,7 @@ import org.springframework.social.zotero.api.ItemCreationResponse;
 import org.springframework.social.zotero.api.ItemCreationResponse.FailedMessage;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Component;
@@ -190,20 +194,23 @@ public class ZoteroConnector implements IZoteroConnector {
      * @return ZoteroUpdateItemsResponse returns statuses of items.
      */
     @Override
-    public ZoteroUpdateItemsResponse updateItems(IUser user, List<Item> items, String groupId,
-            List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList) throws ZoteroConnectionException, ZoteroHttpStatusException {
+    @Async
+    public Future<ZoteroUpdateItemsStatuses> updateItems(IUser user, List<Item> items, String groupId,
+            List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, InterruptedException {
         Zotero zotero = getApi(user);
-        ItemCreationResponse response = zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList);
-        ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
-
-        Function<Map.Entry<String, String>, String> itemKeyExtractor = e -> e.getValue();
-        Function<Map.Entry<String, FailedMessage>, String> failedItemKeyExtractor = e -> e.getValue().getKey();
-
-        statuses.setSuccessItems(extractItemKeys(response.getSuccess(), itemKeyExtractor));
-        statuses.setUnchagedItems(extractItemKeys(response.getUnchanged(), itemKeyExtractor));
-        statuses.setFailedItems(extractItemKeys(response.getFailed(), failedItemKeyExtractor));
-
-        return statuses;
+        return new AsyncResult<ZoteroUpdateItemsStatuses>(
+                zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList));
+//        ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
+//
+//        Function<Map.Entry<String, String>, String> itemKeyExtractor = e -> e.getValue();
+//        Function<Map.Entry<String, FailedMessage>, String> failedItemKeyExtractor = e -> e.getValue().getKey();
+//
+//        statuses.setSuccessItems(extractItemKeys(response.getSuccess(), itemKeyExtractor));
+//        statuses.setUnchagedItems(extractItemKeys(response.getUnchanged(), itemKeyExtractor));
+//        statuses.setFailedItems(extractItemKeys(response.getFailed(), failedItemKeyExtractor));
+//
+//        return statuses;
     }
     
     @Override

@@ -1,8 +1,10 @@
 package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
@@ -34,8 +36,8 @@ public interface ICitationManager {
     void updateCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException;
     
-    ZoteroUpdateItemsResponse updateCitations(IUser user, String groupId, List<ICitation> citations) 
-            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException;
+    ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations) 
+            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, InterruptedException, ExecutionException;
     
     List<BibField> getItemTypeFields(IUser user, ItemType itemType);
 
