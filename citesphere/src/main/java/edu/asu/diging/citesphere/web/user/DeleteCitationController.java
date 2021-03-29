@@ -3,8 +3,6 @@ package edu.asu.diging.citesphere.web.user;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -28,10 +26,7 @@ public class DeleteCitationController {
     @RequestMapping(value = "/auth/group/{groupId}/references/delete", method = RequestMethod.POST)
     public String delete(Authentication authentication, @PathVariable("groupId") String groupId, @RequestParam(value="citationList", required=false) List<String> citationList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, GroupDoesNotExistException {
-        ResponseEntity<String> response = citationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
-        if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
-            throw new ZoteroHttpStatusException("Could not delete item");  
-        }
+        citationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
         return "redirect:/auth/group/{groupId}/items";
     }
 }
