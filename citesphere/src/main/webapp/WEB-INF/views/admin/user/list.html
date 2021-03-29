@@ -23,7 +23,7 @@
 		<span th:if="${user.enabled}">
 			<span th:if="${not user.admin}">
 			<form action="#" th:action="@{'/admin/user/' + ${user.username} + '/admin'}" method="POST">
-			<button style="padding:0px" class="btn btn-link"><i class="fas fa-user-tie"></i> Make Admin</button>
+			<button style="padding:0px" class="btn btn-link"><i class="icon-admin"></i> Make Admin</button>
 			</form>
 			</span>
 			<span th:if="${user.admin}">
@@ -33,7 +33,7 @@
 			</span>
 		
 			<form action="#" th:action="@{'/admin/user/' + ${user.username} + '/disable'}" method="POST">
-			<button style="padding:0px" class="btn btn-link"><i class="fas fa-user-slash"></i> Deactivate User</button>
+			<button style="padding:0px" class="btn btn-link"><i class="icon-user-slash"></i> Deactivate User</button>
 			</form>
 		</span>
 		</div>

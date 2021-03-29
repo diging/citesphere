@@ -46,7 +46,7 @@ $(function() {
         <td>[[${job.finishedOn}]]</td>
         <td>
             <span th:if="${#strings.equals(job.status,'DONE')}"><i style="color: #629262;" class="icon-checkmark-alt"></i></span>
-            <span th:if="${#strings.equals(job.status,'STARTED')}"><i style="color: orange;" class="fas fa-cogs"></i></span>
+            <span th:if="${#strings.equals(job.status,'STARTED')}"><i style="color: orange;" class="icon-gear"></i></span>
             <span th:if="${#strings.equals(job.status,'FAILURE')}"><i style="color: #d83838;" class="fas fa-exclamation-circle"></i></span>
             <span th:if="${#strings.equals(job.status,'PREPARED')}"><i style="color: #5d97b3;" class="icon-time"></i></span>
             <span th:if="${#strings.equals(job.status,'CANCELED')}"><i title="Job was canceled" style="color: #868181;" class="fas fa-exclamation-triangle"></i></span>

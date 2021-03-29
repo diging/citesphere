@@ -180,7 +180,7 @@ function pollStatus(){
 <div class="form-group">
 <div class="input-group">
     <input type="text" id="findItemKey" name="findItemKey" class="form-control" placeholder="Find by item key"/>
-    <div class="input-group-addon" id="findByItemKeyBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
+    <div class="input-group-addon" id="findByItemKeyBtn" style="cursor: pointer;"><i class="icon-search"></i></div>
 </div>
 </div>
 
@@ -188,7 +188,7 @@ function pollStatus(){
 <div class="form-group">
 <div class="input-group">
     <input type="text" id="search" name="search" class="form-control" placeholder="Enter search term..." th:value="${param.searchTerm}"/>
-    <div class="input-group-addon" id="searchBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
+    <div class="input-group-addon" id="searchBtn" style="cursor: pointer;"><i class="icon-search"></i></div>
 </div>
 </div>
 
@@ -226,11 +226,11 @@ function pollStatus(){
 
 <div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} != null">
   <a th:href="@{|items/sync?page=${currentPage}&sort=${sort}&columns=${#strings.listJoin(columns,',')}|}"><big><i
-		class="fas fa-sync" title="Sync Page"></i></big></a>
+		class="icon-sync" title="Sync Page"></i></big></a>
 </div>
 <div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} == null">
   <a th:href="@{|items/sync?page=${currentPage}&sort=${sort}&columns=${#strings.listJoin(columns,',')}|}"><big><i
-		class="fas fa-sync" title="Sync Page"></i></big></a>
+		class="icon-sync" title="Sync Page"></i></big></a>
 </div>
 <div class="pull-right" style="margin-top: 20px;">
 <a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="icon-circle-add"></i> Create Citation</a>
@@ -308,7 +308,7 @@ function pollStatus(){
 			  <span class="text-warning">
 			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
 			  , iconLabel=${@iconsResource.getProperty(entry.itemType + '_label')}">
-				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
+				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
 				</div>
 			  </span>
 			</td>

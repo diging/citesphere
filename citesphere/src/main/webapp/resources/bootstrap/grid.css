@@ -17,6 +17,21 @@ body{
   color: #337ab7;
 }
 
+[class*="icon-gear"]{
+  font-size: 18px;
+  color: #337ab7;
+}
+
+[class*="icon-sync"]{
+  font-size: 18px;
+  color: #337ab7;
+}
+
+[class*="icon-admin"]{
+  font-size: 18px;
+  color: #337ab7;
+}
+
 [class*="icon-sign-out-alt"]{
   font-size: 18px;
   color: #337ab7;
@@ -47,6 +62,16 @@ body{
   color: black;
 }
 
+[class*="icon-gear"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-search"]{
+  font-size: 18px;
+  color: black;
+}
+
 [class*="icon-trash-alt"]{
   font-size: 13px;
   color: black;
@@ -64,7 +89,7 @@ body{
 
 [class*="icon-checkmark-alt"]{
   font-size: 18px;
-  color: #337ab7;
+  color: green;
 }
 
 .bib-entry {
