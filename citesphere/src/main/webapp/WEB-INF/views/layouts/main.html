@@ -67,9 +67,9 @@
 									all Apps</a></li>
 							<li role="presentation"><a th:href="@{/admin/apps/add}">Add</a></li>
 						</ul></li>
-					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
+					<li sec:authorize="hasAnyRole('USER', 'ADMIN')" role="presentation"><a
 						th:href="@{/auth/exports}"> Exports</a></li>
-					<li sec:authorize="hasRole('ADMIN')" role="presentation"
+					<li sec:authorize="hasAnyRole('USER', 'ADMIN')" role="presentation"
 						class="dropdown"><a class="dropdown-toggle"
 						data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
 						aria-expanded="false"> Citation Concepts <span class="caret"></span>
@@ -80,7 +80,7 @@
 							<li role="presentation"><a
 								th:href="@{/auth/concepts/types/list}">Concept Types</a></li>
 						</ul></li>
-					<li sec:authorize="hasRole('ADMIN')" role="presentation"
+					<li sec:authorize="hasAnyRole('USER', 'ADMIN')" role="presentation"
 						class="dropdown"><a class="dropdown-toggle"
 						data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
 						aria-expanded="false"> Import <span class="caret"></span>
@@ -92,9 +92,9 @@
 							<li role="presentation"><a th:href="@{/auth/import/jobs}">See
 									all Imports</a></li>
 						</ul></li>
-					<li sec:authorize="hasRole('ADMIN')" role="presentation"><a
+					<li sec:authorize="hasAnyRole('USER', 'ADMIN')" role="presentation"><a
 						th:href="@{/auth/authority/list}">Managed Authority Entries</a></li>
-					<li sec:authorize="hasRole('ADMIN')" role="presentation"
+					<li sec:authorize="hasAnyRole('USER', 'ADMIN')" role="presentation"
 						class="dropdown"><a class="dropdown-toggle"
 						data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
 						aria-expanded="false"> Profile <span class="caret"></span>

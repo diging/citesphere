@@ -110,6 +110,13 @@ body{
 .bib-entry {
 	cursor: pointer;
 }
+.conceptpower-authority-entry {
+	cursor: pointer;
+}
+
+.user-authority-entry {
+	cursor: pointer;
+}
 
 h4 {
 	margin-top: 25px;
