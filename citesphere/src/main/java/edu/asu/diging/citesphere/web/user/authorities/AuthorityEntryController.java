@@ -76,6 +76,7 @@ public class AuthorityEntryController {
             searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
             searchResult.setCurrentPage(page + 1);
+            searchResult.setGroupName(authorityService.getGroupNameByGroupId(zoteroGroupId));
             authoritySearchResult.put(source, searchResult);
 
         } catch (AuthorityServiceConnectionException e) {
@@ -84,6 +85,10 @@ public class AuthorityEntryController {
 
         } catch (AuthorityImporterNotFoundException e) {
             logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            
+        } catch (GroupDoesNotExistException e) {
+            logger.error("Group " + zoteroGroupId + " not found ", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 

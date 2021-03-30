@@ -40,4 +40,8 @@ public interface IAuthorityService {
     int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize);
 
     List<IAuthorityEntry> getAuthoritiesByGroup(long groupId);
+    
+    String getGroupNameByGroupId(String citationGroupId) throws GroupDoesNotExistException;
+    
+    List<IAuthorityEntry> getUserSpecificAuthorities(IUser user);
 }

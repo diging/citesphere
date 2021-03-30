@@ -186,7 +186,12 @@ public class AuthorityService implements IAuthorityService {
     
     @Override
     public List<IAuthorityEntry> getAuthoritiesByGroup(long groupId) {
-        return entryRepository.findByGroups(groupId);
+        return entryRepository.findByGroupsOrderByName(groupId);
+    }
+    
+    @Override
+    public List<IAuthorityEntry> getUserSpecificAuthorities(IUser user) {
+        return entryRepository.findByUsernameAndGroupsOrderByName(user.getUsername(), null);
     }
 
     @Override
@@ -217,6 +222,15 @@ public class AuthorityService implements IAuthorityService {
             }
         }
         return null;
+    }
+    
+    @Override
+    public String getGroupNameByGroupId(String citationGroupId) throws GroupDoesNotExistException {
+        Optional<ICitationGroup> group = groupRepository.findFirstByGroupId(new Long(citationGroupId));
+        if (!group.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
+        }
+        return group.get().getName();
     }
 
 }

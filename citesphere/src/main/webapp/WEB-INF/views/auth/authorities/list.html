@@ -53,6 +53,8 @@ $(function() {
 	$("#displayAuthorities").change(function () {
 	    if($("#displayAuthorities").val() === 'all'){
 	    	window.location.href = [[@{/auth/authority/list}]];
+	    } else if($("#displayAuthorities").val() === 'userSpecific'){
+	    	window.location.href = [[@{/auth/authority/user/list}]];
 	    } else {
 	    	var zoteroGroupId = $("#displayAuthorities").val();
 	    	window.location.href = [[@{/auth/authority/}]] + zoteroGroupId + "/list";
@@ -69,6 +71,7 @@ $(function() {
 
 <select class="form-control" id="displayAuthorities" name="displayAuthorities" size="1">
 	<option th:selected="${#strings.equals(displayBy, 'all')}" value="all">All</option>
+	<option th:selected="${#strings.equals(displayBy, 'userSpecific')}" value="userSpecific">[[${username}]]</option>
 	<span th:each="groupDetail:${groups}">
 		<option th:selected="${#strings.equals(displayBy, groupDetail.groupId)}" th:value="${groupDetail.groupId}">Group - [[${groupDetail.name}]]</option>
 	</span>  

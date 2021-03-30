@@ -738,9 +738,8 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		url: url ,
   		async: false,
   		success: function(data) {
-			
+  			$('#mycheckboxDiv').append(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
-  			
   			var content = '';
   				
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
@@ -1481,8 +1480,8 @@ function creatorLinkHandler(target) {
 							<div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
 								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
-							<div>
-							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add Authority to the Group
+							<div id="mycheckboxDiv">
+							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group
 							</div>
 							</br>
 							<table class="table table-striped table-bordered table-fixed">
