@@ -52,6 +52,11 @@ body{
   color: #337ab7;
 }
 
+[class*="icon-checkmark-alt"]{
+  font-size: 13px;
+  color: #337ab7;
+}
+
 [class*="icon-time"]{
   font-size: 13px;
   color: black;
@@ -68,6 +73,46 @@ body{
 }
 
 [class*="icon-warning"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-headphone"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-email"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-user-check"]{
+  font-size: 13px;
+  color: #337ab7;
+}
+
+[class*="icon-arrow-right"]{
+  font-size: 18px;
+  color: #337ab7;
+}
+
+[class*="icon-arrow-left"]{
+  font-size: 18px;
+  color: #337ab7;
+}
+
+[class*="icon-spinner"]{
+  color: #337ab7;
+}
+
+[class*="icon-video"]{
+  font-size: 13px;
+  color: black;
+}
+
+
+[class*="icon-book-open-alt"]{
   font-size: 13px;
   color: black;
 }

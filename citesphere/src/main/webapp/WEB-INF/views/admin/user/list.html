@@ -16,7 +16,7 @@
 		<div class="pull-right text-right">
 		<span th:if="${not user.enabled}">
 			<form action="#" th:action="@{'/admin/user/' + ${user.username} + '/approve'}" method="POST">
-			<button style="padding:0px" class="btn btn-link"><i class="fas fa-user-check"></i> Activate</button>
+			<button style="padding:0px" class="btn btn-link"><i class="icon-user-check"></i> Activate</button>
 			</form>
 		</span>
 		

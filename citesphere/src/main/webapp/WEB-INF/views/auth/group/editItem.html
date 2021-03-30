@@ -689,7 +689,7 @@ function getUserAuthorities(modalType, personType, page) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td style="vertical-align: middle;"><span class="user-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
+  					content += '<td style="vertical-align: middle;"><span class="user-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="icon-checkmark-alt"></i></span></td></tr>';
   					
   				});
   				
@@ -753,7 +753,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
+  					content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt"></i></span></td></tr>';
   					
   				}); 				
   				
@@ -1279,14 +1279,14 @@ function creatorLinkHandler(target) {
 		  </div>
 		  <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
 						style="margin-left: 80%" disabled>Search Author 
-						<i id="searchAuthorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+						<i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
 		  </button>
 		  <div class="form-group">
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
 			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<span class="icon-spinner" id="uriLoadingSpinnerAuthor"></span>
 			    	<i id="uriLoadingFoundAuthor" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
 			    	<i id="uriLoadingFailureAuthor" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>

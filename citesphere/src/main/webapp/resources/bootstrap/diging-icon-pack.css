@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/diging-icon-pack.eot?vluisj');
-  src:  url('fonts/diging-icon-pack.eot?vluisj#iefix') format('embedded-opentype'),
-    url('fonts/diging-icon-pack.ttf?vluisj') format('truetype'),
-    url('fonts/diging-icon-pack.woff?vluisj') format('woff'),
-    url('fonts/diging-icon-pack.svg?vluisj#icomoon') format('svg');
+  src:  url('fonts/diging-icon-pack.eot?ot2dk3');
+  src:  url('fonts/diging-icon-pack.eot?ot2dk3#iefix') format('embedded-opentype'),
+    url('fonts/diging-icon-pack.ttf?ot2dk3') format('truetype'),
+    url('fonts/diging-icon-pack.woff?ot2dk3') format('woff'),
+    url('fonts/diging-icon-pack.svg?ot2dk3#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,66 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-spinner .path1:before {
+  content: "\e9b8";
+  color: rgb(0, 0, 0);
+}
+.icon-spinner .path2:before {
+  content: "\e9b9";
+  margin-left: -1em;
+  color: rgb(0, 0, 0);
+}
+.icon-spinner .path3:before {
+  content: "\e9ba";
+  margin-left: -1em;
+  color: rgb(0, 0, 0);
+  opacity: 0.6;
+}
+.icon-spinner .path4:before {
+  content: "\e9bb";
+  margin-left: -1em;
+  color: rgb(0, 0, 0);
+  opacity: 0.8;
+}
+.icon-spinner .path5:before {
+  content: "\e9bc";
+  margin-left: -1em;
+  color: rgb(0, 0, 0);
+  opacity: 0.4;
+}
+.icon-spinner .path6:before {
+  content: "\e9bd";
+  margin-left: -1em;
+  color: rgb(0, 0, 0);
+  opacity: 0.7;
+}
+.icon-spinner .path7:before {
+  content: "\e9be";
+  margin-left: -1em;
+  color: rgb(0, 0, 0);
+  opacity: 0.3;
+}
+.icon-spinner .path8:before {
+  content: "\e9bf";
+  margin-left: -1em;
+  color: rgb(0, 0, 0);
+  opacity: 0.5;
+}
+.icon-spinner .path9:before {
+  content: "\e9c0";
+  margin-left: -1em;
+  color: rgb(0, 0, 0);
+  opacity: 0.9;
+}
+.icon-invoice:before {
+  content: "\e9c1";
+}
+.icon-user-check:before {
+  content: "\e9c2";
+}
+.icon-stop-circle:before {
+  content: "\e9c3";
+}
 .icon-anchor:before {
   content: "\e9b6";
 }

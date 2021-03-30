@@ -52,7 +52,7 @@ $(function() {
 		<td>
 		    <span th:if="${#strings.equals(job.status,'DONE')}"><i style="color: green;" class="icon-checkmark-alt"></i></span>
 		    <span th:if="${#strings.equals(job.status,'STARTED')}"><i style="color: orange;" class="icon-gear"></i></span>
-		    <span th:if="${#strings.equals(job.status,'FAILURE')}"><i style="color: red;" class="fas fa-exclamation-circle"></i></span>
+		    <span th:if="${#strings.equals(job.status,'FAILURE')}"><i style="color: red;" class="icon-warning"></i></span>
 		</td>
 	</tr>
 </table>
