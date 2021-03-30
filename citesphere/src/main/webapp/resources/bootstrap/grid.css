@@ -111,6 +111,11 @@ body{
   color: black;
 }
 
+[class*="icon-voice"]{
+  font-size: 13px;
+  color: black;
+}
+
 
 [class*="icon-book-open-alt"]{
   font-size: 13px;
