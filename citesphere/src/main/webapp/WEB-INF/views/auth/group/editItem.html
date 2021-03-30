@@ -5,6 +5,15 @@
 .popover {
 	min-width: 300px;
 }
+
+.rotating {
+    -webkit-transform: rotate(360deg);
+    -webkit-transition-duration: 1s;
+    -webkit-transition-delay: now;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+}
+
 </style>
 <script th:inline="javascript">
 //# sourceURL=submit.js
@@ -897,7 +906,7 @@ function loadFields() {
 					iconLink.attr("data-creator-type", creators[i]);
 					iconLink.attr("data-target","#creatorModal");
 					var iconImg = $("<i>");
-					iconImg.addClass("fas fa-plus-circle");
+					iconImg.addClass("icon-circle-add");
 					iconLink.append(iconImg);
 					iconLink.append("Add "+creators[i]);
 					addIconDiv.append(iconLink);
@@ -1279,14 +1288,14 @@ function creatorLinkHandler(target) {
 		  </div>
 		  <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
 						style="margin-left: 80%" disabled>Search Author 
-						<i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
+						<i id="searchAuthorSpinner"class="icon-spinner rotating" style="color: white"></i>
 		  </button>
 		  <div class="form-group">
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
 			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<span class="icon-spinner" id="uriLoadingSpinnerAuthor"></span>
+			    	<span class="icon-spinner rotating" id="uriLoadingSpinnerAuthor"></span>
 			    	<i id="uriLoadingFoundAuthor" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
 			    	<i id="uriLoadingFailureAuthor" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
@@ -1338,7 +1347,7 @@ function creatorLinkHandler(target) {
 		  <div>
 			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchEditor"
 						style="margin-left: 80%" disabled>Search Editor 
-						<i id="searchEditorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+						<i id="searchEditorSpinner"class="icon-spinner" style="color: white"></i>
 			</button>
 		  </div>
 		  
@@ -1347,7 +1356,7 @@ function creatorLinkHandler(target) {
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriEditor" placeholder="URI">
 			    <div id="editorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerEditor" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingSpinnerEditor" class="icon-spinner rotating"></i>
 			    	<i id="uriLoadingFoundEditor" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
 			    	<i id="uriLoadingFailureEditor" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
@@ -1398,7 +1407,7 @@ function creatorLinkHandler(target) {
 		  <div>
 			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchCreator"
 				style="margin-left: 80%" disabled> Search Creator 
-				<i id="searchCreatorSpinner" class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+				<i id="searchCreatorSpinner" class="icon-spinner rotating" style="color: white"></i>
 			</button>
 		  </div>
 		  <div class="form-group">
@@ -1406,7 +1415,7 @@ function creatorLinkHandler(target) {
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriCreator" placeholder="URI">
 			    <div id="creatorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerCreator" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingSpinnerCreator" class="icon-spinner rotating"></i>
 			    	<i id="uriLoadingFoundCreator" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
 			    	<i id="uriLoadingFailureCreator" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
