@@ -337,7 +337,7 @@ $(function() {
 		var text = $("#addConceptConceptSelect option:selected").text();
 		var typeName = $("#addConceptTypeSelect option:selected").text();
 		conceptSpan.text(text + " | " + typeName + " ");
-		var deleteIcon = $('<i class="fas fa-times remove-concept"></i>');
+		var deleteIcon = $('<i class="icon-circle-close remove-concept" style="cursor: pointer; color: white; font-size: 12px;"></i>');
 		deleteIcon.click(removeConcept);
 		conceptSpan.append(deleteIcon);
 		$("#conceptTags").append(conceptSpan);
@@ -463,8 +463,8 @@ function savePersonDetails(personType, modalName){
 	}
 	
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-	var editIcon = $('<i class="far fa-edit edit-'+modalNameLCase+'"></i>')
-	var deleteIcon = $('<i class="fas fa-times remove-'+modalNameLCase+'"></i>');
+	var editIcon = $('<i class="icon-edit edit-'+modalNameLCase+'" style="color: white; font-size: 12px;"></i>')
+	var deleteIcon = $('<i class="icon-circle-close remove-'+modalNameLCase+'" style="color: white; font-size: 12px;"></i>');
 	editIcon.click(function(){
 		var personItem = $(this).parent();
 		editPerson(modalName, personItem[0]);
@@ -1056,9 +1056,9 @@ function creatorLinkHandler(target) {
 									<span th:remove="tag" th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
 									&nbsp;
-							<i class="far fa-edit edit-author" style="cursor: pointer;"></i>
+							<i class="icon-edit edit-author" style="cursor: pointer; color: white; font-size: 12px;"></i>
 									&nbsp;
-							<i class="fas fa-times remove-author" style="cursor: pointer;"></i>
+							<i class="icon-circle-close remove-author" style="cursor: pointer; color: white; font-size: 12px;"></i>
 						</span>
 							&nbsp;&nbsp;
 						</th:block>
@@ -1078,9 +1078,9 @@ function creatorLinkHandler(target) {
 						  [[${editor.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
 						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
 							&nbsp;
-							<i class="far fa-edit edit-editor"></i>
+							<i class="icon-edit edit-editor" style="color: white; font-size: 12px;"></i>
 							&nbsp;
-						<i class="fas fa-times remove-editor"></i>
+						<i class="icon-circle-close remove-editor" style="cursor: pointer; color: white; font-size: 12px;"></i>
 								</span>
 							&nbsp;&nbsp;
 				        </th:block>
@@ -1103,8 +1103,8 @@ function creatorLinkHandler(target) {
 				 			</th:block>
 								[[${creator.person.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
 							<th:block th:each="aff:${creator.person.affiliations}">[[${aff.name}]]</th:block>
-							&nbsp;<i class="far fa-edit edit-creator"></i>
-									<i class="fas fa-times remove-creator"></i>
+							&nbsp;<i class="icon-edit edit-creator" style="color: white; font-size: 12px;"></i>
+									<i class="icon-circle-close remove-creator" style="cursor: pointer; color: white; font-size: 12px;"></i>
 						</span>
 							&nbsp;&nbsp;
 					</span>
@@ -1243,7 +1243,7 @@ function creatorLinkHandler(target) {
 		<td>
 		<div id="conceptTags">
 			<th:block th:each= "tag:${citation.conceptTags}">
-				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="fas fa-times remove-concept"></i></span>
+				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="icon-circle-close remove-concept" style="cursor: pointer; color: white; font-size: 12px;"></i></span>
 			</th:block>
 		</div>
 		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="icon-circle-add"></i> Add Concept</a></div>
