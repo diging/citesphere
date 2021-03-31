@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/diging-icon-pack.eot?2nx8fz');
-  src:  url('fonts/diging-icon-pack.eot?2nx8fz#iefix') format('embedded-opentype'),
-    url('fonts/diging-icon-pack.ttf?2nx8fz') format('truetype'),
-    url('fonts/diging-icon-pack.woff?2nx8fz') format('woff'),
-    url('fonts/diging-icon-pack.svg?2nx8fz#icomoon') format('svg');
+  src:  url('fonts/diging-icon-pack.eot?4t9ttr');
+  src:  url('fonts/diging-icon-pack.eot?4t9ttr#iefix') format('embedded-opentype'),
+    url('fonts/diging-icon-pack.ttf?4t9ttr') format('truetype'),
+    url('fonts/diging-icon-pack.woff?4t9ttr') format('woff'),
+    url('fonts/diging-icon-pack.svg?4t9ttr#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-pen:before {
+  content: "\e9b9";
+}
+.icon-sticky-note:before {
+  content: "\e9ba";
+}
 .icon-spinner:before {
   content: "\e9b8";
 }
