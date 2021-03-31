@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,13 @@ public class DeleteCitationController {
     @RequestMapping(value = "/auth/group/{groupId}/references/delete", method = RequestMethod.POST)
     public String delete(Authentication authentication, @PathVariable("groupId") String groupId, @RequestParam(value="citationList", required=false) List<String> citationList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, GroupDoesNotExistException {
-        citationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
+        List <String> zoteroResponse = new ArrayList<String>();
+        zoteroResponse = citationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
+        for (int i = 0; i < zoteroResponse.size(); i++) {
+            if (!zoteroResponse.get(i).contains("204 NO_CONTENT")) {
+                throw new ZoteroHttpStatusException("Could not delete items. Error: " + zoteroResponse.get(i));
+            }
+        }
         return "redirect:/auth/group/{groupId}/items";
     }
 }

@@ -359,7 +359,7 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public ResponseEntity<String> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
+    public List<String> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
         return zoteroConnector.deleteMultipleItems(user, groupId, citationKeys, citationVersion);
     }
