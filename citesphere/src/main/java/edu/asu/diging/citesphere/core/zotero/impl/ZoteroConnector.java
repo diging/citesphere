@@ -200,16 +200,6 @@ public class ZoteroConnector implements IZoteroConnector {
             throws ZoteroConnectionException, ZoteroHttpStatusException, InterruptedException {
         Zotero zotero = getApi(user);
         return zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList);
-//        ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
-//
-//        Function<Map.Entry<String, String>, String> itemKeyExtractor = e -> e.getValue();
-//        Function<Map.Entry<String, FailedMessage>, String> failedItemKeyExtractor = e -> e.getValue().getKey();
-//
-//        statuses.setSuccessItems(extractItemKeys(response.getSuccess(), itemKeyExtractor));
-//        statuses.setUnchagedItems(extractItemKeys(response.getUnchanged(), itemKeyExtractor));
-//        statuses.setFailedItems(extractItemKeys(response.getFailed(), failedItemKeyExtractor));
-//
-//        return statuses;
     }
     
     @Override

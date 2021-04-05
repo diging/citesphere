@@ -427,22 +427,21 @@ $(".list-group-item").droppable( {
 		       console.log(moveItemsAsyncResponse);
 		       let response = moveItemsAsyncResponse;
 		       let count = 0;
-		       let idObject ={
-		    		  taskID:  response.taskID
-		       };
-		       while(count < 10){
+		       
+		       while(count < 100 && response.taskStatus ==="PENDING"){
 		    	   count++;
 		       $.ajax({
 		            type: "POST",
 		            url: "items/move/status?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 		            contentType : "application/json",
 					dataType: "json",
-		            data: JSON.stringify(idObject),
+		            data: response.taskID,
 		            
 		            success: function (moveItemsStatusResponse) {
 		            	response = moveItemsStatusResponse;
-		                console(moveItemsStatusResponse.response.successItems);
-		                console(moveItemsStatusResponsee.response.failedItems);
+		            	console.log(moveItemsStatusResponse);
+		                console.log(response.response.successItems);
+		                console.log(response.response.failedItems);
 		                
 		            },
 		            error: function (moveItemsStatusResponse) {

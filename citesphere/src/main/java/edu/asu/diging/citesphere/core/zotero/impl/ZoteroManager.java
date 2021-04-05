@@ -317,31 +317,7 @@ public class ZoteroManager implements IZoteroManager {
             validCreatorTypesList.add(validCreatorTypes);
         }
         return zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
-        //ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
     }
-    
-//    private ZoteroUpdateItemsResponse getStatusesFromResponse(List<ItemCreationResponse> responses) {
-//        ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
-//        List<String> successKeys = new ArrayList<>();
-//        List<String> failedKeys = new ArrayList<>();
-//        List<String> unchangedKeys = new ArrayList<>();
-//        for (ItemCreationResponse response : responses) {
-//            Function<Map.Entry<String, String>, String> itemKeyExtractor = e -> e.getValue();
-//            Function<Map.Entry<String, FailedMessage>, String> failedItemKeyExtractor = e -> e.getValue().getKey();
-//
-//            successKeys.addAll(extractItemKeys(response.getSuccess(), itemKeyExtractor));
-//            failedKeys.addAll(extractItemKeys(response.getFailed(), failedItemKeyExtractor));
-//            unchangedKeys.addAll(extractItemKeys(response.getUnchanged(), itemKeyExtractor));
-//        }
-//        statuses.setSuccessItems(successKeys);
-//        statuses.setFailedItems(failedKeys);
-//        statuses.setUnchangedItems(unchangedKeys);
-//        return statuses;
-//    }
-//    
-//    private <T> List<String> extractItemKeys(Map<String, T> map, Function<Map.Entry<String, T>, String> keyExtractor) {
-//        return map.entrySet().stream().map(e -> keyExtractor.apply(e)).collect(Collectors.toList());
-//    }
     
     @Override
     public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
