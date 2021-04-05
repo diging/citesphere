@@ -132,6 +132,51 @@ body{
   color: black;
 }
 
+[class*="icon-grad-cap"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-newspaper"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-gavel"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-pen"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-brush"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-up-down-arrow"]{
+  font-size: 18px;
+  color: black;
+}
+
+[class*="icon-sticky-note"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-film-reel"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-firefox"]{
+  font-size: 13px;
+  color: black;
+}
+
 [class*="icon-search"]{
   font-size: 18px;
   color: black;
