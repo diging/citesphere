@@ -416,7 +416,6 @@ $(".list-group-item").droppable( {
 		var itemsMoveData ={};
 		itemsMoveData["itemIds"] = itemsKeys;
 		itemsMoveData["collectionId"] = movedToCollectionKey;
-		if(itemsKeys.length <= 50){
 		$.ajax({
 			type: "POST",
 			url: 'items/move?[(${_csrf.parameterName})]=[(${_csrf.token})]',
@@ -424,39 +423,12 @@ $(".list-group-item").droppable( {
 			contentType : "application/json",
 			dataType: "json",
 			success: function (moveItemsAsyncResponse){
-		       console.log(moveItemsAsyncResponse);
-		       let response = moveItemsAsyncResponse;
-		       let count = 0;
-		       
-		       while(count < 100 && response.taskStatus ==="PENDING"){
-		    	   count++;
-		       $.ajax({
-		            type: "POST",
-		            url: "items/move/status?[(${_csrf.parameterName})]=[(${_csrf.token})]",
-		            contentType : "application/json",
-					dataType: "json",
-		            data: response.taskID,
-		            
-		            success: function (moveItemsStatusResponse) {
-		            	response = moveItemsStatusResponse;
-		            	console.log(moveItemsStatusResponse);
-		                console.log(response.response.successItems);
-		                console.log(response.response.failedItems);
-		                
-		            },
-		            error: function (moveItemsStatusResponse) {
-		                console.log('Error', moveItemsStatusResponse);
-		            }
-		        });
-		       }
+		       doPoll(moveItemsAsyncResponse, collectionName);
 			 },
 			 error: function (moveItemsAsyncResponse) {
 				   showNotification(" Error while moving citations!", "danger", 10000);
 			 }
 		});
-		} else{
-			showNotification("Cannot move more than 50 citations at a time!", "warning", 5000);
-		}
 		$('.fa-chevron-circle-left').show();
 		var checkedBoxes = $('input[type="checkbox"]:checked');
 		checkedBoxes.each(function(){
@@ -466,6 +438,53 @@ $(".list-group-item").droppable( {
 		}
 });
 });	
+
+
+
+function doPoll(response,collectionName){
+	$.ajax({
+	     type: "POST",
+	     url: "items/move/status?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+	     contentType : "application/json",
+		 dataType: "json",
+	     data: response.taskID,
+	     success: function (moveItemsStatusResponse) {
+	     if(moveItemsStatusResponse.taskStatus === "COMPLETE"){
+	       	 if(moveItemsStatusResponse.response.successItems.length != 0){
+	 		    message = " "+moveItemsStatusResponse.response.successItems.length+ " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.successItems;
+	 			showNotification(message, "success", 20000);
+	 		 }
+	 		 if(moveItemsStatusResponse.response.failedItems.length != 0){
+	 		   	message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems;
+	 		   	showNotification(message, "danger", 20000);
+	 		 }
+	 		 clearAsyncTask(moveItemsStatusResponse.taskID);	
+	     }else{
+	       	 setTimeout(doPoll(moveItemsStatusResponse,collectionName),1000);
+	     }
+	     },
+	     error: function (moveItemsStatusResponse) {
+	       	showNotification("Error while polling citations statuses!", "warning", 1000)
+	        },
+	    });
+}
+
+
+
+function clearAsyncTask(taskID){
+	$.ajax({
+		type: "POST",
+		url: 'items/move/cleartask?[(${_csrf.parameterName})]=[(${_csrf.token})]',
+		data: taskID,
+		contentType : "application/json",
+		dataType: "json",
+		success: function (taskRemovedResponse){
+		 },
+		 error: function (taskRemovedResponse) {
+		 }
+	});
+}
+
 
 function showNotification(message, status, time){
 	$.notify('<i class="fas fa-exclamation-circle"></i>'+message, {

@@ -83,7 +83,9 @@ public class MoveItemsController {
         return asyncTaskProcessor.getResponse(taskID);
     }
     
-    public boolean cleatTask(String taskID) {
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/cleartask", method = RequestMethod.POST)
+    public @ResponseBody Boolean cleatTask(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String taskID) {
         return asyncTaskProcessor.clearTask(taskID);
     }
     
