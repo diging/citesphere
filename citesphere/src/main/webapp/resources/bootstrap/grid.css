@@ -157,6 +157,21 @@ body{
   color: black;
 }
 
+[class*="icon-map"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-network"]{
+  font-size: 13px;
+  color: black;
+}
+
+[class*="icon-web"]{
+  font-size: 13px;
+  color: black;
+}
+
 [class*="icon-up-down-arrow"]{
   font-size: 18px;
   color: black;
