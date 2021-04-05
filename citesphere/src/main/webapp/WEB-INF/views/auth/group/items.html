@@ -423,17 +423,35 @@ $(".list-group-item").droppable( {
 			data: JSON.stringify(itemsMoveData),
 			contentType : "application/json",
 			dataType: "json",
-			success: function (data){
-		       if(data.movedCitations.length != 0){
-		    	   message = " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ data.movedCitations;
-				   showNotification(message, "success", 20000);
-		      }
-		       if(data.notMovedCitations.length != 0){
-		    	   message = " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ data.notMovedCitations;
-		    	   showNotification(message, "danger", 20000);
-		      }
+			success: function (moveItemsAsyncResponse){
+		       console.log(moveItemsAsyncResponse);
+		       let response = moveItemsAsyncResponse;
+		       let count = 0;
+		       let idObject ={
+		    		  taskID:  response.taskID
+		       };
+		       while(count < 10){
+		    	   count++;
+		       $.ajax({
+		            type: "POST",
+		            url: "items/move/status?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+		            contentType : "application/json",
+					dataType: "json",
+		            data: JSON.stringify(idObject),
+		            
+		            success: function (moveItemsStatusResponse) {
+		            	response = moveItemsStatusResponse;
+		                console(moveItemsStatusResponse.response.successItems);
+		                console(moveItemsStatusResponsee.response.failedItems);
+		                
+		            },
+		            error: function (moveItemsStatusResponse) {
+		                console.log('Error', moveItemsStatusResponse);
+		            }
+		        });
+		       }
 			 },
-			 error: function (data) {
+			 error: function (moveItemsAsyncResponse) {
 				   showNotification(" Error while moving citations!", "danger", 10000);
 			 }
 		});

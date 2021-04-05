@@ -316,16 +316,8 @@ public class ZoteroManager implements IZoteroManager {
             ignoreFieldsList.add(ignoreFields);
             validCreatorTypesList.add(validCreatorTypes);
         }
-        Future<ZoteroUpdateItemsStatuses> future = zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
+        return zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
         //ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
-        while (true) {
-            if (future.isDone()) {
-//                List<ZoteroUpdateItemsStatuses> responses = future.get();
-//                statuses = getStatusesFromResponse(responses);
-                return future.get();
-            }
-            Thread.sleep(1000);
-        }
     }
     
 //    private ZoteroUpdateItemsResponse getStatusesFromResponse(List<ItemCreationResponse> responses) {

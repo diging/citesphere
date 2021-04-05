@@ -38,15 +38,17 @@ public class MoveItemsController {
 
     @Autowired
     private ICitationManager citationManager;
+    
+    
+    private static AsyncTaskProcessor<ZoteroUpdateItemsStatuses> asyncTaskProcessor = new  AsyncTaskProcessor<ZoteroUpdateItemsStatuses>();
 
     @Autowired
     private ICitationHelper citationHelper;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST)
-    public @ResponseBody String moveItemToCollection(Authentication authentication,
+    public @ResponseBody String moveItemsToCollection(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String itemsData)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
-            CitationIsOutdatedException, InterruptedException, ExecutionException {
+            throws Exception {
         Gson gson = new Gson();
         MoveItemsRequest itemsDataDto = gson.fromJson(itemsData, MoveItemsRequest.class);
         List<ICitation> citations = new ArrayList<>();
@@ -64,14 +66,40 @@ public class MoveItemsController {
             citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
         }
-        ZoteroUpdateItemsStatuses response = citationManager.updateCitations((IUser) authentication.getPrincipal(),
-                zoteroGroupId, citations);
-        CitationStatusesData statusesDto = new CitationStatusesData();
-        statusesDto.setMovedCitations(response.getSuccessItems());
-        for (String failedItemKey : response.getFailedItems()) {
-            notMovedCitations.add(failedItemKey);
+        
+        AsyncTaskResponse<ZoteroUpdateItemsStatuses> asyncResponse;
+        try {
+            asyncResponse = asyncTaskProcessor.submitTask(() -> citationManager.updateCitations((IUser) authentication.getPrincipal(),
+                    zoteroGroupId, citations));
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            logger.error("Unable to move citations.", e);
+            throw e;
         }
-        statusesDto.setNotMovedCitations(notMovedCitations);
-        return gson.toJson(statusesDto, CitationStatusesData.class);
+                
+        return gson.toJson(asyncResponse, AsyncTaskResponse.class);
+//        ZoteroUpdateItemsStatuses response = citationManager.updateCitations((IUser) authentication.getPrincipal(),
+//                zoteroGroupId, citations);
+//        CitationStatusesData statusesDto = new CitationStatusesData();
+//        statusesDto.setMovedCitations(response.getSuccessItems());
+//        for (String failedItemKey : response.getFailedItems()) {
+//            notMovedCitations.add(failedItemKey);
+//        }
+//        statusesDto.setNotMovedCitations(notMovedCitations);
+//        return gson.toJson(statusesDto, CitationStatusesData.class);
     }
+    
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/status", method = RequestMethod.POST)
+    public @ResponseBody AsyncTaskResponse<ZoteroUpdateItemsStatuses> getMoveItemsStatus(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String taskID) throws Exception {
+        System.out.println("in contoller");
+        
+        return asyncTaskProcessor.getResponse(taskID);
+    }
+    
+    public boolean cleatTask(String taskID) {
+        return asyncTaskProcessor.clearTask(taskID);
+    }
+    
+    
 }

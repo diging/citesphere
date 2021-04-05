@@ -194,13 +194,12 @@ public class ZoteroConnector implements IZoteroConnector {
      * @return ZoteroUpdateItemsResponse returns statuses of items.
      */
     @Override
-    @Async
-    public Future<ZoteroUpdateItemsStatuses> updateItems(IUser user, List<Item> items, String groupId,
+   
+    public ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
             List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, InterruptedException {
         Zotero zotero = getApi(user);
-        return new AsyncResult<ZoteroUpdateItemsStatuses>(
-                zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList));
+        return zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList);
 //        ZoteroUpdateItemsResponse statuses = new ZoteroUpdateItemsResponse();
 //
 //        Function<Map.Entry<String, String>, String> itemKeyExtractor = e -> e.getValue();
