@@ -439,8 +439,6 @@ $(".list-group-item").droppable( {
 });
 });	
 
-
-
 function doPoll(response,collectionName){
 	$.ajax({
 	     type: "POST",
@@ -469,8 +467,6 @@ function doPoll(response,collectionName){
 	    });
 }
 
-
-
 function clearAsyncTask(taskID){
 	$.ajax({
 		type: "POST",
@@ -484,7 +480,6 @@ function clearAsyncTask(taskID){
 		 }
 	});
 }
-
 
 function showNotification(message, status, time){
 	$.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
