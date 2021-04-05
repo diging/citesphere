@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -9,7 +8,6 @@ import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
-import org.springframework.social.zotero.api.ItemCreationResponse;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;

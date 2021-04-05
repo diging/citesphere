@@ -2,10 +2,8 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +13,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -25,7 +21,6 @@ import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ItemCreationResponse;
-import org.springframework.social.zotero.api.ItemCreationResponse.FailedMessage;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -39,7 +34,6 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
-import edu.asu.diging.citesphere.core.zotero.ZoteroUpdateItemsResponse;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Component
@@ -185,7 +179,7 @@ public class ZoteroConnector implements IZoteroConnector {
     
     /**
      * This method makes a call to Zotero to batch update items and return back
-     * response
+     * items statuses
      * 
      * @param groupId      group id of citations
      * @param items        List of items to be updated
@@ -194,7 +188,7 @@ public class ZoteroConnector implements IZoteroConnector {
      * @return ZoteroUpdateItemsResponse returns statuses of items.
      */
     @Override
-   
+
     public ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
             List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, InterruptedException {
@@ -315,9 +309,4 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return new ZoteroHttpStatusException(cause);
     }
-    
-    private <T> List<String> extractItemKeys(Map<String, T> map, Function<Map.Entry<String, T>, String> keyExtractor) {
-        return map.entrySet().stream().map(e -> keyExtractor.apply(e)).collect(Collectors.toList());
-    }
-
 }

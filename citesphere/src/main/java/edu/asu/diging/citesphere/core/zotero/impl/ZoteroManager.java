@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +17,6 @@ import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
-import org.springframework.social.zotero.api.ItemCreationResponse;
-import org.springframework.social.zotero.api.ItemCreationResponse.FailedMessage;
 import org.springframework.social.zotero.api.ZoteroFields;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -36,7 +31,6 @@ import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
 import edu.asu.diging.citesphere.core.zotero.ZoteroGroupItemsResponse;
-import edu.asu.diging.citesphere.core.zotero.ZoteroUpdateItemsResponse;
 import edu.asu.diging.citesphere.factory.ICitationCollectionFactory;
 import edu.asu.diging.citesphere.factory.ICitationFactory;
 import edu.asu.diging.citesphere.factory.IGroupFactory;
@@ -293,7 +287,7 @@ public class ZoteroManager implements IZoteroManager {
      * @param citations list of citations that has to be updated.
      * 
      * @return ZoteroUpdateItemsResponse returns statuses of citations.
-     * @throws ExecutionException 
+     * @throws ExecutionException
      */
     @Override
     public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)

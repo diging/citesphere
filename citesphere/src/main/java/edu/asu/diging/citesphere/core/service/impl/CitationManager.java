@@ -36,7 +36,6 @@ import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
-import edu.asu.diging.citesphere.core.zotero.ZoteroUpdateItemsResponse;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
@@ -155,7 +154,8 @@ public class CitationManager implements ICitationManager {
     
     @Override
     public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
-            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, InterruptedException, ExecutionException  {
+            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
+            InterruptedException, ExecutionException {
         return zoteroManager.updateCitations(user, groupId, citations);
     }
 
