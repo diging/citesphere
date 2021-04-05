@@ -29,9 +29,9 @@ public class DeleteCitationController {
             throws ZoteroConnectionException, ZoteroHttpStatusException, GroupDoesNotExistException {
         List <String> zoteroResponse = new ArrayList<String>();
         zoteroResponse = citationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
-        for (int i = 0; i < zoteroResponse.size(); i++) {
-            if (!zoteroResponse.get(i).contains("204 NO_CONTENT")) {
-                throw new ZoteroHttpStatusException("Could not delete items. Error: " + zoteroResponse.get(i));
+        for (String response: zoteroResponse) {
+            if (!response.contains("204 NO_CONTENT")) {
+                throw new ZoteroHttpStatusException("Could not delete items. Error: " + response);
             }
         }
         return "redirect:/auth/group/{groupId}/items";

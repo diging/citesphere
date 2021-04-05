@@ -123,12 +123,12 @@ $(function() {
 		var entry = "Entry";
 		var rows = ids.split(",");
 		var baseurl = "references/delete/";
-
 		$.ajax({
-			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+			'url': baseurl,
 			'type': "POST",
 			'data': {
-				"citationList": ids
+				"citationList": ids,
+				[[${_csrf.parameterName}]] : [[${_csrf.token}]]
 			},
 			'success': function(data) {
 				for(id of rows) {
@@ -151,7 +151,7 @@ $(function() {
 			},
 			'error': function(data) {
 				console.log(data);
-				$.notify('<i class="fas fa-exclamation-circle"></i> Citation could not be deleted!', {
+				$.notify('<i class="fas fa-exclamation-circle"></i> Citations could not be deleted!', {
 					type: 'danger',
 					offset: {
 						x: 50,
