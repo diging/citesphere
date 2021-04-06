@@ -9,7 +9,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
 import org.springframework.social.zotero.api.Data;
@@ -17,6 +16,7 @@ import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
+import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.ZoteroFields;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
@@ -359,7 +359,7 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public List<String> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
+    public List<ItemDeletionResponse> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
         return zoteroConnector.deleteMultipleItems(user, groupId, citationKeys, citationVersion);
     }

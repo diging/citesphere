@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,14 +24,13 @@ public class DeleteCitationController {
     @Autowired
     private ICitationManager citationManager;
 
-
     @RequestMapping(value = "/auth/group/{groupId}/references/delete", method = RequestMethod.POST)
     public String delete(Authentication authentication, @PathVariable("groupId") String groupId, @RequestParam(value="citationList", required=false) List<String> citationList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, GroupDoesNotExistException {
-        List <String> zoteroResponse = new ArrayList<String>();
+        List<ItemDeletionResponse> zoteroResponse = new ArrayList<ItemDeletionResponse>();
         zoteroResponse = citationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
-        for (String response: zoteroResponse) {
-            if (!response.contains("204 NO_CONTENT")) {
+        for (ItemDeletionResponse response: zoteroResponse) {
+            if (response.toString() != "SUCCESS") {
                 throw new ZoteroHttpStatusException("Could not delete items. Error: " + response);
             }
         }

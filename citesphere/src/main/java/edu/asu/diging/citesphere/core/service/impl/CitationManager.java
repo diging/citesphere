@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.util.CloseableIterator;
-import org.springframework.http.ResponseEntity;
+import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -382,8 +382,8 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public List<String> deleteCitations(IUser user, String groupId, List<String> citationIdList) throws ZoteroConnectionException, ZoteroHttpStatusException {
-        List<String> response = zoteroManager.deleteMultipleItems(user, groupId, citationIdList, zoteroManager.getLatestGroupVersion(user, groupId));
+    public List<ItemDeletionResponse> deleteCitations(IUser user, String groupId, List<String> citationIdList) throws ZoteroConnectionException, ZoteroHttpStatusException {
+        List<ItemDeletionResponse> response = zoteroManager.deleteMultipleItems(user, groupId, citationIdList, zoteroManager.getLatestGroupVersion(user, groupId));
         for(String citationId : citationIdList) {
             Optional<ICitation> citation = citationStore.findById(citationId);
             if(citation.isPresent()) {
