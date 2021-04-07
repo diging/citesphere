@@ -10,9 +10,13 @@
 //# sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
+	$("#uriLoadingSpinnerAuthorAffiliation").hide();
 	$("#uriLoadingFailureAuthor").hide();
+	$("#uriLoadingFailureAuthorAffiliation").hide();
 	$("#uriLoadingFoundAuthor").hide();
+	$("#uriLoadingFoundAuthorAffiliation").hide();
 	$("#searchAuthorSpinner").hide();
+	$("#searchAuthorAffiliationSpinner").hide();
 	
 	$("#uriLoadingFoundAuthor").popover();
 	$("#uriLoadingFailureAuthor").popover();
@@ -62,6 +66,10 @@ $(function() {
     $("#firstNameAuthor").keyup(function(e){
     	allowAuthoritySearch("Author");
      });
+	
+    $("#firstNameAuthorAffiliation").keyup(function(e){
+    	allowAuthoritySearch("AuthorAffiliation");
+     });
 		
     $("#lastNameAuthor").keyup(function(e){
     	allowAuthoritySearch("Author");
@@ -80,6 +88,24 @@ $(function() {
     $("#lastNameCreator").keyup(function(e){
     	allowAuthoritySearch("Creator");
      });
+    
+    $(".searchAuthor").click(function() {
+    	var id = $(this).data('client-id');
+    	var property = id.substring(6, id.length);
+    	console.log(id);
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})  
+		$("#" + id + "Spinner").show();
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		
+		getUserAuthorities(property,property, 0)
+		getconceptpowerAuthorities(property,property,0)
+		$("#" + id + "Spinner").hide();
+	});
+    
+    /*
 	$("#searchAuthor").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
@@ -92,6 +118,20 @@ $(function() {
 		getconceptpowerAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
 	});
+	
+	$("#searchAuthorAffiliation").click(function() {
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})  
+		$("#searchAuthorAffiliationSpinner").show();
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		
+		getUserAuthorities('AuthorAffiliation','AuthorAffiliation', 0)
+		getconceptpowerAuthorities('AuthorAffiliation','AuthorAffiliation',0)
+		$("#searchAuthorAffiliationSpinner").hide();
+	});
+	*/
 	
 	$("#searchEditor").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
@@ -143,6 +183,33 @@ $(function() {
 		$("#authorAffiliations").append(affiliationCopy);
 	});
 	
+	$(".authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
+		var id = $(this).data('client-id');
+		var property;
+		var property1;
+		if(id.includes("Affiliation")){
+			property = "AuthorAffiliation";
+			property1 = "authorAffiliation";
+		} else {
+			property = "Author";
+			property1 = "author";
+		}
+    	var property = id.substring(6, id.length);
+    	console.log(id);
+    	
+		var uri = $("#uriLoadingFound" + property).attr('data-authority-uri');
+		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
+			$("#authorCreateAuthority").hide();
+			
+			$("#uri" + property + "LocalId").val(data['id']);
+			$("#" + property1 +"AuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#" + property1 +"AuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], property);
+			$("#uriLoadingFound" + property).popover('hide');
+		});
+	});
+	
+	/*
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
 		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
@@ -156,6 +223,22 @@ $(function() {
 		});
 	});
 	
+	
+	$("#authorAffiliationIconContainer").on('click', ".popover #authorCreateAuthority", function() {
+		var uri = $("#uriLoadingFoundAuthorAffiliation").attr('data-authority-uri');
+		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
+			$("#authorCreateAuthority").hide();
+			
+			$("#uriAuthorAffiliationLocalId").val(data['id']);
+			$("#authorAffiliationAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#authorAffiliationAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], "AuthorAffiliation");
+			$("#uriLoadingFoundAuthorAffiliation").popover('hide');
+		});
+	});
+	
+	*/
+	
 	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
@@ -164,6 +247,16 @@ $(function() {
 		$("#uriLoadingFoundAuthor").popover('hide');
 		event.preventDefault();
 	});
+	
+	$("#authorAffiliationIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var authId = $(this).attr('data-authority-id');
+		$("#uriAuthorAffiliationLocalId").val(authId);
+		$("#authorAffiliationAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), "AuthorAffiliation");
+		$("#uriLoadingFoundAuthorAffiliation").popover('hide');
+		event.preventDefault();
+	});
+	
 	
 	var timer = null;
 	$("#uriAuthor").change(function() {
@@ -175,6 +268,37 @@ $(function() {
 	    	getPersonAuthority(uri, "Author");
 	    }, 1000);
 	});
+	/*
+	var timer = null;
+	$(".uriAuthor").change(function() {
+		var id = $(this).data('client-id');
+		console.log(id);
+		resetPersonAuthorityCreation("Author");
+		$("#uriLoadingSpinnerAuthor").show();
+		var uri = $("#uriAuthor").val();
+		clearTimeout(timer); 
+	    timer = setTimeout(function() {
+	    	getPersonAuthority(uri, "Author");
+	    }, 1000);
+	});
+
+	
+	
+	
+	
+	
+	
+	var timerAffiliation = null;
+	$("#uriAuthorAffiliation").change(function() {
+		resetPersonAuthorityCreation("AuthorAffiliation");
+		$("#uriLoadingSpinnerAuthorAffiliation").show();
+		var uri = $("#uriAuthorAffiliation").val();
+		clearTimeout(timer); 
+		timerAffiliation = setTimeout(function() {
+	    	getPersonAuthority(uri, "AuthorAffiliation");
+	    }, 1000);
+	});
+	*/
 	
 	$("#closeAuthoritySearchResult").click(function() {
 		$("#selectAuthorityModel").modal('hide');
@@ -668,6 +792,9 @@ function getPersonAuthority(uri, personType) {
 function getUserAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
+	if(lastName === undefined) {
+		lastName = "";
+	}
 	personType_lowerCase = personType.toLowerCase();
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/user|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
 	$.ajax({
@@ -730,6 +857,9 @@ function getUserAuthorities(modalType, personType, page) {
 function getconceptpowerAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
+	if(lastName === undefined) {
+		lastName = "";
+	}
 	personType_lowerCase = personType.toLowerCase();
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/conceptpower|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
@@ -1277,15 +1407,15 @@ function creatorLinkHandler(target) {
 		    <label for="lastNameAuthor">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
 		  </div>
-		  <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
+		  <button class="btn btn-primary searchAuthor" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="searchAuthor" id="searchAuthor"
 						style="margin-left: 80%" disabled>Search Author 
 						<i id="searchAuthorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 		  </button>
 		  <div class="form-group">
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
-			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
-			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    <input type="text" class="form-control uriAuthor" data-client-id="uriAuthor" id="uriAuthor" placeholder="URI">
+			    <div data-client-id="authorIconContainer" id="authorIconContainer" class="input-group-addon authorIconContainer" style="min-width: 35px;">
 			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
 			    	<i id="uriLoadingFoundAuthor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
 			    	<i id="uriLoadingFailureAuthor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
@@ -1297,7 +1427,23 @@ function creatorLinkHandler(target) {
 		  <div id="authorAffiliations">
 		  <div id="authorAffiliationTemplate" class="form-group">
 		    <label for="affiliationAuthor">Affiliation:</label>
-		    <input type="text" class="form-control" placeholder="Affiliation">
+		    <input type="text" class="form-control" id="firstNameAuthorAffiliation" placeholder="Affiliation">
+		  
+		    <button class="btn btn-primary searchAuthor" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="searchAuthorAffiliation" id="searchAuthorAffiliation"
+						style="margin-left: 80%" disabled>Search Affiliation
+						<i id="searchAuthorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+		    </button>
+		    <label for="uriAuthorAffiliation">URI:</label>
+		    <div class="input-group">
+			    <input type="text" class="form-control uriAuthor" id="uriAuthorAffiliation" placeholder="URI">
+			    <div data-client-id="authorAffiliationIconContainer" id="authorAffiliationIconContainer" class="input-group-addon authorIconContainer" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerAuthorAffiliation" class="fas fa-spinner fa-spin text-info"></i>
+			    	<i id="uriLoadingFoundAuthorAffiliation" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureAuthorAffiliation" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    </div>
+			    <input type="hidden" id="uriAuthorAffiliationLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="authorAffiliationAuthorityUsed"></div>
 		  </div>
 		  </div>
 		  <div>
