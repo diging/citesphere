@@ -448,13 +448,11 @@ function pollMovedItemsStatuses(response,collectionName){
 	     data: response.taskID,
 	     success: function (moveItemsStatusResponse) {
 	     if(moveItemsStatusResponse.taskStatus === "COMPLETE"){
-	    	 console.log(moveItemsStatusResponse.response);
 	       	 if(moveItemsStatusResponse.response.successItems.length != 0){
 	 		    message = " "+moveItemsStatusResponse.response.successItems.length+ " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.successItems;
 	 			showNotification(message, "success", 20000);
 	 		 }
 	 		 if(moveItemsStatusResponse.response.failedItems.length != 0){
-	 		   	console.log(moveItemsStatusResponse.response.failedItems.length, moveItemsStatusResponse.response.failedItems)
 	 			message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems;
 	 		   	showNotification(message, "danger", 20000);
 	 		 }
@@ -494,7 +492,7 @@ function showNotification(message, status, time){
 		animate: {
 			 enter: 'animated fadeInRight',
 			 exit: 'animated fadeOutRight'
-		}
+		},
 	});
 }
 		
