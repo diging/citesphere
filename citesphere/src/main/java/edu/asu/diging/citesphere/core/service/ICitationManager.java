@@ -15,7 +15,6 @@ import edu.asu.diging.citesphere.core.exceptions.SyncInProgressException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.impl.CitationPage;
-import edu.asu.diging.citesphere.core.zotero.ZoteroUpdateItemsResponse;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;

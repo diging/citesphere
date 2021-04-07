@@ -423,7 +423,7 @@ $(".list-group-item").droppable( {
 			contentType : "application/json",
 			dataType: "json",
 			success: function (moveItemsAsyncResponse){
-		       doPoll(moveItemsAsyncResponse, collectionName);
+		       pollMovedItemsStatuses(moveItemsAsyncResponse, collectionName);
 			 },
 			 error: function (moveItemsAsyncResponse) {
 				   showNotification(" Error while moving citations!", "danger", 10000);
@@ -439,7 +439,7 @@ $(".list-group-item").droppable( {
 });
 });	
 
-function doPoll(response,collectionName){
+function pollMovedItemsStatuses(response,collectionName){
 	$.ajax({
 	     type: "POST",
 	     url: "items/move/status?[(${_csrf.parameterName})]=[(${_csrf.token})]",
@@ -448,17 +448,19 @@ function doPoll(response,collectionName){
 	     data: response.taskID,
 	     success: function (moveItemsStatusResponse) {
 	     if(moveItemsStatusResponse.taskStatus === "COMPLETE"){
+	    	 console.log(moveItemsStatusResponse.response);
 	       	 if(moveItemsStatusResponse.response.successItems.length != 0){
 	 		    message = " "+moveItemsStatusResponse.response.successItems.length+ " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.successItems;
 	 			showNotification(message, "success", 20000);
 	 		 }
 	 		 if(moveItemsStatusResponse.response.failedItems.length != 0){
-	 		   	message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems;
+	 		   	console.log(moveItemsStatusResponse.response.failedItems.length, moveItemsStatusResponse.response.failedItems)
+	 			message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems;
 	 		   	showNotification(message, "danger", 20000);
 	 		 }
 	 		 clearAsyncTask(moveItemsStatusResponse.taskID);	
 	     }else{
-	       	 setTimeout(doPoll(moveItemsStatusResponse,collectionName),1000);
+	       	 setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName),1000);
 	     }
 	     },
 	     error: function (moveItemsStatusResponse) {
