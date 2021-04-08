@@ -223,14 +223,5 @@ public class AuthorityService implements IAuthorityService {
         }
         return null;
     }
-    
-    @Override
-    public String getGroupNameByGroupId(String citationGroupId) throws GroupDoesNotExistException {
-        Optional<ICitationGroup> group = groupRepository.findFirstByGroupId(new Long(citationGroupId));
-        if (!group.isPresent()) {
-            throw new GroupDoesNotExistException("Group with id " + citationGroupId + " does not exist.");
-        }
-        return group.get().getName();
-    }
 
 }
