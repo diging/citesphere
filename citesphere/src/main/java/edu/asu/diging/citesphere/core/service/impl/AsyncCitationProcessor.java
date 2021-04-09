@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,6 +10,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +23,14 @@ import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
-import edu.asu.diging.citesphere.core.service.jobs.impl.SyncJobManager;
+import edu.asu.diging.citesphere.core.service.ICitationStore;
+import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
 import edu.asu.diging.citesphere.core.zotero.ZoteroGroupItemsResponse;
 import edu.asu.diging.citesphere.data.bib.CitationCollectionRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -45,7 +48,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     private IZoteroManager zoteroManager;
 
     @Autowired
-    private CitationRepository citationRepo;
+    private ICitationStore citationStore;
 
     @Autowired
     private CitationGroupRepository groupRepo;
@@ -57,7 +60,17 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     private JobRepository jobRepo;
 
     @Autowired
-    private SyncJobManager jobManager;
+    private ISyncJobManager jobManager;
+    
+    private List<JobStatus> inactiveJobStatuses;
+    
+    @PostConstruct
+    public void init() {
+        inactiveJobStatuses = Collections.synchronizedList(new ArrayList<JobStatus>());
+        inactiveJobStatuses.add(JobStatus.CANCELED);
+        inactiveJobStatuses.add(JobStatus.DONE);
+        inactiveJobStatuses.add(JobStatus.FAILURE);
+    }
 
     /*
      * (non-Javadoc)
@@ -69,16 +82,19 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
      */
     @Override
     @Async
-    public void sync(IUser user, ICitationGroup group, String collectionId) {
-        GroupSyncJob prevJob = jobManager.getMostRecentJob(group.getGroupId() + "");
-        if (prevJob != null && prevJob.getStatus() != JobStatus.DONE && prevJob.getStatus() != JobStatus.FAILURE) {
+    public void sync(IUser user, String groupId, long contentVersion, String collectionId) {
+        GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
+        // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
+        // more activate job statuses than inactive ones, so it's less error prone to use the list that
+        // is less likely to change.
+        if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
             // there is already a job running, let's not start another one
             return;
         }
 
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
-        job.setGroupId(group.getGroupId() + "");
+        job.setGroupId(groupId + "");
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save(job);
         jobManager.addJob(job);
@@ -87,13 +103,13 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         // in between
         // this way the group version can be out-dated and trigger another sync next
         // time
-        long groupVersion = zoteroManager.getLatestGroupVersion(user, group.getGroupId() + "");
-        DeletedZoteroElements deletedElements = zoteroManager.getDeletedElements(user, group.getGroupId() + "",
-                group.getContentVersion());
-        Map<String, Long> versions = zoteroManager.getGroupItemVersions(user, group.getGroupId() + "",
-                group.getContentVersion());
-        Map<String, Long> collectionVersions = zoteroManager.getCollectionsVersions(user, group.getGroupId() + "",
-                group.getContentVersion() + "");
+        long groupVersion = zoteroManager.getLatestGroupVersion(user, groupId + "");
+        DeletedZoteroElements deletedElements = zoteroManager.getDeletedElements(user, groupId + "",
+                contentVersion);
+        Map<String, Long> versions = zoteroManager.getGroupItemsVersions(user, groupId + "",
+                contentVersion, true);
+        Map<String, Long> collectionVersions = zoteroManager.getCollectionsVersions(user, groupId + "",
+                contentVersion + "");
 
         job.setTotal(versions.size() + collectionVersions.size()
                 + (deletedElements.getItems() != null ? deletedElements.getItems().size() : 0));
@@ -101,24 +117,31 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         jobRepo.save(job);
 
         AtomicInteger counter = new AtomicInteger();
-        syncCitations(user, group, job, versions, counter);
-        syncCollections(user, group, job, collectionVersions, groupVersion, counter);
+        syncCitations(user, groupId, job, versions, counter);
+        syncCollections(user, groupId, job, collectionVersions, groupVersion, counter);
 
         removeDeletedItems(deletedElements, job);
 
-        group.setContentVersion(groupVersion);
-        groupRepo.save((CitationGroup) group);
+        
+        // while this thread has been running, the group might have been updated by another thread
+        // so, we have to make sure there is no group with the same group id but other object id
+        // or we'll end up with two groups with the same group id.
+        Optional<ICitationGroup> group = groupRepo.findFirstByGroupId(new Long(groupId));
+        if (group.isPresent()) {
+            group.get().setContentVersion(groupVersion);
+            groupRepo.save((CitationGroup) group.get());
+        }
 
         job.setStatus(JobStatus.DONE);
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
     }
 
-    private void syncCitations(IUser user, ICitationGroup group, GroupSyncJob job, Map<String, Long> versions,
+    private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
             AtomicInteger counter) {
         List<String> keysToRetrieve = new ArrayList<>();
         for (String key : versions.keySet()) {
-            Optional<ICitation> citation = citationRepo.findByKey(key);
+            Optional<ICitation> citation = citationStore.findById(key);
 
             if (citation.isPresent()) {
                 if (citation.get().getVersion() != versions.get(key)) {
@@ -129,7 +152,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             }
             counter.incrementAndGet();
             if (counter.intValue() % 50 == 0) {
-                retrieveCitations(user, group, keysToRetrieve);
+                retrieveCitations(user, groupId, keysToRetrieve);
                 keysToRetrieve = new ArrayList<>();
             }
             job.setCurrent(counter.intValue());
@@ -137,26 +160,26 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
 
         if (!keysToRetrieve.isEmpty()) {
-            retrieveCitations(user, group, keysToRetrieve);
+            retrieveCitations(user, groupId, keysToRetrieve);
         }
     }
     // contentVersion of collections not set
-    private void syncCollections(IUser user, ICitationGroup group, GroupSyncJob job, Map<String, Long> versions,
+    private void syncCollections(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
             long groupVersion, AtomicInteger counter) {
         List<String> keysToRetrieve = new ArrayList<>();
-        List<ICitationCollection> collections = collectionRepo.findByGroupId(group.getGroupId() + "");
+        List<ICitationCollection> collections = collectionRepo.findByGroupId(groupId);
         Set<String> keys = collections.stream().map(c -> c.getKey()).collect(Collectors.toSet());
         keys.addAll(versions.keySet());
         
         for (String key : keys) {
-            ICitationCollection collection = collectionRepo.findByKeyAndGroupId(key, group.getGroupId() + "");
+            ICitationCollection collection = collectionRepo.findByKeyAndGroupId(key, groupId);
             if (collection == null || (versions.containsKey(key) && collection.getVersion() != versions.get(key))
                     || collection.getContentVersion() != groupVersion) {
                 keysToRetrieve.add(key);
             }
             counter.incrementAndGet();
             if (counter.intValue() % 50 == 0) {
-                retrieveCollections(user, group, keysToRetrieve);
+                retrieveCollections(user, groupId, keysToRetrieve);
                 keysToRetrieve = new ArrayList<>();
             }
             job.setCurrent(counter.intValue());
@@ -164,16 +187,16 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
 
         if (!keysToRetrieve.isEmpty()) {
-            retrieveCollections(user, group, keysToRetrieve);
+            retrieveCollections(user, groupId, keysToRetrieve);
         }
     }
 
     private void removeDeletedItems(DeletedZoteroElements deletedElements, GroupSyncJob job) {
         if (deletedElements.getItems() != null) {
             for (String key : deletedElements.getItems()) {
-                Optional<ICitation> citation = citationRepo.findByKey(key);
+                Optional<ICitation> citation = citationStore.findById(key);
                 if (citation.isPresent()) {
-                    citationRepo.delete((Citation) citation.get());
+                    citationStore.delete((Citation) citation.get());
                 }
                 job.setCurrent(job.getCurrent() + 1);
                 jobRepo.save(job);
@@ -181,38 +204,39 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
     }
 
-    private long retrieveCitations(IUser user, ICitationGroup group, List<String> keysToRetrieve) {
+    private long retrieveCitations(IUser user, String groupId, List<String> keysToRetrieve) {
         try {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             logger.error("Could not wait.", e);
         }
-        ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, group.getGroupId() + "",
-                keysToRetrieve);
+        ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, groupId,
+                keysToRetrieve, true);
         retrievedCitations.getCitations().forEach(c -> storeCitation(c));
         return retrievedCitations.getContentVersion();
     }
 
-    private long retrieveCollections(IUser user, ICitationGroup group, List<String> keysToRetrieve) {
+    private long retrieveCollections(IUser user, String groupId, List<String> keysToRetrieve) {
         try {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             logger.error("Could not wait.", e);
         }
-        ZoteroCollectionsResponse response = zoteroManager.getCollectionsByKey(user, group.getGroupId() + "",
+        ZoteroCollectionsResponse response = zoteroManager.getCollectionsByKey(user, groupId,
                 keysToRetrieve);
         response.getCollections().forEach(c -> storeCitationCollection(c));
         return response.getContentVersion();
     }
 
     private void storeCitation(ICitation citation) {
-        Optional<ICitation> optional = citationRepo.findByKey(citation.getKey());
+        Optional<ICitation> optional = citationStore.findById(citation.getKey());
         if (optional.isPresent()) {
-            citationRepo.delete((Citation) optional.get());
+            citationStore.delete((Citation) optional.get());
         }
-        citationRepo.save((Citation) citation);
+
+        citationStore.save((Citation) citation);
     }
 
     private void storeCitationCollection(ICitationCollection collection) {

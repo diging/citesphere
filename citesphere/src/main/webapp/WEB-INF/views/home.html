@@ -1,0 +1,44 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="jumbotron col-md-12" sec:authorize="isAnonymous()">
+
+			<h1>Welcome to Citesphere!</h1>
+			<p>If you try and take a cat apart to see how it works, the first
+				thing you have on your hands is a nonworking cat.</p>
+		</div>
+		<div sec:authorize="isAuthenticated()">
+		<div class="jumbotron col-md-12" th:if="!${isZoteroConnected}">
+			<center>
+				<h2>Please connect your Zotero account before continuing!</h2>
+				<form th:action="@{/signin/zotero}" method="POST">
+					<button class="btn btn-primary btn-lg" type="submit">
+						Connect Zotero</button>
+				</form>
+			</center>
+		</div>
+		<div class="jumbotron col-md-12" style="margin-bottom: 20px;"
+			th:if="${isZoteroConnected}">
+			<h2>Welcome back, <span th:text="${user.firstName}"></span>!</h2>
+		</div>
+		<div class="col-md-12" th:if="${isZoteroConnected}">
+		<div class="text-right" style="margin-bottom: 20px;">
+		<a th:href="@{/auth/jobs/sync/list}"><i class="fas fa-sync"></i> Show sync jobs</a>
+		</div>
+		
+		<tbody th:each="group: ${groups}">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<a th:href="@{'/auth/group/' + ${group.groupId} + '/items'}"><span th:text="${group.name}"/>
+					(<span th:text="${group.numItems}"/>)</a>
+				</div>
+			</div>
+		</tbody>
+		</div>
+		
+		</div>
+	</div>
+</body>
+</html>

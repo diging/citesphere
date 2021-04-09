@@ -2,8 +2,12 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +86,15 @@ public class EditItemController {
         citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
                 .forEach(f -> fields.add(f.getFilename()));
         model.addAttribute("fields", fields);
-        model.addAttribute("creatorMap", properties.entrySet());
+        Set<Entry<Object, Object>> labels = properties.entrySet();
+        Map<String, String> labelsRoles = new HashMap<>();
+        labels.forEach(x -> labelsRoles.put(x.getKey().toString(), x.getValue().toString()));
+        for (String role : citation.getOtherCreatorRoles()) {
+            if (!labelsRoles.containsKey("_item_attribute_label_" + role)) {
+                labelsRoles.put("_item_attribute_label_" + role, org.springframework.util.StringUtils.capitalize(role));
+            }
+        }
+        model.addAttribute("creatorMap", labelsRoles.entrySet());
 
         model.addAttribute("concepts", conceptManager.findAll(userManager.findByUsername(authentication.getName())));
         model.addAttribute("conceptTypes",
@@ -91,7 +103,7 @@ public class EditItemController {
         model.addAttribute("page", page);
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sortBy", sortBy);
-        return "auth/group/items/item/edit";
+        return "auth/group/editItem";
     }
 
     /**
@@ -144,7 +156,7 @@ public class EditItemController {
             model.addAttribute("page", page);
             model.addAttribute("collectionId", collectionId);
             model.addAttribute("sortBy", sortBy);
-            return "auth/group/items/item/edit/conflict";
+            return "auth/group/editConflict";
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }
