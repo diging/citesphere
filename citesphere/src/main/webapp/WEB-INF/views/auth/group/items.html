@@ -368,31 +368,32 @@ $('.checkboxes').change(function(){
 	if ($(this).is(':checked')) {
 		$(this).parents('tr').addClass('selected');
 		$(this).parents('tr').attr("title", "Drag to move citations to a collecton");
-		} else {
-			$(this).parents('tr').removeClass('selected');
-			$(this).parents('tr').removeAttr("title");
-			}
+		} 
+	else {
+		$(this).parents('tr').removeClass('selected');
+		$(this).parents('tr').removeAttr("title");
+	}
 	$('.checkboxes:checked').length > 0? $('.fa-chevron-circle-left').hide(): $('.fa-chevron-circle-left').show();
 });
 $(function(){
-	$(".items").draggable({
-		scroll: true,
-		cursor: "grabbing",
-		helper:function(){
-			var selected = $(".selected");
-			if (selected.length == 0) {
-			$(this).addClass('selected');
-			selected = $(this);
-			}
-			var container = $('<div> Move ' +selected.length+ ' citations </div>').attr('id', 'moveitems-panel-highlighter');
-			(selected.length > 1)? container.addClass('icon-multiple-doc'): container.addClass('icon-docs');
-			var list = container.append('<ul></ul>').find('ul');
-			$(".selected").each(function() {
-				list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
-			});
-			container.find('ul').hide();
-			return container;
-			},
+$(".items").draggable({
+	scroll: true,
+	cursor: "grabbing",
+	helper:function(){
+		var selected = $(".selected");
+		if (selected.length == 0) {
+		$(this).addClass('selected');
+		selected = $(this);
+		}
+		var container = $('<div> Move ' +selected.length+ ' citations </div>').attr('id', 'moveitems-panel-highlighter');
+		(selected.length > 1)? container.addClass('icon-multiple-doc'): container.addClass('icon-docs');
+		var list = container.append('<ul></ul>').find('ul');
+		$(".selected").each(function() {
+			list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
+		});
+		container.find('ul').hide();
+		return container;
+		},
 		cursorAt: { right: 5,top:5 }
 	});
 				
@@ -440,60 +441,56 @@ $(".list-group-item").droppable( {
 });	
 
 function pollMovedItemsStatuses(response,collectionName){
-	$.ajax({
-	     type: "POST",
-	     url: "items/move/status?[(${_csrf.parameterName})]=[(${_csrf.token})]",
-	     contentType : "application/json",
-		 dataType: "json",
-	     data: response.taskID,
-	     success: function (moveItemsStatusResponse) {
-	     if(moveItemsStatusResponse.taskStatus === "COMPLETE"){
-	       	 if(moveItemsStatusResponse.response.successItems.length != 0){
-	 		    message = " "+moveItemsStatusResponse.response.successItems.length+ " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.successItems;
-	 			showNotification(message, "success", 20000);
-	 		 }
-	 		 if(moveItemsStatusResponse.response.failedItems.length != 0){
-	 			message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems;
-	 		   	showNotification(message, "danger", 20000);
-	 		 }
-	 		 clearAsyncTask(moveItemsStatusResponse.taskID);	
-	     }else{
-	       	 setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName),1000);
-	     }
-	     },
-	     error: function (moveItemsStatusResponse) {
-	       	showNotification("Error while polling citations statuses!", "warning", 1000)
-	        },
-	    });
+$.ajax({
+	type: 'GET',
+	url: 'items/move/'+response.taskID+'/status?[(${_csrf.parameterName})]=[(${_csrf.token})]',
+	contentType : "application/json",
+	dataType: "json",
+	success: function (moveItemsStatusResponse) {
+		if(moveItemsStatusResponse.taskStatus === "COMPLETE"){
+		if(moveItemsStatusResponse.response.successItems.length != 0){
+	 	message = " "+moveItemsStatusResponse.response.successItems.length+ " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.successItems;
+	 	showNotification(message, "success", 20000);
+		}
+		if(moveItemsStatusResponse.response.failedItems.length != 0){
+	 	message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems;
+	 	showNotification(message, "danger", 20000);
+		}
+		if(moveItemsStatusResponse.response.unchangedItems.length != 0){
+		 	message =  " "+ moveItemsStatusResponse.response.unchangedItems.length+ " Citations already present in ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.unchangedItems;
+		 	showNotification(message, "info", 20000);
+		}
+		clearAsyncTask(moveItemsStatusResponse.taskID);	
+		}else{
+			setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName),1000);
+		}
+		},
+	error: function (moveItemsStatusResponse) {
+	    	showNotification("Error while polling citations statuses!", "warning", 1000)
+			},
+});
 }
 
 function clearAsyncTask(taskID){
 	$.ajax({
-		type: "POST",
-		url: 'items/move/cleartask?[(${_csrf.parameterName})]=[(${_csrf.token})]',
-		data: taskID,
-		contentType : "application/json",
-		dataType: "json",
-		success: function (taskRemovedResponse){
-		 },
-		 error: function (taskRemovedResponse) {
-		 }
+		type: 'GET',
+		url: 'items/move/task/'+taskID+'/clear?[(${_csrf.parameterName})]=[(${_csrf.token})]',
 	});
 }
 
 function showNotification(message, status, time){
-	$.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
-		type: status,
-		offset: {
-			 x: 50,
-			 y: 90
-		},
-		timer: time,
-		animate: {
-			 enter: 'animated fadeInRight',
-			 exit: 'animated fadeOutRight'
-		},
-	});
+$.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
+	type: status,
+	offset: {
+		x: 50,
+		y: 90
+	},
+	timer: time,
+	animate: {
+		enter: 'animated fadeInRight',
+		exit: 'animated fadeOutRight'
+	},
+});
 }
 		
 </script>

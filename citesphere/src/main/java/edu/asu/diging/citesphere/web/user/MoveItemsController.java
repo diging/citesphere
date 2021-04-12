@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,17 +30,16 @@ public class MoveItemsController {
 
     @Autowired
     private ICitationManager citationManager;
-    
+
     @Autowired
-    private AsyncTaskProcessor<ZoteroUpdateItemsStatuses> asyncTaskProcessor;
+    private AsyncUpdateCitationsProcessor asyncUpdateCitationsProcessor;
 
     @Autowired
     private ICitationHelper citationHelper;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST)
     public @ResponseBody String moveItemsToCollection(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String itemsData)
-            throws Exception {
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String itemsData) throws Exception {
         Gson gson = new Gson();
         MoveItemsRequest itemsDataDto = gson.fromJson(itemsData, MoveItemsRequest.class);
         List<ICitation> citations = new ArrayList<>();
@@ -57,30 +55,30 @@ public class MoveItemsController {
             citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
         }
-        
-        AsyncTaskResponse<ZoteroUpdateItemsStatuses> asyncResponse;
+
+        AsyncUpdateCitationsResponse asyncResponse;
         try {
-            asyncResponse = asyncTaskProcessor.submitTask(() -> citationManager.updateCitations((IUser) authentication.getPrincipal(),
-                    zoteroGroupId, citations));
+            asyncResponse = asyncUpdateCitationsProcessor.updateCitations((IUser) authentication.getPrincipal(),
+                    zoteroGroupId, citations);
         } catch (Exception e) {
             logger.error("Unable to move citations.", e);
             throw e;
         }
-                
-        return gson.toJson(asyncResponse, AsyncTaskResponse.class);
+
+        return gson.toJson(asyncResponse, AsyncUpdateCitationsResponse.class);
     }
-    
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/status", method = RequestMethod.POST)
-    public @ResponseBody AsyncTaskResponse<ZoteroUpdateItemsStatuses> getMoveItemsStatus(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String taskID) throws Exception {
-        return asyncTaskProcessor.getResponse(taskID);
+
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/{taskID}/status")
+    public @ResponseBody AsyncUpdateCitationsResponse getMoveItemsStatus(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID)
+            throws Exception {
+        return asyncUpdateCitationsProcessor.getUpdateCitationsResponse(taskID);
     }
-    
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/cleartask", method = RequestMethod.POST)
-    public @ResponseBody Boolean clearTask(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String taskID) {
-        return asyncTaskProcessor.clearTask(taskID);
+
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/task/{taskID}/clear")
+    public @ResponseBody void clearTask(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID) {
+        asyncUpdateCitationsProcessor.clearTask(taskID);
     }
-    
-    
+
 }

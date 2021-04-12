@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
@@ -288,10 +291,11 @@ public class ZoteroManager implements IZoteroManager {
      * 
      * @return ZoteroUpdateItemsResponse returns statuses of citations.
      * @throws ExecutionException
+     * @throws JsonProcessingException
      */
     @Override
-    public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
-            throws ZoteroConnectionException, ZoteroHttpStatusException, InterruptedException, ExecutionException {
+    public Future<ZoteroUpdateItemsStatuses> updateCitations(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, JsonProcessingException {
         List<Item> items = new ArrayList<>();
         List<String> itemTypeFields = new ArrayList<>();
         List<List<String>> ignoreFieldsList = new ArrayList<>();

@@ -1,16 +1,17 @@
 package edu.asu.diging.citesphere.web.user;
 
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 
-public class AsyncTaskResponse<T> {
+public class AsyncUpdateCitationsResponse {
     private AsyncTaskStatus taskStatus;
-    private T response;
+    private ZoteroUpdateItemsStatuses response;
     private String taskID;
 
     public AsyncTaskStatus getTaskStatus() {
         return taskStatus;
     }
 
-    public T getResponse() {
+    public ZoteroUpdateItemsStatuses getResponse() {
         return response;
     }
 
@@ -18,7 +19,7 @@ public class AsyncTaskResponse<T> {
         this.taskStatus = taskStatus;
     }
 
-    public void setResponse(T response) {
+    public void setResponse(ZoteroUpdateItemsStatuses response) {
         this.response = response;
     } 
     

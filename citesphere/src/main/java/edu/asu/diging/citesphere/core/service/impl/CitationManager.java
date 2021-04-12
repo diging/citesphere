@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +23,8 @@ import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
@@ -153,9 +156,9 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
+    public Future<ZoteroUpdateItemsStatuses> updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
-            InterruptedException, ExecutionException {
+            ExecutionException, JsonProcessingException {
         return zoteroManager.updateCitations(user, groupId, citations);
     }
 

@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 
@@ -13,6 +14,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -28,6 +31,8 @@ import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
@@ -186,14 +191,15 @@ public class ZoteroConnector implements IZoteroConnector {
      * @param ignoreFields Fields that are not necessary to be updated
      * 
      * @return ZoteroUpdateItemsResponse returns statuses of items.
+     * @throws JsonProcessingException 
      */
     @Override
-
-    public ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
+    @Async
+    public Future<ZoteroUpdateItemsStatuses> updateItems(IUser user, List<Item> items, String groupId,
             List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
-            throws ZoteroConnectionException, ZoteroHttpStatusException, InterruptedException {
+            throws ZoteroConnectionException, ZoteroHttpStatusException, JsonProcessingException {
         Zotero zotero = getApi(user);
-        return zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList);
+        return  new AsyncResult<ZoteroUpdateItemsStatuses>(zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList));
     }
     
     @Override
