@@ -183,32 +183,6 @@ $(function() {
 		$("#authorAffiliations").append(affiliationCopy);
 	});
 	
-	$(".authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
-		var id = $(this).data('client-id');
-		var property;
-		var property1;
-		if(id.includes("Affiliation")){
-			property = "AuthorAffiliation";
-			property1 = "authorAffiliation";
-		} else {
-			property = "Author";
-			property1 = "author";
-		}
-    	var property = id.substring(6, id.length);
-    	console.log(id);
-    	
-		var uri = $("#uriLoadingFound" + property).attr('data-authority-uri');
-		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#authorCreateAuthority").hide();
-			
-			$("#uri" + property + "LocalId").val(data['id']);
-			$("#" + property1 +"AuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#" + property1 +"AuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], property);
-			$("#uriLoadingFound" + property).popover('hide');
-		});
-	});
-	
 	/*
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
@@ -239,6 +213,51 @@ $(function() {
 	
 	*/
 	
+	$(".authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
+		var id = $(this).data('client-id');
+		var property;
+		var property1;
+		if(id.includes("Affiliation")){
+			property = "AuthorAffiliation";
+			property1 = "authorAffiliation";
+		} else {
+			property = "Author";
+			property1 = "author";
+		}
+    	
+		var uri = $("#uriLoadingFound" + property).attr('data-authority-uri');
+		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
+			$("#authorCreateAuthority").hide();
+			
+			$("#uri" + property + "LocalId").val(data['id']);
+			$("#" + property1 +"AuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+			$("#" + property1 +"AuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+			showPersonNameInModal(data['name'], property);
+			$("#uriLoadingFound" + property).popover('hide');
+		});
+	});
+	
+	$(".authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+		var id = $(this).data('client-id');
+		var property;
+		var property1;
+		if(id.includes("Affiliation")){
+			property = "AuthorAffiliation";
+			property1 = "authorAffiliation";
+		} else {
+			property = "Author";
+			property1 = "author";
+		}
+		
+		var authId = $(this).attr('data-authority-id');
+		$("#uri" + property + "LocalId").val(authId);
+		$("#" + property1 + "AuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
+		showPersonNameInModal($(this).attr('data-authority-name'), property);
+		$("#uriLoadingFound" + property).popover('hide');
+		event.preventDefault();
+	});
+	
+	/*
 	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
@@ -256,7 +275,7 @@ $(function() {
 		$("#uriLoadingFoundAuthorAffiliation").popover('hide');
 		event.preventDefault();
 	});
-	
+	*/
 	
 	var timer = null;
 	$("#uriAuthor").change(function() {
@@ -539,10 +558,11 @@ function editPerson(modalName, item){
 function savePersonDetails(personType, modalName){
 	var modalNameLCase = modalName.toLowerCase();
 	var personSpan;
-	var personTypeLCase = personType.toLowerCase();
+	var personTypeLCase = personType[0].toLowerCase() + personType.slice(1);
 	if($("#id"+modalName).attr("data-"+modalNameLCase+"-id") != null && $("#id"+modalName).attr("data-"+modalNameLCase+"-id").length > 0) {
 		personSpan = $('#'+$("#id"+modalName).attr("data-"+modalNameLCase+"-id"));
 		personTypeLCase = personSpan.attr("data-creator-type").toLowerCase();
+		personTypeLCase = personTypeLCase[0].toLowerCase() + personType.slice(1);
 	} else {
 		var id = personTypeLCase + $("."+personTypeLCase+"-item").length;
 		personSpan = $('<span id='+id+'>');
@@ -737,19 +757,21 @@ function resetPersonCreationModal(modalType) {
 }
 
 function resetPersonAuthorityCreation(personType) {
+	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
 	$("#uriLoadingFound"+personType).hide();
 	$("#uriLoadingFailure"+personType).hide();
 	$("#uriLoadingSpinner"+personType).hide();
 	$("#uriLoadingFound"+personType).popover('hide');
 	$("#uriLoadingFailure"+personType).popover('hide');
-	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
-	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").html("");
-	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").hide();
+	
+	$("#"+personType_lowerCase+"AuthorityUsed").html("");
+	$("#"+personType_lowerCase+"AuthorityCreationFeedback").html("");
+	$("#"+personType_lowerCase+"AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
 	
-	personType_lowerCase = personType.toLowerCase();
+	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
 	$.get([[@{/auth/authority/get?uri=}]] + uri + '&zoteroGroupId=' + [(${zoteroGroupId})], function(data) {
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", data['uri']);
 		var content = "Authority <b>" + uri + "</b>";
@@ -795,7 +817,7 @@ function getUserAuthorities(modalType, personType, page) {
 	if(lastName === undefined) {
 		lastName = "";
 	}
-	personType_lowerCase = personType.toLowerCase();
+	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/user|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
 	$.ajax({
   		dataType: "json",
@@ -860,7 +882,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 	if(lastName === undefined) {
 		lastName = "";
 	}
-	personType_lowerCase = personType.toLowerCase();
+	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/conceptpower|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
 	$.ajax({
@@ -908,7 +930,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
-			
+			personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
 			createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&source=conceptpower&uri=' + uri;						
 			$.ajax({
 			  		dataType: "json",
@@ -1426,27 +1448,23 @@ function creatorLinkHandler(target) {
 		  </div>
 		  <div id="authorAffiliations">
 		  <div id="authorAffiliationTemplate" class="form-group">
-		    <label for="affiliationAuthor">Affiliation:</label>
-		    <input type="text" class="form-control" id="firstNameAuthorAffiliation" placeholder="Affiliation">
-		  
-		    <button class="btn btn-primary searchAuthor" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="searchAuthorAffiliation" id="searchAuthorAffiliation"
-						style="margin-left: 80%" disabled>Search Affiliation
-						<i id="searchAuthorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
-		    </button>
-		    <label for="uriAuthorAffiliation">URI:</label>
-		    <div class="input-group">
-			    <input type="text" class="form-control uriAuthor" id="uriAuthorAffiliation" placeholder="URI">
-			    <div data-client-id="authorAffiliationIconContainer" id="authorAffiliationIconContainer" class="input-group-addon authorIconContainer" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerAuthorAffiliation" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundAuthorAffiliation" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureAuthorAffiliation" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
-			    </div>
+		    <div>
+			    <label for="affiliationAuthor">Affiliation:</label>
+			    <input type="text" class="form-control" id="firstNameAuthorAffiliation" placeholder="Affiliation">
+		  	</div>
+			<button class="btn btn-primary searchAuthor" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="searchAuthorAffiliation" id="searchAuthorAffiliation"
+				style="margin-left: 80%" disabled>Search Affiliation <i id="searchAuthorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+			</button>
+			<label for="uriAuthorAffiliation">URI:</label>   
+		    <div class="form-group">
+			    <input type="text" class="form-control uriAuthor" data-client-id="uriAuthorAffiliation" id="uriAuthorAffiliation" placeholder="URI">
 			    <input type="hidden" id="uriAuthorAffiliationLocalId" />
 		    </div>
 		    <div class="text-warning pull-right" id="authorAffiliationAuthorityUsed"></div>
 		  </div>
 		  </div>
 		  <div>
+		  </br>
 		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
