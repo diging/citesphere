@@ -16,7 +16,7 @@ $(function() {
 	$("#delete-authority-button").click(function() {
 		var id = $(this).data("authority-id");
 		$.ajax({
-			'url': id + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+			'url': [[@{/auth/authority/}]] + id + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "DELETE",
 			'success': function(data) {
 				$("#tr-" + id).remove();
@@ -100,7 +100,7 @@ $(function() {
 	</span>
 	</td>			
 	<td><a class="delete-link" href="" th:data-authority-id="${authority.id}" th:data-authority-name="${authority.name}" th:data-authority-uri="${authority.uri}"><i class="fas fa-trash-alt"></i></a></td>
-	<td><a th:href="@{${authority.id}+'/edit'}"><i class="far fa-edit" title="Edit"></i></a></td>
+	<td><a th:href="@{|/auth/authority/${authority.id}/edit|}"><i class="far fa-edit" title="Edit"></i></a></td>
 </tr>
 </table>
 
