@@ -130,7 +130,25 @@ $(function() {
 				"citationList": ids,
 				[[${_csrf.parameterName}]] : [[${_csrf.token}]]
 			},
-			'success': function(data) {
+			'success': function(responses) {
+				console.log(responses);
+				responseLength = responses.length;
+				for (var i = 0; i < responseLength; i++) {
+					if(responses[i].toString() != "SUCCESS"){
+						var citationOffset = 50*(i+1);
+						$.notify('<i class="fas fa-exclamation-circle"></i> Error while deleting some of the citations between '+(citationOffset-49)+' to '+citationOffset, {
+							type: 'danger',
+							offset: {
+								x: 50,
+								y: 90
+							},
+							animate: {
+								enter: 'animated fadeInRight',
+								exit: 'animated fadeOutRight'
+							}
+						});
+					}
+				}				
 				for(id of rows) {
 					$("#tr-" + id).remove();
 				}
@@ -149,6 +167,26 @@ $(function() {
 					}
 				});
 			},
+/* 			'success': function(data) {
+				console.log(data);
+				for(id of rows) {
+					$("#tr-" + id).remove();
+				}
+				if (ids.length > 1)
+					entry = "Entries";
+				
+				$.notify('<i class="fas fa-check-circle"></i> '+entry+' successfully deleted!', {
+					type: 'success',
+					offset: {
+						x: 50,
+						y: 90
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				});
+			}, */
 			'error': function(data) {
 				console.log(data);
 				$.notify('<i class="fas fa-exclamation-circle"></i> Citations could not be deleted!', {
