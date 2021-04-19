@@ -174,9 +174,14 @@ $(function() {
 	$(".remove-concept").click(removeConcept);
 	$(".remove-concept").css('cursor', 'pointer');
 	
+	var counter = 0;
 	$("#addAuthorAffiliation").click(function() {
+		counter++;
 		var affiliationCopy = $("#authorAffiliationTemplate").clone();
 		affiliationCopy.removeAttr("id");
+		//affiliationCopy.id = "authorAffiliationTemplate"+counter;
+		//affiliationCopy.setAttribute('id', "authorAffiliationTemplate"+counter);
+		affiliationCopy.attr("id", "authorAffiliationTemplate"+counter);
 		affiliationCopy.addClass("aff-info");
 		affiliationCopy.find("input").val("");
 		affiliationCopy.show();
