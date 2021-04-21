@@ -38,7 +38,7 @@ body{
 }
 
 [class*="icon-circle-add"]{
-  font-size: 12 px;
+  font-size: 13px;
   color: white;
 }
 
@@ -198,8 +198,8 @@ body{
 }
 
 [class*="icon-trash-alt"]{
-  font-size: 13px;
-  color: black;
+  font-size: 16px;
+  color: #337ab7;
 }
 
 [class*="icon-info-circle"]{
