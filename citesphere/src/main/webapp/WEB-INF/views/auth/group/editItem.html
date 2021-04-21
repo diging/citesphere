@@ -67,8 +67,11 @@ $(function() {
     	allowAuthoritySearch("Author");
      });
 	
-    $("#firstNameAuthorAffiliation").keyup(function(e){
-    	allowAuthoritySearch("AuthorAffiliation");
+    $('.firstNameAuthorAffiliation').keyup(function(e){
+    	var id = $(this).data('client-id');
+    	var property = id.substring(9, id.length);
+    	console.log(id);
+    	allowAuthoritySearch(property);
      });
 		
     $("#lastNameAuthor").keyup(function(e){
@@ -92,14 +95,14 @@ $(function() {
     $(".searchAuthor").click(function() {
     	var id = $(this).data('client-id');
     	var property = id.substring(6, id.length);
-    	console.log(id);
+    	//console.log(id);
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})  
 		$("#" + id + "Spinner").show();
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-		
+		console.log(property);
 		getUserAuthorities(property,property, 0)
 		getconceptpowerAuthorities(property,property,0)
 		$("#" + id + "Spinner").hide();
@@ -178,14 +181,16 @@ $(function() {
 	$("#addAuthorAffiliation").click(function() {
 		counter++;
 		var affiliationCopy = $("#authorAffiliationTemplate").clone();
-		affiliationCopy.removeAttr("id");
-		//affiliationCopy.id = "authorAffiliationTemplate"+counter;
-		//affiliationCopy.setAttribute('id', "authorAffiliationTemplate"+counter);
+		//affiliationCopy.removeAttr("id");
 		affiliationCopy.attr("id", "authorAffiliationTemplate"+counter);
 		affiliationCopy.addClass("aff-info");
 		affiliationCopy.find("input").val("");
 		affiliationCopy.show();
 		$("#authorAffiliations").append(affiliationCopy);
+		$("#authorAffiliationTemplate"+counter).find('input, button').each(function() {
+            $(this).attr('id', $(this).attr('id') + counter);
+            $(this).attr('data-client-id', $(this).attr('id'));
+        });
 	});
 	
 	/*
@@ -1453,10 +1458,10 @@ function creatorLinkHandler(target) {
 		  </div>
 		  <div id="authorAffiliations">
 		  <div id="authorAffiliationTemplate" class="form-group">
-		    <div>
+		    
 			    <label for="affiliationAuthor">Affiliation:</label>
-			    <input type="text" class="form-control" id="firstNameAuthorAffiliation" placeholder="Affiliation">
-		  	</div>
+			    <input type="text" class="form-control firstNameAuthorAffiliation" id="firstNameAuthorAffiliation" data-client-id="firstNameAuthorAffiliation" placeholder="Affiliation">
+		  	
 			<button class="btn btn-primary searchAuthor" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="searchAuthorAffiliation" id="searchAuthorAffiliation"
 				style="margin-left: 80%" disabled>Search Affiliation <i id="searchAuthorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 			</button>
