@@ -17,10 +17,6 @@ body{
   color: #337ab7;
 }
 
-[class*="icon-gear"]{
-  font-size: 18px;
-  color: #337ab7;
-}
 
 [class*="icon-sync"]{
   font-size: 18px;
@@ -64,7 +60,7 @@ body{
 
 [class*="icon-download"]{
   font-size: 13px;
-  color: black;
+  color: #337ab7;
 }
 
 [class*="icon-www"]{
@@ -128,7 +124,7 @@ body{
 }
 
 [class*="icon-gear"]{
-  font-size: 13px;
+  font-size: 14px;
   color: black;
 }
 
@@ -213,7 +209,7 @@ body{
 }
 
 [class*="icon-checkmark-alt"]{
-  font-size: 18px;
+  font-size: 14px;
   color: green;
 }
 
