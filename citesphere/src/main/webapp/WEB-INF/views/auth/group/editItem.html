@@ -849,7 +849,6 @@ function getUserAuthorities(modalType, personType, page) {
   						content +=elem['description'] + '</td>';
   					}
   					content += '<td style="vertical-align: middle;"><span class="user-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
-  					
   				});
   				
   				$('#userAuthority-pagination-top').twbsPagination({
@@ -901,9 +900,8 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		url: url ,
   		async: false,
   		success: function(data) {
-			
+  			$('#mycheckboxDiv').append(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
-  			
   			var content = '';
   				
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
@@ -940,12 +938,17 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
+			
 			personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
-			createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&source=conceptpower&uri=' + uri;						
+			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=conceptpower&uri=' + uri;
+			if($("#mycheckbox").is(":checked")){
+				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
+			}
 			$.ajax({
 			  		dataType: "json",
 			  		type: 'POST',
 			  		url: createManageAuthorityURL,
+			  		data: { [[${_csrf.parameterName}]] : [[${_csrf.token}]] },
 			  		async:false,
 			  		success: function(data) {
 			  			$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
@@ -1644,7 +1647,7 @@ function creatorLinkHandler(target) {
 								<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
 								<tbody id="userAuthoritySearchResult">
 								</tbody>
-							</table>
+							</table>		
 						</div>
 			
 						<div role="tabpanel" class="tab-pane" id="conceptpowerAuthoritiesTabContent">
@@ -1652,11 +1655,16 @@ function creatorLinkHandler(target) {
 							<div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
 								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
+							<div id="mycheckboxDiv">
+							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group
+							</div>
+							</br>
 							<table class="table table-striped table-bordered table-fixed">
 								<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
 								<tbody id="conceptpowerAuthoritySearchResult">
 								</tbody>
 							</table>
+							
 						</div>
 				</div>
 			</div>

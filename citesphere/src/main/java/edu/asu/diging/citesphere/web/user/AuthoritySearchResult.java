@@ -8,6 +8,7 @@ public class AuthoritySearchResult {
 
     private int totalPages;
     private int currentPage;
+    private String groupName;
 
     private List<IAuthorityEntry> foundAuthorities;
 
@@ -35,4 +36,11 @@ public class AuthoritySearchResult {
         this.foundAuthorities = foundAuthorities;
     }
 
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
 }
