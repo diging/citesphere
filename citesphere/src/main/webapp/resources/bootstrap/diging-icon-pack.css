@@ -25,6 +25,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@keyframes rotation {
+		from {
+			transform: rotate(359deg);
+		}
+		to {
+			transform: rotate(0deg);
+		}
+}
+
 .icon-newspaper:before {
   content: "\e9bb";
 }
@@ -55,6 +64,12 @@
 .icon-spinner:before {
   content: "\e9b8";
 }
+
+.icon-spinner {
+	display: block;
+	animation: rotation 2s linear infinite;
+}
+
 .icon-invoice:before {
   content: "\e9c1";
 }
