@@ -19,4 +19,6 @@ public interface ICitationStore {
 
     void delete(ICitation citation);
 
+    void deleteCitationByGroupId(String groupId);
+
 }

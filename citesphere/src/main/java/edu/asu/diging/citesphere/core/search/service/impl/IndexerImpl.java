@@ -49,6 +49,11 @@ public class IndexerImpl implements Indexer {
         referenceRepo.deleteById(citation.getKey());
     }
     
+    @Override
+    public void deleteCitationByGroupId(String groupId) {
+        referenceRepo.deleteByGroupId(groupId);
+        
+    }
     private void mapCitation(ICitation citation, Reference reference) {
         reference.setAbstractNote(citation.getAbstractNote());
         reference.setAccessDate(citation.getAccessDate());
@@ -134,4 +139,5 @@ public class IndexerImpl implements Indexer {
             referenceAffiliations.add(affili);
         });
     }
+
 }

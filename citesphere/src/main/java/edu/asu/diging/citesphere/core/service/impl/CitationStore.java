@@ -48,4 +48,9 @@ public class CitationStore implements ICitationStore {
         indexer.deleteCitation(citation);
         citationRepository.delete((Citation) citation);
     }
+    
+    @Override
+    public void deleteCitationByGroupId(String groupId) {
+        indexer.deleteCitationByGroupId(groupId);
+    }
 }
