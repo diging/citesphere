@@ -91,7 +91,7 @@ $(function() {
     $("#lastNameCreator").keyup(function(e){
     	allowAuthoritySearch("Creator");
      });
-    
+    /* 
     $(".searchAuthor").click(function() {
     	var id = $(this).data('client-id');
     	var property = id.substring(6, id.length);
@@ -106,10 +106,9 @@ $(function() {
 		getUserAuthorities(property,property, 0)
 		getconceptpowerAuthorities(property,property,0)
 		$("#" + id + "Spinner").hide();
-	});
-    
-    /*
-	$("#searchAuthor").click(function() {
+	}); */
+	
+	/* $("#searchAuthor").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})  
@@ -120,7 +119,7 @@ $(function() {
 		getUserAuthorities('Author','Author', 0)
 		getconceptpowerAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
-	});
+	}); */
 	
 	$("#searchAuthorAffiliation").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
@@ -134,9 +133,22 @@ $(function() {
 		getconceptpowerAuthorities('AuthorAffiliation','AuthorAffiliation',0)
 		$("#searchAuthorAffiliationSpinner").hide();
 	});
-	*/
 	
-	$("#searchEditor").click(function() {
+	$(".search").click(function() {
+		var id = $(this).data('client-id');
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})  
+		$("#search"+id+"Spinner").show();
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		
+		getUserAuthorities(id, id, 0)
+		getconceptpowerAuthorities(id,id,0)
+		$("#search"+id+"Spinner").hide();
+	});
+	
+	/* $("#searchEditor").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})  
@@ -162,7 +174,7 @@ $(function() {
 		getUserAuthorities('Creator','Creator', 0)
 		getconceptpowerAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
-	});
+	}); */
 	
 	
 	$(".edit-author").click(function(){
@@ -193,7 +205,6 @@ $(function() {
         });
 	});
 	
-	/*
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
 		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
@@ -221,8 +232,7 @@ $(function() {
 		});
 	});
 	
-	*/
-	
+	/* 
 	$(".authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var id = $(this).data('client-id');
 		var property;
@@ -245,9 +255,19 @@ $(function() {
 			showPersonNameInModal(data['name'], property);
 			$("#uriLoadingFound" + property).popover('hide');
 		});
-	});
+	}); */
 	
-	$(".authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
+	function setResult(modal, uriId) {
+		$(modal).hide();
+		
+		$(uriId).val(data['id']);
+		$("#" + property1 +"AuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+		$("#" + property1 +"AuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+		showPersonNameInModal(data['name'], property);
+		$("#uriLoadingFound" + property).popover('hide');
+	}
+	
+	/* $(".authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var id = $(this).data('client-id');
 		var property;
 		var property1;
@@ -265,9 +285,9 @@ $(function() {
 		showPersonNameInModal($(this).attr('data-authority-name'), property);
 		$("#uriLoadingFound" + property).popover('hide');
 		event.preventDefault();
-	});
+	}); */
 	
-	/*
+	
 	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
@@ -285,7 +305,7 @@ $(function() {
 		$("#uriLoadingFoundAuthorAffiliation").popover('hide');
 		event.preventDefault();
 	});
-	*/
+	
 	
 	var timer = null;
 	$("#uriAuthor").change(function() {
@@ -1442,7 +1462,7 @@ function creatorLinkHandler(target) {
 		    <label for="lastNameAuthor">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
 		  </div>
-		  <button class="btn btn-primary searchAuthor" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="searchAuthor" id="searchAuthor"
+		  <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="Author" id="searchAuthor"
 						style="margin-left: 80%" disabled>Search Author 
 						<i id="searchAuthorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 		  </button>
@@ -1465,7 +1485,7 @@ function creatorLinkHandler(target) {
 			    <label for="affiliationAuthor">Affiliation:</label>
 			    <input type="text" class="form-control firstNameAuthorAffiliation" id="firstNameAuthorAffiliation" data-client-id="firstNameAuthorAffiliation" placeholder="Affiliation">
 		  	
-			<button class="btn btn-primary searchAuthor" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="searchAuthorAffiliation" id="searchAuthorAffiliation"
+			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="AuthorAffiliation" id="searchAuthorAffiliation"
 				style="margin-left: 80%" disabled>Search Affiliation <i id="searchAuthorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 			</button>
 			<label for="uriAuthorAffiliation">URI:</label>   
@@ -1513,7 +1533,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  
 		  <div>
-			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchEditor"
+			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" id="searchEditor" data-client-id="Editor"
 						style="margin-left: 80%" disabled>Search Editor 
 						<i id="searchEditorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 			</button>
@@ -1573,7 +1593,7 @@ function creatorLinkHandler(target) {
 		    <input type="text" class="form-control" id="lastNameCreator" placeholder="Last Name">
 		  </div>
 		  <div>
-			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchCreator"
+			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" id="searchCreator" data-client-id="Creator"
 				style="margin-left: 80%" disabled> Search Creator 
 				<i id="searchCreatorSpinner" class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 			</button>
