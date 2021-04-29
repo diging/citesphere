@@ -388,7 +388,7 @@ public class CitationManager implements ICitationManager {
                 zoteroManager.getLatestGroupVersion(user, groupId));
         int counter = 0;
         for (ItemDeletionResponse res : response) {
-            if (res.toString() == "SUCCESS") {
+            if (res.equals(ItemDeletionResponse.SUCCESS)) {
                 for (int i = 0; i < 50; i++) {
                     if (i >= citationIdList.size()) {
                         break;
