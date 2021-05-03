@@ -241,7 +241,6 @@ public class ZoteroConnector implements IZoteroConnector {
     @Override
     @Cacheable(value = "itemTypeCreatorTypes", key = "#itemType")
     public CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType) {
-        System.out.println(itemType);
         return getApi(user).getItemTypesOperations().getCreatorTypes(itemType);
     }
 
