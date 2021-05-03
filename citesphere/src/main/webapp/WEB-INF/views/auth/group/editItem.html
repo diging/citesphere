@@ -1238,7 +1238,7 @@ function creatorLinkHandler(target) {
 				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="icon-circle-close remove-concept" style="cursor: pointer; color: white; font-size: 12px;"></i></span>
 			</th:block>
 		</div>
-		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="icon-circle-add"></i> Add Concept</a></div>
+		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="icon-circle-add" style="color: #337ab7"></i> Add Concept</a></div>
 		</td>
 	</tr>
 
@@ -1485,11 +1485,12 @@ function creatorLinkHandler(target) {
 								</tbody>
 							</table>
 						</div>
+					</div>
 				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default"
-					id="closeAuthoritySearchResult">Close</button>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default"
+						id="closeAuthoritySearchResult">Close</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -1532,8 +1533,6 @@ function creatorLinkHandler(target) {
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
-</div>
 
 </body>
 </html>
