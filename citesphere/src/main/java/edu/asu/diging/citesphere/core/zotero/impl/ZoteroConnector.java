@@ -194,12 +194,11 @@ public class ZoteroConnector implements IZoteroConnector {
      * @throws JsonProcessingException 
      */
     @Override
-    @Async
-    public Future<ZoteroUpdateItemsStatuses> updateItems(IUser user, List<Item> items, String groupId,
+    public ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
             List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, JsonProcessingException {
         Zotero zotero = getApi(user);
-        return  new AsyncResult<ZoteroUpdateItemsStatuses>(zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList));
+        return  zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList);
     }
     
     @Override
@@ -242,6 +241,7 @@ public class ZoteroConnector implements IZoteroConnector {
     @Override
     @Cacheable(value = "itemTypeCreatorTypes", key = "#itemType")
     public CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType) {
+        System.out.println(itemType);
         return getApi(user).getItemTypesOperations().getCreatorTypes(itemType);
     }
 

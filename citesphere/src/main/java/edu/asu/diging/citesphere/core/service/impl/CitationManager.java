@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
 import javax.annotation.PostConstruct;
@@ -156,7 +155,7 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public Future<ZoteroUpdateItemsStatuses> updateCitations(IUser user, String groupId, List<ICitation> citations)
+    public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
             ExecutionException, JsonProcessingException {
         return zoteroManager.updateCitations(user, groupId, citations);

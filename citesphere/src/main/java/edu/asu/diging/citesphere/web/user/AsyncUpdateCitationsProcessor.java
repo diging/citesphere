@@ -16,14 +16,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
-import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.impl.AsyncCitationManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Component
 public class AsyncUpdateCitationsProcessor {
     @Autowired
-    private ICitationManager citationManager;
+    private AsyncCitationManager asyncCitationManager;
 
     private final Map<String, Future<ZoteroUpdateItemsStatuses>> taskTracker;
 
@@ -44,7 +44,8 @@ public class AsyncUpdateCitationsProcessor {
             throws JsonProcessingException, ZoteroConnectionException, CitationIsOutdatedException,
             ZoteroHttpStatusException, InterruptedException, ExecutionException {
         String taskID = UUID.randomUUID().toString();
-        Future<ZoteroUpdateItemsStatuses> futureTask = citationManager.updateCitations(user, zoteroGroupId, citations);
+        Future<ZoteroUpdateItemsStatuses> futureTask = asyncCitationManager.updateCitations(user, zoteroGroupId,
+                citations);
         taskTracker.put(taskID, futureTask);
         AsyncUpdateCitationsResponse asyncResponse = new AsyncUpdateCitationsResponse();
         asyncResponse.setTaskID(taskID);

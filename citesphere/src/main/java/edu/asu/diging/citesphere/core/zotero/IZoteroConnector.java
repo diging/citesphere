@@ -38,7 +38,7 @@ public interface IZoteroConnector {
     Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException;
     
-    Future<ZoteroUpdateItemsStatuses> updateItems(IUser user, List<Item> items, String groupId,
+    ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
             List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, JsonProcessingException;
 

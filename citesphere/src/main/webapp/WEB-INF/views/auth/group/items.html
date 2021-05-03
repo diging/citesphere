@@ -449,16 +449,17 @@ $.ajax({
 	success: function (moveItemsStatusResponse) {
 		if(moveItemsStatusResponse.taskStatus === "COMPLETE"){
 		if(moveItemsStatusResponse.response.successItems.length != 0){
-	 	message = " "+moveItemsStatusResponse.response.successItems.length+ " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.successItems;
+	 	let message = " "+moveItemsStatusResponse.response.successItems.length+ " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.successItems;
 	 	showNotification(message, "success", 20000);
 		}
 		if(moveItemsStatusResponse.response.failedItems.length != 0){
-	 	message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems;
+	 	let message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems 
+	 					+ "<br /> <br /> Reasons: " + moveItemsStatusResponse.response.failedMessages;
 	 	showNotification(message, "danger", 20000);
 		}
 		if(moveItemsStatusResponse.response.unchangedItems.length != 0){
-		 	message =  " "+ moveItemsStatusResponse.response.unchangedItems.length+ " Citations already present in ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.unchangedItems;
-		 	showNotification(message, "info", 20000);
+		let message =  " "+ moveItemsStatusResponse.response.unchangedItems.length+ " Citations already present in ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.unchangedItems;
+		showNotification(message, "info", 20000);
 		}
 		clearAsyncTask(moveItemsStatusResponse.taskID);	
 		}else{

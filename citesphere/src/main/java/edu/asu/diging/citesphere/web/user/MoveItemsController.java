@@ -55,16 +55,8 @@ public class MoveItemsController {
             citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
         }
-
-        AsyncUpdateCitationsResponse asyncResponse;
-        try {
-            asyncResponse = asyncUpdateCitationsProcessor.updateCitations((IUser) authentication.getPrincipal(),
-                    zoteroGroupId, citations);
-        } catch (Exception e) {
-            logger.error("Unable to move citations.", e);
-            throw e;
-        }
-
+        AsyncUpdateCitationsResponse asyncResponse = asyncUpdateCitationsProcessor
+                .updateCitations((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
         return gson.toJson(asyncResponse, AsyncUpdateCitationsResponse.class);
     }
 

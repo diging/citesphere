@@ -36,7 +36,7 @@ public interface IZoteroManager {
 
     ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException;
     
-    Future<ZoteroUpdateItemsStatuses> updateCitations(IUser user, String groupId, List<ICitation> citations)
+    ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, JsonProcessingException;
 
     List<BibField> getFields(IUser user, ItemType itemType);
