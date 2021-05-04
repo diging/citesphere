@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Async;
@@ -24,7 +22,6 @@ import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 @PropertySource("classpath:/config.properties")
-@Transactional
 public class AsyncCitationManager {
     @Autowired
     private IZoteroManager zoteroManager;
