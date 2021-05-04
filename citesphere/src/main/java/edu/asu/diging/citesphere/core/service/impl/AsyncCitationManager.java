@@ -25,7 +25,7 @@ import edu.asu.diging.citesphere.user.IUser;
 public class AsyncCitationManager {
     @Autowired
     private IZoteroManager zoteroManager;
-    
+
     @Async
     public Future<ZoteroUpdateItemsStatuses> updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
