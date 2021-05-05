@@ -16,7 +16,7 @@ $(function() {
 	$("#delete-authority-button").click(function() {
 		var id = $(this).data("authority-id");
 		$.ajax({
-			'url': id + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+			'url': [[@{/auth/authority/}]] + id + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "DELETE",
 			'success': function(data) {
 				$("#tr-" + id).remove();
@@ -49,6 +49,17 @@ $(function() {
 		$('#authority-delete-confirmation').modal("hide");
 		event.preventDefault();
 	});
+	
+	$("#displayAuthorities").change(function () {
+	    if($("#displayAuthorities").val() === 'all'){
+	    	window.location.href = [[@{/auth/authority/list}]];
+	    } else if($("#displayAuthorities").val() === 'userSpecific'){
+	    	window.location.href = [[@{/auth/authority/user/list}]];
+	    } else {
+	    	var zoteroGroupId = $("#displayAuthorities").val();
+	    	window.location.href = [[@{/auth/authority/}]] + zoteroGroupId + "/list";
+	    }
+	});
 });
 </script>
 </head>
@@ -56,11 +67,22 @@ $(function() {
 <body>
 <div layout:fragment="content">
 <h2>Managed Authority Entries</h2>
+<label for="displayAuthorities">Display Authorities</label>
+
+<select class="form-control" id="displayAuthorities" name="displayAuthorities" size="1">
+	<option th:selected="${#strings.equals(displayBy, 'all')}" value="all">All</option>
+	<option th:selected="${#strings.equals(displayBy, 'userSpecific')}" value="userSpecific">[[${username}]]</option>
+	<span th:each="groupDetail:${groups}">
+		<option th:selected="${#strings.equals(displayBy, groupDetail.groupId)}" th:value="${groupDetail.groupId}">Group - [[${groupDetail.name}]]</option>
+	</span>  
+</select><br><br> 
+	
 <table class="table table-striped table-bordered">
 <tr>
 	<th width="20%">URI</th>
 	<th>Name</th>
 	<th>Created on</th>
+	<th>Group</th>
 	<th></th>
 	<th></th>
 </tr>
@@ -68,8 +90,17 @@ $(function() {
 	<td><span th:text="${authority.uri}"/></td>
 	<td><span th:text="${authority.name}"/></td>
 	<td><span class="date" th:text="${authority.createdOn}"/></td>
+	<td>
+	<span th:if="${#lists.isEmpty(authority.groups)}"> - </span>
+	<span th:each="group,status : ${authority.groups}">
+		<span th:each="groupDetail:${groups}">
+			<span th:if="${#strings.equals(group, groupDetail.groupId)}">[[${groupDetail.name}]]</option>
+		</span>
+		<span th:if="${!status.last}">, </span>
+	</span>
+	</td>			
 	<td><a class="delete-link" href="" th:data-authority-id="${authority.id}" th:data-authority-name="${authority.name}" th:data-authority-uri="${authority.uri}"><i class="fas fa-trash-alt"></i></a></td>
-	<td><a th:href="@{${authority.id}+'/edit'}"><i class="far fa-edit" title="Edit"></i></a></td>
+	<td><a th:href="@{|/auth/authority/${authority.id}/edit|}"><i class="far fa-edit" title="Edit"></i></a></td>
 </tr>
 </table>
 
