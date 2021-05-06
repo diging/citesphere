@@ -58,39 +58,37 @@
 				$("#prevSpinner").hide();
 			}
 		});
-		
-	});
 	
-	$("#uploadFileIcon").click(function() {
-        $("#uploadFileModal").modal('show');
-    });
-    
-    $("#uploadFileBtn").click(function(e) {
-        e.preventDefault()
-        
-        /* JQuery doesn't have a files attribute */
-        var uploadFiles = document.getElementById('uploadFileInput').files;
-        var formData = new FormData();
-        for (var i = 0; i < uploadFiles.length; i++) {
-            formData.append("files", uploadFiles[i]);
-        }
-        <c:url value="/auth/group/${zoteroGroupId}/items/${citation.key}/files/upload?${_csrf.parameterName}=${_csrf.token}"  var="postUrl" />
-        $.ajax({
-            type: "POST",
-            url: "${postUrl}",
-            cache       : false,
-            contentType : false,
-            processData : false,
-            enctype: 'multipart/form-data',
-            data: formData, 
-            success: function(data) {
-                document.getElementById('uploadFileInput').value = '';
-                $("#uploadFileModal").modal('hide');
-            }
-        });
-        
-        
-    });
+		$("#uploadFileIcon").click(function() {
+	        $("#uploadFileModal").modal('show');
+	    });
+	    
+	    $("#uploadFileBtn").click(function(e) {
+	        e.preventDefault()
+	        
+	        /* JQuery doesn't have a files attribute */
+	        var uploadFiles = document.getElementById('uploadFileInput').files;
+	        var formData = new FormData();
+	        for (var i = 0; i < uploadFiles.length; i++) {
+	            formData.append("files", uploadFiles[i]);
+	        }
+	        
+	        $.ajax({
+	            type: "POST",
+	            url: "[(@{|/auth/group/${zoteroGroupId}/items/${citation.key}/files/upload?${_csrf.parameterName}=${_csrf.token}|})]",
+	            cache       : false,
+	            contentType : false,
+	            processData : false,
+	            enctype: 'multipart/form-data',
+	            data: formData, 
+	            success: function(data) {
+	                document.getElementById('uploadFileInput').value = '';
+	                $("#uploadFileModal").modal('hide');
+	            }
+	        });
+  
+	    });
+	});
 	
 </script>
 </head>

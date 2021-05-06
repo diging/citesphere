@@ -80,6 +80,9 @@
         <elasticsearch.path.prefix></elasticsearch.path.prefix>
         <!-- in ms (10000ms = 10s) -->
         <elasticsearch.connect.timeout>60000</elasticsearch.connect.timeout>
+        
+        <giles.baseurl></giles.baseurl>
+        <citesphere.oauth2.app.clientId></citesphere.oauth2.app.clientId>
 
         <token.signing.key></token.signing.key>
 
