@@ -169,7 +169,6 @@
 					 (<th:block th:each="aff,affStatus : ${author.affiliations}">
 					 	[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
 					 </th:block>)
-					 <span th:if="${!status.last}">; </span>
 				 </span>
 				 <span th:if="${!#strings.isEmpty(author.uri)}">
 				 	<a th:href="@{|${author.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
@@ -177,6 +176,7 @@
 				 <span th:if="${!#strings.isEmpty(author.localAuthorityId)}">
 				 	<a th:href="@{|/auth/authority/${author.localAuthorityId}|}"><i class="fas fa-anchor"></i></a>
 				 </span>
+				 <span th:if="${!status.last}">; </span>
 			</span></td>
 		</tr>
 		
@@ -188,7 +188,6 @@
 					 (<th:block th:each="aff,affStatus : ${editor.affiliations}">
 					 	[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
 					 </th:block>)
-					 <span th:if="${!status.last}">; </span>
 				 </span>
 				 <span th:if="${!#strings.isEmpty(editor.uri)}">
 				 	<a th:href="@{|${editor.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
@@ -196,6 +195,7 @@
 				 <span th:if="${!#strings.isEmpty(editor.localAuthorityId)}">
 				 	<a th:href="@{|/auth/authority/${editor.localAuthorityId}|}"><i class="fas fa-anchor"></i></a>
 				 </span>
+				 <span th:if="${!status.last}">; </span>
 			</span></td>
 		</tr>
 		<tr th:each="role,status: ${citation.otherCreatorRoles}" th:if="${!#strings.equals(role,'editor')}">
@@ -205,12 +205,11 @@
 			<td>
 				<span th:each="creator,creatorStatus: ${citation.otherCreators}" th:if="${#strings.equals(creator.role, role)}">
  					[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
-					
 					<span th:if="${!#lists.isEmpty(creator.person.affiliations)}">
 				
  						(<th:block th:each="aff,affStatus : ${creator.person.affiliations}">
 							[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
-						</th:block>)<span th:if="${!creatorStatus.last}">;</span>
+						</th:block>)
 					</span>
 					<span th:if="${!#strings.isEmpty(creator.person.uri)}">
 						<a th:href="@{|${creator.person.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
@@ -218,9 +217,9 @@
 					<span th:if="${!#strings.isEmpty(creator.person.localAuthorityId)}">
 						<a th:href="@{|/auth/authority/${creator.person.localAuthorityId}|}"><i class="fas fa-anchor"></i></a>
 					</span>
-					<span th:if="${!status.last}">; </span>
+					<span th:if="${!creatorStatus.last}">; </span>
 				</span>
-			</td>
+ 			</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'publicationTitle')}">
 			<td>Publication Title</td>
