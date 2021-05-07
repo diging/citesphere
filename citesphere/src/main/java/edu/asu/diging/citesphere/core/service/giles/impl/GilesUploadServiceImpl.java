@@ -26,7 +26,7 @@ import edu.asu.diging.citesphere.model.bib.impl.GilesUpload;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
-@PropertySource("classpath:/config.properties")
+@PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
 public class GilesUploadServiceImpl implements GilesUploadService {
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -73,6 +73,7 @@ public class GilesUploadServiceImpl implements GilesUploadService {
         
         IGilesUpload upload = new GilesUpload();
         upload.setProgressId(response.getBody().getId());
+        upload.setUploadingUser(user.getUsername());
         return upload;
     }
     

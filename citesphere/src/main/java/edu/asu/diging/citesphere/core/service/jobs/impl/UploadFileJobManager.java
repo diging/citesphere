@@ -31,6 +31,7 @@ import edu.asu.diging.citesphere.core.model.jobs.impl.UploadFileJob;
 import edu.asu.diging.citesphere.core.repository.jobs.UploadFileJobRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.core.service.giles.GilesUploadChecker;
 import edu.asu.diging.citesphere.core.service.giles.GilesUploadService;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadFileJobManager;
 import edu.asu.diging.citesphere.core.service.jwt.IJwtTokenService;
@@ -69,6 +70,9 @@ public class UploadFileJobManager implements IUploadFileJobManager {
     
     @Autowired
     private ICitationManager citationManager;
+    
+    @Autowired
+    private GilesUploadChecker uploadChecker;
 
     
     /* (non-Javadoc)
@@ -167,6 +171,7 @@ public class UploadFileJobManager implements IUploadFileJobManager {
             }
             citation.getGilesUploads().add(upload);
             citationManager.updateCitation(user, groupId, citation);
+            uploadChecker.add(citation);
             return upload;
         }
         

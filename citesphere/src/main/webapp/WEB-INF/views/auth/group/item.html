@@ -117,9 +117,12 @@
 				</span>
 				 <a
 					th:href="@{|${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
-					class="icon-edit" style="color: #337ab7; font-size: 14px" title="Edit"></i></a> &nbsp;&nbsp; <a
+					class="icon-edit" style="color: #337ab7; font-size: 16px" title="Edit"></i></a> &nbsp;&nbsp; <a
 					th:href="@{|${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
 					class="icon-sync" title="Sync Citation"></i></a>
+				
+				&nbsp;&nbsp; 
+				<a id="uploadFileIcon" href="#"><i style="color: #337ab7; font-size: 20px" class="icon-multiple-doc"></i></a>
 			</div>
 			<div id="pull-right" class="pull-right" style="min-width: 35px;">
 				<button id ="prev" class="btn btn-default" style="font-size:10px;"type="submit"  href="" ${ empty previous ? 'disabled="disabled"' : ''}><i id="prevSpinner" class="icon-spinner rotating"></i> < Previous</button>&nbsp;&nbsp;
@@ -336,10 +339,10 @@
         <ul class="list-group" >
 	        <li class="list-group-item" th:each="upload:${citation.gilesUploads}">
 	        <span th:if="${upload.uploadedFile?.filename}">
-	        [[${upload.progressId}]]
+	        <i class="icon-giles"></i>[[${upload.documentId}]]
 	        </span>
 	        <span th:unless="${upload.uploadedFile}">
-	        File is being uploaded...
+	        <i class="icon-giles"></i> File is being processed... ([[${upload.progressId}]])
 	        </span>
 	        </li>
         </ul>
