@@ -1,20 +1,18 @@
 package edu.asu.diging.citesphere.core.service.giles.impl;
 
-import java.util.Date;
-import java.util.UUID;
-
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -30,6 +28,8 @@ import edu.asu.diging.citesphere.user.IUser;
 @Service
 @PropertySource("classpath:/config.properties")
 public class GilesUploadServiceImpl implements GilesUploadService {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private RestTemplate restTemplate;
     
@@ -57,14 +57,15 @@ public class GilesUploadServiceImpl implements GilesUploadService {
     @Override
     public IGilesUpload uploadFile(IUser user, MultipartFile file, byte[] fileBytes) {
         
-        String token = getToken();
+        String token = getToken(user);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.setBearerAuth(token);
-
+        
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("files", fileBytes);
+        body.add("files", new MultipartFileResource(fileBytes, file.getName()));
+        
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
@@ -75,29 +76,23 @@ public class GilesUploadServiceImpl implements GilesUploadService {
         return upload;
     }
     
-    private String getToken() {
-        OAuth2AccessToken token = internalTokenManager.getAccessToken();
+    private String getToken(IUser user) {
+        OAuth2AccessToken token = internalTokenManager.getAccessToken(user);
         return token.getValue();
     }
+    
+    public class MultipartFileResource extends ByteArrayResource {
 
-    class UploadResponse {
-        private String id;
-        private String checkUrl;
+        private String filename;
 
-        public String getId() {
-            return id;
+        public MultipartFileResource(byte[] bytearray, String filename) {
+            super(bytearray);
+            this.filename = filename;
         }
 
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getCheckUrl() {
-            return checkUrl;
-        }
-
-        public void setCheckUrl(String checkUrl) {
-            this.checkUrl = checkUrl;
+        @Override
+        public String getFilename() {
+            return this.filename;
         }
     }
 }

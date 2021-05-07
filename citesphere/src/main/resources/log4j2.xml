@@ -31,7 +31,7 @@
     </Logger>
     
     
-    <Logger name="org.springframework.security" level="${log.level}">
+    <Logger name="org.springframework.security" level="debug">
         
     </Logger> 
     <Logger name="org.springframework.data" level="${log.level}">
