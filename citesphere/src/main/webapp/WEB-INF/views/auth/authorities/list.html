@@ -20,7 +20,7 @@ $(function() {
 			'type': "DELETE",
 			'success': function(data) {
 				$("#tr-" + id).remove();
-				$.notify('<i class="fas fa-check-circle"></i> Authority successfully deleted!', {
+				$.notify('<i class="icon-checkmark-alt"></i> Authority successfully deleted!', {
 					type: 'success',
 					offset: {
 						x: 50,
@@ -33,7 +33,7 @@ $(function() {
 				});
 			},
 			'error': function(data) {
-				$.notify('<i class="fas fa-exclamation-circle"></i> Authority could not be deleted!', {
+				$.notify('<i class="icon-warning"></i> Authority could not be deleted!', {
 					type: 'danger',
 					offset: {
 						x: 50,
@@ -99,8 +99,8 @@ $(function() {
 		<span th:if="${!status.last}">, </span>
 	</span>
 	</td>			
-	<td><a class="delete-link" href="" th:data-authority-id="${authority.id}" th:data-authority-name="${authority.name}" th:data-authority-uri="${authority.uri}"><i class="fas fa-trash-alt"></i></a></td>
-	<td><a th:href="@{|/auth/authority/${authority.id}/edit|}"><i class="far fa-edit" title="Edit"></i></a></td>
+	<td><a class="delete-link" href="" th:data-authority-id="${authority.id}" th:data-authority-name="${authority.name}" th:data-authority-uri="${authority.uri}"><i class="icon-trash-alt" style="color: #337ab7; font-size: 14px;"></i></a></td>
+	<td><a th:href="@{|/auth/authority/${authority.id}/edit|}"><i class="icon-edit" style="color: #337ab7; font-size: 14px;" title="Edit"></i></a></td>
 </tr>
 </table>
 
