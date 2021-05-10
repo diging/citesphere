@@ -94,7 +94,9 @@ public class OAuthClientManagerTest {
         clientList.add(client1);
         clientList.add(client2);
         Mockito.when(clientRepo.findAll()).thenReturn(clientList);
-        Assert.assertEquals(clientList, managerToTest.getAllApps());
+        List<OAuthClient> apps = managerToTest.getAllApps();
+        Assert.assertEquals(clientList.size(), apps.size());
+        clientList.forEach(app -> Assert.assertTrue(apps.contains(app)));
     }
     
     @Test
