@@ -79,7 +79,6 @@ public class AsyncUpdateCitationsProcessor {
      * to free memory.
      * 
      * @param taskID : id of the task that is not needed in memory
-     * @return returns true of taskID is found and removed.
      */
     public void clearTask(String taskID) {
         taskTracker.remove(taskID);
