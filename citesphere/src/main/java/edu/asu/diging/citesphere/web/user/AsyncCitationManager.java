@@ -16,18 +16,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
-import edu.asu.diging.citesphere.core.service.impl.AsyncCitationManager;
+import edu.asu.diging.citesphere.core.service.impl.AsyncUpdateCitationsProcessor;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Component
-public class AsyncUpdateCitationsProcessor {
+public class AsyncCitationManager {
     @Autowired
-    private AsyncCitationManager asyncCitationManager;
+    private AsyncUpdateCitationsProcessor asyncUpdateCitationsProcessor;
 
     private final Map<String, Future<ZoteroUpdateItemsStatuses>> taskTracker;
 
-    public AsyncUpdateCitationsProcessor() {
+    public AsyncCitationManager() {
         this.taskTracker = new ConcurrentHashMap<>();
     }
 
@@ -44,8 +44,8 @@ public class AsyncUpdateCitationsProcessor {
             throws JsonProcessingException, ZoteroConnectionException, CitationIsOutdatedException,
             ZoteroHttpStatusException, InterruptedException, ExecutionException {
         String taskID = UUID.randomUUID().toString();
-        Future<ZoteroUpdateItemsStatuses> futureTask = asyncCitationManager.updateCitations(user, zoteroGroupId,
-                citations);
+        Future<ZoteroUpdateItemsStatuses> futureTask = asyncUpdateCitationsProcessor.updateCitations(user,
+                zoteroGroupId, citations);
         taskTracker.put(taskID, futureTask);
         AsyncUpdateCitationsResponse asyncResponse = new AsyncUpdateCitationsResponse();
         asyncResponse.setTaskID(taskID);

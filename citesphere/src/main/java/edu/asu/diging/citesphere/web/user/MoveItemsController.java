@@ -32,7 +32,7 @@ public class MoveItemsController {
     private ICitationManager citationManager;
 
     @Autowired
-    private AsyncUpdateCitationsProcessor asyncUpdateCitationsProcessor;
+    private AsyncCitationManager asyncCitationManager;
 
     @Autowired
     private ICitationHelper citationHelper;
@@ -55,7 +55,7 @@ public class MoveItemsController {
             citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
         }
-        AsyncUpdateCitationsResponse asyncResponse = asyncUpdateCitationsProcessor
+        AsyncUpdateCitationsResponse asyncResponse = asyncCitationManager
                 .updateCitations((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
         return gson.toJson(asyncResponse, AsyncUpdateCitationsResponse.class);
     }
@@ -64,13 +64,13 @@ public class MoveItemsController {
     public @ResponseBody AsyncUpdateCitationsResponse getMoveItemsStatus(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID)
             throws Exception {
-        return asyncUpdateCitationsProcessor.getUpdateCitationsResponse(taskID);
+        return asyncCitationManager.getUpdateCitationsResponse(taskID);
     }
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/task/{taskID}/clear")
     public @ResponseBody void clearTask(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID) {
-        asyncUpdateCitationsProcessor.clearTask(taskID);
+        asyncCitationManager.clearTask(taskID);
     }
 
 }

@@ -20,7 +20,7 @@ import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
-public class AsyncCitationManager {
+public class AsyncUpdateCitationsProcessor {
     @Autowired
     private IZoteroManager zoteroManager;
 

@@ -380,14 +380,14 @@ $(".items").draggable({
 	scroll: true,
 	cursor: "grabbing",
 	helper:function(){
-		var selected = $(".selected");
+		let selected = $(".selected");
 		if (selected.length == 0) {
 		$(this).addClass('selected');
 		selected = $(this);
 		}
-		var container = $('<div> Move ' +selected.length+ ' citations </div>').attr('id', 'moveitems-panel-highlighter');
+		let container = $('<div> Move ' +selected.length+ ' citations </div>').attr('id', 'moveitems-panel-highlighter');
 		(selected.length > 1)? container.addClass('icon-multiple-doc'): container.addClass('icon-docs');
-		var list = container.append('<ul></ul>').find('ul');
+		let list = container.append('<ul></ul>').find('ul');
 		$(".selected").each(function() {
 			list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
 		});
@@ -406,15 +406,15 @@ $(".list-group-item").droppable( {
 		},
 	drop: function(event, ui) {
 		$(this).removeClass('drag-over');
-		var collectionName = $(this).find('a').text();
-		var href = $(this).find('a').attr("href");
-		var segments = href.split('/');
-		var movedToCollectionKey = segments[6];
-		var itemsKeys = [];
+		let collectionName = $(this).find('a').text();
+		let href = $(this).find('a').attr("href");
+		let segments = href.split('/');
+		let movedToCollectionKey = segments[6];
+		let itemsKeys = [];
 		ui.helper.find('ul').children().each(function(){
 			itemsKeys.push($(this).text());
 			});
-		var itemsMoveData ={};
+		let itemsMoveData ={};
 		itemsMoveData["itemIds"] = itemsKeys;
 		itemsMoveData["collectionId"] = movedToCollectionKey;
 		$.ajax({
@@ -431,7 +431,7 @@ $(".list-group-item").droppable( {
 			 }
 		});
 		$('.fa-chevron-circle-left').show();
-		var checkedBoxes = $('input[type="checkbox"]:checked');
+		let checkedBoxes = $('input[type="checkbox"]:checked');
 		checkedBoxes.each(function(){
 			$(this).prop('checked', false);
 			$(this).parents('tr').removeClass('selected');
