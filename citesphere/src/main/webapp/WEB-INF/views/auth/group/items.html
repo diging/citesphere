@@ -34,17 +34,17 @@ $(function() {
 	
 	if(sessionStorage.getItem("collectionsHidden") == "true"){
 		$("#collectionsList").hide()
-	    $("#toggleCollection").attr('class', "fa fa-chevron-circle-right")
+	    $("#toggleCollection").attr('class', "icon-arrow-right")
 	    $("#toggleCollection").attr('title', "Show Collections")	    
 	    $("#citationBlock").attr('class', 'col-md-12')
 	}
 	
 	$("#toggleCollection").click(function(){
 	    $("#collectionsList").toggle(); 
-	    collectionsHidden = $("#toggleCollection").hasClass("fa-chevron-circle-left")
+	    collectionsHidden = $("#toggleCollection").hasClass("icon-arrow-left")
 	    sessionStorage.setItem("collectionsHidden",collectionsHidden)
 	        
-	    $("#toggleCollection").attr('class', collectionsHidden ? "fa fa-chevron-circle-right" : "fa fa-chevron-circle-left")
+	    $("#toggleCollection").attr('class', collectionsHidden ? "icon-arrow-right" : "icon-arrow-left")
 	    $("#toggleCollection").attr('title', collectionsHidden ? "Show Collections":"Hide Collections")
 	    
 	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
@@ -130,7 +130,7 @@ Items in Group <span th:text="${group.name}"></span></br>
 	  <span id="syncText">Up to date</span></div>
 	</div>
 	<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
-	    <small><a th:href="@{items}"><i class="fas fa-redo-alt"></i> Reload page</a></small>
+	    <small><a th:href="@{items}"><i class="icon-redo-alt"></i> Reload page</a></small>
 	</div>
 
 <script>
@@ -180,7 +180,7 @@ function pollStatus(){
 <div class="form-group">
 <div class="input-group">
     <input type="text" id="findItemKey" name="findItemKey" class="form-control" placeholder="Find by item key"/>
-    <div class="input-group-addon" id="findByItemKeyBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
+    <div class="input-group-addon" id="findByItemKeyBtn" style="cursor: pointer;"><i class="icon-search"></i></div>
 </div>
 </div>
 
@@ -188,7 +188,7 @@ function pollStatus(){
 <div class="form-group">
 <div class="input-group">
     <input type="text" id="search" name="search" class="form-control" placeholder="Enter search term..." th:value="${param.searchTerm}"/>
-    <div class="input-group-addon" id="searchBtn" style="cursor: pointer;"><i class="fas fa-search"></i></div>
+    <div class="input-group-addon" id="searchBtn" style="cursor: pointer;"><i class="icon-search"></i></div>
 </div>
 </div>
 
@@ -197,7 +197,7 @@ function pollStatus(){
     <div class="panel-heading" role="tab" id="headingOne">
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Group Info <i class="fas fa-arrows-alt-v pull-right"></i>
+          Group Info <i class="icon-up-down-arrow pull-right"></i>
         </a>
       </h4>
     </div>
@@ -226,14 +226,14 @@ function pollStatus(){
 
 <div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} != null">
   <a th:href="@{|items/sync?page=${currentPage}&sort=${sort}&columns=${#strings.listJoin(columns,',')}|}"><big><i
-		class="fas fa-sync" title="Sync Page"></i></big></a>
+		class="icon-sync" title="Sync Page"></i></big></a>
 </div>
 <div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} == null">
   <a th:href="@{|items/sync?page=${currentPage}&sort=${sort}&columns=${#strings.listJoin(columns,',')}|}"><big><i
-		class="fas fa-sync" title="Sync Page"></i></big></a>
+		class="icon-sync" title="Sync Page"></i></big></a>
 </div>
 <div class="pull-right" style="margin-top: 20px;">
-<a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Citation</a>
+<a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="icon-circle-add"></i> Create Citation</a>
 </div>
 
 <div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
@@ -253,7 +253,7 @@ function pollStatus(){
 
 <p class="lead" style="display:inline;padding-left:10px">Collections</p>
 
-<big><i class="fa fa-chevron-circle-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
+<big><i class="icon-arrow-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
 
 
 <div class="dropdown pull-right" style="padding-bottom: 10px;">
@@ -264,7 +264,7 @@ function pollStatus(){
   <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
   <tbody th:each="column:${availableColumns}">
     <li th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}"><a th:data-column-name="${column}" th:data-is-shown="${#lists.contains(columns,column)}">
-	<span th:if ="${#lists.contains(columns,column)}"><i class="fas fa-check"></i> </span>
+	<span th:if ="${#lists.contains(columns,column)}"><i class="icon-checkmark-alt"></i> </span>
 	[[${columnLabel}]]
     </a></li>
   </tbody>
@@ -308,7 +308,7 @@ function pollStatus(){
 			  <span class="text-warning">
 			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
 			  , iconLabel=${@iconsResource.getProperty(entry.itemType + '_label')}">
-				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
+				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
 				</div>
 			  </span>
 			</td>
@@ -325,7 +325,7 @@ function pollStatus(){
 		 	</td>
 		 	<td>
 		 		<span th:if="${!#strings.isEmpty(entry.url)}">
-		 		<a href="${entry.url}" target="_blank" th:title="${entry.url} "><i class="fas fa-globe-americas"></i></a>
+		 		<a href="${entry.url}" target="_blank" th:title="${entry.url} "><i class="icon-www"></i></a>
 		 		</span>
 		 	</td>
 		 	<td th:each="column:${columns}" style="max-width:300px;">

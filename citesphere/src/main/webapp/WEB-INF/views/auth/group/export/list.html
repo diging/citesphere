@@ -56,7 +56,7 @@
 			<td>[[${task.createdOn}]]</td>
 			<td>
 				<span th:if="${#strings.equals(task.status,'DONE')}">
-					<a th:href="@{|exports/${task.id}/download|}"><i class="fas fa-download"></i> Download</a>
+					<a th:href="@{|exports/${task.id}/download|}"><i class="icon-download"></i> Download</a>
 				</span>
 			</td>
 		</tr>
