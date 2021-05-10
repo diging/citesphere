@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -21,7 +20,6 @@ import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
-@PropertySource("classpath:/config.properties")
 public class AsyncCitationManager {
     @Autowired
     private IZoteroManager zoteroManager;

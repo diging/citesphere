@@ -454,7 +454,8 @@ $.ajax({
 		}
 		if(moveItemsStatusResponse.response.failedItems.length != 0){
 	 	let message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems 
-	 					+ "<br /> <br /> Reasons: " + moveItemsStatusResponse.response.failedMessages;
+	 						+ "<br /> <br /> Error codes: " + moveItemsStatusResponse.response.failedCodes
+	 						+ "<br /> <br /> Reasons: " + moveItemsStatusResponse.response.failedMessages;
 	 	showNotification(message, "danger", 20000);
 		}
 		if(moveItemsStatusResponse.response.unchangedItems.length != 0){
