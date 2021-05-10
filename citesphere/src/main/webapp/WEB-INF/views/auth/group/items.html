@@ -129,9 +129,6 @@ Items in Group <span th:text="${group.name}"></span></br>
 	  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">  
 	  <span id="syncText">Up to date</span></div>
 	</div>
-	<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
-	    <small><a th:href="@{items}"><i class="icon-redo-alt"></i> Reload page</a></small>
-	</div>
 
 <script>
 //# sourceURL=poll.js
@@ -170,9 +167,16 @@ function pollStatus(){
             $("#syncProgress").attr('aria-valuemax', 100);
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
+            reloadCitesphere();
         }
     });
 }
+
+function reloadCitesphere(){
+	$.get("items", function(data) {
+	});
+}
+
 </script>
 </div>
 
