@@ -170,8 +170,15 @@ function pollStatus(){
             $("#syncProgress").attr('aria-valuemax', 100);
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
+            getSyncedData();
         }
     });
+}
+
+function getSyncedData(){
+	 $.get("items", function(data) {
+		 console.log(data);
+	 });
 }
 </script>
 </div>
