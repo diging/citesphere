@@ -20,6 +20,10 @@ import edu.asu.diging.citesphere.core.service.impl.AsyncUpdateCitationsProcessor
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 
+/**
+ * Responsible for managing the state of an async update citations task.
+ *
+ */
 @Component
 public class AsyncCitationManager {
     @Autowired
@@ -32,7 +36,7 @@ public class AsyncCitationManager {
     }
 
     /**
-     * This method updates citations.
+     * This method updates citations asynchronously.
      * 
      * @param user          User accessing Zotero
      * @param zoteroGroupId GroupId of the citations
@@ -43,28 +47,30 @@ public class AsyncCitationManager {
     public AsyncUpdateCitationsResponse updateCitations(IUser user, String zoteroGroupId, List<ICitation> citations)
             throws JsonProcessingException, ZoteroConnectionException, CitationIsOutdatedException,
             ZoteroHttpStatusException, InterruptedException, ExecutionException {
-        String taskID = UUID.randomUUID().toString();
+        String taskId = UUID.randomUUID().toString();
         Future<ZoteroUpdateItemsStatuses> futureTask = asyncUpdateCitationsProcessor.updateCitations(user,
                 zoteroGroupId, citations);
-        taskTracker.put(taskID, futureTask);
+        taskTracker.put(taskId, futureTask);
         AsyncUpdateCitationsResponse asyncResponse = new AsyncUpdateCitationsResponse();
-        asyncResponse.setTaskID(taskID);
+        asyncResponse.setTaskID(taskId);
         asyncResponse.setTaskStatus(AsyncTaskStatus.PENDING);
         return asyncResponse;
     }
 
     /**
-     * This method gets response of a update citations request by giving task id.
+     * This method gets the response of an update citations request by giving task
+     * id. The task id is generated when a new async task is submitted using
+     * updateCitations() method in this class
      * 
-     * @param taskID: id of the task
-     * @return: returns AsyncTaskResponse that has task status, task id and task
-     *          response
+     * @param taskId: id of the task
+     * @return: returns AsyncTaskResponse that has task status (complete or
+     *          pending), task id and task response
      */
-    public AsyncUpdateCitationsResponse getUpdateCitationsResponse(String taskID)
+    public AsyncUpdateCitationsResponse getUpdateCitationsResponse(String taskId)
             throws ExecutionException, InterruptedException {
         AsyncUpdateCitationsResponse response = new AsyncUpdateCitationsResponse();
-        Future<ZoteroUpdateItemsStatuses> futureTask = taskTracker.get(taskID);
-        response.setTaskID(taskID);
+        Future<ZoteroUpdateItemsStatuses> futureTask = taskTracker.get(taskId);
+        response.setTaskID(taskId);
         if (futureTask.isDone()) {
             response.setTaskStatus(AsyncTaskStatus.COMPLETE);
             response.setResponse(futureTask.get());
@@ -76,12 +82,13 @@ public class AsyncCitationManager {
 
     /**
      * If you no longer need a task in memory, use this method to remove that task
-     * to free memory.
+     * to free memory. Once the task is removed, its corresponding result can
+     * no longer be retrieved.
      * 
-     * @param taskID : id of the task that is not needed in memory
+     * @param taskId : id of the task that is not needed in memory
      */
-    public void clearTask(String taskID) {
-        taskTracker.remove(taskID);
+    public void clearTask(String taskId) {
+        taskTracker.remove(taskId);
     }
 
 }

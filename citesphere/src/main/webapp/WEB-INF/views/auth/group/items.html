@@ -178,8 +178,13 @@ function pollStatus(){
             $("#syncProgress").attr('aria-valuemax', 100);
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
+            //window.location.href = "items";
         }
     });
+}
+
+function getSyncedData(){
+	$.get("sync/info", pollStatus);
 }
 </script>
 </div>
@@ -454,15 +459,15 @@ $.ajax({
 		}
 		if(moveItemsStatusResponse.response.failedItems.length != 0){
 	 	let message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems 
-	 						+ "<br /> <br /> Error codes: " + moveItemsStatusResponse.response.failedCodes
-	 						+ "<br /> <br /> Reasons: " + moveItemsStatusResponse.response.failedMessages;
+	 						+ "<br /> <br /> Reasons: <br /> <br />" + moveItemsStatusResponse.response.failedMessages.map(x => x.code + " : " + x.message).join("<br>");
+	 				
 	 	showNotification(message, "danger", 20000);
 		}
 		if(moveItemsStatusResponse.response.unchangedItems.length != 0){
 		let message =  " "+ moveItemsStatusResponse.response.unchangedItems.length+ " Citations already present in ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.unchangedItems;
 		showNotification(message, "info", 20000);
 		}
-		clearAsyncTask(moveItemsStatusResponse.taskID);	
+		clearAsyncTask(moveItemsStatusResponse.taskID);
 		}else{
 			setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName),1000);
 		}
