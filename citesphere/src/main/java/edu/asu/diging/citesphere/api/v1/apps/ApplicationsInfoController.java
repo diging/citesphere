@@ -33,7 +33,6 @@ public class ApplicationsInfoController extends V1Controller {
                     .anyMatch(authority -> authority.getAuthority().equals(Role.TRUSTED_CLIENT));
         }
 
-        // If the user is not of expected role, respond as forbidden access
         if (!isAuthorized) {
             return new ResponseEntity<List<AppInfo>>(HttpStatus.FORBIDDEN);
         }
@@ -56,7 +55,7 @@ public class ApplicationsInfoController extends V1Controller {
     /**
      * Data Transfer Object used to retrieve all registered Applications.
      * 
-     * @author mlimbadi
+     * @author Maulik Limbadiya
      *
      */
     class AppInfo {
