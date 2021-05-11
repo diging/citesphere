@@ -373,7 +373,7 @@ $('.checkboxes').change(function(){
 		$(this).parents('tr').removeClass('selected');
 		$(this).parents('tr').removeAttr("title");
 	}
-	$('.checkboxes:checked').length > 0? $('.fa-chevron-circle-left').hide(): $('.fa-chevron-circle-left').show();
+	$('.checkboxes:checked').length > 0? $('.icon-arrow-left').hide(): $('.icon-arrow-left').show();
 });
 $(function(){
 $(".items").draggable({
@@ -427,10 +427,10 @@ $(".list-group-item").droppable( {
 		       pollMovedItemsStatuses(moveItemsAsyncResponse, collectionName);
 			 },
 			 error: function (moveItemsAsyncResponse) {
-				   showNotification(" Error while moving citations!", "danger", 10000);
+			   showNotification(" Error while moving citations!", "danger", 10000);
 			 }
 		});
-		$('.fa-chevron-circle-left').show();
+		$('.icon-arrow-left').show();
 		let checkedBoxes = $('input[type="checkbox"]:checked');
 		checkedBoxes.each(function(){
 			$(this).prop('checked', false);
