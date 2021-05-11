@@ -338,12 +338,16 @@
         
         <ul class="list-group" >
 	        <li class="list-group-item" th:each="upload:${citation.gilesUploads}">
+	        <i class="icon-giles"></i>
 	        <span th:if="${upload.uploadedFile?.filename}">
-	        <i class="icon-giles"></i>[[${upload.documentId}]]
+	        [[${upload.documentId}]]
 	        </span>
-	        <span th:unless="${upload.uploadedFile}">
-	        <i class="icon-giles"></i> File is being processed... ([[${upload.progressId}]])
+	        <span th:unless="${upload.status != null && (upload.status != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
+	        File is being processed... ([[${upload.progressId}]])
 	        </span>
+	        <span th:if="${upload.status == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
+	        <span th:if="${upload.status == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
+	        <span th:if="${upload.status == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
 	        </li>
         </ul>
 	</div>

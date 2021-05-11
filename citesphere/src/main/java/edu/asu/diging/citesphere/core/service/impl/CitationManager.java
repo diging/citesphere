@@ -113,6 +113,15 @@ public class CitationManager implements ICitationManager {
         return updateCitationFromZotero(user, groupId, key);
     }
 
+    @Override
+    public ICitation getCitation(String key) {
+        Optional<ICitation> optional = citationStore.findById(key);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        return null;
+    }
+    
     /**
      * Retrieve a citation from Zotero bypassing the database cache. This method
      * also does not store the retrieved citation in the database cache. Use

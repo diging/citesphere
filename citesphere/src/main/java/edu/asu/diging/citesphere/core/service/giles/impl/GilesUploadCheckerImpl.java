@@ -1,9 +1,13 @@
 package edu.asu.diging.citesphere.core.service.giles.impl;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -21,109 +25,188 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.giles.GilesUploadChecker;
 import edu.asu.diging.citesphere.core.service.oauth.InternalTokenManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
+import edu.asu.diging.citesphere.model.bib.GilesStatus;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.model.bib.impl.GilesUpload;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Component
-@PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
+@PropertySource({ "classpath:config.properties",
+        "${appConfigFile:classpath:}/app.properties" })
 public class GilesUploadCheckerImpl implements GilesUploadChecker {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
-        
+
     @Autowired
     private InternalTokenManager internalTokenManager;
-    
+
     @Autowired
     private IUserManager userManager;
-    
+
     @Autowired
     private ICitationManager citationManager;
 
     @Value("${giles_baseurl}")
     private String gilesBaseurl;
-    
+
     @Value("${giles_check_endpoint}")
     private String gilesCheckEndpoint;
 
     private RestTemplate restTemplate;
 
-    private Queue<ICitation> uploadQueue;
+    private Queue<String> uploadQueue;
 
     @PostConstruct
     public void init() {
         restTemplate = new RestTemplate();
-        uploadQueue = new ConcurrentLinkedQueue<ICitation>();
+        uploadQueue = new ConcurrentLinkedQueue<String>();
         // load in progress uploads from db
     }
-    
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.giles.impl.GilesUploadChecker#add(edu.asu.diging.citesphere.model.bib.ICitation)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.giles.impl.GilesUploadChecker#add(
+     * edu.asu.diging.citesphere.model.bib.ICitation)
      */
     @Override
     public void add(ICitation upload) {
-        if (!uploadQueue.contains(upload)) {
-            uploadQueue.add(upload);
+        if (!uploadQueue.contains(upload.getKey())) {
+            uploadQueue.add(upload.getKey());
         }
     }
-    
+
     // in milliseconds (60000ms = 1m)
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.giles.impl.GilesUploadChecker#checkUploads()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.citesphere.core.service.giles.impl.GilesUploadChecker#
+     * checkUploads()
      */
     @Override
     @Scheduled(fixedDelay = 60000)
     public void checkUploads() {
-        for (ICitation citation : uploadQueue) {
+        for (String citationKey : uploadQueue) {
+            ICitation citation = citationManager.getCitation(citationKey);
             Set<IGilesUpload> checkedUploads = new HashSet<>();
             boolean needsUpdating = false;
             IUser user = null;
             for (IGilesUpload upload : citation.getGilesUploads()) {
-                if (upload.getUploadingUser() == null) {
+                if (upload.getUploadingUser() == null
+                        || Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
+                                .contains(upload.getStatus())) {
                     // in case something went wrong with the user
+                    // or the upload has been processed
                     continue;
                 }
+
                 user = userManager.findByUsername(upload.getUploadingUser());
                 String token = internalTokenManager.getAccessToken(user).getValue();
-    
+
                 HttpHeaders headers = new HttpHeaders();
                 headers.setBearerAuth(token);
-                HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(headers);
-    
-                // FIXME: does giles expect upload id? if so, need to get that.
-                ResponseEntity<String> response = restTemplate.exchange(gilesBaseurl + gilesCheckEndpoint + upload.getProgressId(), HttpMethod.GET, requestEntity, String.class);
+                HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(
+                        headers);
+
+                ResponseEntity<String> response;
+                try {
+                    response = restTemplate.exchange(
+                            gilesBaseurl + gilesCheckEndpoint + upload.getProgressId(),
+                            HttpMethod.GET, requestEntity, String.class);
+                } catch (HttpClientErrorException ex) {
+                    upload.setStatus(GilesStatus.FAILED);
+                    checkedUploads.add(upload);
+                    needsUpdating = true;
+                    continue;
+                }
                 if (response.getStatusCode() == HttpStatus.ACCEPTED) {
                     // Giles is still procoessing
-                    logger.debug("Upload " + upload.getProgressId() + " still being processed.");
+                    logger.debug("Upload " + upload.getProgressId()
+                            + " still being processed.");
                     checkedUploads.add(upload);
                     continue;
                 } else if (response.getStatusCode() == HttpStatus.OK) {
                     logger.debug("Upload " + upload.getProgressId() + " is done.");
-                    Gson gson = new Gson();
-                    GilesUpload processed = gson.fromJson(response.getBody(), GilesUpload.class);
-                    checkedUploads.add(processed);
+                    ObjectMapper mapper = new ObjectMapper();
+                    String jsonBody = response.getBody();
+                    GilesUpload[] processed = new GilesUpload[0];
+                    try {
+                        processed = mapper.readValue(jsonBody, GilesUpload[].class);
+                    } catch (IOException e) {
+                        logger.error("Could not deserialize response.", e);
+                        upload.setStatus(GilesStatus.FAILED);
+                        checkedUploads.add(upload);
+                    }
+                    for (GilesUpload processedUpload : processed) {
+                        checkedUploads.add(processedUpload);
+                    }
                     needsUpdating = true;
                 }
             }
+
             if (needsUpdating) {
-                citation.setGilesUploads(checkedUploads);
-                // we'll just use the last user here
+                ICitation currentCitation = null;
                 try {
-                    citationManager.updateCitation(user, citation.getGroup(), citation);
-                } catch (ZoteroConnectionException | CitationIsOutdatedException | ZoteroHttpStatusException e) {
-                    logger.error("Could not update citation.", e);
+                    // we'll just use the last user here
+                    currentCitation = citationManager.getCitation(user,
+                            citation.getGroup(), citation.getKey());
+                } catch (GroupDoesNotExistException e) {
+                    logger.error("Could not get citation.", e);
+                    uploadQueue.remove(citation.getKey());
+                } catch (CannotFindCitationException e) {
+                    logger.error("Could not get citation.", e);
+                } catch (ZoteroHttpStatusException e) {
+                    logger.error("Could not get citation.", e);
                 }
+
+                if (currentCitation != null) {
+                    for (IGilesUpload upload : checkedUploads) {
+                        Optional<IGilesUpload> oldUpload = currentCitation
+                                .getGilesUploads().stream().filter(u -> u.getProgressId()
+                                        .equals(upload.getProgressId()))
+                                .findFirst();
+                        if (oldUpload.isPresent()) {
+                            currentCitation.getGilesUploads().remove(oldUpload.get());
+                        }
+                        currentCitation.getGilesUploads().add(upload);
+                    }
+
+                    // in case there is a newer citation in storage, make sure
+                    // we'll
+                    // update that one
+                    currentCitation.setGilesUploads(citation.getGilesUploads());
+                    try {
+                        citationManager.updateCitation(user, citation.getGroup(),
+                                currentCitation);
+                    } catch (ZoteroConnectionException | CitationIsOutdatedException
+                            | ZoteroHttpStatusException e) {
+                        logger.error("Could not update citation.", e);
+                    }
+                }
+            }
+
+            int unfinishedUplaods = citation.getGilesUploads().stream()
+                    .filter(u -> !Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
+                            .contains(u.getStatus()))
+                    .collect(Collectors.toList()).size();
+            if (unfinishedUplaods == 0) {
+                uploadQueue.remove(citation.getKey());
             }
         }
     }
