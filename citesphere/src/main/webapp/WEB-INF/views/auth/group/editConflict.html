@@ -39,7 +39,7 @@ Do you want to proceed?
 <td>Citation Type</td>
 <td th:with="iconClass=${@iconsResource.getProperty(form.itemType + '_icon')}
 			  , iconLabel=${@iconsResource.getProperty(form.itemType + '_label')}">
-<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
+<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
 </td>
 </tr>
 
@@ -171,7 +171,7 @@ Do you want to proceed?
 <td>
 	<div th:with="iconClass=${@iconsResource.getProperty(currentCitation.itemType + '_icon')}
 			 , iconLabel=${@iconsResource.getProperty(currentCitation.itemType + '_label')}">
-				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${currentCitation.itemType}"></i> [[${iconLabel} ?: ${currentCitation.itemType}]]
+				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${currentCitation.itemType}"></i> [[${iconLabel} ?: ${currentCitation.itemType}]]
 	</div>
 </td>
 
@@ -300,7 +300,7 @@ Do you want to proceed?
 <td>Citation Type</td>
 <td>
 	<div th:with="iconClass=${@iconsResource.getProperty(form.itemType + '_icon')}, iconLabel=${@iconsResource.getProperty(form.itemType + '_label')}">
-		<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
+		<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
 	</div>
 </td>
 </tr>

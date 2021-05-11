@@ -50,9 +50,9 @@ $(function() {
 		<td>[[${job.status}]]</td>
 		<td>[[${job.createdOn}]]</td>
 		<td>
-		    <span th:if="${#strings.equals(job.status,'DONE')}"><i style="color: green;" class="fas fa-check-circle"></i></span>
-		    <span th:if="${#strings.equals(job.status,'STARTED')}"><i style="color: orange;" class="fas fa-cogs"></i></span>
-		    <span th:if="${#strings.equals(job.status,'FAILURE')}"><i style="color: red;" class="fas fa-exclamation-circle"></i></span>
+		    <span th:if="${#strings.equals(job.status,'DONE')}"><i style="color: green; font-size: 13px;" class="icon-checkmark-alt"></i></span>
+		    <span th:if="${#strings.equals(job.status,'STARTED')}"><i style="color: orange; font-size: 13px;" class="icon-gear"></i></span>
+		    <span th:if="${#strings.equals(job.status,'FAILURE')}"><i style="color: red; font-size: 13px;" class="icon-warning"></i></span>
 		</td>
 	</tr>
 </table>

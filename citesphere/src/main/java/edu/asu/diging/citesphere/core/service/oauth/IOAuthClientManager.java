@@ -19,6 +19,8 @@ public interface IOAuthClientManager {
 
     OAuthClientResultPage getAllClientDetails(Pageable pageable);
 
+    List<OAuthClient> getAllApps();
+
     void deleteClient(String clientId);
 
     OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException;

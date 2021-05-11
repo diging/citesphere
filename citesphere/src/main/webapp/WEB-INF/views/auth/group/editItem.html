@@ -5,6 +5,7 @@
 .popover {
 	min-width: 300px;
 }
+
 </style>
 <script th:inline="javascript">
 //# sourceURL=submit.js
@@ -328,7 +329,7 @@ $(function() {
 		var text = $("#addConceptConceptSelect option:selected").text();
 		var typeName = $("#addConceptTypeSelect option:selected").text();
 		conceptSpan.text(text + " | " + typeName + " ");
-		var deleteIcon = $('<i class="fas fa-times remove-concept"></i>');
+		var deleteIcon = $('<i class="icon-circle-close remove-concept" style="cursor: pointer; color: white; font-size: 12px;"></i>');
 		deleteIcon.click(removeConcept);
 		conceptSpan.append(deleteIcon);
 		$("#conceptTags").append(conceptSpan);
@@ -454,8 +455,8 @@ function savePersonDetails(personType, modalName){
 	}
 	
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-	var editIcon = $('<i class="far fa-edit edit-'+modalNameLCase+'"></i>')
-	var deleteIcon = $('<i class="fas fa-times remove-'+modalNameLCase+'"></i>');
+	var editIcon = $('<i class="icon-edit edit-'+modalNameLCase+'" style="color: white; font-size: 12px;"></i>')
+	var deleteIcon = $('<i class="icon-circle-close remove-'+modalNameLCase+'" style="color: white; font-size: 12px;"></i>');
 	editIcon.click(function(){
 		var personItem = $(this).parent();
 		editPerson(modalName, personItem[0]);
@@ -689,8 +690,7 @@ function getUserAuthorities(modalType, personType, page) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td style="vertical-align: middle;"><span class="user-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
-  					
+  					content += '<td style="vertical-align: middle;"><span class="user-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
   				});
   				
   				$('#userAuthority-pagination-top').twbsPagination({
@@ -739,9 +739,8 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		url: url ,
   		async: false,
   		success: function(data) {
-			
+  			$('#mycheckboxDiv').append(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
-  			
   			var content = '';
   				
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
@@ -753,7 +752,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
+  					content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
   					
   				}); 				
   				
@@ -779,11 +778,15 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
 			
-			createManageAuthorityURL = [[@{|/auth/authority/add?${_csrf.parameterName}=${_csrf.token}|}]]+ '&source=conceptpower&uri=' + uri;						
+			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=conceptpower&uri=' + uri;	
+			if($("#mycheckbox").is(":checked")){
+				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
+			}
 			$.ajax({
 			  		dataType: "json",
 			  		type: 'POST',
 			  		url: createManageAuthorityURL,
+			  		data: { [[${_csrf.parameterName}]] : [[${_csrf.token}]] },
 			  		async:false,
 			  		success: function(data) {
 			  			$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
@@ -897,7 +900,7 @@ function loadFields() {
 					iconLink.attr("data-creator-type", creators[i]);
 					iconLink.attr("data-target","#creatorModal");
 					var iconImg = $("<i>");
-					iconImg.addClass("fas fa-plus-circle");
+					iconImg.addClass("icon-circle-add");
 					iconLink.append(iconImg);
 					iconLink.append("Add "+creators[i]);
 					addIconDiv.append(iconLink);
@@ -1047,14 +1050,14 @@ function creatorLinkHandler(target) {
 									<span th:remove="tag" th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
 									&nbsp;
-							<i class="far fa-edit edit-author" style="cursor: pointer;"></i>
+							<i class="icon-edit edit-author" style="cursor: pointer; color: white; font-size: 12px;"></i>
 									&nbsp;
-							<i class="fas fa-times remove-author" style="cursor: pointer;"></i>
+							<i class="icon-circle-close remove-author" style="cursor: pointer; color: white; font-size: 12px;"></i>
 						</span>
 							&nbsp;&nbsp;
 						</th:block>
 					</span>
-						<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="fas fa-plus-circle"></i> Add Author</a></div>
+						<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="icon-circle-add"></i> Add Author</a></div>
 				</td>
 			</tr>
 			<tr>
@@ -1069,14 +1072,14 @@ function creatorLinkHandler(target) {
 						  [[${editor.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
 						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
 							&nbsp;
-							<i class="far fa-edit edit-editor"></i>
+							<i class="icon-edit edit-editor" style="color: white; font-size: 12px;"></i>
 							&nbsp;
-						<i class="fas fa-times remove-editor"></i>
+						<i class="icon-circle-close remove-editor" style="cursor: pointer; color: white; font-size: 12px;"></i>
 								</span>
 							&nbsp;&nbsp;
 				        </th:block>
 					</span>
-							<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
+							<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="icon-circle-add"></i> Add Editor</a></div>
 				</td>
 			</tr>
 			<th:block th:each="curCreator:${creatorMap}">
@@ -1094,15 +1097,15 @@ function creatorLinkHandler(target) {
 				 			</th:block>
 								[[${creator.person.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
 							<th:block th:each="aff:${creator.person.affiliations}">[[${aff.name}]]</th:block>
-							&nbsp;<i class="far fa-edit edit-creator"></i>
-									<i class="fas fa-times remove-creator"></i>
+							&nbsp;<i class="icon-edit edit-creator" style="color: white; font-size: 12px;"></i>
+									<i class="icon-circle-close remove-creator" style="cursor: pointer; color: white; font-size: 12px;"></i>
 						</span>
 							&nbsp;&nbsp;
 					</span>
 					</span>
 					</div>
 					
-				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add [[${curCreator.value}]]</a></div>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="icon-circle-add"></i> Add [[${curCreator.value}]]</a></div>
 				</td>
 				</tr>
 				</span>
@@ -1234,24 +1237,24 @@ function creatorLinkHandler(target) {
 		<td>
 		<div id="conceptTags">
 			<th:block th:each= "tag:${citation.conceptTags}">
-				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="fas fa-times remove-concept"></i></span>
+				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="icon-circle-close remove-concept" style="cursor: pointer; color: white; font-size: 12px;"></i></span>
 			</th:block>
 		</div>
-		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
+		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="icon-circle-add" style="color: #337ab7"></i> Add Concept</a></div>
 		</td>
 	</tr>
 
 			
 		</table>
-		<button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
+		<button id="submitForm" class="btn btn-primary" type="submit"><i class="icon-save-alt"></i> &nbsp;Save</button>
 		<span th:if="${itemId == null}">
 			<a th:href="@{|/auth/group/${zoteroGroupId}/items|}" class="btn btn-default">
-		          <i class="fa fa-times"></i>&nbsp;Cancel
+		          <i class="icon-close-alt"></i>&nbsp;Cancel
             </a>
 		</span>
 		<span th:if="${itemId != null}">
                <a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}" class="btn btn-default">
-		          <i class="fa fa-times"></i>&nbsp;Cancel
+		          <i class="icon-close-alt"></i>&nbsp;Cancel
                </a>
         </span>
 	</form>
@@ -1279,16 +1282,16 @@ function creatorLinkHandler(target) {
 		  </div>
 		  <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
 						style="margin-left: 80%" disabled>Search Author 
-						<i id="searchAuthorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+						<i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
 		  </button>
 		  <div class="form-group">
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
 			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundAuthor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureAuthor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    	<i id="uriLoadingSpinnerAuthor" class="icon-spinner" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFoundAuthor" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureAuthor" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
 			    <input type="hidden" id="uriAuthorLocalId" />
 		    </div>
@@ -1301,7 +1304,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addAuthorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
@@ -1338,7 +1341,7 @@ function creatorLinkHandler(target) {
 		  <div>
 			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchEditor"
 						style="margin-left: 80%" disabled>Search Editor 
-						<i id="searchEditorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+						<i id="searchEditorSpinner"class="icon-spinner" style="color: white"></i>
 			</button>
 		  </div>
 		  
@@ -1347,9 +1350,9 @@ function creatorLinkHandler(target) {
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriEditor" placeholder="URI">
 			    <div id="editorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerEditor" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundEditor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureEditor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    	<i id="uriLoadingSpinnerEditor" class="icon-spinner"></i>
+			    	<i id="uriLoadingFoundEditor" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureEditor" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
 			    <input type="hidden" id="uriEditorLocalId" />
 		    </div>
@@ -1362,7 +1365,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addEditorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addEditorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
@@ -1398,7 +1401,7 @@ function creatorLinkHandler(target) {
 		  <div>
 			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchCreator"
 				style="margin-left: 80%" disabled> Search Creator 
-				<i id="searchCreatorSpinner" class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+				<i id="searchCreatorSpinner" class="icon-spinner rotating" style="color: white"></i>
 			</button>
 		  </div>
 		  <div class="form-group">
@@ -1406,9 +1409,9 @@ function creatorLinkHandler(target) {
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriCreator" placeholder="URI">
 			    <div id="creatorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerCreator" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundCreator" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureCreator" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    	<i id="uriLoadingSpinnerCreator" class="icon-spinner rotating"></i>
+			    	<i id="uriLoadingFoundCreator" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureCreator" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
 			    <input type="hidden" id="uriCreatorLocalId" />
 		    </div>
@@ -1421,7 +1424,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addCreatorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addCreatorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
@@ -1470,7 +1473,7 @@ function creatorLinkHandler(target) {
 								<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
 								<tbody id="userAuthoritySearchResult">
 								</tbody>
-							</table>
+							</table>		
 						</div>
 			
 						<div role="tabpanel" class="tab-pane" id="conceptpowerAuthoritiesTabContent">
@@ -1478,17 +1481,23 @@ function creatorLinkHandler(target) {
 							<div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
 								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
+							<div id="mycheckboxDiv">
+							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group
+							</div>
+							</br>
 							<table class="table table-striped table-bordered table-fixed">
 								<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
 								<tbody id="conceptpowerAuthoritySearchResult">
 								</tbody>
 							</table>
+							
 						</div>
+					</div>
 				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default"
-					id="closeAuthoritySearchResult">Close</button>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default"
+						id="closeAuthoritySearchResult">Close</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -1531,8 +1540,6 @@ function creatorLinkHandler(target) {
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
-</div>
 
 </body>
 </html>

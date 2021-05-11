@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundExcept
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
+import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.user.IUser;
@@ -38,6 +40,9 @@ public class AuthorityEntryController {
     
     @Autowired
     private IAuthorityService authorityService;
+    
+    @Autowired
+    private IGroupManager groupManager;
     
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/authorities/user")
     public ResponseEntity<AuthoritySearchResult> getUserAuthorities(Model model, Authentication authentication,
@@ -75,6 +80,7 @@ public class AuthorityEntryController {
             searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
             searchResult.setCurrentPage(page + 1);
+            searchResult.setGroupName(groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
             authoritySearchResult.put(source, searchResult);
 
         } catch (AuthorityServiceConnectionException e) {
@@ -84,6 +90,7 @@ public class AuthorityEntryController {
         } catch (AuthorityImporterNotFoundException e) {
             logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            
         }
 
         return new ResponseEntity<AuthoritySearchResult>(searchResult, HttpStatus.OK);
@@ -130,14 +137,14 @@ public class AuthorityEntryController {
             logger.info("Not a valid URI: " + uri, e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
         entry = authorityService.create(entry, (IUser) authentication.getPrincipal());
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
     
     @RequestMapping(value = "/auth/authority/add", method = RequestMethod.POST)
     public ResponseEntity<IAuthorityEntry> addAuthorityEntry(Authentication authentication,
-            @RequestParam("uri") String uri, @RequestParam("source") String source) {
+            @RequestParam("uri") String uri, @RequestParam("source") String source,
+            @RequestParam(defaultValue = "", required = false, value = "zoteroGroupId") String zoteroGroupId) {
         
         IAuthorityEntry entry = null;
         if(source != null && authoritySearchResult!= null && authoritySearchResult.containsKey(source)) {
@@ -145,6 +152,12 @@ public class AuthorityEntryController {
                     .filter(authority -> authority.getUri().equals(uri)).findFirst();
             
             if (authorityEntry.isPresent()) {
+                if(!zoteroGroupId.isEmpty()) {
+                    if(authorityEntry.get().getGroups() == null) {
+                        authorityEntry.get().setGroups(new HashSet<>());
+                    }
+                    authorityEntry.get().getGroups().add(Long.valueOf(zoteroGroupId));
+                }
                 entry = authorityService.create(authorityEntry.get(), (IUser) authentication.getPrincipal());
             }
         }

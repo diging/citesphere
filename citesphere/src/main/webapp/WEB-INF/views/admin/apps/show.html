@@ -36,7 +36,7 @@ $(function() {
 			'type': "DELETE",
 			'success': function(data) {
 				$("#tr-" + id).remove();
-				$.notify('<i class="fas fa-check-circle"></i> App successfully deleted!', {
+				$.notify('<i class="icon-checkmark-alt"></i> App successfully deleted!', {
 					type: 'success',
 					offset: {
 						x: 50,
@@ -49,7 +49,7 @@ $(function() {
 				});
 			},
 			'error': function(data) {
-				$.notify('<i class="fas fa-exclamation-circle"></i> App could not be deleted!', {
+				$.notify('<i class="icon-warning"></i> App could not be deleted!', {
 					type: 'danger',
 					offset: {
 						x: 50,
@@ -77,7 +77,7 @@ $(function() {
 <div layout:fragment="content">
 <h2>Apps</h2>
 <ul id="pagination-top" class="pagination-sm"></ul>
-<div class="pull-right" style="margin-top: 20px;margin-bottom:10px"><a th:href="@{/admin/apps/add}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Add App</a></div>
+<div class="pull-right" style="margin-top: 20px;margin-bottom:10px"><a th:href="@{/admin/apps/add}" class="btn btn-primary"><i class="icon-circle-add"></i> Add App</a></div>
 <table class="table table-striped" id="table">
 <tr>
 	<th>Client Id</th>
@@ -90,7 +90,7 @@ $(function() {
 	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.clientId}"/></a></td>
 	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.name}"/></a></td>
 	<td class="client-entry" th:data-id="${client.clientId}"> <span th:text="${client.description}"/></td>
-	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="fas fa-trash-alt"></i></button></td>
+	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="icon-trash-alt"></i></button></td>
 </tr>
 </table>
 <div class="modal fade" id="client-delete-confirmation" tabindex="-1" role="dialog">
