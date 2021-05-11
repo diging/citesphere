@@ -178,13 +178,8 @@ function pollStatus(){
             $("#syncProgress").attr('aria-valuemax', 100);
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
-            //window.location.href = "items";
         }
     });
-}
-
-function getSyncedData(){
-	$.get("sync/info", pollStatus);
 }
 </script>
 </div>
@@ -454,17 +449,17 @@ $.ajax({
 	success: function (moveItemsStatusResponse) {
 		if(moveItemsStatusResponse.taskStatus === "COMPLETE"){
 		if(moveItemsStatusResponse.response.successItems.length != 0){
-	 	let message = " "+moveItemsStatusResponse.response.successItems.length+ " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.successItems;
+	 	let message = " "+moveItemsStatusResponse.response.successItems.length+ " Citations moved successfully to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.successItems.join("<br>");
 	 	showNotification(message, "success", 20000);
 		}
 		if(moveItemsStatusResponse.response.failedItems.length != 0){
-	 	let message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems 
+	 	let message =  " "+ moveItemsStatusResponse.response.failedItems.length+ " Citations not moved to ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.failedItems.join("<br>") 
 	 						+ "<br /> <br /> Reasons: <br /> <br />" + moveItemsStatusResponse.response.failedMessages.map(x => x.code + " : " + x.message).join("<br>");
 	 				
 	 	showNotification(message, "danger", 20000);
 		}
 		if(moveItemsStatusResponse.response.unchangedItems.length != 0){
-		let message =  " "+ moveItemsStatusResponse.response.unchangedItems.length+ " Citations already present in ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.unchangedItems;
+		let message =  " "+ moveItemsStatusResponse.response.unchangedItems.length+ " Citations already present in ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.unchangedItems.join("<br>");
 		showNotification(message, "info", 20000);
 		}
 		clearAsyncTask(moveItemsStatusResponse.taskID);
