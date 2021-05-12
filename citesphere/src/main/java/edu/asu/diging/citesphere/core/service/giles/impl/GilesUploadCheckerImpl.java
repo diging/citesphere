@@ -110,7 +110,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
             for (IGilesUpload upload : citation.getGilesUploads()) {
                 if (upload.getUploadingUser() == null
                         || Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
-                                .contains(upload.getStatus())) {
+                                .contains(upload.getDocumentStatus())) {
                     // in case something went wrong with the user
                     // or the upload has been processed
                     continue;
@@ -130,7 +130,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                             gilesBaseurl + gilesCheckEndpoint + upload.getProgressId(),
                             HttpMethod.GET, requestEntity, String.class);
                 } catch (HttpClientErrorException ex) {
-                    upload.setStatus(GilesStatus.FAILED);
+                    upload.setDocumentStatus(GilesStatus.FAILED);
                     checkedUploads.add(upload);
                     needsUpdating = true;
                     continue;
@@ -150,36 +150,39 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                         processed = mapper.readValue(jsonBody, GilesUpload[].class);
                     } catch (IOException e) {
                         logger.error("Could not deserialize response.", e);
-                        upload.setStatus(GilesStatus.FAILED);
+                        upload.setDocumentStatus(GilesStatus.FAILED);
                         checkedUploads.add(upload);
                     }
                     for (GilesUpload processedUpload : processed) {
+                        // giles does not return the progress id again, but we need it
+                        processedUpload.setProgressId(upload.getProgressId());
                         checkedUploads.add(processedUpload);
                     }
                     needsUpdating = true;
                 }
             }
 
+            ICitation currentCitation = null;
+            try {
+                // we'll just use the last user here
+                currentCitation = citationManager.getCitation(user,
+                        citation.getGroup(), citation.getKey());
+            } catch (GroupDoesNotExistException e) {
+                logger.error("Could not get citation.", e);
+                uploadQueue.remove(citation.getKey());
+            } catch (CannotFindCitationException e) {
+                logger.error("Could not get citation.", e);
+            } catch (ZoteroHttpStatusException e) {
+                logger.error("Could not get citation.", e);
+            }
+            
             if (needsUpdating) {
-                ICitation currentCitation = null;
-                try {
-                    // we'll just use the last user here
-                    currentCitation = citationManager.getCitation(user,
-                            citation.getGroup(), citation.getKey());
-                } catch (GroupDoesNotExistException e) {
-                    logger.error("Could not get citation.", e);
-                    uploadQueue.remove(citation.getKey());
-                } catch (CannotFindCitationException e) {
-                    logger.error("Could not get citation.", e);
-                } catch (ZoteroHttpStatusException e) {
-                    logger.error("Could not get citation.", e);
-                }
-
                 if (currentCitation != null) {
                     for (IGilesUpload upload : checkedUploads) {
                         Optional<IGilesUpload> oldUpload = currentCitation
-                                .getGilesUploads().stream().filter(u -> u.getProgressId()
-                                        .equals(upload.getProgressId()))
+                                .getGilesUploads().stream()
+                                .filter(u -> u.getProgressId() != null && u
+                                        .getProgressId().equals(upload.getProgressId()))
                                 .findFirst();
                         if (oldUpload.isPresent()) {
                             currentCitation.getGilesUploads().remove(oldUpload.get());
@@ -187,10 +190,6 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                         currentCitation.getGilesUploads().add(upload);
                     }
 
-                    // in case there is a newer citation in storage, make sure
-                    // we'll
-                    // update that one
-                    currentCitation.setGilesUploads(citation.getGilesUploads());
                     try {
                         citationManager.updateCitation(user, citation.getGroup(),
                                 currentCitation);
@@ -201,9 +200,9 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                 }
             }
 
-            int unfinishedUplaods = citation.getGilesUploads().stream()
+            int unfinishedUplaods = currentCitation.getGilesUploads().stream()
                     .filter(u -> !Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
-                            .contains(u.getStatus()))
+                            .contains(u.getDocumentStatus()))
                     .collect(Collectors.toList()).size();
             if (unfinishedUplaods == 0) {
                 uploadQueue.remove(citation.getKey());

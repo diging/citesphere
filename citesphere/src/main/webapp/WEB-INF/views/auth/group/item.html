@@ -342,12 +342,12 @@
 	        <span th:if="${upload.uploadedFile?.filename}">
 	        [[${upload.documentId}]]
 	        </span>
-	        <span th:unless="${upload.status != null && (upload.status != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
+	        <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
 	        File is being processed... ([[${upload.progressId}]])
 	        </span>
-	        <span th:if="${upload.status == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
-	        <span th:if="${upload.status == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
-	        <span th:if="${upload.status == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
+	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
+	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
+	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
 	        </li>
         </ul>
 	</div>

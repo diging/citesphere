@@ -152,7 +152,7 @@ public class CitationManager implements ICitationManager {
             if (storedCitation.getVersion() != citationVersion) {
                 throw new CitationIsOutdatedException();
             }
-            citationStore.delete(storedCitationOptional.get());
+            citationStore.delete(storedCitation);
         }
 
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);

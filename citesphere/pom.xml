@@ -80,7 +80,7 @@
         <elasticsearch.path.prefix></elasticsearch.path.prefix>
         <!-- in ms (10000ms = 10s) -->
         <elasticsearch.connect.timeout>60000</elasticsearch.connect.timeout>
-        
+
         <giles.baseurl></giles.baseurl>
         <citesphere.oauth2.app.clientId></citesphere.oauth2.app.clientId>
 
@@ -336,6 +336,14 @@
             <version>${org.slf4j-version}</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${org.slf4j-version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
