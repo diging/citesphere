@@ -188,7 +188,8 @@ public class ZoteroConnector implements IZoteroConnector {
      * 
      * @param groupId      group id of citations
      * @param items        List of items to be updated
-     * @param ignoreFields Fields that are not necessary to be updated
+     * @param ignoreFieldsList Fields that are not necessary to be updated
+     * @param validCreatorTypesList valid creators list
      * 
      * @return ZoteroUpdateItemsResponse returns statuses of items.
      * @throws JsonProcessingException 

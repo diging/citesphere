@@ -288,9 +288,7 @@ public class ZoteroManager implements IZoteroManager {
      * @param groupId   group id of citations.
      * @param citations list of citations that has to be updated.
      * 
-     * @return ZoteroUpdateItemsResponse returns statuses of citations.
-     * @throws ExecutionException
-     * @throws JsonProcessingException
+     * @return ZoteroUpdateItemsStatuses returns statuses of citations
      */
     @Override
     public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
