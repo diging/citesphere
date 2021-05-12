@@ -157,7 +157,7 @@ public class GroupItemsController {
 
        Map<String,Object> responseMap = new HashMap<>();
        IUser user = (IUser) authentication.getPrincipal();
-       CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+       CitationResults results = getItemsManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
        if (results == null) {
            responseMap.put("items", null);
            responseMap.put("total", 0);
