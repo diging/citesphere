@@ -186,10 +186,11 @@ public class ZoteroConnector implements IZoteroConnector {
      * This method makes a call to Zotero to batch update items and return back
      * items statuses
      * 
-     * @param groupId      group id of citations
-     * @param items        List of items to be updated
-     * @param ignoreFieldsList Fields that are not necessary to be updated
+     * @param groupId               group id of citations
+     * @param items                 List of items to be updated
+     * @param ignoreFieldsList      Fields that are not necessary to be updated
      * @param validCreatorTypesList valid creators list
+     * @param user                  user accessing Zotero
      * 
      * @return ZoteroUpdateItemsStatuses returns statuses of items.
      */

@@ -61,7 +61,7 @@ public class AsyncCitationManager {
      * id. The task id is generated when a new async task is submitted using
      * updateCitations() method in this class
      * 
-     * @param taskId: id of the task
+     * @param taskId id of the task
      * @return AsyncUpdateCitationsResponse returns task status (complete or
      *         pending), task id and task response
      */
@@ -81,10 +81,10 @@ public class AsyncCitationManager {
 
     /**
      * If you no longer need a task in memory, use this method to remove that task
-     * to free memory. Once the task is removed, its corresponding result can
-     * no longer be retrieved.
+     * to free memory. Once the task is removed, its corresponding result can no
+     * longer be retrieved.
      * 
-     * @param taskId : id of the task that is not needed in memory
+     * @param taskId id of the task that is not needed in memory
      */
     public void clearTask(String taskId) {
         taskTracker.remove(taskId);
