@@ -23,7 +23,7 @@
 
         <javers.version>5.0.0</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
-        <spring-social-zotero.version>0.8-SNAPSHOT</spring-social-zotero.version>
+        <spring-social-zotero.version>0.10-SNAPSHOT</spring-social-zotero.version>
         <citesphere.messages.version>0.4</citesphere.messages.version>
         <citesphere.model.version>1.8</citesphere.model.version>
 
