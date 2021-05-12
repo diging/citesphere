@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 
 import org.slf4j.Logger;
@@ -18,7 +17,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
@@ -66,7 +64,6 @@ public class GroupItemsController {
             logger.warn("Trying to access invalid page number: " + page);
         }
         IUser user = (IUser) authentication.getPrincipal();
-
         CitationResults results;
         try {
             results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
