@@ -64,8 +64,6 @@ public class ZoteroConnector implements IZoteroConnector {
     public ZoteroResponse<Item> getGroupItems(IUser user, String groupId, int page, String sortBy,
             Long lastGroupVersion) throws ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
-        
-        
         if (page < 1) {
             page = 0;
         } else {
