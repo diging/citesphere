@@ -41,8 +41,7 @@ public class AsyncCitationManager {
      * @param user          User accessing Zotero
      * @param zoteroGroupId GroupId of the citations
      * @param citations     citations that have to be updated
-     * @return returns AsyncUpdateCitationsResponse object that contains task id,
-     *         response and status.
+     * @return AsyncUpdateCitationsResponse contains task id, response and status.
      */
     public AsyncUpdateCitationsResponse updateCitations(IUser user, String zoteroGroupId, List<ICitation> citations)
             throws JsonProcessingException, ZoteroConnectionException, CitationIsOutdatedException,
@@ -63,8 +62,8 @@ public class AsyncCitationManager {
      * updateCitations() method in this class
      * 
      * @param taskId: id of the task
-     * @return: returns AsyncTaskResponse that has task status (complete or
-     *          pending), task id and task response
+     * @return AsyncUpdateCitationsResponse returns task status (complete or
+     *         pending), task id and task response
      */
     public AsyncUpdateCitationsResponse getUpdateCitationsResponse(String taskId)
             throws ExecutionException, InterruptedException {
