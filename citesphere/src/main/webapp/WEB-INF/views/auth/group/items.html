@@ -4,7 +4,12 @@
 
 <script th:inline="javascript">
 //# sourceURL=page.js
+
 $(function() {
+	addEventListeners();
+});
+
+function addEventListeners(){
 	$('#pagination-top').twbsPagination({
 	    totalPages: [(${totalPages})],
 	    startPage: [(${currentPage})],
@@ -17,7 +22,7 @@ $(function() {
 	    }
 	});
 	
-	$(".bib-entry").click(function() {
+	$(".bib-entry").on('click',function() {
 		var key = $(this).data("key");
 		var index = $(this).data("index");
 		var currentURL = window.location.href;
@@ -98,7 +103,7 @@ $(function() {
             }
         }
     });
-});
+}
 </script>
 </head>
 <body>
@@ -122,7 +127,7 @@ $(function() {
 Items in Group <span th:text="${group.name}"></span></br>
 </span>
 	
-	<small><span th:text="${total}"></span> records </small>
+	<small><span id="total-records" th:text="${total}"></span> records </small>
 </h2>
 <div class="pull-right">
 	<div class="progress" style="width: 200px">
@@ -163,6 +168,7 @@ function pollStatus(){
                 $("#syncProgress").addClass("progress-bar-striped active");
                 $("#syncText").text(Math.round(percent) + "% synced");
         	}
+        	getCurrentItemsData();
         	setTimeout(pollStatus,1000);
         } else {
         	$("#syncProgress").attr('style', "width: 100%");
@@ -170,28 +176,26 @@ function pollStatus(){
             $("#syncProgress").attr('aria-valuemax', 100);
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
-            getSyncedData();
+            getCurrentItemsData();
         }
     });
 }
 
-function getSyncedData(){
-	 $.get("items1", function(data) {
-		 if(data['items'] == null){
-			 setTimeout(getSyncedData,1000);
-		 }else{
-			 $(".table").find("tr:gt(0)").remove();
-			 console.log(data['items']);
-			 data['items'].forEach(item => {
-				 console.log(entry.key);
-				 $(".table").append("<tr> <td class='bib-entry' th:data-key= entry['key']>"})
-				 //entry['authors'].forEach({author => <strong> author['lastName']<span , author['firstName']</span></strong><span >; </span>})</td> <tr>"
-		 	
-			 
-			 
-		 }
+function getCurrentItemsData(){
+	let pageNumber = $(".page-item.active").text();
+	 $.get("items?page="+pageNumber, function(data) {
+		 let parser = new DOMParser();
+		 let itemsDOM = parser.parseFromString(data, 'text/html');
+		 $("#pagination-top").replaceWith(itemsDOM.getElementById("pagination-top"));
+		 $("#items-table").replaceWith(itemsDOM.getElementById("items-table"));
+		 $("#collectionsList").replaceWith(itemsDOM.getElementById("collectionsList"));
+		 $("#total-records").replaceWith(itemsDOM.getElementById("total-records"));
+		 $("#groupInfo").replaceWith(itemsDOM.getElementById("groupInfo"));
+		 addEventListeners();
 	 });
 }
+
+
 </script>
 </div>
 
@@ -221,7 +225,7 @@ function getSyncedData(){
       </h4>
     </div>
     <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-      <div class="panel-body">
+      <div id="groupInfo" class="panel-body">
       	[(${group.description})]
         <div class="col-md-6">
         <b>Local Metadata Version:</b> <span th:text="${group.metadataVersion}"></span><br>
@@ -309,7 +313,7 @@ function getSyncedData(){
 
 <div class="col-md-10" id="citationBlock">
 
-	<table class="table table-striped table-bordered">
+	<table id="items-table" class="table table-striped table-bordered">
 		<tr>
 			<th>Type</th>
 			<th>Authors</th>
