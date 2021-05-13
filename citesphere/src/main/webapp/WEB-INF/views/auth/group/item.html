@@ -340,7 +340,7 @@
 	        <li class="list-group-item" th:each="upload:${citation.gilesUploads}">
 	        <i class="icon-giles"></i>
 	        <span th:if="${upload.uploadedFile?.filename}">
-	        [[${upload.documentId}]]
+	        [[${upload.uploadedFile?.filename}]]
 	        </span>
 	        <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
 	        File is being processed... ([[${upload.progressId}]])
