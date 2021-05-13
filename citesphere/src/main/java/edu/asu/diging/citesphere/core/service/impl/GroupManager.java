@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,5 +43,10 @@ public class GroupManager implements IGroupManager {
             return group;
         }
         return null;
+    }
+    
+    @Override
+    public List<ICitationGroup> getGroupInstancesForGroupId(String groupId) {
+       return groupRepository.findByGroupId(new Long(groupId));
     }
 }
