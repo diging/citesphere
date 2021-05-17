@@ -283,7 +283,6 @@ function pollStatus(){
 </div>  
 
 </div>
-
 <div class="col-md-2">
 	
 	<ul class="list-group" id="collectionsList">
@@ -406,6 +405,8 @@ $(".list-group-item").droppable( {
 		},
 	drop: function(event, ui) {
 		$(this).removeClass('drag-over');
+		var $div = $("<div>", {"class": "icon-spinner spinner", id:"updatedCollection"});
+		$(this).append($div);
 		let collectionName = $(this).find('a').text();
 		let href = $(this).find('a').attr("href");
 		let segments = href.split('/');
@@ -424,7 +425,7 @@ $(".list-group-item").droppable( {
 			contentType : "application/json",
 			dataType: "json",
 			success: function (moveItemsAsyncResponse){
-		       pollMovedItemsStatuses(moveItemsAsyncResponse, collectionName);
+		       pollMovedItemsStatuses(moveItemsAsyncResponse, collectionName, $(this), movedToCollectionKey);
 			 },
 			 error: function (moveItemsAsyncResponse) {
 			   showNotification(" Error while moving citations!", "danger", 10000);
@@ -436,11 +437,13 @@ $(".list-group-item").droppable( {
 			$(this).prop('checked', false);
 			$(this).parents('tr').removeClass('selected');
 			});
+		
 		}
+		
 });
 });	
 
-function pollMovedItemsStatuses(response,collectionName){
+function pollMovedItemsStatuses(response,collectionName, collectionHTMLElement, collectionId){
 $.ajax({
 	type: 'GET',
 	url: 'items/move/'+response.taskID+'/status?[(${_csrf.parameterName})]=[(${_csrf.token})]',
@@ -463,13 +466,14 @@ $.ajax({
 		showNotification(message, "info", 20000);
 		}
 		clearAsyncTask(moveItemsStatusResponse.taskID);
+		updateCitationsCount(collectionHTMLElement,collectionId);
 		}else{
-			setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName),1000);
+			setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName, collectionHTMLElement, collectionId),1000);
 		}
-		},
+	},
 	error: function (moveItemsStatusResponse) {
-	    	showNotification("Error while polling citations statuses!", "warning", 1000)
-			},
+	    showNotification("Error while polling citations statuses!", "warning", 1000)
+	},
 });
 }
 
@@ -479,6 +483,18 @@ function clearAsyncTask(taskID){
 		url: 'items/move/task/'+taskID+'/clear?[(${_csrf.parameterName})]=[(${_csrf.token})]',
 	});
 }
+
+function updateCitationsCount(collectionHTMLElement, collectionId){
+	$.ajax({
+		type: 'GET',
+		url: 'items/move/'+collectionId+'/totalItems?[(${_csrf.parameterName})]=[(${_csrf.token})]',
+		dataType: "json",
+		success: function (totalItems) {
+			console.log(totalItems);
+		}
+	});
+}
+
 
 function showNotification(message, status, time){
 $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {

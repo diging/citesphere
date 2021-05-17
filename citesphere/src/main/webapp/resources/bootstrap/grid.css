@@ -338,3 +338,16 @@ tr.changed>td {
   	padding-left: 10px;
 	border-radius: 10px
 }
+
+.sticky-class{
+	position:sticky;
+	top:0;
+}
+
+.spinner{
+    display: inline-block;
+}
+
+.body.drag-over.spinner{
+	display: block;
+}
