@@ -13,15 +13,15 @@ $(function() {
 	    visiblePages: 10,
 	    initiateStartPageClick: false,
 	    onPageClick: function (event, page) {
-	    	var currentURL = window.location.href;
-	    	if(currentURL.match(/search/)) {
-    			var key = $("#search").val();
-    	        if (key != undefined && key != '') {
-    	            window.location.href="search?searchTerm=" + key + "&page=" + page;
-    	        }
-	    	} else {
-	    		window.location.href = "items?page=" + page;
-	    	}
+	        var currentURL = window.location.href;
+	        if(currentURL.match(/search/)) {
+	            var key = $("#search").val();
+	            if (key != undefined && key != '') {
+	                window.location.href="search?searchTerm=" + key + "&page=" + page;
+	            }
+	        } else {
+	            window.location.href = "items?page=" + page;
+	        }
 	    }
 	});
 	
