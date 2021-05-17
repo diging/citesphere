@@ -7,6 +7,7 @@ import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -54,7 +55,7 @@ public class SearchEngineImpl implements SearchEngine {
                 .should(QueryBuilders.queryStringQuery(searchTerm).field("title").field("creators.name"));
         BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
         boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId));
-        NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder);
+        NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder).withPageable(PageRequest.of(page, pageSize));
 
         AggregatedPage<Reference> results = template.queryForPage(b.build(), Reference.class);
         List<ICitation> foundCitations = new ArrayList<ICitation>();
