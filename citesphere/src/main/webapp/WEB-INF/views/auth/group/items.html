@@ -294,9 +294,7 @@ function pollStatus(){
 	  </li>
 	</th:block>
 	</ul>
-
 </div>
-
 
 <div class="col-md-10" id="citationBlock">
 
@@ -472,13 +470,14 @@ $.ajax({
 		showNotification(message, "info", 20000);
 		}
 		clearAsyncTask(moveItemsStatusResponse.taskID);
-		setTimeout(function() {updateCitationsCount(collectionHTMLElement,collectionId) }, 6000);
+		updateCitationsCount(collectionHTMLElement,collectionId);
 		}else{
 		setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName, collectionHTMLElement, collectionId),1000);
 		}
 	},
 	error: function (moveItemsStatusResponse) {
 	    showNotification("Error while polling citations statuses!", "warning", 1000)
+	    collectionHTMLElement.children('div').remove();
 	},
 });
 
@@ -497,7 +496,9 @@ function updateCitationsCount(collectionHTMLElement, collectionId){
 		url: 'items/move/'+collectionId+'/totalItems',
 		dataType: "json",
 		success: function (totalItems) {
-			collectionHTMLElement.children('span').text(totalItems);
+			if(totalItems != null){
+				collectionHTMLElement.children('span').text(totalItems);
+			}
 			collectionHTMLElement.children('div').remove();
 		}
 	});
