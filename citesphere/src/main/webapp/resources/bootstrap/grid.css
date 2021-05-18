@@ -339,15 +339,23 @@ tr.changed>td {
 	border-radius: 10px
 }
 
-.sticky-class{
-	position:sticky;
-	top:0;
-}
-
 .spinner{
     display: inline-block;
 }
 
-.body.drag-over.spinner{
-	display: block;
+.sticky {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 10px;
 }
+
+#wrapper {
+  margin: auto;
+}
+
+@media (min-height: 300px) {
+  #wrapper{
+    height: 4000px;
+  }
+}
+

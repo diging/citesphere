@@ -76,23 +76,24 @@ public class MoveItemsController {
         return asyncCitationManager.getUpdateCitationsResponse(taskID);
     }
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/task/{taskID}/clear")
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/task/{taskID}/clear", method = RequestMethod.POST)
     public @ResponseBody void clearTask(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID) {
         asyncCitationManager.clearTask(taskID);
     }
-    
+
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/{collectionId}/totalItems")
-    public @ResponseBody Long getTotalCitationsCollection(Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId, 
-            @PathVariable("collectionId") String collectionId) {
+    public @ResponseBody Long getTotalCitationsCollection(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("collectionId") String collectionId) {
         CitationResults results;
         try {
-            results = zoteroManager.getCollectionItems((IUser) authentication.getPrincipal(),zoteroGroupId, collectionId, 1, null, null );
+            results = zoteroManager.getCollectionItems((IUser) authentication.getPrincipal(), zoteroGroupId,
+                    collectionId, 1, null, null);
             return results.getTotalResults();
-        } catch(ZoteroHttpStatusException e) {
+        } catch (ZoteroHttpStatusException e) {
             logger.error("Exception occured", e);
             return null;
         }
     }
-    
+
 }
