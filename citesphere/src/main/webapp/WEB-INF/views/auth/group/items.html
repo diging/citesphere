@@ -404,6 +404,7 @@ $(".list-group-item").droppable( {
 		$(this).removeClass('drag-over');
 		},
 	drop: function(event, ui) {
+		let collectionElement = $(this);
 		$(this).removeClass('drag-over');
 		var $div = $("<div>", {"class": "icon-spinner spinner", id:"updatedCollection"});
 		$(this).append($div);
@@ -425,7 +426,7 @@ $(".list-group-item").droppable( {
 			contentType : "application/json",
 			dataType: "json",
 			success: function (moveItemsAsyncResponse){
-		       pollMovedItemsStatuses(moveItemsAsyncResponse, collectionName, $(this), movedToCollectionKey);
+		       pollMovedItemsStatuses(moveItemsAsyncResponse, collectionName, collectionElement, movedToCollectionKey);
 			 },
 			 error: function (moveItemsAsyncResponse) {
 			   showNotification(" Error while moving citations!", "danger", 10000);
@@ -437,7 +438,6 @@ $(".list-group-item").droppable( {
 			$(this).prop('checked', false);
 			$(this).parents('tr').removeClass('selected');
 			});
-		
 		}
 		
 });
@@ -466,15 +466,16 @@ $.ajax({
 		showNotification(message, "info", 20000);
 		}
 		clearAsyncTask(moveItemsStatusResponse.taskID);
-		updateCitationsCount(collectionHTMLElement,collectionId);
+		setTimeout(function() {updateCitationsCount(collectionHTMLElement,collectionId) }, 6000);
 		}else{
-			setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName, collectionHTMLElement, collectionId),1000);
+		setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName, collectionHTMLElement, collectionId),1000);
 		}
 	},
 	error: function (moveItemsStatusResponse) {
 	    showNotification("Error while polling citations statuses!", "warning", 1000)
 	},
 });
+
 }
 
 function clearAsyncTask(taskID){
@@ -490,7 +491,8 @@ function updateCitationsCount(collectionHTMLElement, collectionId){
 		url: 'items/move/'+collectionId+'/totalItems?[(${_csrf.parameterName})]=[(${_csrf.token})]',
 		dataType: "json",
 		success: function (totalItems) {
-			console.log(totalItems);
+			collectionHTMLElement.children('span').text(totalItems);
+			collectionHTMLElement.children('div').remove();
 		}
 	});
 }

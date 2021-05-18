@@ -22,6 +22,7 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
+import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
@@ -43,7 +44,7 @@ public class MoveItemsController {
     private ICitationHelper citationHelper;
     
     @Autowired
-    private ICitationCollectionManager collectionManager;
+    private IZoteroManager zoteroManager;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST)
     public @ResponseBody String moveItemsToCollection(Authentication authentication,
@@ -84,15 +85,11 @@ public class MoveItemsController {
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/{collectionId}/totalItems")
     public @ResponseBody Long getTotalCitationsCollection(Authentication authentication, @PathVariable("zoteroGroupId") String zoteroGroupId, 
             @PathVariable("collectionId") String collectionId) {
-        //ICitationCollection collection = collectionManager.getCollection((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId);
         CitationResults results;
         try {
-            results = citationManager.getGroupItems((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId, 1, null);
+            results = zoteroManager.getCollectionItems((IUser) authentication.getPrincipal(),zoteroGroupId, collectionId, 1, null, null );
             return results.getTotalResults();
         } catch(ZoteroHttpStatusException e) {
-            logger.error("Exception occured", e);
-            return null;
-        } catch(GroupDoesNotExistException e) {
             logger.error("Exception occured", e);
             return null;
         }
