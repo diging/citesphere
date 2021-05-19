@@ -183,15 +183,11 @@ function pollStatus(){
 
 function getCurrentItemsData(){
 	let pageNumber = $(".page-item.active").text();
-	 $.get("items?page="+pageNumber, function(data) {
-		 let parser = new DOMParser();
-		 let itemsDOM = parser.parseFromString(data, 'text/html');
-		 $("#pagination-top").replaceWith(itemsDOM.getElementById("pagination-top"));
-		 $("#items-table").replaceWith(itemsDOM.getElementById("items-table"));
-		 $("#collectionsList").replaceWith(itemsDOM.getElementById("collectionsList"));
-		 $("#total-records").replaceWith(itemsDOM.getElementById("total-records"));
-		 $("#groupInfo").replaceWith(itemsDOM.getElementById("groupInfo"));
-		 addEventListeners();
+	 $.get("items/data?page="+pageNumber, function(data) {
+		 console.log(data.totalResults);
+		 $("#items-table").find('tr').each(function () {
+			 console.log($(this).find('td').eq(0).text() + " " + $(this).find('td').eq(1).text() );
+			});
 	 });
 }
 
