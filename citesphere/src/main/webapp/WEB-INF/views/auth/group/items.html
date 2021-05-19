@@ -470,7 +470,7 @@ $.ajax({
 		showNotification(message, "info", 20000);
 		}
 		clearAsyncTask(moveItemsStatusResponse.taskID);
-		updateCitationsCount(collectionHTMLElement,collectionId);
+		syncCitations(collectionHTMLElement,collectionId);
 		}else{
 		setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName, collectionHTMLElement, collectionId),1000);
 		}
@@ -490,20 +490,33 @@ function clearAsyncTask(taskID){
 	});
 }
 
+function syncCitations(collectionHTMLElement, collectionId){
+	$.ajax({
+		type: 'GET',
+		url: 'items/move/'+collectionId+'/startSync',
+		success: function (status) {
+			if(status === "sync-started"){
+				pollStatus();
+			}
+			setTimeout(function(){updateCitationsCount(collectionHTMLElement, collectionId)},10000);
+		}
+	}); 
+}
+
 function updateCitationsCount(collectionHTMLElement, collectionId){
 	$.ajax({
 		type: 'GET',
 		url: 'items/move/'+collectionId+'/totalItems',
-		dataType: "json",
 		success: function (totalItems) {
-			if(totalItems != null){
+			if($("#syncText").text() === "Up to date"){
 				collectionHTMLElement.children('span').text(totalItems);
+				collectionHTMLElement.children('div').remove();
+			}else{
+				setTimeout(updateCitationsCount(collectionHTMLElement, collectionId),1000);
 			}
-			collectionHTMLElement.children('div').remove();
 		}
-	});
+	}); 
 }
-
 
 function showNotification(message, status, time){
 $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {

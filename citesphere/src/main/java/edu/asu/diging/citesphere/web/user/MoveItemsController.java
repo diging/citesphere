@@ -17,11 +17,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.dto.MoveItemsRequest;
@@ -42,6 +46,9 @@ public class MoveItemsController {
 
     @Autowired
     private IZoteroManager zoteroManager;
+    
+    @Autowired
+    private ICitationCollectionManager collectionManager;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move", method = RequestMethod.POST)
     public @ResponseBody String moveItemsToCollection(Authentication authentication,
@@ -79,17 +86,28 @@ public class MoveItemsController {
         asyncCitationManager.clearTask(taskID);
     }
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/{collectionId}/totalItems")
-    public @ResponseBody Long getTotalCitationsCollection(Authentication authentication,
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/{collectionId}/startSync")
+    public @ResponseBody String startSync(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("collectionId") String collectionId) {
+        IUser user = (IUser) authentication.getPrincipal();
         try {
-            CitationResults results = zoteroManager.getCollectionItems((IUser) authentication.getPrincipal(),
-                    zoteroGroupId, collectionId, 1, null, null);
-            return results.getTotalResults();
-        } catch (ZoteroHttpStatusException e) {
+            citationManager.getGroupItems(user, zoteroGroupId, collectionId, 1, null); 
+            return "sync-started";
+        } catch(ZoteroHttpStatusException e) {
+            logger.error("Exception occured", e);
+            return null;
+        } catch(GroupDoesNotExistException e) {
             logger.error("Exception occured", e);
             return null;
         }
-    }
 
-}
+    }
+    
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/{collectionId}/totalItems")
+    public @ResponseBody Long getTotalCitationsCollection(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("collectionId") String collectionId) {
+        ICitationCollection collection = collectionManager.getCollection((IUser) authentication.getPrincipal(),
+                zoteroGroupId, collectionId);
+        return collection.getNumberOfItems();
+    }
+ }
