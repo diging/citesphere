@@ -33,6 +33,9 @@ $(function() {
 			{
 			window.location.href = "../../items/" + key +"?index=" + index + "&page=[(${currentPage})]&sortBy=[(${sort})]&collectionId=[(${collectionId})]";
 			}
+		else if (currentURL.match(/search/)) {
+			window.location.href = "items/" + key + "?searchTerm=[(${searchTerm})]" + "&index=" + index + "&page=[(${currentPage})]&sortBy=[(${sort})]&collectionId=[(${collectionId})]";
+		}
 		else{
 			window.location.href = "items/" + key +"?index=" + index + "&page=[(${currentPage})]&sortBy=[(${sort})]&collectionId=[(${collectionId})]";
 		    }

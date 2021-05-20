@@ -69,6 +69,7 @@ public class SearchController {
 
         ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
 
+        model.addAttribute("searchTerm", searchTerm);
         model.addAttribute("items", citations.getResults());
         model.addAttribute("totalPages", citations.getTotalPages());
         model.addAttribute("total", citations.getTotalResults());
