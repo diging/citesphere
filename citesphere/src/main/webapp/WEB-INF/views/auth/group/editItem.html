@@ -670,7 +670,7 @@ function getUserAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
-	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/user|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
+	url = [[@{|/auth/authority/find/authorities/user|}]] + '?zoteroGroupId=[(${zoteroGroupId})]' + '&firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
 	$.ajax({
   		dataType: "json",
   		type: 'GET',
@@ -731,7 +731,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
-	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/conceptpower|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
+	url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?zoteroGroupId=[(${zoteroGroupId})]' + '&firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
 	$.ajax({
   		dataType: "json",

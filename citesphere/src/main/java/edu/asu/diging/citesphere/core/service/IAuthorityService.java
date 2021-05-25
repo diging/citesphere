@@ -32,6 +32,8 @@ public interface IAuthorityService {
     List<IAuthorityEntry> findByUri(IUser user, String uri);
 
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
+    
+    IAuthorityEntry create(IAuthorityEntry entry, IUser user, String uri);
 
     List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize);
 

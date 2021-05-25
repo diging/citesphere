@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -201,6 +203,14 @@ public class AuthorityService implements IAuthorityService {
         return save(entry);
     }
 
+    @Override
+    @Transactional
+    public IAuthorityEntry create(IAuthorityEntry entry, IUser user, String uri) {
+        entry = create(entry, user);
+        entry.setUri(uri + entry.getId());
+        return save(entry);
+    }
+    
     @Override
     public IAuthorityEntry save(IAuthorityEntry entry) {
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry) entry);
