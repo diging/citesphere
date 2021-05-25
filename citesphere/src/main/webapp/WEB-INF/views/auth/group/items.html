@@ -469,6 +469,7 @@ $.ajax({
 		let message =  " "+ moveItemsStatusResponse.response.unchangedItems.length+ " Citations already present in ' "+collectionName+" ' ! <br /> <br />"+ moveItemsStatusResponse.response.unchangedItems.join("<br>");
 		showNotification(message, "info", 20000);
 		}
+		collectionHTMLElement.children('div').removeClass("icon-spinner").addClass("icon-sync");
 		clearAsyncTask(moveItemsStatusResponse.taskID);
 		syncCitations(collectionHTMLElement,collectionId);
 		}else{
@@ -493,7 +494,7 @@ $.ajax({
 function syncCitations(collectionHTMLElement, collectionId){
 $.ajax({
 	type: 'GET',
-	url: 'items/move/'+collectionId+'/startSync?page=[(${currentPage})]',
+	url: 'items/move/'+collectionId+'/sync/start?page=[(${currentPage})]',
 	success: function (status) {
 		if(status === "sync-started"){
 			pollStatus();

@@ -81,7 +81,7 @@ public class MoveItemsController {
         asyncCitationManager.clearTask(taskID);
     }
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/{collectionId}/startSync")
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/{collectionId}/sync/start")
     public @ResponseBody String startSync(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("collectionId") String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
@@ -90,10 +90,10 @@ public class MoveItemsController {
                     new Integer(page), null);
             return "sync-started";
         } catch (ZoteroHttpStatusException e) {
-            logger.error("Exception occured", e);
+            logger.error("Zotero HTTP status exception occured while syncing ", e);
             return null;
         } catch (GroupDoesNotExistException e) {
-            logger.error("Exception occured", e);
+            logger.error("Group does not exists exception occured while syncing", e);
             return null;
         }
     }
