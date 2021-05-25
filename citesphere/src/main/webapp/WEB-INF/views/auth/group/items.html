@@ -185,14 +185,15 @@ function getCurrentItemsData(){
 	let pageNumber = $(".page-item.active").text();
 	 $.get("items/data?page="+pageNumber, function(data) {
 		 console.log(data);
+		 let $tableData = $('<table>');
 		 i=0;
 		 $("#items-table").find('tr').each(function () {
-			 var typeElement = $(this).find('td').eq(0);
-			 var authorsElement = $(this).find('td').eq(1);
-			 var titleElement = $(this).find('td').eq(2);
-			 var dateElement = $(this).find('td').eq(3);
-			 var urlElement = $(this).find('td').eq(4);
-			 var columns = $(this).find('td').eq(5);
+			 let typeElement = $(this).find('td').eq(0);
+			 let authorsElement = $(this).find('td').eq(1);
+			 let titleElement = $(this).find('td').eq(2);
+			 let dateElement = $(this).find('td').eq(3);
+			 let urlElement = $(this).find('td').eq(4);
+			 let columns = $(this).find('td').eq(5);
 			 
 			 console.log(typeElement.text(), authorsElement.text(), titleElement.text(), dateElement.text(),
 					 urlElement.text());
@@ -205,13 +206,22 @@ function getCurrentItemsData(){
 			/*  typeElement.text(data.citations[i].itemType);
 			 authorsElement.text(data.citations[i].authors);
 			  */
+			  
+			  
+			  let $iconData = $('<td>' +
+					  '<span class = "text-warning">'+
+					  '<div>'+'<i title="Data"> '+'</i>'+'</div'>
+					  '</span>'+'</td>')
 			 
+			  let $row = $('<tr>' + $iconData+'</tr>')
 			  
 			  
-			  
-			 
+			 $tableData.append($row);
 			 i++;
+			  
 			});
+		 $("#items-table").find("tr:gt(0)").remove();
+		 $("#items-table").append($tableData);
 	 });
 }
 
