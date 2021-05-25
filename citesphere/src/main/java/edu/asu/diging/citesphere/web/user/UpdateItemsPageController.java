@@ -76,7 +76,7 @@ public class UpdateItemsPageController {
         }
         
         ItemsDataDto itemsData = new ItemsDataDto();
-        //itemsData.setCitations(results.getCitations());
+        itemsData.setCitations(results.getCitations());
         itemsData.setTotalResults(results.getTotalResults());
         itemsData.setTotalPages(Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         itemsData.setCurrentPage(pageInt);

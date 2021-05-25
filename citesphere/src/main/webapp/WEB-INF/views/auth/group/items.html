@@ -184,9 +184,33 @@ function pollStatus(){
 function getCurrentItemsData(){
 	let pageNumber = $(".page-item.active").text();
 	 $.get("items/data?page="+pageNumber, function(data) {
-		 console.log(data.totalResults);
+		 console.log(data);
+		 i=0;
 		 $("#items-table").find('tr').each(function () {
-			 console.log($(this).find('td').eq(0).text() + " " + $(this).find('td').eq(1).text() );
+			 var typeElement = $(this).find('td').eq(0);
+			 var authorsElement = $(this).find('td').eq(1);
+			 var titleElement = $(this).find('td').eq(2);
+			 var dateElement = $(this).find('td').eq(3);
+			 var urlElement = $(this).find('td').eq(4);
+			 var columns = $(this).find('td').eq(5);
+			 
+			 console.log(typeElement.text(), authorsElement.text(), titleElement.text(), dateElement.text(),
+					 urlElement.text());
+			 
+			 console.log(typeElement.innerHTML, authorsElement.innerHTML, titleElement, dateElement, urlElement);
+			 
+			 
+			 console.log(authorsElement.data());
+			 
+			/*  typeElement.text(data.citations[i].itemType);
+			 authorsElement.text(data.citations[i].authors);
+			  */
+			 
+			  
+			  
+			  
+			 
+			 i++;
 			});
 	 });
 }
