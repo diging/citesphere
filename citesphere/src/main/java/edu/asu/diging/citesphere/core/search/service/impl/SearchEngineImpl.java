@@ -196,5 +196,4 @@ public class SearchEngineImpl implements SearchEngine {
             citation.getConceptTags().add(citTag);
         }
     }
-
 }

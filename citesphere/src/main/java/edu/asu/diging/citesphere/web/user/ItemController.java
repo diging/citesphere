@@ -44,8 +44,7 @@ public class ItemController {
                         zoteroGroupId, collectionId, page, sortBy, Integer.valueOf(index));
             }
         } else {
-            citationPage = engine.getPrevAndNextCitation(searchTerm, zoteroGroupId, page - 1, Integer.valueOf(index),
-                    50);
+            citationPage = engine.getPrevAndNextCitation(searchTerm, zoteroGroupId, page - 1, Integer.valueOf(index), 50);
         }
         
         if (citation != null) {
@@ -64,16 +63,5 @@ public class ItemController {
             model.addAttribute("sortBy", sortBy);
         }
         return "auth/group/item";
-    }
-    
-    @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/paging")
-    public @ResponseBody CitationPage getPrevAndNextItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
-            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
-        
-        if(index != null && index != "") {
-            return citationManager.getPrevAndNextCitation((IUser)authentication.getPrincipal(), zoteroGroupId, collectionId, page, sortBy, Integer.valueOf(index));  
-        }
-        return new CitationPage();
     }
 }
