@@ -379,8 +379,6 @@ $('.checkboxes').change(function(){
 $(function(){
 $(".items").draggable({
 	scroll: true,
-	scrollSensitivity: 100,
-	scrollSpeed: 50,
 	cursor: "grabbing",
 	helper:function(){
 		let selected = $(".selected");
@@ -495,8 +493,8 @@ function syncCitations(collectionHTMLElement, collectionId){
 $.ajax({
 	type: 'GET',
 	url: 'items/move/'+collectionId+'/sync/start?page=[(${currentPage})]',
-	success: function (status) {
-		if(status === "sync-started"){
+	success: function (data) {
+		if(data.status === "sync-started"){
 			pollStatus();
 		}
 		setTimeout(function(){updateCitationsCount(collectionHTMLElement, collectionId)},10000);

@@ -82,13 +82,15 @@ public class MoveItemsController {
     }
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/move/{collectionId}/sync/start")
-    public @ResponseBody String startSync(Authentication authentication,
+    public @ResponseBody Sync startSync(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("collectionId") String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
         try {
             citationManager.getGroupItems((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId,
                     new Integer(page), null);
-            return "sync-started";
+            Sync sync = new Sync();
+            sync.setStatus("sync-started");
+            return sync;
         } catch (ZoteroHttpStatusException e) {
             logger.error("Zotero HTTP status exception occured while syncing ", e);
             return null;
@@ -104,5 +106,17 @@ public class MoveItemsController {
         ICitationCollection collection = collectionManager.getCollection((IUser) authentication.getPrincipal(),
                 zoteroGroupId, collectionId);
         return collection.getNumberOfItems();
+    }
+}
+
+class Sync {
+    String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
