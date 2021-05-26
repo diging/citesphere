@@ -214,15 +214,17 @@ function getCurrentItemsData(){
 				  authors.append(authorsData);
 			  } 
 			  
-			  let title = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +
-					  +'<em>'+citation.title+'</em>'+'</td>');
-			  let date = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +
-					  +citation.dateFreetext+'</td>'); 
-			  let url = $('<td>' +
-					  '<span>' +
-					  '<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www>'+'</a>'
-					  +'</span>'+	
-					  +'</td>'); 
+			  let title = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +'</td>');
+			  title.append($('<em>'+ citation.title+'</em>'));
+			  
+			  let date = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +'</td>'); 
+			  date.append(citation.dateFreetext);
+			  
+			  let url = $('<td>');
+			  if(citation.url || citation.url !== ""){
+				 let  urlElement = $('<span>' +'<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www>'+'</a>' +'</span>');
+				 url.append(urlElement);
+			  }
 			  /* let columnsData;
 			  for(const column of data['columns']){
 				  columnsData = columnsData+ citation[column];
@@ -233,6 +235,7 @@ function getCurrentItemsData(){
 			  
 			  
 			 tablebody.append(row);
+			 i++;
 			};
 		 $("#items-table tbody").replaceWith(tablebody);
 		 addEventListeners();
