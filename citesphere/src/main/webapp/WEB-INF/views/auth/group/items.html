@@ -200,10 +200,10 @@ function getCurrentItemsData(){
 		 let i=0;
 		 for (const citation of data['citations']){
 			  console.log(citation.itemType);
-			  let iconData = $('<td>' +
-					  '<span class = "text-warning">'+
-					  '<div>'+'<i title='+citation.itemType +'>'+ citation.itemType +'</i>'+'</div>'+
-					  '</span>'+'</td>')
+			  
+			  let divIconData = $('<div>').append($('<i class="icon-docs" title='+citation.itemType +'>'+'</i>')).append(citation.itemType);
+			  let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
+			  let iconData = $('<td>').append(spanElement);
 			
 			  let authors = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>'+'</td>');
 			  
