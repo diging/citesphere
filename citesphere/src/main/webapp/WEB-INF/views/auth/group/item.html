@@ -56,7 +56,6 @@
 				window.location.href = uri;
 			});
 		}
-		
 	});
 	
 </script>
@@ -85,11 +84,12 @@
 	<div class="pull-left" style="margin-bottom: 20px;">
 	
 		<span th:if="${!#strings.isEmpty(collectionId)}">
-			<a class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
+			<a class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/collection/${collectionId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
 		</span>
 		
 		<span th:unless="${!#strings.isEmpty(collectionId)}">
-			<a class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
+            <a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/search?&searchTerm=${searchTerm}&page=${page}|}">Back</a> &nbsp;&nbsp;
+			<a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
 		</span>
 		 <a
 			th:href="@{|${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i

@@ -20,7 +20,7 @@ $(function() {
 	                window.location.href="search?searchTerm=" + key + "&page=" + page;
 	            }
 	        } else {
-	            window.location.href = "items?page=" + page;
+	            window.location.href = "items?page=" + page + "&sortBy=[(${sort})]";
 	        }
 	    }
 	});

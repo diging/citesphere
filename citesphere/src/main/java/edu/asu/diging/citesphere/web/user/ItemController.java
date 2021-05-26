@@ -38,7 +38,8 @@ public class ItemController {
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         
         CitationPage citationPage = null;
-        if (searchTerm.isEmpty() || searchTerm.equals(" ")) {
+        searchTerm.trim();
+        if (searchTerm.isEmpty()) {
             if (index != null) {
                 citationPage = citationManager.getPrevAndNextCitation((IUser) authentication.getPrincipal(),
                         zoteroGroupId, collectionId, page, sortBy, Integer.valueOf(index));
