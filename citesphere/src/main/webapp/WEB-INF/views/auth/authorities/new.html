@@ -1,12 +1,6 @@
 <html layout:decorate="~{layouts/main}">
 <head>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
-<style>
-.popover {
-    min-width: 300px;
-}
-
-</style>
 <script th:inline="javascript">
 $(function() {
 	
@@ -305,13 +299,16 @@ function getPersonAuthority(uri, personType) {
 			content += '<ul class="foundAuthorities">';
 			data['userAuthorityEntries'].forEach(function(elem) {
 				content += '<li>' + elem['name'];
-				content += ' [<a href="" data-authority-id="' + elem['id'] + '" data-authority-name="' + elem['name'] + '">Use this one</a>]';
 				content += '</li>';
 			});
 			content += "</ul>";
+		} else if (data['importedAuthority'] != null) {
+			content += "<br><br>Following authority can be imported:<br>" + data['importedAuthority']['name'] +
+					'<span id="'+personType_lowerCase+'AuthorityCreationFeedback"><button id="'+personType_lowerCase+'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b></button></span>';
+		} else {
+			content += "<br><br>No authorities found for the given URI<br>";
 		}
-		content += "<br><br>Do you want to create a managed authority entry?<br>" +
-					'<span id="'+personType_lowerCase+'AuthorityCreationFeedback"><button id="'+personType_lowerCase+'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+		
 		$("#uriLoadingFound"+personType).attr("data-content", content);
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", uri);
 		$("#uriLoadingFound"+personType).show();
