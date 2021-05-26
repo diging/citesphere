@@ -185,44 +185,60 @@ function getCurrentItemsData(){
 	let pageNumber = $(".page-item.active").text();
 	 $.get("items/data?page="+pageNumber, function(data) {
 		 console.log(data);
-		 let $tableData = $('<table>');
-		 i=0;
-		 $("#items-table").find('tr').each(function () {
-			 let typeElement = $(this).find('td').eq(0);
-			 let authorsElement = $(this).find('td').eq(1);
-			 let titleElement = $(this).find('td').eq(2);
-			 let dateElement = $(this).find('td').eq(3);
-			 let urlElement = $(this).find('td').eq(4);
-			 let columns = $(this).find('td').eq(5);
-			 
-			 console.log(typeElement.text(), authorsElement.text(), titleElement.text(), dateElement.text(),
-					 urlElement.text());
-			 
-			 console.log(typeElement.innerHTML, authorsElement.innerHTML, titleElement, dateElement, urlElement);
-			 
-			 
-			 console.log(authorsElement.data());
-			 
-			/*  typeElement.text(data.citations[i].itemType);
-			 authorsElement.text(data.citations[i].authors);
-			  */
-			  
-			  
-			  let $iconData = $('<td>' +
+		 let tablebody = $('<tbody>');
+		 let headerRow = $('<tr>'+
+				 '<th>'+"Type"+'</th>'+
+				 '<th>'+"Author"+'</th>'+
+				 '<th>'+"Title"+'</th>'+
+				 '<th>'+"Date"+'</th>'+
+				 '<th>'+"URL"+'</th>'+
+				 '</tr>')
+				 
+		 tablebody.append(headerRow);
+		 const citations = data['citations'];
+		 console.log(citations);
+		 let i=0;
+		 for (const citation of data['citations']){
+			  console.log(citation.itemType);
+			  let iconData = $('<td>' +
 					  '<span class = "text-warning">'+
-					  '<div>'+'<i title="Data"> '+'</i>'+'</div'>
+					  '<div>'+'<i title='+citation.itemType +'>'+ citation.itemType +'</i>'+'</div>'+
 					  '</span>'+'</td>')
-			 
-			  let $row = $('<tr>' + $iconData+'</tr>')
+			
+			  let authors = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>'+'</td>');
+			  
+			 for(const author of citation['authors']){
+				  let authorsData = $('<strong>' + author.lastName + 
+				  '<span> ,' + author.firstName + '</span>'+ '</strong>'+
+				  '<span>'+'</span>')
+				  authors.append(authorsData);
+			  } 
+			  
+			  let title = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +
+					  +'<em>'+citation.title+'</em>'+'</td>');
+			  let date = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +
+					  +citation.dateFreetext+'</td>'); 
+			  let url = $('<td>' +
+					  '<span>' +
+					  '<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www>'+'</a>'
+					  +'</span>'+	
+					  +'</td>'); 
+			  /* let columnsData;
+			  for(const column of data['columns']){
+				  columnsData = columnsData+ citation[column];
+			  }
+			  let column = $('<td style="max-width:300px;">' +'</td>'); 
+			  column.append(columnsData); */
+			  let row = $('<tr>').append(iconData).append(authors).append(title).append(date).append(url);
 			  
 			  
-			 $tableData.append($row);
-			 i++;
-			  
-			});
-		 $("#items-table").find("tr:gt(0)").remove();
-		 $("#items-table").append($tableData);
+			 tablebody.append(row);
+			};
+		 $("#items-table tbody").replaceWith(tablebody);
+		 addEventListeners();
+		 //$("#items-table").append(tablebody);
 	 });
+	 addEventListeners();
 }
 
 
