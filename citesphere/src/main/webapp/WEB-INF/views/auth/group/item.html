@@ -88,7 +88,7 @@
 		</span>
 		
 		<span th:unless="${!#strings.isEmpty(collectionId)}">
-            <a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/search?&searchTerm=${searchTerm}&page=${page}|}">Back</a> &nbsp;&nbsp;
+			<a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/search?&searchTerm=${searchTerm}&page=${page}|}">Back</a> &nbsp;&nbsp;
 			<a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
 		</span>
 		 <a
