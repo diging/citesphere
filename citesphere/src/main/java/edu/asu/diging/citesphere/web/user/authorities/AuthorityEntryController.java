@@ -81,8 +81,7 @@ public class AuthorityEntryController {
                     lastName, source, page, pageSize);
             searchResult.setCurrentPage(page + 1);
             if (zoteroGroupId != null && !zoteroGroupId.isEmpty()) {
-                searchResult.setGroupName(
-                        groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
+                searchResult.setGroupName(groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
             }
             authoritySearchResult.put(source, searchResult);
 
