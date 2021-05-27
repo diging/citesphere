@@ -27,37 +27,7 @@
             
 			$("#parsed-ref-modal").modal();
 		});
-		
-	});
-	
-	$(document).ready(function(){
-		var next = "[(${adjacentCitations.next})]";
-		if (next) {
-			$('#next').attr("disabled", false);
-			$('#next').removeClass("btn btn-default").addClass("btn btn-primary");
-			document.getElementById("next").addEventListener("click", function(e) {
-				uri = next + "?index=" + [(${adjacentCitations.nextIndex})] + "&page=" + [(${adjacentCitations.nextPage})] + "&sortBy=[(${sortBy})]&collectionId=[(${collectionId})]";
-				if ("[(${searchTerm})]") {
-					uri = uri + "&searchTerm=[(${searchTerm})]";
-				}
-				window.location.href = uri;
-			});
-		}
-		
-		var prev = "[(${adjacentCitations.prev})]";
-		if (prev) {
-			$('#prev').attr("disabled", false);
-			$('#prev').removeClass("btn btn-default").addClass("btn btn-primary");
-			document.getElementById("prev").addEventListener("click", function(e) {
-				uri = prev + "?index=" + [(${adjacentCitations.prevIndex})] + "&page=" + [(${adjacentCitations.prevPage})] + "&sortBy=[(${sortBy})]&collectionId=[(${collectionId})]";
-				if ("[(${searchTerm})]") {
-					uri = uri + "&searchTerm=[(${searchTerm})]";
-				}
-				window.location.href = uri;
-			});
-		}
-	});
-	
+	});	
 </script>
 </head>
 
@@ -98,8 +68,13 @@
 			class="icon-sync" title="Sync Citation"></i></a>
 	</div>
 	<div id="pull-right" class="pull-right" style="min-width: 35px;">
-		<button id ="prev" class="btn btn-default" style="font-size:10px; "type="submit" href="" ${ empty previous ? 'disabled="disabled"' : ''}> < Previous</button>&nbsp;&nbsp;
-		<button id ="next" class="btn btn-default" style="font-size:10px; "type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}>Next ></button>
+		<a th:if="${!#strings.isEmpty(adjacentCitations.prev)}" class ="btn btn-primary" style="font-size:10px;" 
+		    th:href="@{|/auth/group/${zoteroGroupId}/items/${adjacentCitations.prev}?searchTerm=${searchTerm}&index=${adjacentCitations.prevIndex}&page=${adjacentCitations.prevPage}&sortBy=${sortBy}&collectionId=${collectionId}|}"> < Previous</a>
+		<a th:unless="${!#strings.isEmpty(adjacentCitations.prev)}" class ="btn btn-default" style="font-size:10px;" disabled> < Previous</a> &nbsp;&nbsp;
+
+		<a th:if="${!#strings.isEmpty(adjacentCitations.next)}" class ="btn btn-primary" style="font-size:10px;" 
+		    th:href="@{|/auth/group/${zoteroGroupId}/items/${adjacentCitations.next}?searchTerm=${searchTerm}&index=${adjacentCitations.nextIndex}&page=${adjacentCitations.nextPage}&sortBy=${sortBy}&collectionId=${collectionId}|}">Next ></a>
+		<a th:unless="${!#strings.isEmpty(adjacentCitations.next)}" class ="btn btn-default" style="font-size:10px;" disabled>Next ></a>
 	</div>
 	
 	<table class="table table-striped">
