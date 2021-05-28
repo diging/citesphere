@@ -138,7 +138,7 @@ Items in Group <span th:text="${group.name}"></span></br>
 	    <small><a th:href="@{items}"><i class="icon-redo-alt"></i> Reload page</a></small>
 	</div>
 
-<script>
+<script th:inline="javascript">
 //# sourceURL=poll.js
 var syncUrl= "sync/info";
 var currentURL = window.location.href;
@@ -199,7 +199,9 @@ function getCurrentItemsData(){
 		 console.log(citations);
 		 let i=0;
 		 for (const citation of data['citations']){
-			  console.log(citation.itemType);
+			  let type = citation.itemType +"_icon";
+			  //console.log(type);
+			  //console.log([[${@iconsResource.getProperty(type+"_icon")}]]);
 			  
 			  let divIconData = $('<div>').append($('<i class="icon-docs" title='+citation.itemType +'>'+'</i>')).append(citation.itemType);
 			  let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
@@ -225,23 +227,43 @@ function getCurrentItemsData(){
 				 let  urlElement = $('<span>' +'<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www>'+'</a>' +'</span>');
 				 url.append(urlElement);
 			  }
-			  /* let columnsData;
-			  for(const column of data['columns']){
-				  columnsData = columnsData+ citation[column];
-			  }
-			  let column = $('<td style="max-width:300px;">' +'</td>'); 
-			  column.append(columnsData); */
-			  let row = $('<tr>').append(iconData).append(authors).append(title).append(date).append(url);
 			  
+			  let columnsData = null;
+			  for(const column of data['shownColumns']){
+				  columnsData = columnsData + citation[column];
+			  }
+			  
+			  let column = $('<td style="max-width:300px;">' +'</td>'); 
+			  let row = $('<tr>').append(iconData).append(authors).append(title).append(date).append(url);
+			  if(columnsData !== null){
+				  column.append(columnsData);
+				  row.append(column);
+				  console.log(columnsData);
+			  }
 			  
 			 tablebody.append(row);
 			 i++;
 			};
 		 $("#items-table tbody").replaceWith(tablebody);
+		 $("#total-records").text(data['totalResults']);
+		 
+		 
+		 let unOrderedList = $('<ul class="list-group" id=collectionsList">'+'</ul>');
+		 for(const collection of data['citationCollections']){
+			 let list = $('<li class="list-group-item">'+'</li>');
+			 let badge = $('<span class="badge">'+'</span>').text(collection.numberOfItems);
+			 list.append(badge);
+			 let collectionURL = window.location.href +"/../collection/"+collection.key+"/items";
+			 let collectionText = $('<span/>').text(collection.name)
+			 let anchorTag = $('<a href= '+collectionURL+'>'+'</a>').append(collectionText);
+			 list.append(anchorTag);
+			 unOrderedList.append(list);
+		 }
+		
+		 $("#collectionsList").replaceWith(unOrderedList);
 		 addEventListeners();
-		 //$("#items-table").append(tablebody);
-	 });
-	 addEventListeners();
+		 
+	 }); 
 }
 
 
