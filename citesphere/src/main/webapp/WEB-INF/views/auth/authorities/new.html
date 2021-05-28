@@ -28,10 +28,8 @@ $(function() {
             $('#selectAuthorityModel a:first').tab('show');
         })
         $("#searchAuthorSpinner").show();
-
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         getconceptpowerAuthorities('Author', 'Author', 0)
-        
         $("#searchAuthorSpinner").hide();
     });
 
@@ -40,20 +38,11 @@ $(function() {
         $.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]]+uri, function(data) {
             $("#authorCreateAuthority").hide();
             $("#uriAuthorLocalId").val(data['id']);
-            $("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+            $("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i><br>.");
             $("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
             showPersonNameInModal(data['name'], "Author");
             $("#uriLoadingFoundAuthor").popover('hide');
         });
-    });
-
-    $("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
-        var authId = $(this).attr('data-authority-id');
-        $("#uriAuthorLocalId").val(authId);
-        $("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
-        showPersonNameInModal($(this).attr('data-authority-name'), "Author");
-        $("#uriLoadingFoundAuthor").popover('hide');
-        event.preventDefault();
     });
 
     var timer = null;
