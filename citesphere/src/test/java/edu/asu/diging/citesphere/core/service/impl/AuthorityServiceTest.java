@@ -288,6 +288,36 @@ public class AuthorityServiceTest {
         Assert.assertTrue(timeBfr.isBefore(actualEntry.getCreatedOn()));
         Assert.assertEquals(id, actualEntry.getId());
     }
+    
+    @Test
+    public void test_createWithURI() throws InterruptedException {
+        String username = "user";
+        String id = "entry1";
+        String uri = "https://test.uri/pre";
+        OffsetDateTime timeBfr = OffsetDateTime.now();
+
+        AuthorityEntry entry = new AuthorityEntry();
+
+        IUser user = new User();
+        user.setUsername(username);
+
+        Answer<AuthorityEntry> answer = new Answer<AuthorityEntry>() {
+            public AuthorityEntry answer(InvocationOnMock invocation) {
+                entry.setId(id);
+                return entry;
+            }
+        };
+
+        Thread.sleep(100);
+
+        Mockito.when(entryRepository.save(entry)).thenAnswer(answer);
+
+        IAuthorityEntry actualEntry = managerToTest.create(entry, user, uri);
+        Assert.assertEquals(username, actualEntry.getUsername());
+        Assert.assertTrue(timeBfr.isBefore(actualEntry.getCreatedOn()));
+        Assert.assertEquals(id, actualEntry.getId());
+        Assert.assertEquals(uri + id, actualEntry.getUri());
+    }
 
     @Test
     public void test_save() {
