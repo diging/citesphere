@@ -63,13 +63,20 @@ public class AuthorityEntryController {
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     
-    @RequestMapping("/auth/authority/find/authorities/{source}")
+    @RequestMapping(value = { "/auth/authority/find/authorities/{source}",
+            "/auth/authority/{zoteroGroupId}/find/authorities/{source}" })
     public ResponseEntity<AuthoritySearchResult> getAuthoritiesFromAuthorityService(Authentication authentication,
-            @PathVariable("source") String source, @RequestParam(required = false, value = "zoteroGroupId") String zoteroGroupId,
+            @PathVariable("source") String source, @PathVariable("zoteroGroupId") Optional<String> zoteroGroupId,
+            @RequestParam(required = false, value = "zoteroGroupId") String rpZoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
+        String groupId = zoteroGroupId.orElse(null);
+        if (rpZoteroGroupId != null && !rpZoteroGroupId.isEmpty()) {
+            groupId = rpZoteroGroupId;
+        }
+        
         if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
             logger.warn(
                     "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
@@ -80,8 +87,8 @@ public class AuthorityEntryController {
             searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
             searchResult.setCurrentPage(page + 1);
-            if (zoteroGroupId != null && !zoteroGroupId.isEmpty()) {
-                searchResult.setGroupName(groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
+            if (groupId != null && !groupId.isEmpty()) {
+                searchResult.setGroupName(groupManager.getGroup((IUser) authentication.getPrincipal(), groupId).getName());
             }
             authoritySearchResult.put(source, searchResult);
 
@@ -130,7 +137,7 @@ public class AuthorityEntryController {
         return new ResponseEntity<FoundAuthorities>(foundAuthorities, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/auth/authority/create", method=RequestMethod.POST)
+    @RequestMapping(value="/auth/authority/import", method=RequestMethod.POST)
     public ResponseEntity<IAuthorityEntry> createAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri) {
         IAuthorityEntry entry = null;
         try {

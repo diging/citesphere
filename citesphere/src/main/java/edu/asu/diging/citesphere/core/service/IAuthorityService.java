@@ -33,7 +33,7 @@ public interface IAuthorityService {
 
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
     
-    IAuthorityEntry create(IAuthorityEntry entry, IUser user, String uri);
+    IAuthorityEntry createWithUri(IAuthorityEntry entry, IUser user);
 
     List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize);
 
