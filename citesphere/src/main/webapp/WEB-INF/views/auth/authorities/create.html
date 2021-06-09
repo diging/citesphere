@@ -29,7 +29,8 @@ $(function() {
         })
         $("#searchAuthorSpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-        getconceptpowerAuthorities('Author', 'Author', 0)
+        getconceptpowerAuthorities('Author', 'Author', 1)
+        getViafAuthorities('Author', 'Author', 1)
         $("#searchAuthorSpinner").hide();
     });
 
@@ -176,6 +177,83 @@ function getconceptpowerAuthorities(modalType, personType, page) {
         error: function(data) {
             $('#conceptpowerAuthoritySearchResult').parents('table').hide()
             $("#conceptpowerAuthoritiesError").show();
+        }
+
+    });
+}
+
+function getViafAuthorities(modalType, personType, page) {
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+	url = [[@{|/auth/authority/find/authorities/viaf|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
+
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+  			$("#viafAuthoritySearchResult").empty();
+  			var content = '';
+  			
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+                data['foundAuthorities'].forEach(function(elem) {
+                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
+                    if (elem['description'] == null) {
+                        content += ' - </td>';
+                    } else {
+                        content += elem['description'] + '</td>';
+                    }
+                    content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+
+                });
+
+                $('#viafAuthority-pagination-top').twbsPagination({
+                    totalPages: data['totalPages'],
+                    startPage: data['currentPage'],
+                    prev: "«",
+                    next: "»",
+                    visiblePages: 5,
+                    initiateStartPageClick: false,
+                    onPageClick: function(event, page) {
+                        getconceptpowerAuthorities(modalType, personType, page)
+                    }
+                });
+
+            }
+
+            $("#viafAuthoritySearchResult").append(content);
+            $(".viaf-authority-entry").click(function() {
+                name = $(this).closest("tr").find(".name").text();
+                uri = $(this).closest("tr").find(".uri").text();
+
+                showPersonNameInModal(name, personType)
+                $("#uri" + modalType).val(uri);
+
+                createManageAuthorityURL = [[@{/auth/authority/add?}]] + '&source=viaf&uri=' + uri;
+                $.ajax({
+                    dataType: "json",
+                    type: 'POST',
+                    url: createManageAuthorityURL,
+                    data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
+                    async: false,
+                    success: function(data) {
+                        $("#" + personType_lowerCase + "AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+                    },
+                    error: function(data) {
+                        $("#uri" + modalType).val("");
+                        $("#" + personType_lowerCase + "AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+                    }
+                });
+
+                $("#selectAuthorityModel").modal('hide');
+            });
+
+        },
+        error: function(data) {
+            $('#viafAuthoritySearchResult').parents('table').hide()
+            $("#viafAuthoritiesError").show();
         }
 
     });
@@ -339,6 +417,10 @@ function getPersonAuthority(uri, personType) {
                             <a href="#conceptpowerAuthoritiesTabContent" aria-controls="uploadTab"
                                 role="tab" data-toggle="tab">Authorities from Conceptpower</a>
                         </li>
+                        <li role="presentation">
+                            <a href="#viafAuthoritiesTabContent"
+                                aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from VIAF</a>
+                        </li>
                     </ul>
                     
                     <!-- Tab panes -->
@@ -353,10 +435,22 @@ function getPersonAuthority(uri, personType) {
                                 <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
                                 <tbody id="conceptpowerAuthoritySearchResult">
                                 </tbody>
-                            </table>
-                            
+                            </table>                            
                         </div>
-                    </div>
+                        
+                        <div role="tabpanel" class="tab-pane" id="viafAuthoritiesTabContent">
+                            <ul id="viafAuthority-pagination-top" class="pagination-sm"></ul>
+                            <div id="viafAuthoritiesError" class="text-warning" style="display: none">
+                                <span> Error occurred while searching authorities in VIAF </span>
+                            </div>
+                            </br>
+                            <table class="table table-striped table-bordered table-fixed">
+                                <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+                                <tbody id="viafAuthoritySearchResult">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>        
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default"
