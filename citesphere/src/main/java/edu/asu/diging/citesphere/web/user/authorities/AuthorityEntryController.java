@@ -66,7 +66,7 @@ public class AuthorityEntryController {
     @RequestMapping("/auth/authority/find/authorities/{source}")
     public ResponseEntity<AuthoritySearchResult> getAuthoritiesFromAuthorityService(Authentication authentication,
             @PathVariable("source") String source, @RequestParam(required = false, value = "zoteroGroupId") String zoteroGroupId,
-            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
@@ -79,7 +79,7 @@ public class AuthorityEntryController {
         try {
             searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
-            searchResult.setCurrentPage(page + 1);
+            searchResult.setCurrentPage(page);
             if (zoteroGroupId != null && !zoteroGroupId.isEmpty()) {
                 searchResult.setGroupName(groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
             }
