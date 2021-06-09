@@ -20,35 +20,29 @@ import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.AuthorityForm;
 
 @Controller
-public class AddAuthorityController {
-
-    @Value("${_authority_uri}")
-    private String authorityUri;
-
-    @Value("${_authority_prefix}")
-    private String authorityPrefix;
+public class CreateAuthorityController {
 
     @Autowired
     private IAuthorityService authorityService;
 
-    @GetMapping(value = "/auth/authority/new")
+    @GetMapping(value = "/auth/authority/create")
     public String show(Model model) {
         model.addAttribute("authorityForm", new AuthorityForm());
-        return "auth/authorities/new";
+        return "/auth/authorities/create";
     }
 
-    @PostMapping(value = "/auth/authority/new")
+    @PostMapping(value = "/auth/authority/create")
     public String add(@Validated @ModelAttribute("authorityForm") AuthorityForm form, BindingResult result, Model model,
             Authentication authentication) {
         if (result.hasErrors()) {
             model.addAttribute("authorityForm", form);
-            return "auth/authorities/new";
+            return "auth/authorities/create";
         }
         IAuthorityEntry entry = new AuthorityEntry();
         entry.setName(form.getName());
         entry.setDescription(form.getDescription());
         entry.setGroups(new HashSet<>());
-        entry = authorityService.create(entry, (IUser) authentication.getPrincipal(), authorityUri + authorityPrefix);
+        entry = authorityService.createWithUri(entry, (IUser) authentication.getPrincipal());
         return "redirect:/auth/authority/list";
     }
 

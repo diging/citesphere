@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,12 @@ import edu.asu.diging.citesphere.model.transfer.impl.Persons;
 @Service
 public class AuthorityService implements IAuthorityService {
 
+    @Value("${_authority_uri}")
+    private String authorityUri;
+
+    @Value("${_authority_prefix}")
+    private String authorityPrefix;
+    
     @Autowired
     private AuthorityEntryRepository entryRepository;
 
@@ -205,9 +212,10 @@ public class AuthorityService implements IAuthorityService {
 
     @Override
     @Transactional
-    public IAuthorityEntry create(IAuthorityEntry entry, IUser user, String uri) {
+    public IAuthorityEntry createWithUri(IAuthorityEntry entry, IUser user) {
+        //For manually created author, it generates a URI for reference
         entry = create(entry, user);
-        entry.setUri(uri + entry.getId());
+        entry.setUri(authorityUri + authorityPrefix + entry.getId());
         return save(entry);
     }
     

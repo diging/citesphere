@@ -152,7 +152,7 @@ $(function() {
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
+		$.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
 			$("#authorCreateAuthority").hide();
 			
 			$("#uriAuthorLocalId").val(data['id']);
@@ -229,7 +229,7 @@ $(function() {
 	
 	$("#editorIconContainer").on('click', ".popover #editorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundEditor").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
+		$.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
 			$("#editorCreateAuthority").hide();
 			$("#uriEditorLocalId").val(data['id']);
 			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
@@ -302,7 +302,7 @@ $(function() {
 	
 	$("#creatorIconContainer").on('click', ".popover #creatorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundCreator").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
+		$.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
 			$("#creatorCreateAuthority").hide();
 			$("#uriCreatorLocalId").val(data['id']);
 			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
@@ -737,7 +737,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
-	url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?zoteroGroupId=[(${zoteroGroupId})]' + '&firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/conceptpower|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
 	$.ajax({
   		dataType: "json",
