@@ -1,9 +1,12 @@
 package edu.asu.diging.citesphere.core.authority.impl;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
@@ -11,9 +14,12 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -66,6 +72,13 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
      */
     @Override
     public boolean isResponsible(String uri) {
+        Pattern pattern = Pattern.compile(viafUrlRegex);
+        Matcher matcher = pattern.matcher(uri);
+
+        if (matcher.matches()) {
+            return true;
+        }
+
         return false;
     }
 
@@ -76,9 +89,32 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
      * retrieveAuthorityData(java.lang.String)
      */
     @Override
+    @Cacheable("viafAuthorities")
     public IImportedAuthority retrieveAuthorityData(String uri)
             throws URISyntaxException, AuthorityServiceConnectionException {
-        throw new UnsupportedOperationException();
+
+        RequestEntity<Void> request = RequestEntity
+                .get(new URI(uri))
+                .accept(MediaType.APPLICATION_JSON).build();
+        ResponseEntity<ViafRecordData> response = null;
+        try {
+            response = restTemplate.exchange(request, ViafRecordData.class);
+        } catch (RestClientException ex) {
+            throw new AuthorityServiceConnectionException(ex);
+        }
+        if (response.getStatusCode() == HttpStatus.OK) {
+            ViafRecordData viaf = response.getBody();
+            Iterator<Data> iterator = viaf.getMainHeadings().getData().iterator();
+            if (iterator.hasNext()) {
+                // let's get the first entry for now
+                String name = iterator.next().getText();
+                ImportedAuthority authority = new ImportedAuthority();
+                authority.setName(name);
+                authority.setUri(viaf.getDocument().get("@about") + "");
+                return authority;
+            }
+        }
+        return null;
     }
 
     @Override

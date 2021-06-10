@@ -107,14 +107,17 @@ public class AuthorityEntryController {
 
     @RequestMapping("/auth/authority/get")
     public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri,
-            @RequestParam(value = "zoteroGroupId", required = false) String zoteroGroupId) {
+            @RequestParam(value = "zoteroGroupId", required = false) String zoteroGroupId,
+            @RequestParam(defaultValue = "true", value = "checkImporter", required = false) boolean checkImporter) {
         List<IAuthorityEntry> userEntries = authorityService.findByUri((IUser) authentication.getPrincipal(), uri);
         FoundAuthorities foundAuthorities = new FoundAuthorities();
         foundAuthorities.setUserAuthorityEntries(userEntries);
 
         try {
-            IAuthorityEntry entry = authorityService.importAuthority(uri);
-            foundAuthorities.setImportedAuthority(entry);
+            if(checkImporter) {
+                IAuthorityEntry entry = authorityService.importAuthority(uri);
+                foundAuthorities.setImportedAuthority(entry);
+            }
         } catch (AuthorityServiceConnectionException e) {
             logger.warn("Could not retrieve authority entry.", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
