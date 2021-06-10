@@ -31,19 +31,17 @@ public class ItemController {
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @RequestParam(defaultValue = "", required = false, value = "searchTerm") String searchTerm, @RequestParam(required = false, value = "index") String index, 
-            @RequestParam(defaultValue = "1", required = false, value = "page") int page, @RequestParam(value="collectionId", required=false) String collectionId,
+            @RequestParam(defaultValue = "", required = false, value = "searchTerm") String searchTerm, @RequestParam(defaultValue = "0",required = false, value = "index") String index,
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page, @RequestParam(defaultValue = "", value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         
         CitationPage citationPage = null;
-        searchTerm.trim();
+        searchTerm = searchTerm.trim();
         if (searchTerm.isEmpty()) {
-            if (index != null) {
-                citationPage = citationManager.getPrevAndNextCitation((IUser) authentication.getPrincipal(),
-                        zoteroGroupId, collectionId, page, sortBy, Integer.valueOf(index));
-            }
+            citationPage = citationManager.getPrevAndNextCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
+                    collectionId, page, sortBy, Integer.valueOf(index));
         } else {
             citationPage = engine.getPrevAndNextCitation(searchTerm, zoteroGroupId, page - 1, Integer.valueOf(index), 50);
         }
