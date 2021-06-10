@@ -21,6 +21,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
@@ -76,6 +77,8 @@ public class AuthorityServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
+        ReflectionTestUtils.setField(managerToTest, "authorityUri", "https://test.uri/");
+        ReflectionTestUtils.setField(managerToTest, "authorityPrefix", "pre");
         Iterator<AuthorityImporter> importerIterator = Mockito.mock(Iterator.class);
         Mockito.when(importerIterator.hasNext()).thenReturn(true, false);
         Mockito.when(importerIterator.next()).thenReturn(testImporter);
@@ -312,7 +315,7 @@ public class AuthorityServiceTest {
 
         Mockito.when(entryRepository.save(entry)).thenAnswer(answer);
 
-        IAuthorityEntry actualEntry = managerToTest.create(entry, user, uri);
+        IAuthorityEntry actualEntry = managerToTest.createWithUri(entry, user);
         Assert.assertEquals(username, actualEntry.getUsername());
         Assert.assertTrue(timeBfr.isBefore(actualEntry.getCreatedOn()));
         Assert.assertEquals(id, actualEntry.getId());
