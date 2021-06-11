@@ -25,7 +25,7 @@ public class AuthorityListController {
     @RequestMapping("/auth/authority/list")
     public String list(Model model, Authentication authentication) {
         IUser user = (IUser)authentication.getPrincipal();
-        model.addAttribute("authorities", authorityService.getAll(user));   
+        model.addAttribute("authorities", authorityService.getAll(user));
         model.addAttribute("groups", citationManager.getGroups((IUser)authentication.getPrincipal()));
         model.addAttribute("displayBy", "all");
         model.addAttribute("username", user.getUsername());

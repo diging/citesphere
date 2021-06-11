@@ -150,19 +150,6 @@ $(function() {
 		$("#authorAffiliations").append(affiliationCopy);
 	});
 	
-	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
-		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#authorCreateAuthority").hide();
-			
-			$("#uriAuthorLocalId").val(data['id']);
-			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], "Author");
-			$("#uriLoadingFoundAuthor").popover('hide');
-		});
-	});
-	
 	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
@@ -227,18 +214,6 @@ $(function() {
 	    }, 1000);
 	});
 	
-	$("#editorIconContainer").on('click', ".popover #editorCreateAuthority", function() {
-		var uri = $("#uriLoadingFoundEditor").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#editorCreateAuthority").hide();
-			$("#uriEditorLocalId").val(data['id']);
-			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], "Editor");
-			$("#uriLoadingFoundEditor").popover('hide');
-		});
-	});
-	
 	$("#editorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriEditorLocalId").val(authId);
@@ -298,18 +273,6 @@ $(function() {
 	    timer = setTimeout(function() {
 	    	getPersonAuthority(uri, "Creator");
 	    }, 1000);
-	});
-	
-	$("#creatorIconContainer").on('click', ".popover #creatorCreateAuthority", function() {
-		var uri = $("#uriLoadingFoundCreator").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#creatorCreateAuthority").hide();
-			$("#uriCreatorLocalId").val(data['id']);
-			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], "Creator");
-			$("#uriLoadingFoundCreator").popover('hide');
-		});
 	});
 	
 	$("#creatorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
@@ -626,8 +589,6 @@ function resetPersonAuthorityCreation(personType) {
 	$("#uriLoadingFound"+personType).popover('hide');
 	$("#uriLoadingFailure"+personType).popover('hide');
 	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
-	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").html("");
-	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
@@ -656,8 +617,12 @@ function getPersonAuthority(uri, personType) {
 			});
 			content += "</ul>";
 		}
-		content += "<br><br>Do you want to create a managed authority entry?<br>" +
-					'<span id="'+personType_lowerCase+'AuthorityCreationFeedback"><button id="'+personType_lowerCase+'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+		
+		if((data['userAuthorityEntries'] == null || data['userAuthorityEntries'].length == 0) 
+				&& (data['datasetAuthorityEntries'] == null || data['datasetAuthorityEntries'].length == 0)) {
+			content += "<br><br>No authorities found for the given URI<br>";
+		}
+		
 		$("#uriLoadingFound"+personType).attr("data-content", content);
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", uri);
 		$("#uriLoadingFound"+personType).show();

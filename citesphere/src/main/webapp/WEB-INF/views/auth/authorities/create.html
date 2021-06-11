@@ -29,6 +29,7 @@ $(function() {
         })
         $("#searchAuthorSpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+        $('#viafAuthority-pagination-top').twbsPagination('destroy');
         getconceptpowerAuthorities('Author', 'Author', 1)
         getViafAuthorities('Author', 'Author', 1)
         $("#searchAuthorSpinner").hide();
@@ -40,7 +41,6 @@ $(function() {
             $("#authorCreateAuthority").hide();
             $("#uriAuthorLocalId").val(data['id']);
             $("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i><br>.");
-            $("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
             showPersonNameInModal(data['name'], "Author");
             $("#uriLoadingFoundAuthor").popover('hide');
         });
@@ -282,8 +282,6 @@ function resetPersonAuthorityCreation(personType) {
     $("#uriLoadingFound" + personType).popover('hide');
     $("#uriLoadingFailure" + personType).popover('hide');
     $("#" + personType.toLowerCase() + "AuthorityUsed").html("");
-    $("#" + personType.toLowerCase() + "AuthorityCreationFeedback").html("");
-    $("#" + personType.toLowerCase() + "AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
@@ -302,7 +300,7 @@ function getPersonAuthority(uri, personType) {
                 content += "</ul>";
             } else if (data['importedAuthority'] != null) {
                 content += "<br><br>Following authority can be imported:<br>" + data['importedAuthority']['name'] +
-                    '<span id="' + personType_lowerCase + 'AuthorityCreationFeedback"><button id="' + personType_lowerCase + 'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b></button></span>';
+                    '<button id="' + personType_lowerCase + 'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b></button>';
             } else {
                 content += "<br><br>No authorities found for the given URI<br>";
             }

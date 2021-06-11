@@ -177,7 +177,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
         if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty()) {
             viafSearchString += firstName + " " + lastName;
         } else {
-            viafSearchString += firstName == null ? lastName : firstName;
+            viafSearchString += firstName == null || firstName.isEmpty() ? lastName : firstName;
         }
         int startRecord = (page - 1) * pageSize + 1;
         viafSearchString += "\"&startRecord=" + startRecord + "&maximumRecords=" + pageSize
