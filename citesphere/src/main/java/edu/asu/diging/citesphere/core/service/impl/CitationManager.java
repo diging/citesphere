@@ -379,4 +379,9 @@ public class CitationManager implements ICitationManager {
         }
         return result;
     }
+    
+    @Override
+    public void deleteLocalGroupCitations(String groupId) {
+        citationStore.deleteCitationByGroupId(groupId);
+    }
 }

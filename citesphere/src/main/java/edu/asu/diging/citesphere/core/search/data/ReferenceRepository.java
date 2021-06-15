@@ -6,7 +6,6 @@ import edu.asu.diging.citesphere.core.search.model.impl.Reference;
 
 public interface ReferenceRepository extends ElasticsearchRepository<Reference, String> {
 
-    void deleteByGroupId(String groupId);
-    
+    void deleteByGroup(String group);
     
 }

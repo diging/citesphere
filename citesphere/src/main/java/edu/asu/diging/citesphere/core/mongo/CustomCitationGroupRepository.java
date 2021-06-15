@@ -9,6 +9,6 @@ import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 @JaversSpringDataAuditable
 public interface CustomCitationGroupRepository extends MongoRepository<CitationGroup, ObjectId>{
     
-    void deleteByGroupId(int parseInt);
+    Long deleteByGroupId(int groupId);
 
 }
