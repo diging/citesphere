@@ -16,7 +16,7 @@ $(function() {
 			'type': "POST",
 			'success': function(response){
 				 $('#secretKey').text(response.secret);
-				 $.notify('<i class="fas fa-check-circle"></i> New secret successfully generated!', {
+				 $.notify('<i class="icon-checkmark-alt"></i> New secret successfully generated!', {
 						type: 'success',
 						offset: {
 							x: 50,
@@ -29,7 +29,7 @@ $(function() {
 				});
 			},
 			'error': function(data) {
-				$.notify('<i class="fas fa-exclamation-circle"></i> An error occurred. A new secret could not be generated.', {
+				$.notify('<i class="icon-warning"></i> An error occurred. A new secret could not be generated.', {
 					type: 'danger',
 					offset: {
 						x: 50,

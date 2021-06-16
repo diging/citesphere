@@ -11,6 +11,9 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
@@ -51,6 +54,9 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         if (clientOptional.isPresent()) {
             ClientDetails details = clientOptional.get();
             details.getAuthorities().size();
+            for (String scope : details.getScope()) {
+                // load authorities, ugly but best I can come up with right now
+            }
             return details;
         } 
         throw new InvalidClientException("Client with id " + clientId + " does not exist.");
@@ -88,6 +94,11 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         result.setTotalPages(oAuthClients.getTotalPages());
         return result;
         
+    }
+    
+    @Override
+    public List<OAuthClient> getAllApps() {
+        return clientRepo.findAll();
     }
     
     @Override
