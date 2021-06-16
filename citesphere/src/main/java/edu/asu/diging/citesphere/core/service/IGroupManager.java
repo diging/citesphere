@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service;
 
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -11,6 +12,7 @@ public interface IGroupManager {
      * Does not delete the group completely. Only deletes the local copy of citation group
      * @param user
      * @param groupId
+     * @throws GroupDoesNotExistException 
      */
-    void deleteLocalGroupCopy(String groupId);
+    void deleteLocalGroupCopy(String groupId) throws GroupDoesNotExistException;
 }

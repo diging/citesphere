@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.mongo.CustomCitationGroupRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
@@ -49,7 +50,10 @@ public class GroupManager implements IGroupManager {
     }
     
     @Override
-    public void deleteLocalGroupCopy(String groupId) {
-        customGroupRepo.deleteByGroupId(Integer.parseInt(groupId));
+    public void deleteLocalGroupCopy(String groupId) throws GroupDoesNotExistException {
+        Long deleteCount = customGroupRepo.deleteByGroupId(Integer.parseInt(groupId));
+        if (deleteCount == 0L) {
+            throw new GroupDoesNotExistException("There is no group with id " + groupId);
+        }
     }
 }

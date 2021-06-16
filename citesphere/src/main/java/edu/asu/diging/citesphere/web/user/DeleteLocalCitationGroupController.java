@@ -17,7 +17,7 @@ import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 
 @Controller
-public class DeleteLocalGroupCopyController{
+public class DeleteLocalCitationGroupController{
      
     @Autowired
     private IGroupManager groupManager;
@@ -28,7 +28,6 @@ public class DeleteLocalGroupCopyController{
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/resync", method = RequestMethod.POST)
     public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
             @PathVariable("zoteroGroupId") String groupId, Principal principal) throws GroupDoesNotExistException {
-		
         groupManager.deleteLocalGroupCopy(groupId);
         citationManger.deleteLocalGroupCitations(groupId);
         return new ResponseEntity<String>(HttpStatus.OK);        
