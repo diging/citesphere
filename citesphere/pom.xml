@@ -9,7 +9,7 @@
     <packaging>war</packaging>
 
     <properties>
-        <org.slf4j-version>1.7.25</org.slf4j-version>
+        <org.slf4j-version>1.7.30</org.slf4j-version>
         <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
         <spring-security-version>5.1.5.RELEASE</spring-security-version>
         <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
@@ -25,7 +25,7 @@
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
         <spring-social-zotero.version>0.8-SNAPSHOT</spring-social-zotero.version>
         <citesphere.messages.version>0.4</citesphere.messages.version>
-        <citesphere.model.version>1.5</citesphere.model.version>
+        <citesphere.model.version>1.8</citesphere.model.version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -131,6 +131,16 @@
             <groupId>edu.asu.diging</groupId>
             <artifactId>citesphere-messages</artifactId>
             <version>${citesphere.messages.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>edu.asu.diging</groupId>
@@ -246,6 +256,16 @@
             <groupId>edu.asu.diging</groupId>
             <artifactId>spring-social-zotero</artifactId>
             <version>${spring-social-zotero.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Spring AOP + AspectJ -->
@@ -313,35 +333,22 @@
             <version>${org.slf4j-version}</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${org.slf4j-version}</version>
-            <scope>runtime</scope>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.11.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.15</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.jms</groupId>
-                    <artifactId>jms</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.jdmk</groupId>
-                    <artifactId>jmxtools</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.jmx</groupId>
-                    <artifactId>jmxri</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>runtime</scope>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.11.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.11.1</version>
         </dependency>
 
         <!-- DataSource (HikariCP) -->

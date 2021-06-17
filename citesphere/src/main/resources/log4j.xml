@@ -19,7 +19,7 @@
 		<level value="${log.level}" />
 	</logger>
 	
-	<!-- 3rdparty Loggers -->
+	
 	<logger name="org.springframework.core">
 		<level value="${log.level}" />
 	</logger>
@@ -36,12 +36,14 @@
 		<level value="${log.level}" />
 	</logger>
     
+    
     <logger name="org.springframework.security">
         <level value="${log.level}" />
-    </logger>
+    </logger> 
     <logger name="org.springframework.data">
         <level value="${log.level}" />
     </logger>
+    
     <logger name="org.elasticsearch">
         <level value="${log.level}" />
     </logger>
@@ -50,6 +52,9 @@
         <level value="${log.level}" />
     </logger>
     <logger name="org.hibernate.type.descriptor.sql">
+        <level value="${log.level}" />
+    </logger>
+    <logger name="org.apache.kafka">
         <level value="${log.level}" />
     </logger>
 

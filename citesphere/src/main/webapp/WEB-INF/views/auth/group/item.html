@@ -95,13 +95,13 @@
 		</span>
 		 <a
 			th:href="@{|${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
-			class="far fa-edit" title="Edit"></i></a> &nbsp;&nbsp; <a
+			class="icon-edit" style="color: #337ab7; font-size: 14px" title="Edit"></i></a> &nbsp;&nbsp; <a
 			th:href="@{|${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
-			class="fas fa-sync" title="Sync Citation"></i></a>
+			class="icon-sync" title="Sync Citation"></i></a>
 	</div>
 	<div id="pull-right" class="pull-right" style="min-width: 35px;">
-		<button id ="prev" class="btn btn-default" style="font-size:10px;"type="submit"  href="" ${ empty previous ? 'disabled="disabled"' : ''}><i id="prevSpinner" class="fas fa-spinner fa-spin text-info"></i> < Previous</button>&nbsp;&nbsp;
-		<button id ="next" class="btn btn-default" style="font-size:10px;" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}><i id="nextSpinner" class="fas fa-spinner fa-spin text-info"></i>Next ></button>
+		<button id ="prev" class="btn btn-default" style="font-size:10px;"type="submit"  href="" ${ empty previous ? 'disabled="disabled"' : ''}><i id="prevSpinner" class="icon-spinner rotating"></i> < Previous</button>&nbsp;&nbsp;
+		<button id ="next" class="btn btn-default" style="font-size:10px;" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}><i id="nextSpinner" class="icon-spinner rotating"></i>Next ></button>
 	</div>
 	
 	<table class="table table-striped">
@@ -114,7 +114,7 @@
 			<td th:with="iconClass=${@iconsResource.getProperty(citation.itemType + '_icon')}, 
 			iconLabel=${@iconsResource.getProperty(citation.itemType + '_label')}">
 			
-			<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'fas fa-file'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
+			<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'title')}">
 			<td>Title</td>
@@ -138,14 +138,14 @@
 					 (<th:block th:each="aff,affStatus : ${author.affiliations}">
 					 	[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
 					 </th:block>)
-					 <span th:if="${!status.last}">; </span>
 				 </span>
 				 <span th:if="${!#strings.isEmpty(author.uri)}">
-				 	<a th:href="@{|${author.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
+				 	<a th:href="@{|${author.uri}|}" target="_blank"><i class="icon-link"></i></a>
 				 </span>
 				 <span th:if="${!#strings.isEmpty(author.localAuthorityId)}">
-				 	<a th:href="@{|/auth/authority/${author.localAuthorityId}|}"><i class="fas fa-anchor"></i></a>
+				 	<a th:href="@{|/auth/authority/${author.localAuthorityId}|}"><i class="icon-anchor"></i></a>
 				 </span>
+				 <span th:if="${!status.last}">; </span>
 			</span></td>
 		</tr>
 		
@@ -159,10 +159,10 @@
 					 </th:block>)
 				 </span>
 				 <span th:if="${!#strings.isEmpty(editor.uri)}">
-				 	<a th:href="@{|${editor.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
+				 	<a th:href="@{|${editor.uri}|}" target="_blank"><i class="icon-link"></i></a>
 				 </span>
 				 <span th:if="${!#strings.isEmpty(editor.localAuthorityId)}">
-				 	<a th:href="@{|/auth/authority/${editor.localAuthorityId}|}"><i class="fas fa-anchor"></i></a>
+				 	<a th:href="@{|/auth/authority/${editor.localAuthorityId}|}"><i class="icon-anchor"></i></a>
 				 </span>
 				 <span th:if="${!status.last}">; </span>
 			</span></td>
@@ -174,22 +174,21 @@
 			<td>
 				<span th:each="creator,creatorStatus: ${citation.otherCreators}" th:if="${#strings.equals(creator.role, role)}">
  					[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
-					
 					<span th:if="${!#lists.isEmpty(creator.person.affiliations)}">
 				
  						(<th:block th:each="aff,affStatus : ${creator.person.affiliations}">
 							[[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
-						</th:block>)<span th:if="${!creatorStatus.last}">;</span>
+						</th:block>)
 					</span>
 					<span th:if="${!#strings.isEmpty(creator.person.uri)}">
-						<a th:href="@{|${creator.person.uri}|}" target="_blank"><i class="fas fa-link"></i></a>
+						<a th:href="@{|${creator.person.uri}|}" target="_blank"><i class="icon-link"></i></a>
 					</span>
 					<span th:if="${!#strings.isEmpty(creator.person.localAuthorityId)}">
-						<a th:href="@{|/auth/authority/${creator.person.localAuthorityId}|}"><i class="fas fa-anchor"></i></a>
+						<a th:href="@{|/auth/authority/${creator.person.localAuthorityId}|}"><i class="icon-anchor"></i></a>
 					</span>
-					<span th:if="${!status.last}">; </span>
+					<span th:if="${!creatorStatus.last}">; </span>
 				</span>
-			</td>
+ 			</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'publicationTitle')}">
 			<td>Publication Title</td>
@@ -283,7 +282,7 @@
 	                        th:data-citation-id="${ref.citationId}"
 	                        th:data-ref-raw="${#strings.escapeXml(ref.referenceStringRaw)}"
 	                        >
-						<span class="fas fa-info-circle"></span>
+						<span class="icon-info-circle"></span>
 						[[${ref.referenceString}]]
 					</p>
 			
