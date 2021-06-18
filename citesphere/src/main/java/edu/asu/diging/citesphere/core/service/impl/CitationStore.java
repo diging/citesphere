@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import edu.asu.diging.citesphere.core.search.service.Indexer;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 
 /**
@@ -47,5 +49,10 @@ public class CitationStore implements ICitationStore {
     public void delete(ICitation citation) {
         indexer.deleteCitation(citation);
         citationRepository.delete((Citation) citation);
+    }
+
+    @Override
+    public List<ICitation> getAttachments(String id) {
+        return citationRepository.findByParentItemAndItemType(id, ItemType.ATTACHMENT.name());
     }
 }

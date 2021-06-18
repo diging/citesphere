@@ -112,6 +112,19 @@ public class CitationManager implements ICitationManager {
         }
         return updateCitationFromZotero(user, groupId, key);
     }
+    
+    @Override
+    public List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException {
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        if (group != null && group.getGroupId() == new Long(groupId)) {
+            if (!group.getUsers().contains(user.getUsername())) {
+                if (!group.getUsers().contains(user.getUsername())) {
+                    throw new AccessForbiddenException("User does not have access this citation.");
+                }
+            }
+        }
+        return citationStore.getAttachments(key);
+    }
 
     /**
      * Retrieve a citation from Zotero bypassing the database cache. This method

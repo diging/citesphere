@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import edu.asu.diging.citesphere.model.bib.ICitation;
@@ -18,5 +19,7 @@ public interface ICitationStore {
     Optional<ICitation> findById(String id);
 
     void delete(ICitation citation);
+    
+    List<ICitation> getAttachments(String id);
 
 }
