@@ -30,7 +30,8 @@ public interface ICitationManager {
     ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException,
             CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException;
     
-    List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException;
+    List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException,
+            GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 
     void updateCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException;

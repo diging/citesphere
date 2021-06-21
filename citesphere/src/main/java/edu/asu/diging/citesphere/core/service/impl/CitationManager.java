@@ -114,7 +114,8 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException {
+    public List<ICitation> getAttachments(IUser user, String groupId, String key)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group != null && group.getGroupId() == new Long(groupId)) {
             if (!group.getUsers().contains(user.getUsername())) {
@@ -123,7 +124,11 @@ public class CitationManager implements ICitationManager {
                 }
             }
         }
-        return citationStore.getAttachments(key);
+        List<ICitation> attachments = citationStore.getAttachments(key);
+        if (attachments.isEmpty()) {
+            attachments = updateAttachmentsFromZotero(user, groupId, key);
+        }
+        return attachments;
     }
 
     /**
@@ -204,6 +209,28 @@ public class CitationManager implements ICitationManager {
             throw new CannotFindCitationException(ex);
         }
 
+    }
+    
+    public List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey) 
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
+        try {
+            List<ICitation> attachments = zoteroManager.getGroupItemAttachments(user, groupId, itemKey);
+            attachments.forEach(attachment -> {
+                attachment.setGroup(groupOptional.get().getGroupId() + "");
+                Optional<ICitation> oldAttachment = citationStore.findById(attachment.getKey());
+                if(oldAttachment.isPresent()) {
+                    citationStore.delete(oldAttachment.get());
+                }
+                citationStore.save(attachment);
+            });
+            return attachments;
+        } catch (HttpClientErrorException ex) {
+            throw new CannotFindCitationException(ex);
+        }
     }
 
     /*

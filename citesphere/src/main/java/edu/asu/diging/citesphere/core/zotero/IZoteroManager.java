@@ -24,6 +24,8 @@ public interface IZoteroManager {
             throws ZoteroHttpStatusException;
 
     ICitation getGroupItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
+    
+    List<ICitation> getGroupItemAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
 
     Map<Long, Long> getGroupsVersion(IUser user);
 

@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
+import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Component
@@ -155,6 +157,18 @@ public class ZoteroConnector implements IZoteroConnector {
         try  {
             return zotero.getGroupsOperations().getGroupItem(groupId, itemKey);
         } catch(HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
+    
+    @Override
+    public List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            return zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey).stream()
+                    .filter(item -> item.getData().getItemType().equals(ItemType.ATTACHMENT.name()))
+                    .collect(Collectors.toList());
+        } catch (HttpClientErrorException ex) {
             throw createException(ex.getStatusCode(), ex);
         }
     }
