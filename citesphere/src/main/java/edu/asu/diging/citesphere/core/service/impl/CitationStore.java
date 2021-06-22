@@ -53,6 +53,6 @@ public class CitationStore implements ICitationStore {
 
     @Override
     public List<ICitation> getAttachments(String id) {
-        return citationRepository.findByParentItemAndItemType(id, ItemType.ATTACHMENT.name());
+        return citationRepository.findByParentItemAndItemTypeAndDeleted(id, ItemType.ATTACHMENT.name(), 0);
     }
 }

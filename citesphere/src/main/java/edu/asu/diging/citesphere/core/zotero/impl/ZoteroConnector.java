@@ -166,7 +166,7 @@ public class ZoteroConnector implements IZoteroConnector {
         Zotero zotero = getApi(user);
         try {
             return zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey).stream()
-                    .filter(item -> item.getData().getItemType().equals(ItemType.ATTACHMENT.name()))
+                    .filter(item -> item.getData().getItemType().equals(ItemType.ATTACHMENT.getZoteroKey()))
                     .collect(Collectors.toList());
         } catch (HttpClientErrorException ex) {
             throw createException(ex.getStatusCode(), ex);
