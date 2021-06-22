@@ -42,6 +42,9 @@ public interface ICitationManager {
 
     ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
+    
+    List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 
     ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException,

@@ -211,7 +211,7 @@ public class CitationManager implements ICitationManager {
 
     }
     
-    public List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey) 
+    public List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
@@ -222,7 +222,7 @@ public class CitationManager implements ICitationManager {
             attachments.forEach(attachment -> {
                 attachment.setGroup(groupOptional.get().getGroupId() + "");
                 Optional<ICitation> oldAttachment = citationStore.findById(attachment.getKey());
-                if(oldAttachment.isPresent()) {
+                if (oldAttachment.isPresent()) {
                     citationStore.delete(oldAttachment.get());
                 }
                 citationStore.save(attachment);
