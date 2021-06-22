@@ -51,9 +51,6 @@ public class ItemController {
             List<String> fields = new ArrayList<>();
             citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
             model.addAttribute("fields", fields);
-            if (citationPage == null) {
-                citationPage = new CitationPage();
-            }
             model.addAttribute("adjacentCitations", citationPage);
             model.addAttribute("searchTerm", searchTerm);
             model.addAttribute("index", index);

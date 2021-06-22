@@ -17,7 +17,7 @@ $(function() {
 	        if(!queryParams) {
 	            queryParams = "?";
     	        } else {
-    	            const params = new URLSearchParams(queryParams);
+    	            var params = new URLSearchParams(queryParams);
     	            params.delete('page');
     	            params.delete('searchTerm');
     	            queryParams = "?" + params.toString();
@@ -108,7 +108,7 @@ $(function() {
 $(document).ready(function() {
     var queryParams = window.location.search;
     if(queryParams)  {
-        const params = new URLSearchParams(queryParams);
+        var params = new URLSearchParams(queryParams);
         params.delete('page');
         params.delete('searchTerm');
         queryParams = params.toString();
