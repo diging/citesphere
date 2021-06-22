@@ -14,7 +14,7 @@ $(function() {
 	    initiateStartPageClick: false,
 	    onPageClick: function (event, page) {
 	        var queryParams = window.location.search;
-	        if(!queryParams) {
+	        if (!queryParams) {
 	            queryParams = "?";
     	        } else {
     	            var params = new URLSearchParams(queryParams);
@@ -107,7 +107,7 @@ $(function() {
 
 $(document).ready(function() {
     var queryParams = window.location.search;
-    if(queryParams)  {
+    if (queryParams)  {
         var params = new URLSearchParams(queryParams);
         params.delete('page');
         params.delete('searchTerm');
