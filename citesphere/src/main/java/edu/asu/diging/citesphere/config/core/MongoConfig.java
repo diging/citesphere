@@ -5,6 +5,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +34,7 @@ import com.mongodb.client.MongoClients;
 
 @Configuration
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
-@EnableMongoRepositories({ "edu.asu.diging.citesphere.core.mongo", "edu.asu.diging.citesphere.data.bib.impl" })
+@EnableMongoRepositories({ "edu.asu.diging.citesphere.core.mongo", "edu.asu.diging.citesphere.data.bib" })
 public class MongoConfig {
 
     @Value("${mongo.database.name}")
