@@ -107,6 +107,7 @@ public class ZoteroManager implements IZoteroManager {
         return citationFactory.createCitation(item);
     }
     
+    @Override
     public List<ICitation> getGroupItemAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
         List<Item> attachmentResponse = zoteroConnector.getAttachments(user, groupId, itemKey);
         List<ICitation> attachments = new ArrayList<>();

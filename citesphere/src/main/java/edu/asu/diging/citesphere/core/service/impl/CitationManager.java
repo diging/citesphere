@@ -211,6 +211,7 @@ public class CitationManager implements ICitationManager {
 
     }
     
+    @Override
     public List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
