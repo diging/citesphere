@@ -55,4 +55,5 @@ public interface ICitationManager {
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
 
     void deleteLocalGroupCitations(String groupId);
+    
 }

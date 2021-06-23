@@ -10,6 +10,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.mongo.CustomCitationCollectionDeleteRepository;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationCollectionRepository;
@@ -26,6 +27,9 @@ public class CitationCollectionManager implements ICitationCollectionManager {
 
     @Autowired
     private CitationCollectionRepository collectionRepository;
+    
+    @Autowired
+    private CustomCitationCollectionDeleteRepository citationCollectionDeleteRepository;
     
     @Autowired
     private ICollectionMongoDao collectionDao;
@@ -101,5 +105,10 @@ public class CitationCollectionManager implements ICitationCollectionManager {
             return (ICitationCollection) collectionOptional.get();
         }
         return null;
+    }
+    
+    @Override
+    public void deleteLocalGroupCollections(String groupId) {
+        citationCollectionDeleteRepository.deleteByGroupId(groupId);
     }
 }
