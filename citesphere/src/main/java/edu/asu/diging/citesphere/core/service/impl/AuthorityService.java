@@ -165,12 +165,18 @@ public class AuthorityService implements IAuthorityService {
         return entries;
     }
 
-
+    @Override
     public List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
         List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
                 user.getUsername(), firstName, lastName, paging);
         return results;
+    }
+    
+    @Override
+    public List<IAuthorityEntry> findByGroupAndName(Long groupId, String firstName, String lastName, int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        return authorityRepository.findByGroupAndFirstNameOrLastName(groupId, firstName, lastName, paging);
     }
 
     @Override
