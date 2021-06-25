@@ -66,7 +66,8 @@ public class AuthorityEntryController {
     @RequestMapping(value = { "/auth/authority/find/authorities/{source}",
             "/auth/authority/{zoteroGroupId}/find/authorities/{source}" })
     public ResponseEntity<AuthoritySearchResult> getAuthoritiesFromAuthorityService(Authentication authentication,
-            @PathVariable("source") String source, @PathVariable(required = false, value = "zoteroGroupId") String zoteroGroupId,
+            @PathVariable("source") String source,
+            @PathVariable(required = false, value = "zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
@@ -76,13 +77,14 @@ public class AuthorityEntryController {
                     "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        AuthoritySearchResult searchResult = null;        
+        AuthoritySearchResult searchResult = null;
         try {
             searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
             searchResult.setCurrentPage(page + 1);
             if (zoteroGroupId != null && !zoteroGroupId.isEmpty()) {
-                searchResult.setGroupName(groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
+                searchResult.setGroupName(
+                        groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
             }
             authoritySearchResult.put(source, searchResult);
 
@@ -93,11 +95,11 @@ public class AuthorityEntryController {
         } catch (AuthorityImporterNotFoundException e) {
             logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            
+
         }
 
         return new ResponseEntity<AuthoritySearchResult>(searchResult, HttpStatus.OK);
-    } 
+    }
 
     @RequestMapping("/auth/authority/get")
     public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri,
