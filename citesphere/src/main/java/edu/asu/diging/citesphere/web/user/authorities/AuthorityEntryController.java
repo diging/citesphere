@@ -63,8 +63,7 @@ public class AuthorityEntryController {
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     
-    @RequestMapping(value = { "/auth/authority/find/authorities/{source}",
-            "/auth/authority/{zoteroGroupId}/find/authorities/{source}" })
+    @RequestMapping(value = {"/auth/authority/find/authorities/{source}", "/auth/authority/{zoteroGroupId}/find/authorities/{source}"})
     public ResponseEntity<AuthoritySearchResult> getAuthoritiesFromAuthorityService(Authentication authentication,
             @PathVariable("source") String source,
             @PathVariable(required = false, value = "zoteroGroupId") String zoteroGroupId,
