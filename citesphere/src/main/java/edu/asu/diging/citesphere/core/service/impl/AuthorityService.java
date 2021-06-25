@@ -213,7 +213,6 @@ public class AuthorityService implements IAuthorityService {
     @Override
     @Transactional
     public IAuthorityEntry createWithUri(IAuthorityEntry entry, IUser user) {
-        //For manually created author, it generates a URI for reference
         entry = create(entry, user);
         entry.setUri(authorityUri + authorityPrefix + entry.getId());
         return save(entry);

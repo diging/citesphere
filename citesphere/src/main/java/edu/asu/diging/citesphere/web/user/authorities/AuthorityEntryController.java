@@ -70,7 +70,7 @@ public class AuthorityEntryController {
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-        
+
         if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
             logger.warn(
                     "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
