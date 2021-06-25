@@ -19,6 +19,8 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -71,6 +73,7 @@ public class AuthorityServiceTest {
     private int page;
     private int pageSize;
     private Pageable paging;
+    private Long groupId;
 
     @Before
     public void init() {
@@ -85,6 +88,7 @@ public class AuthorityServiceTest {
         page = 1;
         pageSize = 10;
         paging = PageRequest.of(page, pageSize);
+        groupId = 123456L;
 
     }
 
@@ -94,23 +98,35 @@ public class AuthorityServiceTest {
         user.setUsername(username);
         group = new CitationGroup();
         group.setGroupId(5);
-
+        Set<Long> groups;
+        
+        groups = new HashSet<>();
+        groups.add(123456L);
+        groups.add(654321L);
         entry1 = new AuthorityEntry();
         entry1.setUri("http://test1.uri/");
         entry1.setName("Albert Einstein");
         entry1.setId("1");
+        entry1.setGroups(groups);
 
+        groups = new HashSet<>();
+        groups.add(123456L);
         entry2 = new AuthorityEntry();
         entry2.setUri("http://test2.uri/");
         entry2.setName("Albert Sam");
         entry2.setId("2");
         entry2.setUsername("chandana");
+        entry2.setGroups(groups);
 
+        groups = new HashSet<>();
+        groups.add(123456L);
+        groups.add(12345L);
         entry3 = new AuthorityEntry();
         entry3.setUri("http://test1.uri/");
         entry3.setName("Albert Einstein 2");
         entry3.setId("3");
-        entry2.setUsername("chandana");
+        entry3.setUsername("chandana");
+        entry3.setGroups(groups);
 
         entry4 = new AuthorityEntry();
         entry4.setUri("http://test4.uri/");
@@ -328,6 +344,32 @@ public class AuthorityServiceTest {
                 "Peter", "Doe", paging)).thenReturn(new ArrayList<>());
         List<IAuthorityEntry> actual3 = managerToTest.findByName(user, "Peter", "Doe", page, pageSize);
         Assert.assertTrue(actual3.isEmpty());
+    }
+    
+    @Test
+    public void test_findByGroupAndName() {
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+        entriesAlbert.add(entry1);
+        entriesAlbert.add(entry2);
+        entriesAlbert.add(entry3);
+        Page<IAuthorityEntry> entries = new PageImpl<>(entriesAlbert);
+        Mockito.when(authorityRepository.findByGroupAndFirstNameAndLastName(groupId, "", "Albert", paging))
+                .thenReturn(entries);
+        Page<IAuthorityEntry> searchResult = managerToTest.findByGroupAndName(groupId, "", "Albert", page, pageSize);
+        Assert.assertEquals(3, searchResult.getTotalElements());
+        List<IAuthorityEntry> resultEntries = searchResult.getContent();
+        for(IAuthorityEntry entry : resultEntries) {
+            Assert.assertTrue(entry.getGroups().contains(groupId));
+            Assert.assertTrue(entry.getName().contains("Albert"));
+        }
+    }
+    
+    @Test
+    public void test_findByGroupAndName_emptyResult() {
+        Mockito.when(authorityRepository.findByGroupAndFirstNameAndLastName(groupId, "Peter", "Doe", paging))
+        .thenReturn(new PageImpl<>(new ArrayList<>()));
+        Page<IAuthorityEntry> searchResult = managerToTest.findByGroupAndName(groupId, "Peter", "Doe", page, pageSize);
+        Assert.assertTrue(searchResult.getContent().isEmpty());
     }
 
     @Test
