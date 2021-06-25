@@ -177,7 +177,7 @@ public class AuthorityService implements IAuthorityService {
     @Override
     public Page<IAuthorityEntry> findByGroupAndName(Long groupId, String firstName, String lastName, int page, int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
-        return authorityRepository.findByGroupAndFirstNameOrLastName(groupId, firstName, lastName, paging);
+        return authorityRepository.findByGroupAndFirstNameAndLastName(groupId, firstName, lastName, paging);
     }
 
     @Override
