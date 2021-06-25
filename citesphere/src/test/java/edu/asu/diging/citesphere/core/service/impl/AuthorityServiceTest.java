@@ -367,7 +367,7 @@ public class AuthorityServiceTest {
     @Test
     public void test_findByGroupAndName_emptyResult() {
         Mockito.when(authorityRepository.findByGroupAndFirstNameAndLastName(groupId, "Peter", "Doe", paging))
-        .thenReturn(new PageImpl<>(new ArrayList<>()));
+                .thenReturn(new PageImpl<>(new ArrayList<>()));
         Page<IAuthorityEntry> searchResult = managerToTest.findByGroupAndName(groupId, "Peter", "Doe", page, pageSize);
         Assert.assertTrue(searchResult.getContent().isEmpty());
     }
