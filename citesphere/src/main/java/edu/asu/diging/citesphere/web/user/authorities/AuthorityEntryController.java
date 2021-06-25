@@ -10,6 +10,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -71,12 +72,12 @@ public class AuthorityEntryController {
         
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
 
-        List<IAuthorityEntry> userEntries = authorityService.findByGroupAndName(Long.valueOf(zoteroGroupId),
+        Page<IAuthorityEntry> userEntries = authorityService.findByGroupAndName(Long.valueOf(zoteroGroupId),
                 firstName, lastName, page, pageSize);
 
-        authorityResult.setFoundAuthorities(userEntries);
+        authorityResult.setFoundAuthorities(userEntries.getContent());
         authorityResult.setCurrentPage(page + 1);
-        authorityResult.setTotalPages(1);
+        authorityResult.setTotalPages(userEntries.getTotalPages());
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     

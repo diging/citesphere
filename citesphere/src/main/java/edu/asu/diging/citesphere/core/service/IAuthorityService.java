@@ -4,6 +4,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
@@ -35,7 +37,7 @@ public interface IAuthorityService {
 
     List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize);
     
-    List<IAuthorityEntry> findByGroupAndName(Long groupId, String firstName, String lastName, int page, int pageSize);
+    Page<IAuthorityEntry> findByGroupAndName(Long groupId, String firstName, String lastName, int page, int pageSize);
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
