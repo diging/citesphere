@@ -29,7 +29,8 @@ public interface IZoteroManager {
 
     ICitationGroup getGroup(IUser user, String groupId, boolean refresh);
 
-    ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    ICitation updateCitation(IUser user, String groupId, ICitation citation)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
 
     List<BibField> getFields(IUser user, ItemType itemType);
 
@@ -54,7 +55,7 @@ public interface IZoteroManager {
 
     Map<String, Long> getGroupItemsVersions(IUser user, String groupId, long version, boolean includeTrashed);
 
-    ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed);
+    ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed) throws ZoteroHttpStatusException;
 
     DeletedZoteroElements getDeletedElements(IUser user, String groupId, long version);
 

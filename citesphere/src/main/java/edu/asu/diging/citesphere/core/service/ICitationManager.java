@@ -30,8 +30,8 @@ public interface ICitationManager {
     ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException,
             CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException;
 
-    void updateCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException;
+    void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
+            CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
 
     List<BibField> getItemTypeFields(IUser user, ItemType itemType);
 

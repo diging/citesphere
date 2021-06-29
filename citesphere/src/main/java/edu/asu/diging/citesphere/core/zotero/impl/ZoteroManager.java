@@ -64,7 +64,7 @@ public class ZoteroManager implements IZoteroManager {
     public CitationResults getGroupItems(IUser user, String groupId, int page, String sortBy, Long lastGroupVersion)
             throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItems(user, groupId, page, sortBy, lastGroupVersion);
-        return createCitationResults(response);
+        return createCitationResults(user, groupId, response);
     }
 
     @Override
@@ -104,18 +104,20 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public ICitation getGroupItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
         Item item = zoteroConnector.getItem(user, groupId, itemKey);
-        return citationFactory.createCitation(item);
+        Item metaData = zoteroConnector.getCitesphereMetaData(user, groupId, itemKey);
+        return citationFactory.createCitation(item, metaData);
     }
     
     @Override
-    public ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed) {
+    public ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed) throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItemsByKey(user, groupId, itemKeys, includeTrashed);
         
         ZoteroGroupItemsResponse zoteroReponse = new ZoteroGroupItemsResponse();
         zoteroReponse.setContentVersion(response.getLastVersion());
         zoteroReponse.setCitations(new ArrayList<>());
         for(Item item : response.getResults()) {
-            zoteroReponse.getCitations().add(citationFactory.createCitation(item));
+            Item metaData = zoteroConnector.getCitesphereMetaData(user, groupId, item.getKey());
+            zoteroReponse.getCitations().add(citationFactory.createCitation(item, metaData));
         }
         
         return zoteroReponse;
@@ -189,7 +191,7 @@ public class ZoteroManager implements IZoteroManager {
             Long lastGroupVersion) throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getCollectionItems(user, groupId, collectionId, page, sortBy,
                 lastGroupVersion);
-        return createCitationResults(response);
+        return createCitationResults(user, groupId, response);
     }
     
     @Override
@@ -226,11 +228,12 @@ public class ZoteroManager implements IZoteroManager {
         }
     }
 
-    private CitationResults createCitationResults(ZoteroResponse<Item> response) {
+    private CitationResults createCitationResults(IUser user, String groupId, ZoteroResponse<Item> response) throws ZoteroHttpStatusException {
         List<ICitation> citations = new ArrayList<>();
         if (response.getResults() != null) {
             for (Item item : response.getResults()) {
-                citations.add(citationFactory.createCitation(item));
+                Item metaData = zoteroConnector.getCitesphereMetaData(user, groupId, item.getKey());
+                citations.add(citationFactory.createCitation(item, metaData));
             }
         }
         CitationResults results = new CitationResults();
@@ -255,8 +258,9 @@ public class ZoteroManager implements IZoteroManager {
 
     @Override
     public ICitation updateCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, ZoteroHttpStatusException {
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         Item item = itemFactory.createItem(citation, new ArrayList<>());
+        Item metaData = itemFactory.createMetaDataItem(citation);
 
         List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
         // add fields that need to be submitted
@@ -271,13 +275,32 @@ public class ZoteroManager implements IZoteroManager {
 
         Item updatedItem = zoteroConnector.updateItem(user, item, groupId, new ArrayList<>(), ignoreFields,
                 validCreatorTypes);
-        return citationFactory.createCitation(updatedItem);
+
+        itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
+        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
+        itemTypeFields.add(ZoteroFields.CREATOR);
+        itemTypeFields.add(ZoteroFields.COLLECTIONS);
+        
+        ignoreFields = createIgnoreFields(itemTypeFields, metaData, false);
+        validCreatorTypes = getValidCreatorTypes(user, ItemType.NOTE);
+
+        Item updatedMetaData = null;
+        if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
+            updatedMetaData = zoteroConnector.createItem(user, metaData, groupId, new ArrayList<>(), ignoreFields,
+                    validCreatorTypes);
+        } else {
+            updatedMetaData = zoteroConnector.updateItem(user, metaData, groupId, new ArrayList<>(), ignoreFields,
+                    validCreatorTypes);
+        }
+        
+        return citationFactory.createCitation(updatedItem, updatedMetaData);
     }
 
     @Override
     public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
         Item item = itemFactory.createItem(citation, collectionIds);
+        Item metaData = itemFactory.createMetaDataItem(citation);
 
         List<String> itemTypeFields = getItemTypeFields(user, citation.getItemType());
         itemTypeFields.add(ZoteroFields.ITEM_TYPE);
@@ -288,7 +311,17 @@ public class ZoteroManager implements IZoteroManager {
         List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
 
         Item newItem = zoteroConnector.createItem(user, item, groupId, collectionIds, ignoreFields, validCreatorTypes);
-        return citationFactory.createCitation(newItem);
+
+        itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
+        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
+        itemTypeFields.add(ZoteroFields.CREATOR);
+        itemTypeFields.add(ZoteroFields.COLLECTIONS);
+
+        ignoreFields = createIgnoreFields(itemTypeFields, item, true);
+        validCreatorTypes = getValidCreatorTypes(user, ItemType.NOTE);
+        Item newMetaData = zoteroConnector.createItem(user, metaData, groupId, new ArrayList<>(), ignoreFields,
+                validCreatorTypes);
+        return citationFactory.createCitation(newItem, newMetaData);
     }
 
     private List<String> createIgnoreFields(List<String> itemTypeFields, Item item, boolean ignoreEmpty) {

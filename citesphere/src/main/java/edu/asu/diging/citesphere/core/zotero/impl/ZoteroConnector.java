@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
+import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Component
@@ -155,6 +157,21 @@ public class ZoteroConnector implements IZoteroConnector {
         try  {
             return zotero.getGroupsOperations().getGroupItem(groupId, itemKey);
         } catch(HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
+    
+    @Override
+    public Item getCitesphereMetaData(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            List<Item> children = zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey);
+            Optional<Item> citesphereMetaData = children.stream()
+                    .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()) && item.getData()
+                            .getTags().stream().anyMatch(tag -> tag.getTag().equals("citesphere-metadata")))
+                    .findFirst();
+            return citesphereMetaData.orElse(null);
+        } catch (HttpClientErrorException ex) {
             throw createException(ex.getStatusCode(), ex);
         }
     }

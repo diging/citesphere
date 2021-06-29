@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
@@ -82,7 +83,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
      */
     @Override
     @Async
-    public void sync(IUser user, String groupId, long contentVersion, String collectionId) {
+    public void sync(IUser user, String groupId, long contentVersion, String collectionId) throws ZoteroHttpStatusException {
         GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
         // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
         // more activate job statuses than inactive ones, so it's less error prone to use the list that
@@ -138,7 +139,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     }
 
     private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
-            AtomicInteger counter) {
+            AtomicInteger counter) throws ZoteroHttpStatusException {
         List<String> keysToRetrieve = new ArrayList<>();
         for (String key : versions.keySet()) {
             Optional<ICitation> citation = citationStore.findById(key);
@@ -204,7 +205,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
     }
 
-    private long retrieveCitations(IUser user, String groupId, List<String> keysToRetrieve) {
+    private long retrieveCitations(IUser user, String groupId, List<String> keysToRetrieve) throws ZoteroHttpStatusException {
         try {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
