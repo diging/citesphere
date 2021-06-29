@@ -95,6 +95,7 @@ public class AddItemController {
         if (form.getCollectionId() != null && !form.getCollectionId().trim().isEmpty()) {
             collectionIds.add(form.getCollectionId());
         }
+        citation.setCollections(collectionIds);
         citationHelper.updateCitation(citation, form, (IUser) authentication.getPrincipal());
         try {
             citation = citationManager.createCitation((IUser) authentication.getPrincipal(), zoteroGroupId,

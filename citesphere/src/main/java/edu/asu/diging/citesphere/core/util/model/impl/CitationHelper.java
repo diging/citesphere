@@ -1,9 +1,9 @@
 package edu.asu.diging.citesphere.core.util.model.impl;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,6 +122,20 @@ public class CitationHelper implements ICitationHelper {
             }
         }
     }
+    
+    /**
+     * This method adds a collection id to an existing citation
+     * 
+     * @param citation     Citation that has to be updated with collection id.
+     * @param collectionId unique id of the collection.
+     * @param user         user accessing Zotero.
+     */
+    @Override
+    public void addCollection(ICitation citation, String collectionId, IUser user) {
+        List<String> collections = Optional.ofNullable(citation.getCollections()).orElse(new ArrayList<String>());
+        collections.add(collectionId);
+        citation.setCollections(collections);
+    }
 
     private void mapPersonFields(List<PersonForm> personList,
             Set<IPerson> citationPersonList) {
@@ -162,5 +176,4 @@ public class CitationHelper implements ICitationHelper {
             citationCreatorList.add(creator);
         }
     }
-
 }
