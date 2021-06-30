@@ -10,9 +10,7 @@ public interface IGroupManager {
     
     /**
      * Does not delete the group completely. Only deletes the local copy of citation group
-     * @param user
-     * @param groupId
-     * @throws GroupDoesNotExistException 
+     * @param groupId Zotero id of the group to be deleted
      */
-    void deleteLocalGroupCopy(String groupId) throws GroupDoesNotExistException;
+    void deleteLocalGroupCopy(String groupId);
 }

@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import edu.asu.diging.citesphere.core.mongo.CustomCitationDeleteRepository;
 import edu.asu.diging.citesphere.core.search.service.Indexer;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.data.bib.CitationRepository;
+import edu.asu.diging.citesphere.data.bib.CustomCitationDeleteRepository;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 

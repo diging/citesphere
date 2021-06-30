@@ -23,18 +23,10 @@ public class DeleteLocalCitationGroupController{
     @Autowired
     private IGroupManager groupManager;
     
-    @Autowired
-    private ICitationManager citationManager;
-    
-    @Autowired
-    private ICitationCollectionManager collectionManager;
-    
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/resync", method = RequestMethod.POST)
     public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
-            @PathVariable("zoteroGroupId") String groupId, Principal principal) throws GroupDoesNotExistException {
+            @PathVariable("zoteroGroupId") String groupId, Principal principal) {
         groupManager.deleteLocalGroupCopy(groupId);
-        collectionManager.deleteLocalGroupCollections(groupId);
-        citationManager.deleteLocalGroupCitations(groupId);
         return new ResponseEntity<String>(HttpStatus.OK);
     }	
 }
