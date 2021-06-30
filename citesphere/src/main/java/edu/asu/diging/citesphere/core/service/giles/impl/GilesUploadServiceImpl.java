@@ -64,8 +64,7 @@ public class GilesUploadServiceImpl implements GilesUploadService {
         headers.setBearerAuth(token);
         
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("files", new MultipartFileResource(fileBytes, file.getName()));
-        
+        body.add("files", new MultipartFileResource(fileBytes, file.getOriginalFilename()));
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
