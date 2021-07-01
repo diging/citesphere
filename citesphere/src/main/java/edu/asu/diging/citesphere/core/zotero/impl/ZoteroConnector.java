@@ -243,6 +243,28 @@ public class ZoteroConnector implements IZoteroConnector {
         // since we only submitted one item, there should only be one in the map
         return getItem(user, groupId, success.values().iterator().next());
     }
+    
+    public Item createNote(IUser user, Item item, String groupId) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        ItemCreationResponse response = zotero.getGroupsOperations().createNote(groupId, item);
+
+        // let's give Zotero a minute to process
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not sleep.", e);
+            // well if something goes wrong here, let's just ignore it
+        }
+
+        Map<String, String> success = response.getSuccess();
+        if (success.isEmpty()) {
+            logger.error("Could not create item: " + response.getFailed().get("0"));
+            throw new ZoteroItemCreationFailedException(response);
+        }
+
+        // since we only submitted one item, there should only be one in the map
+        return getItem(user, groupId, success.values().iterator().next());
+    }
 
     @Override
     public long getItemVersion(IUser user, String groupId, String itemKey) {

@@ -51,6 +51,9 @@ public interface IZoteroConnector {
     Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException;
 
+    Item createNote(IUser user, Item item, String groupId)
+            throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException;
+    
     CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType);
 
     ZoteroResponse<Collection> getCitationCollections(IUser user, String groupId, String collectionId, int page,

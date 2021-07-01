@@ -49,6 +49,8 @@ import edu.asu.diging.citesphere.user.IUser;
 public class ZoteroManager implements IZoteroManager {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    
+    private static final String CITESPHERE_METADATA_TAG = "citesphere-metadata";
 
     @Autowired
     private IZoteroConnector zoteroConnector;
@@ -113,17 +115,30 @@ public class ZoteroManager implements IZoteroManager {
     }
     
     @Override
-    public ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed) throws ZoteroHttpStatusException {
+    public ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys,
+            boolean includeTrashed) throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItemsByKey(user, groupId, itemKeys, includeTrashed);
-        
+
         ZoteroGroupItemsResponse zoteroReponse = new ZoteroGroupItemsResponse();
         zoteroReponse.setContentVersion(response.getLastVersion());
         zoteroReponse.setCitations(new ArrayList<>());
-        for(Item item : response.getResults()) {
-            Item metaData = zoteroConnector.getCitesphereMetaData(user, groupId, item.getKey());
-            zoteroReponse.getCitations().add(citationFactory.createCitation(item, metaData));
+        HashMap<String, ICitation> citationMap = new HashMap<>();
+        for (Item item : response.getResults()) {
+            if (isMetaDataNote(item)) {
+                if (citationMap.containsKey(item.getData().getParentItem())) {
+                    citationFactory.parseMetaDataNote(citationMap.get(item.getData().getParentItem()), item);
+                } else {
+                    Item parentCitation = zoteroConnector.getItem(user, groupId, item.getData().getParentItem());
+                    citationMap.put(item.getData().getParentItem(),
+                            citationFactory.createCitation(parentCitation, item));
+                }
+                citationMap.put(item.getKey(), citationFactory.createCitation(item, null));
+            }
+            if (!citationMap.containsKey(item.getKey())) {
+                citationMap.put(item.getKey(), citationFactory.createCitation(item, null));
+            }
         }
-        
+        zoteroReponse.getCitations().addAll(citationMap.values());
         return zoteroReponse;
     }
 
@@ -289,15 +304,13 @@ public class ZoteroManager implements IZoteroManager {
         itemTypeFields.add(ZoteroFields.COLLECTIONS);
         
         ignoreFields = createIgnoreFields(itemTypeFields, metaData, false);
-        validCreatorTypes = getValidCreatorTypes(user, ItemType.NOTE);
 
         Item updatedMetaData = null;
         if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
-            updatedMetaData = zoteroConnector.createItem(user, metaData, groupId, new ArrayList<>(), ignoreFields,
-                    validCreatorTypes);
-        } else {
             updatedMetaData = zoteroConnector.updateItem(user, metaData, groupId, new ArrayList<>(), ignoreFields,
-                    validCreatorTypes);
+                    null);
+        } else {
+            updatedMetaData = zoteroConnector.createNote(user, metaData, groupId);
         }
         
         return citationFactory.createCitation(updatedItem, updatedMetaData);
@@ -358,9 +371,8 @@ public class ZoteroManager implements IZoteroManager {
         itemTypeFields.add(ZoteroFields.COLLECTIONS);
 
         ignoreFields = createIgnoreFields(itemTypeFields, item, true);
-        validCreatorTypes = getValidCreatorTypes(user, ItemType.NOTE);
         Item newMetaData = zoteroConnector.createItem(user, metaData, groupId, new ArrayList<>(), ignoreFields,
-                validCreatorTypes);
+                null);
         return citationFactory.createCitation(newItem, newMetaData);
     }
     
@@ -417,6 +429,13 @@ public class ZoteroManager implements IZoteroManager {
         }
 
         return itemTypeFields;
+    }
+    
+    private boolean isMetaDataNote(Item item) {
+        if (item.getData().getDeleted() != 1 && item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey())
+                && item.getData().getTags().stream().anyMatch(tag -> tag.getTag().equals(CITESPHERE_METADATA_TAG)))
+            return true;
+        return false;
     }
 
     @Override
