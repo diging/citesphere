@@ -199,6 +199,21 @@ public class ZoteroConnector implements IZoteroConnector {
         return getItem(user, groupId, item.getKey());
     }
     
+    @Override
+    public Item updateNote(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException, ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        zotero.getGroupsOperations().updateNote(groupId, item, ignoreFields);
+        // it seems like Zotero needs a minute to process the submitted data
+        // so let's wait a second before retrieving updated data
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not sleep.", e);
+            // well if something goes wrong here, let's just ignore it
+        }
+        return getItem(user, groupId, item.getKey());
+    }
+    
     /**
      * This method makes a call to Zotero to batch update items and return back
      * items statuses
@@ -244,9 +259,10 @@ public class ZoteroConnector implements IZoteroConnector {
         return getItem(user, groupId, success.values().iterator().next());
     }
     
-    public Item createNote(IUser user, Item item, String groupId) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
+    @Override
+    public Item createNote(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
-        ItemCreationResponse response = zotero.getGroupsOperations().createNote(groupId, item);
+        ItemCreationResponse response = zotero.getGroupsOperations().createNote(groupId, item, ignoreFields);
 
         // let's give Zotero a minute to process
         try {

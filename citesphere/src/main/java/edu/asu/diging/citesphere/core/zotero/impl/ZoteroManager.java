@@ -298,19 +298,17 @@ public class ZoteroManager implements IZoteroManager {
         Item updatedItem = zoteroConnector.updateItem(user, item, groupId, new ArrayList<>(), ignoreFields,
                 validCreatorTypes);
 
-        itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
-        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
-        itemTypeFields.add(ZoteroFields.CREATOR);
-        itemTypeFields.add(ZoteroFields.COLLECTIONS);
-        
-        ignoreFields = createIgnoreFields(itemTypeFields, metaData, false);
-
         Item updatedMetaData = null;
         if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
-            updatedMetaData = zoteroConnector.updateItem(user, metaData, groupId, new ArrayList<>(), ignoreFields,
-                    null);
+            itemTypeFields = getNoteFieldList();
+            itemTypeFields.add(ZoteroFields.KEY);
+            itemTypeFields.add(ZoteroFields.VERSION);
+            ignoreFields = createIgnoreFieldsForMetaDataNote(itemTypeFields, metaData, true);
+            updatedMetaData = zoteroConnector.updateNote(user, metaData, groupId, ignoreFields);
         } else {
-            updatedMetaData = zoteroConnector.createNote(user, metaData, groupId);
+            itemTypeFields = getNoteFieldList();
+            ignoreFields = createIgnoreFieldsForMetaDataNote(itemTypeFields, metaData, true);
+            updatedMetaData = zoteroConnector.createNote(user, metaData, groupId, ignoreFields);
         }
         
         return citationFactory.createCitation(updatedItem, updatedMetaData);
@@ -418,6 +416,46 @@ public class ZoteroManager implements IZoteroManager {
 
         return ignoreFields;
     }
+    
+    private List<String> createIgnoreFieldsForMetaDataNote(List<String> itemTypeFields, Item item, boolean ignoreEmpty) {
+        List<String> ignoreFields = new ArrayList<>();
+        // general fields to ignore for the moment
+        ignoreFields.add("relations");
+        ignoreFields.add("linkMode");
+        ignoreFields.add("contentType");
+        ignoreFields.add("charset");
+        ignoreFields.add("filename");
+        ignoreFields.add("md5");
+        ignoreFields.add("mtime");
+        ignoreFields.add("dateModified");
+
+        Field[] fields = Data.class.getDeclaredFields();
+        for (Field field : fields) {
+            String fieldName = field.getName();
+            // already ignored
+            if (ignoreFields.contains(fieldName)) {
+                continue;
+            }
+
+            if (!itemTypeFields.contains(fieldName)) {
+                ignoreFields.add(fieldName);
+            }
+            if (ignoreEmpty) {
+                field.setAccessible(true);
+                try {
+                    Object value = field.get(item.getData());
+                    if (value == null || (value instanceof String && value.toString().isEmpty())
+                            || (List.class.isAssignableFrom(value.getClass()) && ((List) value).isEmpty())) {
+                        ignoreFields.add(fieldName);
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    logger.error("Could not access field to retrive ignore fields.", e);
+                }
+            }
+        }
+
+        return ignoreFields;
+    }
 
     private List<String> getItemTypeFields(IUser user, ItemType itemType) {
         FieldInfo[] fieldInfos = zoteroConnector.getFields(user, itemType.getZoteroKey());
@@ -429,6 +467,15 @@ public class ZoteroManager implements IZoteroManager {
         }
 
         return itemTypeFields;
+    }
+    
+    private List<String> getNoteFieldList() {
+        List<String> noteFields = new ArrayList<>();
+        noteFields.add(ZoteroFields.ITEM_TYPE);
+        noteFields.add(ZoteroFields.PARENT_ITEM);
+        noteFields.add(ZoteroFields.TAGS);
+        noteFields.add(ZoteroFields.NOTE);
+        return noteFields;
     }
     
     private boolean isMetaDataNote(Item item) {

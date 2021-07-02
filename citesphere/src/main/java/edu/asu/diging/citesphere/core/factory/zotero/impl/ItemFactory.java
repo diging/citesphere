@@ -98,12 +98,12 @@ public class ItemFactory implements IItemFactory {
             });
         }
 
-        try {
-            writeExtraData(citation, data);
-        } catch (JsonProcessingException e1) {
-            // FIXME: hadnle this
-            logger.error("Could not serialize extra data.", e1);
-        }
+//        try {
+//            writeExtraData(citation, data);
+//        } catch (JsonProcessingException e1) {
+//            // FIXME: hadnle this
+//            logger.error("Could not serialize extra data.", e1);
+//        }
 
         return item;
     }

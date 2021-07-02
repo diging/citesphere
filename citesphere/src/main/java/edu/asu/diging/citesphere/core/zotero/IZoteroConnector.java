@@ -40,6 +40,8 @@ public interface IZoteroConnector {
     Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException;
     
+    Item updateNote(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    
     ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
             List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, JsonProcessingException;
@@ -51,7 +53,7 @@ public interface IZoteroConnector {
     Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException;
 
-    Item createNote(IUser user, Item item, String groupId)
+    Item createNote(IUser user, Item item, String groupId, List<String> ignoreFields)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException;
     
     CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType);
