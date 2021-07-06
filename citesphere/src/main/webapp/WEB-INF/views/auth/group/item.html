@@ -28,8 +28,39 @@
 			$("#parsed-ref-modal").modal();
 		});
 	});
+
+	$(document).ready(function(){
 	
-	$(document).ready(function() {
+		$("#uploadFileIcon").click(function() {
+	        $("#uploadFileModal").modal('show');
+	    });
+	    
+	    $("#uploadFileBtn").click(function(e) {
+	        e.preventDefault()
+	        
+	        /* JQuery doesn't have a files attribute */
+	        var uploadFiles = document.getElementById('uploadFileInput').files;
+	        var formData = new FormData();
+	        for (var i = 0; i < uploadFiles.length; i++) {
+	            formData.append("files", uploadFiles[i]);
+	        }
+	        
+	        $.ajax({
+	            type: "POST",
+	            url: "[(@{|/auth/group/${zoteroGroupId}/items/${citation.key}/files/upload?${_csrf.parameterName}=${_csrf.token}|})]",
+	            cache       : false,
+	            contentType : false,
+	            processData : false,
+	            enctype: 'multipart/form-data',
+	            data: formData, 
+	            success: function(data) {
+	                document.getElementById('uploadFileInput').value = '';
+	                $("#uploadFileModal").modal('hide');
+	            }
+	        });
+  
+	    });
+	    
 	    var queryParams = window.location.search;
 	    if(queryParams)  {
 	        var params = new URLSearchParams(queryParams);
@@ -57,24 +88,7 @@
 		<li class="active">[[${citation.key}]]</li>
 	</ol>
 	
-	<h2>
-		<th:block th:each="author,status : ${citation.authors}">
-			<strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
-			<span th:if="${!status.last}">; </span>
-		</th:block>
-		
-		<em>[[${citation.title}]]</em>
-		<span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
-	 	  [[(${citation.dateFreetext})]]
-	 	</span>
-	</h2>	
-	
 	<div class="pull-left" style="margin-bottom: 20px;">
-	
-		<span th:if="${!#strings.isEmpty(collectionId)}">
-			<a class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/collection/${collectionId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
-		</span>
-		
 		<span th:unless="${!#strings.isEmpty(collectionId)}">
 			<a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/search?&searchTerm=${searchTerm}&page=${page}|}">Back</a> &nbsp;&nbsp;
 			<a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
@@ -84,7 +98,11 @@
 			class="icon-edit" style="color: #337ab7; font-size: 14px" title="Edit"></i></a> &nbsp;&nbsp; <a
 			th:href="@{|${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
 			class="icon-sync" title="Sync Citation"></i></a>
-	</div>
+			
+		&nbsp;&nbsp;
+        <a id="uploadFileIcon" href="#"><i style="color: #337ab7; font-size: 20px" class="icon-multiple-doc"></i></a>
+       </div>
+	
 	<div id="pull-right" class="pull-right" style="min-width: 35px;">
 		<a th:if="${!#strings.isEmpty(adjacentCitations.prev)}" class ="btn btn-primary btn-nav" style="font-size:10px;" 
 		    th:href="@{|/auth/group/${zoteroGroupId}/items/${adjacentCitations.prev}?searchTerm=${searchTerm}&index=${adjacentCitations.prevIndex}&page=${adjacentCitations.prevPage}&sortBy=${sortBy}&collectionId=${collectionId}|}"> < Previous</a>
@@ -93,8 +111,26 @@
 		<a th:if="${!#strings.isEmpty(adjacentCitations.next)}" class ="btn btn-primary btn-nav" style="font-size:10px;" 
 		    th:href="@{|/auth/group/${zoteroGroupId}/items/${adjacentCitations.next}?searchTerm=${searchTerm}&index=${adjacentCitations.nextIndex}&page=${adjacentCitations.nextPage}&sortBy=${sortBy}&collectionId=${collectionId}|}">Next ></a>
 		<a th:unless="${!#strings.isEmpty(adjacentCitations.next)}" class ="btn btn-default btn-nav" style="font-size:10px;" disabled>Next ></a>
+
 	</div>
 	
+	
+	<div class="row">
+	<div class="col-xs-12">
+	<h2 style="margin-top: 0">
+        <th:block th:each="author,status : ${citation.authors}">
+            <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
+            <span th:if="${!status.last}">; </span>
+        </th:block>
+        
+        <em>[[${citation.title}]]</em>
+        <span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
+          [[(${citation.dateFreetext})]]
+        </span>
+    </h2>   
+    
+	</div>
+	<div class="col-md-10">
 	<table class="table table-striped">
 		<tr>
 			<td width="20%">Item Key</td>
@@ -280,7 +316,27 @@
 			</th:block></td>
 		</tr>
 	</table>
+	</div>
+	<div class="col-md-2">
+        <h3 style="margin-top: 0">Files</h3>
+        
+        <ul class="list-group" >
+	        <li class="list-group-item" th:each="upload:${citation.gilesUploads}">
+	        <i class="icon-giles"></i>
+	        <span th:if="${upload.uploadedFile?.filename}">
+	        <a th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}">[[${upload.uploadedFile?.filename}]]</a>
+	        </span>
+	        <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
+	        File is being processed... ([[${upload.progressId}]])
+	        </span>
+	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
+	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
+	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
+	        </li>
+        </ul>
+	</div>
 	
+	</div>
 	<div id="parsed-ref-modal" class="modal fade" tabindex="-1" role="dialog">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
@@ -356,6 +412,25 @@
 	    </div><!-- /.modal-content -->
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
+	
+	<div id="uploadFileModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Upload File</h4>
+      </div>
+      <div class="modal-body">
+        <label>Choose file to upload</label>
+        <input type="file" id="uploadFileInput">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="uploadFileBtn" type="button" class="btn btn-primary">Upload</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 </div>
 </body>
 </html>

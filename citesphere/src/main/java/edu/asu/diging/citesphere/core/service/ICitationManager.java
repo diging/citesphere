@@ -35,6 +35,15 @@ public interface ICitationManager {
     ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException,
             CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException;
 
+    /**
+     * Method to retrieve a citation object from the database. This method will retrieve the citation stored in the database.
+     * It will not do any access checks, nor will it update the citation from Zotero or retrieve it for the first time. This method
+     * should only be used if the current stored version is required.
+     * @param key The key of the citation.
+     * @return Citation to be retrieve or null.
+     */
+    ICitation getCitation(String key);
+
     void updateCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException;
     
