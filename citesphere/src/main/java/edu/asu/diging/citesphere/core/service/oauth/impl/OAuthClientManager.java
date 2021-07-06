@@ -97,6 +97,11 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
     }
     
     @Override
+    public List<OAuthClient> getAllApps() {
+        return clientRepo.findAll();
+    }
+    
+    @Override
     public void deleteClient(String clientId) {
         if(clientId != null) {
             clientRepo.deleteById(clientId);

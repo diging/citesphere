@@ -24,8 +24,6 @@
 		<td><span th:text="${type.uri}"></span></td>
 		<td><span th:text="${type.name}"></span></td>
 		<td><span th:text="${type.description}"></span></td>
-		
-		
 		<td><span class="date" th:text="${type.createdOn}"></span></td>
 		<td><span th:text="${type.owner.firstName + ' ' + type.owner.lastName}"></span></td>
 		<td><a th:href="@{'/auth/concepts/types/' + ${type.id} + '/edit'}" /><i class="icon-edit" style="color: #337ab7" title="Edit"></i></a></td>

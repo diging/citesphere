@@ -27,37 +27,9 @@
             
 			$("#parsed-ref-modal").modal();
 		});
-		
 	});
-	
+
 	$(document).ready(function(){
-		$.ajax({ 
-			'url': '[(${citation.key})]/paging?index=[(${index})]&page=[(${page})]&sortBy=[(${sortBy})]&collectionId=[(${collectionId})]',
-			'type': "GET",
-			'success': function(response){
-				if(response.next != null){
-					document.getElementById("next").addEventListener("click", function(e) {
-						window.location.href = response.next + "?index=" + response.nextIndex + "&page=" + response.nextPage + "&sortBy=" + response.sortBy + "&collectionId=" + response.collectionId;
-					});
-					$('#next').attr("disabled", false);
-					$('#next').removeClass("btn btn-default").addClass("btn btn-primary");
-				}
-				
-				if(response.prev != null){
-					document.getElementById("prev").addEventListener("click", function(e) {
-						window.location.href = response.prev + "?index=" + response.prevIndex + "&page=" + response.prevPage + "&sortBy=" + response.sortBy + "&collectionId=" + response.collectionId;
-					});
-					$('#prev').attr("disabled", false);
-					$('#prev').removeClass("btn btn-default").addClass("btn btn-primary");
-				}
-				$("#nextSpinner").hide(),
-				$("#prevSpinner").hide();
-			},
-			'error': function(data) {
-				$("#nextSpinner").hide(),
-				$("#prevSpinner").hide();
-			}
-		});
 	
 		$("#uploadFileIcon").click(function() {
 	        $("#uploadFileModal").modal('show');
@@ -88,6 +60,21 @@
 	        });
   
 	    });
+	    
+	    var queryParams = window.location.search;
+	    if(queryParams)  {
+	        var params = new URLSearchParams(queryParams);
+	        params.delete('page');
+	        params.delete('searchTerm');
+	        params.delete('sortBy');
+	        params.delete('index');
+	        params.delete('collectionId');
+	        queryParams = params.toString();
+	    }
+	    
+	    $('.btn-nav').each(function() {
+	    	$(this).attr("href", $(this).attr("href") + "&" + queryParams);
+	    })
 	});
 	
 </script>
@@ -101,35 +88,32 @@
 		<li class="active">[[${citation.key}]]</li>
 	</ol>
 	
-	
-
-	<div class="row">
-		<div class="col-xs-12">
-		
-			<div class="pull-left" style="margin-bottom: 20px;">
+	<div class="pull-left" style="margin-bottom: 20px;">
+		<span th:unless="${!#strings.isEmpty(collectionId)}">
+			<a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/search?&searchTerm=${searchTerm}&page=${page}|}">Back</a> &nbsp;&nbsp;
+			<a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
+		</span>
+		 <a
+			th:href="@{|${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
+			class="icon-edit" style="color: #337ab7; font-size: 14px" title="Edit"></i></a> &nbsp;&nbsp; <a
+			th:href="@{|${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
+			class="icon-sync" title="Sync Citation"></i></a>
 			
-				<span th:if="${!#strings.isEmpty(collectionId)}">
-					<a class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
-				</span>
-				
-				<span th:unless="${!#strings.isEmpty(collectionId)}">
-					<a class ="btn btn-primary" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
-				</span>
-				 <a
-					th:href="@{|${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
-					class="icon-edit" style="color: #337ab7; font-size: 16px" title="Edit"></i></a> &nbsp;&nbsp; <a
-					th:href="@{|${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
-					class="icon-sync" title="Sync Citation"></i></a>
-				
-				&nbsp;&nbsp; 
-				<a id="uploadFileIcon" href="#"><i style="color: #337ab7; font-size: 20px" class="icon-multiple-doc"></i></a>
-			</div>
-			<div id="pull-right" class="pull-right" style="min-width: 35px;">
-				<button id ="prev" class="btn btn-default" style="font-size:10px;"type="submit"  href="" ${ empty previous ? 'disabled="disabled"' : ''}><i id="prevSpinner" class="icon-spinner rotating"></i> < Previous</button>&nbsp;&nbsp;
-				<button id ="next" class="btn btn-default" style="font-size:10px;" type="submit" href="" ${ empty next ? 'disabled="disabled"' : ''}><i id="nextSpinner" class="icon-spinner rotating"></i>Next ></button>
-		    </div>
-	   </div>
+		&nbsp;&nbsp;
+        <a id="uploadFileIcon" href="#"><i style="color: #337ab7; font-size: 20px" class="icon-multiple-doc"></i></a>
+       </div>
+	
+	<div id="pull-right" class="pull-right" style="min-width: 35px;">
+		<a th:if="${!#strings.isEmpty(adjacentCitations.prev)}" class ="btn btn-primary btn-nav" style="font-size:10px;" 
+		    th:href="@{|/auth/group/${zoteroGroupId}/items/${adjacentCitations.prev}?searchTerm=${searchTerm}&index=${adjacentCitations.prevIndex}&page=${adjacentCitations.prevPage}&sortBy=${sortBy}&collectionId=${collectionId}|}"> < Previous</a>
+		<a th:unless="${!#strings.isEmpty(adjacentCitations.prev)}" class ="btn btn-default btn-nav" style="font-size:10px;" disabled> < Previous</a> &nbsp;&nbsp;
+
+		<a th:if="${!#strings.isEmpty(adjacentCitations.next)}" class ="btn btn-primary btn-nav" style="font-size:10px;" 
+		    th:href="@{|/auth/group/${zoteroGroupId}/items/${adjacentCitations.next}?searchTerm=${searchTerm}&index=${adjacentCitations.nextIndex}&page=${adjacentCitations.nextPage}&sortBy=${sortBy}&collectionId=${collectionId}|}">Next ></a>
+		<a th:unless="${!#strings.isEmpty(adjacentCitations.next)}" class ="btn btn-default btn-nav" style="font-size:10px;" disabled>Next ></a>
+
 	</div>
+	
 	
 	<div class="row">
 	<div class="col-xs-12">
