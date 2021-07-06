@@ -32,7 +32,7 @@ public class CheckAccessController extends V1Controller {
     private IGroupManager groupManager;
 
     @RequestMapping(value = { "/files/giles/{documentId}/access/check" }, produces = {
-                    MediaType.APPLICATION_JSON_VALUE })
+        MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<String> checkAccess(@PathVariable("documentId") String documentId, @RequestParam("username") String username, Principal principal) {
         
         List<String> authorities = ((OAuth2Authentication)principal).getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList());
