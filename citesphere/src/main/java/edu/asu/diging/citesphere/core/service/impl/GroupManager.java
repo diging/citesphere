@@ -47,6 +47,6 @@ public class GroupManager implements IGroupManager {
     
     @Override
     public List<ICitationGroup> getGroupInstancesForGroupId(String groupId) {
-       return groupRepository.findByGroupId(new Long(groupId));
+        return groupRepository.findByGroupId(new Long(groupId));
     }
 }

@@ -46,7 +46,7 @@ import edu.asu.diging.citesphere.user.IUser;
 
 @Component
 @PropertySource({ "classpath:config.properties",
-        "${appConfigFile:classpath:}/app.properties" })
+    "${appConfigFile:classpath:}/app.properties" })
 public class GilesUploadCheckerImpl implements GilesUploadChecker {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -162,41 +162,11 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                 }
             }
 
-            ICitation currentCitation = null;
-            try {
-                // we'll just use the last user here
-                currentCitation = citationManager.getCitation(user,
-                        citation.getGroup(), citation.getKey());
-            } catch (GroupDoesNotExistException e) {
-                logger.error("Could not get citation.", e);
-                uploadQueue.remove(citation.getKey());
-            } catch (CannotFindCitationException e) {
-                logger.error("Could not get citation.", e);
-            } catch (ZoteroHttpStatusException e) {
-                logger.error("Could not get citation.", e);
-            }
+            ICitation currentCitation = getCurrentCitation(citation, user);
             
             if (needsUpdating) {
                 if (currentCitation != null) {
-                    for (IGilesUpload upload : checkedUploads) {
-                        Optional<IGilesUpload> oldUpload = currentCitation
-                                .getGilesUploads().stream()
-                                .filter(u -> u.getProgressId() != null && u
-                                        .getProgressId().equals(upload.getProgressId()))
-                                .findFirst();
-                        if (oldUpload.isPresent()) {
-                            currentCitation.getGilesUploads().remove(oldUpload.get());
-                        }
-                        currentCitation.getGilesUploads().add(upload);
-                    }
-
-                    try {
-                        citationManager.updateCitation(user, citation.getGroup(),
-                                currentCitation);
-                    } catch (ZoteroConnectionException | CitationIsOutdatedException
-                            | ZoteroHttpStatusException e) {
-                        logger.error("Could not update citation.", e);
-                    }
+                    updateCitation(citation, checkedUploads, user, currentCitation);
                 }
             }
 
@@ -208,5 +178,44 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                 uploadQueue.remove(citation.getKey());
             }
         }
+    }
+
+    public void updateCitation(ICitation citation, Set<IGilesUpload> checkedUploads,
+            IUser user, ICitation currentCitation) {
+        for (IGilesUpload upload : checkedUploads) {
+            Optional<IGilesUpload> oldUpload = currentCitation
+                    .getGilesUploads().stream()
+                    .filter(u -> u.getProgressId() != null && u
+                            .getProgressId().equals(upload.getProgressId()))
+                    .findFirst();
+            if (oldUpload.isPresent()) {
+                currentCitation.getGilesUploads().remove(oldUpload.get());
+            }
+            currentCitation.getGilesUploads().add(upload);
+        }
+
+        try {
+            citationManager.updateCitation(user, citation.getGroup(),
+                    currentCitation);
+        } catch (ZoteroConnectionException | CitationIsOutdatedException
+                | ZoteroHttpStatusException e) {
+            logger.error("Could not update citation.", e);
+        }
+    }
+
+    public ICitation getCurrentCitation(ICitation citation, IUser user) {
+        try {
+            // we'll just use the last user here
+            return citationManager.getCitation(user,
+                    citation.getGroup(), citation.getKey());
+        } catch (GroupDoesNotExistException e) {
+            logger.error("Could not get citation.", e);
+            uploadQueue.remove(citation.getKey());
+        } catch (CannotFindCitationException e) {
+            logger.error("Could not get citation.", e);
+        } catch (ZoteroHttpStatusException e) {
+            logger.error("Could not get citation.", e);
+        }
+        return null;
     }
 }

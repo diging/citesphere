@@ -20,7 +20,7 @@ import edu.asu.diging.citesphere.user.IUser;
 
 @Component
 @PropertySource({ "classpath:config.properties",
-        "${appConfigFile:classpath:}/app.properties" })
+    "${appConfigFile:classpath:}/app.properties" })
 public class GilesConnector implements IGilesConnector {
 
     @Value("${giles_baseurl}")
