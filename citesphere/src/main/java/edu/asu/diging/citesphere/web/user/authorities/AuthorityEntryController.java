@@ -70,14 +70,13 @@ public class AuthorityEntryController {
             @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
         
-        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
-
-        Page<IAuthorityEntry> userEntries = authorityService.findByGroupAndName(Long.valueOf(zoteroGroupId),
+        Page<IAuthorityEntry> groupEntries = authorityService.findByGroupAndName(Long.valueOf(zoteroGroupId),
                 firstName, lastName, page, pageSize);
 
-        authorityResult.setFoundAuthorities(userEntries.getContent());
+        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
+        authorityResult.setFoundAuthorities(groupEntries.getContent());
         authorityResult.setCurrentPage(page + 1);
-        authorityResult.setTotalPages(userEntries.getTotalPages());
+        authorityResult.setTotalPages(groupEntries.getTotalPages());
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     
