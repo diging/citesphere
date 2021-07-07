@@ -11,7 +11,6 @@ import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CustomCitationGroupRepository;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
@@ -24,9 +23,6 @@ public class GroupManager implements IGroupManager {
 
     @Autowired
     private IZoteroManager zoteroManager;
-    
-    @Autowired
-    private CustomCitationGroupRepository customGroupRepo;
     
     @Autowired
     private ICitationManager citationManager;
@@ -59,7 +55,7 @@ public class GroupManager implements IGroupManager {
     
     @Override
     public void deleteLocalGroupCopy(String groupId) {
-        customGroupRepo.deleteByGroupId(Integer.parseInt(groupId));
+        groupRepository.deleteByGroupId(Integer.parseInt(groupId));
         collectionManager.deleteLocalGroupCollections(groupId);
         citationManager.deleteLocalGroupCitations(groupId);
     }

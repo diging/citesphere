@@ -14,7 +14,6 @@ import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationCollectionRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CustomCitationCollectionDeleteRepository;
 import edu.asu.diging.citesphere.data.bib.ICollectionMongoDao;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -27,9 +26,6 @@ public class CitationCollectionManager implements ICitationCollectionManager {
 
     @Autowired
     private CitationCollectionRepository collectionRepository;
-    
-    @Autowired
-    private CustomCitationCollectionDeleteRepository citationCollectionDeleteRepository;
     
     @Autowired
     private ICollectionMongoDao collectionDao;
@@ -109,6 +105,6 @@ public class CitationCollectionManager implements ICitationCollectionManager {
     
     @Override
     public void deleteLocalGroupCollections(String groupId) {
-        citationCollectionDeleteRepository.deleteByGroupId(groupId);
+        collectionRepository.deleteByGroupId(groupId);
     }
 }

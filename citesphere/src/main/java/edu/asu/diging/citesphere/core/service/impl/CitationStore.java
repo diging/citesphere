@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import edu.asu.diging.citesphere.core.search.service.Indexer;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.data.bib.CitationRepository;
-import edu.asu.diging.citesphere.data.bib.CustomCitationDeleteRepository;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 
@@ -23,9 +22,6 @@ public class CitationStore implements ICitationStore {
 
     @Autowired
     private CitationRepository citationRepository;
-    
-    @Autowired
-    private CustomCitationDeleteRepository citationDeleteRepository;
     
     @Autowired 
     private Indexer indexer;
@@ -55,7 +51,7 @@ public class CitationStore implements ICitationStore {
     
     @Override
     public void deleteCitationByGroupId(String groupId) {
-        citationDeleteRepository.deleteByGroup(groupId);
+        citationRepository.deleteByGroup(groupId);
         indexer.deleteCitationByGroupId(groupId);
     }
 }
