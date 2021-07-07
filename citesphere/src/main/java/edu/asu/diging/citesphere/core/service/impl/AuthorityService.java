@@ -212,6 +212,7 @@ public class AuthorityService implements IAuthorityService {
 
     @Override
     @Transactional
+    //Creates a new Authority entry and also generates a custom URI for it
     public IAuthorityEntry createWithUri(IAuthorityEntry entry, IUser user) {
         entry = create(entry, user);
         entry.setUri(authorityUri + authorityPrefix + entry.getId());

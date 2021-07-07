@@ -85,6 +85,9 @@
 
         <app.name>Citesphere</app.name>
         <app.url></app.url>
+        
+        <authority.uri>https://localhost:8080/citesphere/auth/authority/</authority.uri>
+        <authority.prefix>PRE</authority.prefix>
 
         <kafka.hosts></kafka.hosts>
         <pullrequest></pullrequest>
