@@ -132,10 +132,14 @@ public class ZoteroManager implements IZoteroManager {
                     citationMap.put(item.getData().getParentItem(),
                             citationFactory.createCitation(parentCitation, item));
                 }
-                citationMap.put(item.getKey(), citationFactory.createCitation(item, null));
             }
             if (!citationMap.containsKey(item.getKey())) {
-                citationMap.put(item.getKey(), citationFactory.createCitation(item, null));
+                Item metaData = null;
+                if (!item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey())
+                        && !item.getData().getItemType().equals(ItemType.ATTACHMENT.getZoteroKey())) {
+                    metaData = zoteroConnector.getCitesphereMetaData(user, groupId, item.getKey());
+                }
+                citationMap.put(item.getKey(), citationFactory.createCitation(item, metaData));
             }
         }
         zoteroReponse.getCitations().addAll(citationMap.values());
@@ -251,7 +255,10 @@ public class ZoteroManager implements IZoteroManager {
         List<ICitation> citations = new ArrayList<>();
         if (response.getResults() != null) {
             for (Item item : response.getResults()) {
-                Item metaData = zoteroConnector.getCitesphereMetaData(user, groupId, item.getKey());
+                Item metaData = null;
+                if (!item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey())) {
+                    metaData = zoteroConnector.getCitesphereMetaData(user, groupId, item.getKey());
+                }
                 citations.add(citationFactory.createCitation(item, metaData));
             }
         }
@@ -363,14 +370,9 @@ public class ZoteroManager implements IZoteroManager {
 
         Item newItem = zoteroConnector.createItem(user, item, groupId, collectionIds, ignoreFields, validCreatorTypes);
 
-        itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
-        itemTypeFields.add(ZoteroFields.ITEM_TYPE);
-        itemTypeFields.add(ZoteroFields.CREATOR);
-        itemTypeFields.add(ZoteroFields.COLLECTIONS);
-
-        ignoreFields = createIgnoreFields(itemTypeFields, item, true);
-        Item newMetaData = zoteroConnector.createItem(user, metaData, groupId, new ArrayList<>(), ignoreFields,
-                null);
+        itemTypeFields = getNoteFieldList();
+        ignoreFields = createIgnoreFieldsForMetaDataNote(itemTypeFields, metaData, true);
+        Item newMetaData = zoteroConnector.createNote(user, metaData, groupId, ignoreFields);
         return citationFactory.createCitation(newItem, newMetaData);
     }
     
