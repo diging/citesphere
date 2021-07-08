@@ -35,6 +35,7 @@ import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
@@ -44,6 +45,8 @@ import edu.asu.diging.citesphere.user.IUser;
 public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    
+    private static final String CITESPHERE_METADATA_TAG = "citesphere-metadata";
 
     @Autowired
     private IZoteroManager zoteroManager;
@@ -238,6 +241,16 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
 
         citationStore.save((Citation) citation);
+        
+        if(isDeletedMetaDataNote(citation)) {
+            optional = citationStore.findById(citation.getParentItem());
+            if(optional.isPresent() && optional.get().getMetaDataItemKey()!=null && optional.get().getMetaDataItemKey().equals(citation.getKey())) {
+                ICitation parent = optional.get();
+                parent.setMetaDataItemKey(null);
+                parent.setMetaDataItemVersion(0);
+                citationStore.save(parent);
+            }
+        }
     }
 
     private void storeCitationCollection(ICitationCollection collection) {
@@ -246,6 +259,14 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             collectionRepo.delete((CitationCollection) optional.get());
         }
         collectionRepo.save((CitationCollection) collection);
+    }
+    
+    private boolean isDeletedMetaDataNote(ICitation citation) {
+        if (citation.getDeleted() == 1 && citation.getItemType().equals(ItemType.NOTE) && citation.getTags() != null
+                && citation.getTags().stream().anyMatch(tag -> tag.getTag().equals(CITESPHERE_METADATA_TAG))) {
+            return true;
+        }
+        return false;
     }
 
 }

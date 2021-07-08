@@ -110,7 +110,11 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public ICitation getGroupItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
         Item item = zoteroConnector.getItem(user, groupId, itemKey);
-        Item metaData = zoteroConnector.getCitesphereMetaData(user, groupId, itemKey);
+        Item metaData = null;
+        if (!item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey())
+                && !item.getData().getItemType().equals(ItemType.ATTACHMENT.getZoteroKey())) {
+            metaData = zoteroConnector.getCitesphereMetaData(user, groupId, itemKey);
+        }
         return citationFactory.createCitation(item, metaData);
     }
     
