@@ -22,4 +22,6 @@ public interface ICitationStore {
     
     List<ICitation> getAttachments(String id);
 
+    List<ICitation> findByGilesDocumentId(String documentId);
+
 }

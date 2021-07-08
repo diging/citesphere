@@ -55,4 +55,9 @@ public class CitationStore implements ICitationStore {
     public List<ICitation> getAttachments(String id) {
         return citationRepository.findByParentItemAndItemTypeAndDeleted(id, ItemType.ATTACHMENT.name(), 0);
     }
+
+    @Override
+    public List<ICitation> findByGilesDocumentId(String documentId) {
+        return citationRepository.findByGilesUploadsDocumentId(documentId);
+    }
 }

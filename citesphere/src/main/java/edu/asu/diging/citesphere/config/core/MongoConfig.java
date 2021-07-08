@@ -15,6 +15,9 @@ import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Component;
 
@@ -69,7 +72,13 @@ public class MongoConfig {
 
     @Bean
     public MongoTemplate mongoTemplate() throws UnknownHostException {
-        return new MongoTemplate(mongoDbFactory());
+        MongoMappingContext mappingContext = new MongoMappingContext();
+        mappingContext.setAutoIndexCreation(true);      
+        
+        MongoDatabaseFactory dbFactory = mongoDbFactory();
+        DefaultDbRefResolver dbRefResolver = new DefaultDbRefResolver(dbFactory);
+        
+        return new MongoTemplate(dbFactory, new MappingMongoConverter(dbRefResolver, mappingContext));
     }
     
     @WritingConverter
