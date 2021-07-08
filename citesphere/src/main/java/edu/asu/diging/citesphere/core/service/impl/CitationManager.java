@@ -97,6 +97,15 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
+    public ICitation getCitation(String key) {
+        Optional<ICitation> optional = citationStore.findById(key);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        return null;
+    }
+    
+    @Override
     public ICitation getCitation(IUser user, String groupId, String key)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         Optional<ICitation> optional = citationStore.findById(key);
@@ -135,15 +144,6 @@ public class CitationManager implements ICitationManager {
         return attachments;
     }
 
-    @Override
-    public ICitation getCitation(String key) {
-        Optional<ICitation> optional = citationStore.findById(key);
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        return null;
-    }
-    
     /**
      * Retrieve a citation from Zotero bypassing the database cache. This method
      * also does not store the retrieved citation in the database cache. Use
