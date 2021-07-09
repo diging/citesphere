@@ -28,8 +28,6 @@ public class ItemFactory implements IItemFactory {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final String CITESPHERE_METADATA_TAG = "citesphere-metadata";
-
     /*
      * (non-Javadoc)
      * 
@@ -97,14 +95,6 @@ public class ItemFactory implements IItemFactory {
                 }
             });
         }
-
-//        try {
-//            writeExtraData(citation, data);
-//        } catch (JsonProcessingException e1) {
-//            // FIXME: hadnle this
-//            logger.error("Could not serialize extra data.", e1);
-//        }
-
         return item;
     }
 
@@ -117,7 +107,7 @@ public class ItemFactory implements IItemFactory {
         try {
             data = createMetaData(citation);
         } catch (JsonProcessingException e1) {
-            // FIXME: hadnle this
+            // FIXME: handle this
             logger.error("Could not create citesphere meta data", e1);
         }
         item.setData(data);
@@ -194,7 +184,7 @@ public class ItemFactory implements IItemFactory {
 
         List<Tag> tagList = new ArrayList<>();
         Tag tag = new Tag();
-        tag.setTag(CITESPHERE_METADATA_TAG);
+        tag.setTag(ExtraData.CITESPHERE_METADATA_TAG);
         tagList.add(tag);
         data.setTags(tagList);
 

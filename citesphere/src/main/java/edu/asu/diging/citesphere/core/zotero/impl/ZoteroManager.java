@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
+import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
@@ -50,8 +51,6 @@ public class ZoteroManager implements IZoteroManager {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
-    private static final String CITESPHERE_METADATA_TAG = "citesphere-metadata";
-
     @Autowired
     private IZoteroConnector zoteroConnector;
 
@@ -311,15 +310,15 @@ public class ZoteroManager implements IZoteroManager {
 
         Item updatedMetaData = null;
         if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
-            itemTypeFields = getNoteFieldList();
+            itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
             itemTypeFields.add(ZoteroFields.KEY);
             itemTypeFields.add(ZoteroFields.VERSION);
-            ignoreFields = createIgnoreFieldsForMetaDataNote(itemTypeFields, metaData, true);
-            updatedMetaData = zoteroConnector.updateNote(user, metaData, groupId, ignoreFields);
+            ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
+            updatedMetaData = zoteroConnector.updateItem(user, metaData, groupId, new ArrayList<>(), ignoreFields, null);
         } else {
-            itemTypeFields = getNoteFieldList();
-            ignoreFields = createIgnoreFieldsForMetaDataNote(itemTypeFields, metaData, true);
-            updatedMetaData = zoteroConnector.createNote(user, metaData, groupId, ignoreFields);
+            itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
+            ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
+            updatedMetaData = zoteroConnector.createItem(user, metaData, groupId, new ArrayList<>(), ignoreFields, null);
         }
         
         return citationFactory.createCitation(updatedItem, updatedMetaData);
@@ -342,7 +341,7 @@ public class ZoteroManager implements IZoteroManager {
         List<List<String>> ignoreFieldsList = new ArrayList<>();
         List<List<String>> validCreatorTypesList = new ArrayList<>();
         for (ICitation citation : citations) {
-            Item item = itemFactory.createItem(citation, citation.getCollections());
+            Item item = itemFactory.createItem(citation, citation.getCollections());            
             items.add(item);
             itemTypeFields = getItemTypeFields(user, citation.getItemType());
             itemTypeFields.add(ZoteroFields.ITEM_TYPE);
@@ -354,6 +353,20 @@ public class ZoteroManager implements IZoteroManager {
             List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
             ignoreFieldsList.add(ignoreFields);
             validCreatorTypesList.add(validCreatorTypes);
+            
+            Item metaData = itemFactory.createMetaDataItem(citation);
+            items.add(metaData);
+            if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
+                itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
+                itemTypeFields.add(ZoteroFields.KEY);
+                itemTypeFields.add(ZoteroFields.VERSION);
+                ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
+            } else {
+                itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
+                ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
+            }
+            ignoreFieldsList.add(ignoreFields);
+            validCreatorTypesList.add(new ArrayList<>());
         }
         return zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
     }
@@ -374,20 +387,21 @@ public class ZoteroManager implements IZoteroManager {
 
         Item newItem = zoteroConnector.createItem(user, item, groupId, collectionIds, ignoreFields, validCreatorTypes);
 
-        itemTypeFields = getNoteFieldList();
-        ignoreFields = createIgnoreFieldsForMetaDataNote(itemTypeFields, metaData, true);
-        Item newMetaData = zoteroConnector.createNote(user, metaData, groupId, ignoreFields);
+        metaData.getData().setParentItem(newItem.getKey());
+        itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
+        ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
+        Item newMetaData = zoteroConnector.createItem(user, metaData, groupId, new ArrayList<>(), ignoreFields, null);
         return citationFactory.createCitation(newItem, newMetaData);
     }
     
     private List<String> createIgnoreFields(List<String> itemTypeFields, Item item, boolean ignoreEmpty) {
         List<String> ignoreFields = new ArrayList<>();
         // general fields to ignore for the moment
-        ignoreFields.add("tags");
+//        ignoreFields.add("tags");
         ignoreFields.add("relations");
-        ignoreFields.add("parentItem");
+//        ignoreFields.add("parentItem");
         ignoreFields.add("linkMode");
-        ignoreFields.add("note");
+//        ignoreFields.add("note");
         ignoreFields.add("contentType");
         ignoreFields.add("charset");
         ignoreFields.add("filename");
@@ -423,47 +437,10 @@ public class ZoteroManager implements IZoteroManager {
         return ignoreFields;
     }
     
-    private List<String> createIgnoreFieldsForMetaDataNote(List<String> itemTypeFields, Item item, boolean ignoreEmpty) {
-        List<String> ignoreFields = new ArrayList<>();
-        // general fields to ignore for the moment
-        ignoreFields.add("relations");
-        ignoreFields.add("linkMode");
-        ignoreFields.add("contentType");
-        ignoreFields.add("charset");
-        ignoreFields.add("filename");
-        ignoreFields.add("md5");
-        ignoreFields.add("mtime");
-        ignoreFields.add("dateModified");
-
-        Field[] fields = Data.class.getDeclaredFields();
-        for (Field field : fields) {
-            String fieldName = field.getName();
-            // already ignored
-            if (ignoreFields.contains(fieldName)) {
-                continue;
-            }
-
-            if (!itemTypeFields.contains(fieldName)) {
-                ignoreFields.add(fieldName);
-            }
-            if (ignoreEmpty) {
-                field.setAccessible(true);
-                try {
-                    Object value = field.get(item.getData());
-                    if (value == null || (value instanceof String && value.toString().isEmpty())
-                            || (List.class.isAssignableFrom(value.getClass()) && ((List) value).isEmpty())) {
-                        ignoreFields.add(fieldName);
-                    }
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    logger.error("Could not access field to retrive ignore fields.", e);
-                }
-            }
-        }
-
-        return ignoreFields;
-    }
-
     private List<String> getItemTypeFields(IUser user, ItemType itemType) {
+        if (itemType.equals(ItemType.NOTE)) {
+            return getNoteFieldList();
+        }
         FieldInfo[] fieldInfos = zoteroConnector.getFields(user, itemType.getZoteroKey());
         List<String> itemTypeFields = new ArrayList<>();
 
@@ -474,7 +451,7 @@ public class ZoteroManager implements IZoteroManager {
 
         return itemTypeFields;
     }
-    
+
     private List<String> getNoteFieldList() {
         List<String> noteFields = new ArrayList<>();
         noteFields.add(ZoteroFields.ITEM_TYPE);
@@ -486,7 +463,7 @@ public class ZoteroManager implements IZoteroManager {
     
     private boolean isMetaDataNote(Item item) {
         if (item.getData().getDeleted() != 1 && item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey())
-                && item.getData().getTags().stream().anyMatch(tag -> tag.getTag().equals(CITESPHERE_METADATA_TAG)))
+                && item.getData().getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG)))
             return true;
         return false;
     }

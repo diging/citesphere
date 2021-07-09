@@ -198,22 +198,7 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return getItem(user, groupId, item.getKey());
     }
-    
-    @Override
-    public Item updateNote(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException, ZoteroHttpStatusException {
-        Zotero zotero = getApi(user);
-        zotero.getGroupsOperations().updateNote(groupId, item, ignoreFields);
-        // it seems like Zotero needs a minute to process the submitted data
-        // so let's wait a second before retrieving updated data
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            logger.error("Could not sleep.", e);
-            // well if something goes wrong here, let's just ignore it
-        }
-        return getItem(user, groupId, item.getKey());
-    }
-    
+  
     /**
      * This method makes a call to Zotero to batch update items and return back
      * items statuses
@@ -240,29 +225,6 @@ public class ZoteroConnector implements IZoteroConnector {
         Zotero zotero = getApi(user);
         ItemCreationResponse response = zotero.getGroupsOperations().createItem(groupId, item, ignoreFields,
                 validCreatorTypes);
-
-        // let's give Zotero a minute to process
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            logger.error("Could not sleep.", e);
-            // well if something goes wrong here, let's just ignore it
-        }
-
-        Map<String, String> success = response.getSuccess();
-        if (success.isEmpty()) {
-            logger.error("Could not create item: " + response.getFailed().get("0"));
-            throw new ZoteroItemCreationFailedException(response);
-        }
-
-        // since we only submitted one item, there should only be one in the map
-        return getItem(user, groupId, success.values().iterator().next());
-    }
-    
-    @Override
-    public Item createNote(IUser user, Item item, String groupId, List<String> ignoreFields) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {
-        Zotero zotero = getApi(user);
-        ItemCreationResponse response = zotero.getGroupsOperations().createNote(groupId, item, ignoreFields);
 
         // let's give Zotero a minute to process
         try {

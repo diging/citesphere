@@ -26,6 +26,7 @@ import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
+import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
@@ -46,8 +47,6 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
-    private static final String CITESPHERE_METADATA_TAG = "citesphere-metadata";
-
     @Autowired
     private IZoteroManager zoteroManager;
 
@@ -263,7 +262,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     
     private boolean isDeletedMetaDataNote(ICitation citation) {
         if (citation.getDeleted() == 1 && citation.getItemType().equals(ItemType.NOTE) && citation.getTags() != null
-                && citation.getTags().stream().anyMatch(tag -> tag.getTag().equals(CITESPHERE_METADATA_TAG))) {
+                && citation.getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG))) {
             return true;
         }
         return false;
