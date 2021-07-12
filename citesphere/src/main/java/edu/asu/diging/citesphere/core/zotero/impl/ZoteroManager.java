@@ -127,7 +127,10 @@ public class ZoteroManager implements IZoteroManager {
         zoteroReponse.setCitations(new ArrayList<>());
         HashMap<String, ICitation> citationMap = new HashMap<>();
         for (Item item : response.getResults()) {
+            //Check if the item is an active(non-deleted) metadata note
             if (isMetaDataNote(item)) {
+                //If the citation to which the metadata note belongs is already processed, populate its extra data from the note
+                //Else fetch the citation from zotero and add it to the item list
                 if (citationMap.containsKey(item.getData().getParentItem())) {
                     citationFactory.parseMetaDataNote(citationMap.get(item.getData().getParentItem()), item);
                 } else {
@@ -136,6 +139,7 @@ public class ZoteroManager implements IZoteroManager {
                             citationFactory.createCitation(parentCitation, item));
                 }
             }
+            //If the item is not a metadata note and is not already processed, add it to the list
             if (!citationMap.containsKey(item.getKey())) {
                 Item metaData = null;
                 if (!item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey())
@@ -309,6 +313,7 @@ public class ZoteroManager implements IZoteroManager {
                 validCreatorTypes);
 
         Item updatedMetaData = null;
+        //If the metadata note already exists, update it or else create a new note
         if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
             itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
             itemTypeFields.add(ZoteroFields.KEY);
@@ -354,6 +359,7 @@ public class ZoteroManager implements IZoteroManager {
             ignoreFieldsList.add(ignoreFields);
             validCreatorTypesList.add(validCreatorTypes);
             
+            //Add metadata note to the list
             Item metaData = itemFactory.createMetaDataItem(citation);
             items.add(metaData);
             if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
