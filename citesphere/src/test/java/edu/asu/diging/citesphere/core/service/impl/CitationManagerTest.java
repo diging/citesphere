@@ -25,7 +25,6 @@ import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -139,7 +138,8 @@ public class CitationManagerTest {
     }
     
     @Test 
-    public void test_updateCitation_success() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {
+    public void test_updateCitation_success() throws ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(currentVersion);
         ICitation updatedCitation = new Citation();
         updatedCitation.setKey(EXISTING_ID);
@@ -151,7 +151,8 @@ public class CitationManagerTest {
     }
     
     @Test(expected=CitationIsOutdatedException.class)
-    public void test_updateCitation_conflict() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {
+    public void test_updateCitation_conflict() throws ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(new Long(2));
         managerToTest.updateCitation(user, GROUP_ID, existingCitation);
     }
