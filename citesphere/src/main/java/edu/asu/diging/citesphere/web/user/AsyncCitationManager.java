@@ -55,6 +55,27 @@ public class AsyncCitationManager {
         asyncResponse.setTaskStatus(AsyncTaskStatus.PENDING);
         return asyncResponse;
     }
+    
+    /**
+     * This method moves citations asynchronously.
+     * 
+     * @param user          User accessing Zotero
+     * @param zoteroGroupId GroupId of the citations
+     * @param citations     citations that have to be updated
+     * @return AsyncUpdateCitationsResponse contains task id, response and status.
+     */
+    public AsyncUpdateCitationsResponse moveCitationsToCollection(IUser user, String zoteroGroupId, List<ICitation> citations)
+            throws JsonProcessingException, ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroHttpStatusException, InterruptedException, ExecutionException {
+        String taskId = UUID.randomUUID().toString();
+        Future<ZoteroUpdateItemsStatuses> futureTask = asyncUpdateCitationsProcessor.moveCitationsToCollection(user,
+                zoteroGroupId, citations);
+        taskTracker.put(taskId, futureTask);
+        AsyncUpdateCitationsResponse asyncResponse = new AsyncUpdateCitationsResponse();
+        asyncResponse.setTaskID(taskId);
+        asyncResponse.setTaskStatus(AsyncTaskStatus.PENDING);
+        return asyncResponse;
+    }
 
     /**
      * This method gets the response of an update citations request by giving task

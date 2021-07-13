@@ -39,6 +39,9 @@ public interface IZoteroManager {
     
     ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, JsonProcessingException;
+    
+    ZoteroUpdateItemsStatuses moveCitationsToCollection(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, JsonProcessingException;
 
     List<BibField> getFields(IUser user, ItemType itemType);
 

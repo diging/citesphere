@@ -377,6 +377,39 @@ public class ZoteroManager implements IZoteroManager {
         return zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
     }
     
+    /**
+     * Using this method we can update multiple citations.
+     * 
+     * @param user      user accessing Zotero.
+     * @param groupId   group id of citations.
+     * @param citations list of citations that has to be updated.
+     * 
+     * @return ZoteroUpdateItemsStatuses returns statuses of citations
+     */
+    @Override
+    public ZoteroUpdateItemsStatuses moveCitationsToCollection(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, JsonProcessingException {
+        List<Item> items = new ArrayList<>();
+        List<String> itemTypeFields = new ArrayList<>();
+        List<List<String>> ignoreFieldsList = new ArrayList<>();
+        List<List<String>> validCreatorTypesList = new ArrayList<>();
+        for (ICitation citation : citations) {
+            Item item = itemFactory.createItem(citation, citation.getCollections());            
+            items.add(item);
+            itemTypeFields = getItemTypeFields(user, citation.getItemType());
+            itemTypeFields.add(ZoteroFields.ITEM_TYPE);
+            itemTypeFields.add(ZoteroFields.CREATOR);
+            itemTypeFields.add(ZoteroFields.COLLECTIONS);
+            itemTypeFields.add(ZoteroFields.KEY);
+            itemTypeFields.add(ZoteroFields.VERSION);
+            List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, true);
+            List<String> validCreatorTypes = getValidCreatorTypes(user, citation.getItemType());
+            ignoreFieldsList.add(ignoreFields);
+            validCreatorTypesList.add(validCreatorTypes);
+        }
+        return zoteroConnector.updateItems(user, items, groupId, ignoreFieldsList, validCreatorTypesList);
+    }
+    
     @Override
     public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {

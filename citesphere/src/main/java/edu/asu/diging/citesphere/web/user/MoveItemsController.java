@@ -65,7 +65,7 @@ public class MoveItemsController {
                     (IUser) authentication.getPrincipal());
         }
         AsyncUpdateCitationsResponse asyncResponse = asyncCitationManager
-                .updateCitations((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
+                .moveCitationsToCollection((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
         return gson.toJson(asyncResponse, AsyncUpdateCitationsResponse.class);
     }
 
