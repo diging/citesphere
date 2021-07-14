@@ -240,10 +240,11 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
 
         citationStore.save((Citation) citation);
-        
-        if(isDeletedMetaDataNote(citation)) {
+        //If the citation is a deleted metadata note and if it is the active metadata note, remove its link from parent item
+        if (isDeletedMetaDataNote(citation)) {
             optional = citationStore.findById(citation.getParentItem());
-            if(optional.isPresent() && optional.get().getMetaDataItemKey()!=null && optional.get().getMetaDataItemKey().equals(citation.getKey())) {
+            if (optional.isPresent() && optional.get().getMetaDataItemKey() != null
+                    && optional.get().getMetaDataItemKey().equals(citation.getKey())) {
                 ICitation parent = optional.get();
                 parent.setMetaDataItemKey(null);
                 parent.setMetaDataItemVersion(0);
@@ -262,7 +263,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     
     private boolean isDeletedMetaDataNote(ICitation citation) {
         if (citation.getDeleted() == 1 && citation.getItemType().equals(ItemType.NOTE) && citation.getTags() != null
-                && citation.getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG))) {
+                && citation.getTags().stream()
+                        .anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG))) {
             return true;
         }
         return false;

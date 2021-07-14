@@ -30,10 +30,7 @@ public class ItemFactory implements IItemFactory {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * edu.asu.diging.citesphere.core.factory.zotero.impl.IItemFactory#createItem(
-     * edu.asu.diging.citesphere.core.model.bib.ICitation)
+     * @see edu.asu.diging.citesphere.core.factory.zotero.impl.IItemFactory#createItem(edu.asu.diging.citesphere.core.model.bib.ICitation)
      */
     @Override
     public Item createItem(ICitation citation, List<String> collectionIds) {
