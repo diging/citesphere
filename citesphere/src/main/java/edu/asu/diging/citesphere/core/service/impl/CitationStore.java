@@ -29,7 +29,7 @@ public class CitationStore implements ICitationStore {
     private Indexer indexer;
 
     /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.ICitationStore#save(edu.asu.diging.citesphere.model.bib.ICitation)
+     * @see edu.asu.diging.citesphere.core.service.ICitationStore#save(edu.asu.diging.citesphere.model.bib.ICitation)
      */
     @Override
     public ICitation save(ICitation citation) {
@@ -38,7 +38,7 @@ public class CitationStore implements ICitationStore {
     }
     
     /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.ICitationStore#findById(java.lang.String)
+     * @see edu.asu.diging.citesphere.core.service.ICitationStore#findById(java.lang.String)
      */
     @Override
     public Optional<ICitation> findById(String id) {
@@ -51,6 +51,9 @@ public class CitationStore implements ICitationStore {
         citationRepository.delete((Citation) citation);
     }
 
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.ICitationStore#getAttachments(java.lang.String)
+     */
     @Override
     public List<ICitation> getAttachments(String id) {
         return citationRepository.findByParentItemAndItemTypeAndDeleted(id, ItemType.ATTACHMENT.name(), 0);
