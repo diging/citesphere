@@ -128,7 +128,7 @@ public class ZoteroManager implements IZoteroManager {
         HashMap<String, ICitation> citationMap = new HashMap<>();
         for (Item item : response.getResults()) {
             //Check if the item is an active(non-deleted) metadata note
-            if (isMetaDataNote(item)) {
+            if (item.getData().getDeleted() != 1 && item.isMetaDataNote()) {
                 //If the citation to which the metadata note belongs is already processed, populate its extra data from the note
                 //Else fetch the citation from zotero and add it to the item list
                 if (citationMap.containsKey(item.getData().getParentItem())) {
@@ -366,11 +366,10 @@ public class ZoteroManager implements IZoteroManager {
                 itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
                 itemTypeFields.add(ZoteroFields.KEY);
                 itemTypeFields.add(ZoteroFields.VERSION);
-                ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
             } else {
                 itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
-                ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
             }
+            ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
             ignoreFieldsList.add(ignoreFields);
             validCreatorTypesList.add(new ArrayList<>());
         }
@@ -436,11 +435,8 @@ public class ZoteroManager implements IZoteroManager {
     private List<String> createIgnoreFields(List<String> itemTypeFields, Item item, boolean ignoreEmpty) {
         List<String> ignoreFields = new ArrayList<>();
         // general fields to ignore for the moment
-//        ignoreFields.add("tags");
         ignoreFields.add("relations");
-//        ignoreFields.add("parentItem");
         ignoreFields.add("linkMode");
-//        ignoreFields.add("note");
         ignoreFields.add("contentType");
         ignoreFields.add("charset");
         ignoreFields.add("filename");
@@ -498,13 +494,6 @@ public class ZoteroManager implements IZoteroManager {
         noteFields.add(ZoteroFields.TAGS);
         noteFields.add(ZoteroFields.NOTE);
         return noteFields;
-    }
-    
-    private boolean isMetaDataNote(Item item) {
-        if (item.getData().getDeleted() != 1 && item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey())
-                && item.getData().getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG)))
-            return true;
-        return false;
     }
 
     @Override

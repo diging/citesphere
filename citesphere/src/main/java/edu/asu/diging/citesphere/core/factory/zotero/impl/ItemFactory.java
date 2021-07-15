@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -182,10 +183,7 @@ public class ItemFactory implements IItemFactory {
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
         data.setNote(extraDataAsJson);
 
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag = new Tag();
-        tag.setTag(ExtraData.CITESPHERE_METADATA_TAG);
-        tagList.add(tag);
+        List<Tag> tagList = Arrays.asList(new Tag(ExtraData.CITESPHERE_METADATA_TAG));
         data.setTags(tagList);
 
         return data;
