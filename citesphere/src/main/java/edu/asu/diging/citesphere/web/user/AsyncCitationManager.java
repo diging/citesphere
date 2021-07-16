@@ -57,11 +57,11 @@ public class AsyncCitationManager {
     }
     
     /**
-     * This method moves citations asynchronously.
+     * This method moves citations to a collection asynchronously.
      * 
      * @param user          User accessing Zotero
      * @param zoteroGroupId GroupId of the citations
-     * @param citations     citations that have to be updated
+     * @param citations     citations that have to be moved
      * @return AsyncUpdateCitationsResponse contains task id, response and status.
      */
     public AsyncUpdateCitationsResponse moveCitationsToCollection(IUser user, String zoteroGroupId, List<ICitation> citations)

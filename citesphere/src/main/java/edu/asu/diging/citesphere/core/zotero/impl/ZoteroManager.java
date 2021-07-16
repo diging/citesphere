@@ -377,11 +377,13 @@ public class ZoteroManager implements IZoteroManager {
     }
     
     /**
-     * Using this method we can update multiple citations.
+     * Using this method we can move multiple citations to collection. This method
+     * does not create or update citesphere metadata note as compared to the batch
+     * update method.
      * 
      * @param user      user accessing Zotero.
      * @param groupId   group id of citations.
-     * @param citations list of citations that has to be updated.
+     * @param citations list of citations that has to be moved.
      * 
      * @return ZoteroUpdateItemsStatuses returns statuses of citations
      */
