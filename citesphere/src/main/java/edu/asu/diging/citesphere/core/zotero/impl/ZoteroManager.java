@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -122,35 +123,40 @@ public class ZoteroManager implements IZoteroManager {
             boolean includeTrashed) throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItemsByKey(user, groupId, itemKeys, includeTrashed);
 
-        ZoteroGroupItemsResponse zoteroReponse = new ZoteroGroupItemsResponse();
-        zoteroReponse.setContentVersion(response.getLastVersion());
-        zoteroReponse.setCitations(new ArrayList<>());
-        HashMap<String, ICitation> citationMap = new HashMap<>();
+        ZoteroGroupItemsResponse zoteroResponse = new ZoteroGroupItemsResponse();
+        zoteroResponse.setContentVersion(response.getLastVersion());
+        zoteroResponse.setCitations(new ArrayList<>());
+        // Holds the metadata note against the item key
+        HashMap<String, Item> metaDataMap = new HashMap<>();
+        // Holds the items to be updated
+        HashMap<String, Item> itemMap = new HashMap<>();
         for (Item item : response.getResults()) {
-            //Check if the item is an active(non-deleted) metadata note
-            if (item.getData().getDeleted() != 1 && item.isMetaDataNote()) {
-                //If the citation to which the metadata note belongs is already processed, populate its extra data from the note
-                //Else fetch the citation from zotero and add it to the item list
-                if (citationMap.containsKey(item.getData().getParentItem())) {
-                    citationFactory.parseMetaDataNote(citationMap.get(item.getData().getParentItem()), item);
-                } else {
-                    Item parentCitation = zoteroConnector.getItem(user, groupId, item.getData().getParentItem());
-                    citationMap.put(item.getData().getParentItem(),
-                            citationFactory.createCitation(parentCitation, item));
-                }
-            }
-            //If the item is not a metadata note and is not already processed, add it to the list
-            if (!citationMap.containsKey(item.getKey())) {
-                Item metaData = null;
-                if (!item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey())
+            // If the item is note already visited, process it
+            if (!itemMap.containsKey(item.getKey())) {
+                // If the item is an active(non-deleted) metadata note, fetch its parent item if
+                // it not already present in the map.
+                // Else check for metadata note for the item and fetch it.
+                if (item.getData().getDeleted() != 1 && item.isMetaDataNote()) {
+                    metaDataMap.put(item.getData().getParentItem(), item);
+                    if (!itemMap.containsKey(item.getData().getParentItem())) {
+                        Item parentItem = zoteroConnector.getItem(user, groupId, item.getData().getParentItem());
+                        itemMap.put(parentItem.getKey(), parentItem);
+                    }
+                } else if (!item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey())
                         && !item.getData().getItemType().equals(ItemType.ATTACHMENT.getZoteroKey())) {
-                    metaData = zoteroConnector.getCitesphereMetaData(user, groupId, item.getKey());
+                    Item metaData = zoteroConnector.getCitesphereMetaData(user, groupId, item.getKey());
+                    if (metaData != null) {
+                        metaDataMap.put(item.getKey(), metaData);
+                    }
                 }
-                citationMap.put(item.getKey(), citationFactory.createCitation(item, metaData));
+                itemMap.put(item.getKey(), item);
             }
         }
-        zoteroReponse.getCitations().addAll(citationMap.values());
-        return zoteroReponse;
+        itemMap.values().forEach(item -> {
+            zoteroResponse.getCitations()
+                    .add(citationFactory.createCitation(item, metaDataMap.getOrDefault(item.getKey(), null)));
+        });
+        return zoteroResponse;
     }
 
     @Override
