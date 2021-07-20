@@ -308,3 +308,54 @@ a.appName:hover {
 tr.changed>td {
 	background-color: #f7e8bf;
 }
+
+.checkboxes{
+	cursor:pointer;
+}
+
+.drag-over{
+	background: #ddf;
+	border-color: blue ;
+	transition: transform .2s;
+	transform: scale(1.15);
+	-ms-transform: scale(1.15);
+    -webkit-transform: scale(1.15); 
+}
+
+.selected > td{
+  background-color: rgba(13, 173, 253, 0.37);
+  cursor: move;
+}
+
+#moveitems-panel-highlighter{
+	color:white;
+	background-color:#2554C7; 
+	font-size:120% ;
+	font-weight: bold; 
+	padding-bottom:12px;
+	padding-top: 10px;
+  	padding-right: 10px;
+  	padding-left: 10px;
+	border-radius: 10px
+}
+
+.spinner{
+    display: inline-block;
+}
+
+.sticky {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 10px;
+}
+
+#wrapper {
+  margin: auto;
+}
+
+@media (min-height: 300px) {
+  #wrapper{
+    height: 4000px;
+  }
+}
+

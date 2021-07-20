@@ -18,14 +18,14 @@
 
         <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
 
-        <spring.version>5.2.8.RELEASE</spring.version>
+        <spring.version>5.2.9.RELEASE</spring.version>
         <spring-data.version>Neumann-SR3</spring-data.version>
 
         <javers.version>5.0.0</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
-        <spring-social-zotero.version>0.7</spring-social-zotero.version>
+        <spring-social-zotero.version>0.9</spring-social-zotero.version>
         <citesphere.messages.version>0.4</citesphere.messages.version>
-        <citesphere.model.version>1.8</citesphere.model.version>
+        <citesphere.model.version>1.10</citesphere.model.version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -80,6 +80,9 @@
         <elasticsearch.path.prefix></elasticsearch.path.prefix>
         <!-- in ms (10000ms = 10s) -->
         <elasticsearch.connect.timeout>60000</elasticsearch.connect.timeout>
+
+        <giles.baseurl></giles.baseurl>
+        <citesphere.oauth2.app.clientId></citesphere.oauth2.app.clientId>
 
         <token.signing.key></token.signing.key>
 
@@ -336,6 +339,14 @@
             <version>${org.slf4j-version}</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${org.slf4j-version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
