@@ -5,7 +5,7 @@ import java.util.List;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 
 /**
- * Data transfer object to fetch item details and information about its attachments.
+ * Data transfer object to fetch item details and its attachment info
  * 
  * @author Maulik Limbadiya
  */

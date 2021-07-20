@@ -56,8 +56,6 @@ public class ItemApiController extends V1Controller {
 
         ICitation item;
         List<ICitation> attachments;
-        List<String> attachmentTitles = new ArrayList<>();
-
         try {
             item = citationManager.getCitation(user, groupId, itemKey);
             attachments = citationManager.getAttachments(user, groupId, itemKey);
@@ -69,6 +67,7 @@ public class ItemApiController extends V1Controller {
 
         ItemDetails response = new ItemDetails();
         response.setItem(item);
+        List<String> attachmentTitles = new ArrayList<>();
         attachments.forEach(attachment -> {
             attachmentTitles.add(attachment.getTitle());
         });
