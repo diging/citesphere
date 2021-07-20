@@ -33,6 +33,12 @@ public interface IAuthorityService {
 
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
     
+    /**
+     * Creates a new Authority entry and also generates a custom URI for it.
+     * @param entry Authority entry to be created
+     * @param user User creating the entry
+     * @return the created entry
+     */
     IAuthorityEntry createWithUri(IAuthorityEntry entry, IUser user);
 
     List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize);

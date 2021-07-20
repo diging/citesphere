@@ -293,7 +293,7 @@ public class AuthorityServiceTest {
     }
     
     @Test
-    public void test_createWithURI() throws InterruptedException {
+    public void test_createWithURI() {
         String username = "user";
         String id = "entry1";
         String uri = "https://test.uri/pre";

@@ -210,10 +210,15 @@ public class AuthorityService implements IAuthorityService {
         return save(entry);
     }
 
+    /* (non-Javadoc)
+     * @see
+     * edu.asu.diging.citesphere.core.service.IAuthorityService#createWithUri(edu.asu.diging.citesphere.model.authority.IAuthorityEntry,
+     * edu.asu.diging.citesphere.user.IUser)
+     */
     @Override
     @Transactional
-    //Creates a new Authority entry and also generates a custom URI for it
     public IAuthorityEntry createWithUri(IAuthorityEntry entry, IUser user) {
+        //The entry needs to be persisted first in order to generate the id which is then used to create the URI
         entry = create(entry, user);
         entry.setUri(authorityUri + authorityPrefix + entry.getId());
         return save(entry);
