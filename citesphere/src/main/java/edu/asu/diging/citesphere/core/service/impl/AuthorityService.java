@@ -10,10 +10,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
@@ -24,12 +22,12 @@ import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.IPersonMongoDao;
-import edu.asu.diging.citesphere.user.IUser;
-import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.transfer.impl.Persons;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 
 @Service
 public class AuthorityService implements IAuthorityService {
