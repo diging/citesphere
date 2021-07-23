@@ -1,16 +1,18 @@
 package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,14 +23,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.annotation.SessionScope;
+
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
-import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
 
 @Controller
@@ -55,12 +58,20 @@ public class AuthorityEntryController {
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
 
         List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
-                firstName, lastName, page, pageSize);
+                firstName, lastName);
 
-        authorityResult.setFoundAuthorities(userEntries);
+        if (!firstName.trim().isEmpty() && !lastName.trim().isEmpty()) {
+            Set<String> userEntryIds = userEntries.stream().map(IAuthorityEntry::getId).collect(Collectors.toSet());
+            List<IAuthorityEntry> lastNameEntries = authorityService
+                    .findByName((IUser) authentication.getPrincipal(), "", lastName).stream()
+                    .filter(lastNameEntry -> !userEntryIds.contains(lastNameEntry.getId()))
+                    .collect(Collectors.toList());
+            userEntries.addAll(lastNameEntries);
+        }
+        
+        authorityResult.setFoundAuthorities(getPage(userEntries, page, pageSize));
         authorityResult.setCurrentPage(page + 1);
-        authorityResult.setTotalPages(authorityService
-                .getTotalUserAuthoritiesPages((IUser) authentication.getPrincipal(), firstName, lastName, pageSize));
+        authorityResult.setTotalPages((int) Math.ceil((float) userEntries.size() / pageSize));
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     
@@ -70,13 +81,22 @@ public class AuthorityEntryController {
             @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
         
-        Page<IAuthorityEntry> groupEntries = authorityService.findByGroupAndName(Long.valueOf(zoteroGroupId),
-                firstName, lastName, page, pageSize);
+        List<IAuthorityEntry> groupEntries = authorityService.findByGroupAndName(Long.valueOf(zoteroGroupId), firstName,
+                lastName);
+        
+        if (!firstName.trim().isEmpty() && !lastName.trim().isEmpty()) {
+            Set<String> groupEntryIds = groupEntries.stream().map(IAuthorityEntry::getId).collect(Collectors.toSet());
+            List<IAuthorityEntry> lastNameEntries = authorityService
+                    .findByGroupAndName(Long.valueOf(zoteroGroupId), "", lastName).stream()
+                    .filter(lastNameEntry -> !groupEntryIds.contains(lastNameEntry.getId()))
+                    .collect(Collectors.toList());
+            groupEntries.addAll(lastNameEntries);
+        }
 
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
-        authorityResult.setFoundAuthorities(groupEntries.getContent());
+        authorityResult.setFoundAuthorities(getPage(groupEntries, page, pageSize));
         authorityResult.setCurrentPage(page + 1);
-        authorityResult.setTotalPages(groupEntries.getTotalPages());
+        authorityResult.setTotalPages((int) Math.ceil((float) groupEntries.size() / pageSize));
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     
@@ -181,4 +201,12 @@ public class AuthorityEntryController {
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
 
+    private <T> List<T> getPage(List<T> entries, int page, int pageSize) {
+        int fromIndex = Math.min(page * pageSize, entries.size());
+        if (fromIndex == entries.size()) {
+            return new ArrayList<>();
+        }
+        int toIndex = Math.min(fromIndex + pageSize, entries.size());
+        return entries.subList(fromIndex, toIndex);
+    }
 }

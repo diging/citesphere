@@ -24,9 +24,8 @@ public interface AuthorityRepository extends PagingAndSortingRepository<Authorit
     public long countByUsernameAndNameContainingAndNameContainingOrderByName(@Param("username") String username,
             @Param("firstName") String firstName, @Param("lastName") String lastName);
     
-    @Query("select a from AuthorityEntry a where :group member of a.groups and a.name like :firstName% and a.name like %:lastName order by a.name")
-    public Page<IAuthorityEntry> findByGroupAndFirstNameAndLastName(
-            @Param("group") Long group, @Param("firstName") String firstName,
-            @Param("lastName") String lastName, Pageable paging);
+    @Query("select a from AuthorityEntry a where :group member of a.groups and a.name like %:firstName% and a.name like %:lastName% order by a.name")
+    public List<IAuthorityEntry> findByGroupAndFirstNameAndLastName(@Param("group") Long group,
+            @Param("firstName") String firstName, @Param("lastName") String lastName);
 
 }

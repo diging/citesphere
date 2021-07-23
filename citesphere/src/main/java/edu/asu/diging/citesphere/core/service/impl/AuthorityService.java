@@ -167,17 +167,15 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize) {
-        Pageable paging = PageRequest.of(page, pageSize);
+    public List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName) {
         List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
-                user.getUsername(), firstName, lastName, paging);
+                user.getUsername(), firstName, lastName);
         return results;
     }
     
     @Override
-    public Page<IAuthorityEntry> findByGroupAndName(Long groupId, String firstName, String lastName, int page, int pageSize) {
-        Pageable paging = PageRequest.of(page, pageSize);
-        return authorityRepository.findByGroupAndFirstNameAndLastName(groupId, firstName, lastName, paging);
+    public List<IAuthorityEntry> findByGroupAndName(Long groupId, String firstName, String lastName) {
+        return authorityRepository.findByGroupAndFirstNameAndLastName(groupId, firstName, lastName);
     }
 
     @Override
@@ -211,14 +209,6 @@ public class AuthorityService implements IAuthorityService {
     @Override
     public IAuthorityEntry save(IAuthorityEntry entry) {
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry) entry);
-    }
-
-    @Override
-    public int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize) {
-
-        return (int) Math.ceil(new Float(authorityRepository
-                .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName))
-                / pageSize);
     }
 
     private AuthorityImporter getAuthorityImporter(String source) {

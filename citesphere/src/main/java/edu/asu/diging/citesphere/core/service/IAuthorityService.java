@@ -35,13 +35,11 @@ public interface IAuthorityService {
 
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
 
-    List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize);
+    List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName);
     
-    Page<IAuthorityEntry> findByGroupAndName(Long groupId, String firstName, String lastName, int page, int pageSize);
+    List<IAuthorityEntry> findByGroupAndName(Long groupId, String firstName, String lastName);
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
-
-    int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize);
 
     List<IAuthorityEntry> getAuthoritiesByGroup(long groupId);
         

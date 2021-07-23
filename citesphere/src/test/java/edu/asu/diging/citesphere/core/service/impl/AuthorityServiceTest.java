@@ -330,8 +330,8 @@ public class AuthorityServiceTest {
         entriesAlbert.add(entry2);
         entriesAlbert.add(entry3);
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
-                "", "Albert", paging)).thenReturn(entriesAlbert);
-        List<IAuthorityEntry> searchFirstnameAlbert = managerToTest.findByName(user, "", "Albert", page, pageSize);
+                "", "Albert")).thenReturn(entriesAlbert);
+        List<IAuthorityEntry> searchFirstnameAlbert = managerToTest.findByName(user, "", "Albert");
         Assert.assertEquals(3, searchFirstnameAlbert.size());
         for (IAuthorityEntry entry : searchFirstnameAlbert) {
             Assert.assertTrue(entry.getName().contains("Albert"));
@@ -342,7 +342,7 @@ public class AuthorityServiceTest {
     public void test_findByName_resultsNotFound() {
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
                 "Peter", "Doe", paging)).thenReturn(new ArrayList<>());
-        List<IAuthorityEntry> actual3 = managerToTest.findByName(user, "Peter", "Doe", page, pageSize);
+        List<IAuthorityEntry> actual3 = managerToTest.findByName(user, "Peter", "Doe");
         Assert.assertTrue(actual3.isEmpty());
     }
     
@@ -352,13 +352,12 @@ public class AuthorityServiceTest {
         entriesAlbert.add(entry1);
         entriesAlbert.add(entry2);
         entriesAlbert.add(entry3);
-        Page<IAuthorityEntry> entries = new PageImpl<>(entriesAlbert);
-        Mockito.when(authorityRepository.findByGroupAndFirstNameAndLastName(groupId, "", "Albert", paging))
+        List<IAuthorityEntry> entries = new ArrayList<>(entriesAlbert);
+        Mockito.when(authorityRepository.findByGroupAndFirstNameAndLastName(groupId, "", "Albert"))
                 .thenReturn(entries);
-        Page<IAuthorityEntry> searchResult = managerToTest.findByGroupAndName(groupId, "", "Albert", page, pageSize);
-        Assert.assertEquals(3, searchResult.getTotalElements());
-        List<IAuthorityEntry> resultEntries = searchResult.getContent();
-        for(IAuthorityEntry entry : resultEntries) {
+        List<IAuthorityEntry> searchResult = managerToTest.findByGroupAndName(groupId, "", "Albert");
+        Assert.assertEquals(3, searchResult.size());
+        for(IAuthorityEntry entry : searchResult) {
             Assert.assertTrue(entry.getGroups().contains(groupId));
             Assert.assertTrue(entry.getName().contains("Albert"));
         }
@@ -366,20 +365,12 @@ public class AuthorityServiceTest {
     
     @Test
     public void test_findByGroupAndName_emptyResult() {
-        Mockito.when(authorityRepository.findByGroupAndFirstNameAndLastName(groupId, "Peter", "Doe", paging))
-                .thenReturn(new PageImpl<>(new ArrayList<>()));
-        Page<IAuthorityEntry> searchResult = managerToTest.findByGroupAndName(groupId, "Peter", "Doe", page, pageSize);
-        Assert.assertTrue(searchResult.getContent().isEmpty());
+        Mockito.when(authorityRepository.findByGroupAndFirstNameAndLastName(groupId, "Peter", "Doe"))
+                .thenReturn(new ArrayList<>());
+        List<IAuthorityEntry> searchResult = managerToTest.findByGroupAndName(groupId, "Peter", "Doe");
+        Assert.assertTrue(searchResult.isEmpty());
     }
 
-    @Test
-    public void test_getTotalUserAuthoritiesPages() {
-        pageSize = 2;
-        Mockito.when(authorityRepository
-                .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), "", "Albert"))
-                .thenReturn((long) 3);
-        Assert.assertEquals(2, managerToTest.getTotalUserAuthoritiesPages(user, "", "Albert", pageSize));
-    }
 
     @Test
     public void test_searchAuthorityEntries_ConceptpowerAuthorityNotImportedByUser()
