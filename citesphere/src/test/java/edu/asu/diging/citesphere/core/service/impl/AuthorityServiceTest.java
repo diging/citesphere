@@ -336,7 +336,7 @@ public class AuthorityServiceTest {
     @Test
     public void test_findByName_resultsNotFound() {
         Mockito.when(authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(),
-                "Peter", "Doe", paging)).thenReturn(new ArrayList<>());
+                "Peter", "Doe")).thenReturn(new ArrayList<>());
         List<IAuthorityEntry> actual3 = managerToTest.findByName(user, "Peter", "Doe");
         Assert.assertTrue(actual3.isEmpty());
     }

@@ -55,8 +55,6 @@ public class AuthorityEntryController {
             @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
-
         List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
                 firstName, lastName);
 
@@ -69,6 +67,7 @@ public class AuthorityEntryController {
             userEntries.addAll(lastNameEntries);
         }
         
+        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
         authorityResult.setFoundAuthorities(getPage(userEntries, page, pageSize));
         authorityResult.setCurrentPage(page + 1);
         authorityResult.setTotalPages((int) Math.ceil((float) userEntries.size() / pageSize));
