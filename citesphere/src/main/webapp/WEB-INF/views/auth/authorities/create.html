@@ -29,19 +29,27 @@ $(function() {
         })
         $("#searchAuthorSpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-        getconceptpowerAuthorities('Author', 'Author', 0)
+        getConceptpowerAuthorities('Author', 'Author', 0)
         $("#searchAuthorSpinner").hide();
     });
 
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
         var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-        $.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]]+uri, function(data) {
-            $("#authorCreateAuthority").hide();
-            $("#uriAuthorLocalId").val(data['id']);
-            $("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i><br>.");
-            $("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-            showPersonNameInModal(data['name'], "Author");
-            $("#uriLoadingFoundAuthor").popover('hide');
+        importAuthorityURL = [[@{|/auth/authority/import?uri=|}]]+uri;
+        $.ajax({
+            dataType: "json",
+            type: 'POST',
+            url: importAuthorityURL,
+            data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
+            async: false, 
+            success: function(data) {
+                $("#authorCreateAuthority").hide();
+                $("#uriAuthorLocalId").val(data['id']);
+                $("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i><br>.");
+                $("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+                showPersonNameInModal(data['name'], "Author");
+                $("#uriLoadingFoundAuthor").popover('hide');
+            }
         });
     });
 
@@ -105,7 +113,7 @@ function showPersonNameInModal(name, personType) {
     }
 }
 
-function getconceptpowerAuthorities(modalType, personType, page) {
+function getConceptpowerAuthorities(modalType, personType, page) {
     var firstName = $("#firstName" + personType).val();
     var lastName = $("#lastName" + personType).val();
     personType_lowerCase = personType.toLowerCase();
@@ -139,7 +147,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
                     visiblePages: 5,
                     initiateStartPageClick: false,
                     onPageClick: function(event, page) {
-                        getconceptpowerAuthorities(modalType, personType, page)
+                        getConceptpowerAuthorities(modalType, personType, page)
                     }
                 });
 
@@ -249,7 +257,7 @@ function getPersonAuthority(uri, personType) {
 
 <div layout:fragment="content">
 <h1>Create Authority</h1>
-
+<p>To import an authority from another service, click the search button.</p>
 <p class="pull-right">
     <button data-toggle="modal" data-target="#authorModal" class="btn btn-primary btn-sm">&nbsp;Search</button>
 </p>
