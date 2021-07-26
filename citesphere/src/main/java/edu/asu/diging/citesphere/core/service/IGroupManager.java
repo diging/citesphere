@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.service;
 
-import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import java.util.List;
+
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -13,4 +14,7 @@ public interface IGroupManager {
      * @param groupId Zotero id of the group to be deleted
      */
     void deleteLocalGroupCopy(String groupId);
+
+    List<ICitationGroup> getGroupInstancesForGroupId(String groupId);
+
 }

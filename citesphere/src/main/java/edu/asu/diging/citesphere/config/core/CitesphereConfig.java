@@ -20,6 +20,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import edu.asu.diging.citesphere.core.email.impl.NotSetupMailSender;
@@ -28,6 +29,7 @@ import edu.asu.diging.citesphere.core.email.impl.NotSetupMailSender;
 @EnableCaching
 @EnableAsync
 @EnableSpringDataWebSupport
+@EnableScheduling
 @PropertySource("classpath:/config.properties")
 public class CitesphereConfig {
     

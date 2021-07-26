@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +54,10 @@ public class CitationStore implements ICitationStore {
     public void deleteCitationByGroupId(String groupId) {
         citationRepository.deleteByGroup(groupId);
         indexer.deleteCitationByGroupId(groupId);
+    }
+    
+    @Override
+    public List<ICitation> findByGilesDocumentId(String documentId) {
+        return citationRepository.findByGilesUploadsDocumentId(documentId);
     }
 }
