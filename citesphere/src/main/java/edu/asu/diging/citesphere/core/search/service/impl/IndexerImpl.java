@@ -53,6 +53,7 @@ public class IndexerImpl implements Indexer {
     public void deleteCitationByGroupId(String groupId) {
         referenceRepo.deleteByGroup(groupId);
     }
+    
     private void mapCitation(ICitation citation, Reference reference) {
         reference.setAbstractNote(citation.getAbstractNote());
         reference.setAccessDate(citation.getAccessDate());
