@@ -10,6 +10,7 @@ import edu.asu.diging.citesphere.core.search.service.Indexer;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 
 /**
@@ -28,7 +29,7 @@ public class CitationStore implements ICitationStore {
     private Indexer indexer;
 
     /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.ICitationStore#save(edu.asu.diging.citesphere.model.bib.ICitation)
+     * @see edu.asu.diging.citesphere.core.service.ICitationStore#save(edu.asu.diging.citesphere.model.bib.ICitation)
      */
     @Override
     public ICitation save(ICitation citation) {
@@ -37,7 +38,7 @@ public class CitationStore implements ICitationStore {
     }
     
     /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.core.service.impl.ICitationStore#findById(java.lang.String)
+     * @see edu.asu.diging.citesphere.core.service.ICitationStore#findById(java.lang.String)
      */
     @Override
     public Optional<ICitation> findById(String id) {
@@ -49,7 +50,15 @@ public class CitationStore implements ICitationStore {
         indexer.deleteCitation(citation);
         citationRepository.delete((Citation) citation);
     }
-    
+
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.ICitationStore#getAttachments(java.lang.String)
+     */
+    @Override
+    public List<ICitation> getAttachments(String id) {
+        return citationRepository.findByParentItemAndItemTypeAndDeleted(id, ItemType.ATTACHMENT.name(), 0);
+    }
+
     @Override
     public List<ICitation> findByGilesDocumentId(String documentId) {
         return citationRepository.findByGilesUploadsDocumentId(documentId);
