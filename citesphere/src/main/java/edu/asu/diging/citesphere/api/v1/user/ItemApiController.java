@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,11 +68,7 @@ public class ItemApiController extends V1Controller {
 
         ItemDetails response = new ItemDetails();
         response.setItem(item);
-        List<String> attachmentTitles = new ArrayList<>();
-        attachments.forEach(attachment -> {
-            attachmentTitles.add(attachment.getTitle());
-        });
-        response.setAttachments(attachmentTitles);
+        response.setAttachments(attachments.stream().map(ICitation::getTitle).collect(Collectors.toList()));
 
         String jsonResponse = "";
         try {
