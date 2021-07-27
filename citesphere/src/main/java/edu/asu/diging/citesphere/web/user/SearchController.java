@@ -71,7 +71,7 @@ public class SearchController {
 
         model.addAttribute("searchTerm", searchTerm);
         model.addAttribute("items", citations.getResults());
-        model.addAttribute("totalPages", citations.getTotalPages());
+        model.addAttribute("totalPages", Math.max(1, citations.getTotalPages()));
         model.addAttribute("total", citations.getTotalResults());
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
