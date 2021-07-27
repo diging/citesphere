@@ -146,14 +146,21 @@ $(function() {
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#authorCreateAuthority").hide();
-			
-			$("#uriAuthorLocalId").val(data['id']);
-			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], "Author");
-			$("#uriLoadingFoundAuthor").popover('hide');
+		importAuthorityURL = [[@{|/auth/authority/import?uri=|}]]+uri;
+		$.ajax({
+			dataType: "json",
+			type: 'POST',
+			url: importAuthorityURL,
+			data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
+			async: false,
+			success: function(data) {
+				$("#authorCreateAuthority").hide();
+				$("#uriAuthorLocalId").val(data['id']);
+				$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+				$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+				showPersonNameInModal(data['name'], "Author");
+				$("#uriLoadingFoundAuthor").popover('hide');
+			}
 		});
 	});
 	
@@ -223,13 +230,21 @@ $(function() {
 	
 	$("#editorIconContainer").on('click', ".popover #editorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundEditor").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#editorCreateAuthority").hide();
-			$("#uriEditorLocalId").val(data['id']);
-			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], "Editor");
-			$("#uriLoadingFoundEditor").popover('hide');
+		importAuthorityURL = [[@{|/auth/authority/import?uri=|}]]+uri;
+		$.ajax({
+			dataType: "json",
+			type: 'POST',
+			url: importAuthorityURL,
+			data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
+			async: false,
+			success: function(data) {
+				$("#editorCreateAuthority").hide();
+				$("#uriEditorLocalId").val(data['id']);
+				$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+				$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+				showPersonNameInModal(data['name'], "Editor");
+				$("#uriLoadingFoundEditor").popover('hide');
+			}
 		});
 	});
 	
@@ -296,13 +311,21 @@ $(function() {
 	
 	$("#creatorIconContainer").on('click', ".popover #creatorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundCreator").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#creatorCreateAuthority").hide();
-			$("#uriCreatorLocalId").val(data['id']);
-			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], "Creator");
-			$("#uriLoadingFoundCreator").popover('hide');
+		importAuthorityURL = [[@{|/auth/authority/import?uri=|}]]+uri;
+		$.ajax({
+			dataType: "json",
+			type: 'POST',
+			url: importAuthorityURL,
+			data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
+			async: false,
+			success: function(data) {
+				$("#creatorCreateAuthority").hide();
+				$("#uriCreatorLocalId").val(data['id']);
+				$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+				$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+				showPersonNameInModal(data['name'], "Creator");
+				$("#uriLoadingFoundCreator").popover('hide');
+			}
 		});
 	});
 	
