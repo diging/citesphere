@@ -8,16 +8,16 @@ body{
 }
 
 [class*="icon"]{
-  font-size: 16px;
+  font-size: 18px;
   color: black;
 }
 
 .icon-user, .icon-sync, .icon-admin, .icon-sign-out-alt, .icon-redo-alt, .icon-checkmark-alt, .icon-download, .icon-user-check, .con-arrow-right, .icon-arrow-left, 
-	.icon-arrow-right, .icon-arrow-left, .icon-spinner, .icon-trash-alt  {
+	.icon-arrow-right, .icon-arrow-left, .icon-spinner, .icon-trash-alt, .icon-circle-add  {
   color: #337ab7;
 }
 
-.icon-circle-add, .icon-save-alt {
+.btn.icon-circle-add, .btn.icon-save-alt {
   color: white;
 }
 
