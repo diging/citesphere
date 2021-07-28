@@ -27,6 +27,8 @@ public interface IZoteroConnector {
     ZoteroResponse<Group> getGroups(IUser user);
 
     Item getItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
+    
+    List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
 
     ZoteroResponse<Group> getGroupsVersions(IUser user);
 
