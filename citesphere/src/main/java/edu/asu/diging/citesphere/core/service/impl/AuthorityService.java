@@ -178,9 +178,8 @@ public class AuthorityService implements IAuthorityService {
     public Page<IAuthorityEntry> findByFirstNameAndLastName(IUser user, String firstName, String lastName, int page,
             int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
-        Page<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
+        return authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
                 user.getUsername(), firstName, lastName, paging);
-        return results;
     }
     
     /*
@@ -194,10 +193,9 @@ public class AuthorityService implements IAuthorityService {
     public Page<IAuthorityEntry> findByLastNameAndExcludingFirstName(IUser user, String firstName, String lastName,
             int page, int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
-        Page<IAuthorityEntry> results = authorityRepository
+        return authorityRepository
                 .findByUsernameAndNameNotContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName,
                         paging);
-        return results;
     }
     
     @Override
