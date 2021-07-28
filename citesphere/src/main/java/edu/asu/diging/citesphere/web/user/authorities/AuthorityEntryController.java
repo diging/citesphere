@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -55,47 +56,57 @@ public class AuthorityEntryController {
             @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
-                firstName, lastName);
-
-        if (!firstName.trim().isEmpty() && !lastName.trim().isEmpty()) {
-            Set<String> userEntryIds = userEntries.stream().map(IAuthorityEntry::getId).collect(Collectors.toSet());
-            List<IAuthorityEntry> lastNameEntries = authorityService
-                    .findByName((IUser) authentication.getPrincipal(), "", lastName).stream()
-                    .filter(lastNameEntry -> !userEntryIds.contains(lastNameEntry.getId()))
-                    .collect(Collectors.toList());
-            userEntries.addAll(lastNameEntries);
-        }
-        
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
-        authorityResult.setFoundAuthorities(getPage(userEntries, page, pageSize));
+
+        int totalPages = authorityService.getTotalUserAuthoritiesPages((IUser) authentication.getPrincipal(), firstName,
+                lastName, pageSize);
+        authorityResult.setTotalPages(totalPages);
+
+        Page<IAuthorityEntry> fullNameEntries = authorityService
+                .findByFirstNameAndLastName((IUser) authentication.getPrincipal(), firstName, lastName, page, pageSize);
+        List<IAuthorityEntry> userEntries = new ArrayList<>();
+        userEntries.addAll(fullNameEntries.getContent());
+        // If the user entries found by full name does not fill the page entirely,
+        // search by just the last name to complete the rest of the page
+        // This works for both the cases:
+        // 1) The page is partially filled by the entries found by full name
+        // 2) All the entries by full name are exhausted and the page is suppose to be
+        // entirely filled by entries for last name
+        if (userEntries.size() < pageSize && !lastName.trim().isEmpty()) {
+            Page<IAuthorityEntry> lastNameEntries = authorityService.findByLastNameExcludingFirstName(
+                    (IUser) authentication.getPrincipal(), firstName, lastName,
+                    page - fullNameEntries.getTotalPages() + 1, pageSize - userEntries.size());
+            userEntries.addAll(lastNameEntries.getContent());
+        }
+        authorityResult.setFoundAuthorities(userEntries);
         authorityResult.setCurrentPage(page + 1);
-        authorityResult.setTotalPages((int) Math.ceil((float) userEntries.size() / pageSize));
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     
     @RequestMapping("/auth/authority/{zoteroGroupId}/find/authorities/group")
-    public ResponseEntity<AuthoritySearchResult> getGroupAuthorities(@PathVariable("zoteroGroupId") String zoteroGroupId,
+    public ResponseEntity<AuthoritySearchResult> getGroupAuthorities(
+            @PathVariable("zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-        
-        List<IAuthorityEntry> groupEntries = authorityService.findByGroupAndName(Long.valueOf(zoteroGroupId), firstName,
-                lastName);
-        
-        if (!firstName.trim().isEmpty() && !lastName.trim().isEmpty()) {
-            Set<String> groupEntryIds = groupEntries.stream().map(IAuthorityEntry::getId).collect(Collectors.toSet());
-            List<IAuthorityEntry> lastNameEntries = authorityService
-                    .findByGroupAndName(Long.valueOf(zoteroGroupId), "", lastName).stream()
-                    .filter(lastNameEntry -> !groupEntryIds.contains(lastNameEntry.getId()))
-                    .collect(Collectors.toList());
-            groupEntries.addAll(lastNameEntries);
-        }
 
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
-        authorityResult.setFoundAuthorities(getPage(groupEntries, page, pageSize));
+        Long groupId = Long.valueOf(zoteroGroupId);
+        int totalPages = authorityService.getTotalGroupAuthoritiesPages(groupId, firstName, lastName, pageSize);
+        authorityResult.setTotalPages(totalPages);
+
+        Page<IAuthorityEntry> fullNameEntries = authorityService.findByGroupAndFirstNameAndLastName(groupId, firstName,
+                lastName, page, pageSize);
+        List<IAuthorityEntry> groupEntries = new ArrayList<>();
+        groupEntries.addAll(fullNameEntries.getContent());
+        // Same reasoning as the getUserAuthorities() method
+        if (groupEntries.size() < pageSize && !lastName.trim().isEmpty()) {
+            Page<IAuthorityEntry> lastNameEntries = authorityService.findByGroupAndLastNameExcludingFirstName(groupId,
+                    firstName, lastName, page - fullNameEntries.getTotalPages() + 1, pageSize - groupEntries.size());
+            groupEntries.addAll(lastNameEntries.getContent());
+        }
+        authorityResult.setFoundAuthorities(groupEntries);
         authorityResult.setCurrentPage(page + 1);
-        authorityResult.setTotalPages((int) Math.ceil((float) groupEntries.size() / pageSize));
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     

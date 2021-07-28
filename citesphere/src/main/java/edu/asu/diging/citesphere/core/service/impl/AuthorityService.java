@@ -10,6 +10,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
@@ -165,15 +168,53 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName) {
-        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
-                user.getUsername(), firstName, lastName);
+    public Page<IAuthorityEntry> findByFirstNameAndLastName(IUser user, String firstName, String lastName, int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        Page<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
+                user.getUsername(), firstName, lastName, paging);
         return results;
     }
     
     @Override
-    public List<IAuthorityEntry> findByGroupAndName(Long groupId, String firstName, String lastName) {
-        return authorityRepository.findByGroupAndFirstNameAndLastName(groupId, firstName, lastName);
+    public Page<IAuthorityEntry> findByLastNameExcludingFirstName(IUser user, String firstName, String lastName, int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        Page<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameNotContainingAndNameContainingOrderByName(
+                user.getUsername(), firstName, lastName, paging);
+        return results;
+    }
+    
+    @Override
+    public int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize) {
+        long total;
+        if (!lastName.trim().isEmpty()) {
+            total = authorityRepository.countByUsernameAndNameContaining(user.getUsername(), lastName);
+        } else {
+            total = authorityRepository.countByUsernameAndNameContaining(user.getUsername(), firstName);
+        }
+        return (int) Math.ceil(new Float(total)/ pageSize);
+    }
+    
+    @Override
+    public Page<IAuthorityEntry> findByGroupAndFirstNameAndLastName(Long groupId, String firstName, String lastName, int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        return authorityRepository.findByGroupsContainingAndNameContainingAndNameContainingOrderByName(groupId, firstName, lastName, paging);
+    }
+    
+    @Override
+    public Page<IAuthorityEntry> findByGroupAndLastNameExcludingFirstName(Long groupId, String firstName, String lastName, int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        return authorityRepository.findByGroupsContainingAndNameNotContainingAndNameContainingOrderByName(groupId, firstName, lastName, paging);
+    }
+    
+    @Override
+    public int getTotalGroupAuthoritiesPages(Long groupId, String firstName, String lastName, int pageSize) {
+        long total;
+        if (!lastName.trim().isEmpty()) {
+            total = authorityRepository.countByGroupsContainingAndNameContaining(groupId, lastName);
+        } else {
+            total = authorityRepository.countByGroupsContainingAndNameContaining(groupId, firstName);
+        }
+        return (int) Math.ceil(new Float(total)/ pageSize);
     }
 
     @Override
