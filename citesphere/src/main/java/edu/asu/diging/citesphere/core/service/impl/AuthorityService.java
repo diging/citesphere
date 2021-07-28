@@ -167,54 +167,93 @@ public class AuthorityService implements IAuthorityService {
         return entries;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * findByFirstNameAndLastName(edu.asu.diging.citesphere.user.IUser,
+     * java.lang.String, java.lang.String, int, int)
+     */
     @Override
-    public Page<IAuthorityEntry> findByFirstNameAndLastName(IUser user, String firstName, String lastName, int page, int pageSize) {
+    public Page<IAuthorityEntry> findByFirstNameAndLastName(IUser user, String firstName, String lastName, int page,
+            int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
         Page<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
                 user.getUsername(), firstName, lastName, paging);
         return results;
     }
     
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * findByLastNameAndExcludingFirstName(edu.asu.diging.citesphere.user.IUser,
+     * java.lang.String, java.lang.String, int, int)
+     */
     @Override
-    public Page<IAuthorityEntry> findByLastNameExcludingFirstName(IUser user, String firstName, String lastName, int page, int pageSize) {
+    public Page<IAuthorityEntry> findByLastNameAndExcludingFirstName(IUser user, String firstName, String lastName,
+            int page, int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
-        Page<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameNotContainingAndNameContainingOrderByName(
-                user.getUsername(), firstName, lastName, paging);
+        Page<IAuthorityEntry> results = authorityRepository
+                .findByUsernameAndNameNotContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName,
+                        paging);
         return results;
     }
     
     @Override
     public int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize) {
         long total;
+        // If the last name is not empty then total authority count would be same as the
+        // users whose name contains the given last name
         if (!lastName.trim().isEmpty()) {
             total = authorityRepository.countByUsernameAndNameContaining(user.getUsername(), lastName);
         } else {
             total = authorityRepository.countByUsernameAndNameContaining(user.getUsername(), firstName);
         }
-        return (int) Math.ceil(new Float(total)/ pageSize);
+        return (int) Math.ceil(new Float(total) / pageSize);
     }
     
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * findByGroupAndFirstNameAndLastName(java.lang.Long, java.lang.String,
+     * java.lang.String, int, int)
+     */
     @Override
-    public Page<IAuthorityEntry> findByGroupAndFirstNameAndLastName(Long groupId, String firstName, String lastName, int page, int pageSize) {
+    public Page<IAuthorityEntry> findByGroupAndFirstNameAndLastName(Long groupId, String firstName, String lastName,
+            int page, int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
-        return authorityRepository.findByGroupsContainingAndNameContainingAndNameContainingOrderByName(groupId, firstName, lastName, paging);
+        return authorityRepository.findByGroupsContainingAndNameContainingAndNameContainingOrderByName(groupId,
+                firstName, lastName, paging);
     }
     
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * findByGroupAndLastNameAndExcludingFirstName(java.lang.Long, java.lang.String,
+     * java.lang.String, int, int)
+     */
     @Override
-    public Page<IAuthorityEntry> findByGroupAndLastNameExcludingFirstName(Long groupId, String firstName, String lastName, int page, int pageSize) {
+    public Page<IAuthorityEntry> findByGroupAndLastNameAndExcludingFirstName(Long groupId, String firstName,
+            String lastName, int page, int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
-        return authorityRepository.findByGroupsContainingAndNameNotContainingAndNameContainingOrderByName(groupId, firstName, lastName, paging);
+        return authorityRepository.findByGroupsContainingAndNameNotContainingAndNameContainingOrderByName(groupId,
+                firstName, lastName, paging);
     }
     
     @Override
     public int getTotalGroupAuthoritiesPages(Long groupId, String firstName, String lastName, int pageSize) {
         long total;
+        // If the last name is not empty then total authority count would be same as the
+        // users whose name contains the given last name
         if (!lastName.trim().isEmpty()) {
             total = authorityRepository.countByGroupsContainingAndNameContaining(groupId, lastName);
         } else {
             total = authorityRepository.countByGroupsContainingAndNameContaining(groupId, firstName);
         }
-        return (int) Math.ceil(new Float(total)/ pageSize);
+        return (int) Math.ceil(new Float(total) / pageSize);
     }
 
     @Override

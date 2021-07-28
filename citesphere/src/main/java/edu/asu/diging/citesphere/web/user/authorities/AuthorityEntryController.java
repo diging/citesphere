@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +72,7 @@ public class AuthorityEntryController {
         // 2) All the entries by full name are exhausted and the page is suppose to be
         // entirely filled by entries for last name
         if (userEntries.size() < pageSize && !lastName.trim().isEmpty()) {
-            Page<IAuthorityEntry> lastNameEntries = authorityService.findByLastNameExcludingFirstName(
+            Page<IAuthorityEntry> lastNameEntries = authorityService.findByLastNameAndExcludingFirstName(
                     (IUser) authentication.getPrincipal(), firstName, lastName,
                     page - fullNameEntries.getTotalPages() + 1, pageSize - userEntries.size());
             userEntries.addAll(lastNameEntries.getContent());
@@ -101,8 +100,9 @@ public class AuthorityEntryController {
         groupEntries.addAll(fullNameEntries.getContent());
         // Same reasoning as the getUserAuthorities() method
         if (groupEntries.size() < pageSize && !lastName.trim().isEmpty()) {
-            Page<IAuthorityEntry> lastNameEntries = authorityService.findByGroupAndLastNameExcludingFirstName(groupId,
-                    firstName, lastName, page - fullNameEntries.getTotalPages() + 1, pageSize - groupEntries.size());
+            Page<IAuthorityEntry> lastNameEntries = authorityService.findByGroupAndLastNameAndExcludingFirstName(
+                    groupId, firstName, lastName, page - fullNameEntries.getTotalPages() + 1,
+                    pageSize - groupEntries.size());
             groupEntries.addAll(lastNameEntries.getContent());
         }
         authorityResult.setFoundAuthorities(groupEntries);
@@ -210,13 +210,5 @@ public class AuthorityEntryController {
         }
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
-
-    private <T> List<T> getPage(List<T> entries, int page, int pageSize) {
-        int fromIndex = Math.min(page * pageSize, entries.size());
-        if (fromIndex == entries.size()) {
-            return new ArrayList<>();
-        }
-        int toIndex = Math.min(fromIndex + pageSize, entries.size());
-        return entries.subList(fromIndex, toIndex);
-    }
+    
 }

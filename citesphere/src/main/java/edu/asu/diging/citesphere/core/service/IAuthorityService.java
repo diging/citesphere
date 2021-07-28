@@ -36,23 +36,54 @@ public interface IAuthorityService {
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
 
     /**
-     * Finds the authorities whose name matches for the given first and last name
-     * and which are created or imported by the given user
+     * Finds the authorities which are created or imported by the given user whose
+     * name matches the given first and last name
+     * 
      * @param user      User who created or imported the authority
-     * @param firstName First name to be searched for
-     * @param lastName  Last name to be searched for
+     * @param firstName First name by which the authorities are to be searched
+     * @param lastName  Last name by which the authorities are to be searched
      * @param page      Requested page number
      * @param pageSize  Size of the requested page
      * @return Requested page of the found authorities
      */
     Page<IAuthorityEntry> findByFirstNameAndLastName(IUser user, String firstName, String lastName, int page, int pageSize);
     
+    /**
+     * Finds the authorities which are created or imported by the user whose name
+     * matches the given last name and does not match the given first name
+     * @param user      User who created or imported the authority
+     * @param firstName First name by which the authorities are to be excluded
+     * @param lastName  Last name by which the authorities are to be searched
+     * @param page      Requested page number
+     * @param pageSize  Size of the requested page
+     * @return Requested page of the found authorities
+     */
     Page<IAuthorityEntry> findByLastNameAndExcludingFirstName(IUser user, String firstName, String lastName, int page, int pageSize);
     
     int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize);
     
+    /**
+     * Finds the authorities who belong to the given group and whose name matches
+     * the given first and last name
+     * @param groupId   Group Id to which the authority should belong to
+     * @param firstName First name by which the authorities are to be searched
+     * @param lastName  Last name by which the authorities are to be searched
+     * @param page      Requested page number
+     * @param pageSize  Size of the requested page
+     * @return Requested page of the found authorities
+     */
     Page<IAuthorityEntry> findByGroupAndFirstNameAndLastName(Long groupId, String firstName, String lastName, int page, int pageSize);
     
+    /**
+     * Finds the authorities who belong to the given group and whose name matches
+     * the given last name and does not match the given first name
+     * @param groupId   Group Id to which the authority should belong to
+     * @param firstName First name by which the authorities are to be excluded
+     * @param lastName  Last name by which the authorities are to be searched
+     * @param page      Requested page number
+     * @param pageSize  Size of the requested page
+     * @return Requested page of the found authorities
+     */
     Page<IAuthorityEntry> findByGroupAndLastNameAndExcludingFirstName(Long groupId, String firstName, String lastName, int page, int pageSize);
     
     int getTotalGroupAuthoritiesPages(Long groupId, String firstName, String lastName, int pageSize);
