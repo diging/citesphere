@@ -515,6 +515,13 @@
             <artifactId>javers-persistence-sql</artifactId>
             <version>${javers.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.javers/javers-persistence-mongo -->
+        <dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-persistence-mongo</artifactId>
+            <version>${javers.version}</version>
+        </dependency>
+        
 
         <!-- Testing -->
         <!-- https://mvnrepository.com/artifact/junit/junit -->

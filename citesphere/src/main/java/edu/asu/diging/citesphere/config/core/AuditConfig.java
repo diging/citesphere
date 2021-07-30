@@ -1,22 +1,21 @@
 package edu.asu.diging.citesphere.config.core;
 
 import org.javers.core.Javers;
-import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
+import org.javers.core.JaversBuilder;
+import org.javers.repository.mongo.MongoRepository;
 import org.javers.repository.sql.ConnectionProvider;
-import org.javers.repository.sql.DialectName;
-import org.javers.repository.sql.JaversSqlRepository;
-import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
-import org.javers.spring.jpa.TransactionalJaversBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.mongodb.MongoClient;
 
 @Configuration
 public class AuditConfig {
@@ -26,12 +25,16 @@ public class AuditConfig {
 
     @Bean
     public Javers javers() {
-        JaversSqlRepository sqlRepository = SqlRepositoryBuilder.sqlRepository()
-                .withConnectionProvider(jpaConnectionProvider()).withDialect(DialectName.MYSQL).build();
+        MongoRepository javersMongoRepository =
+                new MongoRepository(mongo().getDatabase("citesphere"));
 
-        return TransactionalJaversBuilder.javers().withTxManager(txManager)
-                .withObjectAccessHook(new HibernateUnproxyObjectAccessHook()).registerJaversRepository(sqlRepository)
+        return JaversBuilder.javers()
+                .registerJaversRepository(javersMongoRepository)
                 .build();
+    }
+    
+    public MongoClient mongo() {
+        return new MongoClient();
     }
 
     @Bean
