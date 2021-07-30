@@ -264,15 +264,32 @@ function getPersonAuthority(uri, personType) {
 
 <form action="#" th:action="@{/auth/authority/create}" method="POST" th:object="${authorityForm}">
     <table class="table table-striped">
-        
+    
     <tr>
-        <td width="20%"><label>Name</label></td>
-        <td><input th:field="*{name}" class="form-control"></input></td>
+        <td width="20%"><label>Group</label></td>
+        <td>
+            <select th:field="*{groupId}" class="form-control" id="addConceptConceptSelect">
+                <option th:value=null>None</option>
+                <th:block th:each="group:${groups}">
+                    <option th:value="${group.groupId}">[[${group.name}]]</option>
+                </th:block>
+            </select>
+        </td>
     </tr>
     
     <tr>
-        <td width="20%"><label>Description</label></td>
-        <td><input th:field="*{description}" class="form-control"></input></td>
+        <td width="20%"><label for="name">Name</label></td>
+        <td><input id="name" th:field="*{name}" class="form-control"></input></td>
+    </tr>
+    
+    <tr>
+        <td width="20%"><label for="description">Description</label></td>
+        <td><input id="description" th:field="*{description}" class="form-control"></input></td>
+    </tr>
+    
+    <tr type="hidden">
+        <td width="20%"><label for="uri">URI</label></td>
+        <td><input id="uri" th:field="*{uri}" class="form-control"></input></td>
     </tr>
     
     </table>
