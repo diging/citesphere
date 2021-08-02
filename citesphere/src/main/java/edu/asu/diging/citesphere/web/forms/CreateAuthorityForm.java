@@ -4,6 +4,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
 public class CreateAuthorityForm {
+    
     private String description;
     
     @NotEmpty(message = "Name cannot be empty.")
@@ -11,6 +12,10 @@ public class CreateAuthorityForm {
 
     @Pattern(regexp="[0-9]*", message="Group Id can only contain numeric value.")
     private String groupId;
+    
+    private String uri;
+
+    private String importerId;
     
     public String getDescription() {
         return description;
@@ -34,5 +39,21 @@ public class CreateAuthorityForm {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getImporterId() {
+        return importerId;
+    }
+
+    public void setImporterId(String importerId) {
+        this.importerId = importerId;
     }
 }

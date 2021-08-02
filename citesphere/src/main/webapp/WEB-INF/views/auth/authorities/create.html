@@ -9,6 +9,9 @@ $(function() {
     $("#uriLoadingFailureAuthor").hide();
     $("#uriLoadingFoundAuthor").hide();
     $("#searchAuthorSpinner").hide();
+    $("#tr-uriAuthor").hide();
+    $("#importerId").hide();
+    
 
     $("#firstNameAuthor").keyup(function(e) {
         allowAuthoritySearch("Author");
@@ -41,13 +44,13 @@ $(function() {
             type: 'POST',
             url: importAuthorityURL,
             data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
-            async: false, 
+            async: false,
             success: function(data) {
                 $("#authorCreateAuthority").hide();
                 $("#uriAuthorLocalId").val(data['id']);
                 $("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i><br>.");
                 $("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-                showPersonNameInModal(data['name'], "Author");
+                showPerson(data['name'], data['description'], data['uri'], data['importerId']);
                 $("#uriLoadingFoundAuthor").popover('hide');
             }
         });
@@ -80,37 +83,21 @@ function allowAuthoritySearch(element) {
 }
 
 /* Function to populate name in modal fetched from uri */
-function showPersonNameInModal(name, personType) {
-    var personName = name;
-
-    /* Name containing brackets
-    example: Dempsey, Hugh A. (Hugh Aylmer), 1929- */
-    if (name.includes("(")) {
-        personName = name.substring(0, name.indexOf("("));
-    }
-
-    /* Name containing title/year
-    example: Iqbāl, Muḥammad, Sir, 1877-1938 */
-    if (personName.split(",").length > 2) {
-        personName = personName.substring(0, personName.indexOf(',', personName.indexOf(",") + 1));
-    }
-
-    /* Name containing span
-    example: Dempsey, Patrick, 1966- */
-    if (personName.includes("-")) {
-        personName = personName.trim();
-        personName = personName.substring(0, personName.lastIndexOf(' '));
-    }
-
-    /* Name separated by comma
-    example: Dempsey, Paul Stephen */
-    if (personName.indexOf(",") != -1) {
-        $("#firstName" + personType).val(personName.substring(personName.indexOf(',') + 1).trim());
-        $("#lastName" + personType).val(personName.substring(0, personName.lastIndexOf(', ')));
-    } else {
-        $("#lastName" + personType).val(personName.substring(personName.lastIndexOf(' ') + 1).trim());
-        $("#firstName" + personType).val(personName.substring(0, personName.lastIndexOf(' ')));
-    }
+function showPerson(name, description, uri, importerId) {
+	$("#name").val(name);
+	
+	if (description != undefined && description != ' - ') {
+		$("#description").val(description);
+	}
+	
+	if(uri != undefined && uri!='') {
+		$("#uri").val(uri);
+		$("#tr-uriAuthor").show();
+	}
+	
+	if(importerId != undefined) {
+		$("#importerId").val(importerId);
+	}
 }
 
 function getConceptpowerAuthorities(modalType, personType, page) {
@@ -129,11 +116,17 @@ function getConceptpowerAuthorities(modalType, personType, page) {
 
             if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
                 data['foundAuthorities'].forEach(function(elem) {
-                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
+                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
                     if (elem['description'] == null) {
                         content += ' - </td>';
                     } else {
                         content += elem['description'] + '</td>';
+                    }
+                    content += '<div type="hidden" class="importerId">';
+                    if (elem['importerId'] == null) {
+                    	content += '</div>';
+                    } else {
+                    	content += elem['importerId'] + '</div>';
                     }
                     content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
@@ -157,29 +150,14 @@ function getConceptpowerAuthorities(modalType, personType, page) {
             $(".conceptpower-authority-entry").click(function() {
                 name = $(this).closest("tr").find(".name").text();
                 uri = $(this).closest("tr").find(".uri").text();
-
-                showPersonNameInModal(name, personType)
-                $("#uri" + modalType).val(uri);
-
-                createManageAuthorityURL = [[@{/auth/authority/add?}]] + '&source=conceptpower&uri=' + uri;
-                $.ajax({
-                    dataType: "json",
-                    type: 'POST',
-                    url: createManageAuthorityURL,
-                    data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
-                    async: false,
-                    success: function(data) {
-                        $("#" + personType_lowerCase + "AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
-                    },
-                    error: function(data) {
-                        $("#uri" + modalType).val("");
-                        $("#" + personType_lowerCase + "AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
-                    }
-                });
-
+                description = $(this).closest("tr").find(".description").text();
+                importerId = $(this).closest("tr").find(".importerId").text();
+                
+                showPerson(name, description, uri, importerId);
                 $("#selectAuthorityModel").modal('hide');
+                $("#authorModal").modal('hide');
+                resetPersonCreationModal("Author");
             });
-
         },
         error: function(data) {
             $('#conceptpowerAuthoritySearchResult').parents('table').hide()
@@ -232,7 +210,16 @@ function getPersonAuthority(uri, personType) {
                 content += "</ul>";
             } else if (data['importedAuthority'] != null) {
                 content += "<br><br>Following authority can be imported:<br>" + data['importedAuthority']['name'] +
-                    '<span id="' + personType_lowerCase + 'AuthorityCreationFeedback"><button id="' + personType_lowerCase + 'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b></button></span>';
+                    '<button id="' + personType_lowerCase + 'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b><div type="hidden">'
+                    +'<p class="name">'+ data['importedAuthority']['name'];
+                    content += '</p><p class="uri">'+ data['importedAuthority']['uri'];
+                    if (data['importedAuthority']['description'] != null) {
+                    	content += '</p><p class="description">'+ data['importedAuthority']['description'];
+                    }
+                    if (data['importedAuthority']['importerId'] != null) {
+                    	content += '</p><p class="importerId">'+ data['importedAuthority']['importerId'];
+                    }
+                    content += '</p></div></button>';
             } else {
                 content += "<br><br>No authorities found for the given URI<br>";
             }
@@ -268,7 +255,7 @@ function getPersonAuthority(uri, personType) {
     <tr>
         <td width="20%"><label>Group</label></td>
         <td>
-            <select th:field="*{groupId}" class="form-control" id="addConceptConceptSelect">
+            <select th:field="*{groupId}" class="form-control" id="groupId">
                 <option th:value=null>None</option>
                 <th:block th:each="group:${groups}">
                     <option th:value="${group.groupId}">[[${group.name}]]</option>
@@ -287,14 +274,17 @@ function getPersonAuthority(uri, personType) {
         <td><input id="description" th:field="*{description}" class="form-control"></input></td>
     </tr>
     
-    <tr type="hidden">
+    <tr id="tr-uriAuthor">
         <td width="20%"><label for="uri">URI</label></td>
-        <td><input id="uri" th:field="*{uri}" class="form-control"></input></td>
+        <td><input id="uri" th:field="*{uri}" class="form-control" readonly /></td>
     </tr>
+    
+    <input id="importerId" th:field="*{importerId}" class="form-control" />
     
     </table>
     
     <p class="pull-right">
+        <button id="clear" class="btn btn-default" type="reset">Clear</button>
         <button class="btn btn-primary" type="submit">Create</button>
     </p>
 </form>
