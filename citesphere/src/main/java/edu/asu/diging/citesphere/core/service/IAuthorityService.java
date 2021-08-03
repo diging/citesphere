@@ -49,7 +49,7 @@ public interface IAuthorityService {
     
     /**
      * Finds the authorities whose name matches the given last name but does not
-     * match the given first name and which are created or imported by the user
+     * match the given first name and which are created or imported by the given user
      * @param user      User who created or imported the authority
      * @param firstName First name by which the authorities are to be excluded
      * @param lastName  Last name by which the authorities are to be searched
