@@ -78,4 +78,6 @@ public interface ICitationManager {
     CloseableIterator<ICitation> getAllGroupItems(IUser user, String groupId, String collectionId) throws
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
 
+    void deleteLocalGroupCitations(String groupId);
+    
 }

@@ -60,6 +60,12 @@ public class CitationStore implements ICitationStore {
     }
 
     @Override
+    public void deleteCitationByGroupId(String groupId) {
+        citationRepository.deleteByGroup(groupId);
+        indexer.deleteCitationByGroupId(groupId);
+    }
+    
+    @Override
     public List<ICitation> findByGilesDocumentId(String documentId) {
         return citationRepository.findByGilesUploadsDocumentId(documentId);
     }
