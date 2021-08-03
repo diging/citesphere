@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.web.forms;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
 
 public class CreateAuthorityForm {
     
@@ -10,7 +9,6 @@ public class CreateAuthorityForm {
     @NotEmpty(message = "Name cannot be empty.")
     private String name;
 
-    @Pattern(regexp="[0-9]*", message="Group Id can only contain numeric value.")
     private String groupId;
     
     private String uri;
