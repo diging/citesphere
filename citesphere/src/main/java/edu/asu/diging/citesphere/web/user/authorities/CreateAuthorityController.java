@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
@@ -45,26 +46,33 @@ public class CreateAuthorityController {
 
     @PostMapping(value = "/auth/authority/create")
     public String add(@Validated @ModelAttribute("authorityForm") CreateAuthorityForm form, BindingResult result,
-            Model model, Authentication authentication) {
+            Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
+        IUser user = (IUser) authentication.getPrincipal();
         if (result.hasErrors()) {
+            model.addAttribute("groups", citationManager.getGroups(user));
             model.addAttribute("authorityForm", form);
             return "auth/authorities/create";
         }
         IAuthorityEntry entry = new AuthorityEntry();
         entry.setName(form.getName());
         entry.setDescription(form.getDescription());
-        entry.setImporterId(form.getImporterId());
+        if (form.getImporterId() != null && !form.getImporterId().isEmpty()) {
+            entry.setImporterId(form.getImporterId());
+        }
         Set<Long> groups = new HashSet<>();
         if (form.getGroupId() != null && !form.getGroupId().isEmpty()) {
             groups.add(Long.valueOf(form.getGroupId()));
         }
         entry.setGroups(groups);
-        if (form.getUri() != null && !form.getUri().trim().isEmpty()) {
-            entry.setUri(form.getUri().trim());
-            entry = authorityService.create(entry, (IUser) authentication.getPrincipal());
+        if (form.getUri() != null && !form.getUri().isEmpty()) {
+            entry.setUri(form.getUri());
+            entry = authorityService.create(entry, user);
         } else {
-            entry = authorityService.createWithUri(entry, (IUser) authentication.getPrincipal());
+            entry = authorityService.createWithUri(entry, user);
         }
+        redirectAttributes.addFlashAttribute("show_alert", true);
+        redirectAttributes.addFlashAttribute("alert_msg", "Managed authority was successfully created.");
+        redirectAttributes.addFlashAttribute("alert_type", "success");
         return "redirect:/auth/authority/list";
     }
 

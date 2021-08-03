@@ -25,6 +25,10 @@ $(function() {
         $("#authorModal").modal('hide');
         resetPersonCreationModal("Author");
     });
+    
+    $("#clear").click(function() {
+    	$("#tr-uriAuthor").hide();
+    });
 
     $("#searchAuthor").click(function() {
         $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
@@ -37,23 +41,16 @@ $(function() {
     });
 
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
-        var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-        importAuthorityURL = [[@{|/auth/authority/import?uri=|}]]+uri;
-        $.ajax({
-            dataType: "json",
-            type: 'POST',
-            url: importAuthorityURL,
-            data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
-            async: false,
-            success: function(data) {
-                $("#authorCreateAuthority").hide();
-                $("#uriAuthorLocalId").val(data['id']);
-                $("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i><br>.");
-                $("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-                showPerson(data['name'], data['description'], data['uri'], data['importerId']);
-                $("#uriLoadingFoundAuthor").popover('hide');
-            }
-        });
+    	name = $(this).closest("div").find(".name").text();
+    	uri = $(this).closest("div").find(".uri").text();
+    	importerId = $(this).closest("div").find(".importerId").text();
+    	
+    	showPerson(name, null, uri, importerId);
+        $("#authorCreateAuthority").hide();
+        $("#uriLoadingFoundAuthor").popover('hide');
+        $("#selectAuthorityModel").modal('hide');
+        $("#authorModal").modal('hide');
+        resetPersonCreationModal("Author");
     });
 
     var timer = null;
@@ -189,9 +186,6 @@ function resetPersonAuthorityCreation(personType) {
     $("#uriLoadingSpinner" + personType).hide();
     $("#uriLoadingFound" + personType).popover('hide');
     $("#uriLoadingFailure" + personType).popover('hide');
-    $("#" + personType.toLowerCase() + "AuthorityUsed").html("");
-    $("#" + personType.toLowerCase() + "AuthorityCreationFeedback").html("");
-    $("#" + personType.toLowerCase() + "AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
@@ -210,16 +204,13 @@ function getPersonAuthority(uri, personType) {
                 content += "</ul>";
             } else if (data['importedAuthority'] != null) {
                 content += "<br><br>Following authority can be imported:<br>" + data['importedAuthority']['name'] +
-                    '<button id="' + personType_lowerCase + 'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b><div type="hidden">'
+                    '<button id="' + personType_lowerCase + 'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b><div style="display: none;">'
                     +'<p class="name">'+ data['importedAuthority']['name'];
-                    content += '</p><p class="uri">'+ data['importedAuthority']['uri'];
-                    if (data['importedAuthority']['description'] != null) {
-                    	content += '</p><p class="description">'+ data['importedAuthority']['description'];
-                    }
-                    if (data['importedAuthority']['importerId'] != null) {
-                    	content += '</p><p class="importerId">'+ data['importedAuthority']['importerId'];
-                    }
-                    content += '</p></div></button>';
+                content += '</p><p class="uri">'+ data['importedAuthority']['uri'] + '</p><p class="importerId">';
+                if (data['importedAuthority']['importerId'] != null) {
+                	content += data['importedAuthority']['importerId'];
+                }
+                content += '</p></div></button>';
             } else {
                 content += "<br><br>No authorities found for the given URI<br>";
             }
@@ -323,7 +314,6 @@ function getPersonAuthority(uri, personType) {
                 </div>
                 <input type="hidden" id="uriAuthorLocalId" />
             </div>
-            <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
           </div>
           
           <div class="modal-footer">
