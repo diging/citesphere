@@ -462,4 +462,9 @@ public class CitationManager implements ICitationManager {
         }
         return response;
     }
+    
+    @Override
+    public void deleteLocalGroupCitations(String groupId) {
+        citationStore.deleteCitationByGroupId(groupId);
+    }
 }

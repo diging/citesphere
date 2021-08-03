@@ -79,4 +79,7 @@ public interface ICitationManager {
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
     
     List<ItemDeletionResponse> deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException;
+
+    void deleteLocalGroupCitations(String groupId);
+    
 }
