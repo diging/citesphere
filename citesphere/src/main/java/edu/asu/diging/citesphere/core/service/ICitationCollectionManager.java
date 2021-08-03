@@ -18,5 +18,7 @@ public interface ICitationCollectionManager {
 
     List<ICitationCollection> getAllCollections(IUser user, String groupId, String parentCollectionId, String sortBy, int maxCollections)
             throws GroupDoesNotExistException;
+    
+    void deleteLocalGroupCollections(String groupId);
 
 }
