@@ -81,12 +81,11 @@ public class AuthorityServiceTest {
         Mockito.when(importerIterator.next()).thenReturn(testImporter);
         Mockito.when(importers.iterator()).thenReturn(importerIterator);
 
+        groupId = 123456L;
         initAuthorityEntries();
         page = 1;
         pageSize = 10;
         paging = PageRequest.of(page, pageSize);
-        groupId = 123456L;
-
     }
 
     private void initAuthorityEntries() {
@@ -98,7 +97,7 @@ public class AuthorityServiceTest {
         Set<Long> groups;
         
         groups = new HashSet<>();
-        groups.add(123456L);
+        groups.add(groupId);
         groups.add(654321L);
         entry1 = new AuthorityEntry();
         entry1.setUri("http://test1.uri/");
@@ -107,7 +106,7 @@ public class AuthorityServiceTest {
         entry1.setGroups(groups);
 
         groups = new HashSet<>();
-        groups.add(123456L);
+        groups.add(groupId);
         entry2 = new AuthorityEntry();
         entry2.setUri("http://test2.uri/");
         entry2.setName("Albert Sam");
@@ -116,7 +115,7 @@ public class AuthorityServiceTest {
         entry2.setGroups(groups);
 
         groups = new HashSet<>();
-        groups.add(123456L);
+        groups.add(groupId);
         groups.add(12345L);
         entry3 = new AuthorityEntry();
         entry3.setUri("http://test1.uri/");

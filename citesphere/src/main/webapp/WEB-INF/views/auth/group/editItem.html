@@ -806,7 +806,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		url: url ,
   		async: false,
   		success: function(data) {
-  			$('#mycheckboxDiv').append(data['groupName']);
+  			$('#cp-groupName').text(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
   			var content = '';
   				
@@ -1566,7 +1566,7 @@ function creatorLinkHandler(target) {
 								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
 							<div id="mycheckboxDiv">
-							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group
+							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group <span id="cp-groupName"></span>
 							</div>
 							</br>
 							<table class="table table-striped table-bordered table-fixed">

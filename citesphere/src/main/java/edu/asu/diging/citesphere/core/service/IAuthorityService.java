@@ -36,9 +36,8 @@ public interface IAuthorityService {
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
 
     /**
-     * Finds the authorities which are created or imported by the given user whose
-     * name matches the given first and last name
-     * 
+     * Finds the authorities whose name matches the given first and last name and
+     * which are created or imported by the given user
      * @param user      User who created or imported the authority
      * @param firstName First name by which the authorities are to be searched
      * @param lastName  Last name by which the authorities are to be searched
@@ -49,8 +48,8 @@ public interface IAuthorityService {
     Page<IAuthorityEntry> findByFirstNameAndLastName(IUser user, String firstName, String lastName, int page, int pageSize);
     
     /**
-     * Finds the authorities which are created or imported by the user whose name
-     * matches the given last name and does not match the given first name
+     * Finds the authorities whose name matches the given last name but does not
+     * match the given first name and which are created or imported by the user
      * @param user      User who created or imported the authority
      * @param firstName First name by which the authorities are to be excluded
      * @param lastName  Last name by which the authorities are to be searched
@@ -76,7 +75,7 @@ public interface IAuthorityService {
     
     /**
      * Finds the authorities who belong to the given group and whose name matches
-     * the given last name and does not match the given first name
+     * the given last name but does not match the given first name
      * @param groupId   Group Id to which the authority should belong to
      * @param firstName First name by which the authorities are to be excluded
      * @param lastName  Last name by which the authorities are to be searched

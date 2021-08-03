@@ -74,7 +74,7 @@ public class AuthorityEntryController {
         if (userEntries.size() < pageSize && !lastName.trim().isEmpty()) {
             Page<IAuthorityEntry> lastNameEntries = authorityService.findByLastNameAndExcludingFirstName(
                     (IUser) authentication.getPrincipal(), firstName, lastName,
-                    page - fullNameEntries.getTotalPages() + 1, pageSize - userEntries.size());
+                    page - Math.max(1, fullNameEntries.getTotalPages()) + 1, pageSize - userEntries.size());
             userEntries.addAll(lastNameEntries.getContent());
         }
         authorityResult.setFoundAuthorities(userEntries);
@@ -101,7 +101,7 @@ public class AuthorityEntryController {
         // Same reasoning as the getUserAuthorities() method
         if (groupEntries.size() < pageSize && !lastName.trim().isEmpty()) {
             Page<IAuthorityEntry> lastNameEntries = authorityService.findByGroupAndLastNameAndExcludingFirstName(
-                    groupId, firstName, lastName, page - fullNameEntries.getTotalPages() + 1,
+                    groupId, firstName, lastName, page - Math.max(1, fullNameEntries.getTotalPages()) + 1,
                     pageSize - groupEntries.size());
             groupEntries.addAll(lastNameEntries.getContent());
         }

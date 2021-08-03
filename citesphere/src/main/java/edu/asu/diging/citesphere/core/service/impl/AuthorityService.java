@@ -202,7 +202,7 @@ public class AuthorityService implements IAuthorityService {
     public int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize) {
         long total;
         // If the last name is not empty then total authority count would be same as the
-        // users whose name contains the given last name
+        // authorities whose name contains the given last name
         if (!lastName.trim().isEmpty()) {
             total = authorityRepository.countByUsernameAndNameContaining(user.getUsername(), lastName);
         } else {
