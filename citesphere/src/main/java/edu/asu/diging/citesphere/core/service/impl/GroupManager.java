@@ -6,6 +6,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
+import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
@@ -21,6 +24,12 @@ public class GroupManager implements IGroupManager {
 
     @Autowired
     private IZoteroManager zoteroManager;
+    
+    @Autowired
+    private ICitationManager citationManager;
+    
+    @Autowired
+    private ICitationCollectionManager collectionManager;
 
     /*
      * (non-Javadoc)
@@ -43,6 +52,13 @@ public class GroupManager implements IGroupManager {
             return group;
         }
         return null;
+    }
+    
+    @Override
+    public void deleteLocalGroupCopy(String groupId) {
+        groupRepository.deleteByGroupId(Integer.parseInt(groupId));
+        collectionManager.deleteLocalGroupCollections(groupId);
+        citationManager.deleteLocalGroupCitations(groupId);
     }
     
     @Override

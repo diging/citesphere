@@ -27,6 +27,8 @@ public interface ICitationStore {
      */
     List<ICitation> getAttachments(String id);
 
+    void deleteCitationByGroupId(String groupId);
+    
     List<ICitation> findByGilesDocumentId(String documentId);
 
 }
