@@ -1,7 +1,11 @@
 package edu.asu.diging.citesphere.config.core;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
+import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.spring.auditable.AuthorProvider;
@@ -13,28 +17,30 @@ import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.mongodb.MongoClient;
+import com.google.common.collect.Maps;
+import com.mongodb.client.MongoClient;
+
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
 
 @Configuration
+@EnableAspectJAutoProxy
 public class AuditConfig {
-
+    
     @Autowired
-    private PlatformTransactionManager txManager;
+    private MongoClient mongoClient;
 
     @Bean
     public Javers javers() {
         MongoRepository javersMongoRepository =
-                new MongoRepository(mongo().getDatabase("citesphere"));
+                new MongoRepository(mongoClient.getDatabase("citesphere"));
 
         return JaversBuilder.javers()
                 .registerJaversRepository(javersMongoRepository)
                 .build();
-    }
-    
-    public MongoClient mongo() {
-        return new MongoClient();
     }
 
     @Bean
@@ -54,6 +60,14 @@ public class AuditConfig {
 
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        return new EmptyPropertiesProvider();
+        return new CommitPropertiesProvider() {
+            @Override
+            public Map<String, String> provideForCommittedObject(Object domainObject) {
+                if (domainObject instanceof ICitation) {
+                    return Collections.singletonMap("key", ((ICitation)domainObject).getKey());
+                }
+                return Collections.emptyMap();
+            }
+        };
     }
 }
