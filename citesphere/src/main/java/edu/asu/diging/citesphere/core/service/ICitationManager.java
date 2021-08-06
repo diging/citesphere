@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -23,6 +22,7 @@ import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.impl.CitationVersion;
 import edu.asu.diging.citesphere.user.IUser;
 
 public interface ICitationManager {
@@ -43,6 +43,10 @@ public interface ICitationManager {
     
     ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException,
             CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException;
+    
+    List<CitationVersion> getCitationVersions(IUser user, String groupId, String key) throws AccessForbiddenException;
+    
+    ICitation getCitationVersion(IUser user, String groupId, String key, Long version) throws AccessForbiddenException;
     
     List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException,
             GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;

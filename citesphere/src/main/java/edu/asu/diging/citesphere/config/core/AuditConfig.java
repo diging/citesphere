@@ -29,18 +29,16 @@ import edu.asu.diging.citesphere.model.bib.impl.Citation;
 @Configuration
 @EnableAspectJAutoProxy
 public class AuditConfig {
-    
+
     @Autowired
     private MongoClient mongoClient;
 
     @Bean
     public Javers javers() {
-        MongoRepository javersMongoRepository =
-                new MongoRepository(mongoClient.getDatabase("citesphere"));
+        MongoRepository javersMongoRepository = new MongoRepository(mongoClient.getDatabase("citesphere"));
 
-        return JaversBuilder.javers()
-                .registerJaversRepository(javersMongoRepository)
-                .build();
+        return JaversBuilder.javers().registerEntity(new EntityDefinition(Citation.class, "key"))
+                .registerJaversRepository(javersMongoRepository).build();
     }
 
     @Bean
@@ -64,7 +62,7 @@ public class AuditConfig {
             @Override
             public Map<String, String> provideForCommittedObject(Object domainObject) {
                 if (domainObject instanceof ICitation) {
-                    return Collections.singletonMap("key", ((ICitation)domainObject).getKey());
+                    return Collections.singletonMap("key", ((ICitation) domainObject).getKey());
                 }
                 return Collections.emptyMap();
             }
