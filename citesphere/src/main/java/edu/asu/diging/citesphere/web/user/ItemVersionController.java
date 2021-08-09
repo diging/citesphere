@@ -1,28 +1,74 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
+import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.impl.CitationVersion;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class ItemVersionController {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private ICitationManager citationManager;
 
-    @GetMapping("/auth/group/{zoteroGroupId}/items/{itemId}/history")
+    @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/history")
     public String getVersions(Authentication authentication, Model model,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId)
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page,
+            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize)
             throws AccessForbiddenException {
+        List<CitationVersion> versions;
+        try {
+            versions = citationManager.getCitationVersions((IUser) authentication.getPrincipal(), zoteroGroupId, itemId,
+                    page - 1, pageSize);
+        } catch (GroupDoesNotExistException e) {
+            logger.error("Exception occured", e);
+            return "error/404";
+        }
+
+        model.addAttribute("itemKey", itemId);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", 1);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
-        model.addAttribute("versions", citationManager.getCitationVersions((IUser)authentication.getPrincipal(), zoteroGroupId, itemId));
-        return "auth/group/itemHistory";
+        model.addAttribute("versions", versions);
+        return "auth/group/itemVersions";
+    }
+
+    @GetMapping("/auth/group/{zoteroGroupId}/items/{itemId}/history/{version}/version")
+    public String getVersions(Authentication authentication, Model model,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
+            @PathVariable("version") Long version) throws AccessForbiddenException, GroupDoesNotExistException {
+        model.addAttribute("zoteroGroupId", zoteroGroupId);
+        ICitation citation;
+        citation = citationManager.getCitationVersion((IUser) authentication.getPrincipal(), zoteroGroupId, itemId,
+                version);
+        if (citation != null) {
+            model.addAttribute("citation", citation);
+            List<String> fields = new ArrayList<>();
+            citationManager.getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType())
+                    .forEach(f -> fields.add(f.getFilename()));
+            model.addAttribute("fields", fields);
+        } else {
+            return "error/404";
+        }
+        return "auth/group/itemVersion";
     }
 }

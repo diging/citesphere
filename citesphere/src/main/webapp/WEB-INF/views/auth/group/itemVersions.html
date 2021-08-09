@@ -1,0 +1,36 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<script th:inline="javascript">
+$(function() {
+	$('#pagination-top').twbsPagination({
+	    totalPages: [(${totalPages})],
+	    startPage: [(${currentPage})],
+	    prev: "«",
+	    next: "»",
+	    visiblePages: 10,
+	    initiateStartPageClick: false,
+	    onPageClick: function (event, page) {
+	    	window.location.href = "history?page=" + page;
+	    }
+	});
+});
+</script>
+</head>
+<body>
+<div layout:fragment="content">
+<h3>Versions for item [[${itemKey}]]</h3>
+<ul id="pagination-top" class="pagination-sm"></ul>
+<table class="table table-striped">
+    <tr>
+        <th width="20%">Index</th>
+        <th>Updated On</th>
+    </tr>
+    <tr th:each="version,loop : ${versions}">
+        <td><span th:text="${loop.index + 1}"/></td>
+        <td><a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version|}" th:text="${version.updatedDate}"/></td>
+    </tr>
+</table>
+</div>
+</body>
+</html>

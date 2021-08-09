@@ -44,9 +44,10 @@ public interface ICitationManager {
     ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException,
             CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException;
     
-    List<CitationVersion> getCitationVersions(IUser user, String groupId, String key) throws AccessForbiddenException;
+    List<CitationVersion> getCitationVersions(IUser user, String groupId, String key, int page, int pageSize)
+            throws AccessForbiddenException, GroupDoesNotExistException;
     
-    ICitation getCitationVersion(IUser user, String groupId, String key, Long version) throws AccessForbiddenException;
+    ICitation getCitationVersion(IUser user, String groupId, String key, Long version) throws AccessForbiddenException, GroupDoesNotExistException;
     
     List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException,
             GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;

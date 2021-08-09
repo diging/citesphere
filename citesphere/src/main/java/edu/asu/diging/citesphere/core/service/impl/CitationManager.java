@@ -132,30 +132,35 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public List<CitationVersion> getCitationVersions(IUser user, String groupId, String key)
-            throws AccessForbiddenException {
-        ICitationGroup group = groupManager.getGroup(user, groupId);
-        if (group != null && group.getGroupId() == new Long(groupId)) {
-            if (!group.getUsers().contains(user.getUsername())) {
-                if (!group.getUsers().contains(user.getUsername())) {
-                    throw new AccessForbiddenException("User does not have access this citation.");
-                }
-            }
-            return citationVersionsDao.getVersions(groupId, key);
+    public List<CitationVersion> getCitationVersions(IUser user, String groupId, String key, int page, int pageSize)
+            throws AccessForbiddenException, GroupDoesNotExistException {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
-        return null;
+        ICitationGroup group = groupOptional.get();
+        if (group.getGroupId() == new Long(groupId)) {
+            if (!group.getUsers().contains(user.getUsername())) {
+                throw new AccessForbiddenException("User does not have access this citation.");
+            }
+            return citationVersionsDao.getVersions(groupId, key, page, pageSize);
+        }
+        return new ArrayList<>();
     }
-    
+
     @Override
-    public ICitation getCitationVersion(IUser user, String groupId, String key, Long version) throws AccessForbiddenException {
-        ICitationGroup group = groupManager.getGroup(user, groupId);
+    public ICitation getCitationVersion(IUser user, String groupId, String key, Long version)
+            throws AccessForbiddenException, GroupDoesNotExistException {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
+        ICitationGroup group = groupOptional.get();
         if (group != null && group.getGroupId() == new Long(groupId)) {
             if (!group.getUsers().contains(user.getUsername())) {
-                if (!group.getUsers().contains(user.getUsername())) {
-                    throw new AccessForbiddenException("User does not have access this citation.");
-                }
+                throw new AccessForbiddenException("User does not have access this citation.");
             }
-            return citationVersionsDao.getVersion(key, version);
+            return citationVersionsDao.getVersion(groupId, key, version);
         }
         return null;
     }
