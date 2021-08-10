@@ -19,16 +19,28 @@ $(function() {
 </head>
 <body>
 <div layout:fragment="content">
-<h3>Versions for item [[${itemKey}]]</h3>
+
+<div class="col-xs-12">
+    <h2 style="margin-top: 0">
+        <th:block th:each="author,status : ${authors}">
+            <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
+            <span th:if="${!status.last}">; </span>
+        </th:block>
+        <em>[[${title}]]</em>
+        <span th:if="${!#strings.isEmpty(year)}">
+          [[(${year})]]
+        </span>
+    </h2>
+</div>
 <ul id="pagination-top" class="pagination-sm"></ul>
 <table class="table table-striped">
     <tr>
-        <th width="20%">Index</th>
-        <th>Updated On</th>
+        <th>Updated on</th>
+        <th>Updated by</th>
     </tr>
     <tr th:each="version,loop : ${versions}">
-        <td><span th:text="${loop.index + 1}"/></td>
-        <td><a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version|}" th:text="${version.updatedDate}"/></td>
+        <td><a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}|}" th:text="${version.updatedDate}"/></td>
+        <td><a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}|}" th:text="${version.updatedBy}"/></td>
     </tr>
 </table>
 </div>

@@ -97,7 +97,8 @@
 			th:href="@{|${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
 			class="icon-edit" style="color: #337ab7; font-size: 14px" title="Edit"></i></a> &nbsp;&nbsp; <a
 			th:href="@{|${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
-			class="icon-sync" title="Sync Citation"></i></a>
+			class="icon-sync" title="Sync Citation"></i></a> &nbsp;&nbsp; 
+            <a th:href="@{|${citation.key}/history|}"><i class="icon-layers" style="color: #337ab7;" title="Previous Versions"></i></a>
 			
 		&nbsp;&nbsp;
         <a id="uploadFileIcon" href="#"><i style="color: #337ab7; font-size: 20px" class="icon-multiple-doc"></i></a>

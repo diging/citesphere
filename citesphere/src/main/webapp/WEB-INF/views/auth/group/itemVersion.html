@@ -1,23 +1,56 @@
 <html layout:decorate="~{layouts/main}">
 <head>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<script th:inline="javascript">
+//# sourceURL=modal.js
+    $(function() {
+        $(".parse-ref-info").click(function(e) {
+            var clicked = e.target;
+            $("#ref-unparsed").text($(clicked).text());
+            $("#parsed-ref-authors").text($(clicked).attr('data-authors'));
+            $("#parsed-ref-title").text($(clicked).attr('data-title'));
+            $("#parsed-ref-year").text($(clicked).attr('data-year'));
+            var identifier = $(clicked).attr('data-identifier');
+            var identType = $(clicked).attr('data-identifier-type');
+            if (identType != undefined && identType != "") {
+                identifier = identifier + " (" + identType + ")";
+            }
+            $("#parsed-ref-ident").text(identifier);
+            $("#parsed-ref-first-page").text($(clicked).attr('data-first-page'));
+            $("#parsed-ref-last-page").text($(clicked).attr('data-last-page'));
+            $("#parsed-ref-volume").text($(clicked).attr('data-volume'));
+            $("#parsed-ref-source").text($(clicked).attr('data-source'));
+            $("#parsed-ref-publication-type").text($(clicked).attr('data-publication-type'));
+            $("#parsed-ref-reference-id").text($(clicked).attr('data-reference-id'));
+            $("#parsed-ref-reference-label").text($(clicked).attr('data-reference-label'));
+            $("#parsed-ref-citation-id").text($(clicked).attr('data-citation-id'));
+            $("#parsed-ref-ref-raw").text($(clicked).attr('data-ref-raw'));
+            
+            $("#parsed-ref-modal").modal();
+        });
+    });
+</script>
 </head>
 <body>
 <div layout:fragment="content">
+    <div class="pull-left" style="margin-bottom: 20px;">
+        <a class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/history?page=${page}|}">Back</a> &nbsp;&nbsp;
+   </div>
+   
     <div class="row">
-    <div class="col-xs-12">
-    <h2 style="margin-top: 0">
-        <th:block th:each="author,status : ${citation.authors}">
-            <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
-            <span th:if="${!status.last}">; </span>
-        </th:block>
-        
-        <em>[[${citation.title}]]</em>
-        <span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
-          [[(${citation.dateFreetext})]]
-        </span>
-    </h2>   
-    
+        <div class="col-xs-12">
+        <h2 style="margin-top: 0">
+            <th:block th:each="author,status : ${citation.authors}">
+                <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
+                <span th:if="${!status.last}">; </span>
+            </th:block>
+            
+            <em>[[${citation.title}]]</em>
+            <span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
+              [[(${citation.dateFreetext})]]
+            </span>
+        </h2>    
+        </div>
     </div>
     <div class="col-md-10">
     <table class="table table-striped">
@@ -233,7 +266,6 @@
         </ul>
     </div>
     
-    </div>
     <div id="parsed-ref-modal" class="modal fade" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
