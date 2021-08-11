@@ -1,29 +1,21 @@
 package edu.asu.diging.citesphere.config.core;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.repository.mongo.MongoRepository;
-import org.javers.repository.sql.ConnectionProvider;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
-import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.transaction.PlatformTransactionManager;
 
-import com.google.common.collect.Maps;
 import com.mongodb.client.MongoClient;
 
-import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 
 @Configuration
@@ -42,11 +34,6 @@ public class AuditConfig {
     }
 
     @Bean
-    public ConnectionProvider jpaConnectionProvider() {
-        return new JpaHibernateConnectionProvider();
-    }
-
-    @Bean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
         return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(), commitPropertiesProvider());
     }
@@ -58,14 +45,6 @@ public class AuditConfig {
 
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        return new CommitPropertiesProvider() {
-            @Override
-            public Map<String, String> provideForCommittedObject(Object domainObject) {
-                if (domainObject instanceof ICitation) {
-                    return Collections.singletonMap("key", ((ICitation) domainObject).getKey());
-                }
-                return Collections.emptyMap();
-            }
-        };
+        return new EmptyPropertiesProvider();
     }
 }

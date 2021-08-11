@@ -68,7 +68,9 @@ public class ItemVersionController {
     @GetMapping("/auth/group/{zoteroGroupId}/items/{itemId}/history/{version}/version")
     public String getVersions(Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @PathVariable("version") Long version, @RequestParam(defaultValue = "1", required = false, value = "page") int page) throws AccessForbiddenException, GroupDoesNotExistException {
+            @PathVariable("version") Long version,
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page)
+            throws AccessForbiddenException, GroupDoesNotExistException {
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         ICitation citation;
         citation = citationManager.getCitationVersion((IUser) authentication.getPrincipal(), zoteroGroupId, itemId,

@@ -34,7 +34,7 @@
 <body>
 <div layout:fragment="content">
     <div class="pull-left" style="margin-bottom: 20px;">
-        <a class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/history?page=${page}|}">Back</a> &nbsp;&nbsp;
+        <a class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/history?page=${page}|}">Back</a>
    </div>
    
     <div class="row">
@@ -44,7 +44,6 @@
                 <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
                 <span th:if="${!status.last}">; </span>
             </th:block>
-            
             <em>[[${citation.title}]]</em>
             <span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
               [[(${citation.dateFreetext})]]
@@ -237,32 +236,21 @@
             
             </th:block></td>
         </tr>
-        <tr>
+        <!-- <tr>
             <td>Attachments</td>
             <td>
                 <th:block th:each="att:${attachments}">
                     <p><span class="icon-attach" style="font-size: 14px"></span> [[${att.title}]]</p>
                 </th:block>
             </td>
-        </tr>
+        </tr>  -->
     </table>
     </div>
     <div class="col-md-2">
         <h3 style="margin-top: 0">Files</h3>
         
         <ul class="list-group" >
-            <li class="list-group-item" th:each="upload:${citation.gilesUploads}">
-            <i class="icon-giles"></i>
-            <span th:if="${upload.uploadedFile?.filename}">
-            <a th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}">[[${upload.uploadedFile?.filename}]]</a>
-            </span>
-            <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
-            File is being processed... ([[${upload.progressId}]])
-            </span>
-            <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
-            <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
-            <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
-            </li>
+            <li class="list-group-item" th:each="upload:${citation.gilesUploads}"></li>
         </ul>
     </div>
     

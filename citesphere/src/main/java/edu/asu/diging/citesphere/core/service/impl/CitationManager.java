@@ -147,7 +147,7 @@ public class CitationManager implements ICitationManager {
         }
         return new ArrayList<>();
     }
-    
+
     @Override
     public int getTotalCitationVersionPages(String groupId, String key, int pageSize) {
         int totalCount = citationVersionsDao.getTotalCount(groupId, key);
