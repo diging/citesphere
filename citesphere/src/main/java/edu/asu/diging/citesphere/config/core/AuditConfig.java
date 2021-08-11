@@ -10,6 +10,7 @@ import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -24,12 +25,17 @@ public class AuditConfig {
 
     @Autowired
     private MongoClient mongoClient;
+    
+    @Value("${mongo.database.name}")
+    private String mongoDbName;
+    
+    private static final String CITATION_KEY = "key";
 
     @Bean
     public Javers javers() {
-        MongoRepository javersMongoRepository = new MongoRepository(mongoClient.getDatabase("citesphere"));
+        MongoRepository javersMongoRepository = new MongoRepository(mongoClient.getDatabase(mongoDbName));
 
-        return JaversBuilder.javers().registerEntity(new EntityDefinition(Citation.class, "key"))
+        return JaversBuilder.javers().registerEntity(new EntityDefinition(Citation.class, CITATION_KEY))
                 .registerJaversRepository(javersMongoRepository).build();
     }
 
