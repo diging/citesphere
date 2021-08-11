@@ -37,9 +37,7 @@ public class CreateAuthorityController {
         IUser user = (IUser) authentication.getPrincipal();
         model.addAttribute("groups", citationManager.getGroups(user));
         CreateAuthorityForm authorityForm = new CreateAuthorityForm();
-        if (zoteroGroupId != null) {
-            authorityForm.setGroupId(zoteroGroupId);
-        }
+        authorityForm.setGroupId(zoteroGroupId);
         model.addAttribute("authorityForm", authorityForm);
         return "/auth/authorities/create";
     }
@@ -73,6 +71,9 @@ public class CreateAuthorityController {
         redirectAttributes.addFlashAttribute("show_alert", true);
         redirectAttributes.addFlashAttribute("alert_msg", "Managed authority was successfully created.");
         redirectAttributes.addFlashAttribute("alert_type", "success");
+        if (form.getGroupId() != null && !form.getGroupId().isEmpty()) {
+            return "redirect:/auth/authority/" + form.getGroupId() + "/list";
+        }
         return "redirect:/auth/authority/list";
     }
 
