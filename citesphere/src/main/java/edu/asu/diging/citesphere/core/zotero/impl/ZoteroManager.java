@@ -408,7 +408,7 @@ public class ZoteroManager implements IZoteroManager {
     }
 
     @Override
-    public List<ItemDeletionResponse> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
+    public Map<String, ItemDeletionResponse> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
         return zoteroConnector.deleteMultipleItems(user, groupId, citationKeys, citationVersion);
     }

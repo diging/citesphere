@@ -441,25 +441,33 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public List<ItemDeletionResponse> deleteCitations(IUser user, String groupId, List<String> citationIdList)
+    public Map<String, ItemDeletionResponse> deleteCitations(IUser user, String groupId, List<String> citationIdList)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
-        List<ItemDeletionResponse> response = zoteroManager.deleteMultipleItems(user, groupId, citationIdList,
+        Map<String, ItemDeletionResponse> response = zoteroManager.deleteMultipleItems(user, groupId, citationIdList,
                 zoteroManager.getLatestGroupVersion(user, groupId));
-        int counter = 0;
-        for (ItemDeletionResponse res : response) {
-            if (res.equals(ItemDeletionResponse.SUCCESS)) {
-                for (int i = 0; i < 50; i++) {
-                    if (i >= citationIdList.size()) {
-                        break;
-                    }
-                    Optional<ICitation> citation = citationStore.findById(citationIdList.get(counter + i));
-                    if (citation.isPresent()) {
-                        citationStore.delete(citation.get());
-                    }
+        for (String key : response.keySet()) {
+            if (response.get(key).equals(ItemDeletionResponse.SUCCESS)) {
+                Optional<ICitation> citation = citationStore.findById(key);
+                if (citation.isPresent()) {
+                    citationStore.delete(citation.get());
                 }
             }
-            counter += 50;
         }
+//        int counter = 0;
+//        for (ItemDeletionResponse res : response) {
+//            if (res.equals(ItemDeletionResponse.SUCCESS)) {
+//                for (int i = 0; i < 50; i++) {
+//                    if (i >= citationIdList.size()) {
+//                        break;
+//                    }
+//                    Optional<ICitation> citation = citationStore.findById(citationIdList.get(counter + i));
+//                    if (citation.isPresent()) {
+//                        citationStore.delete(citation.get());
+//                    }
+//                }
+//            }
+//            counter += 50;
+//        }
         return response;
     }
     

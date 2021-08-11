@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.data.util.CloseableIterator;
@@ -78,7 +79,7 @@ public interface ICitationManager {
     CloseableIterator<ICitation> getAllGroupItems(IUser user, String groupId, String collectionId) throws
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
     
-    List<ItemDeletionResponse> deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    Map<String, ItemDeletionResponse> deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException;
 
     void deleteLocalGroupCitations(String groupId);
     

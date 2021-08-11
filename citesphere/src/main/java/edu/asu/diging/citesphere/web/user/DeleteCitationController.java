@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.web.user;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,16 +27,17 @@ public class DeleteCitationController {
     private ICitationManager citationManager;
 
     @RequestMapping(value = "/auth/group/{groupId}/references/delete", method = RequestMethod.POST)
-    public ResponseEntity<List<ItemDeletionResponse>> delete(Authentication authentication,
+    public ResponseEntity<Map<String, ItemDeletionResponse>> delete(Authentication authentication,
             @PathVariable("groupId") String groupId,
             @RequestParam(value = "citationList", required = false) List<String> citationList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, GroupDoesNotExistException {
-        List<ItemDeletionResponse> zoteroResponse = citationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
-        for (ItemDeletionResponse response : zoteroResponse) {
+        Map<String, ItemDeletionResponse> zoteroResponse = citationManager
+                .deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
+        for (ItemDeletionResponse response : zoteroResponse.values()) {
             if (!response.equals(ItemDeletionResponse.SUCCESS)) {
-                throw new ZoteroHttpStatusException("Could not delete items. Error: " + response.getValue() + " " + response.getDescription());
+                return new ResponseEntity<Map<String, ItemDeletionResponse>>(HttpStatus.resolve(response.getValue()));
             }
         }
-        return new ResponseEntity<List<ItemDeletionResponse>>(zoteroResponse, HttpStatus.OK);
+        return new ResponseEntity<Map<String, ItemDeletionResponse>>(zoteroResponse, HttpStatus.OK);
     }
 }

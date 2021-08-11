@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.springframework.social.zotero.api.Collection;
@@ -79,6 +80,6 @@ public interface IZoteroConnector {
 
     ZoteroResponse<Collection> getCitationCollectionsByKey(IUser user, String groupId, List<String> keys);
     
-    List<ItemDeletionResponse> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    Map<String, ItemDeletionResponse> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
 
 }
