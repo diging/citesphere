@@ -439,37 +439,6 @@ public class CitationManager implements ICitationManager {
         }
         return result;
     }
-
-    @Override
-    public Map<String, ItemDeletionResponse> deleteCitations(IUser user, String groupId, List<String> citationIdList)
-            throws ZoteroConnectionException, ZoteroHttpStatusException {
-        Map<String, ItemDeletionResponse> response = zoteroManager.deleteMultipleItems(user, groupId, citationIdList,
-                zoteroManager.getLatestGroupVersion(user, groupId));
-        for (String key : response.keySet()) {
-            if (response.get(key).equals(ItemDeletionResponse.SUCCESS)) {
-                Optional<ICitation> citation = citationStore.findById(key);
-                if (citation.isPresent()) {
-                    citationStore.delete(citation.get());
-                }
-            }
-        }
-//        int counter = 0;
-//        for (ItemDeletionResponse res : response) {
-//            if (res.equals(ItemDeletionResponse.SUCCESS)) {
-//                for (int i = 0; i < 50; i++) {
-//                    if (i >= citationIdList.size()) {
-//                        break;
-//                    }
-//                    Optional<ICitation> citation = citationStore.findById(citationIdList.get(counter + i));
-//                    if (citation.isPresent()) {
-//                        citationStore.delete(citation.get());
-//                    }
-//                }
-//            }
-//            counter += 50;
-//        }
-        return response;
-    }
     
     @Override
     public void deleteLocalGroupCitations(String groupId) {

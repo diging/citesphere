@@ -74,5 +74,5 @@ public interface IZoteroManager {
 
     long getLatestGroupVersion(IUser user, String groupId);
         
-    Map<String, ItemDeletionResponse> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    Map<ItemDeletionResponse, List<String>> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
 }

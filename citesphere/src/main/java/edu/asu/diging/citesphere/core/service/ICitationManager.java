@@ -79,8 +79,6 @@ public interface ICitationManager {
     CloseableIterator<ICitation> getAllGroupItems(IUser user, String groupId, String collectionId) throws
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
     
-    Map<String, ItemDeletionResponse> deleteCitations(IUser user, String groupId, List<String> citationList) throws ZoteroConnectionException, ZoteroHttpStatusException;
-
     void deleteLocalGroupCitations(String groupId);
     
 }

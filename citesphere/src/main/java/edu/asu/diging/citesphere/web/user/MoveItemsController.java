@@ -81,7 +81,7 @@ public class MoveItemsController {
             "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/task/{taskID}/clear" }, method = RequestMethod.POST)
     public @ResponseBody void clearTask(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID) {
-        asyncCitationManager.clearTask(taskID);
+        asyncCitationManager.clearUpdateTask(taskID);
     }
 
     @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/move/{targetCollectionId}/sync/start",

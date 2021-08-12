@@ -142,55 +142,11 @@ $(function() {
 				"citationList": ids,
 				[[${_csrf.parameterName}]] : [[${_csrf.token}]]
 			},
-			'success': function(responses) {
-				console.log(responses);
-				responseLength = responses.length;
-				for (var i = 0; i < responseLength; i++) {
-					if(responses[i].toString() != "SUCCESS"){
-						var citationOffset = 50*(i+1);
-						$.notify('<i class="fas fa-exclamation-circle"></i> Error while deleting some of the citations between '+(citationOffset-49)+' to '+citationOffset, {
-							type: 'danger',
-							offset: {
-								x: 50,
-								y: 90
-							},
-							animate: {
-								enter: 'animated fadeInRight',
-								exit: 'animated fadeOutRight'
-							}
-						});
-					}
-				}				
-				for(id of rows) {
-					$("#tr-" + id).remove();
-				}
-				if (ids.length > 1)
-					entry = "Entries";
-				
-				$.notify('<i class="fas fa-check-circle"></i> '+entry+' successfully deleted!', {
-					type: 'success',
-					offset: {
-						x: 50,
-						y: 90
-					},
-					animate: {
-						enter: 'animated fadeInRight',
-						exit: 'animated fadeOutRight'
-					}
-				});
+			'success': function(response) {
+				pollDeleteItemsStatuses(response);
 			},
 			'error': function(data) {
-				$.notify('<i class="fas fa-exclamation-circle"></i> Citations could not be deleted!', {
-					type: 'danger',
-					offset: {
-						x: 50,
-						y: 90
-					},
-					animate: {
-						enter: 'animated fadeInRight',
-						exit: 'animated fadeOutRight'
-					}
-				});
+				showNotification(" Error while deleting citations!", "danger", 10000);
 			}
 		});		
 		
@@ -660,6 +616,54 @@ $.ajax({
 	type: 'POST',
 	url: 'items/move/task/'+taskID+'/clear?[(${_csrf.parameterName})]=[(${_csrf.token})]',
 });
+}
+
+function pollDeleteItemsStatuses(response) {
+$.ajax({
+	type: 'GET',
+	url: 'references/delete/'+response.taskID+'/status',
+	contentType : "application/json",
+	dataType: "json",
+	success: function (deleteItemsStatusResponse) {
+		if(deleteItemsStatusResponse.taskStatus === "COMPLETE") {
+    		if(deleteItemsStatusResponse.response["SUCCESS"] != null) {
+        	 	let message = " "+deleteItemsStatusResponse.response["SUCCESS"].length+ " Citations deleted successfully! <br /> <br />"+ deleteItemsStatusResponse.response["SUCCESS"].join("<br>");
+        	 	showNotification(message, "success", 20000);
+    		}
+    		if(deleteItemsStatusResponse.response["LIBRARY_LOCKED"] != null) {
+        	 	let message =  " "+ deleteItemsStatusResponse.response["LIBRARY_LOCKED"].length+ " Citations could not be deleted as the target library is locked! <br /> <br />"+ deleteItemsStatusResponse.response["LIBRARY_LOCKED"].join("<br>");
+    	 		showNotification(message, "danger", 20000);
+    		}
+    		if(deleteItemsStatusResponse.response["LIBRARY_VERSION_CHANGED"] != null) {
+        	 	let message =  " "+ deleteItemsStatusResponse.response["LIBRARY_VERSION_CHANGED"].length+ " Citations could not be deleted as the library version has changed! <br /> <br />"+ deleteItemsStatusResponse.response["LIBRARY_VERSION_CHANGED"].join("<br>");
+    	 		showNotification(message, "danger", 20000);
+    		}
+    		if(deleteItemsStatusResponse.response["MISSING_IF_UNMODIFIED_SINCE_VERSION"] != null) {
+        	 	let message =  " "+ deleteItemsStatusResponse.response["MISSING_IF_UNMODIFIED_SINCE_VERSION"].length+ " Citations not deleted! <br /> <br />"+ deleteItemsStatusResponse.response["MISSING_IF_UNMODIFIED_SINCE_VERSION"].join("<br>");
+    	 		showNotification(message, "danger", 20000);
+    		}
+    		clearAsyncDeleteTask(deleteItemsStatusResponse.taskID);
+    		if (deleteItemsStatusResponse.response["SUCCESS"] != null) {
+    			for(id of deleteItemsStatusResponse.response["SUCCESS"]) {
+    				$("#tr-" + id).remove();
+    			}
+    		}
+		} else {
+			setTimeout(pollDeleteItemsStatuses(deleteItemsStatusResponse),1000);
+		}
+	},
+	error: function (deleteItemsStatusResponse) {
+	    showNotification("Error while polling delete citations statuses!", "warning", 1000)
+	},
+});
+
+}
+
+function clearAsyncDeleteTask(taskID){
+	$.ajax({
+		type: 'POST',
+		url: 'references/delete/'+taskID+'/clear?[(${_csrf.parameterName})]=[(${_csrf.token})]',
+	});
 }
 
 function syncCitations(collectionHTMLElement, collectionId){
