@@ -9,8 +9,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,12 @@ import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 @Service
 public class AuthorityService implements IAuthorityService {
 
+    @Value("${_authority_uri}")
+    private String authorityUri;
+
+    @Value("${_authority_prefix}")
+    private String authorityPrefix;
+    
     @Autowired
     private AuthorityEntryRepository entryRepository;
 
@@ -282,6 +291,20 @@ public class AuthorityService implements IAuthorityService {
         return save(entry);
     }
 
+    /* (non-Javadoc)
+     * @see
+     * edu.asu.diging.citesphere.core.service.IAuthorityService#createWithUri(edu.asu.diging.citesphere.model.authority.IAuthorityEntry,
+     * edu.asu.diging.citesphere.user.IUser)
+     */
+    @Override
+    @Transactional
+    public IAuthorityEntry createWithUri(IAuthorityEntry entry, IUser user) {
+        //The entry needs to be persisted first in order to generate the id which is then used to create the URI
+        entry = create(entry, user);
+        entry.setUri(authorityUri + authorityPrefix + entry.getId());
+        return save(entry);
+    }
+    
     @Override
     public IAuthorityEntry save(IAuthorityEntry entry) {
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry) entry);

@@ -34,6 +34,14 @@ public interface IAuthorityService {
     List<IAuthorityEntry> findByUri(IUser user, String uri);
 
     IAuthorityEntry create(IAuthorityEntry entry, IUser user);
+    
+    /**
+     * Creates a new Authority entry and also generates a custom URI for it.
+     * @param entry Authority entry to be created
+     * @param user User creating the entry
+     * @return the created entry
+     */
+    IAuthorityEntry createWithUri(IAuthorityEntry entry, IUser user);
 
     /**
      * Finds the authorities whose name matches the given first and last name and
