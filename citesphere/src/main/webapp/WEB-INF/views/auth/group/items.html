@@ -115,10 +115,9 @@ $(function() {
 	$(function() {
 		$(".delete-link").click(function(event) {
 			var ids = []
-			$('.checkboxes:checked').each(function() 
-				{
+			$('.checkboxes:checked').each(function() {
 				   ids.push($(this).data('entry-key'));
-				});
+			});
 			if(ids.length==0) {
 				$('#no-selected-entry').modal("show");	
 			}
@@ -186,43 +185,43 @@ $.ajax({
 			var invalidRequest = deleteItemsStatusResponse.response["MISSING_IF_UNMODIFIED_SINCE_VERSION"];
 			
         		if(success != null) {
-            	 	let message = " "+success.length;
-            	 	if(success.length > 1) {
-            	 		message += " Citations deleted successfully! <br />";
-            	 	} else {
-            	 		message += " Citation deleted successfully! <br />";
-            	 	}
-            	 	showNotification(message, "success", 20000);
+                	 	let message = " "+success.length;
+                	 	if(success.length > 1) {
+                	 		message += " Citations deleted successfully! <br />";
+                	 	} else {
+                	 		message += " Citation deleted successfully! <br />";
+                	 	}
+                	 	showNotification(message, "success", 20000);
         		}
         		if(libraryLocked != null) {
-            	 	let message =  " "+ libraryLocked.length;
-            	 	if(libraryLocked.length > 1) {
-            	 		message += " Citations";
-            	 	} else {
-            	 		message += " Citation";
-            	 	}
-            	 	message += + " could not be deleted as the target library is locked <br />"+ libraryLocked.join(", ");
-            	 	showNotification(message, "danger", 20000);
+                	 	let message =  " "+ libraryLocked.length;
+                	 	if(libraryLocked.length > 1) {
+                	 		message += " Citations";
+                	 	} else {
+                	 		message += " Citation";
+                	 	}
+                	 	message += + " could not be deleted as the target library is locked <br />"+ libraryLocked.join(", ");
+                	 	showNotification(message, "danger", 20000);
         		}
         		if(libraryVersionChanged != null) {
-            	 	let message =  " "+ libraryVersionChanged.length;
-            	 	if(libraryVersionChanged.length > 1) {
-            	 		message += " Citations";
-            	 	} else {
-            	 		message += " Citation";
-            	 	}
-            	 	message += " could not be deleted as the library version has changed <br />"+ libraryVersionChanged.join(", ");
-            	 	showNotification(message, "danger", 20000);
+                	 	let message =  " "+ libraryVersionChanged.length;
+                	 	if(libraryVersionChanged.length > 1) {
+                	 		message += " Citations";
+                	 	} else {
+                	 		message += " Citation";
+                	 	}
+                	 	message += " could not be deleted as the library version has changed <br />"+ libraryVersionChanged.join(", ");
+                	 	showNotification(message, "danger", 20000);
         		}
         		if(invalidRequest != null) {
-            	 	let message =  " "+ invalidRequest.length;
-            	 	if(invalidRequest.length > 1) {
-            	 		message += " Citations";
-            	 	} else {
-            	 		message += " Citation";
-            	 	}
-            	 	message += " not deleted due to internal error <br />"+ invalidRequest.join(", ");
-            	 	showNotification(message, "danger", 20000);
+                	 	let message =  " "+ invalidRequest.length;
+                	 	if(invalidRequest.length > 1) {
+                	 		message += " Citations";
+                	 	} else {
+                	 		message += " Citation";
+                	 	}
+                	 	message += " not deleted due to internal error <br />"+ invalidRequest.join(", ");
+                	 	showNotification(message, "danger", 20000);
         		}
         		clearAsyncDeleteTask(deleteItemsStatusResponse.taskID);
         		if (deleteItemsStatusResponse.response["SUCCESS"] != null) {
