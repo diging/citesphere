@@ -1,11 +1,9 @@
 package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.data.util.CloseableIterator;
-import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 

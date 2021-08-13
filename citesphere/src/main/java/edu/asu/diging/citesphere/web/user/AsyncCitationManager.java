@@ -26,7 +26,7 @@ import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 
 /**
- * Responsible for managing the state of an async update citations task.
+ * Responsible for managing the state of an async citation tasks.
  *
  */
 @Component
@@ -104,6 +104,14 @@ public class AsyncCitationManager {
         updateTaskTracker.remove(taskId);
     }
 
+    /**
+     * Deletes Citations asynchronously
+     * 
+     * @param user           User accessing Zotero
+     * @param groupId        GroupId of the Citations
+     * @param citationIdList List of the Citations to be deleted
+     * @return AsyncDeleteCitationsResponse containing taskId and its current status
+     */
     public AsyncDeleteCitationsResponse deleteCitations(IUser user, String groupId, List<String> citationIdList)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
         String taskId = UUID.randomUUID().toString();
@@ -116,6 +124,14 @@ public class AsyncCitationManager {
         return asyncResponse;
     }
 
+    /**
+     * Gets the current status of the deletion task. If the task is completed, it
+     * returns the status for each Citation which was requested to be deleted.
+     * 
+     * @param taskId Id of the task
+     * @return AsyncDeleteCitationsResponse containing task id, task status, and
+     *         response if the task is completed
+     */
     public AsyncDeleteCitationsResponse getDeleteCitationsResponse(String taskId)
             throws ExecutionException, InterruptedException {
         AsyncDeleteCitationsResponse response = new AsyncDeleteCitationsResponse();
@@ -130,6 +146,12 @@ public class AsyncCitationManager {
         return response;
     }
 
+    /**
+     * Removes the Citation deletion task from memory and removes the deleted
+     * Citations from index and local database
+     * 
+     * @param taskId Id of the task
+     */
     public void clearDeleteTask(String taskId) throws InterruptedException, ExecutionException {
         Map<ItemDeletionResponse, List<String>> deletionResponse = deleteTaskTracker.remove(taskId).get();
         for (String itemKey : deletionResponse.getOrDefault(ItemDeletionResponse.SUCCESS, new ArrayList<>())) {
@@ -139,33 +161,5 @@ public class AsyncCitationManager {
             }
         }
     }
-
-//    @Override
-//    public Map<String, ItemDeletionResponse> deleteaCitations(IUser user, String groupId, List<String> citationIdList)
-//            throws ZoteroConnectionException, ZoteroHttpStatusException {
-//        Map<String, ItemDeletionResponse> response = zoteroManager.deleteMultipleItems(user, groupId, citationIdList,
-//                );
-//        for (String key : response.keySet()) {
-//            if (response.get(key).equals(ItemDeletionResponse.SUCCESS)) {
-//                
-//            }
-//        }
-//        int counter = 0;
-//        for (ItemDeletionResponse res : response) {
-//            if (res.equals(ItemDeletionResponse.SUCCESS)) {
-//                for (int i = 0; i < 50; i++) {
-//                    if (i >= citationIdList.size()) {
-//                        break;
-//                    }
-//                    Optional<ICitation> citation = citationStore.findById(citationIdList.get(counter + i));
-//                    if (citation.isPresent()) {
-//                        citationStore.delete(citation.get());
-//                    }
-//                }
-//            }
-//            counter += 50;
-//        }
-//        return response;
-//    }
 
 }

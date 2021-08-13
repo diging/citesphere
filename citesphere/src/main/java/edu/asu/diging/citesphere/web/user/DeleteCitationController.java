@@ -28,13 +28,11 @@ public class DeleteCitationController {
             @PathVariable("groupId") String groupId,
             @RequestParam(value = "citationList", required = false) List<String> citationList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, GroupDoesNotExistException {
-        AsyncDeleteCitationsResponse deletionResponse = asyncCitationManager
-                .deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
-        return deletionResponse;
+        return asyncCitationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
     }
 
     @RequestMapping("/auth/group/{zoteroGroupId}/references/delete/{taskID}/status")
-    public @ResponseBody AsyncDeleteCitationsResponse getMoveItemsStatus(Authentication authentication,
+    public @ResponseBody AsyncDeleteCitationsResponse getMoveItemsStatus(
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID)
             throws Exception {
         return asyncCitationManager.getDeleteCitationsResponse(taskID);
