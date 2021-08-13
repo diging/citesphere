@@ -63,9 +63,10 @@ public class AuthorityEntryController {
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     
-    @RequestMapping("/auth/authority/{zoteroGroupId}/find/authorities/{source}")
+    @RequestMapping(value = {"/auth/authority/find/authorities/{source}", "/auth/authority/{zoteroGroupId}/find/authorities/{source}"})
     public ResponseEntity<AuthoritySearchResult> getAuthoritiesFromAuthorityService(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("source") String source,
+            @PathVariable("source") String source,
+            @PathVariable(required = false, value = "zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
@@ -75,12 +76,15 @@ public class AuthorityEntryController {
                     "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        AuthoritySearchResult searchResult = null;        
+        AuthoritySearchResult searchResult = null;
         try {
             searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
             searchResult.setCurrentPage(page + 1);
-            searchResult.setGroupName(groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
+            if (zoteroGroupId != null && !zoteroGroupId.isEmpty()) {
+                searchResult.setGroupName(
+                        groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
+            }
             authoritySearchResult.put(source, searchResult);
 
         } catch (AuthorityServiceConnectionException e) {
@@ -90,14 +94,15 @@ public class AuthorityEntryController {
         } catch (AuthorityImporterNotFoundException e) {
             logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            
+
         }
 
         return new ResponseEntity<AuthoritySearchResult>(searchResult, HttpStatus.OK);
-    } 
+    }
 
     @RequestMapping("/auth/authority/get")
-    public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri, @RequestParam("zoteroGroupId") String zoteroGroupId) {
+    public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri,
+            @RequestParam(value = "zoteroGroupId", required = false) String zoteroGroupId) {
         List<IAuthorityEntry> userEntries = authorityService.findByUri((IUser) authentication.getPrincipal(), uri);
         FoundAuthorities foundAuthorities = new FoundAuthorities();
         foundAuthorities.setUserAuthorityEntries(userEntries);
@@ -114,9 +119,11 @@ public class AuthorityEntryController {
         }
 
         
-        Set<IAuthorityEntry> datasetEntries;
+        Set<IAuthorityEntry> datasetEntries = null;
         try {
-            datasetEntries = authorityService.findByUriInDataset(uri, zoteroGroupId);
+            if (zoteroGroupId != null && !zoteroGroupId.isEmpty()) {
+                datasetEntries = authorityService.findByUriInDataset(uri, zoteroGroupId);
+            }
         } catch (GroupDoesNotExistException e) {
             logger.warn("Group does not exist: " + zoteroGroupId, e);
             return new ResponseEntity<FoundAuthorities>(HttpStatus.BAD_REQUEST);
@@ -125,7 +132,7 @@ public class AuthorityEntryController {
         return new ResponseEntity<FoundAuthorities>(foundAuthorities, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/auth/authority/create", method=RequestMethod.POST)
+    @RequestMapping(value="/auth/authority/import", method=RequestMethod.POST)
     public ResponseEntity<IAuthorityEntry> createAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri) {
         IAuthorityEntry entry = null;
         try {

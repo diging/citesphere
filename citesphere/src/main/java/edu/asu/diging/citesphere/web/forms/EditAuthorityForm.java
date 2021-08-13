@@ -2,7 +2,7 @@ package edu.asu.diging.citesphere.web.forms;
 
 import javax.validation.constraints.NotEmpty;
 
-public class AuthorityForm {
+public class EditAuthorityForm {
     private String description;
     @NotEmpty(message="Name cannot be empty.")
     private String name;
