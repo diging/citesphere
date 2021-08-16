@@ -40,7 +40,6 @@ import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
-import edu.asu.diging.citesphere.data.bib.ICitationVersionsDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -48,7 +47,6 @@ import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
-import edu.asu.diging.citesphere.model.bib.impl.CitationVersion;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
@@ -76,9 +74,6 @@ public class CitationManager implements ICitationManager {
     
     @Autowired
     private ICitationDao citationDao;
-    
-    @Autowired
-    private ICitationVersionsDao citationVersionsDao;
 
     @Autowired
     private IGroupManager groupManager;
@@ -129,46 +124,6 @@ public class CitationManager implements ICitationManager {
             return null;
         }
         return updateCitationFromZotero(user, groupId, key);
-    }
-    
-    @Override
-    public List<CitationVersion> getCitationVersions(IUser user, String groupId, String key, int page, int pageSize)
-            throws AccessForbiddenException, GroupDoesNotExistException {
-        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-        if (!groupOptional.isPresent()) {
-            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
-        }
-        ICitationGroup group = groupOptional.get();
-        if (group.getGroupId() == new Long(groupId)) {
-            if (!group.getUsers().contains(user.getUsername())) {
-                throw new AccessForbiddenException("User does not have access this citation.");
-            }
-            return citationVersionsDao.getVersions(groupId, key, page, pageSize);
-        }
-        return new ArrayList<>();
-    }
-
-    @Override
-    public int getTotalCitationVersionPages(String groupId, String key, int pageSize) {
-        int totalCount = citationVersionsDao.getTotalCount(groupId, key);
-        return (int) Math.ceil(Float.valueOf(totalCount) / pageSize);
-    }
-
-    @Override
-    public ICitation getCitationVersion(IUser user, String groupId, String key, Long version)
-            throws AccessForbiddenException, GroupDoesNotExistException {
-        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-        if (!groupOptional.isPresent()) {
-            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
-        }
-        ICitationGroup group = groupOptional.get();
-        if (group != null && group.getGroupId() == new Long(groupId)) {
-            if (!group.getUsers().contains(user.getUsername())) {
-                throw new AccessForbiddenException("User does not have access this citation.");
-            }
-            return citationVersionsDao.getVersion(groupId, key, version);
-        }
-        return null;
     }
     
     @Override

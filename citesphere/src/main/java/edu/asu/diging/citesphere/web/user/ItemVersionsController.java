@@ -1,8 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,47 +14,57 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.model.bib.CitationVersion;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationVersionManager;
+import edu.asu.diging.citesphere.factory.impl.DateParser;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
-public class ItemVersionController {
+public class ItemVersionsController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ICitationManager citationManager;
-
+    
     @Autowired
     private ICitationVersionManager citationVersionManager;
 
-    @GetMapping("/auth/group/{zoteroGroupId}/items/{itemId}/history/{version}/version")
+    @Autowired
+    private DateParser dateParser;
+
+    @GetMapping("/auth/group/{zoteroGroupId}/items/{itemId}/history")
     public String getVersions(Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @PathVariable("version") Long version,
-            @RequestParam(defaultValue = "1", required = false, value = "page") int page)
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page,
+            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize)
             throws AccessForbiddenException {
-        model.addAttribute("zoteroGroupId", zoteroGroupId);
+        List<CitationVersion> versions;
         ICitation citation;
         try {
-            citation = citationVersionManager.getCitationVersion((IUser) authentication.getPrincipal(), zoteroGroupId,
-                    itemId, version);
+            versions = citationVersionManager.getCitationVersions((IUser) authentication.getPrincipal(), zoteroGroupId, itemId,
+                    page - 1, pageSize);
+            citation = citationManager.getCitation(itemId);
         } catch (GroupDoesNotExistException e) {
             logger.error("Group with id {} does not exist", zoteroGroupId);
             return "error/404";
         }
+
         if (citation != null) {
-            model.addAttribute("page", page);
-            model.addAttribute("citation", citation);
-            List<String> fields = citationManager
-                    .getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType()).stream()
-                    .map(f -> f.getFilename()).collect(Collectors.toList());
-            model.addAttribute("fields", fields);
-        } else {
-            return "error/404";
+            model.addAttribute("title", citation.getTitle());
+            model.addAttribute("authors", citation.getAuthors());
+            if (citation.getDateFreetext() != null && !citation.getDateFreetext().isEmpty()) {
+                model.addAttribute("year", dateParser.parse(citation.getDateFreetext()).getYear());
+            }
         }
-        return "auth/group/itemVersion";
+        model.addAttribute("itemKey", itemId);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages",
+                Math.max(1, citationVersionManager.getTotalCitationVersionPages(zoteroGroupId, itemId, pageSize)));
+        model.addAttribute("zoteroGroupId", zoteroGroupId);
+        model.addAttribute("versions", versions);
+        return "auth/group/itemVersions";
     }
 }

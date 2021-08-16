@@ -22,7 +22,6 @@ import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
-import edu.asu.diging.citesphere.model.bib.impl.CitationVersion;
 import edu.asu.diging.citesphere.user.IUser;
 
 public interface ICitationManager {
@@ -43,14 +42,6 @@ public interface ICitationManager {
     
     ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException,
             CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException;
-    
-    List<CitationVersion> getCitationVersions(IUser user, String groupId, String key, int page, int pageSize)
-            throws AccessForbiddenException, GroupDoesNotExistException;
-
-    int getTotalCitationVersionPages(String groupId, String key, int pageSize);
-
-    ICitation getCitationVersion(IUser user, String groupId, String key, Long version)
-            throws AccessForbiddenException, GroupDoesNotExistException;
     
     List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException,
             GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
