@@ -1,12 +1,10 @@
 package edu.asu.diging.citesphere.core.bib.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.shadow.Shadow;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,22 +26,20 @@ public class CitationVersionDao implements ICitationVersionsDao {
     @Override
     public List<CitationVersion> getVersions(String groupId, String key, int page, int pageSize) {
         int offset = page * pageSize;
-        List<CitationVersion> result = new ArrayList<>();
-        List<CdoSnapshot> versions = javers.findSnapshots(QueryBuilder.byInstanceId(key, Citation.class)
-                .withSnapshotTypeUpdate().skip(offset).limit(pageSize).build());
-        result.addAll(versions.stream().filter(version -> version.getPropertyValue(GROUP_PROPERTY).equals(groupId))
-                .map(version -> toCitationVersion(version, key)).collect(Collectors.toList()));
+        List<CdoSnapshot> versions = javers.findSnapshots(
+                QueryBuilder.byInstanceId(key, Citation.class).withCommitProperty(GROUP_PROPERTY, groupId)
+                        .withSnapshotTypeUpdate().skip(offset).limit(pageSize).build());
+        List<CitationVersion> result = versions.stream().map(version -> toCitationVersion(version, key))
+                .collect(Collectors.toList());
 
         // If the page is still empty and if the index of the last element of the
-        // current page is less than or equal to the total version count, add the initial version
+        // current page is greater than or equal to the total version count, add the
+        // initial version
         if (result.size() < pageSize && getTotalCount(groupId, key) <= offset + pageSize) {
-            CdoSnapshot initialVersion = javers
-                    .findSnapshots(QueryBuilder.byInstanceId(key, Citation.class).withSnapshotType(SnapshotType.INITIAL)
-                            .build())
-                    .stream().filter(version -> version.getPropertyValue(GROUP_PROPERTY).equals(groupId)).findFirst()
-                    .orElseGet(null);
-            if (initialVersion != null) {
-                result.add(toCitationVersion(initialVersion, key));
+            List<CdoSnapshot> initialVersions = javers.findSnapshots(
+                    QueryBuilder.byInstanceId(key, Citation.class).withCommitProperty(GROUP_PROPERTY, groupId).build());
+            if (initialVersions != null && !initialVersions.isEmpty()) {
+                result.add(toCitationVersion(initialVersions.get(0), key));
             }
         }
         return result;
@@ -51,20 +47,18 @@ public class CitationVersionDao implements ICitationVersionsDao {
 
     @Override
     public int getTotalCount(String groupId, String key) {
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(key, Citation.class).withSnapshotTypeUpdate();
-        return (int) javers.findSnapshots(jqlQuery.build()).stream()
-                .filter(version -> version.getPropertyValue(GROUP_PROPERTY).equals(groupId)).count() + 1;
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(key, Citation.class)
+                .withCommitProperty(GROUP_PROPERTY, groupId).withSnapshotTypeUpdate();
+        return javers.findSnapshots(jqlQuery.build()).size() + 1;
     }
 
     @Override
     public ICitation getVersion(String groupId, String key, long version) {
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(key, Citation.class).withVersion(version);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(key, Citation.class)
+                .withCommitProperty(GROUP_PROPERTY, groupId).withVersion(version);
         List<Shadow<ICitation>> shadows = javers.findShadows(jqlQuery.build());
         if (!shadows.isEmpty()) {
-            ICitation citation = shadows.get(0).get();
-            if (citation.getGroup().equals(groupId)) {
-                return citation;
-            }
+            return shadows.get(0).get();
         }
         return null;
     }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.bib.CitationVersion;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
@@ -28,7 +27,7 @@ public class ItemVersionsController {
 
     @Autowired
     private ICitationManager citationManager;
-    
+
     @Autowired
     private ICitationVersionManager citationVersionManager;
 
@@ -39,16 +38,15 @@ public class ItemVersionsController {
     public String getVersions(Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
             @RequestParam(defaultValue = "1", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize)
-            throws AccessForbiddenException {
+            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize) {
         List<CitationVersion> versions;
         ICitation citation;
         try {
-            versions = citationVersionManager.getCitationVersions((IUser) authentication.getPrincipal(), zoteroGroupId, itemId,
-                    page - 1, pageSize);
+            versions = citationVersionManager.getCitationVersions((IUser) authentication.getPrincipal(), zoteroGroupId,
+                    itemId, page - 1, pageSize);
             citation = citationManager.getCitation(itemId);
         } catch (GroupDoesNotExistException e) {
-            logger.error("Group with id {} does not exist", zoteroGroupId);
+            logger.error("Group with id {} does not exist", zoteroGroupId, e);
             return "error/404";
         }
 

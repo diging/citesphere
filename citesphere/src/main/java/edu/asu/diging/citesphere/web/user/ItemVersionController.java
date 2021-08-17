@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationVersionManager;
@@ -35,15 +34,14 @@ public class ItemVersionController {
     public String getVersions(Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
             @PathVariable("version") Long version,
-            @RequestParam(defaultValue = "1", required = false, value = "page") int page)
-            throws AccessForbiddenException {
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page) {
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         ICitation citation;
         try {
             citation = citationVersionManager.getCitationVersion((IUser) authentication.getPrincipal(), zoteroGroupId,
                     itemId, version);
         } catch (GroupDoesNotExistException e) {
-            logger.error("Group with id {} does not exist", zoteroGroupId);
+            logger.error("Group with id {} does not exist", zoteroGroupId, e);
             return "error/404";
         }
         if (citation != null) {
