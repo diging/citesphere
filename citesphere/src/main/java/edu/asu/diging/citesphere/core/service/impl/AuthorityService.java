@@ -207,6 +207,13 @@ public class AuthorityService implements IAuthorityService {
                         paging);
     }
     
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * getTotalUserAuthoritiesPages(edu.asu.diging.citesphere.user.IUser,
+     * java.lang.String, java.lang.String, int)
+     */
     @Override
     public int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize) {
         long total;
@@ -250,6 +257,13 @@ public class AuthorityService implements IAuthorityService {
                 firstName, lastName, paging);
     }
     
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * getTotalGroupAuthoritiesPages(java.lang.Long, java.lang.String,
+     * java.lang.String, int)
+     */
     @Override
     public int getTotalGroupAuthoritiesPages(Long groupId, String firstName, String lastName, int pageSize) {
         long total;

@@ -67,6 +67,16 @@ public interface IAuthorityService {
      */
     Page<IAuthorityEntry> findByLastNameAndExcludingFirstName(IUser user, String firstName, String lastName, int page, int pageSize);
     
+    /**
+     * Gets the total count of authorities whose name contains the last name or contains
+     * the first name if the given last name is empty and which are created or imported by
+     * the given user
+     * @param user      User who created or imported the authority
+     * @param firstName First name by which the authorities are to be searched
+     * @param lastName  Last name by which the authorities are to be searched
+     * @param pageSize  Size of the requested page
+     * @return authority count
+     */
     int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize);
     
     /**
@@ -93,6 +103,16 @@ public interface IAuthorityService {
      */
     Page<IAuthorityEntry> findByGroupAndLastNameAndExcludingFirstName(Long groupId, String firstName, String lastName, int page, int pageSize);
     
+    /**
+     * Gets the total count of authorities who belong to the given group and whose
+     * name contains the last name or contains the first name if the given last name
+     * is empty
+     * @param groupId   Group Id to which the authority should belong to
+     * @param firstName First name by which the authorities are to be searched
+     * @param lastName  Last name by which the authorities are to be searched
+     * @param pageSize  Size of the requested page
+     * @return authority count
+     */
     int getTotalGroupAuthoritiesPages(Long groupId, String firstName, String lastName, int pageSize);
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
