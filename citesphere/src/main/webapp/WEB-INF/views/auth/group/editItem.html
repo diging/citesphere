@@ -87,9 +87,11 @@ $(function() {
 		})  
 		$("#searchAuthorSpinner").show();
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Author','Author', 0)
+		getGroupAuthorities('Author','Author', 0)
 		getconceptpowerAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
 	});
@@ -101,9 +103,11 @@ $(function() {
 		$("#searchEditorSpinner").show();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Editor','Editor', 0)
+		getGroupAuthorities('Editor','Editor', 0)
 		getconceptpowerAuthorities('Editor','Editor',0)
 		$("#searchEditorSpinner").hide();
 	});
@@ -115,9 +119,11 @@ $(function() {
 		$("#searchCreatorSpinner").show();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Creator','Creator', 0)
+		getGroupAuthorities('Creator','Creator', 0)
 		getconceptpowerAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
 	});
@@ -750,6 +756,67 @@ function getUserAuthorities(modalType, personType, page) {
 	});
 }
 
+function getGroupAuthorities(modalType, personType, page) {
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/group|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+			
+  			$("#groupAuthoritySearchResult").empty();
+  			var content = '';
+  			
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {
+  					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
+  					if(elem['description']==null){
+  						content += ' - </td>';
+  						}
+  					else{
+  						content +=elem['description'] + '</td>';
+  					}
+  					content += '<td style="vertical-align: middle;"><span class="group-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+  				});
+  				
+  				$('#groupAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	getGroupAuthorities(modalType, personType, page-1)
+  				    }
+  				});
+  			}  		
+  			
+		
+		$("#groupAuthoritySearchResult").append(content);
+		$(".group-authority-entry").click(function() {
+			name = $(this).closest("tr").find(".name").text();
+			uri = $(this).closest("tr").find(".uri").text();
+				
+			showPersonNameInModal(name, personType)
+			$("#uri"+modalType).val( uri);
+			$("#"+personType_lowerCase+"AuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
+			$("#selectAuthorityModel").modal('hide');
+		});	
+		 	
+        },
+    	error: function(data){
+    		$('#groupAuthoritySearchResult').parents('table').hide()
+    		$("#groupAuthoritiesError").show();	
+    	}
+	
+	});
+}
+
 function getconceptpowerAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
@@ -762,7 +829,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		url: url ,
   		async: false,
   		success: function(data) {
-  			$('#mycheckboxDiv').append(data['groupName']);
+  			$('#cp-groupName').text(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
   			var content = '';
   				
@@ -1480,6 +1547,10 @@ function creatorLinkHandler(target) {
 								role="tab" data-toggle="tab">Authorities imported by you</a>
 						</li>
 						<li role="presentation">
+							<a href="#groupAuthoritiesTabContent"
+							    aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from Group</a>
+						</li>
+						<li role="presentation">
 							<a href="#conceptpowerAuthoritiesTabContent"
 								aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from Conceptpower</a>
 						</li>
@@ -1498,6 +1569,19 @@ function creatorLinkHandler(target) {
 								</tbody>
 							</table>		
 						</div>
+                        
+						<div role="tabpanel" class="tab-pane" id="groupAuthoritiesTabContent">
+						    <ul id="groupAuthority-pagination-top" class="pagination-sm"></ul>
+						    <div id="groupAuthoritiesError" class="text-warning" style="display: none">
+						        <span> Error occurred while searching authorities in group </span>
+						    </div>
+						    </br>
+						    <table class="table table-striped table-bordered table-fixed">
+						        <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+						        <tbody id="groupAuthoritySearchResult">
+						        </tbody>
+						    </table>
+						</div>
 			
 						<div role="tabpanel" class="tab-pane" id="conceptpowerAuthoritiesTabContent">
 							<ul id="conceptpowerAuthority-pagination-top" class="pagination-sm"></ul>
@@ -1505,7 +1589,7 @@ function creatorLinkHandler(target) {
 								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
 							<div id="mycheckboxDiv">
-							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group
+							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group <span id="cp-groupName"></span>
 							</div>
 							</br>
 							<table class="table table-striped table-bordered table-fixed">
