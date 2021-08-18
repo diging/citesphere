@@ -1,9 +1,7 @@
 package edu.asu.diging.citesphere.web.user;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -19,7 +17,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
-import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.impl.AsyncDeleteCitationsProcessor;
 import edu.asu.diging.citesphere.core.service.impl.AsyncUpdateCitationsProcessor;
 import edu.asu.diging.citesphere.model.bib.ICitation;
@@ -37,9 +34,6 @@ public class AsyncCitationManager {
 
     @Autowired
     private AsyncDeleteCitationsProcessor asyncDeleteCitationsProcessor;
-
-    @Autowired
-    private ICitationStore citationStore;
 
     private final Map<String, Future<ZoteroUpdateItemsStatuses>> updateTaskTracker;
     private final Map<String, Future<Map<ItemDeletionResponse, List<String>>>> deleteTaskTracker;
@@ -147,19 +141,12 @@ public class AsyncCitationManager {
     }
 
     /**
-     * Removes the Citation deletion task from memory and removes the deleted
-     * Citations from index and local database
+     * Removes the Citation deletion task from memory
      * 
      * @param taskId Id of the task
      */
     public void clearDeleteTask(String taskId) throws InterruptedException, ExecutionException {
-        Map<ItemDeletionResponse, List<String>> deletionResponse = deleteTaskTracker.remove(taskId).get();
-        for (String itemKey : deletionResponse.getOrDefault(ItemDeletionResponse.SUCCESS, new ArrayList<>())) {
-            Optional<ICitation> citation = citationStore.findById(itemKey);
-            if (citation.isPresent()) {
-                citationStore.delete(citation.get());
-            }
-        }
+        deleteTaskTracker.remove(taskId);
     }
 
 }
