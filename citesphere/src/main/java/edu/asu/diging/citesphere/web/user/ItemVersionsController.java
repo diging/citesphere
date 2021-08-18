@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -54,7 +55,8 @@ public class ItemVersionsController {
             model.addAttribute("title", citation.getTitle());
             model.addAttribute("authors", citation.getAuthors());
             if (citation.getDateFreetext() != null && !citation.getDateFreetext().isEmpty()) {
-                model.addAttribute("year", dateParser.parse(citation.getDateFreetext()).getYear());
+                OffsetDateTime date = dateParser.parse(citation.getDateFreetext());
+                model.addAttribute("year", date == null ? null : date.getYear());
             }
         }
         model.addAttribute("itemKey", itemId);
