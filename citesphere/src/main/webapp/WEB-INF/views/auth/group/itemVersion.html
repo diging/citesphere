@@ -34,7 +34,8 @@
 <body>
 <div layout:fragment="content">
     <div class="pull-left" style="margin-bottom: 20px;">
-        <a class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/history?page=${page}|}">Back</a>
+        <a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/history?page=${page}&searchTerm=${searchTerm}&itemsPage=${itemsPage}|}">Back</a>
+        <a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/history?page=${page}&itemsPage=${itemsPage}&sortBy=${sortBy}|}">Back</a>
    </div>
    
     <div class="row">

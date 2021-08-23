@@ -19,8 +19,11 @@ $(function() {
 </head>
 <body>
 <div layout:fragment="content">
-
-<div class="col-xs-12">
+<div class="pull-left" style="margin-bottom: 20px;">
+    <a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}?searchTerm=${searchTerm}&page=${itemsPage}|}">Back</a>
+    <a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}?page=${itemsPage}&sortBy=${sortBy}|}">Back</a>
+</div>
+<div class="row col-xs-12">
     <h2 style="margin-top: 0">
         <th:block th:each="author,status : ${authors}">
             <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
@@ -39,8 +42,14 @@ $(function() {
         <th>Updated by</th>
     </tr>
     <tr th:each="version,loop : ${versions}">
-        <td><a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}|}" th:text="${version.updatedDate}"/></td>
-        <td><a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}|}" th:text="${version.updatedBy}"/></td>
+        <td>
+            <a th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}&searchTerm=${searchTerm}&itemsPage=${itemsPage}|}" th:text="${version.updatedDate}"/>
+            <a th:unless="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}&itemsPage=${itemsPage}&sortBy=${sortBy}|}" th:text="${version.updatedDate}"/>
+        </td>
+        <td>
+            <a th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}&searchTerm=${searchTerm}&itemsPage=${itemsPage}|}" th:text="${version.updatedBy}"/>
+            <a th:unless="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}&itemsPage=${itemsPage}&sortBy=${sortBy}|}" th:text="${version.updatedBy}"/>
+        </td>
     </tr>
 </table>
 </div>

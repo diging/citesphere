@@ -49,6 +49,7 @@ public class CitationVersionDao implements ICitationVersionsDao {
     public int getTotalCount(String groupId, String key) {
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(key, Citation.class)
                 .withCommitProperty(GROUP_PROPERTY, groupId).withSnapshotTypeUpdate();
+        //Adding 1 for initial version of the citation
         return javers.findSnapshots(jqlQuery.build()).size() + 1;
     }
 

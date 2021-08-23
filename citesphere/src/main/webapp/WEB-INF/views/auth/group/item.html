@@ -90,15 +90,16 @@
 	
 	<div class="pull-left" style="margin-bottom: 20px;">
 		<span th:unless="${!#strings.isEmpty(collectionId)}">
-			<a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/search?&searchTerm=${searchTerm}&page=${page}|}">Back</a> &nbsp;&nbsp;
-			<a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
+			<a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/search?index=${index}&searchTerm=${searchTerm}&page=${page}|}">Back</a> &nbsp;&nbsp;
+			<a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items?index=${index}&page=${page}&sortBy=${sortBy}|}">Back</a> &nbsp;&nbsp;
 		</span>
 		 <a
 			th:href="@{|${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
 			class="icon-edit" style="color: #337ab7; font-size: 14px" title="Edit"></i></a> &nbsp;&nbsp; <a
 			th:href="@{|${citation.key}/sync?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}"><i
 			class="icon-sync" title="Sync Citation"></i></a> &nbsp;&nbsp; 
-        <a th:href="@{|${citation.key}/history|}"><i class="icon-layers" style="color: #337ab7;" title="Previous Versions"></i></a>
+        <a th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|${citation.key}/history?searchTerm=${searchTerm}&itemsPage=${page}|}"><i class="icon-layers" style="color: #337ab7;" title="Previous Versions"></i></a>
+        <a th:unless="${!#strings.isEmpty(searchTerm)}" th:href="@{|${citation.key}/history?itemsPage=${page}&sortBy=${sortBy}|}"><i class="icon-layers" style="color: #337ab7;" title="Previous Versions"></i></a>
 			
 		&nbsp;&nbsp;
         <a id="uploadFileIcon" href="#"><i style="color: #337ab7; font-size: 20px" class="icon-multiple-doc"></i></a>

@@ -34,7 +34,10 @@ public class ItemVersionController {
     public String getVersions(Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
             @PathVariable("version") Long version,
-            @RequestParam(defaultValue = "1", required = false, value = "page") int page) {
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page,
+            @RequestParam(required = false, value = "searchTerm") String searchTerm,
+            @RequestParam(defaultValue = "1", required = false, value = "itemsPage") int itemsPage,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) {
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         ICitation citation;
         try {
@@ -51,6 +54,9 @@ public class ItemVersionController {
                     .getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType()).stream()
                     .map(f -> f.getFilename()).collect(Collectors.toList());
             model.addAttribute("fields", fields);
+            model.addAttribute("searchTerm", searchTerm);
+            model.addAttribute("itemsPage", itemsPage);
+            model.addAttribute("sortBy", sortBy);
         } else {
             return "error/404";
         }

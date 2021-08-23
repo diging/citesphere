@@ -39,7 +39,10 @@ public class ItemVersionsController {
     public String getVersions(Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
             @RequestParam(defaultValue = "1", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize) {
+            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
+            @RequestParam(required = false, value = "searchTerm") String searchTerm,
+            @RequestParam(defaultValue = "1", required = false, value = "itemsPage") int itemsPage,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) {
         List<CitationVersion> versions;
         ICitation citation;
         try {
@@ -65,6 +68,9 @@ public class ItemVersionsController {
                 Math.max(1, citationVersionManager.getTotalCitationVersionPages(zoteroGroupId, itemId, pageSize)));
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("versions", versions);
+        model.addAttribute("searchTerm", searchTerm);
+        model.addAttribute("itemsPage", itemsPage);
+        model.addAttribute("sortBy", sortBy);
         return "auth/group/itemVersions";
     }
 }
