@@ -7,17 +7,15 @@ import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 
 public class ItemsDataDto {
-    private List<ICitation> citations;
+    private List<CitationsDto> citationsData;
     private long totalResults;
     private double totalPages;
     private int currentPage;
     private String zoteroGroupId;
-    private CitationResults results;
     private List<ICitationCollection> citationCollections;
     private List<String> shownColumns;
     private List<String> allowedColumns;
-    
-    
+    private boolean notModified;
     
     public List<String> getAllowedColumns() {
         return allowedColumns;
@@ -37,17 +35,11 @@ public class ItemsDataDto {
     public void setCitationCollections(List<ICitationCollection> citationCollections) {
         this.citationCollections = citationCollections;
     }
-    public CitationResults getResults() {
-        return results;
+    public List<CitationsDto> getCitationsData() {
+        return citationsData;
     }
-    public void setResults(CitationResults results) {
-        this.results = results;
-    }
-    public List<ICitation> getCitations() {
-        return citations;
-    }
-    public void setCitations(List<ICitation> citations) {
-        this.citations = citations;
+    public void setCitationsData(List<CitationsDto> citationsData) {
+        this.citationsData = citationsData;
     }
     public long getTotalResults() {
         return totalResults;
@@ -73,8 +65,10 @@ public class ItemsDataDto {
     public void setZoteroGroupId(String zoteroGroupId) {
         this.zoteroGroupId = zoteroGroupId;
     }
-    
-     
-    
-    
+    public boolean getNotModified() {
+        return notModified;
+    }
+    public void setNotModified(boolean notModified) {
+        this.notModified = notModified;
+    }   
 }

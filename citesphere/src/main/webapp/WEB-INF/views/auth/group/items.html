@@ -168,7 +168,6 @@ function pollStatus(){
                 $("#syncProgress").addClass("progress-bar-striped active");
                 $("#syncText").text(Math.round(percent) + "% synced");
         	}
-        	getCurrentItemsData();
         	setTimeout(pollStatus,1000);
         } else {
         	$("#syncProgress").attr('style', "width: 100%");
@@ -176,8 +175,8 @@ function pollStatus(){
             $("#syncProgress").attr('aria-valuemax', 100);
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
-            getCurrentItemsData();
         }
+        getCurrentItemsData();
     });
 }
 
@@ -185,85 +184,90 @@ function getCurrentItemsData(){
 	let pageNumber = $(".page-item.active").text();
 	 $.get("items/data?page="+pageNumber, function(data) {
 		 console.log(data);
-		 let tablebody = $('<tbody>');
-		 let headerRow = $('<tr>'+
-				 '<th>'+"Type"+'</th>'+
-				 '<th>'+"Author"+'</th>'+
-				 '<th>'+"Title"+'</th>'+
-				 '<th>'+"Date"+'</th>'+
-				 '<th>'+"URL"+'</th>'+
-				 '</tr>')
-				 
-		 tablebody.append(headerRow);
-		 const citations = data['citations'];
-		 console.log(citations);
-		 let i=0;
-		 for (const citation of data['citations']){
-			  let type = citation.itemType +"_icon";
-			  //console.log(type);
-			  //console.log([[${@iconsResource.getProperty(type+"_icon")}]]);
-			  
-			  let divIconData = $('<div>').append($('<i class="icon-docs" title='+citation.itemType +'>'+'</i>')).append(citation.itemType);
-			  let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
-			  let iconData = $('<td>').append(spanElement);
-			
-			  let authors = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>'+'</td>');
-			  
-			 for(const author of citation['authors']){
-				  let authorsData = $('<strong>' + author.lastName + 
-				  '<span> ,' + author.firstName + '</span>'+ '</strong>'+
-				  '<span>'+'</span>')
-				  authors.append(authorsData);
-			  } 
-			  
-			  let title = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +'</td>');
-			  title.append($('<em>'+ citation.title+'</em>'));
-			  
-			  let date = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +'</td>'); 
-			  date.append(citation.dateFreetext);
-			  
-			  let url = $('<td>');
-			  if(citation.url || citation.url !== ""){
-				 let  urlElement = $('<span>' +'<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www>'+'</a>' +'</span>');
-				 url.append(urlElement);
-			  }
-			  
-			  let columnsData = null;
-			  for(const column of data['shownColumns']){
-				  columnsData = columnsData + citation[column];
-			  }
-			  
-			  let column = $('<td style="max-width:300px;">' +'</td>'); 
-			  let row = $('<tr>').append(iconData).append(authors).append(title).append(date).append(url);
-			  if(columnsData !== null){
-				  column.append(columnsData);
-				  row.append(column);
-				  console.log(columnsData);
-			  }
-			  
-			 tablebody.append(row);
-			 i++;
-			};
-		 $("#items-table tbody").replaceWith(tablebody);
-		 $("#total-records").text(data['totalResults']);
-		 
-		 
-		 let unOrderedList = $('<ul class="list-group" id=collectionsList">'+'</ul>');
-		 for(const collection of data['citationCollections']){
-			 let list = $('<li class="list-group-item">'+'</li>');
-			 let badge = $('<span class="badge">'+'</span>').text(collection.numberOfItems);
-			 list.append(badge);
-			 let collectionURL = window.location.href +"/../collection/"+collection.key+"/items";
-			 let collectionText = $('<span/>').text(collection.name)
-			 let anchorTag = $('<a href= '+collectionURL+'>'+'</a>').append(collectionText);
-			 list.append(anchorTag);
-			 unOrderedList.append(list);
+		 if(data['notModified']){
+			 rewriteCitationsTable(data);
+			 rewriteCollectionsList(data);
+			 addEventListeners();
 		 }
-		
-		 $("#collectionsList").replaceWith(unOrderedList);
-		 addEventListeners();
-		 
 	 }); 
+}
+
+function rewriteCitationsTable(data){
+	let tablebody = $('<tbody>');
+	 let headerRow = $('<tr>'+
+			 '<th>'+"Type"+'</th>'+
+			 '<th>'+"Author"+'</th>'+
+			 '<th>'+"Title"+'</th>'+
+			 '<th>'+"Date"+'</th>'+
+			 '<th>'+"URL"+'</th>'+
+			 '</tr>')
+			 
+	 tablebody.append(headerRow);
+	 let i=0;
+	 for (const citationData of data['citationsData']){
+		  let citation = citationData['citation']
+		  let citationIcon =  citationData['citationIcon'] ? citationData['citationIcon'] : "icon-docs"
+		  let citationLabel = citationData['citationLabel'] ? citationData['citationLabel'] : citation.itemType
+		  
+		  let divIconData = $('<div>').append($('<i class='+citationIcon+' title='+citationLabel +'>'+'</i>')).append(citationLabel);
+		  let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
+		  let iconData = $('<td>').append(spanElement);
+		
+		  let authors = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>'+'</td>');
+		  
+		 for(const author of citation['authors']){
+			  let authorsData = $('<strong>' + author.lastName + 
+			  '<span> ,' + author.firstName + '</span>'+ '</strong>'+
+			  '<span>'+'</span>')
+			  authors.append(authorsData);
+		  } 
+		  
+		  let title = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +'</td>');
+		  title.append($('<em>'+ citation.title+'</em>'));
+		  
+		  let date = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +'</td>'); 
+		  date.append(citation.dateFreetext);
+		  
+		  let url = $('<td>');
+		  if(citation.url || citation.url !== ""){
+			 let  urlElement = $('<span>' +'<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www>'+'</a>' +'</span>');
+			 url.append(urlElement);
+		  }
+		  
+		  let columnsData = null;
+		  for(const column of data['shownColumns']){
+			  columnsData = columnsData + citation[column];
+		  }
+		  
+		  let column = $('<td style="max-width:300px;">' +'</td>'); 
+		  let row = $('<tr>').append(iconData).append(authors).append(title).append(date).append(url);
+		  if(columnsData !== null){
+			  column.append(columnsData);
+			  row.append(column);
+			  console.log(columnsData);
+		  }
+		  
+		 tablebody.append(row);
+		 i++;
+	 };
+	 $("#items-table tbody").replaceWith(tablebody);
+	 $("#total-records").text(data['totalResults']);
+}
+
+function rewriteCollectionsList(data){
+	let unOrderedList = $('<ul class="list-group" id=collectionsList">'+'</ul>');
+	 for(const collection of data['citationCollections']){
+		 let list = $('<li class="list-group-item">'+'</li>');
+		 let badge = $('<span class="badge">'+'</span>').text(collection.numberOfItems);
+		 list.append(badge);
+		 let collectionURL = window.location.href +"/../collection/"+collection.key+"/items";
+		 let collectionText = $('<span/>').text(collection.name)
+		 let anchorTag = $('<a href= '+collectionURL+'>'+'</a>').append(collectionText);
+		 list.append(anchorTag);
+		 unOrderedList.append(list);
+	 }
+	
+	 $("#collectionsList").replaceWith(unOrderedList);
 }
 
 
@@ -402,7 +406,7 @@ function getCurrentItemsData(){
 			  <span class="text-warning">
 			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
 			  , iconLabel=${@iconsResource.getProperty(entry.itemType + '_label')}">
-				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
+				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ? ${iconLabel} : ${entry.itemType}"></i> [[${iconLabel} ? ${iconLabel} : ${entry.itemType}]]
 				</div>
 			  </span>
 			</td>

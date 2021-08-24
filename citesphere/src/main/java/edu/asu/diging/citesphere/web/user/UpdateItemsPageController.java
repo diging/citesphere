@@ -2,36 +2,32 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.gson.Gson;
-
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
-import edu.asu.diging.citesphere.core.service.IGroupManager;
-import edu.asu.diging.citesphere.model.bib.ICitationCollection;
-import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
-import edu.asu.diging.citesphere.web.BreadCrumb;
-import edu.asu.diging.citesphere.web.BreadCrumbType;
 
 @Controller
+@PropertySource("classpath:/config.properties")
+@PropertySource("classpath:/item_type_icons.properties")
 public class UpdateItemsPageController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -41,15 +37,15 @@ public class UpdateItemsPageController {
     
     @Value("${_available_item_columns}")
     private String availableColumns;
+    
+    @Autowired
+    private Environment env;
 
     @Autowired
     private ICitationManager citationManager;
     
     @Autowired
     private ICitationCollectionManager collectionManager;
-    
-    @Autowired
-    private IGroupManager groupManager;
 
     @RequestMapping(value= "/auth/group/{zoteroGroupId}/items/data")
     public @ResponseBody ItemsDataDto show(Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
@@ -76,12 +72,12 @@ public class UpdateItemsPageController {
         }
         
         ItemsDataDto itemsData = new ItemsDataDto();
-        itemsData.setCitations(results.getCitations());
+        itemsData.setCitationsData(results.getCitations().stream().map(c -> new CitationsDto(c, env.getProperty(c.getItemType()+"_label") ,env.getProperty(c.getItemType()+"_icon"))).collect(Collectors.toList()));
         itemsData.setTotalResults(results.getTotalResults());
         itemsData.setTotalPages(Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         itemsData.setCurrentPage(pageInt);
         itemsData.setZoteroGroupId(groupId);
-        itemsData.setResults(results);
+        itemsData.setNotModified(results.isNotModified());
         
         try {
             itemsData.setCitationCollections(collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
@@ -100,8 +96,7 @@ public class UpdateItemsPageController {
         }
         itemsData.setShownColumns(shownColumns);
         itemsData.setAllowedColumns(allowedColumns);
-       
-        Gson gson = new Gson();
+        
         return itemsData;
     }
     
