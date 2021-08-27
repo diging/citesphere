@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 
 import javax.annotation.PostConstruct;
@@ -17,9 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
@@ -93,6 +97,15 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
+    public ICitation getCitation(String key) {
+        Optional<ICitation> optional = citationStore.findById(key);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        return null;
+    }
+
+    @Override
     public ICitation getCitation(IUser user, String groupId, String key)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         Optional<ICitation> optional = citationStore.findById(key);
@@ -111,6 +124,22 @@ public class CitationManager implements ICitationManager {
             return null;
         }
         return updateCitationFromZotero(user, groupId, key);
+    }
+
+    @Override
+    public List<ICitation> getAttachments(IUser user, String groupId, String key)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        if (group != null && group.getGroupId() == new Long(groupId)) {
+            if (!group.getUsers().contains(user.getUsername())) {
+                throw new AccessForbiddenException("User does not have access this citation.");
+            }
+        }
+        List<ICitation> attachments = citationStore.getAttachments(key);
+        if (attachments.isEmpty()) {
+            attachments = updateAttachmentsFromZotero(user, groupId, key);
+        }
+        return attachments;
     }
 
     /**
@@ -143,11 +172,18 @@ public class CitationManager implements ICitationManager {
             if (storedCitation.getVersion() != citationVersion) {
                 throw new CitationIsOutdatedException();
             }
-            citationStore.delete(storedCitationOptional.get());
+            citationStore.delete(storedCitation);
         }
 
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         citationStore.save(updatedCitation);
+    }
+    
+    @Override
+    public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
+            ExecutionException, JsonProcessingException {
+        return zoteroManager.updateCitations(user, groupId, citations);
     }
 
     @Override
@@ -191,6 +227,29 @@ public class CitationManager implements ICitationManager {
             throw new CannotFindCitationException(ex);
         }
 
+    }
+    
+    @Override
+    public List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
+        try {
+            List<ICitation> attachments = zoteroManager.getGroupItemAttachments(user, groupId, itemKey);
+            attachments.forEach(attachment -> {
+                attachment.setGroup(groupOptional.get().getGroupId() + "");
+                Optional<ICitation> oldAttachment = citationStore.findById(attachment.getKey());
+                if (oldAttachment.isPresent()) {
+                    citationStore.delete(oldAttachment.get());
+                }
+                citationStore.save(attachment);
+            });
+            return attachments;
+        } catch (HttpClientErrorException ex) {
+            throw new CannotFindCitationException(ex);
+        }
     }
 
     /*
@@ -378,5 +437,10 @@ public class CitationManager implements ICitationManager {
             }
         }
         return result;
+    }
+    
+    @Override
+    public void deleteLocalGroupCitations(String groupId) {
+        citationStore.deleteCitationByGroupId(groupId);
     }
 }

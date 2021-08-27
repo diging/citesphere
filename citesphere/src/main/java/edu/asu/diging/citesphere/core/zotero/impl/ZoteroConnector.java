@@ -2,7 +2,10 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +15,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -22,16 +27,20 @@ import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ItemCreationResponse;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
+import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Component
@@ -158,6 +167,18 @@ public class ZoteroConnector implements IZoteroConnector {
             throw createException(ex.getStatusCode(), ex);
         }
     }
+    
+    @Override
+    public List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            return zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey).stream()
+                    .filter(item -> item.getData().getItemType().equals(ItemType.ATTACHMENT.getZoteroKey()))
+                    .collect(Collectors.toList());
+        } catch (HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
 
     @Override
     public Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
@@ -174,7 +195,27 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return getItem(user, groupId, item.getKey());
     }
-
+    
+    /**
+     * This method makes a call to Zotero to batch update items and return back
+     * items statuses
+     * 
+     * @param groupId               group id of citations
+     * @param items                 List of items to be updated
+     * @param ignoreFieldsList      Fields that are not necessary to be updated
+     * @param validCreatorTypesList valid creators list
+     * @param user                  user accessing Zotero
+     * 
+     * @return ZoteroUpdateItemsStatuses returns statuses of items.
+     */
+    @Override
+    public ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
+            List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
+            throws ZoteroConnectionException, JsonProcessingException {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().batchUpdateItems(groupId, items, ignoreFieldsList, validCreatorTypesList);
+    }
+    
     @Override
     public Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException {

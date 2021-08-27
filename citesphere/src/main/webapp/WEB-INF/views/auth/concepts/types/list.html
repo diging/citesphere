@@ -8,7 +8,7 @@
 <div layout:fragment="content">
 <h2>Concept Types</h2>
 <p>
-<a th:href="@{add}" class="btn btn-primary btn-sm">Add</a>
+<a th:href="@{add}" class="btn btn-primary btn-sm"><i class="icon-circle-add"></i> &nbsp;Add</a>
 </p> 
 
 <table class="table table-striped table-bordered">
@@ -17,15 +17,16 @@
 		<th>Name</th>
 		<th>Description</th>
 		<th>Created on</th>
+		<th>Created by</th>
 		<th></th>
 	</tr>
 	<tr th:id="'tr-'+${type.id}" th:each="type : ${types}">
 		<td><span th:text="${type.uri}"></span></td>
 		<td><span th:text="${type.name}"></span></td>
 		<td><span th:text="${type.description}"></span></td>
-		
 		<td><span class="date" th:text="${type.createdOn}"></span></td>
-		<td><a th:href="@{'/auth/concepts/types/' + ${type.id} + '/edit'}" /><i class="far fa-edit" title="Edit"></i></a></td>
+		<td><span th:text="${type.owner.firstName + ' ' + type.owner.lastName}"></span></td>
+		<td><a th:href="@{'/auth/concepts/types/' + ${type.id} + '/edit'}" /><i class="icon-edit" style="color: #337ab7" title="Edit"></i></a></td>
 		</tr>
 	</th:forEach>
 </table>
