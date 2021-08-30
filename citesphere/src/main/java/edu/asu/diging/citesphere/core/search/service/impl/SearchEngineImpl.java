@@ -7,6 +7,7 @@ import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -20,6 +21,7 @@ import edu.asu.diging.citesphere.core.search.model.impl.Person;
 import edu.asu.diging.citesphere.core.search.model.impl.Reference;
 import edu.asu.diging.citesphere.core.search.model.impl.Tag;
 import edu.asu.diging.citesphere.core.search.service.SearchEngine;
+import edu.asu.diging.citesphere.core.service.impl.CitationPage;
 import edu.asu.diging.citesphere.model.bib.IAffiliation;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationConceptTag;
@@ -54,7 +56,7 @@ public class SearchEngineImpl implements SearchEngine {
                 .should(QueryBuilders.queryStringQuery(searchTerm).field("title").field("creators.name"));
         BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
         boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId));
-        NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder);
+        NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder).withPageable(PageRequest.of(page, pageSize));
 
         AggregatedPage<Reference> results = template.queryForPage(b.build(), Reference.class);
         List<ICitation> foundCitations = new ArrayList<ICitation>();
@@ -62,6 +64,43 @@ public class SearchEngineImpl implements SearchEngine {
             foundCitations.add(mapReference(r));
         });
         return new ResultPage(foundCitations, results.getTotalElements(), results.getTotalPages());
+    }
+
+    @Override
+    public CitationPage getPrevAndNextCitation(String searchTerm, String groupId, int page, int index, int pageSize) {
+        ResultPage searchResult = search(searchTerm, groupId, page, pageSize);
+        List<ICitation> citations = searchResult.getResults();
+
+        CitationPage citationPage = new CitationPage();
+        citationPage.setIndex(String.valueOf(index));
+        citationPage.setZoteroGroupId(groupId);
+
+        if (citations != null && citations.size() > 0) {
+            if (index == citations.size() - 1 && page < searchResult.getTotalPages() - 1) {
+                ResultPage nextPageSearchResult = search(searchTerm, groupId, page + 1, pageSize);
+                citationPage.setNext(nextPageSearchResult.getResults().get(0).getKey());
+                citationPage.setNextIndex(String.valueOf(0));
+                citationPage.setNextPage(String.valueOf(page + 2));
+            } else if (index < citations.size() - 1) {
+                citationPage.setNext(citations.get(index + 1).getKey());
+                citationPage.setNextIndex(String.valueOf(index + 1));
+                citationPage.setNextPage(String.valueOf(page + 1));
+            }
+
+            if (index > 0) {
+                citationPage.setPrev(citations.get(index - 1).getKey());
+                citationPage.setPrevIndex(String.valueOf(index - 1));
+                citationPage.setPrevPage(String.valueOf(page + 1));
+            } else if (index == 0 && page > 0) {
+                ResultPage prevPageSearchResult = search(searchTerm, groupId, page - 1, pageSize);
+                int prevPageSize = prevPageSearchResult.getResults().size();
+                citationPage.setPrev(prevPageSearchResult.getResults().get(prevPageSize - 1).getKey());
+                citationPage.setPrevIndex(String.valueOf(prevPageSize - 1));
+                citationPage.setPrevPage(String.valueOf(page));
+            }
+        }
+
+        return citationPage;
     }
 
     private ICitation mapReference(Reference ref) {

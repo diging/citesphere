@@ -1,0 +1,372 @@
+<html layout:decorate="~{layouts/main}">
+
+<head>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<script th:inline="javascript">
+$(function() {
+
+    $("#uriLoadingSpinnerAuthor").hide();
+    $("#uriLoadingFailureAuthor").hide();
+    $("#uriLoadingFoundAuthor").hide();
+    $("#searchAuthorSpinner").hide();
+    $("#tr-uriAuthor").hide();
+    $("#importerId").hide();
+    
+
+    $("#firstNameAuthor").keyup(function(e) {
+        allowAuthoritySearch("Author");
+    });
+
+    $("#lastNameAuthor").keyup(function(e) {
+        allowAuthoritySearch("Author");
+    });
+
+    $("#addAuthorModalCancel").click(function() {
+        $("#authorModal").modal('hide');
+        resetPersonCreationModal("Author");
+    });
+    
+    $("#clear").click(function() {
+    	$("#tr-uriAuthor").hide();
+    });
+
+    $("#searchAuthor").click(function() {
+        $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+            $('#selectAuthorityModel a:first').tab('show');
+        })
+        $("#searchAuthorSpinner").show();
+        $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+        getConceptpowerAuthorities('Author', 'Author', 0)
+        $("#searchAuthorSpinner").hide();
+    });
+
+    $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
+        name = $(this).closest("div").find(".name").text();
+        uri = $(this).closest("div").find(".uri").text();
+        importerId = $(this).closest("div").find(".importerId").text();
+    	
+        showPerson(name, null, uri, importerId);
+        $("#authorCreateAuthority").hide();
+        $("#uriLoadingFoundAuthor").popover('hide');
+        $("#selectAuthorityModel").modal('hide');
+        $("#authorModal").modal('hide');
+        resetPersonCreationModal("Author");
+    });
+
+    var timer = null;
+    $("#uriAuthor").change(function() {
+        resetPersonAuthorityCreation("Author");
+        $("#uriLoadingSpinnerAuthor").show();
+        var uri = $("#uriAuthor").val();
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+            getPersonAuthority(uri, "Author");
+        }, 1000);
+    });
+
+    $("#closeAuthoritySearchResult").click(function() {
+        $("#selectAuthorityModel").modal('hide');
+        $('#selectAuthorityModel a:first').tab('show');
+    });
+
+});
+
+function allowAuthoritySearch(element) {
+    if ($("#firstName" + element).val() == "" && $("#lastName" + element).val() == "") {
+        $("#search" + element).prop("disabled", true);
+    } else {
+        $("#search" + element).prop("disabled", false);
+    }
+}
+
+/* Function to populate name in modal fetched from uri */
+function showPerson(name, description, uri, importerId) {
+	$("#name").val(name);
+	
+	if (description != undefined && description != ' - ') {
+	    $("#description").val(description);
+	}
+	
+	if (uri != undefined && uri != '') {
+	    $("#uri").val(uri);
+	    $("#tr-uriAuthor").show();
+	}
+	
+	if (importerId != undefined) {
+	    $("#importerId").val(importerId);
+	}
+}
+
+function getConceptpowerAuthorities(modalType, personType, page) {
+    var firstName = $("#firstName" + personType).val();
+    var lastName = $("#lastName" + personType).val();
+    personType_lowerCase = personType.toLowerCase();
+    url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?firstName=' + firstName + '&lastName=' + lastName + '&page=' + page;
+    $.ajax({
+        dataType: "json",
+        type: 'GET',
+        url: url,
+        async: false,
+        success: function(data) {
+            $("#conceptpowerAuthoritySearchResult").empty();
+            var content = '';
+
+            if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+                data['foundAuthorities'].forEach(function(elem) {
+                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
+                    if (elem['description'] == null) {
+                        content += ' - </td>';
+                    } else {
+                        content += elem['description'] + '</td>';
+                    }
+                    content += '<div class="importerId" style="display: none;">';
+                    if (elem['importerId'] == null) {
+                        content += '</div>';
+                    } else {
+                        content += elem['importerId'] + '</div>';
+                    }
+                    content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+
+                });
+
+                $('#conceptpowerAuthority-pagination-top').twbsPagination({
+                    totalPages: data['totalPages'],
+                    startPage: data['currentPage'],
+                    prev: "«",
+                    next: "»",
+                    visiblePages: 5,
+                    initiateStartPageClick: false,
+                    onPageClick: function(event, page) {
+                        getConceptpowerAuthorities(modalType, personType, page)
+                    }
+                });
+
+            }
+
+            $("#conceptpowerAuthoritySearchResult").append(content);
+            $(".conceptpower-authority-entry").click(function() {
+                name = $(this).closest("tr").find(".name").text();
+                uri = $(this).closest("tr").find(".uri").text();
+                description = $(this).closest("tr").find(".description").text();
+                importerId = $(this).closest("tr").find(".importerId").text();
+                
+                showPerson(name, description, uri, importerId);
+                $("#selectAuthorityModel").modal('hide');
+                $("#authorModal").modal('hide');
+                resetPersonCreationModal("Author");
+            });
+        },
+        error: function(data) {
+            $('#conceptpowerAuthoritySearchResult').parents('table').hide()
+            $("#conceptpowerAuthoritiesError").show();
+        }
+
+    });
+}
+
+function resetPersonCreationModal(modalType) {
+    var modalNameLCase = modalType.toLowerCase();
+    $("#firstName" + modalType).val("");
+    $("#lastName" + modalType).val("");
+    $("#id" + modalType).attr("data-" + modalType + "-id", "");
+    $("#uri" + modalType).val("");
+    resetPersonAuthorityCreation(modalType);
+}
+
+function resetPersonAuthorityCreation(personType) {
+    $("#uriLoadingFound" + personType).hide();
+    $("#uriLoadingFailure" + personType).hide();
+    $("#uriLoadingSpinner" + personType).hide();
+    $("#uriLoadingFound" + personType).popover('hide');
+    $("#uriLoadingFailure" + personType).popover('hide');
+}
+
+function getPersonAuthority(uri, personType) {
+
+    personType_lowerCase = personType.toLowerCase();
+    $.get([[@{/auth/authority/get?uri=}]] + uri, function(data) {
+            $("#uriLoadingFound" + personType).attr("data-authority-uri", data['uri']);
+            var content = "Authority <b>" + uri + "</b>";
+            if (data['userAuthorityEntries'] != null && data['userAuthorityEntries'].length > 0) {
+                content += "<br><br>This authority entry has already been imported by you:";
+                content += '<ul class="foundAuthorities">';
+                data['userAuthorityEntries'].forEach(function(elem) {
+                    content += '<li>' + elem['name'];
+                    content += '</li>';
+                });
+                content += "</ul>";
+            } else if (data['importedAuthority'] != null) {
+                content += "<br><br>Following authority can be imported:<br>" + data['importedAuthority']['name'] +
+                    '<button id="' + personType_lowerCase + 'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b><div style="display: none;">'
+                    +'<p class="name">'+ data['importedAuthority']['name'] + '</p><p class="uri">'+ data['importedAuthority']['uri'] + '</p><p class="importerId">';
+                if (data['importedAuthority']['importerId'] != null) {
+                	content += data['importedAuthority']['importerId'];
+                }
+                content += '</p></div></button>';
+            } else {
+                content += "<br><br>No authorities found for the given URI<br>";
+            }
+
+            $("#uriLoadingFound" + personType).attr("data-content", content);
+            $("#uriLoadingFound" + personType).attr("data-authority-uri", uri);
+            $("#uriLoadingFound" + personType).show();
+            $("#uriLoadingFound" + personType).popover('show');
+        })
+        .fail(function() {
+            $("#uriLoadingFailure" + personType).show();
+        })
+        .always(function() {
+            $("#uriLoadingSpinner" + personType).hide();
+        });
+
+}
+</script>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+<h1>Create Authority</h1>
+<p>To import an authority from another service, click the search button.</p>
+<p class="pull-right">
+    <button data-toggle="modal" data-target="#authorModal" class="btn btn-primary btn-sm">&nbsp;Search</button>
+</p>
+
+<form action="#" th:action="@{/auth/authority/create}" method="POST" th:object="${authorityForm}">
+    <table class="table table-striped">
+    
+    <tr>
+        <td width="20%"><label>Group</label></td>
+        <td>
+            <select th:field="*{groupId}" class="form-control" id="groupId">
+                <option th:value=null>None</option>
+                <th:block th:each="group:${groups}">
+                    <option th:value="${group.groupId}">[[${group.name}]]</option>
+                </th:block>
+            </select>
+        </td>
+    </tr>
+    
+    <tr>
+        <td width="20%"><label for="name">Name</label></td>
+        <td><input id="name" th:field="*{name}" class="form-control"></input></td>
+    </tr>
+    
+    <tr>
+        <td width="20%"><label for="description">Description</label></td>
+        <td><input id="description" th:field="*{description}" class="form-control"></input></td>
+    </tr>
+    
+    <tr id="tr-uriAuthor">
+        <td width="20%"><label for="uri">URI for the imported authority</label></td>
+        <td><input id="uri" th:field="*{uri}" class="form-control" readonly/></td>
+    </tr>
+    
+    <input id="importerId" th:field="*{importerId}" class="form-control" />
+    
+    </table>
+    
+    <p class="pull-right">
+        <button id="clear" class="btn btn-default" type="reset">Clear</button>
+        <button class="btn btn-primary" type="submit">Create</button>
+    </p>
+</form>
+
+<div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="authorLabel">Enter Author Information</h4>
+      </div>
+      <div class="modal-body">
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="idAuthor">
+          </div>
+          <div class="form-group">
+            <label for="firstNameAuthor">First Name:</label>
+            <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
+          </div>
+          <div class="form-group">
+            <label for="lastNameAuthor">Last Name:</label>
+            <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
+          </div>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
+                        style="margin-left: 80%" disabled>Search Author 
+                        <i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
+          </button>
+          <div class="form-group">
+            <label for="uriAuthor">URI:</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
+                <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
+                    <i id="uriLoadingSpinnerAuthor" class="icon-spinner" data-toggle="popover" data-html="true" data-placement="right"></i>
+                    <i id="uriLoadingFoundAuthor" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
+                    <i id="uriLoadingFailureAuthor" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+                </div>
+                <input type="hidden" id="uriAuthorLocalId" />
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" id="addAuthorModalCancel" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="selectAuthorityModel" class="modal fade" tabindex="-1"
+    role="dialog" aria-labelledby="selectAuthorityLabel">
+    <div class="modal-dialog" style="width: 1000px" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="authorLabel">Authority Search Result</h4>
+            </div>
+            
+            <div class="modal-body">
+                <div role="tabpanel">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#conceptpowerAuthoritiesTabContent" aria-controls="uploadTab"
+                                role="tab" data-toggle="tab">Authorities from Conceptpower</a>
+                        </li>
+                    </ul>
+                    
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="conceptpowerAuthoritiesTabContent">
+                            <ul id="conceptpowerAuthority-pagination-top" class="pagination-sm"></ul>
+                            <div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
+                                <span> Error occurred while searching authorities in conceptpower </span>
+                            </div>
+                            </br>
+                            <table class="table table-striped table-bordered table-fixed">
+                                <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+                                <tbody id="conceptpowerAuthoritySearchResult">
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                        id="closeAuthoritySearchResult">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End modal -->
+
+</div>
+
+</body>
+
+</html>

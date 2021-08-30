@@ -9,10 +9,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
@@ -23,16 +28,22 @@ import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.data.AuthorityEntryRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.IPersonMongoDao;
-import edu.asu.diging.citesphere.user.IUser;
-import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.authority.impl.AuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.transfer.impl.Persons;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 
 @Service
 public class AuthorityService implements IAuthorityService {
 
+    @Value("${_authority_uri}")
+    private String authorityUri;
+
+    @Value("${_authority_prefix}")
+    private String authorityPrefix;
+    
     @Autowired
     private AuthorityEntryRepository entryRepository;
 
@@ -165,12 +176,105 @@ public class AuthorityService implements IAuthorityService {
         return entries;
     }
 
-
-    public List<IAuthorityEntry> findByName(IUser user, String firstName, String lastName, int page, int pageSize) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * findByFirstNameAndLastName(edu.asu.diging.citesphere.user.IUser,
+     * java.lang.String, java.lang.String, int, int)
+     */
+    @Override
+    public Page<IAuthorityEntry> findByFirstNameAndLastName(IUser user, String firstName, String lastName, int page,
+            int pageSize) {
         Pageable paging = PageRequest.of(page, pageSize);
-        List<IAuthorityEntry> results = authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
+        return authorityRepository.findByUsernameAndNameContainingAndNameContainingOrderByName(
                 user.getUsername(), firstName, lastName, paging);
-        return results;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * findByLastNameAndExcludingFirstName(edu.asu.diging.citesphere.user.IUser,
+     * java.lang.String, java.lang.String, int, int)
+     */
+    @Override
+    public Page<IAuthorityEntry> findByLastNameAndExcludingFirstName(IUser user, String firstName, String lastName,
+            int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        return authorityRepository
+                .findByUsernameAndNameNotContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName,
+                        paging);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * getTotalUserAuthoritiesPages(edu.asu.diging.citesphere.user.IUser,
+     * java.lang.String, java.lang.String, int)
+     */
+    @Override
+    public int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize) {
+        long total;
+        // If the last name is not empty then total authority count would be same as the
+        // authorities whose name contains the given last name
+        if (!lastName.trim().isEmpty()) {
+            total = authorityRepository.countByUsernameAndNameContaining(user.getUsername(), lastName);
+        } else {
+            total = authorityRepository.countByUsernameAndNameContaining(user.getUsername(), firstName);
+        }
+        return (int) Math.ceil(new Float(total) / pageSize);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * findByGroupAndFirstNameAndLastName(java.lang.Long, java.lang.String,
+     * java.lang.String, int, int)
+     */
+    @Override
+    public Page<IAuthorityEntry> findByGroupAndFirstNameAndLastName(Long groupId, String firstName, String lastName,
+            int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        return authorityRepository.findByGroupsContainingAndNameContainingAndNameContainingOrderByName(groupId,
+                firstName, lastName, paging);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * findByGroupAndLastNameAndExcludingFirstName(java.lang.Long, java.lang.String,
+     * java.lang.String, int, int)
+     */
+    @Override
+    public Page<IAuthorityEntry> findByGroupAndLastNameAndExcludingFirstName(Long groupId, String firstName,
+            String lastName, int page, int pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        return authorityRepository.findByGroupsContainingAndNameNotContainingAndNameContainingOrderByName(groupId,
+                firstName, lastName, paging);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#
+     * getTotalGroupAuthoritiesPages(java.lang.Long, java.lang.String,
+     * java.lang.String, int)
+     */
+    @Override
+    public int getTotalGroupAuthoritiesPages(Long groupId, String firstName, String lastName, int pageSize) {
+        long total;
+        // If the last name is not empty then total authority count would be same as the
+        // authorities whose name contains the given last name
+        if (!lastName.trim().isEmpty()) {
+            total = authorityRepository.countByGroupsContainingAndNameContaining(groupId, lastName);
+        } else {
+            total = authorityRepository.countByGroupsContainingAndNameContaining(groupId, firstName);
+        }
+        return (int) Math.ceil(new Float(total) / pageSize);
     }
 
     @Override
@@ -201,17 +305,23 @@ public class AuthorityService implements IAuthorityService {
         return save(entry);
     }
 
+    /* (non-Javadoc)
+     * @see
+     * edu.asu.diging.citesphere.core.service.IAuthorityService#createWithUri(edu.asu.diging.citesphere.model.authority.IAuthorityEntry,
+     * edu.asu.diging.citesphere.user.IUser)
+     */
+    @Override
+    @Transactional
+    public IAuthorityEntry createWithUri(IAuthorityEntry entry, IUser user) {
+        //The entry needs to be persisted first in order to generate the id which is then used to create the URI
+        entry = create(entry, user);
+        entry.setUri(authorityUri + authorityPrefix + entry.getId());
+        return save(entry);
+    }
+    
     @Override
     public IAuthorityEntry save(IAuthorityEntry entry) {
         return (IAuthorityEntry) entryRepository.save((AuthorityEntry) entry);
-    }
-
-    @Override
-    public int getTotalUserAuthoritiesPages(IUser user, String firstName, String lastName, int pageSize) {
-
-        return (int) Math.ceil(new Float(authorityRepository
-                .countByUsernameAndNameContainingAndNameContainingOrderByName(user.getUsername(), firstName, lastName))
-                / pageSize);
     }
 
     private AuthorityImporter getAuthorityImporter(String source) {
