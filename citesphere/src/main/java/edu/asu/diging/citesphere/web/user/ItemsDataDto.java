@@ -16,6 +16,8 @@ public class ItemsDataDto {
     private List<String> shownColumns;
     private List<String> allowedColumns;
     private boolean notModified;
+    private String sort;
+    private String collectionId;
     
     public List<String> getAllowedColumns() {
         return allowedColumns;
@@ -70,5 +72,17 @@ public class ItemsDataDto {
     }
     public void setNotModified(boolean notModified) {
         this.notModified = notModified;
+    }
+    public void setSort(String sort) {
+       this.sort = sort;
     }   
+    public String getSort() {
+        return sort;
+    }
+    public String getCollectionId() {
+        return collectionId;
+    }
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
+    }
 }

@@ -78,6 +78,8 @@ public class UpdateItemsPageController {
         itemsData.setCurrentPage(pageInt);
         itemsData.setZoteroGroupId(groupId);
         itemsData.setNotModified(results.isNotModified());
+        itemsData.setSort(sort);
+        itemsData.setCollectionId(collectionId);
         
         try {
             itemsData.setCitationCollections(collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));

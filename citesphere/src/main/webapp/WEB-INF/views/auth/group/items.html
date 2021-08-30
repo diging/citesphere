@@ -212,27 +212,45 @@ function getCurrentItemsData(){
 	let pageNumber = $(".page-item.active").text();
 	 $.get("items/data?page="+pageNumber, function(data) {
 		 console.log(data);
-		 if(!data['notModified']){
+		 if(data['notModified']){
 			 rewriteCitationsTable(data);
 			 rewriteCollectionsList(data);
 			 addEventListeners();
+			 addCheckboxesEventListeners();
+			 addMoveItemListeners();
 		 }
 	 }); 
 }
 
 function rewriteCitationsTable(data){
+	let groupId = data['zoteroGroupId']
+	let collectionId = data['collectionId']
+	
 	let tablebody = $('<tbody>');
 	 let headerRow = $('<tr>'+
+			 '<th title="Move to collection">'+ 
+			 '<div class="btn-group">' +
+			 '<button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle icon-move-to " style="font-size:160%"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+			 '<span class="caret">'+'</span>' + 
+			 '</button>'+
+			 '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
+			 '<li id="selectAll" class="dropdown-item"><a>All</a></li>'+
+			 '<li id="deSelectAll" class="dropdown-item"><a>None</a></li>' +
+			 '</div>'+
+			 '</div>' +
+			 '</th>'+
 			 '<th>'+"Type"+'</th>'+
 			 '<th>'+"Author"+'</th>'+
 			 '<th>'+"Title"+'</th>'+
 			 '<th>'+"Date"+'</th>'+
 			 '<th>'+"URL"+'</th>'+
 			 '</tr>')
-			 
+	
 	 tablebody.append(headerRow);
 	 let i=0;
 	 for (const citationData of data['citationsData']){
+		  let checkboxes = $(' <td><input title="Select" type="checkbox" id="checkbox" class="checkboxes"/>&nbsp;</td>')
+		 
 		  let citation = citationData['citation']
 		  let citationIcon =  citationData['citationIcon'] ? citationData['citationIcon'] : "icon-docs"
 		  let citationLabel = citationData['citationLabel'] ? citationData['citationLabel'] : citation.itemType
@@ -241,13 +259,21 @@ function rewriteCitationsTable(data){
 		  let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
 		  let iconData = $('<td>').append(spanElement);
 		
-		  let authors = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>'+'</td>');
+		  let authors = $('<td data-key='+citation.key+' data-index='+i+'>'+'</td>');
+		  let authorHref;
+		  if(collectionId){
+			  authorHref = $('<a class="bib-entry"'+ 'href=items/'+citation.key+'?index='+i+'&collectionId='+collectionId+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'+'/>')
+		  }else{
+			  authorHref = $('<a class="bib-entry"'+ 'href=items/'+citation.key+'?index='+i+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'+'/>')
+		  }
+		  
+		  authors.append(authorHref);
 		  
 		 for(const author of citation['authors']){
-			  let authorsData = $('<strong>' + author.lastName + 
-			  '<span> ,' + author.firstName + '</span>'+ '</strong>'+
+			  let authorsData = $('<strong style="color: black">' + author.lastName + 
+			  '<span style="color: black"> ,' + author.firstName + '</span>'+ '</strong>'+
 			  '<span>'+'</span>')
-			  authors.append(authorsData);
+			  authorHref.append(authorsData);
 		  } 
 		  
 		  let title = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +'</td>');
@@ -268,7 +294,7 @@ function rewriteCitationsTable(data){
 		  }
 		  
 		  let column = $('<td style="max-width:300px;">' +'</td>'); 
-		  let row = $('<tr>').append(iconData).append(authors).append(title).append(date).append(url);
+		  let row = $('<tr data-action="draggable" class="items">').append(checkboxes).append(iconData).append(authors).append(title).append(date).append(url);
 		  if(columnsData !== null){
 			  column.append(columnsData);
 			  row.append(column);
@@ -502,27 +528,37 @@ function rewriteCollectionsList(data){
 </div>
 <script >
 	//# sourceURL=move.js
-$("#selectAll").click(function(){
-	$('input:checkbox').prop('checked',true);
-	$(".items").addClass('selected');
+	
+$(function() {
+	addCheckboxesEventListeners();
+	addMoveItemListeners();
 });
-$("#deSelectAll").click(function(){
-	$('input:checkbox').prop('checked',false);
-	$(".items").removeClass('selected');
-});
-$('.checkboxes').change(function(){
-	if ($(this).is(':checked')) {
-		$(this).parents('tr').addClass('selected');
-		$(this).parents('tr').attr("title", "Drag to move citations to a collecton");
-		} 
-	else {
-		$(this).parents('tr').removeClass('selected');
-		$(this).parents('tr').removeAttr("title");
-		$('.icon-arrow-left').show();
-	}
-	$('.checkboxes:checked').length > 0? $('.icon-arrow-left').hide(): $('.icon-arrow-left').show();
-});
-$(function(){
+
+	
+function addCheckboxesEventListeners(){
+	$("#selectAll").click(function(){
+		$('input:checkbox').prop('checked',true);
+		$(".items").addClass('selected');
+	});
+	$("#deSelectAll").click(function(){
+		$('input:checkbox').prop('checked',false);
+		$(".items").removeClass('selected');
+	});
+	$('.checkboxes').change(function(){
+		if ($(this).is(':checked')) {
+			$(this).parents('tr').addClass('selected');
+			$(this).parents('tr').attr("title", "Drag to move citations to a collecton");
+			} 
+		else {
+			$(this).parents('tr').removeClass('selected');
+			$(this).parents('tr').removeAttr("title");
+			$('.icon-arrow-left').show();
+		}
+		$('.checkboxes:checked').length > 0? $('.icon-arrow-left').hide(): $('.icon-arrow-left').show();
+	});
+}
+
+function addMoveItemListeners() {
 $(".items").draggable({
 	scroll: true,
 	cursor: "grabbing",
@@ -589,7 +625,7 @@ $(".list-group-item").droppable( {
 		}
 		
 });
-});	
+}	
 
 function pollMovedItemsStatuses(response,collectionName, collectionHTMLElement, collectionId){
 $.ajax({
