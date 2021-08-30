@@ -305,7 +305,7 @@ public class AuthorityServiceTest {
     }
     
     @Test
-    public void test_createWithURI() {
+    public void test_createWithURI() throws InterruptedException {
         String username = "user";
         String id = "entry1";
         String uri = "https://test.uri/pre";
@@ -323,6 +323,8 @@ public class AuthorityServiceTest {
             }
         };
 
+        Thread.sleep(100);
+        
         Mockito.when(entryRepository.save(entry)).thenAnswer(answer);
 
         IAuthorityEntry actualEntry = managerToTest.createWithUri(entry, user);
