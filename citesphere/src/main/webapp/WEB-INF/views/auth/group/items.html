@@ -212,7 +212,7 @@ function getCurrentItemsData(){
 	let pageNumber = $(".page-item.active").text();
 	 $.get("items/data?page="+pageNumber, function(data) {
 		 console.log(data);
-		 if(!data['notModified']){
+		 if(data['notModified']){
 			 rewriteCitationsTable(data);
 			 rewriteCollectionsList(data);
 			 addEventListeners();
@@ -230,9 +230,8 @@ function rewriteCitationsTable(data){
 	 let headerRow = $('<tr>'+
 			 '<th title="Move to collection">'+ 
 			 '<div class="btn-group">' +
-			 '<button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle icon-move-to " style="font-size:160%"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-			 '<span class="caret">'+'</span>' + 
-			 '</button>'+
+			 '<button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle icon-move-to" style="font-size:160%"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+			 '<span class="caret"></span></button>'+
 			 '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
 			 '<li id="selectAll" class="dropdown-item"><a>All</a></li>'+
 			 '<li id="deSelectAll" class="dropdown-item"><a>None</a></li>' +
@@ -255,7 +254,7 @@ function rewriteCitationsTable(data){
 		  let citationIcon =  citationData['citationIcon'] ? citationData['citationIcon'] : "icon-docs"
 		  let citationLabel = citationData['citationLabel'] ? citationData['citationLabel'] : citation.itemType
 		  
-		  let divIconData = $('<div>').append($('<i class='+citationIcon+' title='+citationLabel +'>'+'</i>')).append(citationLabel);
+		  let divIconData = $('<div>').append($('<i class="'+citationIcon+'" title="'+citationLabel +'">'+'</i>')).append(citationLabel);
 		  let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
 		  let iconData = $('<td>').append(spanElement);
 		  
@@ -266,8 +265,6 @@ function rewriteCitationsTable(data){
 			  href = '"items/'+citation.key+'?index='+i+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
 		  }
 		  
-	 	
-		
 		  let authors = $('<td data-key='+citation.key+' data-index='+i+'>'+'</td>');
 		  let authorHref = $('<a class="bib-entry" href='+href+'>');
 		  authors.append(authorHref);
@@ -282,9 +279,9 @@ function rewriteCitationsTable(data){
 				  authorsData = $('<strong style="color: black">' + author.lastName + '</strong>'+
 						  '<span>'+'; '+'</span>')
 			  }
-			 
 			  authorHref.append(authorsData);
-		  } 		  
+		  }
+		  authorHref.find("span").last().remove()
 		  
 		  let title = $('<td data-key='+citation.key+' data-index='+i+'>' +'</td>');
 		  title.append($('<a class="bib-entry" href='+href+'>'+ '<em style="color: black">'+ citation.title+'</em>'+'</a>'));
