@@ -212,7 +212,7 @@ function getCurrentItemsData(){
 	let pageNumber = $(".page-item.active").text();
 	 $.get("items/data?page="+pageNumber, function(data) {
 		 console.log(data);
-		 if(data['notModified']){
+		 if(!data['notModified']){
 			 rewriteCitationsTable(data);
 			 rewriteCollectionsList(data);
 			 addEventListeners();
@@ -249,7 +249,7 @@ function rewriteCitationsTable(data){
 	 tablebody.append(headerRow);
 	 let i=0;
 	 for (const citationData of data['citationsData']){
-		  let checkboxes = $(' <td><input title="Select" type="checkbox" id="checkbox" class="checkboxes"/>&nbsp;</td>')
+		  let checkboxes = $('<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes"/>&nbsp;</td>')
 		 
 		  let citation = citationData['citation']
 		  let citationIcon =  citationData['citationIcon'] ? citationData['citationIcon'] : "icon-docs"
@@ -258,33 +258,43 @@ function rewriteCitationsTable(data){
 		  let divIconData = $('<div>').append($('<i class='+citationIcon+' title='+citationLabel +'>'+'</i>')).append(citationLabel);
 		  let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
 		  let iconData = $('<td>').append(spanElement);
-		
-		  let authors = $('<td data-key='+citation.key+' data-index='+i+'>'+'</td>');
-		  let authorHref;
+		  
+		  let href;
 		  if(collectionId){
-			  authorHref = $('<a class="bib-entry"'+ 'href=items/'+citation.key+'?index='+i+'&collectionId='+collectionId+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'+'/>')
-		  }else{
-			  authorHref = $('<a class="bib-entry"'+ 'href=items/'+citation.key+'?index='+i+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'+'/>')
+			  href = '"items/'+citation.key+'?index='+i+'&collectionId='+collectionId+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
+		  } else{
+			  href = '"items/'+citation.key+'?index='+i+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
 		  }
 		  
+	 	
+		
+		  let authors = $('<td data-key='+citation.key+' data-index='+i+'>'+'</td>');
+		  let authorHref = $('<a class="bib-entry" href='+href+'>');
 		  authors.append(authorHref);
 		  
-		 for(const author of citation['authors']){
-			  let authorsData = $('<strong style="color: black">' + author.lastName + 
-			  '<span style="color: black"> ,' + author.firstName + '</span>'+ '</strong>'+
-			  '<span>'+'</span>')
+		  for(const author of citation['authors']){
+			  let authorsData
+			  if(author.firstName){
+				  authorsData = $('<strong style="color: black">' + author.lastName + 
+						  '<span style="color: black">, ' + author.firstName + '</span>'+ '</strong>'+
+						  '<span>'+'; '+'</span>')
+			  }else{
+				  authorsData = $('<strong style="color: black">' + author.lastName + '</strong>'+
+						  '<span>'+'; '+'</span>')
+			  }
+			 
 			  authorHref.append(authorsData);
-		  } 
+		  } 		  
 		  
-		  let title = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +'</td>');
-		  title.append($('<em>'+ citation.title+'</em>'));
+		  let title = $('<td data-key='+citation.key+' data-index='+i+'>' +'</td>');
+		  title.append($('<a class="bib-entry" href='+href+'>'+ '<em style="color: black">'+ citation.title+'</em>'+'</a>'));
 		  
-		  let date = $('<td class="bib-entry" data-key='+citation.key+' data-index='+i+'>' +'</td>'); 
-		  date.append(citation.dateFreetext);
+		  let date = $('<td data-key='+citation.key+' data-index='+i+'>' +'</td>'); 
+		  date.append($('<a class="bib-entry" style="color: black" href='+href+'>'+ citation.dateFreetext+'</a>'));
 		  
 		  let url = $('<td>');
 		  if(citation.url || citation.url !== ""){
-			 let  urlElement = $('<span>' +'<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www>'+'</a>' +'</span>');
+			 let  urlElement = $('<span>' +'<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www></i>'+'</a>' +'</span>');
 			 url.append(urlElement);
 		  }
 		  
@@ -292,8 +302,8 @@ function rewriteCitationsTable(data){
 		  for(const column of data['shownColumns']){
 			  columnsData = columnsData + citation[column];
 		  }
-		  
 		  let column = $('<td style="max-width:300px;">' +'</td>'); 
+		  
 		  let row = $('<tr data-action="draggable" class="items">').append(checkboxes).append(iconData).append(authors).append(title).append(date).append(url);
 		  if(columnsData !== null){
 			  column.append(columnsData);
