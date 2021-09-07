@@ -327,8 +327,13 @@ function rewriteCollectionsList(data){
 }
 
 function rewriteGroupInfo(data) {
-	
-	
+	console.log(data['group'].updatedOn)
+	$("#collapseOne .panel-body").replaceWith($('<div id="groupInfo" class="panel-body">'+ data['group'].description+ '<div class="col-md-6">'+
+		'<b>Local Metadata Version:</b> <span>'+ data['group'].metadataVersion +'</span><br>'+
+		'<b>Local Library Version:</b> <span>'+ data['group'].contentVersion+'</span><br>'+ 
+		'<b>Created on:</b> <span class="date">'+ data['group'].created+'</span><br>'+
+		'<b>Last Modified on:</b> <span class="date">'+ data['group'].lastModified+'</span>'+'</div>'+'<div class="col-md-6">'+
+		'<b>Owner:</b><span">'+data['group'].owner+'</span><br><br>'+'<b>Last synced:</b> <span class="date">'+data['group'].updatedOn+'</span></div></div>'))
 }
 
 </script>
