@@ -315,7 +315,7 @@ function rewriteCitationsTable(data){
 }
 
 function rewriteCollectionsList(data){
-	let unOrderedList = $('<ul class="list-group">'+'</ul>');
+	let unOrderedList = $('<ul class="list-group" id="collectionsList">'+'</ul>');
 	for(const collection of data['citationCollections']){
 		let list = $('<li class="list-group-item collections">'+'</li>');
 		list.append($('<span class="badge">'+'</span>').text(collection.numberOfItems));
@@ -323,11 +323,10 @@ function rewriteCollectionsList(data){
 		list.append($('<a href= '+collectionURL+'>'+'</a>').append($('<span/>').text(collection.name)));
 		unOrderedList.append(list);
 	 }
-	 $("#collectionsList ul").replaceWith(unOrderedList);
+	 $("#collectionsDiv ul").replaceWith(unOrderedList);
 }
 
 function rewriteGroupInfo(data) {
-	console.log(data['group'].updatedOn)
 	$("#collapseOne .panel-body").replaceWith($('<div id="groupInfo" class="panel-body">'+ data['group'].description+ '<div class="col-md-6">'+
 		'<b>Local Metadata Version:</b> <span>'+ data['group'].metadataVersion +'</span><br>'+
 		'<b>Local Library Version:</b> <span>'+ data['group'].contentVersion+'</span><br>'+ 
@@ -440,8 +439,8 @@ function rewriteGroupInfo(data) {
 </div>
 
 <div id="wrapper">
-<div class="col-md-2 sticky" id="collectionsList">
-	<ul class="list-group">
+<div class="col-md-2 sticky" id="collectionsDiv">
+	<ul class="list-group" id="collectionsList">
 	<th:block th:each="collection:${citationCollections}">
 	  <li class="list-group-item collections">
 		  <span class="badge" th:text="${collection.numberOfItems}"/>
