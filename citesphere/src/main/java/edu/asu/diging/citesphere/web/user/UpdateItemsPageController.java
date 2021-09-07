@@ -35,25 +35,26 @@ public class UpdateItemsPageController {
 
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
-    
+
     @Value("${_available_item_columns}")
     private String availableColumns;
-    
+
     @Autowired
     private Environment env;
 
     @Autowired
     private ICitationManager citationManager;
-    
+
     @Autowired
     private ICitationCollectionManager collectionManager;
-    
+
     @Autowired
     private IGroupManager groupManager;
 
-    @RequestMapping(value= {"/auth/group/{zoteroGroupId}/items/data", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/data",
+            "/auth/group/{zoteroGroupId}/collection/{collectionId}/items" })
     public @ResponseBody ItemsDataDto show(Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value="collectionId", required=false) String collectionId,
+            @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns) {
@@ -67,16 +68,18 @@ public class UpdateItemsPageController {
         CitationResults results;
         try {
             results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
-        } catch(ZoteroHttpStatusException e) {
+        } catch (ZoteroHttpStatusException e) {
             logger.error("Zotero status exception occured while updating items page", e);
             return null;
-        } catch(GroupDoesNotExistException e) {
+        } catch (GroupDoesNotExistException e) {
             logger.error("Group does not exist exception occured while updating items page", e);
             return null;
         }
-        
+
         ItemsDataDto itemsData = new ItemsDataDto();
-        itemsData.setCitationsData(results.getCitations().stream().map(c -> new CitationsDto(c, env.getProperty(c.getItemType()+"_label") ,env.getProperty(c.getItemType()+"_icon"))).collect(Collectors.toList()));
+        itemsData.setCitationsData(results.getCitations().stream().map(c -> new CitationsDto(c,
+                env.getProperty(c.getItemType() + "_label"), env.getProperty(c.getItemType() + "_icon")))
+                .collect(Collectors.toList()));
         itemsData.setTotalResults(results.getTotalResults());
         itemsData.setTotalPages(Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         itemsData.setCurrentPage(pageInt);
@@ -85,10 +88,11 @@ public class UpdateItemsPageController {
         itemsData.setSort(sort);
         itemsData.setCollectionId(collectionId);
         itemsData.setGroup(groupManager.getGroup(user, groupId));
-        
+
         try {
-            itemsData.setCitationCollections(collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
-        } catch(GroupDoesNotExistException e) {
+            itemsData.setCitationCollections(
+                    collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
+        } catch (GroupDoesNotExistException e) {
             logger.error("Group does not exist exception occured while updating items page", e);
             return null;
         }
@@ -103,8 +107,7 @@ public class UpdateItemsPageController {
         }
         itemsData.setShownColumns(shownColumns);
         itemsData.setAllowedColumns(allowedColumns);
-        
+
         return itemsData;
     }
-    
 }
