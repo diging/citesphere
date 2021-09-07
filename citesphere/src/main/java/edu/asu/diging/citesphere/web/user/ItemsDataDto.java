@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 
 public class ItemsDataDto {
@@ -18,6 +19,7 @@ public class ItemsDataDto {
     private boolean notModified;
     private String sort;
     private String collectionId;
+    private ICitationGroup group;
     
     public List<String> getAllowedColumns() {
         return allowedColumns;
@@ -84,5 +86,11 @@ public class ItemsDataDto {
     }
     public void setCollectionId(String collectionId) {
         this.collectionId = collectionId;
+    }
+    public ICitationGroup getGroup() {
+        return group;
+    }
+    public void setGroup(ICitationGroup group) {
+        this.group = group;
     }
 }

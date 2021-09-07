@@ -209,17 +209,17 @@ function pollStatus(){
 }
 
 function getCurrentItemsData(){
-	let pageNumber = $(".page-item.active").text();
-	 $.get("items/data?page="+pageNumber, function(data) {
-		 console.log(data);
-		 if(data['notModified']){
-			 rewriteCitationsTable(data);
-			 rewriteCollectionsList(data);
-			 addEventListeners();
-			 addCheckboxesEventListeners();
-			 addMoveItemListeners();
-		 }
-	 }); 
+let pageNumber = $(".page-item.active").text();
+$.get("items/data?page="+pageNumber, function(data) {
+	if(!data['notModified']){
+		rewriteCitationsTable(data);
+		rewriteCollectionsList(data);
+		rewriteGroupInfo(data);
+		addEventListeners();
+		addCheckboxesEventListeners();
+		addMoveItemListeners();
+	}
+}); 
 }
 
 function rewriteCitationsTable(data){
@@ -227,23 +227,23 @@ function rewriteCitationsTable(data){
 	let collectionId = data['collectionId']
 	
 	let tablebody = $('<tbody>');
-	 let headerRow = $('<tr>'+
-			 '<th title="Move to collection">'+ 
-			 '<div class="btn-group">' +
-			 '<button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle icon-move-to" style="font-size:160%"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-			 '<span class="caret"></span></button>'+
-			 '<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
-			 '<li id="selectAll" class="dropdown-item"><a>All</a></li>'+
-			 '<li id="deSelectAll" class="dropdown-item"><a>None</a></li>' +
-			 '</div>'+
-			 '</div>' +
-			 '</th>'+
-			 '<th>'+"Type"+'</th>'+
-			 '<th>'+"Author"+'</th>'+
-			 '<th>'+"Title"+'</th>'+
-			 '<th>'+"Date"+'</th>'+
-			 '<th>'+"URL"+'</th>'+
-			 '</tr>')
+	let headerRow = $('<tr>'+
+		'<th title="Move to collection">'+ 
+		'<div class="btn-group">' +
+		'<button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle icon-move-to" style="font-size:160%"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+		'<span class="caret"></span></button>'+
+		'<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
+		'<li id="selectAll" class="dropdown-item"><a>All</a></li>'+
+		'<li id="deSelectAll" class="dropdown-item"><a>None</a></li>' +
+		'</div>'+
+		'</div>' +
+		'</th>'+
+		'<th>'+"Type"+'</th>'+
+		'<th>'+"Author"+'</th>'+
+		'<th>'+"Title"+'</th>'+
+		'<th>'+"Date"+'</th>'+
+		'<th>'+"URL"+'</th>'+
+		'</tr>')
 	
 	 tablebody.append(headerRow);
 	 let i=0;
@@ -305,7 +305,6 @@ function rewriteCitationsTable(data){
 		  if(columnsData !== null){
 			  column.append(columnsData);
 			  row.append(column);
-			  console.log(columnsData);
 		  }
 		  
 		 tablebody.append(row);
@@ -316,21 +315,21 @@ function rewriteCitationsTable(data){
 }
 
 function rewriteCollectionsList(data){
-	let unOrderedList = $('<ul class="list-group" id=collectionsList">'+'</ul>');
-	 for(const collection of data['citationCollections']){
-		 let list = $('<li class="list-group-item">'+'</li>');
-		 let badge = $('<span class="badge">'+'</span>').text(collection.numberOfItems);
-		 list.append(badge);
-		 let collectionURL = window.location.href +"/../collection/"+collection.key+"/items";
-		 let collectionText = $('<span/>').text(collection.name)
-		 let anchorTag = $('<a href= '+collectionURL+'>'+'</a>').append(collectionText);
-		 list.append(anchorTag);
-		 unOrderedList.append(list);
+	let unOrderedList = $('<ul class="list-group">'+'</ul>');
+	for(const collection of data['citationCollections']){
+		let list = $('<li class="list-group-item collections">'+'</li>');
+		list.append($('<span class="badge">'+'</span>').text(collection.numberOfItems));
+		let collectionURL = window.location.href +"/../collection/"+collection.key+"/items";
+		list.append($('<a href= '+collectionURL+'>'+'</a>').append($('<span/>').text(collection.name)));
+		unOrderedList.append(list);
 	 }
-	
-	 $("#collectionsList").replaceWith(unOrderedList);
+	 $("#collectionsList ul").replaceWith(unOrderedList);
 }
 
+function rewriteGroupInfo(data) {
+	
+	
+}
 
 </script>
 </div>
@@ -436,8 +435,8 @@ function rewriteCollectionsList(data){
 </div>
 
 <div id="wrapper">
-<div class="col-md-2 sticky">
-	<ul class="list-group" id="collectionsList">
+<div class="col-md-2 sticky" id="collectionsList">
+	<ul class="list-group">
 	<th:block th:each="collection:${citationCollections}">
 	  <li class="list-group-item collections">
 		  <span class="badge" th:text="${collection.numberOfItems}"/>

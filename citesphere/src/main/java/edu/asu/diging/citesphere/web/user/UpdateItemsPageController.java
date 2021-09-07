@@ -22,6 +22,7 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -46,8 +47,11 @@ public class UpdateItemsPageController {
     
     @Autowired
     private ICitationCollectionManager collectionManager;
+    
+    @Autowired
+    private IGroupManager groupManager;
 
-    @RequestMapping(value= "/auth/group/{zoteroGroupId}/items/data")
+    @RequestMapping(value= {"/auth/group/{zoteroGroupId}/items/data", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
     public @ResponseBody ItemsDataDto show(Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
@@ -64,10 +68,10 @@ public class UpdateItemsPageController {
         try {
             results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
         } catch(ZoteroHttpStatusException e) {
-            logger.error("Exception occured", e);
+            logger.error("Zotero status exception occured while updating items page", e);
             return null;
         } catch(GroupDoesNotExistException e) {
-            logger.error("Exception occured", e);
+            logger.error("Group does not exist exception occured while updating items page", e);
             return null;
         }
         
@@ -80,11 +84,12 @@ public class UpdateItemsPageController {
         itemsData.setNotModified(results.isNotModified());
         itemsData.setSort(sort);
         itemsData.setCollectionId(collectionId);
+        itemsData.setGroup(groupManager.getGroup(user, groupId));
         
         try {
             itemsData.setCitationCollections(collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
         } catch(GroupDoesNotExistException e) {
-            logger.error("Exception occured", e);
+            logger.error("Group does not exist exception occured while updating items page", e);
             return null;
         }
         List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
