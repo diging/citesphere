@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.web.user.concepts.types;
 
+import java.util.ListIterator;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -52,6 +55,20 @@ public class EditConceptTypeController {
             @Validated @ModelAttribute("form") ConceptTypeForm form, BindingResult result,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            ListIterator<ObjectError> listIterator = result.getAllErrors().listIterator();
+            
+            while(listIterator.hasNext())
+            {
+                if(listIterator.next().getDefaultMessage().equals("must be a valid URL"))
+                {
+                    redirectAttributes.addFlashAttribute("show_alert", true);
+                    redirectAttributes.addFlashAttribute("alert_msg", "URI must be a valid one");
+                    redirectAttributes.addFlashAttribute("alert_type", "danger");
+                    
+                    return "redirect:/auth/concepts/types/{conceptTypeId}/edit";
+                }
+            }
+            
             model.addAttribute("form", form);
             return "auth/concepts/types/edit";
         }
