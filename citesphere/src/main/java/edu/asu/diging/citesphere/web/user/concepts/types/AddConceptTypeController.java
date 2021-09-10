@@ -49,22 +49,15 @@ public class AddConceptTypeController {
     public String post(@Validated @ModelAttribute("conceptTypeForm") ConceptTypeForm form, BindingResult result,
             Model model, Principal principal, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            ListIterator<ObjectError> listIterator = result.getAllErrors().listIterator();
             
-            while(listIterator.hasNext())
-            {
-                if(listIterator.next().getDefaultMessage().equals("must be a valid URL"))
-                {
-                    redirectAttributes.addFlashAttribute("show_alert", true);
-                    redirectAttributes.addFlashAttribute("alert_msg", "URI must be a valid one");
-                    redirectAttributes.addFlashAttribute("alert_type", "danger");
-                    
-                    model.addAttribute("conceptTypeForm", form);
-                    return "redirect:/auth/concepts/types/add";
-                }
+            for(ObjectError error : result.getAllErrors()) { 
+                redirectAttributes.addFlashAttribute("show_alert", true);
+                redirectAttributes.addFlashAttribute("alert_msg", error.getDefaultMessage());
+                redirectAttributes.addFlashAttribute("alert_type", "danger");
             }
+            
             model.addAttribute("conceptTypeForm", form);
-            return "auth/concepts/types/add";
+            return "redirect:/auth/concepts/types/add";
         }
         IUser user = userManager.findByUsername(principal.getName());
         conceptTypeManager.create(form, user);

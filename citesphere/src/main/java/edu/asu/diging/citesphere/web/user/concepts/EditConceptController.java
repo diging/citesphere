@@ -58,21 +58,15 @@ public class EditConceptController {
         
         if(result.hasErrors()) {
             
-            ListIterator<ObjectError> listIterator = result.getAllErrors().listIterator();
-            
-            while(listIterator.hasNext()) {
-                
-                if(listIterator.next().getDefaultMessage().equals("must be a valid URL")) {
-                    redirectAttributes.addFlashAttribute("show_alert", true);
-                    redirectAttributes.addFlashAttribute("alert_msg", "URI must be a valid one");
-                    redirectAttributes.addFlashAttribute("alert_type", "danger");
-                    
-                    return "redirect:/auth/concepts/{conceptId}/edit";
-                }
+            for(ObjectError error : result.getAllErrors()) {
+                redirectAttributes.addFlashAttribute("show_alert", true);
+                redirectAttributes.addFlashAttribute("alert_msg", error.getDefaultMessage());
+                redirectAttributes.addFlashAttribute("alert_type", "danger");
+               
             }
             
             model.addAttribute("form", form);
-            return "auth/concepts/edit";
+            return "redirect:/auth/concepts/{conceptId}/edit";
         }
             
         ICitationConcept citationConcept = conceptManager.get(conceptId);
