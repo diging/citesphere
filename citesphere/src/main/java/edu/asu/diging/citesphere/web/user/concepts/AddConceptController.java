@@ -58,12 +58,10 @@ public class AddConceptController {
         	
         	ListIterator<ObjectError> listIterator = result.getAllErrors().listIterator();
         	
-        	while(listIterator.hasNext())
-        	{
+        	while(listIterator.hasNext()){
         		ObjectError error = listIterator.next();
         		
-        		if(error.getDefaultMessage().equals("must be a valid URL"))
-        		{
+        		if(error.getDefaultMessage().equals("must be a valid URL")){
         			redirectAttributes.addFlashAttribute("show_alert", true);
         			redirectAttributes.addFlashAttribute("alert_msg", "URI must be a valid one");
         			redirectAttributes.addFlashAttribute("alert_type", "danger");
