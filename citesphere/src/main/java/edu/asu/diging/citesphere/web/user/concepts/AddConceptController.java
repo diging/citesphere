@@ -1,17 +1,20 @@
 package edu.asu.diging.citesphere.web.user.concepts;
 
 import java.security.Principal;
+import java.util.ListIterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
@@ -49,9 +52,25 @@ public class AddConceptController {
 
     @RequestMapping(value = "/auth/concepts/add", method = RequestMethod.POST)
     public String post(@Validated @ModelAttribute("conceptForm") CitationConceptForm form, BindingResult result,
-            Model model, Principal principal) {
+            Model model, Principal principal, RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
+        	
+        	ListIterator<ObjectError> listIterator = result.getAllErrors().listIterator();
+        	
+        	while(listIterator.hasNext())
+        	{
+        		ObjectError error = listIterator.next();
+        		
+        		if(error.getDefaultMessage().equals("must be a valid URL"))
+        		{
+        			redirectAttributes.addFlashAttribute("show_alert", true);
+        			redirectAttributes.addFlashAttribute("alert_msg", "URI must be a valid one");
+        			redirectAttributes.addFlashAttribute("alert_type", "danger");
+        		
+        			return "redirect:/auth/concepts/add";
+        		}
+        	}
             model.addAttribute("conceptForm", form);
             return "auth/concepts/add";
         }

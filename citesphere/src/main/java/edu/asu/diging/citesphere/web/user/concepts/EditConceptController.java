@@ -68,7 +68,7 @@ public class EditConceptController {
         			redirectAttributes.addFlashAttribute("alert_msg", "URI must be a valid one");
         			redirectAttributes.addFlashAttribute("alert_type", "danger");
         		
-        			return "redirect:/auth/concepts/list";
+        			return "redirect:/auth/concepts/{conceptId}/edit";
         		}
         	}
         	
