@@ -55,24 +55,26 @@ public class EditConceptController {
     public String post(Model model, @PathVariable("conceptId") String conceptId, Authentication authentication,
             @Valid @ModelAttribute("form") CitationConceptForm form, BindingResult result,
             RedirectAttributes redirectAttributes) {
-    	if (result.hasErrors()) {
-    		ListIterator<ObjectError> listIterator = result.getAllErrors().listIterator();
-        	
-    		while(listIterator.hasNext()) {
-    			ObjectError error = listIterator.next();
-    			
-    			if(error.getDefaultMessage().equals("must be a valid URL")) {
-    	            redirectAttributes.addFlashAttribute("show_alert", true);
-    	            redirectAttributes.addFlashAttribute("alert_msg", "URI must be a valid one");
-    	            redirectAttributes.addFlashAttribute("alert_type", "danger");
-    	            
-    	            return "redirect:/auth/concepts/{conceptId}/edit";
-    			}
-    		}
-        	
+        
+        if(result.hasErrors()) {
+            
+            ListIterator<ObjectError> listIterator = result.getAllErrors().listIterator();
+            
+            while(listIterator.hasNext()) {
+                
+                if(listIterator.next().getDefaultMessage().equals("must be a valid URL")) {
+                    redirectAttributes.addFlashAttribute("show_alert", true);
+                    redirectAttributes.addFlashAttribute("alert_msg", "URI must be a valid one");
+                    redirectAttributes.addFlashAttribute("alert_type", "danger");
+                    
+                    return "redirect:/auth/concepts/{conceptId}/edit";
+                }
+            }
+            
             model.addAttribute("form", form);
             return "auth/concepts/edit";
         }
+            
         ICitationConcept citationConcept = conceptManager.get(conceptId);
         IUser user = (IUser) authentication.getPrincipal();
 

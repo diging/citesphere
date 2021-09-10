@@ -59,6 +59,7 @@ public class AddConceptTypeController {
                     redirectAttributes.addFlashAttribute("alert_msg", "URI must be a valid one");
                     redirectAttributes.addFlashAttribute("alert_type", "danger");
                     
+                    model.addAttribute("conceptTypeForm", form);
                     return "redirect:/auth/concepts/types/add";
                 }
             }
