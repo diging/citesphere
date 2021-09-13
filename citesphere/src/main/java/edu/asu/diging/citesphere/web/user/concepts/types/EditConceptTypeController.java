@@ -57,9 +57,9 @@ public class EditConceptTypeController {
         if (result.hasErrors()) {
             
             for(ObjectError error : result.getAllErrors()) {
-                    redirectAttributes.addFlashAttribute("show_alert", true);
-                    redirectAttributes.addFlashAttribute("alert_msg", error.getDefaultMessage());
-                    redirectAttributes.addFlashAttribute("alert_type", "danger");
+                redirectAttributes.addFlashAttribute("show_alert", true);
+                redirectAttributes.addFlashAttribute("alert_msg", error.getDefaultMessage());
+                redirectAttributes.addFlashAttribute("alert_type", "danger");
                       
             }
             
