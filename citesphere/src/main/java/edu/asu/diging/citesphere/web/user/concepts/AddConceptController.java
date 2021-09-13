@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.web.user.concepts;
 
 import java.security.Principal;
-import java.util.ListIterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

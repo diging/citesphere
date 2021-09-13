@@ -1,8 +1,5 @@
 package edu.asu.diging.citesphere.web.user.concepts.types;
 
-import java.util.ListIterator;
-
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
