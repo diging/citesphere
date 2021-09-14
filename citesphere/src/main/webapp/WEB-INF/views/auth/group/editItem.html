@@ -5,6 +5,7 @@
 .popover {
 	min-width: 300px;
 }
+
 </style>
 <script th:inline="javascript">
 //# sourceURL=submit.js
@@ -114,9 +115,11 @@ $(function() {
 		})  
 		$("#searchAuthorSpinner").show();
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Author','Author', 0)
+		getGroupAuthorities('Author','Author', 0)
 		getconceptpowerAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
 	}); */
@@ -155,9 +158,11 @@ $(function() {
 		$("#searchEditorSpinner").show();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Editor','Editor', 0)
+		getGroupAuthorities('Editor','Editor', 0)
 		getconceptpowerAuthorities('Editor','Editor',0)
 		$("#searchEditorSpinner").hide();
 	});
@@ -169,9 +174,11 @@ $(function() {
 		$("#searchCreatorSpinner").show();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Creator','Creator', 0)
+		getGroupAuthorities('Creator','Creator', 0)
 		getconceptpowerAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
 	}); */
@@ -207,14 +214,21 @@ $(function() {
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#authorCreateAuthority").hide();
-			
-			$("#uriAuthorLocalId").val(data['id']);
-			$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], "Author");
-			$("#uriLoadingFoundAuthor").popover('hide');
+		importAuthorityURL = [[@{|/auth/authority/import?uri=|}]]+uri;
+		$.ajax({
+			dataType: "json",
+			type: 'POST',
+			url: importAuthorityURL,
+			data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
+			async: false,
+			success: function(data) {
+				$("#authorCreateAuthority").hide();
+				$("#uriAuthorLocalId").val(data['id']);
+				$("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+				$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+				showPersonNameInModal(data['name'], "Author");
+				$("#uriLoadingFoundAuthor").popover('hide');
+			}
 		});
 	});
 	
@@ -395,13 +409,21 @@ $(function() {
 	
 	$("#editorIconContainer").on('click', ".popover #editorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundEditor").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#editorCreateAuthority").hide();
-			$("#uriEditorLocalId").val(data['id']);
-			$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], "Editor");
-			$("#uriLoadingFoundEditor").popover('hide');
+		importAuthorityURL = [[@{|/auth/authority/import?uri=|}]]+uri;
+		$.ajax({
+			dataType: "json",
+			type: 'POST',
+			url: importAuthorityURL,
+			data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
+			async: false,
+			success: function(data) {
+				$("#editorCreateAuthority").hide();
+				$("#uriEditorLocalId").val(data['id']);
+				$("#editorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+				$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+				showPersonNameInModal(data['name'], "Editor");
+				$("#uriLoadingFoundEditor").popover('hide');
+			}
 		});
 	});
 	
@@ -468,13 +490,21 @@ $(function() {
 	
 	$("#creatorIconContainer").on('click', ".popover #creatorCreateAuthority", function() {
 		var uri = $("#uriLoadingFoundCreator").attr('data-authority-uri');
-		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-			$("#creatorCreateAuthority").hide();
-			$("#uriCreatorLocalId").val(data['id']);
-			$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-			$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-			showPersonNameInModal(data['name'], "Creator");
-			$("#uriLoadingFoundCreator").popover('hide');
+		importAuthorityURL = [[@{|/auth/authority/import?uri=|}]]+uri;
+		$.ajax({
+			dataType: "json",
+			type: 'POST',
+			url: importAuthorityURL,
+			data: {[[${_csrf.parameterName}]]:[[${_csrf.token}]]},
+			async: false,
+			success: function(data) {
+				$("#creatorCreateAuthority").hide();
+				$("#uriCreatorLocalId").val(data['id']);
+				$("#creatorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
+				$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
+				showPersonNameInModal(data['name'], "Creator");
+				$("#uriLoadingFoundCreator").popover('hide');
+			}
 		});
 	});
 	
@@ -501,7 +531,7 @@ $(function() {
 		var text = $("#addConceptConceptSelect option:selected").text();
 		var typeName = $("#addConceptTypeSelect option:selected").text();
 		conceptSpan.text(text + " | " + typeName + " ");
-		var deleteIcon = $('<i class="fas fa-times remove-concept"></i>');
+		var deleteIcon = $('<i class="icon-circle-close remove-concept" style="cursor: pointer; color: white; font-size: 12px;"></i>');
 		deleteIcon.click(removeConcept);
 		conceptSpan.append(deleteIcon);
 		$("#conceptTags").append(conceptSpan);
@@ -628,8 +658,8 @@ function savePersonDetails(personType, modalName){
 	}
 	
 	personSpan.append(lastname + ', ' + firstname + affiliationString + '&nbsp;&nbsp; ');
-	var editIcon = $('<i class="far fa-edit edit-'+modalNameLCase+'"></i>')
-	var deleteIcon = $('<i class="fas fa-times remove-'+modalNameLCase+'"></i>');
+	var editIcon = $('<i class="icon-edit edit-'+modalNameLCase+'" style="color: white; font-size: 12px;"></i>')
+	var deleteIcon = $('<i class="icon-circle-close remove-'+modalNameLCase+'" style="color: white; font-size: 12px;"></i>');
 	editIcon.click(function(){
 		var personItem = $(this).parent();
 		editPerson(modalName, personItem[0]);
@@ -868,7 +898,7 @@ function getUserAuthorities(modalType, personType, page) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td style="vertical-align: middle;"><span class="user-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
+  					content += '<td style="vertical-align: middle;"><span class="user-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
   				});
   				
   				$('#userAuthority-pagination-top').twbsPagination({
@@ -905,6 +935,67 @@ function getUserAuthorities(modalType, personType, page) {
 	});
 }
 
+function getGroupAuthorities(modalType, personType, page) {
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/group|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+			
+  			$("#groupAuthoritySearchResult").empty();
+  			var content = '';
+  			
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {
+  					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
+  					if(elem['description']==null){
+  						content += ' - </td>';
+  						}
+  					else{
+  						content +=elem['description'] + '</td>';
+  					}
+  					content += '<td style="vertical-align: middle;"><span class="group-authority-entry btn btn-primary" title="Use Authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+  				});
+  				
+  				$('#groupAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	getGroupAuthorities(modalType, personType, page-1)
+  				    }
+  				});
+  			}  		
+  			
+		
+		$("#groupAuthoritySearchResult").append(content);
+		$(".group-authority-entry").click(function() {
+			name = $(this).closest("tr").find(".name").text();
+			uri = $(this).closest("tr").find(".uri").text();
+				
+			showPersonNameInModal(name, personType)
+			$("#uri"+modalType).val( uri);
+			$("#"+personType_lowerCase+"AuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
+			$("#selectAuthorityModel").modal('hide');
+		});	
+		 	
+        },
+    	error: function(data){
+    		$('#groupAuthoritySearchResult').parents('table').hide()
+    		$("#groupAuthoritiesError").show();	
+    	}
+	
+	});
+}
+
 function getconceptpowerAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
@@ -920,7 +1011,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		url: url ,
   		async: false,
   		success: function(data) {
-  			$('#mycheckboxDiv').append(data['groupName']);
+  			$('#cp-groupName').text(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
   			var content = '';
   				
@@ -933,7 +1024,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   					else{
   						content +=elem['description'] + '</td>';
   					}
-  					content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="fas fa-check"></i></span></td></tr>';
+  					content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
   					
   				}); 				
   				
@@ -1082,7 +1173,7 @@ function loadFields() {
 					iconLink.attr("data-creator-type", creators[i]);
 					iconLink.attr("data-target","#creatorModal");
 					var iconImg = $("<i>");
-					iconImg.addClass("fas fa-plus-circle");
+					iconImg.addClass("icon-circle-add");
 					iconLink.append(iconImg);
 					iconLink.append("Add "+creators[i]);
 					addIconDiv.append(iconLink);
@@ -1232,14 +1323,14 @@ function creatorLinkHandler(target) {
 									<span th:remove="tag" th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
 									&nbsp;
-							<i class="far fa-edit edit-author" style="cursor: pointer;"></i>
+							<i class="icon-edit edit-author" style="cursor: pointer; color: white; font-size: 12px;"></i>
 									&nbsp;
-							<i class="fas fa-times remove-author" style="cursor: pointer;"></i>
+							<i class="icon-circle-close remove-author" style="cursor: pointer; color: white; font-size: 12px;"></i>
 						</span>
 							&nbsp;&nbsp;
 						</th:block>
 					</span>
-						<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="fas fa-plus-circle"></i> Add Author</a></div>
+						<div class="pull-right"><a data-toggle="modal" data-target="#authorModal"><i class="icon-circle-add"></i> Add Author</a></div>
 				</td>
 			</tr>
 			<tr>
@@ -1254,14 +1345,14 @@ function creatorLinkHandler(target) {
 						  [[${editor.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
 						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
 							&nbsp;
-							<i class="far fa-edit edit-editor"></i>
+							<i class="icon-edit edit-editor" style="color: white; font-size: 12px;"></i>
 							&nbsp;
-						<i class="fas fa-times remove-editor"></i>
+						<i class="icon-circle-close remove-editor" style="cursor: pointer; color: white; font-size: 12px;"></i>
 								</span>
 							&nbsp;&nbsp;
 				        </th:block>
 					</span>
-							<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="fas fa-plus-circle"></i> Add Editor</a></div>
+							<div class="pull-right"><a data-toggle="modal" data-target="#editorModal"><i class="icon-circle-add"></i> Add Editor</a></div>
 				</td>
 			</tr>
 			<th:block th:each="curCreator:${creatorMap}">
@@ -1279,15 +1370,15 @@ function creatorLinkHandler(target) {
 				 			</th:block>
 								[[${creator.person.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
 							<th:block th:each="aff:${creator.person.affiliations}">[[${aff.name}]]</th:block>
-							&nbsp;<i class="far fa-edit edit-creator"></i>
-									<i class="fas fa-times remove-creator"></i>
+							&nbsp;<i class="icon-edit edit-creator" style="color: white; font-size: 12px;"></i>
+									<i class="icon-circle-close remove-creator" style="cursor: pointer; color: white; font-size: 12px;"></i>
 						</span>
 							&nbsp;&nbsp;
 					</span>
 					</span>
 					</div>
 					
-				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="fas fa-plus-circle"></i> Add [[${curCreator.value}]]</a></div>
+				<div class="pull-right"><a class="creatorModalLink" data-toggle="modal" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" data-target="#creatorModal"><i class="icon-circle-add"></i> Add [[${curCreator.value}]]</a></div>
 				</td>
 				</tr>
 				</span>
@@ -1419,24 +1510,24 @@ function creatorLinkHandler(target) {
 		<td>
 		<div id="conceptTags">
 			<th:block th:each= "tag:${citation.conceptTags}">
-				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="fas fa-times remove-concept"></i></span>
+				<span class="badge" th:data-concept-id="${tag.localConceptId}" th:data-concept-uri="${tag.conceptUri}" th:data-concept-name="${tag.conceptName}" th:data-type-name="${tag.typeName}" th:data-type-uri="${tag.typeUri}" th:data-concept-type-id="${tag.localConceptTypeId}">[[${tag.conceptName}]] | [[${tag.typeName}]] <i class="icon-circle-close remove-concept" style="cursor: pointer; color: white; font-size: 12px;"></i></span>
 			</th:block>
 		</div>
-		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="fas fa-plus-circle"></i> Add Concept</a></div>
+		<div class="pull-right"><a class="addConceptModalLink" data-toggle="modal" data-target="#addConceptModal"><i class="icon-circle-add" style="color: #337ab7"></i> Add Concept</a></div>
 		</td>
 	</tr>
 
 			
 		</table>
-		<button id="submitForm" class="btn btn-primary" type="submit"><i class="far fa-save"></i> &nbsp;Save</button>
+		<button id="submitForm" class="btn btn-primary" type="submit"><i class="icon-save-alt"></i> &nbsp;Save</button>
 		<span th:if="${itemId == null}">
 			<a th:href="@{|/auth/group/${zoteroGroupId}/items|}" class="btn btn-default">
-		          <i class="fa fa-times"></i>&nbsp;Cancel
+		          <i class="icon-close-alt"></i>&nbsp;Cancel
             </a>
 		</span>
 		<span th:if="${itemId != null}">
                <a th:href="@{|/auth/group/${zoteroGroupId}/items/${itemId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}" class="btn btn-default">
-		          <i class="fa fa-times"></i>&nbsp;Cancel
+		          <i class="icon-close-alt"></i>&nbsp;Cancel
                </a>
         </span>
 	</form>
@@ -1464,16 +1555,16 @@ function creatorLinkHandler(target) {
 		  </div>
 		  <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="Author" id="searchAuthor"
 						style="margin-left: 80%" disabled>Search Author 
-						<i id="searchAuthorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+						<i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
 		  </button>
 		  <div class="form-group">
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
-			    <input type="text" class="form-control uriAuthor" data-client-id="uriAuthor" id="uriAuthor" placeholder="URI">
-			    <div data-client-id="authorIconContainer" id="authorIconContainer" class="input-group-addon authorIconContainer" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerAuthor" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundAuthor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureAuthor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
+			    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
+			    	<i id="uriLoadingSpinnerAuthor" class="icon-spinner" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFoundAuthor" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureAuthor" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
 			    <input type="hidden" id="uriAuthorLocalId" />
 		    </div>
@@ -1497,8 +1588,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  </div>
 		  <div>
-		  </br>
-		  <div class="text-right"><a id="addAuthorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addAuthorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
@@ -1535,7 +1625,7 @@ function creatorLinkHandler(target) {
 		  <div>
 			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" id="searchEditor" data-client-id="Editor"
 						style="margin-left: 80%" disabled>Search Editor 
-						<i id="searchEditorSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+						<i id="searchEditorSpinner"class="icon-spinner" style="color: white"></i>
 			</button>
 		  </div>
 		  
@@ -1544,9 +1634,9 @@ function creatorLinkHandler(target) {
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriEditor" placeholder="URI">
 			    <div id="editorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerEditor" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundEditor" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureEditor" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    	<i id="uriLoadingSpinnerEditor" class="icon-spinner"></i>
+			    	<i id="uriLoadingFoundEditor" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureEditor" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
 			    <input type="hidden" id="uriEditorLocalId" />
 		    </div>
@@ -1559,7 +1649,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addEditorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addEditorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
@@ -1595,7 +1685,7 @@ function creatorLinkHandler(target) {
 		  <div>
 			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" id="searchCreator" data-client-id="Creator"
 				style="margin-left: 80%" disabled> Search Creator 
-				<i id="searchCreatorSpinner" class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+				<i id="searchCreatorSpinner" class="icon-spinner rotating" style="color: white"></i>
 			</button>
 		  </div>
 		  <div class="form-group">
@@ -1603,9 +1693,9 @@ function creatorLinkHandler(target) {
 		    <div class="input-group">
 			    <input type="text" class="form-control" id="uriCreator" placeholder="URI">
 			    <div id="creatorIconContainer" class="input-group-addon" style="min-width: 35px;">
-			    	<i id="uriLoadingSpinnerCreator" class="fas fa-spinner fa-spin text-info"></i>
-			    	<i id="uriLoadingFoundCreator" class="fas fa-info-circle text-success" data-toggle="popover" data-html="true" data-placement="right"></i>
-			    	<i id="uriLoadingFailureCreator" class="fas fa-exclamation-triangle text-danger" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
+			    	<i id="uriLoadingSpinnerCreator" class="icon-spinner rotating"></i>
+			    	<i id="uriLoadingFoundCreator" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
+			    	<i id="uriLoadingFailureCreator" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
 			    </div>
 			    <input type="hidden" id="uriCreatorLocalId" />
 		    </div>
@@ -1618,7 +1708,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  </div>
 		  <div>
-		  <div class="text-right"><a id="addCreatorAffiliation"><i class="fas fa-plus-circle" title="Add another affiliation"></i> Add Affiliation</a></div>
+		  <div class="text-right"><a id="addCreatorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
       </div>
       
@@ -1651,6 +1741,10 @@ function creatorLinkHandler(target) {
 								role="tab" data-toggle="tab">Authorities imported by you</a>
 						</li>
 						<li role="presentation">
+							<a href="#groupAuthoritiesTabContent"
+							    aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from Group</a>
+						</li>
+						<li role="presentation">
 							<a href="#conceptpowerAuthoritiesTabContent"
 								aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from Conceptpower</a>
 						</li>
@@ -1669,6 +1763,19 @@ function creatorLinkHandler(target) {
 								</tbody>
 							</table>		
 						</div>
+                        
+						<div role="tabpanel" class="tab-pane" id="groupAuthoritiesTabContent">
+						    <ul id="groupAuthority-pagination-top" class="pagination-sm"></ul>
+						    <div id="groupAuthoritiesError" class="text-warning" style="display: none">
+						        <span> Error occurred while searching authorities in group </span>
+						    </div>
+						    </br>
+						    <table class="table table-striped table-bordered table-fixed">
+						        <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+						        <tbody id="groupAuthoritySearchResult">
+						        </tbody>
+						    </table>
+						</div>
 			
 						<div role="tabpanel" class="tab-pane" id="conceptpowerAuthoritiesTabContent">
 							<ul id="conceptpowerAuthority-pagination-top" class="pagination-sm"></ul>
@@ -1676,7 +1783,7 @@ function creatorLinkHandler(target) {
 								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
 							<div id="mycheckboxDiv">
-							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group
+							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group <span id="cp-groupName"></span>
 							</div>
 							</br>
 							<table class="table table-striped table-bordered table-fixed">
@@ -1686,11 +1793,12 @@ function creatorLinkHandler(target) {
 							</table>
 							
 						</div>
+					</div>
 				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default"
-					id="closeAuthoritySearchResult">Close</button>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default"
+						id="closeAuthoritySearchResult">Close</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -1733,8 +1841,6 @@ function creatorLinkHandler(target) {
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
-</div>
 
 </body>
 </html>
