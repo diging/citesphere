@@ -31,13 +31,15 @@ $(function() {
     });
 
     $("#searchAuthor").click(function() {
-        $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+    	
+    	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
             $('#selectAuthorityModel a:first').tab('show');
-        })
-        $("#searchAuthorSpinner").show();
+        })  
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+        
+        $("#searchAuthorPageSpinner").show();
         getConceptpowerAuthorities('Author', 'Author', 0)
-        $("#searchAuthorSpinner").hide();
+        $("#searchAuthorPageSpinner").hide();
     });
 
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -351,6 +353,10 @@ function getPersonAuthority(uri, personType) {
                                 <tbody id="conceptpowerAuthoritySearchResult">
                                 </tbody>
                             </table>
+                            
+                            <div class="loader" style="font-size: 30px; text-align: center;">
+                				<i id="searchAuthorPageSpinner" class="icon-spinner" style="color: blue"></i>
+            				</div>
                             
                         </div>
                     </div>
