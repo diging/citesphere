@@ -9,7 +9,7 @@
     <packaging>war</packaging>
 
     <properties>
-        <org.slf4j-version>1.7.30</org.slf4j-version>
+        <org.slf4j-version>1.7.32</org.slf4j-version>
         <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
         <spring-security-version>5.1.5.RELEASE</spring-security-version>
         <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
