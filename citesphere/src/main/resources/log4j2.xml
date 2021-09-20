@@ -4,6 +4,14 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </Console>
+    <RollingFile name="fileLogger" fileName="logs/citesphere-info.log" filePattern="logs/citesphere-info-%d{yyyy-MM-dd}.log">
+        <PatternLayout>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</pattern>
+        </PatternLayout>
+        <Policies>
+            <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+        </Policies>
+    </RollingFile>
   </Appenders>
   <Loggers>
     <!-- Application Loggers -->
@@ -51,8 +59,9 @@
     <Logger name="org.apache.kafka" level="${log.level}">
         
     </Logger>
-    <Root level="info">
+    <Root level="${log.level}">
       <AppenderRef ref="Console"/>
+      <AppenderRef ref="fileLogger"/>
     </Root>
   </Loggers>
 </Configuration>
