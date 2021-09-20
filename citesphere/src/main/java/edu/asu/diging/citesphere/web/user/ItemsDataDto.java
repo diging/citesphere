@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.web.BreadCrumb;
 
 public class ItemsDataDto {
     private List<CitationsDto> citationsData;
@@ -18,6 +19,8 @@ public class ItemsDataDto {
     private String sort;
     private String collectionId;
     private ICitationGroup group;
+    private String collectionName;
+    private List<BreadCrumb> breadCrumbs;
 
     public List<String> getAllowedColumns() {
         return allowedColumns;
@@ -113,5 +116,21 @@ public class ItemsDataDto {
 
     public void setGroup(ICitationGroup group) {
         this.group = group;
+    }
+
+    public void setCollectionName(String collectionName) {
+       this.collectionName = collectionName;   
+    }
+    
+    public String getCollectionName() {
+        return collectionName;
+    }
+
+    public List<BreadCrumb> getBreadCrumbs() {
+        return breadCrumbs;
+    }
+
+    public void setBreadCrumbs(List<BreadCrumb> breadCrumbs) {
+        this.breadCrumbs = breadCrumbs;
     }
 }

@@ -74,55 +74,56 @@ public class GroupItemsController {
             return "error/404";
         }
         
-        model.addAttribute("items", results.getCitations());
-        model.addAttribute("total", results.getTotalResults());
-        model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
-        model.addAttribute("currentPage", pageInt);
-        model.addAttribute("zoteroGroupId", groupId);
-        model.addAttribute("group", groupManager.getGroup(user, groupId));
-        model.addAttribute("collectionId", collectionId);
-        model.addAttribute("sort", sort);
-        model.addAttribute("results", results);
-        // more than 200 really don't make sense here, this needs to be changed
-        try {
-            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
-        } catch(GroupDoesNotExistException e) {
-            logger.error("Exception occured", e);
-            return "error/404";
-        }
-        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
-        List<String> shownColumns = new ArrayList<>();
-        if (columns != null && columns.length > 0) {
-            for (String column : columns) {
-                if (allowedColumns.contains(column)) {
-                    shownColumns.add(column);
-                }
-            }
-        }
-        model.addAttribute("columns", shownColumns);
-        model.addAttribute("availableColumns", allowedColumns);
+//        model.addAttribute("items", results.getCitations());
+//        model.addAttribute("total", results.getTotalResults());
+//        model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
+//        model.addAttribute("currentPage", pageInt);
+//        model.addAttribute("zoteroGroupId", groupId);
+//        model.addAttribute("group", groupManager.getGroup(user, groupId));
+//        model.addAttribute("collectionId", collectionId);
+//        model.addAttribute("sort", sort);
+//        model.addAttribute("results", results);
+//        // more than 200 really don't make sense here, this needs to be changed
+//        try {
+//            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
+//        } catch(GroupDoesNotExistException e) {
+//            logger.error("Exception occured", e);
+//            return "error/404";
+//        }
+//        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
+//        List<String> shownColumns = new ArrayList<>();
+//        if (columns != null && columns.length > 0) {
+//            for (String column : columns) {
+//                if (allowedColumns.contains(column)) {
+//                    shownColumns.add(column);
+//                }
+//            }
+//        }
+//        model.addAttribute("columns", shownColumns);
+//        model.addAttribute("availableColumns", allowedColumns);
+//        
+//        
+//        ICitationGroup group = groupManager.getGroup(user, groupId);
+//        List<BreadCrumb> breadCrumbs = new ArrayList<>();
+//        ICitationCollection collection = null;
+//        if (collectionId != null) {
+//            collection = collectionManager.getCollection(user, groupId, collectionId);
+//            if(collection != null) {
+//                model.addAttribute("collectionName", collection.getName()); 
+//            }
+//        }
+//        while(collection != null) {
+//            breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
+//            if (collection.getParentCollectionKey() != null) {
+//                collection = collectionManager.getCollection(user, groupId, collection.getParentCollectionKey());
+//            } else {
+//                collection = null;
+//            }
+//        }
+//        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
+//        Collections.reverse(breadCrumbs);
+//        model.addAttribute("breadCrumbs", breadCrumbs);
         
-        
-        ICitationGroup group = groupManager.getGroup(user, groupId);
-        List<BreadCrumb> breadCrumbs = new ArrayList<>();
-        ICitationCollection collection = null;
-        if (collectionId != null) {
-            collection = collectionManager.getCollection(user, groupId, collectionId);
-            if(collection != null) {
-                model.addAttribute("collectionName", collection.getName()); 
-            }
-        }
-        while(collection != null) {
-            breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
-            if (collection.getParentCollectionKey() != null) {
-                collection = collectionManager.getCollection(user, groupId, collection.getParentCollectionKey());
-            } else {
-                collection = null;
-            }
-        }
-        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
-        Collections.reverse(breadCrumbs);
-        model.addAttribute("breadCrumbs", breadCrumbs);
         return "auth/group/items";
     }
 }

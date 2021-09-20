@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +24,12 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.BreadCrumb;
+import edu.asu.diging.citesphere.web.BreadCrumbType;
 
 @Controller
 @PropertySource("classpath:/config.properties")
@@ -107,6 +112,27 @@ public class UpdateItemsPageController {
         }
         itemsData.setShownColumns(shownColumns);
         itemsData.setAllowedColumns(allowedColumns);
+        
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        List<BreadCrumb> breadCrumbs = new ArrayList<>();
+        ICitationCollection collection = null;
+        if (collectionId != null) {
+            collection = collectionManager.getCollection(user, groupId, collectionId);
+            if(collection != null) {
+                itemsData.setCollectionName(collection.getName()); 
+            }
+        }
+        while(collection != null) {
+            breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
+            if (collection.getParentCollectionKey() != null) {
+                collection = collectionManager.getCollection(user, groupId, collection.getParentCollectionKey());
+            } else {
+                collection = null;
+            }
+        }
+        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
+        Collections.reverse(breadCrumbs);
+        itemsData.setBreadCrumbs(breadCrumbs);
 
         return itemsData;
     }
