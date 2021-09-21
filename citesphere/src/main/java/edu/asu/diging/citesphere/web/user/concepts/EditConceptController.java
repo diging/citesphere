@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -56,15 +55,8 @@ public class EditConceptController {
         
         if(result.hasErrors()) {
             
-            for(ObjectError error : result.getAllErrors()) {
-                redirectAttributes.addFlashAttribute("show_alert", true);
-                redirectAttributes.addFlashAttribute("alert_msg", error.getDefaultMessage());
-                redirectAttributes.addFlashAttribute("alert_type", "danger");
-               
-            }
-            
             model.addAttribute("form", form);
-            return "redirect:/auth/concepts/{conceptId}/edit";
+            return "auth/concepts/edit";
         }
             
         ICitationConcept citationConcept = conceptManager.get(conceptId);

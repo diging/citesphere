@@ -6,14 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
@@ -46,17 +44,10 @@ public class AddConceptTypeController {
 
     @RequestMapping(value = "/auth/concepts/types/add", method = RequestMethod.POST)
     public String post(@Validated @ModelAttribute("conceptTypeForm") ConceptTypeForm form, BindingResult result,
-            Model model, Principal principal, RedirectAttributes redirectAttributes) {
+            Model model, Principal principal) {
         if (result.hasErrors()) {
-            
-            for(ObjectError error : result.getAllErrors()) { 
-                redirectAttributes.addFlashAttribute("show_alert", true);
-                redirectAttributes.addFlashAttribute("alert_msg", error.getDefaultMessage());
-                redirectAttributes.addFlashAttribute("alert_type", "danger");
-            }
-            
             model.addAttribute("conceptTypeForm", form);
-            return "redirect:/auth/concepts/types/add";
+            return "auth/concepts/types/add";
         }
         IUser user = userManager.findByUsername(principal.getName());
         conceptTypeManager.create(form, user);

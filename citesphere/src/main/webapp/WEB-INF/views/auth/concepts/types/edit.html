@@ -11,22 +11,33 @@
 	
 	<form action="#" th:action="@{'/auth/concepts/types/' + ${conceptTypeId} + '/edit'}" th:object="${form}" method="POST" id="editForm">
 	
-		<label>Name:</label>
-		<input th:field="*{name}" type="text" class="form-control" placeholder="Name" th:value="${form.name}" ></input>
-		<p class="text-danger"><th:errors path="name"/></p>
-		
-		<label>Description:</label>
-		<input th:field="*{description}" type="text" class="form-control" placeholder="Description" th:value="${form.description}" ></input>
-		
-		<label>URI:</label>
-		<input th:field="*{uri}" type="text" class="form-control" placeholder="URI" th:value="${form.uri}" ></input>
-		<p class="text-danger"><th:errors path="uri"/></p>
-		<input type="hidden" class="form-control" th:value="${form.conceptTypeId}" ></input>
-		
-		<label>Owner:</label>
-		<input th:field="*{owner}" type="text" class="form-control" placeholder="Owner" th:value="${form.owner}" th:readonly="readonly"></input>
-		<p class="text-danger"><th:errors path="owner"/></p>
-		<input type="hidden" class="form-control" th:value="${form.conceptTypeId}" ></input>
+		<table class="table table-striped">
+	
+		<tr>
+		<td width="20%"><label>Name:</label></td>
+		<td><input th:field="*{name}" type="text" class="form-control" placeholder="Name" th:value="${form.name}"></input>
+		<span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span></td> 
+		</tr>
+
+		<tr>
+		<td width="20%"><label>Description:</label></td>
+		<td><input th:field="*{description}" type="text" class="form-control" placeholder="Description" th:value="${form.description}"></input></td>
+		</tr>
+
+		<tr>
+		<td width="20%"><label>URI:</label></td>
+		<td><input th:field="*{uri}" type="text" class="form-control" placeholder="URI" th:value="${form.uri}"></input>
+		<span class="text-danger" th:if="${#fields.hasErrors('uri')}" th:errors="*{uri}"></span>
+		<input type="hidden" class="form-control" th:value="${form.conceptTypeId}" ></input></td> 
+		</tr>
+
+		<tr>
+		<td width="20%"><label>Owner:</label></td>
+		<td><input th:field="*{owner}" type="text" class="form-control" placeholder="Owner" th:value="${form.owner}" th:readonly="readonly"></input>
+		<span class="text-danger" th:if="${#fields.hasErrors('owner')}" th:errors="*{owner}"></span>
+		<input type="hidden" class="form-control" th:value="${form.conceptTypeId}" ></input></td> 
+		</tr>
+		</table>
 		
 		<br>
 		<button id="submitForm" class="btn btn-primary" type="submit">
