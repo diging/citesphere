@@ -51,7 +51,6 @@ public class EditConceptController {
     public String post(Model model, @PathVariable("conceptId") String conceptId, Authentication authentication,
             @Valid @ModelAttribute("form") CitationConceptForm form, BindingResult result,
             RedirectAttributes redirectAttributes) {
-        
         if (result.hasErrors()) {   
             model.addAttribute("form", form);
             return "auth/concepts/edit";

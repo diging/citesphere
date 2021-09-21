@@ -54,7 +54,7 @@ public class AddConceptController {
         if (result.hasErrors()) {
             model.addAttribute("conceptForm", form);
             return "auth/concepts/add";
-        }  
+        }
         IUser user = userManager.findByUsername(principal.getName());
         conceptManager.create(form, user);
         return "redirect:/auth/concepts/list";
