@@ -51,11 +51,10 @@ public class AddConceptController {
     public String post(@Validated @ModelAttribute("conceptForm") CitationConceptForm form, BindingResult result,
             Model model, Principal principal) {
 
-        if(result.hasErrors()) {
+        if (result.hasErrors()) {
             model.addAttribute("conceptForm", form);
             return "auth/concepts/add";
-        }
-    
+        }  
         IUser user = userManager.findByUsername(principal.getName());
         conceptManager.create(form, user);
         return "redirect:/auth/concepts/list";

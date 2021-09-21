@@ -1,6 +1,5 @@
 package edu.asu.diging.citesphere.web.user.concepts;
 
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +52,10 @@ public class EditConceptController {
             @Valid @ModelAttribute("form") CitationConceptForm form, BindingResult result,
             RedirectAttributes redirectAttributes) {
         
-        if(result.hasErrors()) {
-            
+        if (result.hasErrors()) {   
             model.addAttribute("form", form);
             return "auth/concepts/edit";
         }
-            
         ICitationConcept citationConcept = conceptManager.get(conceptId);
         IUser user = (IUser) authentication.getPrincipal();
 
