@@ -112,27 +112,6 @@ public class UpdateItemsPageController {
         }
         itemsData.setShownColumns(shownColumns);
         itemsData.setAllowedColumns(allowedColumns);
-        
-        ICitationGroup group = groupManager.getGroup(user, groupId);
-        List<BreadCrumb> breadCrumbs = new ArrayList<>();
-        ICitationCollection collection = null;
-        if (collectionId != null) {
-            collection = collectionManager.getCollection(user, groupId, collectionId);
-            if(collection != null) {
-                itemsData.setCollectionName(collection.getName()); 
-            }
-        }
-        while(collection != null) {
-            breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
-            if (collection.getParentCollectionKey() != null) {
-                collection = collectionManager.getCollection(user, groupId, collection.getParentCollectionKey());
-            } else {
-                collection = null;
-            }
-        }
-        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
-        Collections.reverse(breadCrumbs);
-        itemsData.setBreadCrumbs(breadCrumbs);
 
         return itemsData;
     }
