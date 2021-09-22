@@ -92,6 +92,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             return;
         }
 
+        logger.info("Starting sync for " + groupId);
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
         job.setGroupId(groupId + "");
@@ -211,9 +212,11 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         } catch (InterruptedException e) {
             logger.error("Could not wait.", e);
         }
+        logger.debug("Retrieving: " + keysToRetrieve);
         ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, groupId,
                 keysToRetrieve, true);
         retrievedCitations.getCitations().forEach(c -> storeCitation(c));
+        logger.debug("Saved retrieved citations.");
         return retrievedCitations.getContentVersion();
     }
 
