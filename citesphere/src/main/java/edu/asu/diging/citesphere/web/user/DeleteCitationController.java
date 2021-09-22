@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -38,10 +37,4 @@ public class DeleteCitationController {
         return asyncCitationManager.getDeleteCitationsResponse(taskID);
     }
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/references/delete/{taskID}/clear", method = RequestMethod.POST)
-    public @ResponseBody void clearTask(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID)
-            throws InterruptedException, ExecutionException {
-        asyncCitationManager.clearDeleteTask(taskID);
-    }
 }

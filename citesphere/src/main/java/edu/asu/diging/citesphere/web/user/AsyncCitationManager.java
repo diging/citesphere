@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
@@ -27,6 +29,7 @@ import edu.asu.diging.citesphere.user.IUser;
  *
  */
 @Component
+@EnableScheduling
 public class AsyncCitationManager {
 
     @Autowired
@@ -37,10 +40,14 @@ public class AsyncCitationManager {
 
     private final Map<String, Future<ZoteroUpdateItemsStatuses>> updateTaskTracker;
     private final Map<String, Future<Map<ItemDeletionResponse, List<String>>>> deleteTaskTracker;
+    private final Map<String, Long> deleteTaskTimestamps;
+    
+    private static final long durationInMillis = 86400000L; //Number of milliseconds in a day
 
     public AsyncCitationManager() {
         this.updateTaskTracker = new ConcurrentHashMap<>();
         this.deleteTaskTracker = new ConcurrentHashMap<>();
+        this.deleteTaskTimestamps = new ConcurrentHashMap<>();
     }
 
     /**
@@ -88,6 +95,22 @@ public class AsyncCitationManager {
     }
 
     /**
+     * Removes the finished deletion tasks every 24 hrs
+     */
+    @Scheduled(fixedDelay = durationInMillis)
+    public void scheduledDeletionTask() {
+        Long currentTime = System.currentTimeMillis();
+        for (String task : deleteTaskTracker.keySet()) {
+            if (currentTime
+                    - deleteTaskTimestamps.getOrDefault(task, currentTime - durationInMillis - 1) > durationInMillis
+                    && deleteTaskTracker.get(task).isDone()) {
+                deleteTaskTracker.remove(task);
+                deleteTaskTimestamps.remove(task);
+            }
+        }
+    }
+    
+    /**
      * If you no longer need a task in memory, use this method to remove that task
      * to free memory. Once the task is removed, its corresponding result can no
      * longer be retrieved.
@@ -112,6 +135,7 @@ public class AsyncCitationManager {
         Future<Map<ItemDeletionResponse, List<String>>> futureTask = asyncDeleteCitationsProcessor.deleteCitations(user,
                 groupId, citationIdList);
         deleteTaskTracker.put(taskId, futureTask);
+        deleteTaskTimestamps.put(taskId, System.currentTimeMillis());
         AsyncDeleteCitationsResponse asyncResponse = new AsyncDeleteCitationsResponse();
         asyncResponse.setTaskID(taskId);
         asyncResponse.setTaskStatus(AsyncTaskStatus.PENDING);
@@ -138,15 +162,6 @@ public class AsyncCitationManager {
             response.setTaskStatus(AsyncTaskStatus.PENDING);
         }
         return response;
-    }
-
-    /**
-     * Removes the Citation deletion task from memory
-     * 
-     * @param taskId Id of the task
-     */
-    public void clearDeleteTask(String taskId) throws InterruptedException, ExecutionException {
-        deleteTaskTracker.remove(taskId);
     }
 
 }

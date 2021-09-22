@@ -223,7 +223,6 @@ $.ajax({
                 	 	message += " not deleted due to internal error <br />"+ invalidRequest.join(", ");
                 	 	showNotification(message, "danger", 20000);
         		}
-        		clearAsyncDeleteTask(deleteItemsStatusResponse.taskID);
         		if (deleteItemsStatusResponse.response["SUCCESS"] != null) {
         			for(id of deleteItemsStatusResponse.response["SUCCESS"]) {
         				$("#tr-" + id).remove();
@@ -238,13 +237,6 @@ $.ajax({
 	},
 });
 
-}
-
-function clearAsyncDeleteTask(taskID){
-	$.ajax({
-		type: 'POST',
-		url: 'references/delete/'+taskID+'/clear?[(${_csrf.parameterName})]=[(${_csrf.token})]',
-	});
 }
 
 </script>
