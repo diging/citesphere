@@ -1,9 +1,11 @@
-package edu.asu.diging.citesphere.web.user;
+package edu.asu.diging.citesphere.core.model.async;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.social.zotero.api.ItemDeletionResponse;
+
+import edu.asu.diging.citesphere.web.user.AsyncTaskStatus;
 
 public class AsyncDeleteCitationsResponse {
     private AsyncTaskStatus taskStatus;

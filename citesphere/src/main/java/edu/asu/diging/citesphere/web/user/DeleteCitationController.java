@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.model.async.AsyncDeleteCitationsResponse;
+import edu.asu.diging.citesphere.core.service.impl.AsyncCitationManager;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller

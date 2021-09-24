@@ -1,6 +1,8 @@
-package edu.asu.diging.citesphere.web.user;
+package edu.asu.diging.citesphere.core.model.async;
 
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
+
+import edu.asu.diging.citesphere.web.user.AsyncTaskStatus;
 
 public class AsyncUpdateCitationsResponse {
     private AsyncTaskStatus taskStatus;

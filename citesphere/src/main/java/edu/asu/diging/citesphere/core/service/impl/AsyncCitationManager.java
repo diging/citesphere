@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.web.user;
+package edu.asu.diging.citesphere.core.service.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -19,17 +18,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
-import edu.asu.diging.citesphere.core.service.impl.AsyncDeleteCitationsProcessor;
-import edu.asu.diging.citesphere.core.service.impl.AsyncUpdateCitationsProcessor;
+import edu.asu.diging.citesphere.core.model.async.AsyncDeleteCitationsResponse;
+import edu.asu.diging.citesphere.core.model.async.AsyncUpdateCitationsResponse;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.user.AsyncTaskStatus;
 
 /**
  * Responsible for managing the state of an async citation tasks.
  *
  */
 @Component
-@EnableScheduling
 public class AsyncCitationManager {
 
     @Autowired
@@ -98,7 +97,7 @@ public class AsyncCitationManager {
      * Removes the finished deletion tasks every 24 hrs
      */
     @Scheduled(fixedDelay = durationInMillis)
-    public void scheduledDeletionTask() {
+    public void scheduledTaskCleanup() {
         Long currentTime = System.currentTimeMillis();
         for (String task : deleteTaskTracker.keySet()) {
             if (currentTime

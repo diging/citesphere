@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -23,6 +25,8 @@ import edu.asu.diging.citesphere.user.IUser;
 @Service
 public class AsyncDeleteCitationsProcessor {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     @Autowired
     private IZoteroManager zoteroManager;
 
@@ -49,6 +53,7 @@ public class AsyncDeleteCitationsProcessor {
 
             @Override
             public void onFailure(Throwable ex) {
+                logger.error("Error while deleting citations.", ex);
             }
         });
         return result;
