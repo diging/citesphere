@@ -70,9 +70,9 @@ public class MoveItemsController {
     }
 
     @RequestMapping(value = { 
-            "/auth/group/{zoteroGroupId}/items/move/{taskID}/status",
-            "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/{taskID}/status" 
-        })
+        "/auth/group/{zoteroGroupId}/items/move/{taskID}/status",
+        "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/{taskID}/status" 
+    })
     public @ResponseBody AsyncUpdateCitationsResponse getMoveItemsStatus(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID)
             throws Exception {
