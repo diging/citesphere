@@ -3,7 +3,6 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -29,7 +28,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
-import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
@@ -116,6 +114,16 @@ public class ZoteroManager implements IZoteroManager {
             metaData = zoteroConnector.getCitesphereMetaData(user, groupId, itemKey);
         }
         return citationFactory.createCitation(item, metaData);
+    }
+    
+    @Override
+    public List<ICitation> getGroupItemAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        List<Item> attachmentResponse = zoteroConnector.getAttachments(user, groupId, itemKey);
+        List<ICitation> attachments = new ArrayList<>();
+        attachmentResponse.forEach(attachment -> {
+            attachments.add(citationFactory.createCitation(attachment, null));
+        });
+        return attachments;
     }
     
     @Override

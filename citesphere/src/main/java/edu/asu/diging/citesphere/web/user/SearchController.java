@@ -45,7 +45,8 @@ public class SearchController {
     private String availableColumns;
 
     @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search" })
-    public String search(@PathVariable String zoteroGroupId, @RequestParam("searchTerm") String searchTerm, Model model,
+    public String search(@PathVariable String zoteroGroupId,
+            @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
             @RequestParam(defaultValue = "0", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns, Authentication authentication) {
@@ -58,6 +59,10 @@ public class SearchController {
             return "error/404";
         }
 
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return "redirect:/auth/group/" + zoteroGroupId + "/items";
+        }
+        
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
@@ -71,7 +76,7 @@ public class SearchController {
 
         model.addAttribute("searchTerm", searchTerm);
         model.addAttribute("items", citations.getResults());
-        model.addAttribute("totalPages", citations.getTotalPages());
+        model.addAttribute("totalPages", Math.max(1, citations.getTotalPages()));
         model.addAttribute("total", citations.getTotalResults());
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", zoteroGroupId);

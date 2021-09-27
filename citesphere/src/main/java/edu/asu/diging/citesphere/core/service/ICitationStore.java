@@ -19,7 +19,16 @@ public interface ICitationStore {
     Optional<ICitation> findById(String id);
 
     void delete(ICitation citation);
+    
+    /**
+     * Method to fetch non-deleted attachments for an item.
+     * @param id Key of the item.
+     * @return Attachments for the provided item key.
+     */
+    List<ICitation> getAttachments(String id);
 
+    void deleteCitationByGroupId(String groupId);
+    
     List<ICitation> findByGilesDocumentId(String documentId);
 
 }

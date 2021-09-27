@@ -97,6 +97,15 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
+    public ICitation getCitation(String key) {
+        Optional<ICitation> optional = citationStore.findById(key);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        return null;
+    }
+
+    @Override
     public ICitation getCitation(IUser user, String groupId, String key)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         Optional<ICitation> optional = citationStore.findById(key);
@@ -118,14 +127,21 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public ICitation getCitation(String key) {
-        Optional<ICitation> optional = citationStore.findById(key);
-        if (optional.isPresent()) {
-            return optional.get();
+    public List<ICitation> getAttachments(IUser user, String groupId, String key)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        if (group != null && group.getGroupId() == new Long(groupId)) {
+            if (!group.getUsers().contains(user.getUsername())) {
+                throw new AccessForbiddenException("User does not have access this citation.");
+            }
         }
-        return null;
+        List<ICitation> attachments = citationStore.getAttachments(key);
+        if (attachments.isEmpty()) {
+            attachments = updateAttachmentsFromZotero(user, groupId, key);
+        }
+        return attachments;
     }
-    
+
     /**
      * Retrieve a citation from Zotero bypassing the database cache. This method
      * also does not store the retrieved citation in the database cache. Use
@@ -211,6 +227,29 @@ public class CitationManager implements ICitationManager {
             throw new CannotFindCitationException(ex);
         }
 
+    }
+    
+    @Override
+    public List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
+        try {
+            List<ICitation> attachments = zoteroManager.getGroupItemAttachments(user, groupId, itemKey);
+            attachments.forEach(attachment -> {
+                attachment.setGroup(groupOptional.get().getGroupId() + "");
+                Optional<ICitation> oldAttachment = citationStore.findById(attachment.getKey());
+                if (oldAttachment.isPresent()) {
+                    citationStore.delete(oldAttachment.get());
+                }
+                citationStore.save(attachment);
+            });
+            return attachments;
+        } catch (HttpClientErrorException ex) {
+            throw new CannotFindCitationException(ex);
+        }
     }
 
     /*
@@ -398,5 +437,10 @@ public class CitationManager implements ICitationManager {
             }
         }
         return result;
+    }
+    
+    @Override
+    public void deleteLocalGroupCitations(String groupId) {
+        citationStore.deleteCitationByGroupId(groupId);
     }
 }

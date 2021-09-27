@@ -102,4 +102,9 @@ public class CitationCollectionManager implements ICitationCollectionManager {
         }
         return null;
     }
+    
+    @Override
+    public void deleteLocalGroupCollections(String groupId) {
+        collectionRepository.deleteByGroupId(groupId);
+    }
 }

@@ -65,11 +65,11 @@ $(function() {
 
 	
 	var shownColumns = [ /*[# th:each="col : ${columns}"]*/ /*[[${col}]]*/, /*[/]*/ ];
-
 	
 	$("#addionalColumns a").click(function(event) {
 		var isShown = $(this).data("is-shown");
 		var col = $(this).data("column-name");
+
 		if (isShown) {
 			shownColumns = shownColumns.filter(function(value, index, arr){
 			    return value != col;

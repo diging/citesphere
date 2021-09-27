@@ -8,4 +8,6 @@ public interface Indexer {
 
     void deleteCitation(ICitation citation);
 
+    void deleteCitationByGroupId(String groupId);
+
 }

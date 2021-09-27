@@ -7,7 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -52,7 +51,7 @@ public class EditConceptController {
     public String post(Model model, @PathVariable("conceptId") String conceptId, Authentication authentication,
             @Valid @ModelAttribute("form") CitationConceptForm form, BindingResult result,
             RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
+        if (result.hasErrors()) {   
             model.addAttribute("form", form);
             return "auth/concepts/edit";
         }

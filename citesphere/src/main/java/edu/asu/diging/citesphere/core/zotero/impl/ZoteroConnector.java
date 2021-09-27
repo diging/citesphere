@@ -3,9 +3,8 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +14,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -178,6 +175,18 @@ public class ZoteroConnector implements IZoteroConnector {
                             .getTags().stream().anyMatch(tag -> tag.getTag().equals("citesphere-metadata")))
                     .findFirst();
             return citesphereMetaData.orElse(null);
+        } catch (HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
+
+    @Override
+    public List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            return zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey).stream()
+                    .filter(item -> item.getData().getItemType().equals(ItemType.ATTACHMENT.getZoteroKey()))
+                    .collect(Collectors.toList());
         } catch (HttpClientErrorException ex) {
             throw createException(ex.getStatusCode(), ex);
         }

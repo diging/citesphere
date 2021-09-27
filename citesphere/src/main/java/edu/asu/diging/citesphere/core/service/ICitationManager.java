@@ -32,9 +32,6 @@ public interface ICitationManager {
     CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy)
             throws GroupDoesNotExistException, ZoteroHttpStatusException;
 
-    ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException,
-            CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException;
-
     /**
      * Method to retrieve a citation object from the database. This method will retrieve the citation stored in the database.
      * It will not do any access checks, nor will it update the citation from Zotero or retrieve it for the first time. This method
@@ -43,6 +40,12 @@ public interface ICitationManager {
      * @return Citation to be retrieve or null.
      */
     ICitation getCitation(String key);
+    
+    ICitation getCitation(IUser user, String groupId, String key) throws GroupDoesNotExistException,
+            CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException;
+    
+    List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException,
+            GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 
     void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
             CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
@@ -56,6 +59,9 @@ public interface ICitationManager {
     ICitation getCitationFromZotero(IUser user, String groupId, String key) throws ZoteroHttpStatusException;
 
     ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
+    
+    List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 
     ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
@@ -72,4 +78,6 @@ public interface ICitationManager {
     CloseableIterator<ICitation> getAllGroupItems(IUser user, String groupId, String collectionId) throws
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
 
+    void deleteLocalGroupCitations(String groupId);
+    
 }
