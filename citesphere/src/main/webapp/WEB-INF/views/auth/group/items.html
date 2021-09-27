@@ -105,7 +105,7 @@ function addEventListeners(){
 	$("#searchBtn").click(function() {
         var key = $("#search").val();
         if (key != undefined && key != '') {
-            window.location.href="search?searchTerm=" + key;
+        	getSearchResults(key);
         }
     });
 	
@@ -113,10 +113,24 @@ function addEventListeners(){
         if(e.which == 13) {
         	var key = $("#search").val();
             if (key != undefined && key != '') {
-                window.location.href="search?searchTerm=" + key;
+            	getSearchResults(key);
             }
         }
     });
+	
+	function getSearchResults(key){
+		$.ajax({
+			type: "GET",
+			url: "search?searchTerm="+key,
+			dataType: "json",
+			success: function (data){
+				rewriteCitationsTable(data);
+			 },
+			 error: function (data) {
+				 showNotification("Error occured while searching", "Danger", 10000);
+			 }
+		});
+	}
 	
 	var queryParams = window.location.search;
     if (queryParams)  {
@@ -212,7 +226,7 @@ function pollStatus(){
 function getCurrentItemsData(parameter){
 let pageNumber = $(".page-item.active").text();
 $.get("items/data?page="+pageNumber, function(data) {
-	if(parameter === "onFirstLoad" || !data['notModified']){
+	if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad")){
 		rewriteCitationsTable(data);
 		rewriteCollectionsList(data);
 		rewriteGroupInfo(data);
