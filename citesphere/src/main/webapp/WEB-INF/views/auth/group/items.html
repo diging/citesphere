@@ -18,10 +18,10 @@ $(function() {
 	getCurrentItemsData("onFirstLoad");
 });
 
-function addEventListeners(){
+function showPages(totalPages, currentPage){
 	$('#pagination-top').twbsPagination({
-	    totalPages: [(${totalPages})],
-	    startPage: [(${currentPage})],
+	    totalPages: totalPages,
+	    startPage: currentPage,
 	    prev: "«",
 	    next: "»",
 	    visiblePages: 10,
@@ -41,13 +41,26 @@ function addEventListeners(){
 	        if (currentURL.match(/search/)) {
 	            var key = $("#search").val();
 	            if (key != undefined && key != '') {
-	                window.location.href = "search" + queryParams + "&searchTerm=" + key + "&page=" + page;
+	                //window.location.href = "search" + queryParams + "&searchTerm=" + key + "&page=" + page;
+	            	$.ajax({
+	        			type: "GET",
+	        			url: "search" + queryParams + "&searchTerm=" + key + "&page=" + page,
+	        			dataType: "json",
+	        			success: function (data){
+	        				rewriteCitationsTable(data);
+	        				showPages(data['totalPages'], data['currentPage']);
+	        			 }
+	        		});
 	            }
 	        } else {
-	            window.location.href = "items" + queryParams + "&page=" + page;
+	            //window.location.href = "items" + queryParams + "&page=" + page;
+	            getCurrentItemsData("requestingNewPage");
 	        }
 	    }
 	});
+}
+
+function addEventListeners(){
 	
 	$('.collapse').collapse();
 	
@@ -125,9 +138,10 @@ function addEventListeners(){
 			dataType: "json",
 			success: function (data){
 				rewriteCitationsTable(data);
+				showPages(data['totalPages'], data['currentPage']);
 			 },
 			 error: function (data) {
-				 showNotification("Error occured while searching", "Danger", 10000);
+				 showNotification("Error occured while searching", "danger", 20000);
 			 }
 		});
 	}
@@ -226,13 +240,15 @@ function pollStatus(){
 function getCurrentItemsData(parameter){
 let pageNumber = $(".page-item.active").text();
 $.get("items/data?page="+pageNumber, function(data) {
-	if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad")){
+	if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
 		rewriteCitationsTable(data);
 		rewriteCollectionsList(data);
 		rewriteGroupInfo(data);
+		rewriteColumnsList(data)
 		addEventListeners();
 		addCheckboxesEventListeners();
 		addMoveItemListeners();
+		showPages(data['totalPages'], data['currentPage']);
 	}
 }); 
 }
@@ -350,6 +366,23 @@ function rewriteGroupInfo(data) {
 		'<b>Owner:</b><span">'+data['group'].owner+'</span><br><br>'+'<b>Last synced:</b> <span class="date">'+data['group'].updatedOn+'</span></div></div>'))
 }
 
+function rewriteColumnsList(data){
+  let columnsTableBody = $('<tbody>');
+  console.log(data['availableColumnsData'])
+  for(const columnData of data['availableColumnsData']){
+	  console.log(columnData)
+	  let dataShown ;
+	  let columnHTML = $('<li>')
+	  let anchorTag = $('<a data-column-name'+columnData['cloumn']+'data-is-shown'+dataShown+'>'+columnData['cloumnLabel']+'</a>')
+	  if(dataShown){
+		  anchorTag.append($('<span><i class="icon-checkmark-alt"></i> </span>'))
+	  }
+	  columnHTML.append(anchorTag)
+	  columnsTableBody.append(columnHTML)
+  }
+  $("#addionalColumns").append(columnsTableBody);
+}
+
 </script>
 </div>
 
@@ -438,14 +471,7 @@ function rewriteGroupInfo(data) {
     Columns
     <span class="caret"></span>
   </button>
-  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
-  <tbody th:each="column:${availableColumns}">
-    <li th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}"><a th:data-column-name="${column}" th:data-is-shown="${#lists.contains(columns,column)}">
-	<span th:if ="${#lists.contains(columns,column)}"><i class="icon-checkmark-alt"></i> </span>
-	[[${columnLabel}]]
-    </a></li>
-  </tbody>
-  </ul> 
+  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1"></ul> 
    
 </div>
 

@@ -34,6 +34,7 @@ import edu.asu.diging.citesphere.web.BreadCrumbType;
 @Controller
 @PropertySource("classpath:/config.properties")
 @PropertySource("classpath:/item_type_icons.properties")
+@PropertySource("classpath:/labels.properties")
 public class UpdateItemsPageController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -101,17 +102,18 @@ public class UpdateItemsPageController {
             logger.error("Group does not exist exception occured while updating items page", e);
             return null;
         }
-        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
+        List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));        
         List<String> shownColumns = new ArrayList<>();
         if (columns != null && columns.length > 0) {
             for (String column : columns) {
-                if (allowedColumns.contains(column)) {
+                if (availableColumnsList.contains(column)) {
                     shownColumns.add(column);
                 }
             }
         }
         itemsData.setShownColumns(shownColumns);
-        itemsData.setAllowedColumns(allowedColumns);
+        itemsData.setAvailableColumnsData(availableColumnsList.stream().map(c -> 
+            new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_"+c))).collect(Collectors.toList()));
 
         return itemsData;
     }

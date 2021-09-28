@@ -14,7 +14,7 @@ public class ItemsDataDto {
     private String zoteroGroupId;
     private List<ICitationCollection> citationCollections;
     private List<String> shownColumns;
-    private List<String> allowedColumns;
+    private List<AvailableColumnsDataDto> availableColumnsData;
     private boolean notModified;
     private String sort;
     private String collectionId;
@@ -22,12 +22,12 @@ public class ItemsDataDto {
     private String collectionName;
     private List<BreadCrumb> breadCrumbs;
 
-    public List<String> getAllowedColumns() {
-        return allowedColumns;
+    public List<AvailableColumnsDataDto> getAvailableColumnsData() {
+        return availableColumnsData;
     }
 
-    public void setAllowedColumns(List<String> allowedColumns) {
-        this.allowedColumns = allowedColumns;
+    public void setAvailableColumnsData(List<AvailableColumnsDataDto> availableColumnsData) {
+        this.availableColumnsData = availableColumnsData;
     }
 
     public List<String> getShownColumns() {

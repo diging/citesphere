@@ -8,7 +8,7 @@ public class CitationsDto {
     private String citationLabel;
     private String citationIcon;
 
-    CitationsDto(ICitation citation, String label, String icon) {
+    public CitationsDto(ICitation citation, String label, String icon) {
         this.citation = citation;
         this.citationLabel = label;
         this.citationIcon = icon;
