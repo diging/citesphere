@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Holds the data for VIAF authority records
+ * Holds the data for VIAF authority record
  * @author Maulik Limbadiya
  *
  */
