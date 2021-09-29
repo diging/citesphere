@@ -146,7 +146,6 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
                     IAuthorityEntry authority = new AuthorityEntry();
                     Iterator<Data> iterator = record.getMainHeadings().getData().iterator();
                     if (iterator.hasNext()) {
-                        // let's get the first entry for now
                         String name = iterator.next().getText();
                         authority.setName(name);
                         authority.setUri(record.getDocument().get("@about") + "");
@@ -179,7 +178,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
         } else {
             viafSearchString += firstName == null || firstName.isEmpty() ? lastName : firstName;
         }
-        int startRecord = (page - 1) * pageSize + 1;
+        int startRecord = page * pageSize + 1;
         viafSearchString += "\"&startRecord=" + startRecord + "&maximumRecords=" + pageSize
                 + "&httpAccept=application/json";
         return viafSearchString;

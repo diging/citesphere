@@ -92,7 +92,7 @@ $(function() {
 		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Author','Author', 0)
-		getViafAuthorities('Author', 'Author', 1)
+		getViafAuthorities('Author', 'Author', 0)
 		getGroupAuthorities('Author','Author', 0)
 		getconceptpowerAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
@@ -110,7 +110,7 @@ $(function() {
 		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Editor','Editor', 0)
-		getViafAuthorities('Editor', 'Editor', 1)
+		getViafAuthorities('Editor', 'Editor', 0)
 		getGroupAuthorities('Editor','Editor', 0)
 		getconceptpowerAuthorities('Editor','Editor',0)
 		$("#searchEditorSpinner").hide();
@@ -128,7 +128,7 @@ $(function() {
 		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Creator','Creator', 0)
-		getViafAuthorities('Creator', 'Creator', 1)
+		getViafAuthorities('Creator', 'Creator', 0)
 		getGroupAuthorities('Creator','Creator', 0)
 		getconceptpowerAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
@@ -926,10 +926,10 @@ function getViafAuthorities(modalType, personType, page) {
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {	
   					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
-  					if(elem['description']==null){
+  					if(elem['description']==null) {
   						content += ' - </td>';
-  						}
-  					else{
+  					}
+  					else {
   						content +=elem['description'] + '</td>';
   					}
   					content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
@@ -959,23 +959,23 @@ function getViafAuthorities(modalType, personType, page) {
 			$("#uri"+modalType).val( uri);
 			
 			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=viaf&uri=' + uri;	
-			if($("#mycheckbox").is(":checked")){
+			if($("#mycheckbox").is(":checked")) {
 				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
 			}
 			$.ajax({
-			  		dataType: "json",
-			  		type: 'POST',
-			  		url: createManageAuthorityURL,
-			  		data: { [[${_csrf.parameterName}]] : [[${_csrf.token}]] },
-			  		async:false,
-			  		success: function(data) {
-			  			$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
-			  		},
-				error: function(data){					
+				dataType: "json",
+				type: 'POST',
+				url: createManageAuthorityURL,
+				data: { [[${_csrf.parameterName}]] : [[${_csrf.token}]] },
+				async:false,
+				success: function(data) {
+					$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+				},
+				error: function(data) {					
 					$("#uri"+modalType).val("");
 		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
 				}
-				});				
+			});				
 						
 			$("#selectAuthorityModel").modal('hide');
 		});	

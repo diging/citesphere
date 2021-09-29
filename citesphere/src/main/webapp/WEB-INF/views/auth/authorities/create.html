@@ -36,22 +36,12 @@ $(function() {
         $("#searchAuthorSpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         $('#viafAuthority-pagination-top').twbsPagination('destroy');
-        getViafAuthorities('Author', 'Author', 1)
+        getViafAuthorities('Author', 'Author', 0)
         getConceptpowerAuthorities('Author', 'Author', 0)
         $("#searchAuthorSpinner").hide();
     });
 
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
-// <<<<<<< HEAD
-//         var uri = $("#uriLoadingFoundAuthor").attr('data-authority-uri');
-//         $.post([[@{|/auth/authority/import?${_csrf.parameterName}=${_csrf.token}&uri=|}]]+uri, function(data) {
-//             $("#authorCreateAuthority").hide();
-//             $("#uriAuthorLocalId").val(data['id']);
-//             $("#authorAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i><br>.");
-//             showPersonNameInModal(data['name'], "Author");
-//             $("#uriLoadingFoundAuthor").popover('hide');
-//         });
-// =======
         name = $(this).closest("div").find(".name").text();
         uri = $(this).closest("div").find(".uri").text();
         importerId = $(this).closest("div").find(".importerId").text();
@@ -62,7 +52,6 @@ $(function() {
         $("#selectAuthorityModel").modal('hide');
         $("#authorModal").modal('hide');
         resetPersonCreationModal("Author");
-// >>>>>>> a0d64a118f58b841a6f8bfc8c6cb18da2d0022b5
     });
 
     var timer = null;
@@ -213,7 +202,7 @@ function getViafAuthorities(modalType, personType, page) {
                     visiblePages: 5,
                     initiateStartPageClick: false,
                     onPageClick: function(event, page) {
-                        getconceptpowerAuthorities(modalType, personType, page)
+                    	getViafAuthorities(modalType, personType, page)
                     }
                 });
 
@@ -275,16 +264,12 @@ function getPersonAuthority(uri, personType) {
                 content += "</ul>";
             } else if (data['importedAuthority'] != null) {
                 content += "<br><br>Following authority can be imported:<br>" + data['importedAuthority']['name'] +
-// <<<<<<< HEAD
-//                     '<button id="' + personType_lowerCase + 'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b></button>';
-// =======
                     '<button id="' + personType_lowerCase + 'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Import this authority</b><div style="display: none;">'
                     +'<p class="name">'+ data['importedAuthority']['name'] + '</p><p class="uri">'+ data['importedAuthority']['uri'] + '</p><p class="importerId">';
                 if (data['importedAuthority']['importerId'] != null) {
                 	content += data['importedAuthority']['importerId'];
                 }
                 content += '</p></div></button>';
-// >>>>>>> a0d64a118f58b841a6f8bfc8c6cb18da2d0022b5
             } else {
                 content += "<br><br>No authorities found for the given URI<br>";
             }
