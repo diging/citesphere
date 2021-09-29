@@ -7,6 +7,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Holds the data for VIAF authority records
+ * @author Maulik Limbadiya
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class ViafRecordData {
 

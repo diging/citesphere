@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * Wrapper object for VIAF authority search response
+ * @author Maulik Limbadiya
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ViafSearchResponseWrapper {
 
