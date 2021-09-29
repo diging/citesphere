@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -9,7 +10,10 @@ import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ZoteroResponse;
+import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
@@ -23,6 +27,8 @@ public interface IZoteroConnector {
     ZoteroResponse<Group> getGroups(IUser user);
 
     Item getItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
+    
+    List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
 
     ZoteroResponse<Group> getGroupsVersions(IUser user);
 
@@ -33,6 +39,10 @@ public interface IZoteroConnector {
 
     Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    
+    ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
+            List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, JsonProcessingException;
 
     FieldInfo[] getFields(IUser user, String itemType);
 

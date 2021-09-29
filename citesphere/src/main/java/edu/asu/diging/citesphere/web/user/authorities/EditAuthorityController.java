@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.user.IUser;
-import edu.asu.diging.citesphere.web.forms.AuthorityForm;
+import edu.asu.diging.citesphere.web.forms.EditAuthorityForm;
 
 @Controller
 public class EditAuthorityController {
@@ -25,7 +25,7 @@ public class EditAuthorityController {
     private IAuthorityService authorityService;
 
     @RequestMapping("/auth/authority/{authorityId}/edit")
-    public String showPage(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication, AuthorityForm form) {
+    public String showPage(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication, EditAuthorityForm form) {
         IAuthorityEntry entry = authorityService.find(authorityId);
         form.setName(entry.getName());
         form.setDescription(entry.getDescription());
@@ -33,7 +33,7 @@ public class EditAuthorityController {
         return "auth/authorities/edit";
     }
     @RequestMapping(value="/auth/authority/{authorityId}/edit", method=RequestMethod.POST)
-    public String edit(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication, @Valid @ModelAttribute("form") AuthorityForm form, BindingResult result, RedirectAttributes redirectAttributes) {
+    public String edit(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication, @Valid @ModelAttribute("form") EditAuthorityForm form, BindingResult result, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("form", form);
             return "auth/authorities/edit";

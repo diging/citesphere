@@ -1,15 +1,18 @@
 package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,14 +23,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.annotation.SessionScope;
+
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.IAuthorityService;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
-import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 import edu.asu.diging.citesphere.web.user.FoundAuthorities;
 
 @Controller
@@ -53,42 +57,80 @@ public class AuthorityEntryController {
 
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
 
-        List<IAuthorityEntry> userEntries = authorityService.findByName((IUser) authentication.getPrincipal(),
-                firstName, lastName, page, pageSize);
+        int totalPages = authorityService.getTotalUserAuthoritiesPages((IUser) authentication.getPrincipal(), firstName,
+                lastName, pageSize);
+        authorityResult.setTotalPages(totalPages);
 
+        Page<IAuthorityEntry> fullNameEntries = authorityService
+                .findByFirstNameAndLastName((IUser) authentication.getPrincipal(), firstName, lastName, page, pageSize);
+        List<IAuthorityEntry> userEntries = new ArrayList<>();
+        userEntries.addAll(fullNameEntries.getContent());
+        // If the user entries found by full name does not fill the page entirely,
+        // search by just the last name to complete the rest of the page
+        // This works for both the cases:
+        // 1) The page is partially filled by the entries found by full name
+        // 2) All the entries by full name are exhausted and the page is suppose to be
+        // entirely filled by entries for last name
+        if (userEntries.size() < pageSize && !lastName.trim().isEmpty()) {
+            Page<IAuthorityEntry> lastNameEntries = authorityService.findByLastNameAndExcludingFirstName(
+                    (IUser) authentication.getPrincipal(), firstName, lastName,
+                    page - Math.max(1, fullNameEntries.getTotalPages()) + 1, pageSize - userEntries.size());
+            userEntries.addAll(lastNameEntries.getContent());
+        }
         authorityResult.setFoundAuthorities(userEntries);
         authorityResult.setCurrentPage(page + 1);
-        authorityResult.setTotalPages(authorityService
-                .getTotalUserAuthoritiesPages((IUser) authentication.getPrincipal(), firstName, lastName, pageSize));
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
     
-    @RequestMapping(value = { "/auth/authority/find/authorities/{source}",
-            "/auth/authority/{zoteroGroupId}/find/authorities/{source}" })
-    public ResponseEntity<AuthoritySearchResult> getAuthoritiesFromAuthorityService(Authentication authentication,
-            @PathVariable("source") String source, @PathVariable("zoteroGroupId") Optional<String> zoteroGroupId,
-            @RequestParam(required = false, value = "zoteroGroupId") String rpZoteroGroupId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
+    @RequestMapping("/auth/authority/{zoteroGroupId}/find/authorities/group")
+    public ResponseEntity<AuthoritySearchResult> getGroupAuthorities(
+            @PathVariable("zoteroGroupId") String zoteroGroupId,
+            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
+            @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
 
-        String groupId = zoteroGroupId.orElse(null);
-        if (rpZoteroGroupId != null && !rpZoteroGroupId.isEmpty()) {
-            groupId = rpZoteroGroupId;
+        AuthoritySearchResult authorityResult = new AuthoritySearchResult();
+        Long groupId = Long.valueOf(zoteroGroupId);
+        int totalPages = authorityService.getTotalGroupAuthoritiesPages(groupId, firstName, lastName, pageSize);
+        authorityResult.setTotalPages(totalPages);
+
+        Page<IAuthorityEntry> fullNameEntries = authorityService.findByGroupAndFirstNameAndLastName(groupId, firstName,
+                lastName, page, pageSize);
+        List<IAuthorityEntry> groupEntries = new ArrayList<>();
+        groupEntries.addAll(fullNameEntries.getContent());
+        // Same reasoning as the getUserAuthorities() method
+        if (groupEntries.size() < pageSize && !lastName.trim().isEmpty()) {
+            Page<IAuthorityEntry> lastNameEntries = authorityService.findByGroupAndLastNameAndExcludingFirstName(
+                    groupId, firstName, lastName, page - Math.max(1, fullNameEntries.getTotalPages()) + 1,
+                    pageSize - groupEntries.size());
+            groupEntries.addAll(lastNameEntries.getContent());
         }
+        authorityResult.setFoundAuthorities(groupEntries);
+        authorityResult.setCurrentPage(page + 1);
+        return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = {"/auth/authority/find/authorities/{source}", "/auth/authority/{zoteroGroupId}/find/authorities/{source}"})
+    public ResponseEntity<AuthoritySearchResult> getAuthoritiesFromAuthorityService(Authentication authentication,
+            @PathVariable("source") String source,
+            @PathVariable(required = false, value = "zoteroGroupId") String zoteroGroupId,
+            @RequestParam(defaultValue = "0", required = false, value = "page") int page,
+            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
+            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
         
         if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
             logger.warn(
                     "At least one of the fields must be non-empty. firstName and lastName are empty " + zoteroGroupId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        AuthoritySearchResult searchResult = null;        
+        AuthoritySearchResult searchResult = null;
         try {
             searchResult = authorityService.searchAuthorityEntries((IUser) authentication.getPrincipal(), firstName,
                     lastName, source, page, pageSize);
-            searchResult.setCurrentPage(page);
-            if (groupId != null && !groupId.isEmpty()) {
-                searchResult.setGroupName(groupManager.getGroup((IUser) authentication.getPrincipal(), groupId).getName());
+            searchResult.setCurrentPage(page + 1);
+            if (zoteroGroupId != null && !zoteroGroupId.isEmpty()) {
+                searchResult.setGroupName(
+                        groupManager.getGroup((IUser) authentication.getPrincipal(), zoteroGroupId).getName());
             }
             authoritySearchResult.put(source, searchResult);
 
@@ -99,11 +141,11 @@ public class AuthorityEntryController {
         } catch (AuthorityImporterNotFoundException e) {
             logger.error("AuthorityImporter responsible for search in " + source + " not found ", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            
+
         }
 
         return new ResponseEntity<AuthoritySearchResult>(searchResult, HttpStatus.OK);
-    } 
+    }
 
     @RequestMapping("/auth/authority/get")
     public ResponseEntity<FoundAuthorities> retrieveAuthorityEntry(Authentication authentication, @RequestParam("uri") String uri,
@@ -175,5 +217,5 @@ public class AuthorityEntryController {
         }
         return new ResponseEntity<IAuthorityEntry>(entry, HttpStatus.OK);
     }
-
+    
 }
