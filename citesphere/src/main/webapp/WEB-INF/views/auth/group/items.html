@@ -96,7 +96,14 @@ function addEventListeners(){
 		} else {
 			shownColumns.push(col);
 		}
-		window.location.href="items?columns=" + shownColumns; 
+		$.ajax({
+			type: "GET",
+			url: "items/data?columns=" + shownColumns,
+			dataType: "json",
+			success: function (data){
+				rewriteCitationsTable(data);
+			 }
+		});
 	});
 	
 	$("#findByItemKeyBtn").click(function() {
@@ -275,6 +282,12 @@ function rewriteCitationsTable(data){
 		'<th>'+"Date"+'</th>'+
 		'<th>'+"URL"+'</th>'+
 		'</tr>')
+		
+	for(const c of data['shownColumns']){
+		let header = data['availableColumnsData'].filter(colData => colData.column === c).map(colData => colData.columnLabel)
+		let shownColumnsHeaders = $('<th>'+header+'</th>')
+		headerRow.append(shownColumnsHeaders)
+	}
 	
 	 tablebody.append(headerRow);
 	 let i=0;
@@ -326,17 +339,12 @@ function rewriteCitationsTable(data){
 			 url.append(urlElement);
 		  }
 		  
-		  let columnsData = null;
-		  for(const column of data['shownColumns']){
-			  columnsData = columnsData + citation[column];
-		  }
-		  let column = $('<td style="max-width:300px;">' +'</td>'); 
-		  
 		  let row = $('<tr data-action="draggable" class="items">').append(checkboxes).append(iconData).append(authors).append(title).append(date).append(url);
-		  if(columnsData !== null){
-			  column.append(columnsData);
-			  row.append(column);
-		  }
+		  
+		  for(const column of data['shownColumns']){
+			  let colData = (citation[column])?citation[column]:"";
+			  row.append($('<td "style="max-width:300px;">'+colData+'</td>'))
+		  } 
 		  
 		 tablebody.append(row);
 		 i++;
@@ -367,20 +375,19 @@ function rewriteGroupInfo(data) {
 }
 
 function rewriteColumnsList(data){
-  let columnsTableBody = $('<tbody>');
-  console.log(data['availableColumnsData'])
+  let columnsList = $('<ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1"></ul> ');
   for(const columnData of data['availableColumnsData']){
-	  console.log(columnData)
-	  let dataShown ;
+	  let columns = [];
+	  let dataShown = columns.includes(columnData['column']);
 	  let columnHTML = $('<li>')
-	  let anchorTag = $('<a data-column-name'+columnData['cloumn']+'data-is-shown'+dataShown+'>'+columnData['cloumnLabel']+'</a>')
+	  let anchorTag = $('<a data-column-name='+columnData['column']+' data-is-shown='+dataShown+'>'+columnData['columnLabel']+'</a>')
 	  if(dataShown){
 		  anchorTag.append($('<span><i class="icon-checkmark-alt"></i> </span>'))
 	  }
 	  columnHTML.append(anchorTag)
-	  columnsTableBody.append(columnHTML)
+	  columnsList.append(columnHTML)
   }
-  $("#addionalColumns").append(columnsTableBody);
+  $("#addionalColumns").replaceWith(columnsList);
 }
 
 </script>
