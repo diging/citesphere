@@ -34,6 +34,7 @@ import edu.asu.diging.citesphere.web.BreadCrumbType;
 @Controller
 @PropertySource("classpath:/config.properties")
 @PropertySource("classpath:/item_type_icons.properties")
+@PropertySource("classpath:/labels.properties")
 public class SearchController {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -95,17 +96,18 @@ public class SearchController {
         searchItemsData.setTotalResults(citations.getTotalResults());
         searchItemsData.setGroup(group);
         
-        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
+        List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));        
         List<String> shownColumns = new ArrayList<>();
         if (columns != null && columns.length > 0) {
             for (String column : columns) {
-                if (allowedColumns.contains(column)) {
+                if (availableColumnsList.contains(column)) {
                     shownColumns.add(column);
                 }
             }
         }
         searchItemsData.setShownColumns(shownColumns);
-        searchItemsData.setAllowedColumns(allowedColumns);
+        searchItemsData.setAvailableColumnsData(availableColumnsList.stream().map(c -> 
+            new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_"+c))).collect(Collectors.toList()));
 
         Gson gson = new Gson();
         

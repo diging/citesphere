@@ -16,7 +16,7 @@ public class SearchItemsDataDto {
     private String sort;
     private List<CitationsDto> citationsData;
     private List<String> shownColumns;
-    private List<String> allowedColumns;
+    private List<AvailableColumnsDataDto> availableColumnsData;
     
     public String getSearchTerm() {
         return searchTerm;
@@ -90,19 +90,19 @@ public class SearchItemsDataDto {
         this.citationsData = citationsData;
     }
 
+    public List<AvailableColumnsDataDto> getAvailableColumnsData() {
+        return availableColumnsData;
+    }
+
+    public void setAvailableColumnsData(List<AvailableColumnsDataDto> availableColumnsData) {
+        this.availableColumnsData = availableColumnsData;
+    }
+
     public List<String> getShownColumns() {
         return shownColumns;
     }
 
     public void setShownColumns(List<String> shownColumns) {
         this.shownColumns = shownColumns;
-    }
-
-    public List<String> getAllowedColumns() {
-        return allowedColumns;
-    }
-
-    public void setAllowedColumns(List<String> allowedColumns) {
-        this.allowedColumns = allowedColumns;
     }
 }

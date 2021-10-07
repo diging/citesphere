@@ -60,6 +60,8 @@ function showPages(totalPages, currentPage){
 	});
 }
 
+var shownColumns = [];
+
 function addEventListeners(){
 	
 	$('.collapse').collapse();
@@ -81,13 +83,11 @@ function addEventListeners(){
 	    
 	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
 	  })
-
-	
-	var shownColumns = [ /*[# th:each="col : ${columns}"]*/ /*[[${col}]]*/, /*[/]*/ ];
 	
 	$("#addionalColumns a").click(function(event) {
 		var isShown = $(this).data("is-shown");
 		var col = $(this).data("column-name");
+		var searchKey = $("#search").val();
 
 		if (isShown) {
 			shownColumns = shownColumns.filter(function(value, index, arr){
@@ -96,12 +96,20 @@ function addEventListeners(){
 		} else {
 			shownColumns.push(col);
 		}
+		
+		if(searchKey != undefined && searchKey != ''){
+			return getSearchResults(searchKey);
+		}
+		
+		let pageNumber = $(".page-item.active").text();
 		$.ajax({
 			type: "GET",
-			url: "items/data?columns=" + shownColumns,
+			url: "items/data?page="+pageNumber+"&columns=" + shownColumns,
 			dataType: "json",
 			success: function (data){
 				rewriteCitationsTable(data);
+				rewriteColumnsList(data);
+				addEventListeners();
 			 }
 		});
 	});
@@ -139,13 +147,16 @@ function addEventListeners(){
     });
 	
 	function getSearchResults(key){
+		console.log("function called")
 		$.ajax({
 			type: "GET",
-			url: "search?searchTerm="+key,
+			url: "search?searchTerm="+key+"&columns=" + shownColumns,
 			dataType: "json",
 			success: function (data){
 				rewriteCitationsTable(data);
+				rewriteColumnsList(data);
 				showPages(data['totalPages'], data['currentPage']);
+				addEventListeners();
 			 },
 			 error: function (data) {
 				 showNotification("Error occured while searching", "danger", 20000);
@@ -246,7 +257,7 @@ function pollStatus(){
 
 function getCurrentItemsData(parameter){
 let pageNumber = $(".page-item.active").text();
-$.get("items/data?page="+pageNumber, function(data) {
+$.get("items/data?page="+pageNumber+"&columns=" + shownColumns, function(data) {
 	if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
 		rewriteCitationsTable(data);
 		rewriteCollectionsList(data);
@@ -377,13 +388,13 @@ function rewriteGroupInfo(data) {
 function rewriteColumnsList(data){
   let columnsList = $('<ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1"></ul> ');
   for(const columnData of data['availableColumnsData']){
-	  let columns = [];
-	  let dataShown = columns.includes(columnData['column']);
+	  let dataShown = shownColumns.includes(columnData['column']);
 	  let columnHTML = $('<li>')
-	  let anchorTag = $('<a data-column-name='+columnData['column']+' data-is-shown='+dataShown+'>'+columnData['columnLabel']+'</a>')
+	  let anchorTag = $('<a data-column-name='+columnData['column']+' data-is-shown='+dataShown+'>'+'</a>')
 	  if(dataShown){
 		  anchorTag.append($('<span><i class="icon-checkmark-alt"></i> </span>'))
 	  }
+	  anchorTag.append(columnData['columnLabel'])
 	  columnHTML.append(anchorTag)
 	  columnsList.append(columnHTML)
   }
