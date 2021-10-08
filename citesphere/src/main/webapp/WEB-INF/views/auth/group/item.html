@@ -79,7 +79,6 @@
 	    $(".view-link").click(function() {
 			
 			var item = $(this).parent();
-			console.log(item[0]);
 			showFiles('viewUpload', item[0]);
 			
 		});
@@ -96,7 +95,6 @@
 		$("#extractedFileName").attr('href', uploadItem.attr("extractedText-href"));
 		$("#extractedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-extractedText-filename"));
 		
-		console.log(modalNameLCase);
 		$("#"+modalNameLCase+"Modal").modal('show');
 	}
 	
@@ -353,7 +351,8 @@
         
         <ul class="list-group" >
 	        <li class="list-group-item" th:each="upload, status:${citation.gilesUploads}">
-	        <i class="icon-giles"></i>	        
+	        <i class="icon-giles"></i>
+	        
 	        <span th:if="${upload.uploadedFile?.filename}">
 	        <span th:id="|upload${status.index}|" class="upload-item" th:data-viewupload-uploadId="${upload.uploadId}" th:upload-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}" th:data-viewupload-uploadedFile-filename="${upload.uploadedFile?.filename}" th:extractedText-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.extractedText?.id}|}" th:data-viewupload-extractedText-filename="${upload.extractedText?.filename}" >
 	        <a class="view-link">[[${upload.uploadedFile?.filename}]]</a>
@@ -375,8 +374,8 @@
 			aria-labelledby="viewUploadModal" aria-hidden="true">
 			<div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" 
+               <div class="modal-header">
+                   <h4 class="modal-title" 
                         id="viewUploadModal">
                         Files uploaded to and extracted by Giles
                     </h4>
@@ -386,16 +385,15 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    
-                    <ul class="list-group" >
-	        			<li class="list-group-item" >
+                   <ul class="list-group" >
+	        		 <li class="list-group-item" >
 	        			<i class="icon-giles"></i>
 	        		 		<a id="uploadedFileName"> </a>
-	        			</li>
-	        			<li class="list-group-item">
+	        		 </li>
+	        		 <li class="list-group-item">
 	        			<i class="icon-giles"></i>
 		  					<a id="extractedFileName"> </a>
-	        			</li>
+	        		 </li>
 	        		</ul>
                 </div>
                 <div class="modal-footer">
@@ -406,8 +404,8 @@
                     </button>
                 </div>
             </div>
-		</div>
-	</div>
+       </div>
+    </div>
       
 	</div>
 	
@@ -506,7 +504,6 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
 </div>
 </body>
 </html>
