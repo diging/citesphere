@@ -141,6 +141,22 @@ public class CitationManager implements ICitationManager {
         }
         return attachments;
     }
+    
+    @Override
+    public List<ICitation> getNotes(IUser user, String groupId, String key)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        if (group != null && group.getGroupId() == new Long(groupId)) {
+            if (!group.getUsers().contains(user.getUsername())) {
+                throw new AccessForbiddenException("User does not have access this citation.");
+            }
+        }
+        List<ICitation> attachments = citationStore.getNotes(key);
+        if (attachments.isEmpty()) {
+            attachments = updateAttachmentsFromZotero(user, groupId, key);
+        }
+        return attachments;
+    }
 
     /**
      * Retrieve a citation from Zotero bypassing the database cache. This method

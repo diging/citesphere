@@ -58,6 +58,14 @@ public class CitationStore implements ICitationStore {
     public List<ICitation> getAttachments(String id) {
         return citationRepository.findByParentItemAndItemTypeAndDeleted(id, ItemType.ATTACHMENT.name(), 0);
     }
+    
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.ICitationStore#getNotes(java.lang.String)
+     */
+    @Override
+    public List<ICitation> getNotes(String id) {
+        return citationRepository.findByParentItemAndItemTypeAndDeleted(id, ItemType.NOTE.name(), 0);
+    }
 
     @Override
     public void deleteCitationByGroupId(String groupId) {

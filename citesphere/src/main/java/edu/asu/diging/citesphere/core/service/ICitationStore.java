@@ -26,6 +26,8 @@ public interface ICitationStore {
      * @return Attachments for the provided item key.
      */
     List<ICitation> getAttachments(String id);
+    
+    List<ICitation> getNotes(String id);
 
     void deleteCitationByGroupId(String groupId);
     

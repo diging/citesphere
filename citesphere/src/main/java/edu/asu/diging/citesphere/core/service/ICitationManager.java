@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -46,6 +45,8 @@ public interface ICitationManager {
     
     List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException,
             GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
+    
+    List<ICitation> getNotes(IUser user, String groupId, String key);
 
     void updateCitation(IUser user, String groupId, ICitation citation)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException;
