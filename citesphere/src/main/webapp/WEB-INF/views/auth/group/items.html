@@ -19,6 +19,8 @@ $(function() {
 });
 
 function showPages(totalPages, currentPage){
+	$("#pagination-top").remove();
+	$(".col-md-12").prepend($('<ul id="pagination-top" class="pagination-sm"></ul>'))
 	$('#pagination-top').twbsPagination({
 	    totalPages: totalPages,
 	    startPage: currentPage,
@@ -27,37 +29,30 @@ function showPages(totalPages, currentPage){
 	    visiblePages: 10,
 	    initiateStartPageClick: false,
 	    onPageClick: function (event, page) {
-	        var queryParams = window.location.search;
-	        if (!queryParams) {
-	            queryParams = "?";
-    	        } else {
-    	            var params = new URLSearchParams(queryParams);
-    	            params.delete('page');
-    	            params.delete('searchTerm');
-    	            queryParams = "?" + params.toString();
-    	        }
-            
-	        var currentURL = window.location.href;
-	        if (currentURL.match(/search/)) {
-	            var key = $("#search").val();
-	            if (key != undefined && key != '') {
-	                //window.location.href = "search" + queryParams + "&searchTerm=" + key + "&page=" + page;
-	            	$.ajax({
-	        			type: "GET",
-	        			url: "search" + queryParams + "&searchTerm=" + key + "&page=" + page,
-	        			dataType: "json",
-	        			success: function (data){
-	        				rewriteCitationsTable(data);
-	        				showPages(data['totalPages'], data['currentPage']);
-	        			 }
-	        		});
-	            }
-	        } else {
-	            //window.location.href = "items" + queryParams + "&page=" + page;
-	            getCurrentItemsData("requestingNewPage");
-	        }
+    	       onPageClickFunction();
 	    }
 	});
+}
+
+function onPageClickFunction(){
+	 var key = $("#search").val();
+     if (key != undefined && key != '') {
+     	let pageNumber = $(".page-item.active").text();
+         $.ajax({
+     		type: "GET",
+     		url: "search?searchTerm="+key+"&columns=" + shownColumns+"&page=" + pageNumber,
+     		dataType: "json",
+     		success: function (data){
+     			rewriteCitationsTable(data);
+     			rewriteColumnsList(data);
+ 				showPages(data['totalPages'], data['currentPage']);
+ 				console.log(data['totalPages'], data['currentPage'])
+ 				addEventListeners();
+     		}
+     	});
+      } else {
+         getCurrentItemsData("requestingNewPage");
+     }
 }
 
 var shownColumns = [];
@@ -147,7 +142,6 @@ function addEventListeners(){
     });
 	
 	function getSearchResults(key){
-		console.log("function called")
 		$.ajax({
 			type: "GET",
 			url: "search?searchTerm="+key+"&columns=" + shownColumns,
@@ -157,9 +151,6 @@ function addEventListeners(){
 				rewriteColumnsList(data);
 				showPages(data['totalPages'], data['currentPage']);
 				addEventListeners();
-			 },
-			 error: function (data) {
-				 showNotification("Error occured while searching", "danger", 20000);
 			 }
 		});
 	}
