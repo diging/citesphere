@@ -49,6 +49,8 @@ public class ItemController {
         if (citation != null) {
             List<ICitation> attachments = citationManager.getAttachments((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
             model.addAttribute("attachments", attachments);
+            List<ICitation> notes = citationManager.getNotes((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+            model.addAttribute("notes", notes);
             model.addAttribute("citation", citation);
             List<String> fields = new ArrayList<>();
             citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));

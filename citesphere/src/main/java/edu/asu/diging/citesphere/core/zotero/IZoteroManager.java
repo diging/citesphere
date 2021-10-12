@@ -3,7 +3,6 @@ package edu.asu.diging.citesphere.core.zotero;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
@@ -31,6 +30,8 @@ public interface IZoteroManager {
     ICitation getGroupItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
     
     List<ICitation> getGroupItemAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
+    
+    List<ICitation> getGroupItemNotes(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
 
     Map<Long, Long> getGroupsVersion(IUser user);
 

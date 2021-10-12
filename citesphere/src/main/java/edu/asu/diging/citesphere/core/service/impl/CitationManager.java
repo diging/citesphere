@@ -151,11 +151,11 @@ public class CitationManager implements ICitationManager {
                 throw new AccessForbiddenException("User does not have access this citation.");
             }
         }
-        List<ICitation> attachments = citationStore.getNotes(key);
-        if (attachments.isEmpty()) {
-            attachments = updateAttachmentsFromZotero(user, groupId, key);
+        List<ICitation> notes = citationStore.getNotes(key);
+        if (notes.isEmpty()) {
+            notes = updateNotesFromZotero(user, groupId, key);
         }
-        return attachments;
+        return notes;
     }
 
     /**
@@ -268,6 +268,29 @@ public class CitationManager implements ICitationManager {
         }
     }
 
+    @Override
+    public List<ICitation> updateNotesFromZotero(IUser user, String groupId, String itemKey)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
+        try {
+            List<ICitation> notes = zoteroManager.getGroupItemNotes(user, groupId, itemKey);
+            notes.forEach(note -> {
+                note.setGroup(groupOptional.get().getGroupId() + "");
+                Optional<ICitation> oldNote = citationStore.findById(note.getKey());
+                if (oldNote.isPresent()) {
+                    citationStore.delete(oldNote.get());
+                }
+                citationStore.save(note);
+            });
+            return notes;
+        } catch (HttpClientErrorException ex) {
+            throw new CannotFindCitationException(ex);
+        }
+    }
+    
     /*
      * (non-Javadoc)
      * 

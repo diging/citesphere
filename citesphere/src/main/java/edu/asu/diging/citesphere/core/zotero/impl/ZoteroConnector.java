@@ -2,10 +2,8 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +13,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -180,6 +176,18 @@ public class ZoteroConnector implements IZoteroConnector {
         }
     }
 
+    @Override
+    public List<Item> getNotes(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            return zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey).stream()
+                    .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()))
+                    .collect(Collectors.toList());
+        } catch (HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
+    
     @Override
     public Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException {

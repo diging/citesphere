@@ -27,6 +27,15 @@
             
 			$("#parsed-ref-modal").modal();
 		});
+		
+		$(".item-note").click(function(e) {
+			var index = $(this).attr('data-note-index');
+			var displayIndex = parseInt(index)+1;
+			$('#note-header').text('Note '+displayIndex);
+			$('#note-text').html($(this).attr('data-note-text'));
+			
+			$('#noteModal').modal();
+		});
 	});
 
 	$(document).ready(function(){
@@ -342,6 +351,14 @@
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
 	        </li>
         </ul>
+        
+        <h3>Notes</h3>
+        
+        <ul class="list-group">
+            <li class="list-group-item" th:each="note, status:${notes}">
+                <span class="item-note icon-sticky-note" style="color: #337ab7; font-size: 14px" th:data-note-index="${status.index}" th:data-note-text="${note.note}"></span><span> Note [[${status.index + 1}]]</span>
+            </li>
+        </ul>
 	</div>
 	
 	</div>
@@ -439,6 +456,22 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+    <div id="noteModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="note-header"></h4>
+          </div>
+          <div class="modal-body" id="note-text">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
 </div>
 </body>
 </html>
