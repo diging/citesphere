@@ -36,9 +36,11 @@ $(function() {
         })  
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         
-        $("#searchAuthorPageSpinner").show();
-        getConceptpowerAuthorities('Author', 'Author', 0)
-        $("#searchAuthorPageSpinner").hide();
+        $("#authoritySpinner").show();
+        setTimeout(function() {getConceptpowerAuthorities('Author', 'Author', 0);}, 2000);
+        setTimeout(function() {
+			  $('#authoritySpinner').hide()
+			}, 3000);
     });
 
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -354,7 +356,7 @@ function getPersonAuthority(uri, personType) {
                             </table>
                             
 				<div class="loader" style="font-size: 30px; text-align: center;">
-					<i id="searchAuthorPageSpinner" class="icon-spinner" style="color: blue"></i>
+					<i id="authoritySpinner" class="icon-spinner" style="color: #337ab7"></i>
 				</div>
                             
                         </div>

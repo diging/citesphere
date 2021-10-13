@@ -85,47 +85,53 @@ $(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})  
-		$("#searchAuthorSpinner").show();
+		$("#authoritySpinner").show();
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-		
-		getUserAuthorities('Author','Author', 0)
-		getGroupAuthorities('Author','Author', 0)
-		getconceptpowerAuthorities('Author','Author',0)
-		$("#searchAuthorSpinner").hide();
+
+		setTimeout(function() {getUserAuthorities('Author','Author', 0);}, 2000);
+		setTimeout(function() {getGroupAuthorities('Author','Author', 0);}, 2000);
+		setTimeout(function() {getconceptpowerAuthorities('Author','Author',0);}, 2000);
+		setTimeout(function() {
+			  $('#authoritySpinner').hide()
+			}, 3000);
 	});
 	
 	$("#searchEditor").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})  
-		$("#searchEditorSpinner").show();
+		$("#authoritySpinner").show();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
-		getUserAuthorities('Editor','Editor', 0)
-		getGroupAuthorities('Editor','Editor', 0)
-		getconceptpowerAuthorities('Editor','Editor',0)
-		$("#searchEditorSpinner").hide();
+		setTimeout(function() {getUserAuthorities('Editor','Editor', 0);}, 2000);
+		setTimeout(function() {getGroupAuthorities('Editor','Editor', 0);}, 2000);
+		setTimeout(function() {getconceptpowerAuthorities('Editor','Editor',0);}, 2000);
+		setTimeout(function() {
+			  $('#authoritySpinner').hide()
+			}, 3000);
 	});
 	
 	$("#searchCreator").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})  
-		$("#searchCreatorSpinner").show();
+		$("#authoritySpinner").show();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
-		getUserAuthorities('Creator','Creator', 0)
-		getGroupAuthorities('Creator','Creator', 0)
-		getconceptpowerAuthorities('Creator','Creator',0)
-		$("#searchCreatorSpinner").hide();
+		setTimeout(function() {getUserAuthorities('Creator','Creator', 0);}, 2000);
+		setTimeout(function() {getGroupAuthorities('Creator','Creator', 0);}, 2000);
+		setTimeout(function() {getconceptpowerAuthorities('Creator','Creator',0);}, 2000);
+		setTimeout(function() {
+			  $('#authoritySpinner').hide()
+			}, 3000);
 	});
 	
 	
@@ -1372,8 +1378,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
 						style="margin-left: 80%" disabled>Search Author 
-						<i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
-		  </button>
+			</button>
 		  <div class="form-group">
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
@@ -1599,7 +1604,9 @@ function creatorLinkHandler(target) {
 							</table>
 							
 						</div>
-					</div>
+						<div class="loader" style="font-size: 30px; text-align: center;">
+						<i id="authoritySpinner"class="icon-spinner" style="color:#337ab7"></i>
+					</div> 
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default"
