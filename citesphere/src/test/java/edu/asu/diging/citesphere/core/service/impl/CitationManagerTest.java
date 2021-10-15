@@ -383,4 +383,16 @@ public class CitationManagerTest {
             Assert.assertTrue(actualNotes.stream().anyMatch(note->note.getKey().equals(citation.getKey())));
         }
     }
+    
+    @Test
+    public void test_getNotes_empty() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        List<ICitation> emptyList = new ArrayList<>();
+        
+        Mockito.when(citationStore.getNotes(EXISTING_ID)).thenReturn(emptyList);
+        Mockito.when(groupManager.getGroup(user, GROUP_ID)).thenReturn(group);
+        Mockito.when(zoteroManager.getGroupItemNotes(user, GROUP_ID, EXISTING_ID)).thenReturn(new ArrayList<>());
+        
+        List<ICitation> response = managerToTest.getNotes(user, GROUP_ID, EXISTING_ID);
+        Assert.assertTrue(response.size() == 0);
+    }
 }

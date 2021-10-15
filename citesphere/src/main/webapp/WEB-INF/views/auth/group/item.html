@@ -29,10 +29,11 @@
 		});
 		
 		$(".item-note").click(function(e) {
-			var index = $(this).attr('data-note-index');
+			var note = $(this).find(".note-info")
+			var index = note.attr('data-note-index');
 			var displayIndex = parseInt(index)+1;
 			$('#note-header').text('Note '+displayIndex);
-			$('#note-text').html($(this).attr('data-note-text'));
+			$('#note-text').html(note.attr('data-note-text'));
 			
 			$('#noteModal').modal();
 		});
@@ -355,8 +356,8 @@
         <h3>Notes</h3>
         
         <ul class="list-group">
-            <li class="list-group-item" th:each="note, status:${notes}">
-                <span class="item-note icon-sticky-note" style="color: #337ab7; font-size: 14px" th:data-note-index="${status.index}" th:data-note-text="${note.note}"></span><span> Note [[${status.index + 1}]]</span>
+            <li class="item-note list-group-item" th:each="note, status:${notes}">
+                <span class="icon-sticky-note note-info" style="color: #337ab7; font-size: 14px" th:data-note-index="${status.index}" th:data-note-text="${note.note}"></span><span> Note [[${status.index + 1}]]</span>
             </li>
         </ul>
 	</div>
