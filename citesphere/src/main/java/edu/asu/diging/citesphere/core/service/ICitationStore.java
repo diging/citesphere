@@ -27,6 +27,11 @@ public interface ICitationStore {
      */
     List<ICitation> getAttachments(String id);
     
+    /**
+     * Method to fetch non-deleted notes for an item.
+     * @param id Key of the item.
+     * @return Notes for the provided item key.
+     */
     List<ICitation> getNotes(String id);
 
     void deleteCitationByGroupId(String groupId);
