@@ -91,7 +91,7 @@ public class MoveItemsController {
             @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
         try {
             citationManager.getGroupItems((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId,
-                    new Integer(page), null);
+                    new Integer(page), null, new ArrayList<>());
             Sync sync = new Sync();
             sync.setStatus("sync-started");
             return sync;

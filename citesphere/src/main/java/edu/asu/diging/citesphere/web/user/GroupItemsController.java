@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
+import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
@@ -49,13 +50,17 @@ public class GroupItemsController {
     
     @Autowired
     private IGroupManager groupManager;
+    
+    @Autowired
+    private ICitationConceptManager conceptManager;
 
     @RequestMapping(value= { "/auth/group/{zoteroGroupId}","/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
-            @RequestParam(required = false, value = "columns") String[] columns) {
+            @RequestParam(required = false, value = "columns") String[] columns,
+            @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
@@ -65,7 +70,7 @@ public class GroupItemsController {
         IUser user = (IUser) authentication.getPrincipal();
         CitationResults results;
         try {
-            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, Arrays.asList(conceptIds));
         } catch(ZoteroHttpStatusException e) {
             logger.error("Exception occured", e);
             return "error/500";
@@ -101,7 +106,7 @@ public class GroupItemsController {
         }
         model.addAttribute("columns", shownColumns);
         model.addAttribute("availableColumns", allowedColumns);
-        
+        model.addAttribute("concepts", conceptManager.findAll(user));
         
         ICitationGroup group = groupManager.getGroup(user, groupId);
         List<BreadCrumb> breadCrumbs = new ArrayList<>();

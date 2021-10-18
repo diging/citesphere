@@ -29,7 +29,7 @@ public interface ICitationManager {
 
     List<ICitationGroup> getGroups(IUser user);
 
-    CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy)
+    CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds)
             throws GroupDoesNotExistException, ZoteroHttpStatusException;
 
     /**
@@ -71,7 +71,7 @@ public interface ICitationManager {
     List<String> getValidCreatorTypes(IUser user, ItemType itemType);
     
     CitationPage getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy,
-            int index) throws GroupDoesNotExistException, ZoteroHttpStatusException;
+            int index, List<String> conceptIds) throws GroupDoesNotExistException, ZoteroHttpStatusException;
 
     void forceGroupItemsRefresh(IUser user, String groupId, String collectionId, int page, String sortBy);
 

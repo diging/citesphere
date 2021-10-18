@@ -281,17 +281,30 @@ function pollStatus(){
 
 <div>
 
-<p class="lead" style="display:inline;padding-left:10px">Collections</p>
+<p class="lead" style="display:inline;padding-left:20px">Collections</p>
 
 <big><i class="icon-arrow-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
 
+<div class="dropdown pull-right">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Concepts
+    <span class="caret"></span>
+  </button>
+  <ul id="conceptFilter" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+  <tbody th:each="concept:${concepts}">
+    <li>
+    <a>[[${concept.name}]] <input title="Select" type="checkbox" class="concepts pull-right" th:data-concept-id="${concept.id}"/></a>
+    </li>
+  </tbody>
+  </ul>   
+</div>
 
 <div class="dropdown pull-right" style="padding-bottom: 10px;">
-  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
     Columns
     <span class="caret"></span>
   </button>
-  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu2">
   <tbody th:each="column:${availableColumns}">
     <li th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}"><a th:data-column-name="${column}" th:data-is-shown="${#lists.contains(columns,column)}">
 	<span th:if ="${#lists.contains(columns,column)}"><i class="icon-checkmark-alt"></i> </span>
