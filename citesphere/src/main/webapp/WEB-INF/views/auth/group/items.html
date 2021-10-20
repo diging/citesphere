@@ -77,7 +77,33 @@ $(function() {
 		} else {
 			shownColumns.push(col);
 		}
-		window.location.href="items?columns=" + shownColumns; 
+		
+		var queryParams = window.location.search;
+	    if (queryParams)  {
+	        var params = new URLSearchParams(queryParams);
+	        params.delete('columns');
+	        queryParams = params.toString();
+	    }
+		window.location.href = "items?" + queryParams + "&columns=" + shownColumns;
+	});
+	
+	$(".conceptItem").click(function() {
+		var checkbox = $(this).find(".concept-checkbox");
+		checkbox.prop("checked", !checkbox.prop("checked"));
+		var conceptIds = [];
+		$(".conceptItem").each(function() {
+			if ($(this).find(".concept-checkbox").is(":checked")) {
+				conceptIds.push($(this).data("concept-id"));
+			}
+		});
+		
+		var queryParams = window.location.search;
+	    if (queryParams)  {
+	        var params = new URLSearchParams(queryParams);
+	        params.delete('conceptIds');
+	        queryParams = params.toString();
+	    }
+		window.location.href = "items?" + queryParams + "&conceptIds=" + conceptIds;
 	});
 	
 	$("#findByItemKeyBtn").click(function() {
@@ -127,6 +153,7 @@ $(document).ready(function() {
     $('.bib-entry').each(function() {
         $(this).attr("href", $(this).attr("href") + "&" + queryParams);
     });
+    
 });
     
 </script>
@@ -292,8 +319,9 @@ function pollStatus(){
   </button>
   <ul id="conceptFilter" class="dropdown-menu" aria-labelledby="dropdownMenu1">
   <tbody th:each="concept:${concepts}">
-    <li>
-    <a>[[${concept.name}]] <input title="Select" type="checkbox" class="concepts pull-right" th:data-concept-id="${concept.id}"/></a>
+    <li class="conceptItem" th:data-concept-id="${concept.id}">
+    <a><span th:if ="${selectedConceptIds.contains(concept.id)}"><i class="icon-checkmark-alt"></i> </span>
+    <input title="Select" style="display:none" type="checkbox" class="concept-checkbox" th:checked="${selectedConceptIds.contains(concept.id)}"/>[[${concept.name}]]</a>
     </li>
   </tbody>
   </ul>   

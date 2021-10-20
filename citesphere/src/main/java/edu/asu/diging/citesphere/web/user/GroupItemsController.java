@@ -107,6 +107,7 @@ public class GroupItemsController {
         model.addAttribute("columns", shownColumns);
         model.addAttribute("availableColumns", allowedColumns);
         model.addAttribute("concepts", conceptManager.findAll(user));
+        model.addAttribute("selectedConceptIds", Arrays.asList(conceptIds));
         
         ICitationGroup group = groupManager.getGroup(user, groupId);
         List<BreadCrumb> breadCrumbs = new ArrayList<>();

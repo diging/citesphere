@@ -72,6 +72,8 @@ public class CitationManagerTest {
     private ICitationGroup group1;
     private ICitationGroup group2;
     
+    private List<String> filterConcepts = new ArrayList<>();
+    
     @Before
     public void setUp() throws ZoteroHttpStatusException {
         MockitoAnnotations.initMocks(this);
@@ -103,6 +105,9 @@ public class CitationManagerTest {
         group2.setGroupId(GROUP2_ID);
         group2.setContentVersion(3L);
         Mockito.when(groupRepository.findFirstByGroupId(GROUP2_ID)).thenReturn(Optional.of((CitationGroup)group2));
+        
+        filterConcepts.add("CON1");
+        filterConcepts.add("CON2");
         
     }
     
