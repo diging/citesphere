@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.api.v1.user;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ public class ItemsApiController extends V1Controller {
         
         CitationResults results;
         try {
-            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, null);
         } catch(AccessForbiddenException ex) {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         } catch (ZoteroHttpStatusException e1) {
