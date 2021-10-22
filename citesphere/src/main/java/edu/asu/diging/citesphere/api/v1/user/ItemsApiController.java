@@ -60,8 +60,8 @@ public class ItemsApiController extends V1Controller {
     private ObjectMapper objectMapper;
 
     @RequestMapping(value = { "/groups/{zoteroGroupId}/items",
-            "/groups/{zoteroGroupId}/collections/{collectionId}/items" },
-            produces = { MediaType.APPLICATION_JSON_VALUE })
+            "/groups/{zoteroGroupId}/collections/{collectionId}/items"
+            }, produces = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
             @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = false) String collectionId,
