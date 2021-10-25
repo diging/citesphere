@@ -3,7 +3,7 @@ package edu.asu.diging.citesphere.web.user;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 
 /**
- * This class binds citation, it's label and icon together.
+ * This class binds citation, its label and icon together.
  */
 public class CitationsDto {
 
