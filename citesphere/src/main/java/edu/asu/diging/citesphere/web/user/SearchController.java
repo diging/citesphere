@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,11 +24,8 @@ import com.google.gson.Gson;
 import edu.asu.diging.citesphere.core.search.service.SearchEngine;
 import edu.asu.diging.citesphere.core.search.service.impl.ResultPage;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
-import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
-import edu.asu.diging.citesphere.web.BreadCrumb;
-import edu.asu.diging.citesphere.web.BreadCrumbType;
 
 @Controller
 @PropertySource("classpath:/config.properties")
