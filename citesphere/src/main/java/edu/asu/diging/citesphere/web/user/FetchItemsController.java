@@ -99,7 +99,7 @@ public class FetchItemsController {
             logger.error("Group does not exist exception occured while fecting items data", e);
             return "error/404";
         }
-        List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));        
+        List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();
         if (columns != null && columns.length > 0) {
             for (String column : columns) {
@@ -109,8 +109,9 @@ public class FetchItemsController {
             }
         }
         itemsData.setShownColumns(shownColumns);
-        itemsData.setAvailableColumnsData(availableColumnsList.stream().map(c -> 
-            new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_"+c))).collect(Collectors.toList()));
+        itemsData.setAvailableColumnsData(availableColumnsList.stream()
+                .map(c -> new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_" + c)))
+                .collect(Collectors.toList()));
         Gson gson = new Gson();
         return gson.toJson(itemsData, ItemsDataDto.class);
     }

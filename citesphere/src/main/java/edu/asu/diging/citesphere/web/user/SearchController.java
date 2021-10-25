@@ -46,7 +46,7 @@ public class SearchController {
 
     @Value("${_available_item_columns}")
     private String availableColumns;
-    
+
     @Autowired
     private Environment env;
 
@@ -68,31 +68,31 @@ public class SearchController {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
             return "redirect:/auth/group/" + zoteroGroupId + "/items";
         }
-        
+
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
         }
-        
+
         pageInt = pageInt > 0 ? pageInt : 1;
 
-        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
-        
-        SearchItemsDataDto searchItemsData  = new SearchItemsDataDto();
+        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt - 1, 50);
+
+        SearchItemsDataDto searchItemsData = new SearchItemsDataDto();
         searchItemsData.setSearchTerm(searchTerm);
         searchItemsData.setCurrentPage(pageInt);
         searchItemsData.setCitationsData(citations.getResults().stream().map(c -> new CitationsDto(c,
                 env.getProperty(c.getItemType() + "_label"), env.getProperty(c.getItemType() + "_icon")))
                 .collect(Collectors.toList()));
-        searchItemsData.setTotalPages( Math.max(1, citations.getTotalPages()));
+        searchItemsData.setTotalPages(Math.max(1, citations.getTotalPages()));
         searchItemsData.setZoteroGroupId(zoteroGroupId);
         searchItemsData.setSort(sort);
         searchItemsData.setTotalResults(citations.getTotalResults());
         searchItemsData.setGroup(group);
-        
-        List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));        
+
+        List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();
         if (columns != null && columns.length > 0) {
             for (String column : columns) {
@@ -102,11 +102,12 @@ public class SearchController {
             }
         }
         searchItemsData.setShownColumns(shownColumns);
-        searchItemsData.setAvailableColumnsData(availableColumnsList.stream().map(c -> 
-            new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_"+c))).collect(Collectors.toList()));
+        searchItemsData.setAvailableColumnsData(availableColumnsList.stream()
+                .map(c -> new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_" + c)))
+                .collect(Collectors.toList()));
 
         Gson gson = new Gson();
-        
+
         return gson.toJson(searchItemsData, SearchItemsDataDto.class);
     }
 }

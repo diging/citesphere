@@ -122,9 +122,9 @@ public class ItemsDataDto {
     }
 
     public void setCollectionName(String collectionName) {
-       this.collectionName = collectionName;   
+        this.collectionName = collectionName;
     }
-    
+
     public String getCollectionName() {
         return collectionName;
     }

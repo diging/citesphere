@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,22 +36,23 @@ public class GroupItemsController {
 
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
-    
+
     @Value("${_available_item_columns}")
     private String availableColumns;
 
     @Autowired
     private ICitationManager citationManager;
-    
+
     @Autowired
     private ICitationCollectionManager collectionManager;
-    
+
     @Autowired
     private IGroupManager groupManager;
 
-    @RequestMapping(value= { "/auth/group/{zoteroGroupId}","/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}", "/auth/group/{zoteroGroupId}/items",
+            "/auth/group/{zoteroGroupId}/collection/{collectionId}/items" })
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value="collectionId", required=false) String collectionId,
+            @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns) {
@@ -66,14 +66,14 @@ public class GroupItemsController {
         CitationResults results;
         try {
             results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
-        } catch(ZoteroHttpStatusException e) {
+        } catch (ZoteroHttpStatusException e) {
             logger.error("Exception occured", e);
             return "error/500";
-        } catch(GroupDoesNotExistException e) {
+        } catch (GroupDoesNotExistException e) {
             logger.error("Exception occured", e);
             return "error/404";
         }
-        
+
         model.addAttribute("total", results.getTotalResults());
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
@@ -81,19 +81,19 @@ public class GroupItemsController {
         model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sort", sort);
-       
-        
+
         ICitationGroup group = groupManager.getGroup(user, groupId);
         List<BreadCrumb> breadCrumbs = new ArrayList<>();
         ICitationCollection collection = null;
         if (collectionId != null) {
             collection = collectionManager.getCollection(user, groupId, collectionId);
-            if(collection != null) {
-                model.addAttribute("collectionName", collection.getName()); 
+            if (collection != null) {
+                model.addAttribute("collectionName", collection.getName());
             }
         }
-        while(collection != null) {
-            breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
+        while (collection != null) {
+            breadCrumbs.add(
+                    new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
             if (collection.getParentCollectionKey() != null) {
                 collection = collectionManager.getCollection(user, groupId, collection.getParentCollectionKey());
             } else {
@@ -103,7 +103,7 @@ public class GroupItemsController {
         breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
         Collections.reverse(breadCrumbs);
         model.addAttribute("breadCrumbs", breadCrumbs);
-        
+
         return "auth/group/items";
     }
 }
