@@ -5,6 +5,9 @@ import java.util.List;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 
+/**
+ * This class binds citation search results together.
+ */
 public class SearchItemsDataDto {
     private String searchTerm;
     private List<ICitation>  items;

@@ -2,6 +2,9 @@ package edu.asu.diging.citesphere.web.user;
 
 import edu.asu.diging.citesphere.model.bib.ICitation;
 
+/**
+ * This class binds citation, it's label and icon together.
+ */
 public class CitationsDto {
 
     private ICitation citation;

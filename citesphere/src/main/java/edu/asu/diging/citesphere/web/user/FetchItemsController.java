@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
+
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
@@ -35,7 +37,7 @@ import edu.asu.diging.citesphere.web.BreadCrumbType;
 @PropertySource("classpath:/config.properties")
 @PropertySource("classpath:/item_type_icons.properties")
 @PropertySource("classpath:/labels.properties")
-public class UpdateItemsPageController {
+public class FetchItemsController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -59,7 +61,7 @@ public class UpdateItemsPageController {
 
     @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/data",
             "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/data" })
-    public @ResponseBody ItemsDataDto show(Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
+    public @ResponseBody String show(Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
@@ -75,11 +77,11 @@ public class UpdateItemsPageController {
         try {
             results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
         } catch (ZoteroHttpStatusException e) {
-            logger.error("Zotero status exception occured while updating items page", e);
-            return null;
+            logger.error("Zotero status exception occured while fetching items data", e);
+            return "error/500";
         } catch (GroupDoesNotExistException e) {
-            logger.error("Group does not exist exception occured while updating items page", e);
-            return null;
+            logger.error("Group does not exist exception occured while fetching items data", e);
+            return "error/404";
         }
 
         ItemsDataDto itemsData = new ItemsDataDto();
@@ -99,8 +101,8 @@ public class UpdateItemsPageController {
             itemsData.setCitationCollections(
                     collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
         } catch (GroupDoesNotExistException e) {
-            logger.error("Group does not exist exception occured while updating items page", e);
-            return null;
+            logger.error("Group does not exist exception occured while fecting items data", e);
+            return "error/404";
         }
         List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));        
         List<String> shownColumns = new ArrayList<>();
@@ -114,7 +116,7 @@ public class UpdateItemsPageController {
         itemsData.setShownColumns(shownColumns);
         itemsData.setAvailableColumnsData(availableColumnsList.stream().map(c -> 
             new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_"+c))).collect(Collectors.toList()));
-
-        return itemsData;
+        Gson gson = new Gson();
+        return gson.toJson(itemsData, ItemsDataDto.class);
     }
 }

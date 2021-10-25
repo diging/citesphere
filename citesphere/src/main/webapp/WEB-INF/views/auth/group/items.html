@@ -237,18 +237,23 @@ function pollStatus(){
 
 function getCurrentItemsData(parameter){
 let pageNumber = $(".page-item.active").text();
-$.get("items/data?page="+pageNumber+"&columns=" + shownColumns, function(data) {
-	if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
-		rewriteCitationsTable(data);
-		rewriteCollectionsList(data);
-		rewriteGroupInfo(data);
-		rewriteColumnsList(data)
-		addEventListeners();
-		addCheckboxesEventListeners();
-		addMoveItemListeners();
-		showPages(data['totalPages'], data['currentPage']);
-	}
-}); 
+$.ajax({
+	type: "GET",
+	url: "items/data?page="+pageNumber+"&columns=" + shownColumns,
+	dataType: "json",
+	success: function (data){
+		if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
+			rewriteCitationsTable(data);
+			rewriteCollectionsList(data);
+			rewriteGroupInfo(data);
+			rewriteColumnsList(data)
+			addEventListeners();
+			addCheckboxesEventListeners();
+			addMoveItemListeners();
+			showPages(data['totalPages'], data['currentPage']);
+			}
+		}
+});
 }
 
 function rewriteCitationsTable(data){

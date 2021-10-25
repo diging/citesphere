@@ -6,6 +6,9 @@ import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.web.BreadCrumb;
 
+/**
+ * This class binds items data that is used to create items table in frontend.
+ */
 public class ItemsDataDto {
     private List<CitationsDto> citationsData;
     private long totalResults;
