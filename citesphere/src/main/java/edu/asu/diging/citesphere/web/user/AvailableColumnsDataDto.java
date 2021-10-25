@@ -1,5 +1,8 @@
 package edu.asu.diging.citesphere.web.user;
 
+/**
+ *  This class binds column and it'd label together.
+ */
 public class AvailableColumnsDataDto {
     private String column;
     private String columnLabel;
