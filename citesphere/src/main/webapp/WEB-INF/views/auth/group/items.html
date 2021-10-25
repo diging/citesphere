@@ -14,6 +14,24 @@
 //# sourceURL=page.js
 
 $(function() {
+	if(sessionStorage.getItem("collectionsHidden") == "true"){
+		$("#collectionsList").hide()
+	    $("#toggleCollection").attr('class', "icon-arrow-right")
+	    $("#toggleCollection").attr('title', "Show Collections")	    
+	    $("#citationBlock").attr('class', 'col-md-12')
+	}
+
+	$("#toggleCollection").click(function(){
+	    $("#collectionsList").toggle(); 
+	    collectionsHidden = $("#toggleCollection").hasClass("icon-arrow-left")
+	    sessionStorage.setItem("collectionsHidden",collectionsHidden)
+	        
+	    $("#toggleCollection").attr('class', collectionsHidden ? "icon-arrow-right" : "icon-arrow-left")
+	    $("#toggleCollection").attr('title', collectionsHidden ? "Show Collections":"Hide Collections")
+	    
+	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
+	  })
+	  
 	addEventListeners();
 	getCurrentItemsData("onFirstLoad");
 });
@@ -45,9 +63,8 @@ function onPageClickFunction(){
      		success: function (data){
      			rewriteCitationsTable(data);
      			rewriteColumnsList(data);
- 				showPages(data['totalPages'], data['currentPage']);
- 				console.log(data['totalPages'], data['currentPage'])
  				addEventListeners();
+ 				showPages(data['totalPages'], data['currentPage']);
      		}
      	});
       } else {
@@ -60,24 +77,6 @@ var shownColumns = [];
 function addEventListeners(){
 	
 	$('.collapse').collapse();
-	
-	if(sessionStorage.getItem("collectionsHidden") == "true"){
-		$("#collectionsList").hide()
-	    $("#toggleCollection").attr('class', "icon-arrow-right")
-	    $("#toggleCollection").attr('title', "Show Collections")	    
-	    $("#citationBlock").attr('class', 'col-md-12')
-	}
-	
-	$("#toggleCollection").click(function(){
-	    $("#collectionsList").toggle(); 
-	    collectionsHidden = $("#toggleCollection").hasClass("icon-arrow-left")
-	    sessionStorage.setItem("collectionsHidden",collectionsHidden)
-	        
-	    $("#toggleCollection").attr('class', collectionsHidden ? "icon-arrow-right" : "icon-arrow-left")
-	    $("#toggleCollection").attr('title', collectionsHidden ? "Show Collections":"Hide Collections")
-	    
-	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
-	  })
 	
 	$("#addionalColumns a").click(function(event) {
 		var isShown = $(this).data("is-shown");
@@ -149,24 +148,14 @@ function addEventListeners(){
 			success: function (data){
 				rewriteCitationsTable(data);
 				rewriteColumnsList(data);
-				showPages(data['totalPages'], data['currentPage']);
 				addEventListeners();
+				showPages(data['totalPages'], data['currentPage']);
 			 }
 		});
 	}
-	
-	var queryParams = window.location.search;
-    if (queryParams)  {
-        var params = new URLSearchParams(queryParams);
-        params.delete('page');
-        params.delete('searchTerm');
-        params.delete('sortBy');
-        params.delete('index');
-        queryParams = params.toString();
-    }
     
     $('.bib-entry').each(function() {
-        $(this).attr("href", $(this).attr("href") + "&" + queryParams);
+        $(this).attr("href", $(this).attr("href"));
     });
 }
     
@@ -265,26 +254,24 @@ $.get("items/data?page="+pageNumber+"&columns=" + shownColumns, function(data) {
 function rewriteCitationsTable(data){
 	let groupId = data['zoteroGroupId']
 	let collectionId = data['collectionId']
-	
 	let tablebody = $('<tbody>');
 	let headerRow = $('<tr>'+
-		'<th title="Move to collection">'+ 
-		'<div class="btn-group">' +
-		'<button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle icon-move-to" style="font-size:160%"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-		'<span class="caret"></span></button>'+
-		'<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
-		'<li id="selectAll" class="dropdown-item"><a>All</a></li>'+
-		'<li id="deSelectAll" class="dropdown-item"><a>None</a></li>' +
-		'</div>'+
-		'</div>' +
-		'</th>'+
-		'<th>'+"Type"+'</th>'+
-		'<th>'+"Author"+'</th>'+
-		'<th>'+"Title"+'</th>'+
-		'<th>'+"Date"+'</th>'+
-		'<th>'+"URL"+'</th>'+
-		'</tr>')
-		
+			'<th title="Move to collection">'+ 
+			'<div class="btn-group">' +
+			'<button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle icon-move-to" style="font-size:160%"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+			'<span class="caret"></span></button>'+
+			'<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
+			'<li id="selectAll" class="dropdown-item"><a>All</a></li>'+
+			'<li id="deSelectAll" class="dropdown-item"><a>None</a></li>' +
+			'</div>'+
+			'</div>' +
+			'</th>'+
+			'<th>'+"Type"+'</th>'+
+			'<th>'+"Author"+'</th>'+
+			'<th>'+"Title"+'</th>'+
+			'<th>'+"Date"+'</th>'+
+			'<th>'+"URL"+'</th>'+
+			'</tr>')
 	for(const c of data['shownColumns']){
 		let header = data['availableColumnsData'].filter(colData => colData.column === c).map(colData => colData.columnLabel)
 		let shownColumnsHeaders = $('<th>'+header+'</th>')
@@ -361,6 +348,9 @@ function rewriteCollectionsList(data){
 		let list = $('<li class="list-group-item collections">'+'</li>');
 		list.append($('<span class="badge">'+'</span>').text(collection.numberOfItems));
 		let collectionURL = window.location.href +"/../collection/"+collection.key+"/items";
+		if((window.location.href).match(/collection/)){
+			collectionURL = window.location.href +"/../../"+collection.key+"/items";
+		}
 		list.append($('<a href= '+collectionURL+'>'+'</a>').append($('<span/>').text(collection.name)));
 		unOrderedList.append(list);
 	 }
@@ -513,13 +503,7 @@ function rewriteColumnsList(data){
 			<th>Title</th>
 			<th>Date</th>
 			<th>URL</th>
-			<th th:each="column:${columns}" th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}">
-				[[${columnLabel}]]
-			</th>
 		</tr>
-		
-		
-		
 	</table>
 </div>
 </div>
