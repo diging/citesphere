@@ -54,8 +54,7 @@ public class FetchItemsController {
     @Autowired
     private IGroupManager groupManager;
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/data",
-            "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/data" })
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/data", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/data" })
     public @ResponseBody String show(Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
