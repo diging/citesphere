@@ -49,8 +49,7 @@ public class GroupItemsController {
     @Autowired
     private IGroupManager groupManager;
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}", "/auth/group/{zoteroGroupId}/items",
-            "/auth/group/{zoteroGroupId}/collection/{collectionId}/items" })
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}", "/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items" })
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
