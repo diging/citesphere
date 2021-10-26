@@ -190,22 +190,42 @@ public class CitationManager implements ICitationManager {
     public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException,
             ZoteroHttpStatusException {
-        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-        if (!groupOptional.isPresent()) {
+        List<ICitationGroup> citationGroups = groupRepository.findByGroupId(new Long(groupId));
+        
+        if (citationGroups.size()==0) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
+        
 
         ICitation newCitation = zoteroManager.createCitation(user, groupId, collectionIds, citation);
-        return citationStore.save(newCitation);
-
+        citationStore.save(newCitation);
+        
         // mark group outdated, so it'll be updated on the next loading
-//        ICitationGroup group = groupOptional.get();
-//        group.setLastLocallyModifiedOn(OffsetDateTime.now().toString());
-//        groupRepository.save((CitationGroup) group);
+        
+        updateCitationGroup(groupId, false, 0);
 
-//        return newCitation;
+        return newCitation;
     }
 
+    public void updateCitationGroup(String groupId, boolean shouldUpdateFromCitations, long citationsSize) {
+        
+        List<ICitationGroup> citationGroups = groupRepository.findByGroupId(new Long(groupId));
+        
+        long size;
+        
+        if(shouldUpdateFromCitations)
+            size = citationsSize;
+        else
+            size = citationGroups.get(0).getNumItems()+1;
+        
+        for(ICitationGroup citationGroup : citationGroups) {
+            
+            citationGroup.setLastLocallyModifiedOn(OffsetDateTime.now().toString());
+            citationGroup.setNumItems(size);     
+            groupRepository.save((CitationGroup) citationGroup);
+        }
+    }
+    
     @Override
     public ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
@@ -368,7 +388,9 @@ public class CitationManager implements ICitationManager {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
                 (page - 1) * zoteroPageSize, zoteroPageSize, false);
             if (groupOptional.isPresent()) {
-                total = groupOptional.get().getNumItems();
+                updateCitationGroup(groupId, true,citations.size());
+                
+                total = groupRepository.findFirstByGroupId(new Long(groupId)).get().getNumItems();
             } else {
                 total = citations.size();
             }
