@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -236,19 +237,32 @@ public class CitationManagerTest {
     public void test_createCitation_success() throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException, ZoteroHttpStatusException {
         Citation createdCitation = new Citation();
         createdCitation.setKey("KEY");
+        List<ICitationGroup> citationGroups = new ArrayList<>();
+        CitationGroup citationGroup = new CitationGroup();
+        citationGroup.setGroupId(new Long(GROUP_ID));
+        citationGroups.add(citationGroup);
         
         Citation newCitation = new Citation();
         Mockito.when(zoteroManager.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation)).thenReturn(createdCitation);
         Mockito.when(citationStore.save(createdCitation)).thenReturn(createdCitation);
+        Mockito.when(groupRepository.findByGroupId(new Long(GROUP_ID))).thenReturn(citationGroups);
+        Mockito.when(groupRepository.save((CitationGroup)citationGroups.get(0))).thenReturn(citationGroup);
         
         ICitation actual = managerToTest.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation);
         Mockito.verify(citationStore).save(createdCitation);
         Assert.assertEquals(createdCitation, actual);
+        
+        Mockito.verify(groupRepository).save(citationGroup);
     }
     
     @Test(expected=ZoteroItemCreationFailedException.class)
     public void test_createCitation_failure() throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException, ZoteroHttpStatusException {
+        List<ICitationGroup> citationGroups = new ArrayList<>();
+        CitationGroup citationGroup = new CitationGroup();
+        citationGroup.setGroupId(new Long(GROUP_ID));
+        citationGroups.add(citationGroup);
         ICitation newCitation = new Citation();
+        Mockito.when(groupRepository.findByGroupId(new Long(GROUP_ID))).thenReturn(citationGroups);
         Mockito.when(zoteroManager.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation)).thenThrow(new ZoteroItemCreationFailedException());
         
         managerToTest.createCitation(user, GROUP_ID, new ArrayList<>(), newCitation);
