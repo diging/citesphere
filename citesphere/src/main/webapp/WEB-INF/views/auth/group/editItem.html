@@ -1571,18 +1571,18 @@ function creatorLinkHandler(target) {
 		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
 		  </div>
 		  <div id="authorAffiliations">
-		  <div id="authorAffiliationTemplate" class="form-group">
-		    
+		  <div id="authorAffiliationTemplate">
+		    <div class="form-group">
 			    <label for="affiliationAuthor">Affiliation:</label>
 			    <input type="text" class="form-control firstNameAuthorAffiliation" id="firstNameAuthorAffiliation" data-client-id="firstNameAuthorAffiliation" placeholder="Affiliation">
-		  	
+		  	</div>
 			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="AuthorAffiliation" id="searchAuthorAffiliation"
-				style="margin-left: 80%" disabled>Search Affiliation <i id="searchAuthorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+				style="margin-left: 76%" disabled>Search Affiliation <i id="searchAuthorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
 			</button>
-			<label for="uriAuthorAffiliation">URI:</label>   
-		    <div class="form-group">
-			    <input type="text" class="form-control uriAuthor" data-client-id="uriAuthorAffiliation" id="uriAuthorAffiliation" placeholder="URI">
-			    <input type="hidden" id="uriAuthorAffiliationLocalId" />
+			<div class="form-group">
+				<label for="uriAuthorAffiliation">Affiliation URI:</label>   
+			    	<input type="text" class="form-control uriAuthor" data-client-id="uriAuthorAffiliation" id="uriAuthorAffiliation" placeholder="URI"/>
+			    	<input type="hidden" id="uriAuthorAffiliationLocalId" />
 		    </div>
 		    <div class="text-warning pull-right" id="authorAffiliationAuthorityUsed"></div>
 		  </div>
@@ -1642,10 +1642,27 @@ function creatorLinkHandler(target) {
 		    </div>
 		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
 		  </div>
-		  <div id="editorAffiliations">
+<!-- 		  <div id="editorAffiliations">
 		  <div id="editorAffiliationTemplate" class="form-group">
 		    <label for="editorAffiliation">Affiliation:</label>
 		    <input type="text" class="form-control" placeholder="Affiliation">
+		  </div>
+		  </div> -->
+		   <div id="editorAffiliations">
+		  <div id="editorAffiliationTemplate" class="form-group">
+		    
+			    <label for="editorAffiliation">Affiliation:</label>
+			    <input type="text" class="form-control firstNameEditorAffiliation" id="firstNameEditorAffiliation" data-client-id="firstNameEditorAffiliation" placeholder="Affiliation">
+		  	
+			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="EditorAffiliation" id="searchEditorAffiliation"
+				style="margin-left: 80%" disabled>Search Affiliation <i id="searchEditorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+			</button>
+			<label for="uriEditorAffiliation"> Affiliation URI:</label>   
+		    <div class="form-group">
+			    <input type="text" class="form-control uriEditor" data-client-id="uriEditorAffiliation" id="uriEditorAffiliation" placeholder="URI">
+			    <input type="hidden" id="uriEditorAffiliationLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="EditorAffiliationAuthorityUsed"></div>
 		  </div>
 		  </div>
 		  <div>
@@ -1701,12 +1718,31 @@ function creatorLinkHandler(target) {
 		    </div>
 		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
 		  </div>
-		  <div id="creatorAffiliations">
+<!-- 		  <div id="creatorAffiliations">
 		  <div id="creatorAffiliationTemplate" class="form-group">
 		    <label for="affiliationCreator">Affiliation:</label>
 		    <input type="text" class="form-control" placeholder="Affiliation">
 		  </div>
+		  </div> -->
+		  
+		   <div id="creatorAffiliations">
+		  <div id="creatorAffiliationTemplate" class="form-group">
+		    
+			    <label for="creatorAffiliation">Affiliation:</label>
+			    <input type="text" class="form-control firstNameCreatorAffiliation" id="firstNameCreatorAffiliation" data-client-id="firstNameCreatorAffiliation" placeholder="Affiliation">
+		  	
+			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="CreatorAffiliation" id="searchCreatorAffiliation"
+				style="margin-left: 80%" disabled>Search Affiliation <i id="searchCreatorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+			</button>
+			<label for="uriCreatorAffiliation"> Affiliation URI:</label>   
+		    <div class="form-group">
+			    <input type="text" class="form-control uriCreator" data-client-id="uriCreatorAffiliation" id="uriCreatorAffiliation" placeholder="URI">
+			    <input type="hidden" id="uriCreatorAffiliationLocalId" />
+		    </div>
+		    <div class="text-warning pull-right" id="creatorAffiliationAuthorityUsed"></div>
 		  </div>
+		  </div>
+		  
 		  <div>
 		  <div class="text-right"><a id="addCreatorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
