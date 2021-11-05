@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,9 +88,14 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
         // more activate job statuses than inactive ones, so it's less error prone to use the list that
         // is less likely to change.
+        
+        Duration duration = Duration.between(prevJob.getCreatedOn(), OffsetDateTime.now());
+        
         if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
-            // there is already a job running, let's not start another one
-            return;
+         // there is already a job running, let's not start another one
+            if(prevJob != null && duration.toMinutes()<15) {
+                return;
+            }
         }
 
         logger.info("Starting sync for " + groupId);
