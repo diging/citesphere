@@ -104,6 +104,8 @@ function addEventListeners(){
 				rewriteCitationsTable(data);
 				rewriteColumnsList(data);
 				addEventListeners();
+				addCheckboxesEventListeners();
+				addMoveItemListeners();
 			 }
 		});
 	});
@@ -149,6 +151,8 @@ function addEventListeners(){
 				rewriteCitationsTable(data);
 				rewriteColumnsList(data);
 				addEventListeners();
+				addCheckboxesEventListeners();
+				addMoveItemListeners();
 				showPages(data['totalPages'], data['currentPage']);
 			 }
 		});
