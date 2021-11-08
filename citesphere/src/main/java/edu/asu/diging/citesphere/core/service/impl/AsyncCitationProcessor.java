@@ -93,7 +93,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         
         if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
          // there is already a job running, let's not start another one
-            if(prevJob != null && duration.toMinutes()>15) {
+            if(prevJob != null && duration.toMinutes()>5) {
                 jobManager.cancelJob(prevJob.getId());
             }
             else {
