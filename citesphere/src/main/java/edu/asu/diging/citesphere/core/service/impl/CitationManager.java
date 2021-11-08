@@ -211,7 +211,13 @@ public class CitationManager implements ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
-            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+            ICitationGroup group = groupManager.getGroup(user, groupId);
+            if (group == null) {
+                throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+            } else {
+                asyncCitationProcessor.sync(user, groupId, group.getContentVersion(), null);
+                return null;
+            }
         }
         try {
             ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey);
