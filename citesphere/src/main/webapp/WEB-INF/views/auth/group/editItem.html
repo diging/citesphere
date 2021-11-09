@@ -4,6 +4,8 @@
 <style>
 .popover {
 	min-width: 300px;
+	max-height: 100%;
+	overflow-y: auto;
 }
 
 </style>
@@ -62,6 +64,11 @@ $(function() {
 		$("#authorModal").modal('hide');
 		resetPersonCreationModal("Author");
 	});
+	
+	/* $("#authorModal .close").click(function() {
+		$("#authorModal").modal('hide');
+		resetPersonCreationModal("Author");
+	}) */
 	
 	/* Disable search authority button when first name and last name fields are empty*/
     $("#firstNameAuthor").keyup(function(e){
@@ -204,6 +211,7 @@ $(function() {
 		affiliationCopy.attr("id", "authorAffiliationTemplate"+counter);
 		affiliationCopy.addClass("aff-info");
 		affiliationCopy.find("input").val("");
+		affiliationCopy.find("#authorAffiliationAuthorityUsed").empty();
 		affiliationCopy.show();
 		$("#authorAffiliations").append(affiliationCopy);
 		$("#authorAffiliationTemplate"+counter).find('input, button').each(function() {
@@ -813,6 +821,7 @@ function resetPersonCreationModal(modalType) {
 	}
 	
 	$("#add"+modalType+"Button").text("Add "+modalType);
+	$("#authorAffiliationAuthorityUsed").empty();
 	resetPersonAuthorityCreation(modalType);
 }
 
@@ -1067,6 +1076,9 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 				error: function(data){					
 					$("#uri"+modalType).val("");
 		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+		  			setTimeout(function() {
+		  				$("#"+personType_lowerCase+"AuthorityUsed").empty();
+		  			}, 3000);
 				}
 				});				
 						
