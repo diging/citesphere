@@ -89,16 +89,9 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         // more activate job statuses than inactive ones, so it's less error prone to use the list that
         // is less likely to change.
         
-        Duration duration = Duration.between(prevJob.getCreatedOn(), OffsetDateTime.now());
-        
         if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
-         // there is already a job running, let's not start another one
-            if(prevJob != null && duration.toMinutes()>5) {
-                jobManager.cancelJob(prevJob.getId());
-            }
-            else {
-                return;
-            }
+            // there is already a job running, let's not start another one
+            return;
         }
 
         logger.info("Starting sync for " + groupId);
@@ -126,6 +119,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setStatus(JobStatus.STARTED);
         jobRepo.save(job);
 
+        while(job.getStatus() == JobStatus.STARTED) {
         AtomicInteger counter = new AtomicInteger();
         syncCitations(user, groupId, job, versions, counter);
         syncCollections(user, groupId, job, collectionVersions, groupVersion, counter);
@@ -145,6 +139,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setStatus(JobStatus.DONE);
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
+        }
     }
 
     private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
