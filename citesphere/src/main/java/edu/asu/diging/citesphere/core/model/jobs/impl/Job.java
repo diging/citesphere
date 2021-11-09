@@ -44,7 +44,7 @@ public class Job implements IJob {
     @OneToMany(cascade=CascadeType.ALL)
     private List<JobPhase> phases;
     
-
+    private long threadId;
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.jobs.impl.IUploadJob#getId()
      */
@@ -127,5 +127,15 @@ public class Job implements IJob {
     @Override
     public void setCreatedOn(OffsetDateTime createdOn) {
         this.createdOn = createdOn;
+    }
+    
+    @Override
+    public long getThreadId() {
+        return threadId;
+    }
+    
+    @Override
+    public void setThreadId(long threadId) {
+        this.threadId = threadId;
     }
 }

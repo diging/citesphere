@@ -93,12 +93,15 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             // there is already a job running, let's not start another one
             return;
         }
+        
+        long threadId = Thread.currentThread().getId();
 
         logger.info("Starting sync for " + groupId);
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
         job.setGroupId(groupId + "");
         job.setStatus(JobStatus.PREPARED);
+        job.setThreadId(threadId);
         jobRepo.save(job);
         jobManager.addJob(job);
 
@@ -119,7 +122,6 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setStatus(JobStatus.STARTED);
         jobRepo.save(job);
 
-        while(job.getStatus() == JobStatus.STARTED) {
         AtomicInteger counter = new AtomicInteger();
         syncCitations(user, groupId, job, versions, counter);
         syncCollections(user, groupId, job, collectionVersions, groupVersion, counter);
@@ -139,7 +141,6 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setStatus(JobStatus.DONE);
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
-        }
     }
 
     private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,

@@ -38,5 +38,8 @@ public interface IJob {
     void setCreatedOn(OffsetDateTime createdOn);
 
     OffsetDateTime getCreatedOn();
-
+    
+    void setThreadId(long threadId);
+    
+    long getThreadId();
 }

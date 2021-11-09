@@ -15,7 +15,7 @@ public class CancelSyncJobController {
     private ISyncJobManager syncManager;
 
     @RequestMapping(value = "/auth/jobs/sync/{jobId}/cancel", method=RequestMethod.POST)
-    public String cancel(@PathVariable String jobId) {
+    public String cancel(@PathVariable String jobId) throws InterruptedException {
         syncManager.cancelJob(jobId);        
         return "redirect:/auth/jobs/sync/list";
     }
