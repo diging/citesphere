@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;

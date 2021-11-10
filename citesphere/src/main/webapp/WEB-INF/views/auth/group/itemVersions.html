@@ -1,0 +1,68 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<script th:src="@{/resources/dateFormatting/moment-with-locales.min.js}"></script>
+<script th:inline="javascript">
+$(function() {
+	$('#pagination-top').twbsPagination({
+	    totalPages: [(${totalPages})],
+	    startPage: [(${currentPage})],
+	    prev: "«",
+	    next: "»",
+	    visiblePages: 10,
+	    initiateStartPageClick: false,
+	    onPageClick: function (event, page) {
+	    	window.location.href = "history?page=" + page;
+	    }
+	});
+});
+
+$(document).ready(function() {
+	$(".modifiedDate").each(function() {
+		$(this).text(getFormatedDate($(this).text()));
+	});
+});
+
+function getFormatedDate(date) {
+	return moment(date).format(moment().creationData().locale._longDateFormat.L);
+}
+</script>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="pull-left" style="margin-bottom: 20px;">
+    <a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}?searchTerm=${searchTerm}&page=${itemsPage}|}">Back</a>
+    <a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}?page=${itemsPage}&sortBy=${sortBy}|}">Back</a>
+</div>
+<div class="row col-xs-12">
+    <h2 style="margin-top: 0">
+        <th:block th:each="author,status : ${authors}">
+            <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
+            <span th:if="${!status.last}">; </span>
+        </th:block>
+        <em>[[${title}]]</em>
+        <span th:if="${!#strings.isEmpty(year)}">
+          [[(${year})]]
+        </span>
+    </h2>
+</div>
+<ul id="pagination-top" class="pagination-sm"></ul>
+<table class="table table-striped">
+    <tr>
+        <th>Updated on</th>
+        <th>Updated by</th>
+    </tr>
+    <tr th:each="version,loop : ${versions}">
+        <td>
+            <a class="modifiedDate" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}&searchTerm=${searchTerm}&itemsPage=${itemsPage}|}">[[${version.updatedDate}]]</a>
+            <a class="modifiedDate" th:unless="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}&itemsPage=${itemsPage}&sortBy=${sortBy}|}">[[${version.updatedDate}]]</a>
+        </td>
+        <td>
+            <a th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}&searchTerm=${searchTerm}&itemsPage=${itemsPage}|}" th:text="${version.updatedBy}"/>
+            <a th:unless="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${itemKey}/history/${version.version}/version?page=${currentPage}&itemsPage=${itemsPage}&sortBy=${sortBy}|}" th:text="${version.updatedBy}"/>
+        </td>
+    </tr>
+</table>
+</div>
+</body>
+</html>

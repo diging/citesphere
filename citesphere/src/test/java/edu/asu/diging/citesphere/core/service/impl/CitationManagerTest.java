@@ -25,7 +25,6 @@ import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -34,7 +33,6 @@ import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
-
 
 public class CitationManagerTest {
 
@@ -103,7 +101,6 @@ public class CitationManagerTest {
         group2.setGroupId(GROUP2_ID);
         group2.setContentVersion(3L);
         Mockito.when(groupRepository.findFirstByGroupId(GROUP2_ID)).thenReturn(Optional.of((CitationGroup)group2));
-        
     }
     
     @Test
@@ -136,7 +133,7 @@ public class CitationManagerTest {
     @Test
     public void test_getCitationFromZotero_doesNotExist() {
         // FIXME: implement when bug is removed
-    }
+    } 
     
     @Test 
     public void test_updateCitation_success() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {

@@ -1,0 +1,327 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<script th:inline="javascript">
+//# sourceURL=modal.js
+    $(function() {
+        $(".parse-ref-info").click(function(e) {
+            var clicked = e.target;
+            $("#ref-unparsed").text($(clicked).text());
+            $("#parsed-ref-authors").text($(clicked).attr('data-authors'));
+            $("#parsed-ref-title").text($(clicked).attr('data-title'));
+            $("#parsed-ref-year").text($(clicked).attr('data-year'));
+            var identifier = $(clicked).attr('data-identifier');
+            var identType = $(clicked).attr('data-identifier-type');
+            if (identType != undefined && identType != "") {
+                identifier = identifier + " (" + identType + ")";
+            }
+            $("#parsed-ref-ident").text(identifier);
+            $("#parsed-ref-first-page").text($(clicked).attr('data-first-page'));
+            $("#parsed-ref-last-page").text($(clicked).attr('data-last-page'));
+            $("#parsed-ref-volume").text($(clicked).attr('data-volume'));
+            $("#parsed-ref-source").text($(clicked).attr('data-source'));
+            $("#parsed-ref-publication-type").text($(clicked).attr('data-publication-type'));
+            $("#parsed-ref-reference-id").text($(clicked).attr('data-reference-id'));
+            $("#parsed-ref-reference-label").text($(clicked).attr('data-reference-label'));
+            $("#parsed-ref-citation-id").text($(clicked).attr('data-citation-id'));
+            $("#parsed-ref-ref-raw").text($(clicked).attr('data-ref-raw'));
+            
+            $("#parsed-ref-modal").modal();
+        });
+    });
+</script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="pull-left" style="margin-bottom: 20px;">
+        <a th:if="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/history?page=${page}&searchTerm=${searchTerm}&itemsPage=${itemsPage}|}">Back</a>
+        <a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/history?page=${page}&itemsPage=${itemsPage}&sortBy=${sortBy}|}">Back</a>
+   </div>
+   
+    <div class="row">
+        <div class="col-xs-12">
+        <h2 style="margin-top: 0">
+            <th:block th:each="author,status : ${citation.authors}">
+                <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
+                <span th:if="${!status.last}">; </span>
+            </th:block>
+            <em>[[${citation.title}]]</em>
+            <span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
+              [[(${citation.dateFreetext})]]
+            </span>
+        </h2>    
+        </div>
+    </div>
+    <div class="col-md-10">
+    <table class="table table-striped">
+        <tr>
+            <td width="20%">Item Key</td>
+            <td>[[${citation.key}]]</td>
+        </tr>
+        <tr>
+            <td>Citation Type</td>
+            <td th:with="iconClass=${@iconsResource.getProperty(citation.itemType + '_icon')}, 
+            iconLabel=${@iconsResource.getProperty(citation.itemType + '_label')}">
+            
+            <i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'title')}">
+            <td>Title</td>
+            <td>[[${citation.title}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'shortTitle')}">
+            <td>Short Title</td>
+            <td>[[${citation.shortTitle}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'date')}">
+            <td>Date</td>
+            <td>[[${citation.dateFreetext}]]</td>
+        </tr>
+
+        <tr>
+            <td>Authors</td>
+            <td><span th:each="author,status : ${citation.authors}">
+                [[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
+                <!-- <span>[[${!#lists.isEmpty(author.affiliations)}]]-[[${author.affiliations}]]</span> -->
+                <span th:if="${!#lists.isEmpty(author.affiliations)}">
+                     (<th:block th:each="aff,affStatus : ${author.affiliations}">
+                        [[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
+                     </th:block>)
+                 </span>
+                 <span th:if="${!#strings.isEmpty(author.uri)}">
+                    <a th:href="@{|${author.uri}|}" target="_blank"><i class="icon-link"></i></a>
+                 </span>
+                 <span th:if="${!#strings.isEmpty(author.localAuthorityId)}">
+                    <a th:href="@{|/auth/authority/${author.localAuthorityId}|}"><i class="icon-anchor"></i></a>
+                 </span>
+                 <span th:if="${!status.last}">; </span>
+            </span></td>
+        </tr>
+        
+        <tr>
+            <td>Editors</td>
+            <td><span th:each="editor,status : ${citation.editors}">
+                [[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
+                <span th:if="${!#lists.isEmpty(editor.affiliations)}">
+                     (<th:block th:each="aff,affStatus : ${editor.affiliations}">
+                        [[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
+                     </th:block>)
+                 </span>
+                 <span th:if="${!#strings.isEmpty(editor.uri)}">
+                    <a th:href="@{|${editor.uri}|}" target="_blank"><i class="icon-link"></i></a>
+                 </span>
+                 <span th:if="${!#strings.isEmpty(editor.localAuthorityId)}">
+                    <a th:href="@{|/auth/authority/${editor.localAuthorityId}|}"><i class="icon-anchor"></i></a>
+                 </span>
+                 <span th:if="${!status.last}">; </span>
+            </span></td>
+        </tr>
+        <tr th:each="role,status: ${citation.otherCreatorRoles}" th:if="${!#strings.equals(role,'editor')}">
+            <td>
+                [[${#strings.capitalizeWords(@labelsResource.getProperty('_item_attribute_label_${role}', role))}]]
+            </td>
+            <td>
+                <span th:each="creator,creatorStatus: ${citation.otherCreators}" th:if="${#strings.equals(creator.role, role)}">
+                    [[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
+                    <span th:if="${!#lists.isEmpty(creator.person.affiliations)}">
+                
+                        (<th:block th:each="aff,affStatus : ${creator.person.affiliations}">
+                            [[${aff.name}]]<span th:if="${!affStatus.last}">, </span>
+                        </th:block>)
+                    </span>
+                    <span th:if="${!#strings.isEmpty(creator.person.uri)}">
+                        <a th:href="@{|${creator.person.uri}|}" target="_blank"><i class="icon-link"></i></a>
+                    </span>
+                    <span th:if="${!#strings.isEmpty(creator.person.localAuthorityId)}">
+                        <a th:href="@{|/auth/authority/${creator.person.localAuthorityId}|}"><i class="icon-anchor"></i></a>
+                    </span>
+                    <span th:if="${!creatorStatus.last}">; </span>
+                </span>
+            </td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'publicationTitle')}">
+            <td>Publication Title</td>
+            <td>[[${citation.publicationTitle}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'journalAbbreviation')}">
+            <td>Journal Abbreviation</td>
+            <td>[[${citation.journalAbbreviation}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'volume')}">
+            <td>Volume</td>
+            <td>[[${citation.volume}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'issue')}">
+            <td>Issue</td>
+            <td>[[${citation.issue}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'pages')}">
+            <td>Pages</td>
+            <td>[[${citation.pages}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'series')}">
+            <td>Series</td>
+            <td>[[${citation.series}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'seriesTitle')}">
+            <td>Series Title</td>
+            <td>[[${citation.seriesTitle}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'seriesText')}">
+            <td>Series Text</td>
+            <td>[[${citation.seriesText}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'url')}">
+            <td>URL</td>
+            <td><a href="${citation.url}">[[${citation.url}]]</a></td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'language')}">
+            <td>Language</td>
+            <td>[[${citation.language}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'doi')}">
+            <td>DOI</td>
+            <td>[[${citation.doi}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'issn')}">
+            <td>ISSN</td>
+            <td>[[${citation.issn}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'archive')}">
+            <td>Archive</td>
+            <td>[[${citation.archive}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'archiveLocation')}">
+            <td>Archive Location</td>
+            <td>[[${citation.archiveLocation}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'libraryCatalog')}">
+            <td>Library Catalog</td>
+            <td>[[${citation.libraryCatalog}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'callNumber')}">
+            <td>Call Number</td>
+            <td>[[${citation.callNumber}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'rights')}">
+            <td>Rights</td>
+            <td>[[${citation.rights}]]</td>
+        </tr>
+        <tr th:if="${#lists.contains(fields, 'rights')}">
+            <td>Concepts</td>
+            <td>
+                <span th:each="tag:${citation.conceptTags}" class="badge">[[${tag.conceptName}]] | [[${tag.typeName}]]</span>
+            </td>
+        </tr>
+        <tr>
+            <td>References</td>
+            <td>
+            <th:block th:each="ref:${citation.references}">
+                    <p class="parse-ref-info" th:data-authors="${ref.authorString}" th:data-title="${ref.title}"
+                            th:data-year="${ref.year}"
+                            th:data-identifier="${ref.identifier}"
+                            th:data-identifier-type="${ref.identifierType}"
+                            th:data-first-page="${ref.firstPage}"
+                            th:data-last-page="${ref.endPage}"
+                            th:data-volume="${ref.volume}"
+                            th:data-source="${ref.source}"
+                            th:data-publication-type="${ref.publicationType}"
+                            th:data-reference-id="${ref.referenceId}"
+                            th:data-reference-label="${ref.referenceLabel}"
+                            th:data-citation-id="${ref.citationId}"
+                            th:data-ref-raw="${#strings.escapeXml(ref.referenceStringRaw)}"
+                            >
+                        <span class="icon-info-circle"></span>
+                        [[${ref.referenceString}]]
+                    </p>
+            
+            </th:block></td>
+        </tr>
+    </table>
+    </div>
+    <div class="col-md-2">
+        <h3 style="margin-top: 0">Files</h3>
+        
+        <ul class="list-group" >
+            <li class="list-group-item" th:each="upload:${citation.gilesUploads}"></li>
+        </ul>
+    </div>
+    
+    <div id="parsed-ref-modal" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Parse Reference</h4>
+          </div>
+          <div class="modal-body">
+            <p id="ref-unparsed"></p>
+            <table class="table table-striped">
+            <tr>
+                <td width="30%">Author string:</td>
+                <td id="parsed-ref-authors"></td>
+            </tr>
+            <tr>
+                <td>Title:</td>
+                <td id="parsed-ref-title"></td>
+            </tr>
+            <tr>
+                <td>Year:</td>
+                <td id="parsed-ref-year"></td>
+            </tr>
+            <tr>
+                <td>Identifier:</td>
+                <td id="parsed-ref-ident"></td>
+            </tr>
+            <tr>
+                <td>First page:</td>
+                <td id="parsed-ref-first-page"></td>
+            </tr>
+            <tr>
+                <td>Last page:</td>
+                <td id="parsed-ref-last-page"></td>
+            </tr>
+            <tr>
+                <td>Volume:</td>
+                <td id="parsed-ref-volume"></td>
+            </tr>
+            <tr>
+                <td>Source:</td>
+                <td id="parsed-ref-source"></td>
+            </tr>
+            <tr>
+                <td>Publication type:</td>
+                <td id="parsed-ref-publication-type"></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td>Reference ID:</td>
+                <td id="parsed-ref-reference-id"></td>
+            </tr>
+            <tr>
+                <td>Reference label:</td>
+                <td id="parsed-ref-reference-label"></td>
+            </tr>
+            <tr>
+                <td>Citation ID:</td>
+                <td id="parsed-ref-citation-id"></td>
+            </tr>
+            <tr>
+                <td>Reference as found:</td>
+                <td id="parsed-ref-ref-raw"></td>
+            </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+</body>
+</html>
