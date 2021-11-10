@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -74,13 +75,24 @@ public class SyncJobManager implements ISyncJobManager {
     }
     
     @Override
-    public void cancelJob(String jobId) {
+    public void cancelJob(String jobId) throws InterruptedException {
         Optional<GroupSyncJob> jobOptional = jobRepo.findById(jobId);
         if (jobOptional.isPresent()) {
             GroupSyncJob job = currentJobs.get(jobOptional.get().getGroupId());
             if (job == null) {
                 job = jobOptional.get();
             }
+            long threadId = job.getThreadId();
+            
+            Set<Thread> setOfThreads = Thread.getAllStackTraces().keySet();
+
+            //Iterate over set to find the current thread id
+            for(Thread thread : setOfThreads){
+                if(thread.getId() == threadId){
+                    thread.interrupt();
+                }
+            }
+            
             job.setStatus(JobStatus.CANCELED);
             job.setFinishedOn(OffsetDateTime.now());
             jobRepo.save(job);
