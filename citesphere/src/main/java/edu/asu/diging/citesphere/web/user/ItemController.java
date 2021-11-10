@@ -36,6 +36,7 @@ public class ItemController {
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         if (citation == null) {
+            model.addAttribute("zoteroGroupId", zoteroGroupId);
             model.addAttribute("item", itemId);
             return "auth/group/loading";
         }
