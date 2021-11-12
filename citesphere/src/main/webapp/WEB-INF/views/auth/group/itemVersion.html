@@ -38,6 +38,10 @@
         <a th:unless="${!#strings.isEmpty(searchTerm)}" class ="btn btn-primary btn-nav" style="font-size:10px;" th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/history?page=${page}&itemsPage=${itemsPage}&sortBy=${sortBy}|}">Back</a>
    </div>
    
+   <div class="pull-left" style="margin-bottom: 20px;">
+        &nbsp;&nbsp;<a th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/revert/version/${itemVersion}"><i style="color: #337ab7; font-size: 20px" class="icon-history" title="Restore version"></i></a>
+   </div>
+       
     <div class="row">
         <div class="col-xs-12">
         <h2 style="margin-top: 0">

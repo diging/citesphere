@@ -48,6 +48,7 @@ public class ItemVersionController {
             return "error/404";
         }
         if (citation != null) {
+            model.addAttribute("itemVersion", version);
             model.addAttribute("page", page);
             model.addAttribute("citation", citation);
             List<String> fields = citationManager
