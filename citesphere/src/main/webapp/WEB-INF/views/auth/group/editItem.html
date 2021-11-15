@@ -116,7 +116,7 @@ $(function() {
 		$("#" + id + "Spinner").hide();
 	}); */
 	
-	/* $("#searchAuthor").click(function() {
+	 $("#searchAuthor").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})  
@@ -129,7 +129,7 @@ $(function() {
 		getGroupAuthorities('Author','Author', 0)
 		getconceptpowerAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
-	}); */
+	});
 	
 	$("#searchAuthorAffiliation").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
@@ -144,7 +144,7 @@ $(function() {
 		$("#searchAuthorAffiliationSpinner").hide();
 	});
 	
-	$(".search").click(function() {
+	/* $(".search").click(function() {
 		var id = $(this).data('client-id');
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
@@ -156,9 +156,9 @@ $(function() {
 		getUserAuthorities(id, id, 0)
 		getconceptpowerAuthorities(id,id,0)
 		$("#search"+id+"Spinner").hide();
-	});
+	}); */
 	
-	/* $("#searchEditor").click(function() {
+	$("#searchEditor").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})  
@@ -188,8 +188,7 @@ $(function() {
 		getGroupAuthorities('Creator','Creator', 0)
 		getconceptpowerAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
-	}); */
-	
+	}); 
 	
 	$(".edit-author").click(function(){
 		var authorItem = $(this).parent();
@@ -998,6 +997,7 @@ function getGroupAuthorities(modalType, personType, page) {
 		 	
         },
     	error: function(data){
+    		console.log(data);
     		$('#groupAuthoritySearchResult').parents('table').hide()
     		$("#groupAuthoritiesError").show();	
     	}
