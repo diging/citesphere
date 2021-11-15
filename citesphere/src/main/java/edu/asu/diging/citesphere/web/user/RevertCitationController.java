@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationVersionException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -31,7 +32,7 @@ public class RevertCitationController {
                     version);
             return "redirect:/auth/group/" + zoteroGroupId + "/items/" + itemId;
         } catch (GroupDoesNotExistException | ZoteroConnectionException | CitationIsOutdatedException
-                | ZoteroHttpStatusException | CannotFindCitationVersionException e) {
+                | ZoteroHttpStatusException | CannotFindCitationVersionException | CannotFindCitationException e) {
             return "error/404";
         }
 

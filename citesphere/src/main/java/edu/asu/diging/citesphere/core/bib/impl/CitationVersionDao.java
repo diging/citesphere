@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.shadow.Shadow;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,8 @@ public class CitationVersionDao implements ICitationVersionsDao {
         // initial version
         if (result.size() < pageSize && getTotalCount(groupId, key) <= offset + pageSize) {
             List<CdoSnapshot> initialVersions = javers.findSnapshots(
-                    QueryBuilder.byInstanceId(key, Citation.class).withCommitProperty(GROUP_PROPERTY, groupId).build());
+                    QueryBuilder.byInstanceId(key, Citation.class).withCommitProperty(GROUP_PROPERTY, groupId)
+                    .withSnapshotType(SnapshotType.INITIAL).build());
             if (initialVersions != null && !initialVersions.isEmpty()) {
                 result.add(toCitationVersion(initialVersions.get(0), key));
             }

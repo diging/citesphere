@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationVersionException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -55,19 +56,14 @@ public interface ICitationVersionManager {
             throws GroupDoesNotExistException;
     
     /**
-     * 
-     * @param user
-     * @param groupId
-     * @param key
-     * @param version
-     * @throws GroupDoesNotExistException
-     * @throws ZoteroConnectionException
-     * @throws CitationIsOutdatedException
-     * @throws ZoteroHttpStatusException
-     * @throws CannotFindCitationVersionException
+     * Reverts the citation to a previous version
+     * @param user    User requesting the revert operation
+     * @param groupId Id of the Zotero group
+     * @param key     Citation key
+     * @param version Citation version number
      */
     void revertCitationVersion(IUser user, String groupId, String key, Long version)
             throws GroupDoesNotExistException, ZoteroConnectionException, CitationIsOutdatedException,
-            ZoteroHttpStatusException, CannotFindCitationVersionException;
+            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException;
 
 }

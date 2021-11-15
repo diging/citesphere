@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import edu.asu.diging.citesphere.core.bib.ICitationVersionsDao;
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationVersionException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -80,10 +81,13 @@ public class CitationVersionManager implements ICitationVersionManager {
         return group == null ? null : citationVersionsDao.getVersion(groupId, key, version);
     }
 
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.ICitationVersionManager#revertCitationVersion(edu.asu.diging.citesphere.user.IUser, java.lang.String, java.lang.String, java.lang.Long)
+     */
     @Override
     public void revertCitationVersion(IUser user, String groupId, String key, Long version)
             throws GroupDoesNotExistException, ZoteroConnectionException, CitationIsOutdatedException,
-            ZoteroHttpStatusException, CannotFindCitationVersionException {
+            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException {
         ICitationGroup group;
         try {
             group = groupManager.getGroup(user, groupId);
@@ -93,12 +97,19 @@ public class CitationVersionManager implements ICitationVersionManager {
         if (group == null) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
-        ICitation citationVersion = citationVersionsDao.getVersion(groupId, key, version);
-        if (citationVersion == null) {
+        
+        ICitation currentCitation = citationManager.getCitation(key);
+        if (currentCitation == null) {
+            throw new CannotFindCitationException("Citation with key " + key + "does not exist.");
+        }
+        
+        ICitation restoreCitation = citationVersionsDao.getVersion(groupId, key, version);
+        if (restoreCitation == null) {
             throw new CannotFindCitationVersionException(
                     "Citation with key " + key + " and version " + version + "does not exist.");
         }
-        citationManager.updateCitation(user, groupId, citationVersion);
+        restoreCitation.setVersion(currentCitation.getVersion());
+        citationManager.updateCitation(user, groupId, restoreCitation);
     }
 
 }
