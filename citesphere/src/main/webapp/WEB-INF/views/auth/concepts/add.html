@@ -12,7 +12,8 @@
 	
 <tr>
 <td width="20%"><label>Name</label></td>
-<td><input th:field="*{name}" class="form-control"></input></td>
+<td><input th:field="*{name}" class="form-control"></input>
+<span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span></td> 
 </tr>
 
 <tr>
@@ -22,8 +23,8 @@
 
 <tr>
 <td width="20%"><label>URI</label></td>
-<td><input th:field="*{uri}" class="form-control"></input>
-<p class="text-danger"><th:errors path="uri"/></p></td>
+<td><input th:field="*{uri}" id = "URI" class="form-control"></input>
+<span class="text-danger" th:if="${#fields.hasErrors('uri')}" th:errors="*{uri}"></span></td> 
 </tr>
 </table>
 
