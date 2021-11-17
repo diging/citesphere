@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.web.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
@@ -18,6 +20,8 @@ import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class RevertCitationController {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     ICitationVersionManager citationVersionManager;
@@ -33,6 +37,7 @@ public class RevertCitationController {
             return "redirect:/auth/group/" + zoteroGroupId + "/items/" + itemId;
         } catch (GroupDoesNotExistException | ZoteroConnectionException | CitationIsOutdatedException
                 | ZoteroHttpStatusException | CannotFindCitationVersionException | CannotFindCitationException e) {
+            logger.error(e.getMessage());
             return "error/404";
         }
 
