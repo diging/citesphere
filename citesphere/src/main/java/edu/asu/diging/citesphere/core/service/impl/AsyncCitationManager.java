@@ -18,8 +18,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
-import edu.asu.diging.citesphere.core.model.async.AsyncDeleteCitationsResponse;
-import edu.asu.diging.citesphere.core.model.async.AsyncUpdateCitationsResponse;
+import edu.asu.diging.citesphere.core.service.impl.async.AsyncDeleteCitationsResponse;
+import edu.asu.diging.citesphere.core.service.impl.async.AsyncUpdateCitationsResponse;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.AsyncTaskStatus;

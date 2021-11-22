@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.core.model.async;
+package edu.asu.diging.citesphere.core.service.impl.async;
 
 import java.util.List;
 import java.util.Map;

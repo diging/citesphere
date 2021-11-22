@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.core.model.async;
+package edu.asu.diging.citesphere.core.service.impl.async;
 
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 
