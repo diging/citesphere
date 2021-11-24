@@ -51,7 +51,7 @@ public class AsyncCitationManagerTest {
     private String citationId2;
     private ICitation citation2;
 
-//    @Before
+    @Before
     public void init() throws NoSuchFieldException, SecurityException, Exception {
         MockitoAnnotations.initMocks(this);
         groupId = "123456";
@@ -73,7 +73,7 @@ public class AsyncCitationManagerTest {
 
     }
 
-//    @Test
+    @Test
     public void test_updateCitations_success() throws JsonProcessingException, ZoteroConnectionException,
             CitationIsOutdatedException, ZoteroHttpStatusException, ExecutionException, InterruptedException {
         ZoteroUpdateItemsStatuses updateStatuses = new ZoteroUpdateItemsStatuses();
@@ -95,7 +95,7 @@ public class AsyncCitationManagerTest {
         }
     }
 
-//    @Test
+    @Test
     public void test_updateCitations_failed() throws JsonProcessingException, ZoteroConnectionException,
             CitationIsOutdatedException, ZoteroHttpStatusException, ExecutionException, InterruptedException {
         ZoteroUpdateItemsStatuses updateStatuses = new ZoteroUpdateItemsStatuses();
@@ -117,7 +117,7 @@ public class AsyncCitationManagerTest {
         }
     }
 
-//    @Test
+    @Test
     public void test_updateCitations_mixed() throws JsonProcessingException, ZoteroConnectionException,
             CitationIsOutdatedException, ZoteroHttpStatusException, ExecutionException, InterruptedException {
         ZoteroUpdateItemsStatuses updateStatuses = new ZoteroUpdateItemsStatuses();
@@ -151,7 +151,7 @@ public class AsyncCitationManagerTest {
         }
     }
 
-//    @Test
+    @Test
     public void test_deleteCitations_success()
             throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, InterruptedException {
         Map<ItemDeletionResponse, List<String>> responseMap = new HashMap<>();
@@ -173,7 +173,7 @@ public class AsyncCitationManagerTest {
         }
     }
 
-//    @Test
+    @Test
     public void test_deleteCitations_libraryLocked()
             throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, InterruptedException {
         Map<ItemDeletionResponse, List<String>> responseMap = new HashMap<>();
@@ -196,7 +196,7 @@ public class AsyncCitationManagerTest {
         }
     }
     
-//    @Test
+    @Test
     public void test_deleteCitations_mixed()
             throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, InterruptedException {
         Map<ItemDeletionResponse, List<String>> responseMap = new HashMap<>();
