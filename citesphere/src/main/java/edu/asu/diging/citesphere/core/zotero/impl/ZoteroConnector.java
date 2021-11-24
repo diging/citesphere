@@ -57,6 +57,8 @@ public class ZoteroConnector implements IZoteroConnector {
 
     @Autowired
     private ZoteroConnectionFactory zoteroFactory;
+    
+    private static final String CITESPHERE_METADATA = "citesphere-metadata";
 
     /*
      * (non-Javadoc)
@@ -172,7 +174,7 @@ public class ZoteroConnector implements IZoteroConnector {
             List<Item> children = zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey);
             Optional<Item> citesphereMetaData = children.stream()
                     .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()) && item.getData()
-                            .getTags().stream().anyMatch(tag -> tag.getTag().equals("citesphere-metadata")))
+                            .getTags().stream().anyMatch(tag -> tag.getTag().equals(CITESPHERE_METADATA)))
                     .findFirst();
             return citesphereMetaData.orElse(null);
         } catch (HttpClientErrorException ex) {

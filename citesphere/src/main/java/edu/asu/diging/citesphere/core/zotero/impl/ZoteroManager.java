@@ -139,10 +139,10 @@ public class ZoteroManager implements IZoteroManager {
         // Holds the items to be updated
         HashMap<String, Item> itemMap = new HashMap<>();
         for (Item item : response.getResults()) {
-            // If the item is note already visited, process it
+            // If the item is not already visited, process it
             if (!itemMap.containsKey(item.getKey())) {
                 // If the item is an active(non-deleted) metadata note, fetch its parent item if
-                // it not already present in the map.
+                // it is not already present in the map.
                 // Else check for metadata note for the item and fetch it.
                 if (item.getData().getDeleted() != 1 && item.isMetaDataNote()) {
                     metaDataMap.put(item.getData().getParentItem(), item);
@@ -328,14 +328,13 @@ public class ZoteroManager implements IZoteroManager {
 
         Item updatedMetaData = null;
         //If the metadata note already exists, update it or else create a new note
+        itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
         if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
-            itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
             itemTypeFields.add(ZoteroFields.KEY);
             itemTypeFields.add(ZoteroFields.VERSION);
             ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
             updatedMetaData = zoteroConnector.updateItem(user, metaData, groupId, new ArrayList<>(), ignoreFields, null);
         } else {
-            itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
             ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
             updatedMetaData = zoteroConnector.createItem(user, metaData, groupId, new ArrayList<>(), ignoreFields, null);
         }
@@ -376,12 +375,10 @@ public class ZoteroManager implements IZoteroManager {
             //Add metadata note to the list
             Item metaData = itemFactory.createMetaDataItem(citation);
             items.add(metaData);
+            itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
             if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
-                itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
                 itemTypeFields.add(ZoteroFields.KEY);
                 itemTypeFields.add(ZoteroFields.VERSION);
-            } else {
-                itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
             }
             ignoreFields = createIgnoreFields(itemTypeFields, metaData, true);
             ignoreFieldsList.add(ignoreFields);
