@@ -105,7 +105,7 @@ public class ItemFactory implements IItemFactory {
         try {
             data = createMetaData(citation);
         } catch (JsonProcessingException e1) {
-            // FIXME: handle this
+            // FIX : handle this
             logger.error("Could not create citesphere meta data", e1);
         }
         item.setData(data);
