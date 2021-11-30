@@ -75,13 +75,22 @@ $(function() {
     	allowAuthoritySearch("Author");
      });
 	
-    $('.firstNameAuthorAffiliation').keyup(function(e){
+     $('.firstNameAuthorAffiliation').keyup(function(e){
     	var id = $(this).data('client-id');
     	var property = id.substring(9, id.length);
     	console.log(id);
+    	console.log(property)
     	allowAuthoritySearch(property);
      });
 		
+    /* $('.firstNameAuthorAffiliation').on('input', function(e) {
+    	var id = $(this).data('client-id');
+    	var property = id.substring(9, id.length);
+    	console.log(id);
+    	console.log(property)
+    	allowAuthoritySearch(property);
+    }); */
+    
     $("#lastNameAuthor").keyup(function(e){
     	allowAuthoritySearch("Author");
      });
@@ -556,6 +565,17 @@ function allowAuthoritySearch(element){
     }
 }
 
+function showAffiliationNameInModal(name, uri, personType, index){
+	console.log(name, uri, personType, index);
+	if(index == null){
+		$("#firstName"+personType).val(name);
+		$("#uri"+personType).val(uri);
+	}else{
+		$("#firstName"+personType+index).val(name);
+		$("#uri"+personType+index).val(uri);
+	}
+}
+
 /* Function to populate name in modal fetched from uri */
 function showPersonNameInModal(name, personType){
 	var personName = name;
@@ -928,7 +948,17 @@ function getUserAuthorities(modalType, personType, page) {
 			name = $(this).closest("tr").find(".name").text();
 			uri = $(this).closest("tr").find(".uri").text();
 				
-			showPersonNameInModal(name, personType)
+			/* showPersonNameInModal(name, personType) */
+			
+			if(modalType == "AuthorAffiliation"){
+				console.log("If, AuthorAffiliation", name, uri, personType)
+				showAffiliationNameInModal(name, uri, personType);
+			}else{
+				console.log("else Conceptpower function", name, uri, personType)
+				showPersonNameInModal(name, personType)
+				$("#uri"+modalType).val( uri);
+			}
+			
 			$("#uri"+modalType).val( uri);
 			$("#"+personType_lowerCase+"AuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
 			$("#selectAuthorityModel").modal('hide');
@@ -1056,8 +1086,14 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			name = $(this).closest("tr").find(".name").text();
 			uri = $(this).closest("tr").find(".uri").text();
 			
-			showPersonNameInModal(name, personType)
-			$("#uri"+modalType).val( uri);
+			if(modalType == "AuthorAffiliation"){
+				console.log("Conceptpower function, AuthorAffiliation", name, uri, personType)
+				showAffiliationNameInModal(name, uri, personType);
+			}else{
+				console.log("Conceptpower function", name, uri, personType)
+				showPersonNameInModal(name, personType)
+				$("#uri"+modalType).val( uri);
+			}
 			
 			personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
 			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=conceptpower&uri=' + uri;
