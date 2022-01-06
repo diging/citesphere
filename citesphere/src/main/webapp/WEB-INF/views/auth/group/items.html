@@ -265,6 +265,9 @@ function pollStatus(){
 <div class="pull-right" style="margin-top: 20px;">
 <a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="icon-circle-add"></i> Create Citation</a>
 </div>
+<div class="pull-right" style="margin-top: 20px; margin-right: 10px;">
+<a class="btn btn-primary" id="hideItem"> Remove Citation</a>
+</div>
 
 <div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
   <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -404,6 +407,25 @@ function pollStatus(){
 	</table>
 </div>
 </div>
+
+<div id="removeCitationPopUp" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Remove Citation</h4>
+      </div>
+      <div class="modal-body">
+        <p>Please select a citation to remove it.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Alright!</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 <script >
 	//# sourceURL=move.js
 $("#selectAll").click(function(){
@@ -492,6 +514,16 @@ $(".list-group-item").droppable( {
 			});
 		}
 		
+});
+
+$("#hideItem").click(function() {
+	
+	let selected = $(".selected");
+	if(selected.length==0)
+		$('#removeCitationPopUp').modal('show');
+	//hides only one item
+	document.getElementsByClassName("selected")[0].style.display='none';
+	$(".items").removeClass('selected');
 });
 });	
 
