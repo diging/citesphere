@@ -9,7 +9,6 @@
 <link th:href="@{/resources/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
 <link th:href="@{/resources/diging-icon-pack/diging-icon-pack.css}" rel="stylesheet"/>
 <link th:href="@{/resources/bootstrap/grid.css}" rel="stylesheet"/>
-
 <script th:inline="javascript">
 //# sourceURL=page.js
 $(function() {
@@ -141,6 +140,7 @@ $(function() {
 					[[${_csrf.parameterName}]] : [[${_csrf.token}]]
 				},
 				'success': function(response) {
+					$('body').append('<div id="deletingDiv" class="modal-backdrop" style="opacity:0.5"><i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i></div>');
 					pollDeleteItemsStatuses(response);
 				},
 				'error': function(data) {
@@ -179,6 +179,7 @@ $.ajax({
 	dataType: "json",
 	success: function (deleteItemsStatusResponse) {
 		if(deleteItemsStatusResponse.taskStatus === "COMPLETE") {
+			$( "#deletingDiv" ).remove();
 			var success = deleteItemsStatusResponse.response["SUCCESS"];
 			var libraryLocked = deleteItemsStatusResponse.response["LIBRARY_LOCKED"];
 			var libraryVersionChanged = deleteItemsStatusResponse.response["LIBRARY_VERSION_CHANGED"];
@@ -233,6 +234,7 @@ $.ajax({
 		}
 	},
 	error: function (deleteItemsStatusResponse) {
+	    $( "#deletingDiv" ).remove();
 	    showNotification("Error while polling delete citations statuses!", "warning", 1000)
 	},
 });
