@@ -82,10 +82,17 @@ $(function() {
     	allowAuthoritySearch("Creator");
      });
 	$("#searchAuthor").click(function() {
+		
+		$("#userAuthoritySearchResult").empty();
+		$("#groupAuthoritySearchResult").empty();
+		$("#conceptpowerAuthoritySearchResult").empty();
+		
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})  
+		
 		$("#authoritySpinner").show();
+		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
@@ -866,7 +873,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   				
   			}
   			
-		$("#conceptpowerAuthoritySearchResult").append(content); 	
+		$("#conceptpowerAuthoritySearchResult").append(content);
 		$(".conceptpower-authority-entry").click(function() {
 			name = $(this).closest("tr").find(".name").text();
 			uri = $(this).closest("tr").find(".uri").text();
