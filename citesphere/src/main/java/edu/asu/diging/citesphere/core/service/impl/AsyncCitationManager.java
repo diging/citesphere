@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -18,18 +19,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.service.IAsyncCitationManager;
 import edu.asu.diging.citesphere.core.service.impl.async.AsyncDeleteCitationsResponse;
 import edu.asu.diging.citesphere.core.service.impl.async.AsyncUpdateCitationsResponse;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.user.AsyncTaskStatus;
 
-/**
- * Responsible for managing the state of an async citation tasks.
- *
- */
 @Component
-public class AsyncCitationManager {
+public class AsyncCitationManager implements IAsyncCitationManager {
 
     @Autowired
     private AsyncUpdateCitationsProcessor asyncUpdateCitationsProcessor;
@@ -41,7 +39,8 @@ public class AsyncCitationManager {
     private final Map<String, Future<Map<ItemDeletionResponse, List<String>>>> deleteTaskTracker;
     private final Map<String, Long> deleteTaskTimestamps;
     
-    private static final long durationInMillis = 86400000L; //Number of milliseconds in a day
+    @Value("${task_cleanup_cycle}")
+    private long durationInMillis;
 
     public AsyncCitationManager() {
         this.updateTaskTracker = new ConcurrentHashMap<>();
@@ -49,16 +48,11 @@ public class AsyncCitationManager {
         this.deleteTaskTimestamps = new ConcurrentHashMap<>();
     }
 
-    /**
-     * This method updates citations asynchronously.
-     * 
-     * @param user          User accessing Zotero
-     * @param zoteroGroupId GroupId of the citations
-     * @param citations     citations that have to be updated
-     * @return AsyncUpdateCitationsResponse contains task id, response and status.
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.IAsyncCitationManager#updateCitations(edu.asu.diging.citesphere.user.IUser, java.lang.String, java.util.List)
      */
-    public AsyncUpdateCitationsResponse updateCitations(IUser user, String zoteroGroupId, List<ICitation> citations)
-            throws JsonProcessingException, ZoteroConnectionException, CitationIsOutdatedException,
+    @Override
+    public AsyncUpdateCitationsResponse updateCitations(IUser user, String zoteroGroupId, List<ICitation> citations) throws JsonProcessingException, ZoteroConnectionException, CitationIsOutdatedException,
             ZoteroHttpStatusException, InterruptedException, ExecutionException {
         String taskId = UUID.randomUUID().toString();
         Future<ZoteroUpdateItemsStatuses> futureTask = asyncUpdateCitationsProcessor.updateCitations(user,
@@ -70,14 +64,8 @@ public class AsyncCitationManager {
         return asyncResponse;
     }
 
-    /**
-     * This method gets the response of an update citations request by giving task
-     * id. The task id is generated when a new async task is submitted using
-     * updateCitations() method in this class
-     * 
-     * @param taskId id of the task
-     * @return AsyncUpdateCitationsResponse returns task status (complete or
-     *         pending), task id and task response
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.IAsyncCitationManager#getUpdateCitationsResponse(java.lang.String)
      */
     public AsyncUpdateCitationsResponse getUpdateCitationsResponse(String taskId)
             throws ExecutionException, InterruptedException {
@@ -96,8 +84,10 @@ public class AsyncCitationManager {
     /**
      * Removes the finished deletion tasks every 24 hrs
      */
-    @Scheduled(fixedDelay = durationInMillis)
+    @Scheduled(fixedDelayString  = "${task_cleanup_cycle}")
     public void scheduledTaskCleanup() {
+        System.out.println("Inside task cleanup");
+        System.out.println(durationInMillis);
         Long currentTime = System.currentTimeMillis();
         for (String task : deleteTaskTracker.keySet()) {
             if (currentTime
@@ -109,24 +99,15 @@ public class AsyncCitationManager {
         }
     }
     
-    /**
-     * If you no longer need a task in memory, use this method to remove that task
-     * to free memory. Once the task is removed, its corresponding result can no
-     * longer be retrieved.
-     * 
-     * @param taskId id of the task that is not needed in memory
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.IAsyncCitationManager#clearUpdateTask(java.lang.String)
      */
     public void clearUpdateTask(String taskId) {
         updateTaskTracker.remove(taskId);
     }
 
-    /**
-     * Deletes Citations asynchronously
-     * 
-     * @param user           User accessing Zotero
-     * @param groupId        GroupId of the Citations
-     * @param citationIdList List of the Citations to be deleted
-     * @return AsyncDeleteCitationsResponse containing taskId and its current status
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.IAsyncCitationManager#deleteCitations(edu.asu.diging.citesphere.user.IUser, java.lang.String, java.util.List)
      */
     public AsyncDeleteCitationsResponse deleteCitations(IUser user, String groupId, List<String> citationIdList)
             throws ZoteroConnectionException, ZoteroHttpStatusException {
@@ -141,13 +122,8 @@ public class AsyncCitationManager {
         return asyncResponse;
     }
 
-    /**
-     * Gets the current status of the deletion task. If the task is completed, it
-     * returns the status for each Citation which was requested to be deleted.
-     * 
-     * @param taskId Id of the task
-     * @return AsyncDeleteCitationsResponse containing task id, task status, and
-     *         response if the task is completed
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.IAsyncCitationManager#getDeleteCitationsResponse(java.lang.String)
      */
     public AsyncDeleteCitationsResponse getDeleteCitationsResponse(String taskId)
             throws ExecutionException, InterruptedException {
