@@ -533,9 +533,31 @@ $("#hideItem").click(function() {
 	$(".selected").removeClass('items');
 	let temp2 = $(".items");
 	console.log(temp2.length);
+	let temp3 = $(".selected");
+	console.log(temp3.val());
 	hiddenItemCount = hiddenItemCount+1;
 	//console.log(hiddenItemCount);
+	/* let itemsKeys = [];
+	ui.helper.find('ul').children().each(function(){
+		itemsKeys.push($(this).text());
+		});
+	let itemsMoveData ={};
+	itemsMoveData["itemIds"] = itemsKeys;
+	console.log(itemsMoveData); */
+	$(".selected").droppable({
+		drop: function(event, ui){
+	        console.log(event);
+	        console.log(ui);
+	    }
+	});
 	document.getElementById('hiddenCount').innerHTML = hiddenItemCount;
+});
+
+$(".selected").droppable({
+	drop: function(event, ui){
+        console.log(event);
+        console.log(ui);
+    }
 });
 
 });	
