@@ -12,6 +12,7 @@
 
 <script th:inline="javascript">
 //# sourceURL=page.js
+var hiddenItemCount = 0;
 $(function() {
 	$('#pagination-top').twbsPagination({
 	    totalPages: [(${totalPages})],
@@ -152,7 +153,8 @@ $(document).ready(function() {
 Items in Group <span th:text="${group.name}"></span></br>
 </span>
 	
-	<small><span th:text="${total}"></span> records </small>
+	<small><span th:text="${total}"></span> records, </small>
+	<p id = "hiddenCount"><small> hidden </small></p>
 </h2>
 <div class="pull-right">
 	<div class="progress" style="width: 200px">
@@ -519,12 +521,23 @@ $(".list-group-item").droppable( {
 $("#hideItem").click(function() {
 	
 	let selected = $(".selected");
-	if(selected.length==0)
+	if(selected.length==0) {
 		$('#removeCitationPopUp').modal('show');
+		return ;
+	}
 	//hides only one item
 	document.getElementsByClassName("selected")[0].style.display='none';
-	$(".items").removeClass('selected');
+	//$(".items").removeClass('selected');
+	let temp1 = $(".items");
+	console.log(temp1.length);
+	$(".selected").removeClass('items');
+	let temp2 = $(".items");
+	console.log(temp2.length);
+	hiddenItemCount = hiddenItemCount+1;
+	//console.log(hiddenItemCount);
+	document.getElementById('hiddenCount').innerHTML = hiddenItemCount;
 });
+
 });	
 
 function pollMovedItemsStatuses(response,collectionName, collectionHTMLElement, collectionId){
@@ -613,7 +626,10 @@ $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
 	},
 });
 }
-		
+
+window.onload = function(){
+	document.getElementById('hiddenCount').innerHTML = hiddenItemCount;
+};
 </script>
 </div>
 </body>
