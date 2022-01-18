@@ -40,7 +40,7 @@ public class AsyncCitationManager implements IAsyncCitationManager {
     private final Map<String, Long> deleteTaskTimestamps;
     
     @Value("${task_cleanup_cycle}")
-    private long durationInMillis;
+    private long cleanupCycle;
 
     public AsyncCitationManager() {
         this.updateTaskTracker = new ConcurrentHashMap<>();
@@ -86,12 +86,10 @@ public class AsyncCitationManager implements IAsyncCitationManager {
      */
     @Scheduled(fixedDelayString  = "${task_cleanup_cycle}")
     public void scheduledTaskCleanup() {
-        System.out.println("Inside task cleanup");
-        System.out.println(durationInMillis);
         Long currentTime = System.currentTimeMillis();
         for (String task : deleteTaskTracker.keySet()) {
             if (currentTime
-                    - deleteTaskTimestamps.getOrDefault(task, currentTime - durationInMillis - 1) > durationInMillis
+                    - deleteTaskTimestamps.getOrDefault(task, currentTime - cleanupCycle - 1) > cleanupCycle
                     && deleteTaskTracker.get(task).isDone()) {
                 deleteTaskTracker.remove(task);
                 deleteTaskTimestamps.remove(task);

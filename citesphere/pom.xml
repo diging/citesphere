@@ -95,6 +95,8 @@
         <kafka.hosts></kafka.hosts>
         <pullrequest></pullrequest>
         <buildNumber>v42.0.0</buildNumber>
+        
+        <cleanupCycle>86400000</cleanupCycle>
 
     </properties>
 
