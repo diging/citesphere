@@ -5,7 +5,9 @@
 .popover {
 	min-width: 300px;
 }
-
+.greyout {
+  opacity: 0.2;
+}
 </style>
 <script th:inline="javascript">
 //# sourceURL=submit.js
@@ -89,8 +91,10 @@ $(function() {
 		
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
-		})  
-		
+		})
+		$('#userAuthoritiesTabContent').toggleClass('greyout');
+		$('#groupAuthoritiesTabContent').toggleClass('greyout');
+		$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
 		$("#authoritySpinner").show();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
@@ -103,12 +107,22 @@ $(function() {
 		setTimeout(function() {
 			  $('#authoritySpinner').hide()
 			}, 3000);
+		setTimeout(function() { $('#userAuthoritiesTabContent').toggleClass('greyout')}, 3000);
+		setTimeout(function() { $('#groupAuthoritiesTabContent').toggleClass('greyout')}, 3000);
+		setTimeout(function() { $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout')}, 3000);	
 	});
 	
 	$("#searchEditor").click(function() {
+		$("#userAuthoritySearchResult").empty();
+		$("#groupAuthoritySearchResult").empty();
+		$("#conceptpowerAuthoritySearchResult").empty();
+		
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
-		})  
+		})
+		$('#userAuthoritiesTabContent').toggleClass('greyout');
+		$('#groupAuthoritiesTabContent').toggleClass('greyout');
+		$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
 		$("#authoritySpinner").show();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
@@ -121,12 +135,22 @@ $(function() {
 		setTimeout(function() {
 			  $('#authoritySpinner').hide()
 			}, 3000);
+		setTimeout(function() { $('#userAuthoritiesTabContent').toggleClass('greyout')}, 3000);
+		setTimeout(function() { $('#groupAuthoritiesTabContent').toggleClass('greyout')}, 3000);
+		setTimeout(function() { $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout')}, 3000);
 	});
 	
 	$("#searchCreator").click(function() {
+		$("#userAuthoritySearchResult").empty();
+		$("#groupAuthoritySearchResult").empty();
+		$("#conceptpowerAuthoritySearchResult").empty();
+		
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
-		})  
+		})
+		$('#userAuthoritiesTabContent').toggleClass('greyout');
+		$('#groupAuthoritiesTabContent').toggleClass('greyout');
+		$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
 		$("#authoritySpinner").show();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
@@ -139,6 +163,9 @@ $(function() {
 		setTimeout(function() {
 			  $('#authoritySpinner').hide()
 			}, 3000);
+		setTimeout(function() { $('#userAuthoritiesTabContent').toggleClass('greyout')}, 3000);
+		setTimeout(function() { $('#groupAuthoritiesTabContent').toggleClass('greyout')}, 3000);
+		setTimeout(function() { $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout')}, 3000);
 	});
 	
 	
@@ -1568,6 +1595,7 @@ function creatorLinkHandler(target) {
 						</li>
 					</ul>
 					<!-- Tab panes -->
+					<!-- <div class = "opaque"></div> -->
 					<div class="tab-content">
 						<div role="tabpanel" class="tab-pane active" id="userAuthoritiesTabContent">
 							<ul id="userAuthority-pagination-top" class="pagination-sm"></ul>
