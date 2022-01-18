@@ -2,6 +2,11 @@
 
 <head>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<style>
+.greyout {
+  opacity: 0.2;
+}
+</style>
 <script th:inline="javascript">
 $(function() {
 
@@ -31,16 +36,20 @@ $(function() {
     });
 
     $("#searchAuthor").click(function() {
-    	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+    	$("#conceptpowerAuthoritySearchResult").empty();
+        $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
             $('#selectAuthorityModel a:first').tab('show');
-        })  
+        })
+        
+        $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
+        $("#authoritySpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         
-        $("#authoritySpinner").show();
         setTimeout(function() {getConceptpowerAuthorities('Author', 'Author', 0);}, 2000);
         setTimeout(function() {
 			  $('#authoritySpinner').hide()
 			}, 3000);
+        setTimeout(function() { $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout')}, 3000);
     });
 
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -354,10 +363,9 @@ function getPersonAuthority(uri, personType) {
                                 <tbody id="conceptpowerAuthoritySearchResult">
                                 </tbody>
                             </table>
-                            
-				<div class="loader" style="font-size: 30px; text-align: center;">
-					<i id="authoritySpinner" class="icon-spinner" style="color: #337ab7"></i>
-				</div>
+                            <div class="loader" style="font-size: 30px; text-align: center;">
+								<i id="authoritySpinner" class="icon-spinner" style="color: #337ab7"></i>
+							</div>
                             
                         </div>
                     </div>
