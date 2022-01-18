@@ -24,7 +24,7 @@ public class RevertCitationController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ICitationVersionManager citationVersionManager;
+    private ICitationVersionManager citationVersionManager;
 
     @RequestMapping("/auth/group/{zoteroGroupId}/items/{itemId}/revert/version/{version}")
     public String revertCitationVersion(Authentication authentication, Model model,
@@ -37,7 +37,7 @@ public class RevertCitationController {
             return "redirect:/auth/group/" + zoteroGroupId + "/items/" + itemId;
         } catch (GroupDoesNotExistException | ZoteroConnectionException | CitationIsOutdatedException
                 | ZoteroHttpStatusException | CannotFindCitationVersionException | CannotFindCitationException e) {
-            logger.error(e.getMessage());
+            logger.error("Error while restoring citation version", e);
             return "error/404";
         }
 

@@ -47,20 +47,21 @@ public class ItemVersionController {
             logger.error("Group with id {} does not exist", zoteroGroupId, e);
             return "error/404";
         }
-        if (citation != null) {
-            model.addAttribute("itemVersion", version);
-            model.addAttribute("page", page);
-            model.addAttribute("citation", citation);
-            List<String> fields = citationManager
-                    .getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType()).stream()
-                    .map(f -> f.getFilename()).collect(Collectors.toList());
-            model.addAttribute("fields", fields);
-            model.addAttribute("searchTerm", searchTerm);
-            model.addAttribute("itemsPage", itemsPage);
-            model.addAttribute("sortBy", sortBy);
-        } else {
+        
+        if (citation == null) {
             return "error/404";
         }
+        
+        model.addAttribute("itemVersion", version);
+        model.addAttribute("page", page);
+        model.addAttribute("citation", citation);
+        List<String> fields = citationManager
+                .getItemTypeFields((IUser) authentication.getPrincipal(), citation.getItemType()).stream()
+                .map(f -> f.getFilename()).collect(Collectors.toList());
+        model.addAttribute("fields", fields);
+        model.addAttribute("searchTerm", searchTerm);
+        model.addAttribute("itemsPage", itemsPage);
+        model.addAttribute("sortBy", sortBy);
         return "auth/group/itemVersion";
     }
 }

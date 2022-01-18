@@ -33,9 +33,7 @@ public class CitationVersionDao implements ICitationVersionsDao {
         List<CitationVersion> result = versions.stream().map(version -> toCitationVersion(version, key))
                 .collect(Collectors.toList());
 
-        // If the page is still empty and if the index of the last element of the
-        // current page is greater than or equal to the total version count, add the
-        // initial version
+        //Above query would not retrieve the initial version of citation. Add it to the end of list if there is still space available.
         if (result.size() < pageSize && getTotalCount(groupId, key) <= offset + pageSize) {
             List<CdoSnapshot> initialVersions = javers.findSnapshots(
                     QueryBuilder.byInstanceId(key, Citation.class).withCommitProperty(GROUP_PROPERTY, groupId)

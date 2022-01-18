@@ -3,6 +3,8 @@ package edu.asu.diging.citesphere.core.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ import edu.asu.diging.citesphere.user.IUser;
 @Service
 public class CitationVersionManager implements ICitationVersionManager {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     @Autowired
     private ICitationManager citationManager;
     
@@ -46,6 +50,7 @@ public class CitationVersionManager implements ICitationVersionManager {
         try {
             group = groupManager.getGroup(user, groupId);
         } catch (HttpClientErrorException ex) {
+            logger.error("Could not access group from Zotero.", ex);
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
         return group == null ? new ArrayList<>() : citationVersionsDao.getVersions(groupId, key, page, pageSize);
@@ -76,6 +81,7 @@ public class CitationVersionManager implements ICitationVersionManager {
         try {
             group = groupManager.getGroup(user, groupId);
         } catch (HttpClientErrorException ex) {
+            logger.error("Could not access group from Zotero.", ex);
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
         return group == null ? null : citationVersionsDao.getVersion(groupId, key, version);
@@ -92,6 +98,7 @@ public class CitationVersionManager implements ICitationVersionManager {
         try {
             group = groupManager.getGroup(user, groupId);
         } catch (HttpClientErrorException ex) {
+            logger.error("Could not access group from Zotero.", ex);
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
         if (group == null) {
@@ -103,13 +110,13 @@ public class CitationVersionManager implements ICitationVersionManager {
             throw new CannotFindCitationException("Citation with key " + key + "does not exist.");
         }
         
-        ICitation restoreCitation = citationVersionsDao.getVersion(groupId, key, version);
-        if (restoreCitation == null) {
+        ICitation restoredCitation = citationVersionsDao.getVersion(groupId, key, version);
+        if (restoredCitation == null) {
             throw new CannotFindCitationVersionException(
                     "Citation with key " + key + " and version " + version + "does not exist.");
         }
-        restoreCitation.setVersion(currentCitation.getVersion());
-        citationManager.updateCitation(user, groupId, restoreCitation);
+        restoredCitation.setVersion(currentCitation.getVersion());
+        citationManager.updateCitation(user, groupId, restoredCitation);
     }
 
 }
