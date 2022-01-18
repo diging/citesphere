@@ -15,7 +15,7 @@ import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.user.IUser;
 
 /**
- * Responsible for managing the state of an async citation tasks.
+ * Responsible for managing the state of async citation tasks.
  * @author Maulik Limbadiya
  *
  */
