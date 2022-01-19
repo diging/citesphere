@@ -216,7 +216,12 @@ public class CitationManager implements ICitationManager {
                 throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
             } else {
                 asyncCitationProcessor.sync(user, groupId, group.getContentVersion(), null);
-                return null;
+                try {
+                    ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey);
+                    return citation;
+                } catch (HttpClientErrorException ex) {
+                    throw new CannotFindCitationException(ex);
+                }
             }
         }
         try {
