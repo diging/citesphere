@@ -122,12 +122,16 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
         return ID;
     }
 
+    /**
+     * VIAF API Documentation: https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
+     */
     @Override
     public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
             throws AuthorityServiceConnectionException {
 
+        // VIAF search API response contains maximum of 10 records
         pageSize = Math.min(10, pageSize);
-        String url = viafURL + viafSearchKeyword + this.getviafSearchString(firstName, lastName, page, pageSize);
+        String url = viafURL + viafSearchKeyword + this.getViafSearchString(firstName, lastName, page, pageSize);
 
         ResponseEntity<ViafSearchResponseWrapper> response = null;
         try {
@@ -145,6 +149,25 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
                     ViafRecordData record = viafEntry.getRecord().getRecordData();
                     IAuthorityEntry authority = new AuthorityEntry();
                     Iterator<Data> iterator = record.getMainHeadings().getData().iterator();
+                    /* MainHeading data may contain multiple items in some cases. Using the first item for fetching the display name.
+                     * For e.g.,
+                     * "data": [
+                                {
+                                    "text": "Albert, August 1881-",
+                                    "sources": {
+                                        "s": "DNB",
+                                        "sid": "DNB|1204691185"
+                                    }
+                                },
+                                {
+                                    "text": "August Albert German philologist",
+                                    "sources": {
+                                        "s": "WKP",
+                                        "sid": "WKP|Q83561432"
+                                    }
+                                }
+                            ],
+                     */
                     if (iterator.hasNext()) {
                         String name = iterator.next().getText();
                         authority.setName(name);
@@ -170,7 +193,16 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
         return false;
     }
 
-    private String getviafSearchString(String firstName, String lastName, int page, int pageSize)
+    /**
+     * Generates query string for the given search parameters
+     * Example query string = "local.personalNames+all+"Albert Einstein"&startRecord=11&maximumRecords=10&httpAccept=application/json"
+     * @param firstName First name of authority search term
+     * @param lastName Last name of authority search term
+     * @param page Page number request
+     * @param pageSize Records in a single page
+     * @return Generated query string
+     */
+    private String getViafSearchString(String firstName, String lastName, int page, int pageSize)
             throws AuthorityServiceConnectionException {
         String viafSearchString = "local.personalNames+all+\"";
         if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty()) {
