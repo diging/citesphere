@@ -877,7 +877,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			$("#uri"+modalType).val( uri);
 			
 			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=conceptpower&uri=' + uri;	
-			if($("#mycheckbox").is(":checked")){
+			if($("#cp-checkbox").is(":checked")){
 				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
 			}
 			$.ajax({
@@ -911,7 +911,7 @@ function getViafAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	personType_lowerCase = personType.toLowerCase();
-	url = [[@{|/auth/authority/find/authorities/viaf|}]] + '?zoteroGroupId=[(${zoteroGroupId})]' + '&firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/viaf|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
 	$.ajax({
   		dataType: "json",
@@ -919,7 +919,7 @@ function getViafAuthorities(modalType, personType, page) {
   		url: url ,
   		async: false,
   		success: function(data) {
-  			$('#viafMycheckboxDiv').append(data['groupName']);
+  			$('#viaf-groupName').text(data['groupName']);
   			$("#viafAuthoritySearchResult").empty();
   			var content = '';
   				
@@ -944,7 +944,7 @@ function getViafAuthorities(modalType, personType, page) {
   				    visiblePages: 5,
   				    initiateStartPageClick: false,
   				    onPageClick:function(event, page) {
-  				    	getViafAuthorities(modalType, personType, page)
+  				    	getViafAuthorities(modalType, personType, page-1)
   				    }
   				});
   				
@@ -959,7 +959,7 @@ function getViafAuthorities(modalType, personType, page) {
 			$("#uri"+modalType).val( uri);
 			
 			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=viaf&uri=' + uri;	
-			if($("#mycheckbox").is(":checked")) {
+			if($("#viaf-checkbox").is(":checked")) {
 				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
 			}
 			$.ajax({
@@ -1682,8 +1682,8 @@ function creatorLinkHandler(target) {
 							<div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
 								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
-							<div id="mycheckboxDiv">
-							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group <span id="cp-groupName"></span>
+							<div id="cp-checkboxDiv">
+							<input type="checkbox" id="cp-checkbox" name="cp-checkbox" th:checked="checked"> Add authority to group <span id="cp-groupName"></span>
 							</div>
 							</br>
 							<table class="table table-striped table-bordered table-fixed">
@@ -1699,8 +1699,8 @@ function creatorLinkHandler(target) {
                             <div id="viafAuthoritiesError" class="text-warning" style="display: none">
                                 <span> Error occurred while searching authorities in VIAF </span>
                             </div>
-                            <div id="viafMycheckboxDiv">
-                            <input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group
+                            <div id="viaf-checkboxDiv">
+                            <input type="checkbox" id="viaf-checkbox" name="viaf-checkbox" th:checked="checked"> Add authority to group <span id="viaf-groupName"></span>
                             </div>
                             </br>
                             <table class="table table-striped table-bordered table-fixed">
