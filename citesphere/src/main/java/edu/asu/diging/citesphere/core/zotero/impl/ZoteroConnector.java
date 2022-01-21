@@ -154,6 +154,9 @@ public class ZoteroConnector implements IZoteroConnector {
     // @Cacheable(value="groupVersions", key="#user.username")
     public ZoteroResponse<Group> getGroupsVersions(IUser user) {
         Zotero zotero = getApi(user);
+        if (zotero == null) {
+            return null;
+        }
         return zotero.getGroupsOperations().getGroupsVersions();
     }
 
@@ -332,6 +335,9 @@ public class ZoteroConnector implements IZoteroConnector {
 
     private Zotero getApi(IUser user) {
         IZoteroToken token = tokenManager.getToken(user);
+        if (token == null) {
+            return null;
+        }
         Zotero zotero = zoteroFactory.createConnection(new OAuthToken(token.getToken(), token.getSecret())).getApi();
         zotero.setUserId(token.getUserId());
         return zotero;

@@ -98,6 +98,9 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public Map<Long, Long> getGroupsVersion(IUser user) {
         ZoteroResponse<Group> response = zoteroConnector.getGroupsVersions(user);
+        if (response == null) {
+            return null;
+        }
         Map<Long, Long> groupVersions = new HashMap<>();
         for (Group group : response.getResults()) {
             groupVersions.put(group.getId(), group.getVersion());

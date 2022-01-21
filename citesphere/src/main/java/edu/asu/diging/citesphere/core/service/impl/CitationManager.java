@@ -262,6 +262,9 @@ public class CitationManager implements ICitationManager {
     @Override
     public List<ICitationGroup> getGroups(IUser user) {
         Map<Long, Long> groupVersions = zoteroManager.getGroupsVersion(user);
+        if (groupVersions == null) {
+            return null;
+        }
         List<ICitationGroup> groups = new ArrayList<>();
         for (Long id : groupVersions.keySet()) {
             Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(id);
