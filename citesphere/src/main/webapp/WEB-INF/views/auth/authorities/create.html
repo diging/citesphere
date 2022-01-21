@@ -202,7 +202,7 @@ function getViafAuthorities(modalType, personType, page) {
                     visiblePages: 5,
                     initiateStartPageClick: false,
                     onPageClick: function(event, page) {
-                    	getViafAuthorities(modalType, personType, page)
+                    	getViafAuthorities(modalType, personType, page-1)
                     }
                 });
 
