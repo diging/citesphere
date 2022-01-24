@@ -36,6 +36,7 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
+import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.user.IUser;
@@ -58,8 +59,6 @@ public class ZoteroConnector implements IZoteroConnector {
     @Autowired
     private ZoteroConnectionFactory zoteroFactory;
     
-    private static final String CITESPHERE_METADATA_TAG = "citesphere-metadata";
-
     /*
      * (non-Javadoc)
      * 
@@ -177,7 +176,7 @@ public class ZoteroConnector implements IZoteroConnector {
             List<Item> children = zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey);
             Optional<Item> citesphereMetaData = children.stream()
                     .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()) && item.getData()
-                            .getTags().stream().anyMatch(tag -> tag.getTag().equals(CITESPHERE_METADATA_TAG)))
+                            .getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG)))
                     .findFirst();
             return citesphereMetaData.orElse(null);
         } catch (HttpClientErrorException ex) {
