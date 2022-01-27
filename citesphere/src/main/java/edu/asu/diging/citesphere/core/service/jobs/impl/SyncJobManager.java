@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +20,7 @@ import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.GroupSyncJobRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.impl.AsyncCitationProcessor;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
@@ -33,6 +35,9 @@ public class SyncJobManager implements ISyncJobManager {
     
     @Autowired
     private ICitationManager citationManager;
+    
+    @Autowired
+    private AsyncCitationProcessor asyncCitationProcessor;
     
     @PostConstruct
     public void init() {
@@ -96,6 +101,9 @@ public class SyncJobManager implements ISyncJobManager {
             job.setStatus(JobStatus.CANCELED);
             job.setFinishedOn(OffsetDateTime.now());
             jobRepo.save(job);
+            
+            Future<String> future = asyncCitationProcessor.getAsyncMap().get(jobId);
+            future.cancel(true);
         }
     }
 }

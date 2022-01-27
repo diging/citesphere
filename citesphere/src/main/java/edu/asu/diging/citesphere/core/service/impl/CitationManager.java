@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
 import javax.annotation.PostConstruct;
@@ -95,7 +96,7 @@ public class CitationManager implements ICitationManager {
             return o1Title.toLowerCase().compareTo(o2Title.toLowerCase());
         }));
     }
-
+    
     @Override
     public ICitation getCitation(String key) {
         Optional<ICitation> optional = citationStore.findById(key);
@@ -303,7 +304,7 @@ public class CitationManager implements ICitationManager {
             }
             boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
             if (isModified) {
-                asyncCitationProcessor.sync(user, group.getGroupId() + "", group.getContentVersion(), collectionId);
+                asyncCitationProcessor.sync(user, group.getGroupId() + "", group.getContentVersion(), collectionId);    
                 throw new SyncInProgressException();
             } 
             

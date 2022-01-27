@@ -4,10 +4,12 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -18,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
@@ -63,14 +66,24 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     @Autowired
     private ISyncJobManager jobManager;
     
+    @Autowired
+    private CitationManager citationManager;
+    
     private List<JobStatus> inactiveJobStatuses;
+    
+    private Map<String, Future<String>> asyncMap;
     
     @PostConstruct
     public void init() {
+        asyncMap = new HashMap<>();
         inactiveJobStatuses = Collections.synchronizedList(new ArrayList<JobStatus>());
         inactiveJobStatuses.add(JobStatus.CANCELED);
         inactiveJobStatuses.add(JobStatus.DONE);
         inactiveJobStatuses.add(JobStatus.FAILURE);
+    }
+    
+    public Map<String, Future<String>> getAsyncMap() {
+        return asyncMap;
     }
 
     /*
@@ -83,26 +96,37 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
      */
     @Override
     @Async
-    public void sync(IUser user, String groupId, long contentVersion, String collectionId) {
+    public Future<String> sync(IUser user, String groupId, long contentVersion, String collectionId) {
         GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
         // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
         // more activate job statuses than inactive ones, so it's less error prone to use the list that
         // is less likely to change.
         
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
+        
         if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
             // there is already a job running, let's not start another one
-            return;
+            return new AsyncResult<String>(null);
         }
         
         long threadId = Thread.currentThread().getId();
 
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         logger.info("Starting sync for " + groupId);
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
         job.setGroupId(groupId + "");
         job.setStatus(JobStatus.PREPARED);
         job.setThreadId(threadId);
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         jobRepo.save(job);
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         jobManager.addJob(job);
 
         // we'll retrieve the latest group version first in case there are more changes
@@ -120,12 +144,19 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setTotal(versions.size() + collectionVersions.size()
                 + (deletedElements.getItems() != null ? deletedElements.getItems().size() : 0));
         job.setStatus(JobStatus.STARTED);
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         jobRepo.save(job);
 
         AtomicInteger counter = new AtomicInteger();
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         syncCitations(user, groupId, job, versions, counter);
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         syncCollections(user, groupId, job, collectionVersions, groupVersion, counter);
-
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         removeDeletedItems(deletedElements, job);
 
         
@@ -133,16 +164,28 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         // so, we have to make sure there is no group with the same group id but other object id
         // or we'll end up with two groups with the same group id.
         Optional<ICitationGroup> group = groupRepo.findFirstByGroupId(new Long(groupId));
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         if (group.isPresent()) {
             group.get().setContentVersion(groupVersion);
             groupRepo.save((CitationGroup) group.get());
         }
-
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         job.setStatus(JobStatus.DONE);
         job.setFinishedOn(OffsetDateTime.now());
+        if(checkIfThreadIsInterrupted(Thread.currentThread()))
+            return new AsyncResult<String>(null);
         jobRepo.save(job);
+        Future<String> result = new AsyncResult<String>(job.getId());
+        asyncMap.put(job.getId(), result);
+        
+        return result;
     }
 
+    private boolean checkIfThreadIsInterrupted(Thread thread) {
+        return thread.isInterrupted();
+    }
     private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
             AtomicInteger counter) {
         List<String> keysToRetrieve = new ArrayList<>();
