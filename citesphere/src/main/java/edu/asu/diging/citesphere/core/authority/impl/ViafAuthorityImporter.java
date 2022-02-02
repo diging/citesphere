@@ -177,8 +177,6 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
                     ViafRecordData record = viafEntry.getRecord().getRecordData();
                     IAuthorityEntry authority = new AuthorityEntry();
                     Iterator<Data> iterator = record.getMainHeadings().getData().iterator();
-                    /* 
-                     */
                     if (iterator.hasNext()) {
                         String name = iterator.next().getText();
                         authority.setName(name);
