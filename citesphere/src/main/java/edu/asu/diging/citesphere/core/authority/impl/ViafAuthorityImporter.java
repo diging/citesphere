@@ -122,8 +122,36 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
         return ID;
     }
 
+    
     /**
+     * Searches VIAF for authorities for given search terms.
      * VIAF API Documentation: https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
+     * 
+     * Search record may contain multiple mainheading data i.e., authority description.
+     * The first description is selected for the returned record data.
+     * For e.g.,
+     * "data": [
+                {
+                    "text": "Albert, August 1881-",
+                    "sources": {
+                        "s": "DNB",
+                        "sid": "DNB|1204691185"
+                    }
+                },
+                {
+                    "text": "August Albert German philologist",
+                    "sources": {
+                        "s": "WKP",
+                        "sid": "WKP|Q83561432"
+                    }
+                }
+            ],
+     * 
+     * @param firstName First name of authority search term
+     * @param lastName Last name of authority search term
+     * @param page Page number request
+     * @param pageSize Records in a single page
+     * @return the authority search result
      */
     @Override
     public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
@@ -149,24 +177,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
                     ViafRecordData record = viafEntry.getRecord().getRecordData();
                     IAuthorityEntry authority = new AuthorityEntry();
                     Iterator<Data> iterator = record.getMainHeadings().getData().iterator();
-                    /* MainHeading data may contain multiple items in some cases. Using the first item for fetching the display name.
-                     * For e.g.,
-                     * "data": [
-                                {
-                                    "text": "Albert, August 1881-",
-                                    "sources": {
-                                        "s": "DNB",
-                                        "sid": "DNB|1204691185"
-                                    }
-                                },
-                                {
-                                    "text": "August Albert German philologist",
-                                    "sources": {
-                                        "s": "WKP",
-                                        "sid": "WKP|Q83561432"
-                                    }
-                                }
-                            ],
+                    /* 
                      */
                     if (iterator.hasNext()) {
                         String name = iterator.next().getText();
@@ -179,8 +190,6 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
                 searchResult
                         .setTotalPages((int) Math.ceil(viafSearchResponse.getNumberOfRecords() / new Float(pageSize)));
             }
-        } else {
-            throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
         }
         return searchResult;
     }
