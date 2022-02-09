@@ -471,6 +471,7 @@ function savePersonDetails(personType, modalName){
 	personSpan.attr("data-"+modalNameLCase+"-lastname", lastname);
 	personSpan.attr("data-"+modalNameLCase+"-uri", uri);
 	personSpan.attr("data-"+modalNameLCase+"-authority-id", localAuthority);
+	personSpan.attr("data-creator-type", personTypeLCase);
 	
 	var affiliationsList = [];
 	var affSpan = $("<span>");
