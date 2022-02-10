@@ -9,7 +9,6 @@
 <link th:href="@{/resources/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
 <link th:href="@{/resources/diging-icon-pack/diging-icon-pack.css}" rel="stylesheet"/>
 <link th:href="@{/resources/bootstrap/grid.css}" rel="stylesheet"/>
-
 <script th:inline="javascript">
 //# sourceURL=page.js
 $(function() {
@@ -137,6 +136,49 @@ $(function() {
             }
         }
     });
+	
+	$(function() {
+		$(".delete-link").click(function(event) {
+			var ids = []
+			$('.checkboxes:checked').each(function() {
+				   ids.push($(this).data('entry-key'));
+			});
+			if(ids.length==0) {
+				$('#no-selected-entry').modal("show");	
+			}
+			else {
+				$("#delete-entry-button").attr("data-entry-key", ids);
+				$('#entry-delete-confirmation').modal("show");
+			}
+			event.preventDefault();
+		});
+		
+		$("#delete-entry-button").click(function() {
+			var ids = $(this).data("entry-key");
+			var entry = "Entry";
+			var rows = ids.split(",");
+			var baseurl = "references/delete/";
+			$.ajax({
+				'url': baseurl,
+				'type': "POST",
+				'data': {
+					"citationList": ids,
+					[[${_csrf.parameterName}]] : [[${_csrf.token}]]
+				},
+				'success': function(response) {
+					$('body').append('<div id="deletingDiv" class="modal-backdrop" style="opacity:0.5"><i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i></div>');
+					pollDeleteItemsStatuses(response);
+				},
+				'error': function(data) {
+					showNotification(" Error while deleting citations!", "danger", 10000);
+				}
+			});		
+			
+			$('#entry-delete-confirmation').modal("hide");
+			event.preventDefault();
+			$(this).removeData();
+		});
+	});
 });
 
 $(document).ready(function() {
@@ -155,7 +197,77 @@ $(document).ready(function() {
     });
     
 });
-    
+
+function pollDeleteItemsStatuses(response) {
+$.ajax({
+	type: 'GET',
+	url: 'references/delete/'+response.taskID+'/status',
+	contentType : "application/json",
+	dataType: "json",
+	success: function (deleteItemsStatusResponse) {
+		if(deleteItemsStatusResponse.taskStatus === "COMPLETE") {
+			$( "#deletingDiv" ).remove();
+			var success = deleteItemsStatusResponse.response["SUCCESS"];
+			var libraryLocked = deleteItemsStatusResponse.response["LIBRARY_LOCKED"];
+			var libraryVersionChanged = deleteItemsStatusResponse.response["LIBRARY_VERSION_CHANGED"];
+			var invalidRequest = deleteItemsStatusResponse.response["MISSING_IF_UNMODIFIED_SINCE_VERSION"];
+			
+        		if(success != null) {
+                	 	let message = " "+success.length;
+                	 	if(success.length > 1) {
+                	 		message += " Citations deleted successfully! <br />";
+                	 	} else {
+                	 		message += " Citation deleted successfully! <br />";
+                	 	}
+                	 	showNotification(message, "success", 20000);
+        		}
+        		if(libraryLocked != null) {
+                	 	let message =  " "+ libraryLocked.length;
+                	 	if(libraryLocked.length > 1) {
+                	 		message += " Citations";
+                	 	} else {
+                	 		message += " Citation";
+                	 	}
+                	 	message += + " could not be deleted as the target library is locked <br />"+ libraryLocked.join(", ");
+                	 	showNotification(message, "danger", 20000);
+        		}
+        		if(libraryVersionChanged != null) {
+                	 	let message =  " "+ libraryVersionChanged.length;
+                	 	if(libraryVersionChanged.length > 1) {
+                	 		message += " Citations";
+                	 	} else {
+                	 		message += " Citation";
+                	 	}
+                	 	message += " could not be deleted as the library version has changed <br />"+ libraryVersionChanged.join(", ");
+                	 	showNotification(message, "danger", 20000);
+        		}
+        		if(invalidRequest != null) {
+                	 	let message =  " "+ invalidRequest.length;
+                	 	if(invalidRequest.length > 1) {
+                	 		message += " Citations";
+                	 	} else {
+                	 		message += " Citation";
+                	 	}
+                	 	message += " not deleted due to internal error <br />"+ invalidRequest.join(", ");
+                	 	showNotification(message, "danger", 20000);
+        		}
+        		if (deleteItemsStatusResponse.response["SUCCESS"] != null) {
+        			for(id of deleteItemsStatusResponse.response["SUCCESS"]) {
+        				$("#tr-" + id).remove();
+        			}
+        		}
+		} else {
+			setTimeout(pollDeleteItemsStatuses(deleteItemsStatusResponse),1000);
+		}
+	},
+	error: function (deleteItemsStatusResponse) {
+	    $( "#deletingDiv" ).remove();
+	    showNotification("Error while polling delete citations statuses!", "warning", 1000)
+	},
+});
+
+}
+
 </script>
 </head>
 <body>
@@ -291,6 +403,7 @@ function pollStatus(){
 </div>
 <div class="pull-right" style="margin-top: 20px;">
 <a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="icon-circle-add"></i> Create Citation</a>
+<a class="btn btn-primary delete-link"><i class="icon-trash" style="color: #FFFFFF; font-size: 13px;"></i> Delete Citations</a>
 </div>
 
 <div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
@@ -379,9 +492,8 @@ function pollStatus(){
 			</th>
 		</tr>
 		
-		
-		<tr data-action='draggable' class="items" th:each="entry,loop : ${items}">
-			<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes"/>&nbsp;</td>
+		<tr th:id="'tr-'+${entry.key}" data-action='draggable' class="items" th:each="entry,loop : ${items}">
+			<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes" th:data-entry-key="${entry.key}" th:data-index="${loop.index}"/>&nbsp;</td>
 			<td>
 			  <span class="text-warning">
 			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
@@ -440,6 +552,42 @@ function pollStatus(){
 		</tr>
 	</table>
 </div>
+
+<div class="modal fade" id="entry-delete-confirmation" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Delete Entries</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the selected entries?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
+        <button id="delete-entry-button" data-entry-key="" type="button" class="btn btn-primary">Yes, delete!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="no-selected-entry" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Delete Entries</h4>
+      </div>
+      <div class="modal-body">
+        <p>Please select at least 1 entry!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 <script >
 	//# sourceURL=move.js
@@ -477,7 +625,7 @@ $(".items").draggable({
 		(selected.length > 1)? container.addClass('icon-multiple-doc'): container.addClass('icon-docs');
 		let list = container.append('<ul></ul>').find('ul');
 		$(".selected").each(function() {
-			list.append('<li>'+$( this ).find(".bib-entry").data("key")+'</li>');
+			list.append('<li>'+$( this ).find("#checkbox").data("entry-key")+'</li>');
 		});
 		container.find('ul').hide();
 		return container;
@@ -555,7 +703,7 @@ $.ajax({
 		showNotification(message, "info", 20000);
 		}
 		collectionHTMLElement.children('div').removeClass("icon-spinner").addClass("icon-sync");
-		clearAsyncTask(moveItemsStatusResponse.taskID);
+		clearAsyncUpdateTask(moveItemsStatusResponse.taskID);
 		syncCitations(collectionHTMLElement,collectionId);
 		}else{
 		setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName, collectionHTMLElement, collectionId),1000);
@@ -569,12 +717,14 @@ $.ajax({
 
 }
 
-function clearAsyncTask(taskID){
+function clearAsyncUpdateTask(taskID){
 $.ajax({
 	type: 'POST',
 	url: 'items/move/task/'+taskID+'/clear?[(${_csrf.parameterName})]=[(${_csrf.token})]',
 });
 }
+
+
 
 function syncCitations(collectionHTMLElement, collectionId){
 $.ajax({
