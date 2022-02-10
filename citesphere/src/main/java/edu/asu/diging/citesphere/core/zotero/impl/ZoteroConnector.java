@@ -2,10 +2,8 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +13,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -25,6 +21,7 @@ import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ItemCreationResponse;
+import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -155,6 +152,9 @@ public class ZoteroConnector implements IZoteroConnector {
     // @Cacheable(value="groupVersions", key="#user.username")
     public ZoteroResponse<Group> getGroupsVersions(IUser user) {
         Zotero zotero = getApi(user);
+        if (zotero == null) {
+            return null;
+        }
         return zotero.getGroupsOperations().getGroupsVersions();
     }
 
@@ -318,6 +318,9 @@ public class ZoteroConnector implements IZoteroConnector {
 
     private Zotero getApi(IUser user) {
         IZoteroToken token = tokenManager.getToken(user);
+        if (token == null) {
+            return null;
+        }
         Zotero zotero = zoteroFactory.createConnection(new OAuthToken(token.getToken(), token.getSecret())).getApi();
         zotero.setUserId(token.getUserId());
         return zotero;
@@ -328,5 +331,12 @@ public class ZoteroConnector implements IZoteroConnector {
             return new AccessForbiddenException(cause);
         }
         return new ZoteroHttpStatusException(cause);
+    }
+
+    @Override
+    public Map<ItemDeletionResponse, List<String>> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().deleteMultipleItems(groupId, citationKeys, citationVersion);        
     }
 }
