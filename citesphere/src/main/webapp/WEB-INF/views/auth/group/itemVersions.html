@@ -24,7 +24,7 @@ $(document).ready(function() {
 });
 
 function getFormatedDate(date) {
-	return moment(date).format(moment().creationData().locale._longDateFormat.L);
+	return moment(date).local().format("L LT");
 }
 </script>
 </head>

@@ -50,8 +50,7 @@ public class CitationVersionManager implements ICitationVersionManager {
         try {
             group = groupManager.getGroup(user, groupId);
         } catch (HttpClientErrorException ex) {
-            logger.error("Could not access group from Zotero.", ex);
-            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.", ex);
         }
         return group == null ? new ArrayList<>() : citationVersionsDao.getVersions(groupId, key, page, pageSize);
     }
@@ -81,8 +80,7 @@ public class CitationVersionManager implements ICitationVersionManager {
         try {
             group = groupManager.getGroup(user, groupId);
         } catch (HttpClientErrorException ex) {
-            logger.error("Could not access group from Zotero.", ex);
-            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.", ex);
         }
         return group == null ? null : citationVersionsDao.getVersion(groupId, key, version);
     }
