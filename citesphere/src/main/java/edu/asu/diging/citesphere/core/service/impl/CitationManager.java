@@ -214,8 +214,7 @@ public class CitationManager implements ICitationManager {
             } else {
                 asyncCitationProcessor.sync(user, groupId, group.getContentVersion(), null);
                 try {
-                    ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey);
-                    return citation;
+                    return zoteroManager.getGroupItem(user, groupId, itemKey);
                 } catch (HttpClientErrorException ex) {
                     throw new CannotFindCitationException(ex);
                 }
