@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.mongodb.client.MongoClient;
 
@@ -50,7 +52,16 @@ public class AuditConfig {
 
     @Bean
     public AuthorProvider authorProvider() {
-        return new SpringSecurityAuthorProvider();
+        return new AuthorProvider() {
+            @Override
+            public String provide() {
+                Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+                if (auth == null) {
+                    return "Sync Process";
+                }
+                return auth.getName();
+            }
+        };
     }
 
     @Bean
