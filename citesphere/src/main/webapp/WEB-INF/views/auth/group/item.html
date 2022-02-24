@@ -78,8 +78,12 @@
 	    })
 	    
 	    $(".view-link").click(function() {
-			
 			var item = $(this).parent();
+		    
+		    $(".additional-item").each(function(){
+		        var tagValue = $(this).find('span span').contents();
+		        
+		      });
 			showFiles('viewUpload', item[0]);
 			
 		});
@@ -90,11 +94,22 @@
 		var uploadItem = $(item);
 		var modalNameLCase = modalName.toLowerCase();
 		
+		console.log(uploadItem.attr("upload-href"));
 		$("#uploadedFileName").attr('href', uploadItem.attr("upload-href"));
 		$("#uploadedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-uploadedFile-filename"));
 		
+		var extractedTextUrl = uploadItem.attr("extractedText-href");
+		
 		$("#extractedFileName").attr('href', uploadItem.attr("extractedText-href"));
 		$("#extractedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-extractedText-filename"));
+		$(uploadItem).children().each(function() {
+			$(this).children().each(function() {
+				$(this).children().each(function() {
+					$('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></li>');
+					
+				})
+			})
+		})
 		
 		$("#"+modalNameLCase+"Modal").modal('show');
 	}
@@ -355,9 +370,20 @@
 	        <i class="icon-giles"></i>
 	        
 	        <span th:if="${upload.uploadedFile?.filename}">
-	        <span th:id="|upload${status.index}|" class="upload-item" th:data-viewupload-uploadId="${upload.uploadId}" th:upload-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}" th:data-viewupload-uploadedFile-filename="${upload.uploadedFile?.filename}" th:extractedText-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.extractedText?.id}|}" th:data-viewupload-extractedText-filename="${upload.extractedText?.filename}" >
-	        <a class="view-link">[[${upload.uploadedFile?.filename}]]</a>
-	        
+	        	<span th:id="|upload${status.index}|" class="upload-item" th:data-viewupload-uploadId="${upload.uploadId}" th:upload-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}" th:data-viewupload-uploadedFile-filename="${upload.uploadedFile?.filename}" th:extractedText-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.extractedText?.id}|}" th:data-viewupload-extractedText-filename="${upload.extractedText?.filename}" >
+	        	
+	        	<th:block th:each="pages:${upload.pages}">
+					 	<span class="page-item" th:if="${!#lists.isEmpty(pages)}">
+					 	<th:block th:each="additionalFiles, status:${pages.additionalFiles}">
+					 	<span class="additional-item" th:if="${additionalFiles?.filename}">
+					 		<span th:id="|additionalFiles${status.index}|" class="additional-item" th:data-viewupload-uploadId="${upload.uploadId}" th:additionalFiles-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${additionalFiles?.id}|}" th:data-viewupload-additionalFiles-filename="${additionalFiles?.filename}" >
+					 	
+					 	</span>
+					 	</span>
+					 	</th:block>
+					 	</span>
+				</th:block>
+	        	<a class="view-link">[[${upload.uploadedFile?.filename}]]</a>
 	        </span>
 	        </span>
 	        <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
@@ -366,6 +392,7 @@
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
+	        
 	        
 	       </li>
         </ul>

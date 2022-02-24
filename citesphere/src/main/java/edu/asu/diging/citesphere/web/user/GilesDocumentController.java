@@ -37,7 +37,7 @@ public class GilesDocumentController {
     public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication) {
         
         ICitation citation = citationManager.getCitation(itemId);
-        Optional<IGilesUpload> uploadOptional = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null).filter(g -> g.getUploadedFile().getId().equals(fileId)).findFirst();
+        Optional<IGilesUpload> uploadOptional = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null).filter(g -> g.getUploadedFile().getId().equals(fileId) || g.getExtractedText().getId().equals(fileId) || g.getPages().stream().filter(p -> p!=null).anyMatch(a -> a.getAdditionalFiles().stream().filter(f -> f!=null).anyMatch(f -> f.getId().equals(fileId)))).findFirst();
         if (!uploadOptional.isPresent()) {
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
             return;
