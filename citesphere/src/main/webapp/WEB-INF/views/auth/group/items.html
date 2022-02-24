@@ -86,6 +86,28 @@ $(function() {
 		window.location.href = "items?" + queryParams + "&columns=" + shownColumns;
 	});
 	
+	$("#select-all-concept").click(function(){
+		var checkbox = $(this).find(".all-concept-checkbox");
+		checkbox.prop("checked", !checkbox.prop("checked"));
+		$(".concept-checkbox").each(function() {
+			$(this).prop("checked", checkbox.prop("checked"));
+		});
+		var conceptIds = [];
+		$(".conceptItem").each(function() {
+			if ($(this).find(".concept-checkbox").is(":checked")) {
+				conceptIds.push($(this).data("concept-id"));
+			}
+		});
+		
+		var queryParams = window.location.search;
+		if (queryParams)  {
+			var params = new URLSearchParams(queryParams);
+			params.delete('conceptIds');
+			queryParams = params.toString();
+		}
+		window.location.href = "items?" + queryParams + "&conceptIds=" + conceptIds;
+	});
+	
 	$(".conceptItem").click(function() {
 		var checkbox = $(this).find(".concept-checkbox");
 		checkbox.prop("checked", !checkbox.prop("checked"));
@@ -441,14 +463,15 @@ function pollStatus(){
 	<div>
 	    <div th:if="${!param.keySet().contains('searchTerm')}" class="dropdown pull-left">
 	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-	            Concepts
+	            Filter by Concept
 	            <span class="caret"></span>
 	        </button>
 	        <ul id="conceptFilter" class="dropdown-menu" aria-labelledby="dropdownMenu1">
-	            <tbody th:each="concept:${concepts}">
+                <li id="search-concept"><a><input type="text" placeholder="Search.." onchange="filterConcept(this.value)"/></a>
+	            <li id="select-all-concept"><a><input title="Select" class="all-concept-checkbox" type="checkbox" th:checked="${selectedConceptIds.size()==concepts.size()}"/> Select all</a></li>
+                <tbody th:each="concept:${concepts}">
 	                <li class="conceptItem" th:data-concept-id="${concept.id}">
-	                    <a><span th:if ="${selectedConceptIds.contains(concept.id)}"><i class="icon-checkmark-alt"></i> </span>
-	                    <input title="Select" style="display:none" type="checkbox" class="concept-checkbox" th:checked="${selectedConceptIds.contains(concept.id)}"/>[[${concept.name}]]</a>
+	                    <a><input title="Select" type="checkbox" class="concept-checkbox" th:checked="${selectedConceptIds.contains(concept.id)}"/> [[${concept.name}]]</a>
 	                </li>
 	           </tbody>
 	        </ul>
