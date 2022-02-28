@@ -1,6 +1,11 @@
 <html layout:decorate="~{layouts/main}">
 <head>
-
+<style>
+.concept-filter-menu {
+   max-height:200px;
+   overflow:scroll; 
+}
+</style>
 <script src="https://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
@@ -202,6 +207,17 @@ $(function() {
 		});
 	});
 });
+
+function filterConcept(searchText) {
+	searchText = searchText.toLowerCase();
+	$('.conceptItem').each(function() {
+		if (!$(this).attr('data-concept-name').includes(searchText)) {
+			$(this).attr("hidden",true);
+		} else {
+			$(this).attr("hidden",false);
+		}
+	});
+}
 
 $(document).ready(function() {
     var queryParams = window.location.search;
@@ -466,11 +482,11 @@ function pollStatus(){
 	            Filter by Concept
 	            <span class="caret"></span>
 	        </button>
-	        <ul id="conceptFilter" class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <li id="search-concept"><a><input type="text" placeholder="Search.." onchange="filterConcept(this.value)"/></a>
-	            <li id="select-all-concept"><a><input title="Select" class="all-concept-checkbox" type="checkbox" th:checked="${selectedConceptIds.size()==concepts.size()}"/> Select all</a></li>
+	        <ul id="conceptFilter" class="dropdown-menu concept-filter-menu" aria-labelledby="dropdownMenu1">
+                <li id="search-concept"><a><input type="text" placeholder="Search.." onkeyup="filterConcept(this.value)"/></a>
+	            <li id="select-all-concept" class="conceptItem" data-concept-name=""><a><input title="Select" class="all-concept-checkbox" type="checkbox" th:checked="${selectedConceptIds.size()==concepts.size()}"/> Select all</a></li>
                 <tbody th:each="concept:${concepts}">
-	                <li class="conceptItem" th:data-concept-id="${concept.id}">
+	                <li class="conceptItem" th:data-concept-id="${concept.id}" th:data-concept-name="${concept.name.toLowerCase()}">
 	                    <a><input title="Select" type="checkbox" class="concept-checkbox" th:checked="${selectedConceptIds.contains(concept.id)}"/> [[${concept.name}]]</a>
 	                </li>
 	           </tbody>
