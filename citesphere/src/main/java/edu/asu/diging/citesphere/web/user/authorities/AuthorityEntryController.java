@@ -88,8 +88,6 @@ public class AuthorityEntryController {
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-        System.out.println("GET request for authorities in a group");
-
         AuthoritySearchResult authorityResult = new AuthoritySearchResult();
         Long groupId = Long.valueOf(zoteroGroupId);
         int totalPages = authorityService.getTotalGroupAuthoritiesPages(groupId, firstName, lastName, pageSize);

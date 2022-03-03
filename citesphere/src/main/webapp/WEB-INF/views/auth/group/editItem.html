@@ -75,12 +75,12 @@ $(function() {
     	allowAuthoritySearch("Author");
      });
 	
-     $('.firstNameAuthorAffiliation').keyup(function(e){
-    	var id = $(this).data('client-id');
-    	var property = id.substring(9, id.length);
-    	console.log(id);
-    	console.log(property)
-    	allowAuthoritySearch(property);
+     $('#firstNameAuthorAffiliation').keyup(function(e){
+//     	var id = $(this).data('client-id');
+//     	var property = id.substring(9, id.length);
+//     	console.log(id);
+//     	console.log(property)
+    	allowAuthoritySearch("AuthorAffiliation");
      });
     
     $("#lastNameAuthor").keyup(function(e){
@@ -119,12 +119,13 @@ $(function() {
 	$("#searchAuthorAffiliation").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
-		})  
+		})
 		$("#searchAuthorAffiliationSpinner").show();
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('AuthorAffiliation','AuthorAffiliation', 0)
+		getGroupAuthorities('AuthorAffiliation','AuthorAffiliation', 0)
 		getconceptpowerAuthorities('AuthorAffiliation','AuthorAffiliation',0)
 		$("#searchAuthorAffiliationSpinner").hide();
 	});
@@ -187,6 +188,26 @@ $(function() {
             $(this).attr('id', $(this).attr('id') + counter);
             $(this).attr('data-client-id', $(this).attr('id'));
         });
+		
+		$("#authorAffiliationTemplate"+counter).find("#searchAuthorAffiliationSpinner").attr('id', 'searchAuthorAffiliationSpinner'+counter);
+		
+		$('#firstNameAuthorAffiliation'+counter).keyup(function(e) {
+	    	allowAuthoritySearch("AuthorAffiliation"+counter);
+	     });
+		
+		$("#searchAuthorAffiliation"+counter).click(function() {
+			$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+				$('#selectAuthorityModel a:first').tab('show');
+			})
+			$('#searchAuthorAffiliationSpinner'+counter).show();
+			$('#userAuthority-pagination-top').twbsPagination('destroy');
+			$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+			
+			getUserAuthorities('AuthorAffiliation'+counter,'AuthorAffiliation'+counter, 0)
+			getGroupAuthorities('AuthorAffiliation'+counter,'AuthorAffiliation'+counter, 0)
+			getconceptpowerAuthorities('AuthorAffiliation'+counter,'AuthorAffiliation'+counter,0)
+			$('#searchAuthorAffiliationSpinner'+counter).hide();
+		});
 	});
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -785,6 +806,7 @@ function getPersonAuthority(uri, personType) {
 }
 
 function getUserAuthorities(modalType, personType, page) {
+	console.log(modalType);
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
 	if(lastName === undefined) {
