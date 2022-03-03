@@ -94,11 +94,8 @@
 		var uploadItem = $(item);
 		var modalNameLCase = modalName.toLowerCase();
 		
-		console.log(uploadItem.attr("upload-href"));
 		$("#uploadedFileName").attr('href', uploadItem.attr("upload-href"));
 		$("#uploadedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-uploadedFile-filename"));
-		
-		var extractedTextUrl = uploadItem.attr("extractedText-href");
 		
 		$("#extractedFileName").attr('href', uploadItem.attr("extractedText-href"));
 		$("#extractedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-extractedText-filename"));
@@ -419,6 +416,14 @@
                      <li class="list-group-item">
                      <i class="icon-giles"></i>
                      <a id="extractedFileName"> </a>
+                     </li>
+                     <li class="list-group-item">
+                     <i class="icon-giles"></i>
+                     <a id="pageTextFileName"> </a>
+                     </li>
+                     <li class="list-group-item">
+                     <i class="icon-giles"></i>
+                     <a id="pageOcrFileName"> </a>
                      </li>
                    </ul>
                 </div>
