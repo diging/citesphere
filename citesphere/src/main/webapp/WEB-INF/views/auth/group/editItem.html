@@ -195,6 +195,7 @@ $(function() {
 	    	allowAuthoritySearch("AuthorAffiliation"+counter);
 	     });
 		
+		var affiliationCounter = 'AuthorAffiliation' + counter;
 		$("#searchAuthorAffiliation"+counter).click(function() {
 			$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 				$('#selectAuthorityModel a:first').tab('show');
@@ -203,9 +204,9 @@ $(function() {
 			$('#userAuthority-pagination-top').twbsPagination('destroy');
 			$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 			
-			getUserAuthorities('AuthorAffiliation'+counter,'AuthorAffiliation'+counter, 0)
-			getGroupAuthorities('AuthorAffiliation'+counter,'AuthorAffiliation'+counter, 0)
-			getconceptpowerAuthorities('AuthorAffiliation'+counter,'AuthorAffiliation'+counter,0)
+			getUserAuthorities(affiliationCounter,affiliationCounter, 0);
+			getGroupAuthorities(affiliationCounter, affiliationCounter, 0);
+			getconceptpowerAuthorities(affiliationCounter, affiliationCounter, 0);
 			$('#searchAuthorAffiliationSpinner'+counter).hide();
 		});
 	});
@@ -576,11 +577,13 @@ function savePersonDetails(personType, modalName){
 	var affiliationsList = [];
 	var affSpan = $("<span>");
 	$("#"+modalNameLCase+"Affiliations").children().each(function(idx, elem) {
-		var input = $(elem).find("input");
-		if(input.val().length!=0){
+		var affName = $(elem).find(".firstNameAuthorAffiliation");
+		var affUri = $(elem).find(".uriAuthor");
+		if(affName.val().length!=0){
 			var affSpan = $("<span>");
-			affSpan.attr("data-affiliation-name", input.val());
-			affiliationsList.push(input.val());
+			affSpan.attr("data-affiliation-name", affName.val());
+			affSpan.attr("data-affiliation-uri", affUri.val());
+			affiliationsList.push(affName.val());
 			personSpan.append(affSpan);
 		}
 	});
@@ -674,6 +677,13 @@ function constructPersonArray(arrayName, role, iter){
 			affiliationIdField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".id");
 			affiliationIdField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].id");
 			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
+			$("#editForm").append(affiliationIdField);
+			
+			var affiliationIdField = $("<input>");
+			affiliationIdField.attr("type", "hidden");
+			affiliationIdField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".uri");
+			affiliationIdField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].uri");
+			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-uri"));
 			$("#editForm").append(affiliationIdField);
 		});
 		otherCreatorCount += 1;
@@ -857,7 +867,7 @@ function getUserAuthorities(modalType, personType, page) {
 				
 			/* showPersonNameInModal(name, personType) */
 			
-			if(modalType == "AuthorAffiliation"){
+			if(modalType.includes("AuthorAffiliation")){
 				console.log("If, AuthorAffiliation", name, uri, personType)
 				showAffiliationNameInModal(name, uri, personType);
 			}else{
@@ -993,7 +1003,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			name = $(this).closest("tr").find(".name").text();
 			uri = $(this).closest("tr").find(".uri").text();
 			
-			if(modalType == "AuthorAffiliation"){
+			if(modalType.includes("AuthorAffiliation")){
 				console.log("Conceptpower function, AuthorAffiliation", name, uri, personType)
 				showAffiliationNameInModal(name, uri, personType);
 			}else{
@@ -1270,7 +1280,7 @@ function creatorLinkHandler(target) {
 						<th:block th:each="author,status : ${citation.authors}">	
 						<span th:id="|author${status.index}|" class="label label-primary author-item" th:data-author-id="|author${status.index}|" th:data-author-firstname="${author.firstName}" th:data-author-lastname="${author.lastName}" th:data-author-uri="${author.uri}" th:data-creator-type="author" th:data-author-authority-id="${author.localAuthorityId}">
 						<th:block th:each="aff,affStatus : ${author.affiliations}">
-							<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|author${status.index}-aff${affStatus.index}|">
+							<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|author${status.index}-aff${affStatus.index}|" th:data-affiliation-uri="${aff.uri}">
 							</span>
 						</th:block>
 								[[${author.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
@@ -1295,7 +1305,7 @@ function creatorLinkHandler(target) {
 						<th:block th:each="editor,status:${citation.editors}">
 						<span th:id="|editor${status.index}|" class="label label-info editor-item" th:data-editor-id="|editor${status.index}|" th:data-editor-firstname="${editor.firstName}" th:data-editor-lastname="${editor.lastName}" th:data-editor-uri="${editor.uri}" th:data-editor-authority-id="${editor.localAuthorityId}" th:data-creator-type="editor">
 						<th:block th:each="aff,affStatus:${editor.affiliations}"> 
-							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|editor${status.index}-aff${affStatus.index}|"></span>
+							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|editor${status.index}-aff${affStatus.index}|" th:data-affiliation-uri="${aff.uri}"></span>
 						</th:block>
 						  [[${editor.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
 						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
