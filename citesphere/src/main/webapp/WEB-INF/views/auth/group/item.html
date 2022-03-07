@@ -106,11 +106,11 @@
 	<div id="pull-right" class="pull-right" style="min-width: 35px;">
 		<a th:if="${!#strings.isEmpty(adjacentCitations.prev)}" class ="btn btn-primary btn-nav" style="font-size:10px;" 
 		    th:href="@{|/auth/group/${zoteroGroupId}/items/${adjacentCitations.prev}?searchTerm=${searchTerm}&index=${adjacentCitations.prevIndex}&page=${adjacentCitations.prevPage}&sortBy=${sortBy}&collectionId=${collectionId}|}"> < Previous</a>
-		<a th:unless="${!#strings.isEmpty(adjacentCitations.prev)}" class ="btn btn-default btn-nav disabled" style="font-size:10px;" disabled> < Previous</a> &nbsp;&nbsp;
+		<a th:unless="${!#strings.isEmpty(adjacentCitations.prev)}" class ="btn btn-default btn-nav disabled" style="font-size:10px;"> < Previous</a> &nbsp;&nbsp;
 
 		<a th:if="${!#strings.isEmpty(adjacentCitations.next)}" class ="btn btn-primary btn-nav" style="font-size:10px;" 
 		    th:href="@{|/auth/group/${zoteroGroupId}/items/${adjacentCitations.next}?searchTerm=${searchTerm}&index=${adjacentCitations.nextIndex}&page=${adjacentCitations.nextPage}&sortBy=${sortBy}&collectionId=${collectionId}|}">Next ></a>
-		<a th:unless="${!#strings.isEmpty(adjacentCitations.next)}" class ="btn btn-default btn-nav disabled" style="font-size:10px;" disabled>Next ></a>
+		<a th:unless="${!#strings.isEmpty(adjacentCitations.next)}" class ="btn btn-default btn-nav disabled" style="font-size:10px;">Next ></a>
 
 	</div>
 	
