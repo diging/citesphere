@@ -80,6 +80,7 @@ $(function() {
 //     	var property = id.substring(9, id.length);
 //     	console.log(id);
 //     	console.log(property)
+		console.log("keyup");
     	allowAuthoritySearch("AuthorAffiliation");
      });
     
@@ -188,6 +189,14 @@ $(function() {
             $(this).attr('id', $(this).attr('id') + counter);
             $(this).attr('data-client-id', $(this).attr('id'));
         });
+		
+		$("#searchAuthorAffiliation"+counter).prop("disabled",true);
+		
+		var searchAffiliationButton = "AuthorAffiliation" + counter;
+		$('#firstNameAuthorAffiliation'+counter).keyup(function(e) {
+	    	allowAuthoritySearch(searchAffiliationButton);
+	     });
+		
 		
 		$("#authorAffiliationTemplate"+counter).find("#searchAuthorAffiliationSpinner").attr('id', 'searchAuthorAffiliationSpinner'+counter);
 		
