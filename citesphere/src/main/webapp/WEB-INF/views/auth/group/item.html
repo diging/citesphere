@@ -96,10 +96,10 @@
 		$("#extractedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-extractedText-filename"));
 		$(uploadItem).children().each(function() {
 		   $(this).children().each(function() {
-		      $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("image-href")+'">'+$(this).attr("data-"+modalNameLCase+"-image-filename")+'</a></li>');
-              $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageText-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageText-filename")+'</a></li>');
-              $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageOcr-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageOcr-filename")+'</a></li>');
-              $(this).children().each(function() {
+               $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("image-href")+'">'+$(this).attr("data-"+modalNameLCase+"-image-filename")+'</a></li>');
+               $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageText-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageText-filename")+'</a></li>');
+               $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageOcr-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageOcr-filename")+'</a></li>');
+               $(this).children().each(function() {
                   $(this).children().each(function() {
                       $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></li>');
                    })
