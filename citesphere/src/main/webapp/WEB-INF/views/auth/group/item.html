@@ -78,9 +78,8 @@
 	    })
 	    
 	    $(".view-link").click(function() {
-			var item = $(this).parent()
-			
-			showFiles('viewUpload', item[0]);
+           var item = $(this).parent()
+           showFiles('viewUpload', item[0]);
 			
 		});
 	});
@@ -96,20 +95,19 @@
 		$("#extractedFileName").attr('href', uploadItem.attr("extractedText-href"));
 		$("#extractedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-extractedText-filename"));
 		$(uploadItem).children().each(function() {
-			$(this).children().each(function() {
-				$('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("image-href")+'">'+$(this).attr("data-"+modalNameLCase+"-image-filename")+'</a></li>');
-				$('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageText-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageText-filename")+'</a></li>');
-				$('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageOcr-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageOcr-filename")+'</a></li>');
-				$(this).children().each(function() {
-					$(this).children().each(function() {
-						$('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></li>');
-					})
-				})
-			})
-		}) 
+		   $(this).children().each(function() {
+		      $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("image-href")+'">'+$(this).attr("data-"+modalNameLCase+"-image-filename")+'</a></li>');
+              $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageText-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageText-filename")+'</a></li>');
+              $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageOcr-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageOcr-filename")+'</a></li>');
+              $(this).children().each(function() {
+                  $(this).children().each(function() {
+                      $('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></li>');
+                   })
+               })
+           })
+       }) 
 		
-		
-		$("#"+modalNameLCase+"Modal").modal('show');
+	   $("#"+modalNameLCase+"Modal").modal('show');
 	}
 	
 </script>
@@ -371,21 +369,19 @@
 	        	<span th:id="|upload${status.index}|" class="upload-item" th:data-viewupload-uploadId="${upload.uploadId}" th:upload-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}" th:data-viewupload-uploadedFile-filename="${upload.uploadedFile?.filename}" th:extractedText-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.extractedText?.id}|}" th:data-viewupload-extractedText-filename="${upload.extractedText?.filename}" >
 	        	
 	        	<th:block th:each="pages, status:${upload.pages}">
-					 	<span class="page-item">
-					 		<span th:id="|pages${status.index}|" class="page-item" th:data-viewupload-uploadId="${upload.uploadId}" th:image-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${pages.image?.id}|}" th:data-viewupload-image-filename="${pages.image?.filename}" th:pageText-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${pages.text?.id}|}" th:data-viewupload-pageText-filename="${pages.text?.filename}" th:pageOcr-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${pages.ocr?.id}|}" th:data-viewupload-pageOcr-filename="${pages.ocr?.filename}" >
-					 		
-					 		
-					 	<th:block th:each="additionalFiles, status:${pages.additionalFiles}">
-					 	<span class="additional-item" th:if="${additionalFiles?.filename}">
-					 		<span th:id="|additionalFiles${status.index}|" class="additional-item" th:data-viewupload-uploadId="${upload.uploadId}" th:additionalFiles-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${additionalFiles?.id}|}" th:data-viewupload-additionalFiles-filename="${additionalFiles?.filename}" >
-					 	
-					 		</span>
-					 	</span>
-					 	</th:block>
-					 	</span>
-					 	</span> 
-				</th:block>
-	        	<a class="view-link">[[${upload.uploadedFile?.filename}]]</a>
+				   <span class="page-item">
+				       <span th:id="|pages${status.index}|" class="page-item" th:data-viewupload-uploadId="${upload.uploadId}" th:image-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${pages.image?.id}|}" th:data-viewupload-image-filename="${pages.image?.filename}" th:pageText-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${pages.text?.id}|}" th:data-viewupload-pageText-filename="${pages.text?.filename}" th:pageOcr-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${pages.ocr?.id}|}" th:data-viewupload-pageOcr-filename="${pages.ocr?.filename}" >
+					 			
+				        <th:block th:each="additionalFiles, status:${pages.additionalFiles}">
+                        <span class="additional-item" th:if="${additionalFiles?.filename}">
+                             <span th:id="|additionalFiles${status.index}|" class="additional-item" th:data-viewupload-uploadId="${upload.uploadId}" th:additionalFiles-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${additionalFiles?.id}|}" th:data-viewupload-additionalFiles-filename="${additionalFiles?.filename}" >
+					 	     </span>
+                        </span>
+                        </th:block>
+                        </span>
+                        </span> 
+                </th:block>
+                <a class="view-link">[[${upload.uploadedFile?.filename}]]</a>
 	        </span>
 	        </span>
 	        <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
