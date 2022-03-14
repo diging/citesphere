@@ -7,7 +7,9 @@
 	max-height: 100%;
 	overflow-y: auto;
 }
-
+.modal-body {
+    max-height: 100%; overflow-y: auto;
+}
 </style>
 <script th:inline="javascript">
 //# sourceURL=submit.js
@@ -76,13 +78,13 @@ $(function() {
      });
 	
 	$(document).on("keyup", "#firstNameAuthorAffiliation", function() {
-//      $('#firstNameAuthorAffiliation').keyup(function(e){
-//     	var id = $(this).data('client-id');
-//     	var property = id.substring(9, id.length);
-//     	console.log(id);
-//     	console.log(property)
-        console.log('keyup');
     	allowAuthoritySearch("AuthorAffiliation");
+     });
+	$(document).on("keyup", "#firstNameEditorAffiliation", function() {
+    	allowAuthoritySearch("EditorAffiliation");
+     });
+	$(document).on("keyup", "#firstNameCreatorAffiliation", function() {
+    	allowAuthoritySearch("CreatorAffiliation");
      });
     
     $("#lastNameAuthor").keyup(function(e){
@@ -119,7 +121,6 @@ $(function() {
 	});
 	
 	 $(document).on("click", "#searchAuthorAffiliation", function() {
-// 	$("#searchAuthorAffiliation").click(function() {
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})
@@ -131,6 +132,34 @@ $(function() {
 		getGroupAuthorities('AuthorAffiliation','AuthorAffiliation', 0)
 		getconceptpowerAuthorities('AuthorAffiliation','AuthorAffiliation',0)
 		$("#searchAuthorAffiliationSpinner").hide();
+	});
+	 
+	 $(document).on("click", "#searchEditorAffiliation", function() {
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})
+		$("#searchEditorAffiliationSpinner").show();
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		
+		getUserAuthorities('EditorAffiliation','EditorAffiliation', 0)
+		getGroupAuthorities('EditorAffiliation','EditorAffiliation', 0)
+		getconceptpowerAuthorities('EditorAffiliation','EditorAffiliation',0)
+		$("#searchEditorAffiliationSpinner").hide();
+	});
+	 
+	 $(document).on("click", "#searchCreatorAffiliation", function() {
+		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+			$('#selectAuthorityModel a:first').tab('show');
+		})
+		$("#searchCreatorAffiliationSpinner").show();
+		$('#userAuthority-pagination-top').twbsPagination('destroy');
+		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		
+		getUserAuthorities('CreatorAffiliation','CreatorAffiliation', 0)
+		getGroupAuthorities('CreatorAffiliation','CreatorAffiliation', 0)
+		getconceptpowerAuthorities('CreatorAffiliation','CreatorAffiliation',0)
+		$("#searchCreatorAffiliationSpinner").hide();
 	});
 	
 	$("#searchEditor").click(function() {
@@ -177,49 +206,64 @@ $(function() {
 	$(".remove-concept").click(removeConcept);
 	$(".remove-concept").css('cursor', 'pointer');
 	
-	var counter = 0;
-	$("#addAuthorAffiliation").click(function() {
-		counter++;
-		var affiliationCopy = $("#authorAffiliationTemplate").clone();
-		affiliationCopy.attr("id", "authorAffiliationTemplate"+counter);
+	function addAddiliation(modalType, counter) {
+		var counter = 0;
+		modalTypeL = modalType.toLowerCase();
+		var affiliationCopy = $("#"+modalTypeL+"AffiliationTemplate").clone();
+		affiliationCopy.attr("id", modalTypeL+"AffiliationTemplate"+counter);
 		affiliationCopy.addClass("aff-info");
 		affiliationCopy.find("input").val("");
-		affiliationCopy.find("#authorAffiliationAuthorityUsed").empty();
+		affiliationCopy.find("#"+modalTypeL+"AffiliationAuthorityUsed").empty();
 		affiliationCopy.show();
-		$("#authorAffiliations").append(affiliationCopy);
-		$("#authorAffiliationTemplate"+counter).find('input, button').each(function() {
+		$("#"+modalTypeL+"Affiliations").append(affiliationCopy);
+		$("#"+modalTypeL+"AffiliationTemplate"+counter).find('input, button').each(function() {
             $(this).attr('id', $(this).attr('id') + counter);
             $(this).attr('data-client-id', $(this).attr('id'));
         });
 		
-		$("#searchAuthorAffiliation"+counter).prop("disabled",true);
+		$("#search"+modalType+"Affiliation"+counter).prop("disabled",true);
 		
-		var searchAffiliationButton = "AuthorAffiliation" + counter;
-		$('#firstNameAuthorAffiliation'+counter).keyup(function(e) {
+		var searchAffiliationButton = modalType + "Affiliation" + counter;
+		$('#firstName'+modalType+'Affiliation'+counter).keyup(function(e) {
 	    	allowAuthoritySearch(searchAffiliationButton);
 	     });
 		
 		
-		$("#authorAffiliationTemplate"+counter).find("#searchAuthorAffiliationSpinner").attr('id', 'searchAuthorAffiliationSpinner'+counter);
+		$("#"+modalTypeL+"AffiliationTemplate"+counter).find("#search"+modalType+"AffiliationSpinner").attr('id', 'search'+modalType+'AffiliationSpinner'+counter);
 		
-		$('#firstNameAuthorAffiliation'+counter).keyup(function(e) {
-	    	allowAuthoritySearch("AuthorAffiliation"+counter);
+		$('#firstName'+modalType+'Affiliation'+counter).keyup(function(e) {
+	    	allowAuthoritySearch(modalType+"Affiliation"+counter);
 	     });
 		
-		var affiliationCounter = 'AuthorAffiliation' + counter;
-		$("#searchAuthorAffiliation"+counter).click(function() {
+		var affiliationCounter = modalType + 'Affiliation' + counter;
+		$("#search"+modalType+"Affiliation"+counter).click(function() {
 			$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 				$('#selectAuthorityModel a:first').tab('show');
 			})
-			$('#searchAuthorAffiliationSpinner'+counter).show();
+			$('#search'+modalType+'AffiliationSpinner'+counter).show();
 			$('#userAuthority-pagination-top').twbsPagination('destroy');
 			$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 			
 			getUserAuthorities(affiliationCounter,affiliationCounter, 0);
 			getGroupAuthorities(affiliationCounter, affiliationCounter, 0);
 			getconceptpowerAuthorities(affiliationCounter, affiliationCounter, 0);
-			$('#searchAuthorAffiliationSpinner'+counter).hide();
+			$('#search'+modalType+'AffiliationSpinner'+counter).hide();
 		});
+	}
+	
+	var authorAffCounter = 0;
+	$("#addAuthorAffiliation").click(function() {
+		addAddiliation("Author", authorAffCounter);
+	});
+	
+	var editorAffCounter = 0;
+	$("#addAuthorAffiliation").click(function() {
+		addAddiliation("Editor", editorAffCounter);
+	});
+	
+	var creatorAffCounter = 0;
+	$("#addAuthorAffiliation").click(function() {
+		addAddiliation("Creator", creatorAffCounter);
 	});
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -537,21 +581,56 @@ function editPerson(modalName, item){
 	$("#uri"+modalName).val(personItem.attr("data-"+modalNameLCase+"-uri"));
 	$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
 	
+	var counter = 0;
 	personItem.children("span").each(function(idx, elem){
-		var affInput = $("#"+modalNameLCase+"AffiliationTemplate").clone();
-		affInput.removeAttr("id");
-		affInput.addClass("aff-info");
+		
+		var affInput;
+		if (counter == 0) {
+			affInput = $("#"+modalNameLCase+"AffiliationTemplate");
+			$("#searchAuthorAffiliation").prop("disabled",false);
+		} else {
+			affInput = $("#"+modalNameLCase+"AffiliationTemplate").clone();
+			affInput.addClass("aff-info");
+		}
 		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
 		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
 		affInput.find("input").attr("data-affiliation-uri", $(elem).data("affiliationUri"));
 		affInput.find(".firstNameAuthorAffiliation").val($(elem).data("affiliationName"));
 		affInput.find(".uriAuthor").val($(elem).data("affiliationUri"));
 		$("#"+modalNameLCase+"Modal #"+modalNameLCase+"Affiliations").append(affInput);
+		
+		if (counter != 0) {
+			affInput.attr("id", modalNameLCase+"AffiliationTemplate"+counter);
+    		$("#authorAffiliationTemplate"+counter).find("#searchAuthorAffiliationSpinner").attr('id', 'searchAuthorAffiliationSpinner'+counter);
+    		
+    		$("#authorAffiliationTemplate"+counter).find('input, button').each(function() {
+                $(this).attr('id', $(this).attr('id') + counter);
+                $(this).attr('data-client-id', $(this).attr('id'));
+            });
+    		$("#searchAuthorAffiliation"+counter).prop("disabled",false);
+    		
+    		var affiliationCounter = 'AuthorAffiliation' + counter;
+    		$("#searchAuthorAffiliation"+counter).click(function() {
+    			$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+    				$('#selectAuthorityModel a:first').tab('show');
+    			})
+    			$('#searchAuthorAffiliationSpinner'+counter).show();
+    			$('#userAuthority-pagination-top').twbsPagination('destroy');
+    			$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+    			
+    			getUserAuthorities(affiliationCounter,affiliationCounter, 0);
+    			getGroupAuthorities(affiliationCounter, affiliationCounter, 0);
+    			getconceptpowerAuthorities(affiliationCounter, affiliationCounter, 0);
+    			$('#searchAuthorAffiliationSpinner'+counter).hide();
+    		});
+		}
+		counter++;
 	});
 	
-	if(personItem.children("span").length > 0) {
-		$("#"+modalNameLCase+"AffiliationTemplate").hide();
-	}
+// 	if(personItem.children("span").length > 0) {
+// 		$("#"+modalNameLCase+"AffiliationTemplate").hide();
+// 	}
+
 	$("#addCreatorButton").attr("data-"+modalNameLCase+"-type", personItem.attr("data-"+modalNameLCase+"type"));
 	$("#add"+modalName+"Button").text("Update "+modalName);
 	
@@ -1561,15 +1640,13 @@ function creatorLinkHandler(target) {
 			</button>
 			<div class="form-group">
 				<label for="uriAuthorAffiliation">Affiliation URI:</label>   
-			    	<input type="text" class="form-control uriAuthor" data-client-id="uriAuthorAffiliation" id="uriAuthorAffiliation" placeholder="URI"/>
-			    	<input type="hidden" id="uriAuthorAffiliationLocalId" />
+			    	<input type="text" class="form-control affUri" data-client-id="uriAuthorAffiliation" id="uriAuthorAffiliation" placeholder="URI"/>
+			    	<input type="hidden" id="affLocalId" />
 		    </div>
 		    <div class="text-warning pull-right" id="authorAffiliationAuthorityUsed"></div>
 		  </div>
 		  </div>
-		  <div>
 		  <div class="text-right"><a id="addAuthorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
-      	  </div>
       </div>
       
       <div class="modal-footer">
@@ -1639,7 +1716,7 @@ function creatorLinkHandler(target) {
 			</button>
 			<label for="uriEditorAffiliation"> Affiliation URI:</label>   
 		    <div class="form-group">
-			    <input type="text" class="form-control uriEditor" data-client-id="uriEditorAffiliation" id="uriEditorAffiliation" placeholder="URI">
+			    <input type="text" class="form-control affUri" data-client-id="uriEditorAffiliation" id="uriEditorAffiliation" placeholder="URI">
 			    <input type="hidden" id="uriEditorAffiliationLocalId" />
 		    </div>
 		    <div class="text-warning pull-right" id="EditorAffiliationAuthorityUsed"></div>
@@ -1716,7 +1793,7 @@ function creatorLinkHandler(target) {
 			</button>
 			<label for="uriCreatorAffiliation"> Affiliation URI:</label>   
 		    <div class="form-group">
-			    <input type="text" class="form-control uriCreator" data-client-id="uriCreatorAffiliation" id="uriCreatorAffiliation" placeholder="URI">
+			    <input type="text" class="form-control affUri" data-client-id="uriCreatorAffiliation" id="uriCreatorAffiliation" placeholder="URI">
 			    <input type="hidden" id="uriCreatorAffiliationLocalId" />
 		    </div>
 		    <div class="text-warning pull-right" id="creatorAffiliationAuthorityUsed"></div>
