@@ -23,6 +23,8 @@ $(function() {
 	$("#uriLoadingFoundAuthorAffiliation").hide();
 	$("#searchAuthorSpinner").hide();
 	$("#searchAuthorAffiliationSpinner").hide();
+	$("#searchEditorAffiliationSpinner").hide();
+	$("#searchCreatorAffiliationSpinner").hide();
 	
 	$("#uriLoadingFoundAuthor").popover();
 	$("#uriLoadingFailureAuthor").popover();
@@ -676,7 +678,7 @@ function savePersonDetails(personType, modalName){
 	var affiliationsList = [];
 	var affSpan = $("<span>");
 	$("#"+modalNameLCase+"Affiliations").children().each(function(idx, elem) {
-		var affName = $(elem).find(".firstNameAuthorAffiliation");
+		var affName = $(elem).find(".firstName"+modalName+"Affiliation");
 		var affUri = $(elem).find(".uriAuthor");
 		if(affName.val().length!=0){
 			var affSpan = $("<span>");
@@ -1717,19 +1719,20 @@ function creatorLinkHandler(target) {
 		  </div> -->
 		   <div id="editorAffiliations">
 		  <div id="editorAffiliationTemplate" class="form-group">
-		    
-			    <label for="editorAffiliation">Affiliation:</label>
-			    <input type="text" class="form-control firstNameEditorAffiliation" id="firstNameEditorAffiliation" data-client-id="firstNameEditorAffiliation" placeholder="Affiliation">
-		  	
-			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="EditorAffiliation" id="searchEditorAffiliation"
-				style="margin-left: 80%" disabled>Search Affiliation <i id="searchEditorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
-			</button>
-			<label for="uriEditorAffiliation"> Affiliation URI:</label>   
-		    <div class="form-group">
-			    <input type="text" class="form-control affUri" data-client-id="uriEditorAffiliation" id="uriEditorAffiliation" placeholder="URI">
-			    <input type="hidden" id="uriEditorAffiliationLocalId" />
-		    </div>
-		    <div class="text-warning pull-right" id="EditorAffiliationAuthorityUsed"></div>
+		    <hr>
+            <div class="form-group">
+                <label for="editorAffiliation">Affiliation:</label>
+                <input type="text" class="form-control firstNameEditorAffiliation" id="firstNameEditorAffiliation" data-client-id="firstNameEditorAffiliation" placeholder="Affiliation">
+            </div>
+            <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="EditorAffiliation" id="searchEditorAffiliation"
+                style="margin-left: 76%" disabled>Search Affiliation <i id="searchEditorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+            </button>
+            <div class="form-group">
+                <label for="uriEditorAffiliation">Affiliation URI:</label>   
+                    <input type="text" class="form-control affUri" data-client-id="uriEditorAffiliation" id="uriEditorAffiliation" placeholder="URI"/>
+                    <input type="hidden" id="affLocalId" />
+            </div>
+            <div class="text-warning pull-right" id="editorAffiliationAuthorityUsed"></div>
 		  </div>
 		  </div>
 		  <div>
@@ -1794,19 +1797,20 @@ function creatorLinkHandler(target) {
 		  
 		   <div id="creatorAffiliations">
 		  <div id="creatorAffiliationTemplate" class="form-group">
-		    
-			    <label for="creatorAffiliation">Affiliation:</label>
-			    <input type="text" class="form-control firstNameCreatorAffiliation" id="firstNameCreatorAffiliation" data-client-id="firstNameCreatorAffiliation" placeholder="Affiliation">
-		  	
-			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="CreatorAffiliation" id="searchCreatorAffiliation"
-				style="margin-left: 80%" disabled>Search Affiliation <i id="searchCreatorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
-			</button>
-			<label for="uriCreatorAffiliation"> Affiliation URI:</label>   
-		    <div class="form-group">
-			    <input type="text" class="form-control affUri" data-client-id="uriCreatorAffiliation" id="uriCreatorAffiliation" placeholder="URI">
-			    <input type="hidden" id="uriCreatorAffiliationLocalId" />
-		    </div>
-		    <div class="text-warning pull-right" id="creatorAffiliationAuthorityUsed"></div>
+		    <hr>
+            <div class="form-group">
+                <label for="creatorAffiliation">Affiliation:</label>
+                <input type="text" class="form-control firstNameCreatorAffiliation" id="firstNameCreatorAffiliation" data-client-id="firstNameCreatorAffiliation" placeholder="Affiliation">
+            </div>
+            <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="CreatorAffiliation" id="searchCreatorAffiliation"
+                style="margin-left: 76%" disabled>Search Affiliation <i id="searchCreatorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
+            </button>
+            <div class="form-group">
+                <label for="uriCreatorAffiliation">Affiliation URI:</label>   
+                    <input type="text" class="form-control affUri" data-client-id="uriCreatorAffiliation" id="uriCreatorAffiliation" placeholder="URI"/>
+                    <input type="hidden" id="affLocalId" />
+            </div>
+            <div class="text-warning pull-right" id="creatorAffiliationAuthorityUsed"></div>
 		  </div>
 		  </div>
 		  
