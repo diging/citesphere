@@ -22,7 +22,9 @@ public class SyncJobsController {
     public String list(Model model, @PageableDefault(sort = { "createdOn" }, direction = Direction.DESC) Pageable page,
             Authentication authentication) {
         long total = jobManager.getJobsCount((IUser) authentication.getPrincipal());
-        
+        if (total == -1) {
+            return "redirect:/";
+        }
         model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), page));
         model.addAttribute("total", Math.ceil(total/page.getPageSize()));
         model.addAttribute("page", page.getPageNumber() + 1);

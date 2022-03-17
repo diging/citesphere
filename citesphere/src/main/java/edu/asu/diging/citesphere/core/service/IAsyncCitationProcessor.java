@@ -6,5 +6,4 @@ public interface IAsyncCitationProcessor {
 
     void sync(IUser user, String groupId, long contentVersion, String collectionId);
 
-    
 }
