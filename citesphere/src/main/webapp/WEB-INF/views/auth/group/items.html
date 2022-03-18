@@ -450,6 +450,7 @@ function pollStatus(){
 			<th>Title</th>
 			<th>Date</th>
 			<th>URL</th>
+			<th>Files</th>
 			<th th:each="column:${columns}" th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}">
 				[[${columnLabel}]]
 			</th>
@@ -509,6 +510,19 @@ function pollStatus(){
 		 		<a href="${entry.url}" target="_blank" th:title="${entry.url} "><i class="icon-www"></i></a>
 		 		</span>
 		 	</td>
+			<td>
+				<span th:if="${!#sets.isEmpty(entry.gilesUploads)}">
+				<a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+					<i class="icon-multiple-doc"></i>
+				</a>
+				<a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+					<i class="icon-multiple-doc"></i>
+				</a>
+				<a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+					<i class="icon-multiple-doc"></i>
+				</a>
+				</span>
+			</td>
 		 	<td th:each="column:${columns}" style="max-width:300px;">
 		 		[[${entry[column]}]]
 		 	</td>
