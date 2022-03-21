@@ -60,6 +60,7 @@ $(function() {
 	
 	/* Handle Author events */
 	$("#addAuthorButton").click(function() {
+		
 		savePersonDetails("Author", "Author");
 	});
 	
@@ -114,34 +115,34 @@ $(function() {
     
     function searchAuthorities(modalType, personType) {
     	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
-			$('#selectAuthorityModel a:first').tab('show');
-		})  
-		$("#search"+modalType+"Spinner").show();
-		$('#userAuthority-pagination-top').twbsPagination('destroy');
-		$('#groupAuthority-pagination-top').twbsPagination('destroy');
-		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-		$('#viafAuthority-pagination-top').twbsPagination('destroy');
+    	    $('#selectAuthorityModel a:first').tab('show');
+        })  
+	    $("#search"+modalType+"Spinner").show();
+	    $('#userAuthority-pagination-top').twbsPagination('destroy');
+	    $('#groupAuthority-pagination-top').twbsPagination('destroy');
+	    $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+	    $('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
-		getUserAuthorities(modalType, personType, 0)
-		getViafAuthorities(modalType, personType, 0)
-		getGroupAuthorities(modalType, personType, 0)
-		getconceptpowerAuthorities(modalType, personType, 0)
-		$("#search"+modalType+"Spinner").hide();
-    }
+	    getUserAuthorities(modalType, personType, 0)
+	    getViafAuthorities(modalType, personType, 0)
+	    getGroupAuthorities(modalType, personType, 0)
+	    getconceptpowerAuthorities(modalType, personType, 0)
+	    $("#search"+modalType+"Spinner").hide();
+	}
     
-	 $("#searchAuthor").click(function() {
+	$("#searchAuthor").click(function() {
 	    searchAuthorities('Author', 'Author');
 	});
 	
-	 $(document).on("click", "#searchAuthorAffiliation", function() {
+	$(document).on("click", "#searchAuthorAffiliation", function() {
 		searchAuthorities('AuthorAffiliation', 'AuthorAffiliation');
 	});
 	 
-	 $(document).on("click", "#searchEditorAffiliation", function() {
+	$(document).on("click", "#searchEditorAffiliation", function() {
 		searchAuthorities('EditorAffiliation', 'EditorAffiliation');
 	});
 	 
-	 $(document).on("click", "#searchCreatorAffiliation", function() {
+	$(document).on("click", "#searchCreatorAffiliation", function() {
 		searchAuthorities('CreatorAffiliation', 'CreatorAffiliation');
 	});
 	
@@ -520,7 +521,7 @@ function editPerson(modalName, item){
 		if (counter != 0) {
 			affInput.attr("id", modalNameLCase+"AffiliationTemplate"+counter);
 			
-			var affiliationCounter = modalName + 'Affiliation' + counter;
+    		var affiliationCounter = modalName + 'Affiliation' + counter;
     		$("#"+modalNameLCase+"AffiliationTemplate"+counter).find("#search"+modalName+"AffiliationSpinner").attr('id', 'search'+affiliationCounter+'Spinner');
     		
     		$("#"+modalNameLCase+"AffiliationTemplate"+counter).find('input, button').each(function() {
@@ -564,6 +565,11 @@ function savePersonDetails(personType, modalName){
 	
 	var firstname = $("#firstName"+modalName).val();
 	var lastname = $("#lastName"+modalName).val();
+	
+	if (!firstname && !lastname) {
+		
+	}
+	
 	var uri = $("#uri"+modalName).val();
 	var localAuthority = $("#uri"+modalName+"LocalId").val();
 	personSpan.attr("data-"+modalNameLCase+"-firstname", firstname);
