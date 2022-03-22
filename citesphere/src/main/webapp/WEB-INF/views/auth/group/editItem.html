@@ -60,7 +60,6 @@ $(function() {
 	
 	/* Handle Author events */
 	$("#addAuthorButton").click(function() {
-		
 		savePersonDetails("Author", "Author");
 	});
 	
@@ -76,38 +75,40 @@ $(function() {
 	
 	/* Disable search authority button when first name and last name fields are empty*/
     $("#firstNameAuthor").keyup(function(e){
-    	allowAuthoritySearch("Author");
-     });
+    	allowSearchAndAdd("Author");
+    });
 	
     $(document).on("keyup", "#firstNameAuthorAffiliation", function() {
-    	allowAuthoritySearch("AuthorAffiliation");
-     });
+    	allowSearchAndAdd("AuthorAffiliation");
+    });
 
     $(document).on("keyup", "#firstNameEditorAffiliation", function() {
-    	allowAuthoritySearch("EditorAffiliation");
-     });
+    	allowSearchAndAdd("EditorAffiliation");
+    });
 
     $(document).on("keyup", "#firstNameCreatorAffiliation", function() {
-    	allowAuthoritySearch("CreatorAffiliation");
-     });
+    	allowSearchAndAdd("CreatorAffiliation");
+    });
     
     $("#lastNameAuthor").keyup(function(e){
-    	allowAuthoritySearch("Author");
-     });
+    	allowSearchAndAdd("Author");
+    });
+    
     $("#firstNameEditor").keyup(function(e){
-    	allowAuthoritySearch("Editor");
-     });
+    	allowSearchAndAdd("Editor");
+    });
 		
     $("#lastNameEditor").keyup(function(e){
-    	allowAuthoritySearch("Editor");
-     });
+    	allowSearchAndAdd("Editor");
+    });
+    
     $("#firstNameCreator").keyup(function(e){
-    	allowAuthoritySearch("Creator");
-     });
+    	allowSearchAndAdd("Creator");
+    });
 		
     $("#lastNameCreator").keyup(function(e){
-    	allowAuthoritySearch("Creator");
-     });
+    	allowSearchAndAdd("Creator");
+    });
 	
     $(".remove-aff").click(function(){
     	
@@ -228,6 +229,7 @@ $(function() {
 				$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
 				showPersonNameInModal(data['name'], "Author");
 				$("#uriLoadingFoundAuthor").popover('hide');
+				$("#addAuthorButton").prop("disabled", false);
 			}
 		});
 	});
@@ -252,6 +254,7 @@ $(function() {
 		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
 		showPersonNameInModal($(this).attr('data-authority-name'), "Author");
 		$("#uriLoadingFoundAuthor").popover('hide');
+		$("#addAuthorButton").prop("disabled", false);
 		event.preventDefault();
 	});
 	
@@ -327,6 +330,7 @@ $(function() {
 				$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
 				showPersonNameInModal(data['name'], "Editor");
 				$("#uriLoadingFoundEditor").popover('hide');
+				$("#addEditorButton").prop("disabled", false);
 			}
 		});
 	});
@@ -337,6 +341,7 @@ $(function() {
 		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
 		showPersonNameInModal($(this).attr('data-authority-name'), "Editor");
 		$("#uriLoadingFoundEditor").popover('hide');
+		$("#addEditorButton").prop("disabled", false);
 		event.preventDefault();
 	});
 	
@@ -399,6 +404,7 @@ $(function() {
 				$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
 				showPersonNameInModal(data['name'], "Creator");
 				$("#uriLoadingFoundCreator").popover('hide');
+				$("#addCreatorButton").prop("disabled", false);
 			}
 		});
 	});
@@ -409,6 +415,7 @@ $(function() {
 		$("#creatorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
 		showPersonNameInModal($(this).attr('data-authority-name'), "Creator");
 		$("#uriLoadingFoundCreator").popover('hide');
+		$("#addCreatorButton").prop("disabled", false);
 		event.preventDefault();
 	});
 	
@@ -435,12 +442,14 @@ $(function() {
 	});
 });
 
-function allowAuthoritySearch(element){
+function allowSearchAndAdd(element){
     if($("#firstName"+element).val() == "" && $("#lastName"+element).val()==""){
     	$("#search"+element).prop("disabled", true);
+    	$("#add"+element+"Button").prop("disabled", true);
     }
     else{
     	$("#search"+element).prop("disabled", false);
+    	$("#add"+element+"Button").prop("disabled", false);
     }
 }
 
@@ -540,6 +549,7 @@ function editPerson(modalName, item){
 
 	$("#addCreatorButton").attr("data-"+modalNameLCase+"-type", personItem.attr("data-"+modalNameLCase+"type"));
 	$("#add"+modalName+"Button").text("Update "+modalName);
+	$("#add"+modalName+"Button").prop("disabled", false);
 	
 	$("#"+modalNameLCase+"Modal").modal('show');
 	if($("#firstName"+modalName).val() != "" || $("#lastName"+modalName).val() != ""){
@@ -761,6 +771,7 @@ function resetPersonCreationModal(modalType) {
 	}
 	
 	$("#add"+modalType+"Button").text("Add "+modalType);
+	$("#add"+modalType+"Button").prop("disabled",true);
 	$("#"+modalNameLCase+"AffiliationAuthorityUsed").empty();
 	resetPersonAuthorityCreation(modalType);
 }
@@ -1637,9 +1648,10 @@ function creatorLinkHandler(target) {
 		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
 		  </div>
 		  <div id="authorAffiliations">
-		  <div id="authorAffiliationTemplate">
+		  <div class="aff-entry" id="authorAffiliationTemplate">
 		      <hr>
 		      <div class="form-group">
+			    <button type="button" class="remove-aff" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 			    <label for="affiliationAuthor">Affiliation:</label>
 			    <input type="text" class="form-control firstNameAuthorAffiliation" id="firstNameAuthorAffiliation" data-client-id="firstNameAuthorAffiliation" placeholder="Affiliation">
 		  	</div>
@@ -1657,7 +1669,7 @@ function creatorLinkHandler(target) {
       
       <div class="modal-footer">
         <button type="button" class="btn btn-default" id="addAuthorModalCancel">Close</button>
-        <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
+        <button id="addAuthorButton" type="button" class="btn btn-primary" disabled>Add Author</button>
       </div>
     </div>
   </div>
@@ -1728,7 +1740,7 @@ function creatorLinkHandler(target) {
       
       <div class="modal-footer">
         <button type="button" id="addEditorModalCancel" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button id="addEditorButton" type="button" class="btn btn-primary">Add Editor</button>
+        <button id="addEditorButton" type="button" class="btn btn-primary" disabled>Add Editor</button>
       </div>
     </div>
   </div>
@@ -1799,7 +1811,7 @@ function creatorLinkHandler(target) {
       
       <div class="modal-footer">
         <button type="button" class="btn btn-default" id="addCreatorModalCancel">Close</button>
-        <button id="addCreatorButton" type="button" class="btn btn-primary">Add Creator</button>
+        <button id="addCreatorButton" type="button" class="btn btn-primary" disabled>Add Creator</button>
       </div>
     </div>
   </div>
