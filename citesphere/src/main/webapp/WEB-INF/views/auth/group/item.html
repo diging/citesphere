@@ -88,24 +88,48 @@
 		
 		var uploadItem = $(item);
 		var modalNameLCase = modalName.toLowerCase();
-		
 		$("#uploadedFileName").attr('href', uploadItem.attr("upload-href"));
 		$("#uploadedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-uploadedFile-filename"));
 		
 		$("#extractedFileName").attr('href', uploadItem.attr("extractedText-href"));
 		$("#extractedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-extractedText-filename"));
+		$('.modal-body ul').append('<li><p>Pages: </p></li>');
+		pageCount=0
+		$('.modal-body ul').append('<ul>');
+		console.log(uploadItem)
 		$(uploadItem).children().each(function() {
+			
+			$('.modal-body ul').append('<li><p>Page'+pageCount+' : </p></li>');
 		   $(this).children().each(function() {
-           		$('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("image-href")+'">'+$(this).attr("data-"+modalNameLCase+"-image-filename")+'</a></li>');
-           		$('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageText-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageText-filename")+'</a></li>');
-           		$('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("pageOcr-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageOcr-filename")+'</a></li>');
+			    
+			    
+			    /* $('.modal-body ul').append('<ul>'); */
+           		$('.modal-body ul ul li:last').after('<ul><li><p>Image : <a href="'+ $(this).attr("image-href")+'">'+$(this).attr("data-"+modalNameLCase+"-image-filename")+'</a></p></li>');
+           		$('.modal-body ul ul ul li:last').after('<li><p>Text : <a href="'+ $(this).attr("pageText-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageText-filename")+'</a></p></li>');
+           		$('.modal-body ul ul ul li:last').after('<li><p>OCR Result : <a href="'+ $(this).attr("pageOcr-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageOcr-filename")+'</a></p></li>');
+           		$('.modal-body ul ul ul li:last').after('<li><p>Additional Files : </p></li>');
+           		
+           		additionalFilesCount = 0
+           		/* $('.modal-body ul').append('<ul>') */
+           		$('.modal-body ul ul ul li:last').after('<ul>');
            		$(this).children().each(function() {
+           			
            			$(this).children().each(function() {
-           				$('.modal-body ul').append('<li class="list-group-item"><i class="icon-giles"></i><a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></li>');
+           				
+           				$('.modal-body ul ul ul ul li:last').after('<li><p>Additional Files'+additionalFilesCount+' : <a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></p></li>');
                    })
+                   additionalFilesCount += 1;
+           			
                })
+               $('.modal-body ul').append('</ul>');
+               $('.modal-body ul ul ul li:last').after('</ul>');
+           	   /* $('.modal-body ul').append('</ul>');	 */
+               /* $('.modal-body ul ul ul').append('</p>'); */
+           	   pageCount = pageCount+1;
            })
+           
        }) 
+	    $('.modal-body ul ul').append('</ul>');
 		
 	   $("#"+modalNameLCase+"Modal").modal('show');
 	}
@@ -410,14 +434,12 @@
                 </div>
                 <div class="modal-body">
                   <ul class="list-group" >
-                     <li class="list-group-item" >
-                     <i class="icon-giles"></i>
+                  	 <li><p> Upload File: 
                      <a id="uploadedFileName"> </a>
-                     </li>
-                     <li class="list-group-item">
-                     <i class="icon-giles"></i>
+                     </p></li>
+                     <li><p> Extracted Text: 
                      <a id="extractedFileName"> </a>
-                     </li>
+                     </p></li>
                    </ul>
                 </div>
                 <div class="modal-footer">
