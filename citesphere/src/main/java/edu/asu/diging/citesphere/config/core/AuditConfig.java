@@ -9,7 +9,6 @@ import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +32,9 @@ public class AuditConfig {
 
     @Value("${mongo.database.name}")
     private String mongoDbName;
+    
+    @Value("${javers_default_author}")
+    private String javersDefaultAuthor;
 
     private static final String CITATION_KEY = "key";
     private static final String GROUP_PROPERTY = "group";
@@ -57,7 +59,7 @@ public class AuditConfig {
             public String provide() {
                 Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
                 if (auth == null) {
-                    return "Sync Process";
+                    return javersDefaultAuthor;
                 }
                 return auth.getName();
             }
