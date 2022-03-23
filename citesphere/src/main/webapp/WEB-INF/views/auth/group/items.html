@@ -2,7 +2,7 @@
 <head>
 <style>
 .concept-filter-menu {
-   max-height:200px;
+   max-height:300px;
    overflow:scroll; 
 }
 </style>
@@ -93,7 +93,6 @@ $(function() {
 	
 	$("#select-all-concept").click(function(){
 		var checkbox = $(this).find(".all-concept-checkbox");
-		checkbox.prop("checked", !checkbox.prop("checked"));
 		$(".concept-checkbox").each(function() {
 			$(this).prop("checked", checkbox.prop("checked"));
 		});
@@ -114,8 +113,6 @@ $(function() {
 	});
 	
 	$(".conceptItem").click(function() {
-		var checkbox = $(this).find(".concept-checkbox");
-		checkbox.prop("checked", !checkbox.prop("checked"));
 		var conceptIds = [];
 		$(".conceptItem").each(function() {
 			if ($(this).find(".concept-checkbox").is(":checked")) {
@@ -484,10 +481,12 @@ function pollStatus(){
 	        </button>
 	        <ul id="conceptFilter" class="dropdown-menu concept-filter-menu" aria-labelledby="dropdownMenu1">
                 <li id="search-concept"><a><input type="text" placeholder="Search.." onkeyup="filterConcept(this.value)"/></a>
-	            <li id="select-all-concept" class="conceptItem" data-concept-name=""><a><input title="Select" class="all-concept-checkbox" type="checkbox" th:checked="${selectedConceptIds.size()==concepts.size()}"/> Select all</a></li>
-                <tbody th:each="concept:${concepts}">
+                <li id="select-all-concept" class="conceptItem" data-concept-name="">
+                    <a><input title="Select" class="all-concept-checkbox" id="all-concept" type="checkbox" th:checked="${selectedConceptIds.size()==concepts.size()}"/> <label for="all-concept">Select all</label></a>
+                </li>
+                <tbody th:each="concept,loop:${concepts}">
 	                <li class="conceptItem" th:data-concept-id="${concept.id}" th:data-concept-name="${concept.name.toLowerCase()}">
-	                    <a><input title="Select" type="checkbox" class="concept-checkbox" th:checked="${selectedConceptIds.contains(concept.id)}"/> [[${concept.name}]]</a>
+	                    <a><input title="Select" type="checkbox" class="concept-checkbox" id="concept${loop.index}" th:checked="${selectedConceptIds.contains(concept.id)}"/> <label for="concept${loop.index}">[[${concept.name}]]</label></a>
 	                </li>
 	           </tbody>
 	        </ul>
