@@ -60,14 +60,14 @@ public class ListAuthoritiesController {
             		String name=entry.getName();
 	            	Set<IPerson> authors=citation.getAuthors();
 	            	for(IPerson person: authors) {
-	            		if(person.getName().equals(name)){
+	            		if(person.getName().equals(" "+name)){
 	            			citations.add(citation);
 	            			break;
 	            		}
 	            	}
 	            	Set<IPerson> editors=citation.getEditors();
 	            	for(IPerson person: editors) {
-	            		if(person.getName().equals(name) && !citations.contains(citation)){
+	            		if(person.getName().equals(" "+name) && !citations.contains(citation)){
 	            			citations.add(citation);
 	            			break;
 	            			}
@@ -78,7 +78,7 @@ public class ListAuthoritiesController {
 	            			creators.add(creator.getPerson());
 	            		}
 	            	for(IPerson person: creators) {
-	            		if(person.getName().equals(name) && !citations.contains(citation)){
+	            		if(person.getName().equals(" "+name) && !citations.contains(citation)){
 	            			citations.add(citation);
 	            			break;
 	            			}
