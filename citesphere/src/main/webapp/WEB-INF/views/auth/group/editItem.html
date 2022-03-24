@@ -89,8 +89,10 @@ $(function() {
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Author','Author', 0)
+		getViafAuthorities('Author', 'Author', 0)
 		getGroupAuthorities('Author','Author', 0)
 		getconceptpowerAuthorities('Author','Author',0)
 		$("#searchAuthorSpinner").hide();
@@ -105,8 +107,10 @@ $(function() {
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Editor','Editor', 0)
+		getViafAuthorities('Editor', 'Editor', 0)
 		getGroupAuthorities('Editor','Editor', 0)
 		getconceptpowerAuthorities('Editor','Editor',0)
 		$("#searchEditorSpinner").hide();
@@ -121,8 +125,10 @@ $(function() {
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Creator','Creator', 0)
+		getViafAuthorities('Creator', 'Creator', 0)
 		getGroupAuthorities('Creator','Creator', 0)
 		getconceptpowerAuthorities('Creator','Creator',0)
 		$("#searchCreatorSpinner").hide();
@@ -465,6 +471,7 @@ function savePersonDetails(personType, modalName){
 	personSpan.attr("data-"+modalNameLCase+"-lastname", lastname);
 	personSpan.attr("data-"+modalNameLCase+"-uri", uri);
 	personSpan.attr("data-"+modalNameLCase+"-authority-id", localAuthority);
+	personSpan.attr("data-creator-type", personTypeLCase);
 	
 	var affiliationsList = [];
 	var affSpan = $("<span>");
@@ -649,8 +656,6 @@ function resetPersonAuthorityCreation(personType) {
 	$("#uriLoadingFound"+personType).popover('hide');
 	$("#uriLoadingFailure"+personType).popover('hide');
 	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
-	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").html("");
-	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
@@ -679,8 +684,12 @@ function getPersonAuthority(uri, personType) {
 			});
 			content += "</ul>";
 		}
-		content += "<br><br>Do you want to create a managed authority entry?<br>" +
-					'<span id="'+personType_lowerCase+'AuthorityCreationFeedback"><button id="'+personType_lowerCase+'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+		
+		if((data['userAuthorityEntries'] == null || data['userAuthorityEntries'].length == 0) 
+				&& (data['datasetAuthorityEntries'] == null || data['datasetAuthorityEntries'].length == 0)) {
+			content += "<br><br>No authorities found for the given URI<br>";
+		}
+		
 		$("#uriLoadingFound"+personType).attr("data-content", content);
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", uri);
 		$("#uriLoadingFound"+personType).show();
@@ -869,7 +878,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			$("#uri"+modalType).val( uri);
 			
 			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=conceptpower&uri=' + uri;	
-			if($("#mycheckbox").is(":checked")){
+			if($("#cp-checkbox").is(":checked")){
 				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
 			}
 			$.ajax({
@@ -894,6 +903,88 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 	error: function(data){
 		$('#conceptpowerAuthoritySearchResult').parents('table').hide()
 		$("#conceptpowerAuthoritiesError").show();	
+	}
+	
+	});
+}
+
+function getViafAuthorities(modalType, personType, page) {
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/viaf|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
+
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+  			$('#viaf-groupName').text(data['groupName']);
+  			$("#viafAuthoritySearchResult").empty();
+  			var content = '';
+  				
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {	
+  					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
+  					if(elem['description']==null) {
+  						content += ' - </td>';
+  					}
+  					else {
+  						content +=elem['description'] + '</td>';
+  					}
+  					content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+  					
+  				}); 				
+  				
+  				$('#viafAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	getViafAuthorities(modalType, personType, page-1)
+  				    }
+  				});
+  				
+  			}
+  			
+		$("#viafAuthoritySearchResult").append(content); 	
+		$(".viaf-authority-entry").click(function() {
+			name = $(this).closest("tr").find(".name").text();
+			uri = $(this).closest("tr").find(".uri").text();
+			
+			showPersonNameInModal(name, personType)
+			$("#uri"+modalType).val( uri);
+			
+			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=viaf&uri=' + uri;	
+			if($("#viaf-checkbox").is(":checked")) {
+				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
+			}
+			$.ajax({
+				dataType: "json",
+				type: 'POST',
+				url: createManageAuthorityURL,
+				data: { [[${_csrf.parameterName}]] : [[${_csrf.token}]] },
+				async:false,
+				success: function(data) {
+					$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+				},
+				error: function(data) {					
+					$("#uri"+modalType).val("");
+		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+				}
+			});				
+						
+			$("#selectAuthorityModel").modal('hide');
+		});	
+		
+        },
+	error: function(data){
+		$('#viafAuthoritySearchResult').parents('table').hide()
+		$("#viafAuthoritiesError").show();	
 	}
 	
 	});
@@ -1554,6 +1645,10 @@ function creatorLinkHandler(target) {
 							<a href="#conceptpowerAuthoritiesTabContent"
 								aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from Conceptpower</a>
 						</li>
+                        <li role="presentation">
+                            <a href="#viafAuthoritiesTabContent"
+                                aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from VIAF</a>
+                        </li>
 					</ul>
 					<!-- Tab panes -->
 					<div class="tab-content">
@@ -1588,8 +1683,8 @@ function creatorLinkHandler(target) {
 							<div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
 								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
-							<div id="mycheckboxDiv">
-							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group <span id="cp-groupName"></span>
+							<div id="cp-checkboxDiv">
+							<input type="checkbox" id="cp-checkbox" name="cp-checkbox" th:checked="checked"> Add authority to group <span id="cp-groupName"></span>
 							</div>
 							</br>
 							<table class="table table-striped table-bordered table-fixed">
@@ -1599,6 +1694,23 @@ function creatorLinkHandler(target) {
 							</table>
 							
 						</div>
+                        
+                        <div role="tabpanel" class="tab-pane" id="viafAuthoritiesTabContent">
+                            <ul id="viafAuthority-pagination-top" class="pagination-sm"></ul>
+                            <div id="viafAuthoritiesError" class="text-warning" style="display: none">
+                                <span> Error occurred while searching authorities in VIAF </span>
+                            </div>
+                            <div id="viaf-checkboxDiv">
+                            <input type="checkbox" id="viaf-checkbox" name="viaf-checkbox" th:checked="checked"> Add authority to group <span id="viaf-groupName"></span>
+                            </div>
+                            </br>
+                            <table class="table table-striped table-bordered table-fixed">
+                                <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+                                <tbody id="viafAuthoritySearchResult">
+                                </tbody>
+                            </table>
+                        </div>
+                        
 					</div>
 				</div>
 				<div class="modal-footer">
