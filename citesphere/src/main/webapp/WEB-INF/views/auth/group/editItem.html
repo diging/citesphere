@@ -11,6 +11,24 @@
 }
 </style>
 <script th:inline="javascript">
+
+var affiliationTemplate = $($.parseHTML('<div class="aff-entry" id="AffiliationTemplate">' +
+	      '<hr>' + 
+	      '<div class="form-group">' +
+		    '<div class="pull-right remove-aff"><a>Remove</a></div>' +
+		    '<label for="affiliation">Affiliation:</label>' + 
+		    '<input type="text" class="form-control firstName" id="firstName" data-client-id="firstName" placeholder="Affiliation">' +
+		  '</div>' +
+		'<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="Affiliation" id="search"' +
+			'style="margin-left: 76%" disabled>Search Affiliation <i id="searchSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>' +
+		'</button>' +
+		'<div class="form-group">' +
+			'<label for="uri">Affiliation URI:</label>' +
+		    	'<input type="text" class="form-control affUri" data-client-id="uri" id="uri" placeholder="URI"/>' +
+		'</div>' +
+	  '</div>')
+);
+
 //# sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
@@ -110,8 +128,8 @@ $(function() {
     	allowSearchAndAdd("Creator");
     });
 	
-    $(".remove-aff").click(function(){
-    	
+    $(document).on("click", ".remove-aff", function() {
+    	$(this).closest('.aff-entry').remove();
     });
     
     function searchAuthorities(modalType, personType) {
@@ -169,6 +187,12 @@ $(function() {
 	
 	function addAffiliation(modalType, counter) {
 		modalTypeL = modalType.toLowerCase();
+		var affiliationCopy = affiliationTemplate.clone();
+		affiliationCopy.attr("id", modalTypeL+"AffiliationTemplate"+counter);
+		affiliationCopy.addClass("aff-info");
+		affiliationCopy.find("input").val("");
+		$("#"+modalTypeL+"Affiliations").append(affiliationCopy);
+		
 		var affiliationCopy = $("#"+modalTypeL+"AffiliationTemplate").clone();
 		affiliationCopy.attr("id", modalTypeL+"AffiliationTemplate"+counter);
 		affiliationCopy.addClass("aff-info");
@@ -185,7 +209,7 @@ $(function() {
 		
 		var affiliationCounter = modalType + 'Affiliation' + counter;
 		$('#firstName'+affiliationCounter).keyup(function(e) {
-			allowAuthoritySearch(affiliationCounter);
+			allowSearchAndAdd(affiliationCounter);
 		});
 		
 		$("#"+modalTypeL+"AffiliationTemplate"+counter).find("#search"+modalType+"AffiliationSpinner").attr('id', 'search'+affiliationCounter+'Spinner');
@@ -1651,7 +1675,7 @@ function creatorLinkHandler(target) {
 		  <div class="aff-entry" id="authorAffiliationTemplate">
 		      <hr>
 		      <div class="form-group">
-			    <button type="button" class="remove-aff" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			    <div class="pull-right remove-aff"><a>Remove</a></div>
 			    <label for="affiliationAuthor">Affiliation:</label>
 			    <input type="text" class="form-control firstNameAuthorAffiliation" id="firstNameAuthorAffiliation" data-client-id="firstNameAuthorAffiliation" placeholder="Affiliation">
 		  	</div>
@@ -1718,9 +1742,10 @@ function creatorLinkHandler(target) {
 		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
 		  </div>
 		  <div id="editorAffiliations">
-    		  <div id="editorAffiliationTemplate" class="form-group">
+    		  <div id="editorAffiliationTemplate" class="form-group aff-entry">
     		      <hr>
     		      <div class="form-group">
+                      <div class="pull-right remove-aff"><a>Remove</a></div>
     		          <label for="editorAffiliation">Affiliation:</label>
     		          <input type="text" class="form-control firstNameEditorAffiliation" id="firstNameEditorAffiliation" data-client-id="firstNameEditorAffiliation" placeholder="Affiliation">
     		      </div>
@@ -1788,9 +1813,10 @@ function creatorLinkHandler(target) {
 		  </div>
 		  
 		  <div id="creatorAffiliations">
-		      <div id="creatorAffiliationTemplate" class="form-group">
+		      <div id="creatorAffiliationTemplate" class="form-group aff-entry">
 		          <hr>
 		          <div class="form-group">
+                      <div class="pull-right remove-aff"><a>Remove</a></div>
 		              <label for="creatorAffiliation">Affiliation:</label>
 		              <input type="text" class="form-control firstNameCreatorAffiliation" id="firstNameCreatorAffiliation" data-client-id="firstNameCreatorAffiliation" placeholder="Affiliation">
 		          </div>
