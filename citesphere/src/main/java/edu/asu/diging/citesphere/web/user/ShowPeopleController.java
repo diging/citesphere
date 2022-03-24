@@ -36,15 +36,13 @@ public class ShowPeopleController {
 
     @Autowired
     private ICitationManager citationManager;
-    
-    Map<IPerson, List<ICitation>> iPersoniCitSortedMap = new TreeMap<IPerson, List<ICitation>>();
+
+    Map<IPerson, List<ICitation>> personCitationSortedMap = new TreeMap<IPerson, List<ICitation>>();
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/showPeople")
     public String showPeople(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value="index", required=false) String index, @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
-            @RequestParam(required = false, value = "columns") String[] columns) {
+            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort) {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
@@ -54,90 +52,74 @@ public class ShowPeopleController {
         IUser user = (IUser) authentication.getPrincipal();
         CitationResults results;
         try {
-            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
-        } catch(ZoteroHttpStatusException e) {
+            results = citationManager.getGroupItems(user, groupId, null, pageInt, sort);
+        } catch (ZoteroHttpStatusException e) {
             logger.error("Exception occured", e);
             return "error/500";
-        } catch(GroupDoesNotExistException e) {
+        } catch (GroupDoesNotExistException e) {
             logger.error("Exception occured", e);
             return "error/404";
         }
-        model.addAttribute("collectionId", collectionId);
         model.addAttribute("zoteroGroupId", groupId);
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("sort", sort);
-        
-        Map<IPerson, List<ICitation>> personCitationMap=new HashMap<IPerson, List<ICitation>>();
-        
-        results.getCitations().stream().forEach(
-                iCitation -> (Stream.of(iCitation.getAuthors().stream(), iCitation.getEditors().stream(), 
-                        iCitation.getOtherCreators().stream().map(iOtherCreator -> iOtherCreator.getPerson()))
-                        .reduce(Stream::concat).orElseGet(Stream::empty)).
-                filter(distinctByKey(p -> p.getFirstName())).forEach(
-                        au -> {
-                            boolean containKey = false;
-                                for (IPerson key : personCitationMap.keySet()) {
-                                    if (key.getFirstName().equals(au.getFirstName()) && 
-                                            key.getLastName().equals(au.getLastName())) {
-                                        personCitationMap.get(key).add(iCitation);
-                                        containKey = true;
-                                        break;
-                                    }
-                                }
-                                if (!containKey) {
-                                  List<ICitation> citList = new ArrayList<ICitation>();
-                                  citList.add(iCitation);
-                                  personCitationMap.put(au, citList);
-                                }
-                                
-                            }
-                        ));
-        
+
+        Map<IPerson, List<ICitation>> personCitationMap = new HashMap<IPerson, List<ICitation>>();
+
+        results.getCitations().stream()
+                .forEach(
+                        iCitation -> (Stream
+                                .of(iCitation.getAuthors().stream(), iCitation.getEditors().stream(),
+                                        iCitation.getOtherCreators().stream()
+                                                .map(iOtherCreator -> iOtherCreator.getPerson()))
+                                .reduce(Stream::concat).orElseGet(Stream::empty))
+                                        .filter(distinctByKey(p -> p.getFirstName())).forEach(au -> {
+                                            boolean containKey = false;
+                                            for (IPerson key : personCitationMap.keySet()) {
+                                                if (key.getFirstName().equals(au.getFirstName())
+                                                        && key.getLastName().equals(au.getLastName())) {
+                                                    personCitationMap.get(key).add(iCitation);
+                                                    containKey = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!containKey) {
+                                                List<ICitation> citList = new ArrayList<ICitation>();
+                                                citList.add(iCitation);
+                                                personCitationMap.put(au, citList);
+                                            }
+
+                                        }));
+
         Map<IPerson, List<ICitation>> personCitationTMap = new TreeMap<IPerson, List<ICitation>>(personCitationMap);
 
         Collection<IPerson> keyCollection = personCitationTMap.keySet();
         List<IPerson> peopleList = new ArrayList<IPerson>(keyCollection);
-        
+
         model.addAttribute("people", peopleList);
-        
-        iPersoniCitSortedMap = new TreeMap<IPerson, List<ICitation>>(personCitationTMap);
+
+        personCitationSortedMap = new TreeMap<IPerson, List<ICitation>>(personCitationTMap);
+
+        return "auth/group/showPeople";
+    }
+
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/showCitation/{index}")
+    public String showCitation(Model model, Authentication authentication,
+            @PathVariable("zoteroGroupId") String groupId,
+            @PathVariable(value = "index", required = false) String index) {
+
+        model.addAttribute("zoteroGroupId", groupId);
 
         if (index != null && !index.isEmpty()) {
-            model.addAttribute("involvedCitations", personCitationTMap.get(personCitationTMap.keySet().toArray()[Integer.parseInt(index)]));
-            return "auth/group/showCitations";
-        }
-        else
-            return "auth/group/showPeople";
-        }
-    
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/showCitation/{index}")
-    public String showCitation(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value="index", required=false) String index, @PathVariable(value="collectionId", required=false) String collectionId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
-            @RequestParam(required = false, value = "columns") String[] columns) {
-        
-        Integer pageInt = 1;
-        try {
-            pageInt = new Integer(page);
-        } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-        }
-        model.addAttribute("collectionId", collectionId);
-        model.addAttribute("zoteroGroupId", groupId);
-        model.addAttribute("currentPage", pageInt);
-        model.addAttribute("sort", sort);
-        
-        if (index != null && !index.isEmpty()) {
-            model.addAttribute("involvedCitations", iPersoniCitSortedMap.get(iPersoniCitSortedMap.keySet().toArray()[Integer.parseInt(index)]));
+            model.addAttribute("involvedCitations",
+                    personCitationSortedMap.get(personCitationSortedMap.keySet().toArray()[Integer.parseInt(index)]));
         }
         return "auth/group/showCitations";
     }
-    
-    public static <T> Predicate<T> distinctByKey(
-            Function<? super T, ?> keyExtractor) {
-          
-            Map<Object, Boolean> seen = new ConcurrentHashMap<>(); 
-            return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null; 
-        }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
 }

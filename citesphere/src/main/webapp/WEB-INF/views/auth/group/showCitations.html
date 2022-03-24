@@ -9,7 +9,7 @@
     <ul class="list-group">
       <li th:each="iCitation, iterStat : ${involvedCitations}" class="list-group-item clearfix">
         <a class="bib-entry"
-          th:href="@{|/auth/group/${zoteroGroupId}/items/${iCitation.key}?index=${iterStat.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+          th:href="@{|/auth/group/${zoteroGroupId}/items/${iCitation.key}?index=${iterStat.index}|}">
           <i>[[${iCitation.title}]] </i>
         </a>
       </li>
