@@ -1,11 +1,9 @@
 <html layout:decorate="~{layouts/main}">
 <head>
 <style>
-
 #viewUploadBody  {
   padding-left: 30px;
 }
-
 </style>
 <script th:inline="javascript">
 //# sourceURL=modal.js
@@ -37,9 +35,7 @@
 	});
 
 	$(document).ready(function(){
-		
 		$("#uploadFileIcon").click(function() {
-			
 	        $("#uploadFileModal").modal('show');
 	    });
 	    
@@ -86,13 +82,13 @@
 	    
 	    var viewCounter = 0
 	    $(".view-link").click(function() {
-	       if(viewCounter<=0) {	
-           	var item = $(this).parent()
-           	showFiles('viewUpload', item[0]);
-	       }
-	       modalName = 'viewUpload'
-	       $("#"+modalName.toLowerCase()+"Modal").modal('show');
-	       viewCounter++;	
+	        if(viewCounter<=0) {	
+           	   var item = $(this).parent()
+           	   showFiles('viewUpload', item[0]);
+	        }
+	        modalName = 'viewUpload'
+	        $("#"+modalName.toLowerCase()+"Modal").modal('show');
+	        viewCounter++;	
 		});
 	});
 	
@@ -113,12 +109,12 @@
 		
 		$(uploadItem).children().each(function() {
 			
-			if($(this).attr('class')=="page-item"){
-				$('#page-list').append('<li><p style="margin : 0; padding-top:0;">Page'+pageCount+': </p></li>');
-			}
-		   $(this).children().each(function() {
-			    pageItems = "page-items"+pageCount
-			    $('#page-list').append('<ul id = "'+pageItems+'"></ul>');
+           if($(this).attr('class')=="page-item"){
+               $('#page-list').append('<li><p style="margin : 0; padding-top:0;">Page'+pageCount+': </p></li>');
+           }
+           $(this).children().each(function() {
+                pageItems = "page-items"+pageCount
+                $('#page-list').append('<ul id = "'+pageItems+'"></ul>');
            		$('#page-items'+pageCount).append('<li><p style="margin-bottom:0;">Image: <a href="'+ $(this).attr("image-href")+'">'+$(this).attr("data-"+modalNameLCase+"-image-filename")+'</a></p></li>');
            		$('#page-items'+pageCount).append('<li><p style="margin : 0; padding-top:0;">Text: <a href="'+ $(this).attr("pageText-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageText-filename")+'</a></p></li>');
            		$('#page-items'+pageCount).append('<li><p style="margin-bottom:0;">OCR Result: <a href="'+ $(this).attr("pageOcr-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageOcr-filename")+'</a></p></li>');
@@ -127,16 +123,14 @@
            		var additionalFilesCount = 1;
            		additionalItems = "additional-list"+pageCount
            		$('#page-items'+pageCount).append('<ul id="'+additionalItems+'"></ul>')
-           		
            		$(this).children().each(function() {
            			$(this).children().each(function() {
            				$('#additional-list'+pageCount).append('<li><p style="margin-bottom:0;">Additional Files'+additionalFilesCount+': <a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></p></li>');
                    })
                    additionalFilesCount += 1;
                })
-           	   pageCount = pageCount+1;
+               pageCount = pageCount+1;
            })
-           
        }) 
 	}
 	
