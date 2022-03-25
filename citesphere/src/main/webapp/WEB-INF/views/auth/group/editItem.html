@@ -100,18 +100,34 @@ $(function() {
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-
-		setTimeout(function() {getUserAuthorities('Author','Author', 0);}, 2000);
+		getUserAuthorities('Author','Author', 0);
+		$('#authoritySpinner').hide();
+		$('#userAuthoritiesTabContent').toggleClass('greyout');
+		/* setTimeout(function() {getUserAuthorities('Author','Author', 0);}, 2000); */
+		/* pollStatus();
+		console.log("Out of pollstatus") */
 		setTimeout(function() {getGroupAuthorities('Author','Author', 0);}, 2000);
 		setTimeout(function() {getconceptpowerAuthorities('Author','Author',0);}, 2000);
-		setTimeout(function() {
+		/* setTimeout(function() {
 			  $('#authoritySpinner').hide()
-			}, 3000);
-		setTimeout(function() { $('#userAuthoritiesTabContent').toggleClass('greyout')}, 3000);
+			}, 3000); */
+		/* setTimeout(function() { $('#userAuthoritiesTabContent').toggleClass('greyout')}, 3000); */
 		setTimeout(function() { $('#groupAuthoritiesTabContent').toggleClass('greyout')}, 3000);
 		setTimeout(function() { $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout')}, 3000);	
 	});
-	
+	/* function pollStatus(){
+		console.log("In poll status")
+    	$(getUserAuthorities('Author', 'Author', 0), function(data){
+    		console.log(data)
+    		if (data['foundAuthorities'] == null || data['foundAuthorities'].length <= 0){
+    			console.log("Hi")
+    			setTimeout(pollStatus,1000);
+    		}
+    		console.log("Hey")
+    		$('#authoritySpinner').hide()
+    			
+    	})
+    } */
 	$("#searchEditor").click(function() {
 		$("#userAuthoritySearchResult").empty();
 		$("#groupAuthoritySearchResult").empty();
@@ -749,7 +765,7 @@ function getUserAuthorities(modalType, personType, page) {
 			
   			$("#userAuthoritySearchResult").empty();
   			var content = '';
-  			
+  			console.log(data);
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {
   					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
@@ -774,7 +790,10 @@ function getUserAuthorities(modalType, personType, page) {
   				    }
   				});
   			}  		
-  			
+  			/* else{
+  				setTimeout(getUserAuthorities(modalType, personType, page), 1000);
+  				
+  			} */
 		
 		$("#userAuthoritySearchResult").append(content);
 		$(".user-authority-entry").click(function() {
