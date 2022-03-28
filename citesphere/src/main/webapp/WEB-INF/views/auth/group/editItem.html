@@ -12,21 +12,22 @@
 </style>
 <script th:inline="javascript">
 
-var affiliationTemplate = $($.parseHTML('<div class="aff-entry" id="AffiliationTemplate">' +
+var affCount = 0;
+var affiliationTemplate = $($.parseHTML('<div class="aff-entry">' +
 	      '<hr>' + 
 	      '<div class="form-group">' +
 		    '<div class="pull-right remove-aff"><a>Remove</a></div>' +
 		    '<label for="affiliation">Affiliation:</label>' + 
-		    '<input type="text" class="form-control firstName" id="firstName" data-client-id="firstName" placeholder="Affiliation">' +
+		    '<input type="text" class="form-control" id="firstName" placeholder="Affiliation">' +
 		  '</div>' +
-		'<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="Affiliation" id="search"' +
-			'style="margin-left: 76%" disabled>Search Affiliation <i id="searchSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>' +
-		'</button>' +
-		'<div class="form-group">' +
+		  '<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel"' +
+			'style="margin-left: 76%" disabled>Search Affiliation <i id="searchSpinner"class="fas fa-spinner fa-spin text-info" style="color: white" hidden></i>' +
+		  '</button>' +
+		  '<div class="form-group">' +
 			'<label for="uri">Affiliation URI:</label>' +
-		    	'<input type="text" class="form-control affUri" data-client-id="uri" id="uri" placeholder="URI"/>' +
-		'</div>' +
-	  '</div>')
+		    	'<input type="text" class="form-control affUri" placeholder="URI"/>' +
+		  '</div>' +
+		'</div>')
 );
 
 //# sourceURL=submit.js
@@ -188,53 +189,49 @@ $(function() {
 	function addAffiliation(modalType, counter) {
 		modalTypeL = modalType.toLowerCase();
 		var affiliationCopy = affiliationTemplate.clone();
-		affiliationCopy.attr("id", modalTypeL+"AffiliationTemplate"+counter);
-		affiliationCopy.addClass("aff-info");
-		affiliationCopy.find("input").val("");
-		$("#"+modalTypeL+"Affiliations").append(affiliationCopy);
+		affiliationCopy.attr('id', modalTypeL+'AffiliationTemplate'+counter);
+		affiliationCopy.addClass('aff-info');
 		
-		var affiliationCopy = $("#"+modalTypeL+"AffiliationTemplate").clone();
-		affiliationCopy.attr("id", modalTypeL+"AffiliationTemplate"+counter);
-		affiliationCopy.addClass("aff-info");
-		affiliationCopy.find("input").val("");
-		affiliationCopy.find("#"+modalTypeL+"AffiliationAuthorityUsed").empty();
-		affiliationCopy.show();
-		$("#"+modalTypeL+"Affiliations").append(affiliationCopy);
-		$("#"+modalTypeL+"AffiliationTemplate"+counter).find('input, button').each(function() {
-		    $(this).attr('id', $(this).attr('id') + counter);
-		    $(this).attr('data-client-id', $(this).attr('id'));
-		});
+		affiliationCopy.find('label[for="affiliation"]').attr('for', 'firstName'+modalType+'Affiliation'+counter);
+		affiliationCopy.find('label[for="uri"]').attr('for', 'uri'+modalType+'Affiliation'+counter);
 		
-		$("#search"+modalType+"Affiliation"+counter).prop("disabled",true);
+		var affInput = affiliationCopy.find('#firstName');
+		affInput.addClass('firstName'+modalType+'Affiliation');
+		affInput.attr('id', 'firstName'+modalType+'Affiliation'+counter);
+		affInput.attr('data-client-id', affInput.attr('id'));
+		
+		var searchButton = affiliationCopy.find('button');
+		searchButton.attr('id', 'search'+modalType+'Affiliation'+counter);
+		searchButton.attr('data-client-id', searchButton.attr('id'));
+		searchButton.find('#searchSpinner').attr('id', 'search'+modalType+'Affiliation'+counter+'Spinner');
+		searchButton.prop('disabled', true);
+		
+		var affUri = affiliationCopy.find('.affUri');
+		affUri.attr('id', 'uri'+modalType+'Affiliation'+counter);
+		affUri.attr('data-client-id', affUri.attr('id'));
+		
+		$("#"+modalTypeL+"Affiliations").append(affiliationCopy);
 		
 		var affiliationCounter = modalType + 'Affiliation' + counter;
 		$('#firstName'+affiliationCounter).keyup(function(e) {
 			allowSearchAndAdd(affiliationCounter);
 		});
 		
-		$("#"+modalTypeL+"AffiliationTemplate"+counter).find("#search"+modalType+"AffiliationSpinner").attr('id', 'search'+affiliationCounter+'Spinner');
-		
 		$("#search"+affiliationCounter).click(function() {
 			searchAuthorities(affiliationCounter, affiliationCounter);
 		});
 	}
 	
-	var authorAffCounter = 0;
 	$("#addAuthorAffiliation").click(function() {
-		authorAffCounter++;
-		addAffiliation("Author", authorAffCounter);
+		addAffiliation("Author", affCount + 1);
 	});
 	
-	var editorAffCounter = 0;
 	$("#addEditorAffiliation").click(function() {
-		editorAffCounter++;
-		addAffiliation("Editor", editorAffCounter);
+		addAffiliation("Editor", affCount + 1);
 	});
 	
-	var creatorAffCounter = 0;
 	$("#addCreatorAffiliation").click(function() {
-		creatorAffCounter++;
-		addAffiliation("Creator", creatorAffCounter);
+		addAffiliation("Creator", affCount + 1);
 	});
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -258,20 +255,6 @@ $(function() {
 		});
 	});
 	
-	
-// 	$("#authorAffiliationIconContainer").on('click', ".popover #authorCreateAuthority", function() {
-// 		var uri = $("#uriLoadingFoundAuthorAffiliation").attr('data-authority-uri');
-// 		$.post([[@{|/auth/authority/create?${_csrf.parameterName}=${_csrf.token}&uri=|}]] + uri, function(data) {
-// 			$("#authorCreateAuthority").hide();
-			
-// 			$("#uriAuthorAffiliationLocalId").val(data['id']);
-// 			$("#authorAffiliationAuthorityUsed").html("Created new authority entry <i>" + data['name'] + "</i>.");
-// 			$("#authorAffiliationAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
-// 			showPersonNameInModal(data['name'], "AuthorAffiliation");
-// 			$("#uriLoadingFoundAuthorAffiliation").popover('hide');
-// 		});
-// 	});
-	
 	$("#authorIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
 		var authId = $(this).attr('data-authority-id');
 		$("#uriAuthorLocalId").val(authId);
@@ -280,18 +263,8 @@ $(function() {
 		$("#uriLoadingFoundAuthor").popover('hide');
 		$("#addAuthorButton").prop("disabled", false);
 		event.preventDefault();
-	});
-	
-// 	$("#authorAffiliationIconContainer").on('click', ".popover .foundAuthorities li a", function(event) {
-// 		var authId = $(this).attr('data-authority-id');
-// 		$("#uriAuthorAffiliationLocalId").val(authId);
-// 		$("#authorAffiliationAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
-// 		showPersonNameInModal($(this).attr('data-authority-name'), "AuthorAffiliation");
-// 		$("#uriLoadingFoundAuthorAffiliation").popover('hide');
-// 		event.preventDefault();
-// 	});
-	
-	
+	});	
+
 	var timer = null;
 	$("#uriAuthor").change(function() {
 		resetPersonAuthorityCreation("Author");
@@ -532,7 +505,6 @@ function editPerson(modalName, item){
 	
 	var counter = 0;
 	personItem.children("span").each(function(idx, elem){
-		
 		var affInput;
 		if (counter == 0) {
 			affInput = $("#"+modalNameLCase+"AffiliationTemplate");
@@ -570,7 +542,7 @@ function editPerson(modalName, item){
 		}
 		counter++;
 	});
-
+	affCount = counter;
 	$("#addCreatorButton").attr("data-"+modalNameLCase+"-type", personItem.attr("data-"+modalNameLCase+"type"));
 	$("#add"+modalName+"Button").text("Update "+modalName);
 	$("#add"+modalName+"Button").prop("disabled", false);
@@ -599,10 +571,6 @@ function savePersonDetails(personType, modalName){
 	
 	var firstname = $("#firstName"+modalName).val();
 	var lastname = $("#lastName"+modalName).val();
-	
-	if (!firstname && !lastname) {
-		
-	}
 	
 	var uri = $("#uri"+modalName).val();
 	var localAuthority = $("#uri"+modalName+"LocalId").val();
@@ -798,6 +766,7 @@ function resetPersonCreationModal(modalType) {
 	$("#add"+modalType+"Button").prop("disabled",true);
 	$("#"+modalNameLCase+"AffiliationAuthorityUsed").empty();
 	resetPersonAuthorityCreation(modalType);
+	affCount = 0;
 }
 
 function resetPersonAuthorityCreation(personType) {
