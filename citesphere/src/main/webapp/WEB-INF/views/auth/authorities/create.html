@@ -41,17 +41,11 @@ $(function() {
             $('#selectAuthorityModel a:first').tab('show');
         })
         
-        $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
-        $("#authoritySpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         
-        setTimeout(function() {getConceptpowerAuthorities('Author', 'Author', 0);}, 2000);
-        setTimeout(function() {
-			  $('#authoritySpinner').hide()
-			}, 3000);
-        setTimeout(function() { $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout')}, 3000);
+        getConceptpowerAuthorities('Author', 'Author', 0);
     });
-
+    
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
         name = $(this).closest("div").find(".name").text();
         uri = $(this).closest("div").find(".uri").text();
@@ -119,6 +113,10 @@ function getConceptpowerAuthorities(modalType, personType, page) {
         type: 'GET',
         url: url,
         async: false,
+        beforeSend: function(){
+  			$('#authoritySpinner').show();
+  			$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
+  		},
         success: function(data) {
             $("#conceptpowerAuthoritySearchResult").empty();
             var content = '';
@@ -167,6 +165,10 @@ function getConceptpowerAuthorities(modalType, personType, page) {
                 $("#authorModal").modal('hide');
                 resetPersonCreationModal("Author");
             });
+        },
+        complete:function(data){
+        	$('#authoritySpinner').hide();
+        	$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
         },
         error: function(data) {
             $('#conceptpowerAuthoritySearchResult').parents('table').hide()
