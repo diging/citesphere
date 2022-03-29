@@ -5,7 +5,7 @@
 .popover {
 	min-width: 300px;
 }
-.modal-body {
+.auth-body {
     max-height: 75vh;
     overflow-y: auto;
 }
@@ -27,7 +27,7 @@ var affiliationTemplate = $($.parseHTML('<div class="aff-entry">' +
 			'<label for="uri">Affiliation URI:</label>' +
 		    	'<input type="text" class="form-control affUri" placeholder="URI"/>' +
 		  '</div>' +
-		'</div>')
+	'</div>')
 );
 
 //# sourceURL=submit.js
@@ -1604,7 +1604,7 @@ function creatorLinkHandler(target) {
 	
 	
 	<!-- Author Modal -->
-<div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
+<div class="modal fade auth-body" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -1670,7 +1670,7 @@ function creatorLinkHandler(target) {
 
 
 <!-- Editor Modal -->
-<div class="modal fade" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
+<div class="modal fade auth-body" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -1742,7 +1742,7 @@ function creatorLinkHandler(target) {
 
 
 <!-- Other Creator Modal -->
-<div class="modal fade" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
+<div class="modal fade auth-body" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
