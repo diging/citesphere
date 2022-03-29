@@ -5,7 +5,7 @@
 .popover {
 	min-width: 300px;
 }
-.auth-body {
+.modal-body {
     max-height: 75vh;
     overflow-y: auto;
 }
@@ -14,8 +14,8 @@
 
 var affCount = 0;
 var affiliationTemplate = $($.parseHTML('<div class="aff-entry">' +
-	      '<hr>' + 
-	      '<div class="form-group">' +
+		  '<hr>' + 
+		  '<div class="form-group">' +
 		    '<div class="pull-right remove-aff"><a>Remove</a></div>' +
 		    '<label for="affiliation">Affiliation:</label>' + 
 		    '<input type="text" class="form-control" id="firstName" placeholder="Affiliation">' +
@@ -27,7 +27,7 @@ var affiliationTemplate = $($.parseHTML('<div class="aff-entry">' +
 			'<label for="uri">Affiliation URI:</label>' +
 		    	'<input type="text" class="form-control affUri" placeholder="URI"/>' +
 		  '</div>' +
-	'</div>')
+		'</div>')
 );
 
 //# sourceURL=submit.js
@@ -137,37 +137,37 @@ $(function() {
     	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
     	    $('#selectAuthorityModel a:first').tab('show');
         })  
-	    $("#search"+modalType+"Spinner").show();
-	    $('#userAuthority-pagination-top').twbsPagination('destroy');
-	    $('#groupAuthority-pagination-top').twbsPagination('destroy');
-	    $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-	    $('#viafAuthority-pagination-top').twbsPagination('destroy');
+    	$("#search"+modalType+"Spinner").show();
+    	$('#userAuthority-pagination-top').twbsPagination('destroy');
+    	$('#groupAuthority-pagination-top').twbsPagination('destroy');
+    	$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+    	$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
-	    getUserAuthorities(modalType, personType, 0)
-	    getViafAuthorities(modalType, personType, 0)
-	    getGroupAuthorities(modalType, personType, 0)
-	    getconceptpowerAuthorities(modalType, personType, 0)
-	    $("#search"+modalType+"Spinner").hide();
-	}
+    	getUserAuthorities(modalType, personType, 0)
+    	getViafAuthorities(modalType, personType, 0)
+    	getGroupAuthorities(modalType, personType, 0)
+    	getconceptpowerAuthorities(modalType, personType, 0)
+    	$("#search"+modalType+"Spinner").hide();
+    }
+	
+    $(document).on("click", "#searchAuthorAffiliation", function() {
+        searchAuthorities('AuthorAffiliation', 'AuthorAffiliation');
+    });
+	 
+    $(document).on("click", "#searchEditorAffiliation", function() {
+        searchAuthorities('EditorAffiliation', 'EditorAffiliation');
+    });
+	 
+    $(document).on("click", "#searchCreatorAffiliation", function() {
+        searchAuthorities('CreatorAffiliation', 'CreatorAffiliation');
+    });
     
-	$("#searchAuthor").click(function() {
-	    searchAuthorities('Author', 'Author');
+    $("#searchAuthor").click(function() {
+        searchAuthorities('Author', 'Author');
 	});
 	
-	$(document).on("click", "#searchAuthorAffiliation", function() {
-		searchAuthorities('AuthorAffiliation', 'AuthorAffiliation');
-	});
-	 
-	$(document).on("click", "#searchEditorAffiliation", function() {
-		searchAuthorities('EditorAffiliation', 'EditorAffiliation');
-	});
-	 
-	$(document).on("click", "#searchCreatorAffiliation", function() {
-		searchAuthorities('CreatorAffiliation', 'CreatorAffiliation');
-	});
-	
-	$("#searchEditor").click(function() {
-		searchAuthorities('Editor', 'Editor');
+    $("#searchEditor").click(function() {
+        searchAuthorities('Editor', 'Editor');
 	});
 	
 	$("#searchCreator").click(function() {
@@ -450,14 +450,9 @@ function allowSearchAndAdd(element){
     }
 }
 
-function showAffiliationNameInModal(name, uri, personType, index){
-	if (index == null) {
-		$("#firstName"+personType).val(name);
-		$("#uri"+personType).val(uri);
-	} else {
-		$("#firstName"+personType+index).val(name);
-		$("#uri"+personType+index).val(uri);
-	}
+function showAffiliationNameInModal(name, uri, personType){
+	$("#firstName"+personType).val(name);
+	$("#uri"+personType).val(uri);
 }
 
 /* Function to populate name in modal fetched from uri */
@@ -504,42 +499,45 @@ function editPerson(modalName, item){
 	$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
 	
 	var counter = 0;
-	personItem.children("span").each(function(idx, elem){
-		var affInput;
-		if (counter == 0) {
-			affInput = $("#"+modalNameLCase+"AffiliationTemplate");
-			$("#search"+modalName+"Affiliation").prop("disabled",false);
-		} else {
-			affInput = $("#"+modalNameLCase+"AffiliationTemplate").clone();
-			affInput.addClass("aff-info");
-		}
-		var affName = affInput.find(".firstName"+modalName+"Affiliation");
-		affName.attr("data-affiliation-name", $(elem).data("affiliationName"));
-		affName.attr("data-affiliation-id", $(elem).data("affiliationId"));
-		affName.val($(elem).data("affiliationName"));
+	personItem.children("span").each(function(idx, elem) {
+		var affiliationCopy = affiliationTemplate.clone();
+		affiliationCopy.attr('id', modalNameLCase+'AffiliationTemplate'+counter);
+		affiliationCopy.addClass('aff-info');
 		
-		var affUri = affInput.find(".affUri");
+		affiliationCopy.find('label[for="affiliation"]').attr('for', 'firstName'+modalName+'Affiliation'+counter);
+		affiliationCopy.find('label[for="uri"]').attr('for', 'uri'+modalName+'Affiliation'+counter);
+		
+		var affInput = affiliationCopy.find('#firstName');
+		affInput.addClass('firstName'+modalName+'Affiliation');
+		affInput.attr('id', 'firstName'+modalName+'Affiliation'+counter);
+		affInput.attr('data-client-id', affInput.attr('id'));
+		affInput.attr("data-affiliation-name", $(elem).data("affiliationName"));
+		affInput.attr("data-affiliation-id", $(elem).data("affiliationId"));
+		affInput.val($(elem).data("affiliationName"));
+		
+		var searchButton = affiliationCopy.find('button');
+		searchButton.attr('id', 'search'+modalName+'Affiliation'+counter);
+		searchButton.attr('data-client-id', searchButton.attr('id'));
+		searchButton.find('#searchSpinner').attr('id', 'search'+modalName+'Affiliation'+counter+'Spinner');
+		searchButton.prop('disabled', false);
+		
+		var affUri = affiliationCopy.find('.affUri');
+		affUri.attr('id', 'uri'+modalName+'Affiliation'+counter);
+		affUri.attr('data-client-id', affUri.attr('id'));
 		affUri.attr("data-affiliation-uri", $(elem).data("affiliationUri"));
 		affUri.val($(elem).data("affiliationUri"));
-		$("#"+modalNameLCase+"Modal #"+modalNameLCase+"Affiliations").append(affInput);
 		
-		if (counter != 0) {
-			affInput.attr("id", modalNameLCase+"AffiliationTemplate"+counter);
-			
-    		var affiliationCounter = modalName + 'Affiliation' + counter;
-    		$("#"+modalNameLCase+"AffiliationTemplate"+counter).find("#search"+modalName+"AffiliationSpinner").attr('id', 'search'+affiliationCounter+'Spinner');
-    		
-    		$("#"+modalNameLCase+"AffiliationTemplate"+counter).find('input, button').each(function() {
-                $(this).attr('id', $(this).attr('id') + counter);
-                $(this).attr('data-client-id', $(this).attr('id'));
-            });
-    		
-    		$("#search"+affiliationCounter).prop("disabled",false);
-    			
-    		$("#search"+affiliationCounter).click(function() {
-    			searchAuthorities(affiliationCounter, affiliationCounter);
-    		});
-		}
+		$("#"+modalNameLCase+"Affiliations").append(affiliationCopy);
+		
+		var affiliationCounter = modalName + 'Affiliation' + counter;
+		$('#firstName'+affiliationCounter).keyup(function(e) {
+			allowSearchAndAdd(affiliationCounter);
+		});
+		
+		$("#search"+affiliationCounter).click(function() {
+			searchAuthorities(affiliationCounter, affiliationCounter);
+		});
+		
 		counter++;
 	});
 	affCount = counter;
@@ -748,13 +746,7 @@ function resetPersonCreationModal(modalType) {
 	$("#firstName"+modalType).val("");
 	$("#lastName"+modalType).val("");
 	$("#id"+modalType).attr("data-"+modalType+"-id", "");
-	var affTemplate = $("#"+modalNameLCase+"AffiliationTemplate");
 	$("#"+modalNameLCase+"Affiliations").children().remove();
-	$("#"+modalNameLCase+"Affiliations").append(affTemplate);
-	$("#"+modalNameLCase+"AffiliationTemplate").find("input").val("");
-	$("#"+modalNameLCase+"AffiliationTemplate").find("#search"+modalType+"Affiliation").prop("disabled",true);
-	$("#"+modalNameLCase+"AffiliationTemplate").show();
-	$(".aff-info").remove();
 	$("#uri"+modalType).val("");
 	if(modalType == "Creator") {
 		$("#addCreatorButton").attr("data-creator-type", "");
@@ -1604,7 +1596,7 @@ function creatorLinkHandler(target) {
 	
 	
 	<!-- Author Modal -->
-<div class="modal fade auth-body" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
+<div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -1640,23 +1632,7 @@ function creatorLinkHandler(target) {
 		    </div>
 		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
 		  </div>
-		  <div id="authorAffiliations">
-		  <div class="aff-entry" id="authorAffiliationTemplate">
-		      <hr>
-		      <div class="form-group">
-			    <div class="pull-right remove-aff"><a>Remove</a></div>
-			    <label for="affiliationAuthor">Affiliation:</label>
-			    <input type="text" class="form-control firstNameAuthorAffiliation" id="firstNameAuthorAffiliation" data-client-id="firstNameAuthorAffiliation" placeholder="Affiliation">
-		  	</div>
-			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="AuthorAffiliation" id="searchAuthorAffiliation"
-				style="margin-left: 76%" disabled>Search Affiliation <i id="searchAuthorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
-			</button>
-			<div class="form-group">
-				<label for="uriAuthorAffiliation">Affiliation URI:</label>   
-			    	<input type="text" class="form-control affUri" data-client-id="uriAuthorAffiliation" id="uriAuthorAffiliation" placeholder="URI"/>
-			</div>
-		  </div>
-		  </div>
+		  <div id="authorAffiliations"></div>
 		  <div class="text-right"><a id="addAuthorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       </div>
       
@@ -1670,7 +1646,7 @@ function creatorLinkHandler(target) {
 
 
 <!-- Editor Modal -->
-<div class="modal fade auth-body" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
+<div class="modal fade" id="editorModal" tabindex="-1" role="dialog" aria-labelledby="editorLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -1710,23 +1686,7 @@ function creatorLinkHandler(target) {
 		    </div>
 		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
 		  </div>
-		  <div id="editorAffiliations">
-    		  <div id="editorAffiliationTemplate" class="form-group aff-entry">
-    		      <hr>
-    		      <div class="form-group">
-                      <div class="pull-right remove-aff"><a>Remove</a></div>
-    		          <label for="editorAffiliation">Affiliation:</label>
-    		          <input type="text" class="form-control firstNameEditorAffiliation" id="firstNameEditorAffiliation" data-client-id="firstNameEditorAffiliation" placeholder="Affiliation">
-    		      </div>
-    		      <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="EditorAffiliation" id="searchEditorAffiliation"
-                      style="margin-left: 76%" disabled>Search Affiliation <i id="searchEditorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
-    		      </button>
-    		      <div class="form-group">
-    		          <label for="uriEditorAffiliation">Affiliation URI:</label>   
-    		          <input type="text" class="form-control affUri" data-client-id="uriEditorAffiliation" id="uriEditorAffiliation" placeholder="URI"/>
-    		      </div>
-    		  </div>
-		  </div>
+		  <div id="editorAffiliations"></div>
 		  <div>
 		  <div class="text-right"><a id="addEditorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
@@ -1742,7 +1702,7 @@ function creatorLinkHandler(target) {
 
 
 <!-- Other Creator Modal -->
-<div class="modal fade auth-body" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
+<div class="modal fade" id="creatorModal" tabindex="-1" role="dialog" aria-labelledby="creatorLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -1781,23 +1741,7 @@ function creatorLinkHandler(target) {
 		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
 		  </div>
 		  
-		  <div id="creatorAffiliations">
-		      <div id="creatorAffiliationTemplate" class="form-group aff-entry">
-		          <hr>
-		          <div class="form-group">
-                      <div class="pull-right remove-aff"><a>Remove</a></div>
-		              <label for="creatorAffiliation">Affiliation:</label>
-		              <input type="text" class="form-control firstNameCreatorAffiliation" id="firstNameCreatorAffiliation" data-client-id="firstNameCreatorAffiliation" placeholder="Affiliation">
-		          </div>
-		          <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="CreatorAffiliation" id="searchCreatorAffiliation"
-                     style="margin-left: 76%" disabled>Search Affiliation <i id="searchCreatorAffiliationSpinner"class="fas fa-spinner fa-spin text-info" style="color: white"></i>
-		          </button>
-		          <div class="form-group">
-		              <label for="uriCreatorAffiliation">Affiliation URI:</label>   
-		              <input type="text" class="form-control affUri" data-client-id="uriCreatorAffiliation" id="uriCreatorAffiliation" placeholder="URI"/>
-		          </div>
-		      </div>
-		  </div>
+		  <div id="creatorAffiliations"></div>
 		  
 		  <div>
 		  <div class="text-right"><a id="addCreatorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
