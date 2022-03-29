@@ -27,57 +27,57 @@ import edu.asu.diging.citesphere.user.IUser;
 @Controller
 public class ListAuthoritiesController {
 
-	@Autowired
-	private IAuthorityService authorityService;
+    @Autowired
+    private IAuthorityService authorityService;
 
-	@Autowired
-	private ICitationManager citationManager;
+    @Autowired
+    private ICitationManager citationManager;
 
-	@RequestMapping("/auth/authority/{authorityId}/listByName")
-	public String showPage(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication)
-			throws GroupDoesNotExistException, ZoteroHttpStatusException {
-		IAuthorityEntry entry = authorityService.find(authorityId);
-		IUser user = (IUser) authentication.getPrincipal();
-		List<ICitationGroup> groups = citationManager.getGroups(user);
-		List<String> groupIds = new ArrayList<String>();
-		for (int i = 0; i < groups.size(); i++) {
-			groupIds.add(String.valueOf(groups.get(i).getGroupId()));
-		}
-		CitationResults results = null;
-		Set<ICitation> citations = new HashSet<ICitation>();
-		for (String groupId : groupIds) {
-			results = citationManager.getGroupItems(user, groupId, null, 1, "title");
-			for (ICitation citation : results.getCitations()) {
-				String name = entry.getName();
-				Set<IPerson> authors = citation.getAuthors();
-				for (IPerson person : authors) {
-					if (person.getName().equals(" " + name)) {
-						citations.add(citation);
-						break;
-					}
-				}
-				Set<IPerson> editors = citation.getEditors();
-				for (IPerson person : editors) {
-					if (person.getName().equals(" " + name) && !citations.contains(citation)) {
-						citations.add(citation);
-						break;
-					}
-				}
-				Set<ICreator> otherCreators = citation.getOtherCreators();
-				Set<IPerson> creators = new HashSet<IPerson>();
-				for (ICreator creator : otherCreators) {
-					creators.add(creator.getPerson());
-				}
-				for (IPerson person : creators) {
-					if (person.getName().equals(" " + name) && !citations.contains(citation)) {
-						citations.add(citation);
-						break;
-					}
-				}
-			}
-		}
-		model.addAttribute("items", citations);
-		model.addAttribute("name", entry.getName());
-		return "auth/authorities/listAuthorities";
-	}
+    @RequestMapping("/auth/authority/{authorityId}/listByName")
+    public String showPage(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication)
+    		throws GroupDoesNotExistException, ZoteroHttpStatusException {
+        IAuthorityEntry entry = authorityService.find(authorityId);
+        IUser user = (IUser) authentication.getPrincipal();
+        List<ICitationGroup> groups = citationManager.getGroups(user);
+        List<String> groupIds = new ArrayList<String>();
+        for (int i = 0; i < groups.size(); i++) {
+        	groupIds.add(String.valueOf(groups.get(i).getGroupId()));
+        }
+        CitationResults results = null;
+        Set<ICitation> citations = new HashSet<ICitation>();
+        for (String groupId : groupIds) {
+        	results = citationManager.getGroupItems(user, groupId, null, 1, "title");
+        	for (ICitation citation : results.getCitations()) {
+        		String name = entry.getName();
+        		Set<IPerson> authors = citation.getAuthors();
+        		for (IPerson person : authors) {
+        			if (person.getName().equals(" " + name)) {
+        				citations.add(citation);
+        				break;
+        			}
+        		}
+        		Set<IPerson> editors = citation.getEditors();
+        		for (IPerson person : editors) {
+        			if (person.getName().equals(" " + name) && !citations.contains(citation)) {
+        				citations.add(citation);
+        				break;
+        			}
+        		}
+        		Set<ICreator> otherCreators = citation.getOtherCreators();
+        		Set<IPerson> creators = new HashSet<IPerson>();
+        		for (ICreator creator : otherCreators) {
+        			creators.add(creator.getPerson());
+        		}
+        		for (IPerson person : creators) {
+        			if (person.getName().equals(" " + name) && !citations.contains(citation)) {
+        				citations.add(citation);
+        				break;
+        			}
+        		}
+        	}
+        }
+        model.addAttribute("items", citations);
+        model.addAttribute("name", entry.getName());
+        return "auth/authorities/listAuthorities";
+    }
 }
