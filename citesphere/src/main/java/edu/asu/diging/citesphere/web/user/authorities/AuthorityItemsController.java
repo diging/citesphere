@@ -25,7 +25,7 @@ import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
-public class ListAuthoritiesController {
+public class AuthorityItemsController {
 
     @Autowired
     private IAuthorityService authorityService;
@@ -33,15 +33,15 @@ public class ListAuthoritiesController {
     @Autowired
     private ICitationManager citationManager;
 
-    @RequestMapping("/auth/authority/{authorityId}/listByName")
+    @RequestMapping("/auth/authority/{authorityId}/listbyname")
     public String showPage(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication)
     		throws GroupDoesNotExistException, ZoteroHttpStatusException {
         IAuthorityEntry entry = authorityService.find(authorityId);
         IUser user = (IUser) authentication.getPrincipal();
         List<ICitationGroup> groups = citationManager.getGroups(user);
         List<String> groupIds = new ArrayList<String>();
-        for (int i = 0; i < groups.size(); i++) {
-            groupIds.add(String.valueOf(groups.get(i).getGroupId()));
+        for (ICitationGroup group:groups) {
+            groupIds.add(String.valueOf(group.getGroupId()));
         }
         CitationResults results = null;
         Set<ICitation> citations = new HashSet<ICitation>();
@@ -56,28 +56,32 @@ public class ListAuthoritiesController {
                         break;
                     }
                 }
-                Set<IPerson> editors = citation.getEditors();
-                for (IPerson person : editors) {
-                    if (person.getName().equals(" " + name) && !citations.contains(citation)) {
-                        citations.add(citation);
-                        break;
-                    }
+                if(!citations.contains(citation)) {
+	                Set<IPerson> editors = citation.getEditors();
+	                for (IPerson person : editors) {
+	                    if (person.getName().equals(" " + name)) {
+	                        citations.add(citation);
+	                        break;
+	                    }
+	                }
                 }
-                Set<ICreator> otherCreators = citation.getOtherCreators();
-                Set<IPerson> creators = new HashSet<IPerson>();
-                for (ICreator creator : otherCreators) {
-                    creators.add(creator.getPerson());
-                }
-                for (IPerson person : creators) {
-                    if (person.getName().equals(" " + name) && !citations.contains(citation)) {
-                        citations.add(citation);
-                        break;
-                    }
+                if(!citations.contains(citation)) {
+	                Set<ICreator> otherCreators = citation.getOtherCreators();
+	                Set<IPerson> creators = new HashSet<IPerson>();
+	                for (ICreator creator : otherCreators) {
+	                    creators.add(creator.getPerson());
+	                }
+	                for (IPerson person : creators) {
+	                    if (person.getName().equals(" " + name)) {
+	                	    citations.add(citation);
+	                	    break;
+	                    }
+	                }
                 }
             }
         }
         model.addAttribute("items", citations);
         model.addAttribute("name", entry.getName());
-        return "auth/authorities/listAuthorities";
+        return "auth/authorities/authorityItems";
     }
 }
