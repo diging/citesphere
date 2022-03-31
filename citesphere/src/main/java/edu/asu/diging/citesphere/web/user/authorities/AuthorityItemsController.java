@@ -57,26 +57,26 @@ public class AuthorityItemsController {
                     }
                 }
                 if(!citations.contains(citation)) {
-	                Set<IPerson> editors = citation.getEditors();
-	                for (IPerson person : editors) {
-	                    if (person.getName().equals(" " + name)) {
-	                        citations.add(citation);
-	                        break;
-	                    }
-	                }
+                    Set<IPerson> editors = citation.getEditors();
+                    for (IPerson person : editors) {
+                        if (person.getName().equals(" " + name)) {
+                            citations.add(citation);
+                            break;
+                        }
+                    }
                 }
                 if(!citations.contains(citation)) {
-	                Set<ICreator> otherCreators = citation.getOtherCreators();
-	                Set<IPerson> creators = new HashSet<IPerson>();
-	                for (ICreator creator : otherCreators) {
-	                    creators.add(creator.getPerson());
-	                }
-	                for (IPerson person : creators) {
-	                    if (person.getName().equals(" " + name)) {
-	                	    citations.add(citation);
-	                	    break;
-	                    }
-	                }
+                    Set<ICreator> otherCreators = citation.getOtherCreators();
+                    Set<IPerson> creators = new HashSet<IPerson>();
+                    for (ICreator creator : otherCreators) {
+                        creators.add(creator.getPerson());
+                    }
+                    for (IPerson person : creators) {
+                        if (person.getName().equals(" " + name)) {
+                            citations.add(citation);
+                            break;
+                        }
+                    }
                 }
             }
         }
