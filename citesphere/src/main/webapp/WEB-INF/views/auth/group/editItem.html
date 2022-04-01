@@ -33,15 +33,15 @@ var affiliationTemplate = $($.parseHTML('<div class="aff-entry">' +
 //# sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
-	$("#uriLoadingSpinnerAuthorAffiliation").hide();
+// 	$("#uriLoadingSpinnerAuthorAffiliation").hide();
 	$("#uriLoadingFailureAuthor").hide();
-	$("#uriLoadingFailureAuthorAffiliation").hide();
+// 	$("#uriLoadingFailureAuthorAffiliation").hide();
 	$("#uriLoadingFoundAuthor").hide();
-	$("#uriLoadingFoundAuthorAffiliation").hide();
+// 	$("#uriLoadingFoundAuthorAffiliation").hide();
 	$("#searchAuthorSpinner").hide();
-	$("#searchAuthorAffiliationSpinner").hide();
-	$("#searchEditorAffiliationSpinner").hide();
-	$("#searchCreatorAffiliationSpinner").hide();
+// 	$("#searchAuthorAffiliationSpinner").hide();
+// 	$("#searchEditorAffiliationSpinner").hide();
+// 	$("#searchCreatorAffiliationSpinner").hide();
 	
 	$("#uriLoadingFoundAuthor").popover();
 	$("#uriLoadingFailureAuthor").popover();
@@ -97,17 +97,17 @@ $(function() {
     	allowSearchAndAdd("Author");
     });
 	
-    $(document).on("keyup", "#firstNameAuthorAffiliation", function() {
-    	allowSearchAndAdd("AuthorAffiliation");
-    });
+//     $(document).on("keyup", "#firstNameAuthorAffiliation", function() {
+//     	allowSearchAndAdd("AuthorAffiliation");
+//     });
 
-    $(document).on("keyup", "#firstNameEditorAffiliation", function() {
-    	allowSearchAndAdd("EditorAffiliation");
-    });
+//     $(document).on("keyup", "#firstNameEditorAffiliation", function() {
+//     	allowSearchAndAdd("EditorAffiliation");
+//     });
 
-    $(document).on("keyup", "#firstNameCreatorAffiliation", function() {
-    	allowSearchAndAdd("CreatorAffiliation");
-    });
+//     $(document).on("keyup", "#firstNameCreatorAffiliation", function() {
+//     	allowSearchAndAdd("CreatorAffiliation");
+//     });
     
     $("#lastNameAuthor").keyup(function(e){
     	allowSearchAndAdd("Author");
@@ -150,27 +150,27 @@ $(function() {
     	$("#search"+modalType+"Spinner").hide();
     }
 	
-    $(document).on("click", "#searchAuthorAffiliation", function() {
-        searchAuthorities('AuthorAffiliation', 'AuthorAffiliation');
-    });
+//     $(document).on("click", "#searchAuthorAffiliation", function() {
+//         searchAuthorities('AuthorAffiliation', 'AuthorAffiliation');
+//     });
 	 
-    $(document).on("click", "#searchEditorAffiliation", function() {
-        searchAuthorities('EditorAffiliation', 'EditorAffiliation');
-    });
+//     $(document).on("click", "#searchEditorAffiliation", function() {
+//         searchAuthorities('EditorAffiliation', 'EditorAffiliation');
+//     });
 	 
-    $(document).on("click", "#searchCreatorAffiliation", function() {
-        searchAuthorities('CreatorAffiliation', 'CreatorAffiliation');
-    });
+//     $(document).on("click", "#searchCreatorAffiliation", function() {
+//         searchAuthorities('CreatorAffiliation', 'CreatorAffiliation');
+//     });
     
     $("#searchAuthor").click(function() {
         searchAuthorities('Author', 'Author');
-	});
+    });
 	
     $("#searchEditor").click(function() {
         searchAuthorities('Editor', 'Editor');
-	});
+    });
 	
-	$("#searchCreator").click(function() {
+    $("#searchCreator").click(function() {
 		searchAuthorities('Creator', 'Creator');
 	}); 
 	
@@ -756,28 +756,26 @@ function resetPersonCreationModal(modalType) {
 	
 	$("#add"+modalType+"Button").text("Add "+modalType);
 	$("#add"+modalType+"Button").prop("disabled",true);
-	$("#"+modalNameLCase+"AffiliationAuthorityUsed").empty();
 	resetPersonAuthorityCreation(modalType);
 	affCount = 0;
 }
 
 function resetPersonAuthorityCreation(personType) {
-	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
+// 	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
 	$("#uriLoadingFound"+personType).hide();
 	$("#uriLoadingFailure"+personType).hide();
 	$("#uriLoadingSpinner"+personType).hide();
 	$("#uriLoadingFound"+personType).popover('hide');
 	$("#uriLoadingFailure"+personType).popover('hide');
-
 	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
-	$("#"+personType_lowerCase+"AuthorityUsed").html("");
-	$("#"+personType_lowerCase+"AuthorityCreationFeedback").html("");
-	$("#"+personType_lowerCase+"AuthorityCreationFeedback").hide();
+// 	$("#"+personType_lowerCase+"AuthorityUsed").html("");
+// 	$("#"+personType_lowerCase+"AuthorityCreationFeedback").html("");
+// 	$("#"+personType_lowerCase+"AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
 	
-	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
+	personType_lowerCase = personType.toLowerCase();
 	$.get([[@{/auth/authority/get?uri=}]] + uri + '&zoteroGroupId=' + [(${zoteroGroupId})], function(data) {
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", data['uri']);
 		var content = "Authority <b>" + uri + "</b>";
@@ -827,7 +825,7 @@ function getUserAuthorities(modalType, personType, page) {
 	if (lastName === undefined) {
 	    lastName = "";
 	}
-	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
+	personType_lowerCase = personType.toLowerCase();
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/user|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
 	$.ajax({
   		dataType: "json",
@@ -967,7 +965,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 	if (lastName === undefined) {
 	    lastName = "";
 	}
-	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
+	personType_lowerCase = personType.toLowerCase();
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/conceptpower|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
 	$.ajax({
