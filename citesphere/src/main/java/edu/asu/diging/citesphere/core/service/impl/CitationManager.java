@@ -43,10 +43,12 @@ import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IPerson;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.transfer.impl.Persons;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
@@ -125,7 +127,7 @@ public class CitationManager implements ICitationManager {
         }
         return updateCitationFromZotero(user, groupId, key);
     }
-
+    
     @Override
     public List<ICitation> getAttachments(IUser user, String groupId, String key)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
@@ -440,6 +442,13 @@ public class CitationManager implements ICitationManager {
             }
         }
         return result;
+    }
+    
+    @Override
+    public Persons getAllPeople(String groupId) {
+        Persons persons = null;
+        persons = (Persons) citationDao.findAllPeople(groupId);
+        return persons;
     }
     
     @Override
