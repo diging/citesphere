@@ -125,7 +125,7 @@ public class CitationManager implements ICitationManager {
         }
         return updateCitationFromZotero(user, groupId, key);
     }
-
+    
     @Override
     public List<ICitation> getAttachments(IUser user, String groupId, String key)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {

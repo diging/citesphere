@@ -34,7 +34,6 @@ import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
-
 public class CitationManagerTest {
 
     @Mock
@@ -102,7 +101,6 @@ public class CitationManagerTest {
         group2.setGroupId(GROUP2_ID);
         group2.setContentVersion(3L);
         Mockito.when(groupRepository.findFirstByGroupId(GROUP2_ID)).thenReturn(Optional.of((CitationGroup)group2));
-        
     }
     
     @Test
@@ -135,7 +133,7 @@ public class CitationManagerTest {
     @Test
     public void test_getCitationFromZotero_doesNotExist() {
         // FIXME: implement when bug is removed
-    }
+    } 
     
     @Test 
     public void test_updateCitation_success() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {
