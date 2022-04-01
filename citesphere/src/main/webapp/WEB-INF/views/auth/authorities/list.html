@@ -7,7 +7,7 @@
 $(function() {
 	$(".delete-link").click(function(event) {
 		var id = $(this).data('authority-id');
-		$("#delete-authority-button").attr("data-authority-id", id);
+		$("#delete-authority-button").data("authority-id", id);
 		$("#confirm-authority-entry-name").text($(this).data('authority-name'));
 		$("#confirm-authority-entry-uri").text($(this).data('authority-uri'));
 		$('#authority-delete-confirmation').modal("show");	

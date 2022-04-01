@@ -1,6 +1,11 @@
 <html layout:decorate="~{layouts/main}">
 <head>
-
+<style>
+.concept-filter-menu {
+   max-height:300px;
+   overflow-y: auto;
+}
+</style>
 <script src="https://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
@@ -9,7 +14,6 @@
 <link th:href="@{/resources/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
 <link th:href="@{/resources/diging-icon-pack/diging-icon-pack.css}" rel="stylesheet"/>
 <link th:href="@{/resources/bootstrap/grid.css}" rel="stylesheet"/>
-
 <script th:inline="javascript">
 //# sourceURL=page.js
 $(function() {
@@ -77,7 +81,52 @@ $(function() {
 		} else {
 			shownColumns.push(col);
 		}
-		window.location.href="items?columns=" + shownColumns; 
+		
+		var queryParams = window.location.search;
+		if (queryParams)  {
+			var params = new URLSearchParams(queryParams);
+			params.delete('columns');
+			queryParams = params.toString();
+		}
+		window.location.href = "items?" + queryParams + "&columns=" + shownColumns;
+	});
+	
+	$("#select-all-concept").click(function(){
+		var checkbox = $(this).find(".all-concept-checkbox");
+		$(".concept-checkbox").each(function() {
+			$(this).prop("checked", checkbox.prop("checked"));
+		});
+		var conceptIds = [];
+		$(".conceptItem").each(function() {
+			if ($(this).find(".concept-checkbox").is(":checked")) {
+				conceptIds.push($(this).data("concept-id"));
+			}
+		});
+		
+		var queryParams = window.location.search;
+		if (queryParams)  {
+			var params = new URLSearchParams(queryParams);
+			params.delete('conceptIds');
+			queryParams = params.toString();
+		}
+		window.location.href = "items?" + queryParams + "&conceptIds=" + conceptIds;
+	});
+	
+	$(".conceptItem").click(function() {
+		var conceptIds = [];
+		$(".conceptItem").each(function() {
+			if ($(this).find(".concept-checkbox").is(":checked")) {
+				conceptIds.push($(this).data("concept-id"));
+			}
+		});
+		
+		var queryParams = window.location.search;
+		if (queryParams)  {
+			var params = new URLSearchParams(queryParams);
+			params.delete('conceptIds');
+			queryParams = params.toString();
+		}
+		window.location.href = "items?" + queryParams + "&conceptIds=" + conceptIds;
 	});
 	
 	$("#findByItemKeyBtn").click(function() {
@@ -111,7 +160,61 @@ $(function() {
             }
         }
     });
+	
+	$(function() {
+		$(".delete-link").click(function(event) {
+			var ids = []
+			$('.checkboxes:checked').each(function() {
+				   ids.push($(this).data('entry-key'));
+			});
+			if(ids.length==0) {
+				$('#no-selected-entry').modal("show");	
+			}
+			else {
+				$("#delete-entry-button").attr("data-entry-key", ids);
+				$('#entry-delete-confirmation').modal("show");
+			}
+			event.preventDefault();
+		});
+		
+		$("#delete-entry-button").click(function() {
+			var ids = $(this).data("entry-key");
+			var entry = "Entry";
+			var rows = ids.split(",");
+			var baseurl = "references/delete/";
+			$.ajax({
+				'url': baseurl,
+				'type': "POST",
+				'data': {
+					"citationList": ids,
+					[[${_csrf.parameterName}]] : [[${_csrf.token}]]
+				},
+				'success': function(response) {
+					$('body').append('<div id="deletingDiv" class="modal-backdrop" style="opacity:0.5"><i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i></div>');
+					pollDeleteItemsStatuses(response);
+				},
+				'error': function(data) {
+					showNotification(" Error while deleting citations!", "danger", 10000);
+				}
+			});		
+			
+			$('#entry-delete-confirmation').modal("hide");
+			event.preventDefault();
+			$(this).removeData();
+		});
+	});
 });
+
+function filterConcept(searchText) {
+	searchText = searchText.toLowerCase();
+	$('.conceptItem').each(function() {
+		if (!$(this).attr('data-concept-name').includes(searchText)) {
+			$(this).attr("hidden",true);
+		} else {
+			$(this).attr("hidden",false);
+		}
+	});
+}
 
 $(document).ready(function() {
     var queryParams = window.location.search;
@@ -127,8 +230,79 @@ $(document).ready(function() {
     $('.bib-entry').each(function() {
         $(this).attr("href", $(this).attr("href") + "&" + queryParams);
     });
-});
     
+});
+
+function pollDeleteItemsStatuses(response) {
+$.ajax({
+	type: 'GET',
+	url: 'references/delete/'+response.taskID+'/status',
+	contentType : "application/json",
+	dataType: "json",
+	success: function (deleteItemsStatusResponse) {
+		if(deleteItemsStatusResponse.taskStatus === "COMPLETE") {
+			$( "#deletingDiv" ).remove();
+			var success = deleteItemsStatusResponse.response["SUCCESS"];
+			var libraryLocked = deleteItemsStatusResponse.response["LIBRARY_LOCKED"];
+			var libraryVersionChanged = deleteItemsStatusResponse.response["LIBRARY_VERSION_CHANGED"];
+			var invalidRequest = deleteItemsStatusResponse.response["MISSING_IF_UNMODIFIED_SINCE_VERSION"];
+			
+        		if(success != null) {
+                	 	let message = " "+success.length;
+                	 	if(success.length > 1) {
+                	 		message += " Citations deleted successfully! <br />";
+                	 	} else {
+                	 		message += " Citation deleted successfully! <br />";
+                	 	}
+                	 	showNotification(message, "success", 20000);
+        		}
+        		if(libraryLocked != null) {
+                	 	let message =  " "+ libraryLocked.length;
+                	 	if(libraryLocked.length > 1) {
+                	 		message += " Citations";
+                	 	} else {
+                	 		message += " Citation";
+                	 	}
+                	 	message += + " could not be deleted as the target library is locked <br />"+ libraryLocked.join(", ");
+                	 	showNotification(message, "danger", 20000);
+        		}
+        		if(libraryVersionChanged != null) {
+                	 	let message =  " "+ libraryVersionChanged.length;
+                	 	if(libraryVersionChanged.length > 1) {
+                	 		message += " Citations";
+                	 	} else {
+                	 		message += " Citation";
+                	 	}
+                	 	message += " could not be deleted as the library version has changed <br />"+ libraryVersionChanged.join(", ");
+                	 	showNotification(message, "danger", 20000);
+        		}
+        		if(invalidRequest != null) {
+                	 	let message =  " "+ invalidRequest.length;
+                	 	if(invalidRequest.length > 1) {
+                	 		message += " Citations";
+                	 	} else {
+                	 		message += " Citation";
+                	 	}
+                	 	message += " not deleted due to internal error <br />"+ invalidRequest.join(", ");
+                	 	showNotification(message, "danger", 20000);
+        		}
+        		if (deleteItemsStatusResponse.response["SUCCESS"] != null) {
+        			for(id of deleteItemsStatusResponse.response["SUCCESS"]) {
+        				$("#tr-" + id).remove();
+        			}
+        		}
+		} else {
+			setTimeout(pollDeleteItemsStatuses(deleteItemsStatusResponse),1000);
+		}
+	},
+	error: function (deleteItemsStatusResponse) {
+	    $( "#deletingDiv" ).remove();
+	    showNotification("Error while polling delete citations statuses!", "warning", 1000)
+	},
+});
+
+}
+
 </script>
 </head>
 <body>
@@ -264,6 +438,7 @@ function pollStatus(){
 </div>
 <div class="pull-right" style="margin-top: 20px;">
 <a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="icon-circle-add"></i> Create Citation</a>
+<a class="btn btn-primary delete-link"><i class="icon-trash" style="color: #FFFFFF; font-size: 13px;"></i> Delete Citations</a>
 </div>
 
 <div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
@@ -278,36 +453,14 @@ function pollStatus(){
     <li th:if="${total > 300}"><a class="btn btn-disabled" style="color: #999">CSV (up to 300 items)</a></li>
   </ul>
 </div>
+</div>
 
 <div>
-
-<p class="lead" style="display:inline;padding-left:10px">Collections</p>
-
-<big><i class="icon-arrow-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
-
-
-<div class="dropdown pull-right" style="padding-bottom: 10px;">
-  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-    Columns
-    <span class="caret"></span>
-  </button>
-  <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1">
-  <tbody th:each="column:${availableColumns}">
-    <li th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}"><a th:data-column-name="${column}" th:data-is-shown="${#lists.contains(columns,column)}">
-	<span th:if ="${#lists.contains(columns,column)}"><i class="icon-checkmark-alt"></i> </span>
-	[[${columnLabel}]]
-    </a></li>
-  </tbody>
-  </ul> 
-   
-</div>
-
-</div>  
-
-</div>
-
-<div id="wrapper">
 <div class="col-md-2 sticky">
+	<div>
+	    <p class="lead" style="display:inline;padding-left:20px">Collections</p>
+	    <big><i class="icon-arrow-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
+	</div> 
 	<ul class="list-group" id="collectionsList">
 	<th:block th:each="collection:${citationCollections}">
 	  <li class="list-group-item collections">
@@ -319,6 +472,42 @@ function pollStatus(){
 </div>
 
 <div class="col-md-10" id="citationBlock">
+
+	<div>
+	    <div th:if="${!param.keySet().contains('searchTerm')}" class="dropdown pull-left">
+	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+	            Filter by Concept
+	            <span class="caret"></span>
+	        </button>
+	        <ul id="conceptFilter" class="dropdown-menu concept-filter-menu" aria-labelledby="dropdownMenu1">
+	            <li id="search-concept"><a><input type="text" placeholder="Search.." onkeyup="filterConcept(this.value)"/></a>
+	            <li id="select-all-concept" class="conceptItem" data-concept-name="">
+	                <a><input title="Select" class="all-concept-checkbox" id="all-concept" type="checkbox" th:checked="${selectedConceptIds.size()==concepts.size()}"/> <label for="all-concept">Select all</label></a>
+	            </li>
+	            <tbody th:each="concept,loop:${concepts}">
+	                <li class="conceptItem" th:data-concept-id="${concept.id}" th:data-concept-name="${concept.name.toLowerCase()}">
+	                    <a><input title="Select" type="checkbox" class="concept-checkbox" id="concept${loop.index}" th:checked="${selectedConceptIds.contains(concept.id)}"/> <label for="concept${loop.index}">[[${concept.name}]]</label></a>
+	                </li>
+	            </tbody>
+	        </ul>
+	    </div>
+        
+	    <div class="dropdown pull-right" style="padding-bottom: 10px;">
+	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Columns
+                <span class="caret"></span>
+	        </button>
+	        <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu2">
+	            <tbody th:each="column:${availableColumns}">
+	                <li th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}"><a th:data-column-name="${column}" th:data-is-shown="${#lists.contains(columns,column)}">
+	                    <span th:if ="${#lists.contains(columns,column)}"><i class="icon-checkmark-alt"></i> </span>
+	                    [[${columnLabel}]]
+	                    </a>
+	                </li>
+	            </tbody>
+	        </ul>
+	    </div>
+	</div>
 
 	<table class="table table-striped table-bordered">
 		<tr>
@@ -337,14 +526,14 @@ function pollStatus(){
 			<th>Title</th>
 			<th>Date</th>
 			<th>URL</th>
+			<th>Files</th>
 			<th th:each="column:${columns}" th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}">
 				[[${columnLabel}]]
 			</th>
 		</tr>
 		
-		
-		<tr data-action='draggable' class="items" th:each="entry,loop : ${items}">
-			<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes"/>&nbsp;</td>
+		<tr th:id="'tr-'+${entry.key}" data-action='draggable' class="items" th:each="entry,loop : ${items}">
+			<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes" th:data-entry-key="${entry.key}" th:data-index="${loop.index}"/>&nbsp;</td>
 			<td>
 			  <span class="text-warning">
 			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
@@ -397,12 +586,61 @@ function pollStatus(){
 		 		<a href="${entry.url}" target="_blank" th:title="${entry.url} "><i class="icon-www"></i></a>
 		 		</span>
 		 	</td>
+			<td>
+				<span th:if="${!#sets.isEmpty(entry.gilesUploads)}">
+				<a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+					<i class="icon-multiple-doc"></i>
+				</a>
+				<a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+					<i class="icon-multiple-doc"></i>
+				</a>
+				<a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+					<i class="icon-multiple-doc"></i>
+				</a>
+				</span>
+			</td>
 		 	<td th:each="column:${columns}" style="max-width:300px;">
 		 		[[${entry[column]}]]
 		 	</td>
 		</tr>
 	</table>
 </div>
+
+<div class="modal fade" id="entry-delete-confirmation" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Delete Entries</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the selected entries?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
+        <button id="delete-entry-button" data-entry-key="" type="button" class="btn btn-primary">Yes, delete!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="no-selected-entry" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Delete Entries</h4>
+      </div>
+      <div class="modal-body">
+        <p>Please select at least 1 entry!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 <script >
 	//# sourceURL=move.js
@@ -440,7 +678,7 @@ $(".items").draggable({
 		(selected.length > 1)? container.addClass('icon-multiple-doc'): container.addClass('icon-docs');
 		let list = container.append('<ul></ul>').find('ul');
 		$(".selected").each(function() {
-			list.append('<li>'+$( this ).find(".item-key").data("key")+'</li>');
+			list.append('<li>'+$( this ).find("#checkbox").data("entry-key")+'</li>');
 		});
 		container.find('ul').hide();
 		return container;
@@ -518,7 +756,7 @@ $.ajax({
 		showNotification(message, "info", 20000);
 		}
 		collectionHTMLElement.children('div').removeClass("icon-spinner").addClass("icon-sync");
-		clearAsyncTask(moveItemsStatusResponse.taskID);
+		clearAsyncUpdateTask(moveItemsStatusResponse.taskID);
 		syncCitations(collectionHTMLElement,collectionId);
 		}else{
 		setTimeout(pollMovedItemsStatuses(moveItemsStatusResponse,collectionName, collectionHTMLElement, collectionId),1000);
@@ -532,12 +770,14 @@ $.ajax({
 
 }
 
-function clearAsyncTask(taskID){
+function clearAsyncUpdateTask(taskID){
 $.ajax({
 	type: 'POST',
 	url: 'items/move/task/'+taskID+'/clear?[(${_csrf.parameterName})]=[(${_csrf.token})]',
 });
 }
+
+
 
 function syncCitations(collectionHTMLElement, collectionId){
 $.ajax({

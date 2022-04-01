@@ -22,6 +22,7 @@ import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ItemCreationResponse;
+import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -347,5 +348,12 @@ public class ZoteroConnector implements IZoteroConnector {
             return new AccessForbiddenException(cause);
         }
         return new ZoteroHttpStatusException(cause);
+    }
+
+    @Override
+    public Map<ItemDeletionResponse, List<String>> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().deleteMultipleItems(groupId, citationKeys, citationVersion);        
     }
 }

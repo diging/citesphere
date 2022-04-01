@@ -22,6 +22,8 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.impl.AsyncCitationManager;
+import edu.asu.diging.citesphere.core.service.impl.async.AsyncUpdateCitationsResponse;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
@@ -45,7 +47,7 @@ public class MoveItemsController {
     @Autowired
     private ICitationCollectionManager collectionManager;
 
-    @RequestMapping(value = {
+    @RequestMapping(value = { 
         "/auth/group/{zoteroGroupId}/items/move",
         "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move" 
     }, method = RequestMethod.POST)
@@ -87,7 +89,7 @@ public class MoveItemsController {
     }, method = RequestMethod.POST)
     public @ResponseBody void clearTask(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID) {
-        asyncCitationManager.clearTask(taskID);
+        asyncCitationManager.clearUpdateTask(taskID);
     }
 
     @RequestMapping(value = {
@@ -99,7 +101,7 @@ public class MoveItemsController {
             @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
         try {
             citationManager.getGroupItems((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId,
-                    new Integer(page), null);
+                    new Integer(page), null, null);
             Sync sync = new Sync();
             sync.setStatus("sync-started");
             return sync;
