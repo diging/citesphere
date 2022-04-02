@@ -2,14 +2,9 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +20,8 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IPerson;
+import edu.asu.diging.citesphere.model.transfer.impl.Persons;
 import edu.asu.diging.citesphere.user.IUser;
-import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
-import java.util.stream.Stream;
 
 @Controller
 public class ShowPeopleController {
@@ -37,69 +31,43 @@ public class ShowPeopleController {
     @Autowired
     private ICitationManager citationManager;
 
-    Map<IPerson, List<ICitation>> personCitationSortedMap = new TreeMap<IPerson, List<ICitation>>();
+    private Map<IPerson, List<ICitation>> personCitationSortedMap = new TreeMap<IPerson, List<ICitation>>();
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/showPeople")
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/people")
     public String showPeople(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort) {
-        Integer pageInt = 1;
-        try {
-            pageInt = new Integer(page);
-        } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-        }
-        IUser user = (IUser) authentication.getPrincipal();
-        CitationResults results;
-        try {
-            results = citationManager.getGroupItems(user, groupId, null, pageInt, sort);
-        } catch (ZoteroHttpStatusException e) {
-            logger.error("Exception occured", e);
-            return "error/500";
-        } catch (GroupDoesNotExistException e) {
-            logger.error("Exception occured", e);
-            return "error/404";
-        }
-        model.addAttribute("zoteroGroupId", groupId);
-        model.addAttribute("currentPage", pageInt);
-        model.addAttribute("sort", sort);
+//        Integer pageInt = 1;
+//        IUser user = (IUser) authentication.getPrincipal();
+//
+//        Map<IPerson, List<ICitation>> personCitationTMap;
+//        try {
+//            personCitationTMap = citationManager.getAllPeople(user, groupId, pageInt, sort);
+//        } catch (ZoteroHttpStatusException e) {
+//            logger.error("Exception occured", e);
+//            return "error/500";
+//        } catch (GroupDoesNotExistException e) {
+//            logger.error("Exception occured", e);
+//            return "error/404";
+//        }
+//        model.addAttribute("zoteroGroupId", groupId);
+//        model.addAttribute("currentPage", pageInt);
+//        model.addAttribute("sort", sort);
+//
+//        if (personCitationTMap != null && !personCitationTMap.isEmpty()) {
+//            Collection<IPerson> keyCollection = personCitationTMap.keySet();
+//            List<IPerson> peopleList = new ArrayList<IPerson>(keyCollection);
+//
+//            model.addAttribute("people", peopleList);
+//
+//            personCitationSortedMap = new TreeMap<IPerson, List<ICitation>>(personCitationTMap);
+//        }
 
-        Map<IPerson, List<ICitation>> personCitationMap = new HashMap<IPerson, List<ICitation>>();
+        Persons personList = null;
+        personList = citationManager.getAllPeople(groupId) ;
+        model.addAttribute("people", personList.getPersons());
 
-        results.getCitations().stream()
-                .forEach(
-                        iCitation -> (Stream
-                                .of(iCitation.getAuthors().stream(), iCitation.getEditors().stream(),
-                                        iCitation.getOtherCreators().stream()
-                                                .map(iOtherCreator -> iOtherCreator.getPerson()))
-                                .reduce(Stream::concat).orElseGet(Stream::empty))
-                                        .filter(distinctByKey(p -> p.getFirstName())).forEach(au -> {
-                                            boolean containKey = false;
-                                            for (IPerson key : personCitationMap.keySet()) {
-                                                if (key.getFirstName().equals(au.getFirstName())
-                                                        && key.getLastName().equals(au.getLastName())) {
-                                                    personCitationMap.get(key).add(iCitation);
-                                                    containKey = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (!containKey) {
-                                                List<ICitation> citList = new ArrayList<ICitation>();
-                                                citList.add(iCitation);
-                                                personCitationMap.put(au, citList);
-                                            }
-
-                                        }));
-
-        Map<IPerson, List<ICitation>> personCitationTMap = new TreeMap<IPerson, List<ICitation>>(personCitationMap);
-
-        Collection<IPerson> keyCollection = personCitationTMap.keySet();
-        List<IPerson> peopleList = new ArrayList<IPerson>(keyCollection);
-
-        model.addAttribute("people", peopleList);
-
-        personCitationSortedMap = new TreeMap<IPerson, List<ICitation>>(personCitationTMap);
-
+        
         return "auth/group/showPeople";
     }
 
@@ -117,9 +85,4 @@ public class ShowPeopleController {
         return "auth/group/showCitations";
     }
 
-    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-
-        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
 }
