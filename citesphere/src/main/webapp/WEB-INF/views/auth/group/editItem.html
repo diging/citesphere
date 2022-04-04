@@ -33,15 +33,9 @@ var affiliationTemplate = $($.parseHTML('<div class="aff-entry">' +
 //# sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
-// 	$("#uriLoadingSpinnerAuthorAffiliation").hide();
 	$("#uriLoadingFailureAuthor").hide();
-// 	$("#uriLoadingFailureAuthorAffiliation").hide();
 	$("#uriLoadingFoundAuthor").hide();
-// 	$("#uriLoadingFoundAuthorAffiliation").hide();
 	$("#searchAuthorSpinner").hide();
-// 	$("#searchAuthorAffiliationSpinner").hide();
-// 	$("#searchEditorAffiliationSpinner").hide();
-// 	$("#searchCreatorAffiliationSpinner").hide();
 	
 	$("#uriLoadingFoundAuthor").popover();
 	$("#uriLoadingFailureAuthor").popover();
@@ -96,18 +90,6 @@ $(function() {
     $("#firstNameAuthor").keyup(function(e){
     	allowSearchAndAdd("Author");
     });
-	
-//     $(document).on("keyup", "#firstNameAuthorAffiliation", function() {
-//     	allowSearchAndAdd("AuthorAffiliation");
-//     });
-
-//     $(document).on("keyup", "#firstNameEditorAffiliation", function() {
-//     	allowSearchAndAdd("EditorAffiliation");
-//     });
-
-//     $(document).on("keyup", "#firstNameCreatorAffiliation", function() {
-//     	allowSearchAndAdd("CreatorAffiliation");
-//     });
     
     $("#lastNameAuthor").keyup(function(e){
     	allowSearchAndAdd("Author");
@@ -133,35 +115,6 @@ $(function() {
     	$(this).closest('.aff-entry').remove();
     });
     
-    function searchAuthorities(modalType, personType) {
-    	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
-    	    $('#selectAuthorityModel a:first').tab('show');
-        })  
-    	$("#search"+modalType+"Spinner").show();
-    	$('#userAuthority-pagination-top').twbsPagination('destroy');
-    	$('#groupAuthority-pagination-top').twbsPagination('destroy');
-    	$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-    	$('#viafAuthority-pagination-top').twbsPagination('destroy');
-		
-    	getUserAuthorities(modalType, personType, 0)
-    	getViafAuthorities(modalType, personType, 0)
-    	getGroupAuthorities(modalType, personType, 0)
-    	getconceptpowerAuthorities(modalType, personType, 0)
-    	$("#search"+modalType+"Spinner").hide();
-    }
-	
-//     $(document).on("click", "#searchAuthorAffiliation", function() {
-//         searchAuthorities('AuthorAffiliation', 'AuthorAffiliation');
-//     });
-	 
-//     $(document).on("click", "#searchEditorAffiliation", function() {
-//         searchAuthorities('EditorAffiliation', 'EditorAffiliation');
-//     });
-	 
-//     $(document).on("click", "#searchCreatorAffiliation", function() {
-//         searchAuthorities('CreatorAffiliation', 'CreatorAffiliation');
-//     });
-    
     $("#searchAuthor").click(function() {
         searchAuthorities('Author', 'Author');
     });
@@ -171,8 +124,8 @@ $(function() {
     });
 	
     $("#searchCreator").click(function() {
-		searchAuthorities('Creator', 'Creator');
-	}); 
+        searchAuthorities('Creator', 'Creator');
+    }); 
 	
 	$(".edit-author").click(function(){
 		var authorItem = $(this).parent();
@@ -438,6 +391,23 @@ $(function() {
 		$("#addConceptModal").modal('hide');
 	});
 });
+
+function searchAuthorities(modalType, personType) {
+	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+	    $('#selectAuthorityModel a:first').tab('show');
+	})  
+	$("#search"+modalType+"Spinner").show();
+	$('#userAuthority-pagination-top').twbsPagination('destroy');
+	$('#groupAuthority-pagination-top').twbsPagination('destroy');
+	$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+	$('#viafAuthority-pagination-top').twbsPagination('destroy');
+	
+	getUserAuthorities(modalType, personType, 0)
+	getViafAuthorities(modalType, personType, 0)
+	getGroupAuthorities(modalType, personType, 0)
+	getconceptpowerAuthorities(modalType, personType, 0)
+	$("#search"+modalType+"Spinner").hide();
+}
 
 function allowSearchAndAdd(element){
     if($("#firstName"+element).val() == "" && $("#lastName"+element).val()==""){
@@ -761,16 +731,12 @@ function resetPersonCreationModal(modalType) {
 }
 
 function resetPersonAuthorityCreation(personType) {
-// 	personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
 	$("#uriLoadingFound"+personType).hide();
 	$("#uriLoadingFailure"+personType).hide();
 	$("#uriLoadingSpinner"+personType).hide();
 	$("#uriLoadingFound"+personType).popover('hide');
 	$("#uriLoadingFailure"+personType).popover('hide');
 	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
-// 	$("#"+personType_lowerCase+"AuthorityUsed").html("");
-// 	$("#"+personType_lowerCase+"AuthorityCreationFeedback").html("");
-// 	$("#"+personType_lowerCase+"AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
@@ -1017,7 +983,6 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			    $("#uri"+modalType).val( uri);
 			}
 			
-			personType_lowerCase = personType[0].toLowerCase() + personType.slice(1);
 			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=conceptpower&uri=' + uri;	
 			if($("#cp-checkbox").is(":checked")){
 				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
@@ -1034,9 +999,6 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 				error: function(data){					
 					$("#uri"+modalType).val("");
 		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
-		  			setTimeout(function() {
-		  				$("#"+personType_lowerCase+"AuthorityUsed").empty();
-		  			}, 3000);
 				}
 				});				
 						
@@ -1379,9 +1341,11 @@ function creatorLinkHandler(target) {
 							</span>
 						</th:block>
 								[[${author.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
+								<span th:if="${!author.getAffiliations().isEmpty()}">(</span>
 								<th:block th:each="aff:${author.affiliations}">
 									<span th:remove="tag" th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
+								<span th:if="${!author.getAffiliations().isEmpty()}">)</span>
 									&nbsp;
 							<i class="icon-edit edit-author" style="cursor: pointer; color: white; font-size: 12px;"></i>
 									&nbsp;
@@ -1403,7 +1367,9 @@ function creatorLinkHandler(target) {
 							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|editor${status.index}-aff${affStatus.index}|" th:data-affiliation-uri="${aff.uri}"></span>
 						</th:block>
 						  [[${editor.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
+						      <span th:if="${!editor.getAffiliations().isEmpty()}">(</span>
 						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
+						      <span th:if="${!editor.getAffiliations().isEmpty()}">)</span>
 							&nbsp;
 							<i class="icon-edit edit-editor" style="color: white; font-size: 12px;"></i>
 							&nbsp;
@@ -1429,7 +1395,9 @@ function creatorLinkHandler(target) {
 				 				<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|creator${loop.index}-aff${affStatus.index}|" th:data-affiliation-uri="${aff.uri}"></span>
 				 			</th:block>
 								[[${creator.person.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
+							<span th:if="${!creator.person.getAffiliations().isEmpty()}">(</span>
 							<th:block th:each="aff:${creator.person.affiliations}">[[${aff.name}]]</th:block>
+							<span th:if="${!creator.person.getAffiliations().isEmpty()}">)</span>
 							&nbsp;<i class="icon-edit edit-creator" style="color: white; font-size: 12px;"></i>
 									<i class="icon-circle-close remove-creator" style="cursor: pointer; color: white; font-size: 12px;"></i>
 						</span>
@@ -1628,7 +1596,7 @@ function creatorLinkHandler(target) {
 			    </div>
 			    <input type="hidden" id="uriAuthorLocalId" />
 		    </div>
-		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
+		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div><br>
 		  </div>
 		  <div id="authorAffiliations"></div>
 		  <div class="text-right"><a id="addAuthorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
@@ -1682,7 +1650,7 @@ function creatorLinkHandler(target) {
 			    </div>
 			    <input type="hidden" id="uriEditorLocalId" />
 		    </div>
-		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
+		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div><br>
 		  </div>
 		  <div id="editorAffiliations"></div>
 		  <div>
@@ -1736,7 +1704,7 @@ function creatorLinkHandler(target) {
 			    </div>
 			    <input type="hidden" id="uriCreatorLocalId" />
 		    </div>
-		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
+		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div><br>
 		  </div>
 		  
 		  <div id="creatorAffiliations"></div>
