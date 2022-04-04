@@ -85,11 +85,6 @@ $(function() {
 		resetPersonCreationModal("Author");
 	});
 	
-	$("#authorModal .close").click(function() {
-	    $("#authorModal").modal('hide');
-	    resetPersonCreationModal("Author");
-	})
-	
 	/* Disable search authority button when first name and last name fields are empty*/
     $("#firstNameAuthor").keyup(function(e){
     	allowSearchAndAdd("Author");
