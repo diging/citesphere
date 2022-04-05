@@ -38,12 +38,10 @@ $(function() {
         $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
             $('#selectAuthorityModel a:first').tab('show');
         })
-        $("#searchAuthorSpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         $('#viafAuthority-pagination-top').twbsPagination('destroy');
         getViafAuthorities('Author', 'Author', 0)
         getConceptpowerAuthorities('Author', 'Author', 0)
-        $("#searchAuthorSpinner").hide();
     });
     
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -191,6 +189,10 @@ function getViafAuthorities(modalType, personType, page) {
   		type: 'GET',
   		url: url ,
   		async: false,
+  		beforeSend: function(){
+  			$('#authoritySpinner').show();
+  			$('#viafAuthoritiesTabContent').toggleClass('greyout');
+  		},
   		success: function(data) {
   			$("#viafAuthoritySearchResult").empty();
   			var content = '';
@@ -235,6 +237,10 @@ function getViafAuthorities(modalType, personType, page) {
                 resetPersonCreationModal("Author");
             });
 
+        },
+        complete:function(data){
+        	$('#authoritySpinner').hide();
+        	$('#viafAuthoritiesTabContent').toggleClass('greyout');
         },
         error: function(data) {
             $('#viafAuthoritySearchResult').parents('table').hide()

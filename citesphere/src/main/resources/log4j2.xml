@@ -59,7 +59,7 @@
     <Logger name="org.apache.kafka" level="${log.level}">
         
     </Logger>
-    <Root level="info">
+    <Root level="${log.level}">
       <AppenderRef ref="Console"/>
       <AppenderRef ref="fileLogger"/>
     </Root>

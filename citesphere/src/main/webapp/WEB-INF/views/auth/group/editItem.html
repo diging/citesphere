@@ -100,10 +100,11 @@ $(function() {
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+		$('#viafAuthority-pagination-top').twbsPagination('destroy');
+		
 		getUserAuthorities('Author','Author', 0);
 		getGroupAuthorities('Author','Author', 0);
 		getconceptpowerAuthorities('Author','Author',0);
-		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		getViafAuthorities('Author', 'Author', 0);
 	});
 	
@@ -953,6 +954,10 @@ function getViafAuthorities(modalType, personType, page) {
   		type: 'GET',
   		url: url ,
   		async: false,
+  		beforeSend: function(){
+  			$('#authoritySpinner').show();
+  			$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
+  		},
   		success: function(data) {
   			$('#viaf-groupName').text(data['groupName']);
   			$("#viafAuthoritySearchResult").empty();
@@ -1016,6 +1021,10 @@ function getViafAuthorities(modalType, personType, page) {
 		});	
 		
         },
+    complete:function(data){
+   		$('#authoritySpinner').hide();
+        $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
+    },
 	error: function(data){
 		$('#viafAuthoritySearchResult').parents('table').hide()
 		$("#viafAuthoritiesError").show();	
