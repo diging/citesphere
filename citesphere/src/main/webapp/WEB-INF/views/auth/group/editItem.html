@@ -956,7 +956,7 @@ function getViafAuthorities(modalType, personType, page) {
   		async: false,
   		beforeSend: function(){
   			$('#authoritySpinner').show();
-  			$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
+  			$('#viafAuthoritiesTabContent').toggleClass('greyout');
   		},
   		success: function(data) {
   			$('#viaf-groupName').text(data['groupName']);
@@ -1023,7 +1023,7 @@ function getViafAuthorities(modalType, personType, page) {
         },
     complete:function(data){
    		$('#authoritySpinner').hide();
-        $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
+        $('#viafAuthoritiesTabContent').toggleClass('greyout');
     },
 	error: function(data){
 		$('#viafAuthoritySearchResult').parents('table').hide()
