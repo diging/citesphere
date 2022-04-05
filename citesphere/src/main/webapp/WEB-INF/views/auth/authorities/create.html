@@ -17,7 +17,6 @@ $(function() {
     $("#tr-uriAuthor").hide();
     $("#importerId").hide();
     
-
     $("#firstNameAuthor").keyup(function(e) {
         allowAuthoritySearch("Author");
     });
@@ -36,14 +35,15 @@ $(function() {
     });
 
     $("#searchAuthor").click(function() {
-    	$("#conceptpowerAuthoritySearchResult").empty();
         $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
             $('#selectAuthorityModel a:first').tab('show');
         })
-        
+        $("#searchAuthorSpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-        
-        getConceptpowerAuthorities('Author', 'Author', 0);
+        $('#viafAuthority-pagination-top').twbsPagination('destroy');
+        getViafAuthorities('Author', 'Author', 0)
+        getConceptpowerAuthorities('Author', 'Author', 0)
+        $("#searchAuthorSpinner").hide();
     });
     
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -129,6 +129,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
+
                     content += '<div class="importerId" style="display: none;">';
                     if (elem['importerId'] == null) {
                         content += '</div>';
@@ -157,6 +158,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
             $(".conceptpower-authority-entry").click(function() {
                 name = $(this).closest("tr").find(".name").text();
                 uri = $(this).closest("tr").find(".uri").text();
+
                 description = $(this).closest("tr").find(".description").text();
                 importerId = $(this).closest("tr").find(".importerId").text();
                 
@@ -173,6 +175,70 @@ function getConceptpowerAuthorities(modalType, personType, page) {
         error: function(data) {
             $('#conceptpowerAuthoritySearchResult').parents('table').hide()
             $("#conceptpowerAuthoritiesError").show();
+        }
+
+    });
+}
+
+function getViafAuthorities(modalType, personType, page) {
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	personType_lowerCase = personType.toLowerCase();
+	url = [[@{|/auth/authority/find/authorities/viaf|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
+
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+  			$("#viafAuthoritySearchResult").empty();
+  			var content = '';
+  			
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+                data['foundAuthorities'].forEach(function(elem) {
+                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
+                    if (elem['description'] == null) {
+                        content += ' - </td>';
+                    } else {
+                        content += elem['description'] + '</td>';
+                    }
+                    content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+
+                });
+
+                $('#viafAuthority-pagination-top').twbsPagination({
+                    totalPages: data['totalPages'],
+                    startPage: data['currentPage'],
+                    prev: "«",
+                    next: "»",
+                    visiblePages: 5,
+                    initiateStartPageClick: false,
+                    onPageClick: function(event, page) {
+                    	getViafAuthorities(modalType, personType, page-1)
+                    }
+                });
+
+            }
+
+            $("#viafAuthoritySearchResult").append(content);
+            $(".viaf-authority-entry").click(function() {
+                name = $(this).closest("tr").find(".name").text();
+                uri = $(this).closest("tr").find(".uri").text();
+                
+                description = $(this).closest("tr").find(".description").text();
+                importerId = $(this).closest("tr").find(".importerId").text();
+
+                showPerson(name, description, uri, importerId);
+                $("#selectAuthorityModel").modal('hide');
+                $("#authorModal").modal('hide');
+                resetPersonCreationModal("Author");
+            });
+
+        },
+        error: function(data) {
+            $('#viafAuthoritySearchResult').parents('table').hide()
+            $("#viafAuthoritiesError").show();
         }
 
     });
@@ -350,6 +416,10 @@ function getPersonAuthority(uri, personType) {
                             <a href="#conceptpowerAuthoritiesTabContent" aria-controls="uploadTab"
                                 role="tab" data-toggle="tab">Authorities from Conceptpower</a>
                         </li>
+                        <li role="presentation">
+                            <a href="#viafAuthoritiesTabContent"
+                                aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from VIAF</a>
+                        </li>
                     </ul>
                     
                     <!-- Tab panes -->
@@ -364,10 +434,20 @@ function getPersonAuthority(uri, personType) {
                                 <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
                                 <tbody id="conceptpowerAuthoritySearchResult">
                                 </tbody>
-                            </table>
-                            <div class="loader" style="font-size: 30px; text-align: center;">
-                                 <i id="authoritySpinner" class="icon-spinner" style="color: #337ab7"></i>
+                            </table>                            
+                        </div>
+                        
+                        <div role="tabpanel" class="tab-pane" id="viafAuthoritiesTabContent">
+                            <ul id="viafAuthority-pagination-top" class="pagination-sm"></ul>
+                            <div id="viafAuthoritiesError" class="text-warning" style="display: none">
+                                <span> Error occurred while searching authorities in VIAF </span>
                             </div>
+                            </br>
+                            <table class="table table-striped table-bordered table-fixed">
+                                <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+                                <tbody id="viafAuthoritySearchResult">
+                                </tbody>
+                            </table>
                             
                         </div>
                     </div>
