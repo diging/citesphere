@@ -13,13 +13,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IPerson;
+import edu.asu.diging.citesphere.model.bib.impl.Person;
 import edu.asu.diging.citesphere.model.transfer.impl.Persons;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -31,43 +34,18 @@ public class ShowPeopleController {
     @Autowired
     private ICitationManager citationManager;
 
-    private Map<IPerson, List<ICitation>> personCitationSortedMap = new TreeMap<IPerson, List<ICitation>>();
+    private List<Person> peopleList = new ArrayList<Person>();
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/people")
     public String showPeople(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort) {
-//        Integer pageInt = 1;
-//        IUser user = (IUser) authentication.getPrincipal();
-//
-//        Map<IPerson, List<ICitation>> personCitationTMap;
-//        try {
-//            personCitationTMap = citationManager.getAllPeople(user, groupId, pageInt, sort);
-//        } catch (ZoteroHttpStatusException e) {
-//            logger.error("Exception occured", e);
-//            return "error/500";
-//        } catch (GroupDoesNotExistException e) {
-//            logger.error("Exception occured", e);
-//            return "error/404";
-//        }
-//        model.addAttribute("zoteroGroupId", groupId);
-//        model.addAttribute("currentPage", pageInt);
-//        model.addAttribute("sort", sort);
-//
-//        if (personCitationTMap != null && !personCitationTMap.isEmpty()) {
-//            Collection<IPerson> keyCollection = personCitationTMap.keySet();
-//            List<IPerson> peopleList = new ArrayList<IPerson>(keyCollection);
-//
-//            model.addAttribute("people", peopleList);
-//
-//            personCitationSortedMap = new TreeMap<IPerson, List<ICitation>>(personCitationTMap);
-//        }
 
         Persons personList = null;
         personList = citationManager.getAllPeople(groupId) ;
         model.addAttribute("people", personList.getPersons());
 
-        
+        peopleList = personList.getPersons();
         return "auth/group/showPeople";
     }
 
@@ -78,10 +56,17 @@ public class ShowPeopleController {
 
         model.addAttribute("zoteroGroupId", groupId);
 
-        if (index != null && !index.isEmpty()) {
-            model.addAttribute("involvedCitations",
-                    personCitationSortedMap.get(personCitationSortedMap.keySet().toArray()[Integer.parseInt(index)]));
-        }
+//        if (index != null && !index.isEmpty()) {
+//            model.addAttribute("involvedCitations",
+//                    personCitationSortedMap.get(personCitationSortedMap.keySet().toArray()[Integer.parseInt(index)]));
+//        }
+        
+        Person p = peopleList.get(Integer.parseInt(index));
+//        List<ICitation> citations;
+        List<ICitation> citations = citationManager.getAllCitations(p) ;
+//        model.addAttribute("people", personList.getPersons());
+
+        
         return "auth/group/showCitations";
     }
 

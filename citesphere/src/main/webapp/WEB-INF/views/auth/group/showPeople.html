@@ -1,20 +1,20 @@
 <html layout:decorate="~{layouts/main}">
 
 <head>
-  <script src="https://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script>
+<script src="https://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script>
 </head>
 
 <body>
-  <div layout:fragment="content">
-    <ul class="list-group">
-      <li th:each="person, iterStat : ${people}" class="list-group-item clearfix">
-
-        <a th:href="@{|/auth/group/${zoteroGroupId}/items/showCitation/${iterStat.index}|}">
-          <i>[[${person.firstName}]] [[${person.lastName}]]</i>
-        </a>
-      </li>
-    </ul>
-  </div>
+	<div layout:fragment="content">
+		<ul class="list-group">
+			<li th:each="person, iterStat : ${people}"
+				class="list-group-item clearfix"><a
+				th:href="@{|/auth/group/${zoteroGroupId}/items/showCitation/${iterStat.index}|}">
+					<i>[[${person.firstName}]] [[${person.lastName}]]
+						[[${person.uri}]]</i>
+			</a></li>
+		</ul>
+	</div>
 </body>
 
 </html>
