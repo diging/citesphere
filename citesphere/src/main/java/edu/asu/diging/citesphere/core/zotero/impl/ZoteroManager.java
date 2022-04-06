@@ -17,6 +17,7 @@ import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
+import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.ZoteroFields;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -98,6 +99,9 @@ public class ZoteroManager implements IZoteroManager {
     @Override
     public Map<Long, Long> getGroupsVersion(IUser user) {
         ZoteroResponse<Group> response = zoteroConnector.getGroupsVersions(user);
+        if (response == null) {
+            return null;
+        }
         Map<Long, Long> groupVersions = new HashMap<>();
         for (Group group : response.getResults()) {
             groupVersions.put(group.getId(), group.getVersion());
@@ -414,5 +418,11 @@ public class ZoteroManager implements IZoteroManager {
             validTypes.add(type.getCreatorType());
         }
         return validTypes;
+    }
+
+    @Override
+    public Map<ItemDeletionResponse, List<String>> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
+        return zoteroConnector.deleteMultipleItems(user, groupId, citationKeys, citationVersion);
     }
 }

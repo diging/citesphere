@@ -70,6 +70,9 @@ public class SyncJobManager implements ISyncJobManager {
     @Override
     public long getJobsCount(IUser user) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
+        if (groups == null) {
+            return -1;
+        }
         return jobRepo.countByGroupIdIn(groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList()));
     }
     

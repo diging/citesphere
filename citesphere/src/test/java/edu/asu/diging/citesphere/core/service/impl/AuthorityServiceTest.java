@@ -324,7 +324,6 @@ public class AuthorityServiceTest {
         };
 
         Thread.sleep(100);
-        
         Mockito.when(entryRepository.save(entry)).thenAnswer(answer);
 
         IAuthorityEntry actualEntry = managerToTest.createWithUri(entry, user);
