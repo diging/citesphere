@@ -69,13 +69,13 @@ public class MoveItemsController {
                     (IUser) authentication.getPrincipal());
         }
         AsyncUpdateCitationsResponse asyncResponse = asyncCitationManager
-                .updateCitations((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
+                .moveCitationsToCollection((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
         return gson.toJson(asyncResponse, AsyncUpdateCitationsResponse.class);
     }
 
-    @RequestMapping(value = { 
+    @RequestMapping(value = {
         "/auth/group/{zoteroGroupId}/items/move/{taskID}/status",
-        "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/{taskID}/status" 
+        "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/{taskID}/status"
     })
     public @ResponseBody AsyncUpdateCitationsResponse getMoveItemsStatus(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID)
@@ -83,18 +83,18 @@ public class MoveItemsController {
         return asyncCitationManager.getUpdateCitationsResponse(taskID);
     }
 
-    @RequestMapping(value = { 
+    @RequestMapping(value = {
         "/auth/group/{zoteroGroupId}/items/move/task/{taskID}/clear",
-        "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/task/{taskID}/clear" 
+        "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/task/{taskID}/clear"
     }, method = RequestMethod.POST)
     public @ResponseBody void clearTask(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID) {
         asyncCitationManager.clearUpdateTask(taskID);
     }
 
-    @RequestMapping(value = { 
+    @RequestMapping(value = {
         "/auth/group/{zoteroGroupId}/items/move/{targetCollectionId}/sync/start",
-        "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/sync/start" 
+        "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/sync/start"
     })
     public @ResponseBody Sync startSync(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("targetCollectionId") String collectionId,
@@ -114,9 +114,9 @@ public class MoveItemsController {
         }
     }
 
-    @RequestMapping(value = { 
+    @RequestMapping(value = {
         "/auth/group/{zoteroGroupId}/items/move/{targetCollectionId}/totalItems",
-        "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/totalItems" 
+        "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/totalItems"
     })
     public @ResponseBody Long getTotalCitationsCollection(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("targetCollectionId") String collectionId) {

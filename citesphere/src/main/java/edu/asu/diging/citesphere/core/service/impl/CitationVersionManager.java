@@ -16,6 +16,7 @@ import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationVersionExcept
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.bib.CitationVersion;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationVersionManager;
@@ -91,7 +92,7 @@ public class CitationVersionManager implements ICitationVersionManager {
     @Override
     public void revertCitationVersion(IUser user, String groupId, String key, Long version)
             throws GroupDoesNotExistException, ZoteroConnectionException, CitationIsOutdatedException,
-            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException {
+            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException, ZoteroItemCreationFailedException {
         ICitationGroup group;
         try {
             group = groupManager.getGroup(user, groupId);

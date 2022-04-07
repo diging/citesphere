@@ -28,6 +28,7 @@ import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadFileJob;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadFileJobManager;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
@@ -43,7 +44,9 @@ public class UploadItemFileController {
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/files/upload", method = RequestMethod.POST)
     public ResponseEntity<String> uploadFile(Principal principal, @PathVariable String zoteroGroupId,
-            @PathVariable String itemId, @RequestParam("files") MultipartFile[] files) throws AccessForbiddenException, CannotFindCitationException, ZoteroHttpStatusException, ZoteroConnectionException, CitationIsOutdatedException {
+            @PathVariable String itemId, @RequestParam("files") MultipartFile[] files)
+            throws AccessForbiddenException, CannotFindCitationException, ZoteroHttpStatusException,
+            ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
         User user = null;
         if (principal instanceof UsernamePasswordAuthenticationToken) {
             user = (User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
