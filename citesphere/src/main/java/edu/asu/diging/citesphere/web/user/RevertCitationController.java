@@ -15,6 +15,7 @@ import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationVersionExcept
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationVersionManager;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -36,7 +37,7 @@ public class RevertCitationController {
                     version);
             return "redirect:/auth/group/" + zoteroGroupId + "/items/" + itemId;
         } catch (GroupDoesNotExistException | ZoteroConnectionException | CitationIsOutdatedException
-                | ZoteroHttpStatusException | CannotFindCitationVersionException | CannotFindCitationException e) {
+                | ZoteroHttpStatusException | CannotFindCitationVersionException | CannotFindCitationException | ZoteroItemCreationFailedException e) {
             logger.error("Error while restoring citation version", e);
             return "error/404";
         }

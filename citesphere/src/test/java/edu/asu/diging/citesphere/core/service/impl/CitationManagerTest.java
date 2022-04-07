@@ -136,7 +136,8 @@ public class CitationManagerTest {
     } 
     
     @Test 
-    public void test_updateCitation_success() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {
+    public void test_updateCitation_success() throws ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(currentVersion);
         ICitation updatedCitation = new Citation();
         updatedCitation.setKey(EXISTING_ID);
@@ -148,7 +149,8 @@ public class CitationManagerTest {
     }
     
     @Test(expected=CitationIsOutdatedException.class)
-    public void test_updateCitation_conflict() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {
+    public void test_updateCitation_conflict() throws ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(new Long(2));
         managerToTest.updateCitation(user, GROUP_ID, existingCitation);
     }
