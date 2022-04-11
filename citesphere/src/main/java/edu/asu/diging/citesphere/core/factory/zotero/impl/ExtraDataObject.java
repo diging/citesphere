@@ -8,6 +8,12 @@ import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.model.bib.IPerson;
 import edu.asu.diging.citesphere.model.bib.IReference;
 
+/**
+ * Holds the additional Citesphere data for an item. This data has been moved
+ * from the "extra" field to a "note" of the item.
+ * 
+ * @author Julia Damerow
+ */
 public class ExtraDataObject {
 
     private Set<IPerson> authors;

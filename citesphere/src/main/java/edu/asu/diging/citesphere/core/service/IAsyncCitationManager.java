@@ -74,4 +74,15 @@ public interface IAsyncCitationManager {
     public AsyncDeleteCitationsResponse getDeleteCitationsResponse(String taskId)
             throws ExecutionException, InterruptedException;
 
+    /**
+     * This method moves citations to a collection asynchronously.
+     * 
+     * @param user          User accessing Zotero
+     * @param zoteroGroupId GroupId of the citations
+     * @param citations     citations that have to be moved
+     * @return AsyncUpdateCitationsResponse contains task id, response and status.
+     */
+    AsyncUpdateCitationsResponse moveCitationsToCollection(IUser user, String zoteroGroupId, List<ICitation> citations)
+            throws JsonProcessingException, ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroHttpStatusException, InterruptedException, ExecutionException;
 }
