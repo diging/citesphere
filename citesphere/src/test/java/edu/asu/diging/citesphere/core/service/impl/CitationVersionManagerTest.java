@@ -19,6 +19,7 @@ import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationVersionExcept
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.bib.CitationVersion;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -143,7 +144,7 @@ public class CitationVersionManagerTest {
     @Test(expected = GroupDoesNotExistException.class)
     public void test_revertCitationVersion_noSuchGroup()
             throws GroupDoesNotExistException, ZoteroConnectionException, CitationIsOutdatedException,
-            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException {
+            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException, ZoteroItemCreationFailedException {
         Mockito.when(groupManager.getGroup(user, GROUP_ID)).thenReturn(null);
         managerToTest.revertCitationVersion(user, GROUP_ID, EXISTING_ID, CITATION_VERSION_1);
     }
@@ -151,7 +152,7 @@ public class CitationVersionManagerTest {
     @Test(expected = CannotFindCitationException.class)
     public void test_revertCitationVersion_noCitation()
             throws GroupDoesNotExistException, ZoteroConnectionException, CitationIsOutdatedException,
-            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException {
+            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException, ZoteroItemCreationFailedException {
         Mockito.when(groupManager.getGroup(user, GROUP_ID)).thenReturn(group);
         Mockito.when(citationManager.getCitation(EXISTING_ID)).thenReturn(null);
         managerToTest.revertCitationVersion(user, GROUP_ID, EXISTING_ID, CITATION_VERSION_1);
@@ -160,7 +161,7 @@ public class CitationVersionManagerTest {
     @Test(expected = CannotFindCitationVersionException.class)
     public void test_revertCitationVersion_noCitationVersion()
             throws GroupDoesNotExistException, ZoteroConnectionException, CitationIsOutdatedException,
-            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException {
+            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException, ZoteroItemCreationFailedException {
         Mockito.when(groupManager.getGroup(user, GROUP_ID)).thenReturn(group);
         Mockito.when(citationManager.getCitation(EXISTING_ID)).thenReturn(citation1);
         Mockito.when(citationVersionsDao.getVersion(GROUP_ID, EXISTING_ID, CITATION_VERSION_1)).thenReturn(null);

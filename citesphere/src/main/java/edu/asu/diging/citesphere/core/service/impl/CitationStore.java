@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,7 +65,9 @@ public class CitationStore implements ICitationStore {
      */
     @Override
     public List<ICitation> getNotes(String id) {
-        return citationRepository.findByParentItemAndItemTypeAndDeleted(id, ItemType.NOTE.name(), 0);
+        return citationRepository.findByParentItemAndItemTypeAndDeleted(id, ItemType.NOTE.name(), 0).stream().filter(
+                citation -> !citation.getTags().stream().anyMatch(tag -> tag.getTag().equals("citesphere-metadata")))
+                .collect(Collectors.toList());
     }
 
     @Override

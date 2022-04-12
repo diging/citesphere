@@ -49,9 +49,9 @@ public interface ICitationManager {
     List<ICitation> getNotes(IUser user, String groupId, String key)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 
-    void updateCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException;
-    
+    void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
+            CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
+   
     ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
             ExecutionException, JsonProcessingException;
