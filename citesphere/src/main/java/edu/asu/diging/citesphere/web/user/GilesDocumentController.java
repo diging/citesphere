@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
+import edu.asu.diging.citesphere.model.bib.GilesStatus;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.user.IUser;
@@ -37,19 +38,16 @@ public class GilesDocumentController {
     public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication) {
         
         ICitation citation = citationManager.getCitation(itemId);
-        //Find fileId in uploaded file and extracted text file
-        Optional<IGilesUpload> uploadOptional = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null).filter(g -> g.getUploadedFile().getId().equals(fileId) || g.getExtractedText().getId().equals(fileId)).findFirst();
+        Optional<IGilesUpload> uploadOptional = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null && u.getDocumentStatus().equals(GilesStatus.COMPLETE))
+                .filter(g -> g.getUploadedFile().getId().equals(fileId) //Find fileId in uploaded file and extracted text file
+                        || g.getExtractedText().getId().equals(fileId)
+                        || g.getPages().stream().filter(p -> p!=null).anyMatch(a -> a.getImage().getId().equals(fileId)  //Find fileId in pages
+                        || a.getText().getId().equals(fileId) 
+                        || a.getOcr().getId().equals(fileId)
+                        || a.getAdditionalFiles().stream().filter(f -> f!=null).anyMatch(f -> f.getId().equals(fileId)))).findFirst(); //Find fileId in additional files
         if (!uploadOptional.isPresent()) {
-            //Find fileId in pages
-            uploadOptional = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null).filter(g -> g.getPages().stream().filter(p -> p!=null).anyMatch(a -> a.getImage().getId().equals(fileId) || a.getText().getId().equals(fileId) || a.getOcr().getId().equals(fileId))).findFirst();
-            if (!uploadOptional.isPresent()) {
-                //Find fileId in additional files
-                uploadOptional = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null).filter(g -> g.getPages().stream().filter(p -> p!=null).anyMatch(a -> a.getAdditionalFiles().stream().filter(f -> f!=null).anyMatch(f -> f.getId().equals(fileId)))).findFirst();
-                if(!uploadOptional.isPresent()) {
-                    response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
-                    return;
-                }
-            }
+            response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
+            return;
         }
         
         IGilesUpload upload = uploadOptional.get();
