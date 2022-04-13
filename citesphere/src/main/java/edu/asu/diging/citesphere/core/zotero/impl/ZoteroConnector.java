@@ -202,7 +202,8 @@ public class ZoteroConnector implements IZoteroConnector {
         Zotero zotero = getApi(user);
         try {
             return zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey).stream()
-                    .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()))
+                    .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()) && !item.getData()
+                            .getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG)))
                     .collect(Collectors.toList());
         } catch (HttpClientErrorException ex) {
             throw createException(ex.getStatusCode(), ex);
