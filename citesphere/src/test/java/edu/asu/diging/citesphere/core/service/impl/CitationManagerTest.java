@@ -33,6 +33,7 @@ import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
+import edu.asu.diging.citesphere.model.transfer.impl.Persons;
 
 public class CitationManagerTest {
 
@@ -356,5 +357,14 @@ public class CitationManagerTest {
         CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index, null);
         Assert.assertNull(actualResult.getNext());
         Assert.assertNull(actualResult.getPrev());
+    }
+
+    @Test
+    public void test_getAllPeople_success() {
+        Persons createdPersons = new Persons();
+        Mockito.when(citationDao.findAllPeople(GROUP_ID)).thenReturn(createdPersons);
+
+        Persons actual = managerToTest.getAllPeople(GROUP_ID);
+        Assert.assertEquals(createdPersons, actual);
     }
 }
