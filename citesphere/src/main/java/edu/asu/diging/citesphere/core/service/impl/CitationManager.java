@@ -47,6 +47,9 @@ import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.impl.Person;
+import edu.asu.diging.citesphere.model.transfer.impl.Citations;
+import edu.asu.diging.citesphere.model.transfer.impl.Persons;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
@@ -439,6 +442,20 @@ public class CitationManager implements ICitationManager {
             }
         }
         return result;
+    }
+    
+    @Override
+    public Persons getAllPeople(String groupId) {
+        Persons persons = null;
+        persons = (Persons) citationDao.findAllPeople(groupId);
+        return persons;
+    }
+    
+    @Override
+    public Citations getAllCitations(Person person) {
+        Citations citations = null;
+        citations =  citationDao.findCitationsForPerson(person);
+        return citations;
     }
     
     @Override

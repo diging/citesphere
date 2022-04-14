@@ -22,6 +22,9 @@ import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.impl.Person;
+import edu.asu.diging.citesphere.model.transfer.impl.Citations;
+import edu.asu.diging.citesphere.model.transfer.impl.Persons;
 import edu.asu.diging.citesphere.user.IUser;
 
 public interface ICitationManager {
@@ -78,5 +81,8 @@ public interface ICitationManager {
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
     
     void deleteLocalGroupCitations(String groupId);
-    
+
+    Persons getAllPeople(String groupId);
+
+    Citations getAllCitations(Person p);    
 }
