@@ -1342,11 +1342,11 @@ function creatorLinkHandler(target) {
 							</span>
 						</th:block>
 								[[${author.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
-								<span th:if="${!author.getAffiliations().isEmpty()}">(</span>
+								<span th:if="${author.getAffiliations() != null && !author.getAffiliations().isEmpty()}">(</span>
 								<th:block th:each="aff:${author.affiliations}">
 									<span th:remove="tag" th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
-								<span th:if="${!author.getAffiliations().isEmpty()}">)</span>
+								<span th:if="${author.getAffiliations() != null && !author.getAffiliations().isEmpty()}">)</span>
 									&nbsp;
 							<i class="icon-edit edit-author" style="cursor: pointer; color: white; font-size: 12px;"></i>
 									&nbsp;
@@ -1368,9 +1368,9 @@ function creatorLinkHandler(target) {
 							<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|editor${status.index}-aff${affStatus.index}|" th:data-affiliation-uri="${aff.uri}"></span>
 						</th:block>
 						  [[${editor.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
-						      <span th:if="${!editor.getAffiliations().isEmpty()}">(</span>
+						      <span th:if="${editor.getAffiliations() != null && !editor.getAffiliations().isEmpty()}">(</span>
 						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
-						      <span th:if="${!editor.getAffiliations().isEmpty()}">)</span>
+						      <span th:if="${editor.getAffiliations() != null && !editor.getAffiliations().isEmpty()}">)</span>
 							&nbsp;
 							<i class="icon-edit edit-editor" style="color: white; font-size: 12px;"></i>
 							&nbsp;
@@ -1396,9 +1396,9 @@ function creatorLinkHandler(target) {
 				 				<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|creator${loop.index}-aff${affStatus.index}|" th:data-affiliation-uri="${aff.uri}"></span>
 				 			</th:block>
 								[[${creator.person.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
-							<span th:if="${!creator.person.getAffiliations().isEmpty()}">(</span>
+							<span th:if="${creator.person.getAffiliations() != null && !creator.person.getAffiliations().isEmpty()}">(</span>
 							<th:block th:each="aff:${creator.person.affiliations}">[[${aff.name}]]</th:block>
-							<span th:if="${!creator.person.getAffiliations().isEmpty()}">)</span>
+							<span th:if="${creator.person.getAffiliations() != null && !creator.person.getAffiliations().isEmpty()}">)</span>
 							&nbsp;<i class="icon-edit edit-creator" style="color: white; font-size: 12px;"></i>
 									<i class="icon-circle-close remove-creator" style="cursor: pointer; color: white; font-size: 12px;"></i>
 						</span>
