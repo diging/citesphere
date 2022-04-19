@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
+import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.user.IUser;
@@ -57,7 +59,7 @@ public class ZoteroConnector implements IZoteroConnector {
 
     @Autowired
     private ZoteroConnectionFactory zoteroFactory;
-
+    
     /*
      * (non-Javadoc)
      * 
@@ -169,6 +171,21 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
+    public Item getCitesphereMetaData(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            List<Item> children = zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey);
+            Optional<Item> citesphereMetaData = children.stream()
+                    .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()) && item.getData()
+                            .getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG)))
+                    .findFirst();
+            return citesphereMetaData.orElse(null);
+        } catch (HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
+
+    @Override
     public List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
         try {
@@ -195,7 +212,7 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return getItem(user, groupId, item.getKey());
     }
-    
+  
     /**
      * This method makes a call to Zotero to batch update items and return back
      * items statuses

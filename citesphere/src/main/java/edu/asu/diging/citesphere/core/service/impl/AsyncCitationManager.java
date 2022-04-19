@@ -136,5 +136,22 @@ public class AsyncCitationManager implements IAsyncCitationManager {
         }
         return response;
     }
+    
+    
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.IAsyncCitationManager#moveCitationsToCollection(IUser, String, List)
+     */
+    public AsyncUpdateCitationsResponse moveCitationsToCollection(IUser user, String zoteroGroupId, List<ICitation> citations)
+            throws JsonProcessingException, ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroHttpStatusException, InterruptedException, ExecutionException {
+        String taskId = UUID.randomUUID().toString();
+        Future<ZoteroUpdateItemsStatuses> futureTask = asyncUpdateCitationsProcessor.moveCitationsToCollection(user,
+                zoteroGroupId, citations);
+        updateTaskTracker.put(taskId, futureTask);
+        AsyncUpdateCitationsResponse asyncResponse = new AsyncUpdateCitationsResponse();
+        asyncResponse.setTaskID(taskId);
+        asyncResponse.setTaskStatus(AsyncTaskStatus.PENDING);
+        return asyncResponse;
+    }
 
 }

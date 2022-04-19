@@ -34,6 +34,7 @@ import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.giles.GilesUploadChecker;
 import edu.asu.diging.citesphere.core.service.oauth.InternalTokenManager;
@@ -198,7 +199,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
             citationManager.updateCitation(user, citation.getGroup(),
                     currentCitation);
         } catch (ZoteroConnectionException | CitationIsOutdatedException
-                | ZoteroHttpStatusException e) {
+                | ZoteroHttpStatusException | ZoteroItemCreationFailedException e) {
             logger.error("Could not update citation.", e);
         }
     }
