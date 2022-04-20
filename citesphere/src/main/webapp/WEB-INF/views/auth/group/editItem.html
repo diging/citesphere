@@ -390,6 +390,8 @@ function addAffiliation(modalType, counter) {
 	$("#search"+affiliationCounter).click(function() {
 		searchAuthorities(affiliationCounter, affiliationCounter);
 	});
+	
+	affCount++;
 }
 
 function searchAuthorities(modalType, personType) {
@@ -556,6 +558,7 @@ function savePersonDetails(personType, modalName){
 		var affUri = $(elem).find(".affUri");
 		if(affName.val().length!=0){
 			var affSpan = $("<span>");
+			affSpan.addClass("affiliation-class");
 			affSpan.attr("data-affiliation-name", affName.val());
 			affSpan.attr("data-affiliation-uri", affUri.val());
 			affiliationsList.push(affName.val());
@@ -639,7 +642,7 @@ function constructPersonArray(arrayName, role, iter){
 		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
 		$("#editForm").append(personAuthorityField);
 		
-		$(person).children("span").each(function(idx2, affiliation) {
+		$(person).children(".affiliation-class").each(function(idx2, affiliation) {
 			var affiliationField = $("<input>");
 			affiliationField.attr("type", "hidden");
 			affiliationField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".name");
