@@ -59,23 +59,27 @@ public class GilesDocumentController {
                     }
                     
                     List<GilesPage> gilesPages = gilesUploadedFile.getPages();
-                    for(GilesPage gilesPage : gilesPages) {
-                        if(gilesPage.getImage().getId().equals(fileId)) {
-                            contentType = gilesPage.getImage().getContentType();
-                            fileName = gilesPage.getImage().getFilename();
-                            break;
+                    Optional<GilesPage> gilesPageOptional = gilesPages.stream().filter(p -> p.getImage().getId().equals(fileId)
+                            || p.getOcr().getId().equals(fileId)
+                            || p.getText().getId().equals(fileId)).findFirst();
+                    
+                    if(gilesPageOptional.isPresent()) {
+                        GilesPage targetGilesPage = gilesPageOptional.get();
+                        if(targetGilesPage.getImage().getId().equals(fileId)) {
+                            contentType = targetGilesPage.getImage().getContentType();
+                            fileName = targetGilesPage.getImage().getFilename();
                         }
-                        else if(gilesPage.getOcr().getId().equals(fileId)) {
-                            contentType = gilesPage.getOcr().getContentType();
-                            fileName = gilesPage.getOcr().getFilename();
-                            break;
+                        if(targetGilesPage.getOcr().getId().equals(fileId)) {
+                            contentType = targetGilesPage.getOcr().getContentType();
+                            fileName = targetGilesPage.getOcr().getFilename();
                         }
-                        else if(gilesPage.getText().getId().equals(fileId)) {
-                            contentType = gilesPage.getText().getContentType();
-                            fileName = gilesPage.getText().getFilename();
-                            break;
+                        if(targetGilesPage.getText().getId().equals(fileId)) {
+                            contentType = targetGilesPage.getText().getContentType();
+                            fileName = targetGilesPage.getText().getFilename();
                         }
-                        else {
+                    }
+                    else {
+                        for(GilesPage gilesPage : gilesPages) {
                             List<GilesFile> pageAdditionalFiles = gilesPage.getAdditionalFiles();
                             Optional<GilesFile> pageAdditionalFile = pageAdditionalFiles.stream().filter(a -> a.getId().equals(fileId)).findFirst();
                             if(pageAdditionalFile.isPresent()) {
@@ -84,7 +88,9 @@ public class GilesDocumentController {
                                 break;
                             }
                         }
+                        
                     }
+            
                     if(contentType.isEmpty() || contentType==null) {
                         List<GilesFile> additionalFiles = gilesUploadedFile.getAdditionaFiles();
                         Optional<GilesFile> gilesAdditionalFile = additionalFiles.stream().filter(a -> a.getId().equals(fileId)).findFirst();
