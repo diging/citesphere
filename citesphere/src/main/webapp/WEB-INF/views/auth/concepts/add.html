@@ -2,214 +2,207 @@
 <head>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
 <script th:inline="javascript">
-$(function() {
+    $(function() {
 
-    $("#searchConceptSpinner").hide();
+        $("#searchConceptSpinner").hide();
 
 
-    $("#searchConcept").click(function() {
-        if (allowConceptSearch("Concept")) {
-            $("#selectConceptModel").on('hidden.bs.modal', function(e) {
-                $('#selectConceptModel a:first').tab('show');
-            })
-            $("#searchConceptSpinner").show();
-            $('#conceptpowerConcepts-pagination-top').twbsPagination('destroy');
-            $('#viafConcepts-pagination-top').twbsPagination('destroy');
-            getViafConcepts('Concept', 'Concept', 0)
-            getConceptpowerConcepts('Concept', 'Concept', 0)
-            $("#searchConceptSpinner").hide();
-        }
-    });
-
-    $("#clearConceptFields").click(function() {
-        $("#conceptName").val("");
-        $("#conceptDescription").val("");
-        $("#URI").val("");
-        allowConceptSearch("Concept");
-    });
-
-    $("#conceptName").keyup(function(e) {
-        allowConceptSearch("Concept");
-    });
-
-    // $("#conceptDescription").keyup(function(e) {
-    //     allowConceptSearch("Concept");
-    // });
-
-    $("#closeConceptSearchResult").click(function() {
-        $("#selectConceptModel").modal('hide');
-        $('#selectConceptModel a:first').tab('show');
-    });
-
-});
-
-function populateInfo(name, description, uri, importerId) {
-	$("#conceptName").val(name);
-	
-	if (description != undefined && description != ' - ') {
-	    $("#conceptDescription").val(description);
-	}
-	
-	if (uri != undefined && uri != '') {
-	    $("#URI").val(uri);
-	}
-}
-
-function getConceptpowerConcepts(modalType, personType, page) {
-    var conceptName = $("#conceptName").val();
-    // var conceptDescription = $("#conceptDescription").val();
-    personType_lowerCase = personType.toLowerCase();
-    url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?firstName=' + conceptName + '&lastName=' + "" + '&page=' + page;
-    $("#loadingMessageConceptPower").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
-		" Loading Results.");
-	$("#loadingModalConceptPower").modal('show');
-    $.ajax({
-        dataType: "json",
-        type: 'GET',
-        url: url,
-        async: false,
-        success: function(data) {
-            $("#conceptpowerConceptSearchResult").empty();
-            var content = '';
-
-            if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
-                data['foundAuthorities'].forEach(function(elem) {
-                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
-                    if (elem['description'] == null) {
-                        content += ' - </td>';
-                    } else {
-                        content += elem['description'] + '</td>';
-                    }
-
-                    content += '<div class="importerId" style="display: none;">';
-                    if (elem['importerId'] == null) {
-                        content += '</div>';
-                    } else {
-                        content += elem['importerId'] + '</div>';
-                    }
-                    content += '<td style="vertical-align: middle;"><span class="conceptpower-concept-entry btn btn-primary" title="Create new managed concept" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
-
-                });
-
-                $('#conceptpowerConcepts-pagination-top').twbsPagination({
-                    totalPages: data['totalPages'],
-                    startPage: data['currentPage'],
-                    prev: "«",
-                    next: "»",
-                    visiblePages: 5,
-                    initiateStartPageClick: false,
-                    onPageClick: function(event, page) {
-                        getConceptpowerConcepts(modalType, personType, page)
-                    }
-                });
-
+        $("#searchConcept").click(function() {
+            if (allowConceptSearch("Concept")) {
+                $("#selectConceptModel").on('hidden.bs.modal', function(e) {
+                    $('#selectConceptModel a:first').tab('show');
+                })
+                $("#searchConceptSpinner").show();
+                $('#conceptpowerConcepts-pagination-top').twbsPagination('destroy');
+                $('#viafConcepts-pagination-top').twbsPagination('destroy');
+                getViafConcepts('Concept', 'Concept', 0)
+                getConceptpowerConcepts('Concept', 'Concept', 0)
+                $("#searchConceptSpinner").hide();
             }
+        });
 
-            $("#conceptpowerConceptSearchResult").append(content);
-            $(".conceptpower-concept-entry").click(function() {
-                name = $(this).closest("tr").find(".name").text();
-                uri = $(this).closest("tr").find(".uri").text();
+        $("#clearConceptFields").click(function() {
+            $("#conceptName").val("");
+            $("#conceptDescription").val("");
+            $("#URI").val("");
+            allowConceptSearch("Concept");
+        });
 
-                description = $(this).closest("tr").find(".description").text();
-                
-                populateInfo(name, description, uri);
-                $("#selectConceptModel").modal('hide');
-            });
+        $("#conceptName").keyup(function(e) {
+            allowConceptSearch("Concept");
+        });
 
-        	$("#loadingModalConceptPower").modal('hide');
-        },
-        error: function(data) {
-            $("#loadingMessageConceptPower").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
-			"Error loading results. Try again later.");
-			$('#loadingModalConceptPower').modal('show');
-            $('#conceptpowerConceptSearchResult').parents('table').hide()
-            $("#conceptpowerConceptsError").show();
-            setTimeout(function() {
-				$('#loadingModalConceptPower').modal('hide');
-		  	}, 3000);
-        }
+        $("#closeConceptSearchResult").click(function() {
+            $("#selectConceptModel").modal('hide');
+            $('#selectConceptModel a:first').tab('show');
+        });
 
     });
-}
 
-function getViafConcepts(modalType, personType, page) {
-	var conceptName = $("#conceptName").val();
-	personType_lowerCase = personType.toLowerCase();
-	url = [[@{|/auth/authority/find/authorities/viaf|}]] + '?firstName='+ conceptName + '&lastName=' + "" +'&page='+page;		
-    $("#loadingMessageViaf").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
-		" Loading Results.");
-	$("#loadingModalViaf").modal('show');
-	$.ajax({
-  		dataType: "json",
-  		type: 'GET',
-  		url: url ,
-  		async: false,
-  		success: function(data) {
-  			$("#viafConceptsSearchResult").empty();
-  			var content = '';
-  			
-  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
-                data['foundAuthorities'].forEach(function(elem) {
-                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
-                    if (elem['description'] == null) {
-                        content += ' - </td>';
-                    } else {
-                        content += elem['description'] + '</td>';
-                    }
-                    content += '<td style="vertical-align: middle;"><span class="viaf-concept-entry btn btn-primary" title="Create new managed concept" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
-
-                });
-
-                $('#viafConcepts-pagination-top').twbsPagination({
-                    totalPages: data['totalPages'],
-                    startPage: data['currentPage'],
-                    prev: "«",
-                    next: "»",
-                    visiblePages: 5,
-                    initiateStartPageClick: false,
-                    onPageClick: function(event, page) {
-                    	getViafConcepts(modalType, personType, page-1)
-                    }
-                });
-
-            }
-
-            $("#viafConceptsSearchResult").append(content);
-            $(".viaf-concept-entry").click(function() {
-                name = $(this).closest("tr").find(".name").text();
-                uri = $(this).closest("tr").find(".uri").text();
-                
-                description = $(this).closest("tr").find(".description").text();
-
-                populateInfo(name, description, uri);
-                $("#selectConceptModel").modal('hide');
-            });
-        	$("#loadingModalViaf").modal('hide');
-        },
-        error: function(data) {
-            $("#loadingMessageViaf").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
-			"Error loading results. Try again later.");
-			$('#loadingModalViaf').modal('show');
-            $('#viafConceptsSearchResult').parents('table').hide()
-            $("#viafConceptsError").show();
-            setTimeout(function() {
-				$('#loadingModalViaf').modal('hide');
-		  	}, 3000);
+    function populateInfo(name, description, uri, importerId) {
+        $("#conceptName").val(name);
+        
+        if (description != undefined && description != ' - ') {
+            $("#conceptDescription").val(description);
         }
-
-    });
-}
-
-function allowConceptSearch(element) {
-    if ($("#conceptName").val() == "") {
-        $("#search" + element).prop("disabled", true);
-        return false;
-    } else {
-        $("#search" + element).prop("disabled", false);
-        return true;
+        
+        if (uri != undefined && uri != '') {
+            $("#URI").val(uri);
+        }
     }
-}
 
+    function getConceptpowerConcepts(modalType, personType, page) {
+        var conceptName = $("#conceptName").val();
+        personType_lowerCase = personType.toLowerCase();
+        url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?firstName=' + conceptName + '&lastName=' + "" + '&page=' + page;
+        $("#loadingMessageConceptPower").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+            " Loading Results.");
+        $("#loadingModalConceptPower").modal('show');
+        $.ajax({
+            dataType: "json",
+            type: 'GET',
+            url: url,
+            async: false,
+            success: function(data) {
+                $("#conceptpowerConceptSearchResult").empty();
+                var content = '';
+
+                if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+                    data['foundAuthorities'].forEach(function(elem) {
+                        content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
+                        if (elem['description'] == null) {
+                            content += ' - </td>';
+                        } else {
+                            content += elem['description'] + '</td>';
+                        }
+
+                        content += '<div class="importerId" style="display: none;">';
+                        if (elem['importerId'] == null) {
+                            content += '</div>';
+                        } else {
+                            content += elem['importerId'] + '</div>';
+                        }
+                        content += '<td style="vertical-align: middle;"><span class="conceptpower-concept-entry btn btn-primary" title="Create new managed concept" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+
+                    });
+
+                    $('#conceptpowerConcepts-pagination-top').twbsPagination({
+                        totalPages: data['totalPages'],
+                        startPage: data['currentPage'],
+                        prev: "«",
+                        next: "»",
+                        visiblePages: 5,
+                        initiateStartPageClick: false,
+                        onPageClick: function(event, page) {
+                            getConceptpowerConcepts(modalType, personType, page)
+                        }
+                    });
+                }
+
+                $("#conceptpowerConceptSearchResult").append(content);
+                $(".conceptpower-concept-entry").click(function() {
+                    name = $(this).closest("tr").find(".name").text();
+                    uri = $(this).closest("tr").find(".uri").text();
+
+                    description = $(this).closest("tr").find(".description").text();
+                    
+                    populateInfo(name, description, uri);
+                    $("#selectConceptModel").modal('hide');
+                });
+
+                $("#loadingModalConceptPower").modal('hide');
+            },
+            error: function(data) {
+                $("#loadingMessageConceptPower").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+                "Error loading results. Try again later.");
+                $('#loadingModalConceptPower').modal('show');
+                $('#conceptpowerConceptSearchResult').parents('table').hide()
+                $("#conceptpowerConceptsError").show();
+                setTimeout(function() {
+                    $('#loadingModalConceptPower').modal('hide');
+                }, 3000);
+            }
+
+        });
+    }
+
+    function getViafConcepts(modalType, personType, page) {
+        var conceptName = $("#conceptName").val();
+        personType_lowerCase = personType.toLowerCase();
+        url = [[@{|/auth/authority/find/authorities/viaf|}]] + '?firstName='+ conceptName + '&lastName=' + "" +'&page='+page;		
+        $("#loadingMessageViaf").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+            " Loading Results.");
+        $("#loadingModalViaf").modal('show');
+        $.ajax({
+            dataType: "json",
+            type: 'GET',
+            url: url ,
+            async: false,
+            success: function(data) {
+                $("#viafConceptsSearchResult").empty();
+                var content = '';
+                
+                if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+                    data['foundAuthorities'].forEach(function(elem) {
+                        content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
+                        if (elem['description'] == null) {
+                            content += ' - </td>';
+                        } else {
+                            content += elem['description'] + '</td>';
+                        }
+                        content += '<td style="vertical-align: middle;"><span class="viaf-concept-entry btn btn-primary" title="Create new managed concept" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+
+                    });
+
+                    $('#viafConcepts-pagination-top').twbsPagination({
+                        totalPages: data['totalPages'],
+                        startPage: data['currentPage'],
+                        prev: "«",
+                        next: "»",
+                        visiblePages: 5,
+                        initiateStartPageClick: false,
+                        onPageClick: function(event, page) {
+                            getViafConcepts(modalType, personType, page-1)
+                        }
+                    });
+
+                }
+
+                $("#viafConceptsSearchResult").append(content);
+                $(".viaf-concept-entry").click(function() {
+                    name = $(this).closest("tr").find(".name").text();
+                    uri = $(this).closest("tr").find(".uri").text();
+                    
+                    description = $(this).closest("tr").find(".description").text();
+
+                    populateInfo(name, description, uri);
+                    $("#selectConceptModel").modal('hide');
+                });
+                $("#loadingModalViaf").modal('hide');
+            },
+            error: function(data) {
+                $("#loadingMessageViaf").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+                "Error loading results. Try again later.");
+                $('#loadingModalViaf').modal('show');
+                $('#viafConceptsSearchResult').parents('table').hide()
+                $("#viafConceptsError").show();
+                setTimeout(function() {
+                    $('#loadingModalViaf').modal('hide');
+                }, 3000);
+            }
+
+        });
+    }
+
+    function allowConceptSearch(element) {
+        if ($("#conceptName").val() == "") {
+            $("#search" + element).prop("disabled", true);
+            return false;
+        } else {
+            $("#search" + element).prop("disabled", false);
+            return true;
+        }
+    }
 </script>
 </head>
 <body>
@@ -246,18 +239,11 @@ function allowConceptSearch(element) {
 </table>
 
 <p class="pull-right">
+<button class="btn btn-default" data-toggle="modal" id="clearConceptFields" type="button">Clear 
+</button>
 <button class="btn btn-primary" type="submit">Create</button>
 </p>
 </form>
-
-<p>
-    <button class="btn btn-primary" data-toggle="modal"
-        id="clearConceptFields"
-        style="margin-left: 80%">
-        Clear 
-    </button>
-</p>
-    
 
 <div id="selectConceptModel" class="modal fade" tabindex="-1"
     role="dialog" aria-labelledby="selectConceptLabel">
@@ -340,8 +326,6 @@ function allowConceptSearch(element) {
         </div>
     </div>
 </div>
-
-
 </div>
 </body>
 

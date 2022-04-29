@@ -5,8 +5,6 @@
     $(function() {
     
         $("#searchConceptTypeSpinner").hide();
-    
-    
         $("#searchConceptType").click(function() {
             if (allowConceptTypeSearch("ConceptType")) {
                 $("#selectConceptTypeModel").on('hidden.bs.modal', function(e) {
@@ -32,10 +30,6 @@
             allowConceptTypeSearch("ConceptType");
         });
     
-        // $("#conceptTypeDescription").keyup(function(e) {
-        //     allowConceptTypeSearch("ConceptType");
-        // });
-    
         $("#closeConceptTypeSearchResult").click(function() {
             $("#selectConceptTypeModel").modal('hide');
             $('#selectConceptTypeModel a:first').tab('show');
@@ -57,7 +51,6 @@
     
     function getConceptpowerConceptTypes(modalType, personType, page) {
         var conceptTypeName = $("#conceptTypeName").val();
-        // var conceptTypeDescription = $("#conceptTypeDescription").val();
         personType_lowerCase = personType.toLowerCase();
         url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?firstName=' + conceptTypeName + '&lastName=' + "" + '&page=' + page;
         $("#loadingMessageConceptPower").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
@@ -171,7 +164,6 @@
                             getViafConceptTypes(modalType, personType, page-1)
                         }
                     });
-    
                 }
     
                 $("#viafConceptTypeSearchResult").append(content);
@@ -209,7 +201,6 @@
             return true;
         }
     }
-    
     </script>
 </head>
 <body>
@@ -246,17 +237,11 @@
 </table>
 
 <p class="pull-right">
+<button class="btn btn-default" data-toggle="modal" id="clearConceptFields" type="button">Clear 
+</button>
 <button class="btn btn-primary" type="submit">Create</button>
 </p>
 </form>
-
-<p>
-    <button class="btn btn-primary" data-toggle="modal"
-        id="clearConceptTypeFields"
-        style="margin-left: 80%">
-        Clear 
-    </button>
-</p>
 
 <div id="selectConceptTypeModel" class="modal fade" tabindex="-1"
     role="dialog" aria-labelledby="selectConceptTypeLabel">
@@ -339,9 +324,6 @@
         </div>
     </div>
 </div>
-
-
-
 </div>
 </body>
 
