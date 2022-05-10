@@ -82,7 +82,9 @@ public interface ICitationManager {
     
     void deleteLocalGroupCitations(String groupId);
 
-    Persons getAllPeople(String groupId);
+    Persons getAllPeople(String groupId, Integer pageInt);
 
-    Citations getAllCitations(Person p);    
+    Citations getCitationsByPersonUri(String uri);
+
+    Citations getCitationsByPersonCitationKey(String citationKey);    
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.beans.factory.annotation.Value;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
@@ -33,36 +34,54 @@ public class ShowPeopleController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Value("${_zotero_page_size}")
+    private Integer zoteroPageSize;
+
     @Autowired
     private ICitationManager citationManager;
 
-    private List<Person> peopleList = new ArrayList<Person>();
-
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/people")
     public String showPeople(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort) {
-
-        Persons personList = null;
-        personList = citationManager.getAllPeople(groupId) ;
-        model.addAttribute("people", personList.getPersons());
-
-        peopleList = personList.getPersons();
+            @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
+        Integer pageInt = 1;
+        try {
+            pageInt = new Integer(page);
+        } catch (NumberFormatException ex) {
+            logger.warn("Trying to access invalid page number: " + page);
+        }
+        Persons personList = citationManager.getAllPeople(groupId, pageInt);
+        model.addAttribute("groupIdNo", groupId);
+        model.addAttribute("total", personList.getTotalResults());
+        model.addAttribute("totalPages", Math.ceil(new Float(personList.getTotalResults()) / new Float(zoteroPageSize)));
+        model.addAttribute("currentPage", pageInt);
+        if (personList != null) {
+            model.addAttribute("people", personList.getPersons());
+        } else {
+            model.addAttribute("people", null);
+        }
         return "auth/group/showPeople";
     }
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/showCitation/{index}")
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/showCitation")
     public String showCitation(Model model, Authentication authentication,
             @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value = "index", required = false) String index) {
+            @RequestParam(defaultValue = "", required = false, value = "uri") String uri,
+            @RequestParam(defaultValue = "", required = false, value = "citationKey") String citationKey) {
 
         int pageInt = 1;
         model.addAttribute("zoteroGroupId", groupId);
         model.addAttribute("currentPage", pageInt);
         
-        Person p = peopleList.get(Integer.parseInt(index));
-        Citations citations = citationManager.getAllCitations(p);
-        model.addAttribute("involvedCitations", citations.getCitations());
+        Citations citations = new Citations();
+        if (uri != null && !uri.trim().isEmpty()) {
+            citations = citationManager.getCitationsByPersonUri(uri);
+        }
+        else {
+            citations = citationManager.getCitationsByPersonCitationKey(citationKey);
+        }
+        if (citations != null) {
+            model.addAttribute("involvedCitations", citations.getCitations());
+        }
         return "auth/group/showCitations";
     }
 
