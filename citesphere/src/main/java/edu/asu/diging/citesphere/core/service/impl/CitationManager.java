@@ -458,7 +458,7 @@ public class CitationManager implements ICitationManager {
     
     @Override
     public Citations getCitationsByPersonCitationKey(String citationKey) {
-         Citations citations =  citationDao.findCitationsByPersonCitationKey(citationKey);
+        Citations citations =  citationDao.findCitationsByPersonCitationKey(citationKey);
         return citations;
     }
     

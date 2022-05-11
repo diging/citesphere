@@ -25,6 +25,7 @@ import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -33,6 +34,7 @@ import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
+import edu.asu.diging.citesphere.model.transfer.impl.Citations;
 import edu.asu.diging.citesphere.model.transfer.impl.Persons;
 
 public class CitationManagerTest {
@@ -359,14 +361,64 @@ public class CitationManagerTest {
         Assert.assertNull(actualResult.getPrev());
     }
     
-//    @Test
-//    public void test_getAllPeople_success() {
-//        int page = 1;
-//        long zoteroPageSize = 50;
-//        Persons createdPersons = new Persons();
-//        Mockito.when(citationDao.findAllPeople(GROUP_ID, (page - 1)*zoteroPageSize, (int) zoteroPageSize)).thenReturn(createdPersons);
-//
-//        Persons actual = managerToTest.getAllPeople(GROUP_ID, page);
-//        Assert.assertEquals(createdPersons, actual);
-//    }
+    @Test
+    public void test_getAllPeople_success() {
+        int page = 1;
+        long zoteroPageSize = 50;
+        ReflectionTestUtils.setField(managerToTest, "zoteroPageSize", 50);
+        Persons createdPersons = new Persons();
+        Mockito.when(citationDao.findAllPeople(GROUP_ID, (page - 1)*zoteroPageSize, (int) zoteroPageSize)).thenReturn(createdPersons);
+
+        Persons actual = managerToTest.getAllPeople(GROUP_ID, page);
+        Assert.assertEquals(createdPersons, actual);
+    }
+    
+    @Test
+    public void test_getAllPeople_noPeopleFound() {
+        int page = 1;
+        long zoteroPageSize = 50;
+        ReflectionTestUtils.setField(managerToTest, "zoteroPageSize", 50);
+        Mockito.when(citationDao.findAllPeople(GROUP_ID, (page - 1)*zoteroPageSize, (int) zoteroPageSize)).thenReturn(null);
+
+        Persons actual = managerToTest.getAllPeople(GROUP_ID, page);
+        Assert.assertEquals(null, actual);
+    }
+    
+    @Test
+    public void test_getCitationsByPersonUri_success() {
+        String uri = "testUri";
+        Citations citationsMocked = new Citations();
+        Mockito.when(citationDao.findCitationsByPersonUri(uri)).thenReturn(citationsMocked);
+
+        Citations actual = managerToTest.getCitationsByPersonUri(uri);
+        Assert.assertEquals(citationsMocked, actual);
+    }
+    
+    @Test
+    public void test_getCitationsByPersonUri_noCitations() {
+        String uri = "testUri";
+        Mockito.when(citationDao.findCitationsByPersonUri(uri)).thenReturn(null);
+
+        Citations actual = managerToTest.getCitationsByPersonUri(uri);
+        Assert.assertEquals(null, actual);
+    }
+    
+    @Test
+    public void test_getCitationsByPersonCitationKey_success() {
+        String citationKey = "testCitationKey";
+        Citations citationsMocked = new Citations();
+        Mockito.when(citationDao.findCitationsByPersonCitationKey(citationKey)).thenReturn(citationsMocked);
+
+        Citations actual = managerToTest.getCitationsByPersonCitationKey(citationKey);
+        Assert.assertEquals(citationsMocked, actual);
+    }
+    
+    @Test
+    public void test_getCitationsByPersonCitationKey_noCitations() {
+        String citationKey = "testCitationKey";
+        Mockito.when(citationDao.findCitationsByPersonCitationKey(citationKey)).thenReturn(null);
+
+        Citations actual = managerToTest.getCitationsByPersonCitationKey(citationKey);
+        Assert.assertEquals(null, actual);
+    }
 }
