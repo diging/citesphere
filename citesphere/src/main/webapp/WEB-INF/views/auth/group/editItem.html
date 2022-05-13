@@ -92,6 +92,7 @@ $(function() {
 		$("#userAuthoritySearchResult").empty();
 		$("#groupAuthoritySearchResult").empty();
 		$("#conceptpowerAuthoritySearchResult").empty();
+		$("#viafAuthoritySearchResult").empty();
 		
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
@@ -112,6 +113,7 @@ $(function() {
 		$("#userAuthoritySearchResult").empty();
 		$("#groupAuthoritySearchResult").empty();
 		$("#conceptpowerAuthoritySearchResult").empty();
+		$("#viafAuthoritySearchResult").empty();
 		
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
@@ -123,7 +125,7 @@ $(function() {
 		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Editor','Editor', 0);
-		getGroupAuthorities('Editor','Editor', 0);
+		/* getGroupAuthorities('Editor','Editor', 0); */
 		getconceptpowerAuthorities('Editor','Editor',0);
 		getViafAuthorities('Editor', 'Editor', 0);
 	});
@@ -132,11 +134,12 @@ $(function() {
 		$("#userAuthoritySearchResult").empty();
 		$("#groupAuthoritySearchResult").empty();
 		$("#conceptpowerAuthoritySearchResult").empty();
+		$("#viafAuthoritySearchResult").empty();
 		
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})
-		$("#authoritySpinner").show();
+		/* $("#authoritySpinner").show(); */
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
@@ -144,7 +147,7 @@ $(function() {
 		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
 		getUserAuthorities('Creator','Creator', 0);
-		getGroupAuthorities('Creator','Creator', 0);
+		/* getGroupAuthorities('Creator','Creator', 0); */
 		getconceptpowerAuthorities('Creator','Creator',0);
 		getViafAuthorities('Creator', 'Creator', 0);
 	});
@@ -733,12 +736,12 @@ function getUserAuthorities(modalType, personType, page) {
   			$('#authoritySpinner').show();
   			$('#userAuthoritiesTabContent').toggleClass('greyout');
   		},
-  		success: function(data) {
+  		success: function(userData) {
 			
   			$("#userAuthoritySearchResult").empty();
   			var content = '';
-  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
-  				data['foundAuthorities'].forEach(function(elem) {
+  			if (userData['foundAuthorities'] != null && userData['foundAuthorities'].length > 0) {
+  				userData['foundAuthorities'].forEach(function(elem) {
   					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
@@ -750,8 +753,8 @@ function getUserAuthorities(modalType, personType, page) {
   				});
   				
   				$('#userAuthority-pagination-top').twbsPagination({
-  				    totalPages: data['totalPages'],
-  				    startPage: data['currentPage'],
+  				    totalPages: userData['totalPages'],
+  				    startPage: userData['currentPage'],
   				    prev: "«",
   				    next: "»",
   				    visiblePages: 5,
@@ -760,7 +763,10 @@ function getUserAuthorities(modalType, personType, page) {
   				    	   getUserAuthorities(modalType, personType, page-1)
   				    }
   				});
-  			} 
+  			}
+  			else if(userData['foundAuthorities'] != null) {
+  				setTimeout(getUserAuthorities(modalType, personType, page), 1000)
+  			}
 		$("#userAuthoritySearchResult").append(content);
 		$(".user-authority-entry").click(function() {
 			name = $(this).closest("tr").find(".name").text();
@@ -777,7 +783,7 @@ function getUserAuthorities(modalType, personType, page) {
         	$('#authoritySpinner').hide();
         	$('#userAuthoritiesTabContent').toggleClass('greyout');
         },
-    	error: function(data){
+    	error: function(userData){
     		$('#userAuthoritySearchResult').parents('table').hide()
     		$("#userAuthoritiesError").show();	
     	}
@@ -827,7 +833,10 @@ function getGroupAuthorities(modalType, personType, page) {
   				    	getGroupAuthorities(modalType, personType, page-1)
   				    }
   				});
-  			}  		
+  			}
+  			else if(data['foundAuthorities'] != null) {
+  				setTimeout(getGroupAuthorities(modalType, personType, page), 1000)
+  			}
   			
 		
 		$("#groupAuthoritySearchResult").append(content);
@@ -872,6 +881,8 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		success: function(data) {	
   			$('#cp-groupName').text(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
+  			console.log("Concept Power")
+  			console.log(data)
   			var content = '';
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {	
@@ -898,6 +909,9 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   				    }
   				});
   				
+  			}
+  			else if(data['foundAuthorities'] != null) {
+  				setTimeout(getconceptpowerAuthorities(modalType, personType, page), 1000)
   			}
   		
 		$("#conceptpowerAuthoritySearchResult").append(content);
@@ -989,6 +1003,9 @@ function getViafAuthorities(modalType, personType, page) {
   				});
   				
   			}
+  			else if(data['foundAuthorities'] != null) {
+  				setTimeout(getViafAuthorities(modalType, personType, page), 1000)
+  			}
   			
 		$("#viafAuthoritySearchResult").append(content); 	
 		$(".viaf-authority-entry").click(function() {
@@ -1021,14 +1038,14 @@ function getViafAuthorities(modalType, personType, page) {
 		});	
 		
         },
-    complete:function(data){
-   		$('#authoritySpinner').hide();
-        $('#viafAuthoritiesTabContent').toggleClass('greyout');
-    },
-	error: function(data){
-		$('#viafAuthoritySearchResult').parents('table').hide()
-		$("#viafAuthoritiesError").show();	
-	}
+    	complete:function(data){
+   			$('#authoritySpinner').hide();
+        	$('#viafAuthoritiesTabContent').toggleClass('greyout');
+    	},
+		error: function(data){
+			$('#viafAuthoritySearchResult').parents('table').hide()
+			$("#viafAuthoritiesError").show();	
+		}
 	
 	});
 }

@@ -151,6 +151,9 @@ function getConceptpowerAuthorities(modalType, personType, page) {
                 });
 
             }
+            else if(data['foundAuthorities'] != null) {
+            	setTimeout(getConceptpowerAuthorities(modalType, personType, page), 1000)
+            }
 
             $("#conceptpowerAuthoritySearchResult").append(content);
             $(".conceptpower-authority-entry").click(function() {
@@ -221,6 +224,9 @@ function getViafAuthorities(modalType, personType, page) {
                     }
                 });
 
+            }
+  			else if(data['foundAuthorities'] != null) {
+            	setTimeout(getViafAuthorities(modalType, personType, page), 1000)
             }
 
             $("#viafAuthoritySearchResult").append(content);
