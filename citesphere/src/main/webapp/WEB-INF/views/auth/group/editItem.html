@@ -735,12 +735,12 @@ function getUserAuthorities(modalType, personType, page) {
   			$('#authoritySpinner').show();
   			$('#userAuthoritiesTabContent').toggleClass('greyout');
   		},
-  		success: function(userData) {
+  		success: function(data) {
 			
   			$("#userAuthoritySearchResult").empty();
   			var content = '';
-  			if (userData['foundAuthorities'] != null && userData['foundAuthorities'].length > 0) {
-  				userData['foundAuthorities'].forEach(function(elem) {
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {
   					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
   					if(elem['description']==null){
   						content += ' - </td>';
@@ -752,8 +752,8 @@ function getUserAuthorities(modalType, personType, page) {
   				});
   				
   				$('#userAuthority-pagination-top').twbsPagination({
-  				    totalPages: userData['totalPages'],
-  				    startPage: userData['currentPage'],
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
   				    prev: "«",
   				    next: "»",
   				    visiblePages: 5,
@@ -763,7 +763,7 @@ function getUserAuthorities(modalType, personType, page) {
   				    }
   				});
   			}
-  			else if(userData['foundAuthorities'] != null) {
+  			else if(data['foundAuthorities'] != null) {
   				setTimeout(getUserAuthorities(modalType, personType, page), 1000)
   			}
 		$("#userAuthoritySearchResult").append(content);
@@ -782,7 +782,7 @@ function getUserAuthorities(modalType, personType, page) {
         	$('#authoritySpinner').hide();
         	$('#userAuthoritiesTabContent').toggleClass('greyout');
         },
-    	error: function(userData){
+    	error: function(data){
     		$('#userAuthoritySearchResult').parents('table').hide()
     		$("#userAuthoritiesError").show();	
     	}
@@ -880,8 +880,7 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		success: function(data) {	
   			$('#cp-groupName').text(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
-  			console.log("Concept Power")
-  			console.log(data)
+  			
   			var content = '';
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {	
