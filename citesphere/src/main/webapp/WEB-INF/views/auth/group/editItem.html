@@ -947,10 +947,10 @@ function getconceptpowerAuthorities(modalType, personType, page) {
         	$('#authoritySpinner').hide();
         	$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
         },
-		error: function(data){
-			$('#conceptpowerAuthoritySearchResult').parents('table').hide()
-			$("#conceptpowerAuthoritiesError").show();	
-		}
+        error: function(data){
+            $('#conceptpowerAuthoritySearchResult').parents('table').hide()
+            $("#conceptpowerAuthoritiesError").show();	
+        }
 	
 	});
 }
@@ -1037,13 +1037,13 @@ function getViafAuthorities(modalType, personType, page) {
 		
         },
     	complete:function(data){
-   			$('#authoritySpinner').hide();
-        	$('#viafAuthoritiesTabContent').toggleClass('greyout');
+            $('#authoritySpinner').hide();
+            $('#viafAuthoritiesTabContent').toggleClass('greyout');
     	},
-		error: function(data){
-			$('#viafAuthoritySearchResult').parents('table').hide()
-			$("#viafAuthoritiesError").show();	
-		}
+        error: function(data){
+            $('#viafAuthoritySearchResult').parents('table').hide()
+            $("#viafAuthoritiesError").show();	
+        }
 	
 	});
 }
@@ -1768,8 +1768,8 @@ function creatorLinkHandler(target) {
                             </table>
                         </div>
                         <div class="loader" style="font-size: 30px; text-align: center;">
-						    <i id="authoritySpinner"class="icon-spinner" style="color:#337ab7"></i>
-					   </div> 
+                             <i id="authoritySpinner"class="icon-spinner" style="color:#337ab7"></i>
+                        </div> 
                         
 				</div>
 				<div class="modal-footer">
