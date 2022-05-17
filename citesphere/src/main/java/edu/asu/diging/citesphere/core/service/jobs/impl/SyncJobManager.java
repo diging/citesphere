@@ -1,10 +1,12 @@
 package edu.asu.diging.citesphere.core.service.jobs.impl;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -12,6 +14,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
@@ -32,11 +35,19 @@ public class SyncJobManager implements ISyncJobManager {
     
     @Autowired
     private ICitationManager citationManager;
+
+//    private Map<String, AsyncResult<String>> asyncMap;
     
     @PostConstruct
     public void init() {
+//        asyncMap = new HashMap<>();
         currentJobs = new ConcurrentHashMap<>();
     }
+    
+//    @Override
+//    public void addJobsToAsyncMap(String job, AsyncResult<String> result) {
+//        asyncMap.put(job, result);
+//    }
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.jobs.impl.ISyncJobManager#addJobId(edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob)
@@ -87,6 +98,10 @@ public class SyncJobManager implements ISyncJobManager {
             job.setStatus(JobStatus.CANCELED);
             job.setFinishedOn(OffsetDateTime.now());
             jobRepo.save(job);
+            
+//            Future<String> future = citationManager.getAsyncMap().get(jobId);
+//            future.cancel(true);
+            citationManager.cancel();
         }
     }
 }
