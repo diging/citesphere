@@ -3,7 +3,6 @@ package edu.asu.diging.citesphere.core.service.impl;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -103,7 +102,6 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save(job);
         jobManager.addJob(job);
-//        jobManager.addJobsToAsyncMap(job.getId(), new AsyncResult<String>(job.getId()));
         Thread currentThread = Thread.currentThread();
         
         if(checkIfThreadIsInterrupted(currentThread)) {

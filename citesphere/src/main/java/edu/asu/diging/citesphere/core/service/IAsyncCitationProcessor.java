@@ -1,6 +1,5 @@
 package edu.asu.diging.citesphere.core.service;
 
-import java.util.Map;
 import java.util.concurrent.Future;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;

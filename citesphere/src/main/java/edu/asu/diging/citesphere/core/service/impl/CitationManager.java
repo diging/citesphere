@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.util.CloseableIterator;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
@@ -87,14 +86,11 @@ public class CitationManager implements ICitationManager {
     private IAsyncCitationProcessor asyncCitationProcessor;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
-    
-    private Map<String, Future<String>> asyncMap;
 
-    Future<String> future = new AsyncResult<String>(null);
+    Future<String> future;
     
     @PostConstruct
     public void init() {
-        asyncMap = new HashMap<>();
         sortFunctions = new HashMap<>();
         sortFunctions.put("title", ((o1, o2) -> {
             String o1Title = o1 != null && o1.getTitle() != null ? o1.getTitle() : "";
@@ -103,10 +99,6 @@ public class CitationManager implements ICitationManager {
         }));
     }
 
-    @Override
-    public Map<String, Future<String>> getAsyncMap() {
-        return asyncMap;
-    }
     @Override
     public ICitation getCitation(String key) {
         Optional<ICitation> optional = citationStore.findById(key);
@@ -316,15 +308,7 @@ public class CitationManager implements ICitationManager {
             }
             boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
             if (isModified) {
-                future = asyncCitationProcessor.sync(user, group.getGroupId() + "", group.getContentVersion(), collectionId);
-                
-                try {
-                    String jobid = future.get();
-                    asyncMap.put(jobid, future);
-                }
-                catch(Exception ex) {
-                    logger.info("Exception occured " + ex);
-                }
+                asyncCitationProcessor.sync(user, group.getGroupId() + "", group.getContentVersion(), collectionId);
                 throw new SyncInProgressException();
             }
 
@@ -332,12 +316,6 @@ public class CitationManager implements ICitationManager {
         }
 
         throw new GroupDoesNotExistException("Group " + groupId + " does not exist.");
-    }
-    
-    @Override
-    public void cancel() {
-        boolean val = future.cancel(true);
-        
     }
 
     @Override
@@ -376,7 +354,7 @@ public class CitationManager implements ICitationManager {
 
             // then update content
             results.setNotModified(false);
-            asyncCitationProcessor.sync(user, group.getGroupId() + "", previousVersion, collectionId);
+            future = asyncCitationProcessor.sync(user, group.getGroupId() + "", previousVersion, collectionId);
         } else {
             results.setNotModified(true);
         }
@@ -404,6 +382,16 @@ public class CitationManager implements ICitationManager {
         results.setTotalResults(total);
         return results;
 
+    }
+    
+    @Override
+    public boolean cancel() {
+        boolean result = false;
+        if(future != null) {
+            result = future.cancel(true);
+        } 
+        
+        return result;
     }
 
     @Override

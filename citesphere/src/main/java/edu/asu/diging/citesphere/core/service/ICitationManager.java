@@ -1,9 +1,7 @@
 package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -27,10 +25,8 @@ import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 
 public interface ICitationManager {
-
-    Map<String, Future<String>> getAsyncMap();
     
-    void cancel();
+    boolean cancel();
     
     List<ICitationGroup> getGroups(IUser user);
 
