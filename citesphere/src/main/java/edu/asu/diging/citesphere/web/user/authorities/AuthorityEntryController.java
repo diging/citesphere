@@ -77,12 +77,7 @@ public class AuthorityEntryController {
                     page - Math.max(1, fullNameEntries.getTotalPages()) + 1, pageSize - userEntries.size());
             userEntries.addAll(lastNameEntries.getContent());
         }
-        if(userEntries.size() == 0) {
-            authorityResult.setFoundAuthorities(null);
-        }
-        else {
-            authorityResult.setFoundAuthorities(userEntries);
-        }
+        authorityResult.setFoundAuthorities(userEntries);
         authorityResult.setCurrentPage(page + 1);
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }
@@ -110,12 +105,7 @@ public class AuthorityEntryController {
                     pageSize - groupEntries.size());
             groupEntries.addAll(lastNameEntries.getContent());
         }
-        if(groupEntries.size() == 0) {
-            authorityResult.setFoundAuthorities(null);
-        }
-        else {
-            authorityResult.setFoundAuthorities(groupEntries);
-        }
+        authorityResult.setFoundAuthorities(groupEntries);
         authorityResult.setCurrentPage(page + 1);
         return new ResponseEntity<AuthoritySearchResult>(authorityResult, HttpStatus.OK);
     }

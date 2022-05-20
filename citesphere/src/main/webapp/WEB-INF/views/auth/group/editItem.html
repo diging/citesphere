@@ -5,12 +5,22 @@
 .popover {
 	min-width: 300px;
 }
-.greyout {
-  opacity: 0.2;
-}
 .icon-circle-add{
 	cursor: pointer; 
 	color: #337ab7;
+}
+#overlay {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10;
+  opacity: 0.2;
 }
 </style>
 <script th:inline="javascript">
@@ -88,6 +98,9 @@ $(function() {
     	allowAuthoritySearch("Creator");
      });
 	$("#searchAuthor").click(function() {
+		$('#selectAuthorityModel').modal('show');
+		$("#authoritySpinner").show();
+		$("#overlay").show();
 		
 		$("#userAuthoritySearchResult").empty();
 		$("#groupAuthoritySearchResult").empty();
@@ -103,34 +116,46 @@ $(function() {
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
-		getUserAuthorities('Author','Author', 0);
-		getGroupAuthorities('Author','Author', 0);
-		getconceptpowerAuthorities('Author','Author',0);
-		getViafAuthorities('Author', 'Author', 0);
+		$("#selectAuthorityModel").on('shown.bs.modal', function(e) {
+			$("#overlay").hide();
+		    getUserAuthorities('Author','Author', 0);
+		    getGroupAuthorities('Author','Author', 0); 
+		    getconceptpowerAuthorities('Author','Author',0);
+		    getViafAuthorities('Author', 'Author', 0);
+		})
 	});
 	
 	$("#searchEditor").click(function() {
-		$("#userAuthoritySearchResult").empty();
-		$("#groupAuthoritySearchResult").empty();
-		$("#conceptpowerAuthoritySearchResult").empty();
-		$("#viafAuthoritySearchResult").empty();
+		$("#authoritySpinner").show();
+		$("#overlay").show();
 		
 		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
 			$('#selectAuthorityModel a:first').tab('show');
 		})
+		
+		$("#userAuthoritySearchResult").empty();
+		$("#groupAuthoritySearchResult").empty();
+		$("#conceptpowerAuthoritySearchResult").empty();
+		$("#viafAuthoritySearchResult").empty();
 		
 		$('#userAuthority-pagination-top').twbsPagination('destroy');
 		$('#groupAuthority-pagination-top').twbsPagination('destroy');
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
-		getUserAuthorities('Editor','Editor', 0);
-		getGroupAuthorities('Editor','Editor', 0);
-		getconceptpowerAuthorities('Editor','Editor',0);
-		getViafAuthorities('Editor', 'Editor', 0);
+		$("#selectAuthorityModel").on('shown.bs.modal', function(e) {
+			$("#overlay").hide();
+		    getUserAuthorities('Editor','Editor', 0);
+		    getGroupAuthorities('Editor','Editor', 0);
+		    getconceptpowerAuthorities('Editor','Editor',0);
+		    getViafAuthorities('Editor', 'Editor', 0);
+		})
 	});
 	
 	$("#searchCreator").click(function() {
+		$("#authoritySpinner").show();
+		$("#overlay").show();
+		
 		$("#userAuthoritySearchResult").empty();
 		$("#groupAuthoritySearchResult").empty();
 		$("#conceptpowerAuthoritySearchResult").empty();
@@ -145,10 +170,13 @@ $(function() {
 		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 		$('#viafAuthority-pagination-top').twbsPagination('destroy');
 		
-		getUserAuthorities('Creator','Creator', 0);
-		getGroupAuthorities('Creator','Creator', 0);
-		getconceptpowerAuthorities('Creator','Creator',0);
-		getViafAuthorities('Creator', 'Creator', 0);
+		$("#selectAuthorityModel").on('shown.bs.modal', function(e) {
+			$("#overlay").hide();
+		    getUserAuthorities('Creator','Creator', 0);
+		    getGroupAuthorities('Creator','Creator', 0);
+		    getconceptpowerAuthorities('Creator','Creator',0);
+		    getViafAuthorities('Creator', 'Creator', 0);
+		})
 	});
 	
 	
@@ -732,8 +760,7 @@ function getUserAuthorities(modalType, personType, page) {
   		url: url ,
   		async: false,
   		beforeSend: function(){
-  			$('#authoritySpinner').show();
-  			$('#userAuthoritiesTabContent').toggleClass('greyout');
+  			$('#authoritySpinner').show(); 
   		},
   		success: function(data) {
 			
@@ -763,9 +790,6 @@ function getUserAuthorities(modalType, personType, page) {
   				    }
   				});
   			}
-  			else if(data['foundAuthorities'] != null) {
-  				setTimeout(getUserAuthorities(modalType, personType, page), 1000)
-  			}
 		$("#userAuthoritySearchResult").append(content);
 		$(".user-authority-entry").click(function() {
 			name = $(this).closest("tr").find(".name").text();
@@ -780,7 +804,6 @@ function getUserAuthorities(modalType, personType, page) {
         },
         complete:function(data){
         	$('#authoritySpinner').hide();
-        	$('#userAuthoritiesTabContent').toggleClass('greyout');
         },
     	error: function(data){
     		$('#userAuthoritySearchResult').parents('table').hide()
@@ -802,7 +825,6 @@ function getGroupAuthorities(modalType, personType, page) {
   		async: false,
   		beforeSend: function(){
   			$('#authoritySpinner').show();
-  			$('#groupAuthoritiesTabContent').toggleClass('greyout');
   		},
   		success: function(data) {
 			
@@ -833,11 +855,6 @@ function getGroupAuthorities(modalType, personType, page) {
   				    }
   				});
   			}
-  			else if(data['foundAuthorities'] != null) {
-  				setTimeout(getGroupAuthorities(modalType, personType, page), 1000)
-  			}
-  			
-		
 		$("#groupAuthoritySearchResult").append(content);
 		$(".group-authority-entry").click(function() {
 			name = $(this).closest("tr").find(".name").text();
@@ -852,7 +869,6 @@ function getGroupAuthorities(modalType, personType, page) {
         },
         complete:function(data){
         	$('#authoritySpinner').hide();
-        	$('#groupAuthoritiesTabContent').toggleClass('greyout');
         },
     	error: function(data){
     		$('#groupAuthoritySearchResult').parents('table').hide()
@@ -875,7 +891,6 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		async: false,
   		beforeSend: function(){
   			$('#authoritySpinner').show();
-  			$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
   		},
   		success: function(data) {	
   			$('#cp-groupName').text(data['groupName']);
@@ -907,9 +922,6 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   				    }
   				});
   				
-  			}
-  			else if(data['foundAuthorities'] != null) {
-  				setTimeout(getconceptpowerAuthorities(modalType, personType, page), 1000)
   			}
   		
 		$("#conceptpowerAuthoritySearchResult").append(content);
@@ -945,7 +957,6 @@ function getconceptpowerAuthorities(modalType, personType, page) {
         },
         complete:function(data){
         	$('#authoritySpinner').hide();
-        	$('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
         },
         error: function(data){
             $('#conceptpowerAuthoritySearchResult').parents('table').hide()
@@ -968,7 +979,6 @@ function getViafAuthorities(modalType, personType, page) {
   		async: false,
   		beforeSend: function(){
   			$('#authoritySpinner').show();
-  			$('#viafAuthoritiesTabContent').toggleClass('greyout');
   		},
   		success: function(data) {
   			$('#viaf-groupName').text(data['groupName']);
@@ -1000,9 +1010,6 @@ function getViafAuthorities(modalType, personType, page) {
   				    }
   				});
   				
-  			}
-  			else if(data['foundAuthorities'] != null) {
-  				setTimeout(getViafAuthorities(modalType, personType, page), 1000)
   			}
   			
 		$("#viafAuthoritySearchResult").append(content); 	
@@ -1038,7 +1045,6 @@ function getViafAuthorities(modalType, personType, page) {
         },
     	complete:function(data){
             $('#authoritySpinner').hide();
-            $('#viafAuthoritiesTabContent').toggleClass('greyout');
     	},
         error: function(data){
             $('#viafAuthoritySearchResult').parents('table').hide()
@@ -1519,7 +1525,7 @@ function creatorLinkHandler(target) {
 		    <label for="lastNameAuthor">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
 		  </div>
-		  <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
+		  <button class="btn btn-primary" data-target="#selectAuthorityModel" id="searchAuthor"
 						style="margin-left: 80%" disabled>Search Author 
 			</button>
 		  <div class="form-group">
@@ -1678,6 +1684,7 @@ function creatorLinkHandler(target) {
 <!-- 		  Search and Select Authority Modal -->
 <div id="selectAuthorityModel" class="modal fade" tabindex="-1"
 	role="dialog" aria-labelledby="selectAuthorityLabel">
+	<div id="overlay"></div>
 	<div class="modal-dialog" style="width: 1000px" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -1769,7 +1776,7 @@ function creatorLinkHandler(target) {
                         </div>
                         <div class="loader" style="font-size: 30px; text-align: center;">
                              <i id="authoritySpinner"class="icon-spinner" style="color:#337ab7"></i>
-                        </div> 
+                        </div>
                         
 				</div>
 				<div class="modal-footer">

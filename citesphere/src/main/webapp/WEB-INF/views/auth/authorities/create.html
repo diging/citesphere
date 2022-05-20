@@ -6,6 +6,19 @@
 .greyout {
   opacity: 0.2;
 }
+#overlay {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10;
+  opacity: 0.2;
+}
 </style>
 <script th:inline="javascript">
 $(function() {
@@ -35,13 +48,23 @@ $(function() {
     });
 
     $("#searchAuthor").click(function() {
+    	$('#selectAuthorityModel').modal('show');
+		$("#authoritySpinner").show();
+		$("#overlay").show();
+		
+		$("#conceptpowerAuthoritySearchResult").empty();
+		$("#viafAuthoritySearchResult").empty();
+		
         $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
             $('#selectAuthorityModel a:first').tab('show');
         })
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         $('#viafAuthority-pagination-top').twbsPagination('destroy');
-        getViafAuthorities('Author', 'Author', 0)
-        getConceptpowerAuthorities('Author', 'Author', 0)
+        $("#selectAuthorityModel").on('shown.bs.modal', function(e) {
+			$("#overlay").hide();
+            getViafAuthorities('Author', 'Author', 0)
+            getConceptpowerAuthorities('Author', 'Author', 0)
+        })
     });
     
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -113,7 +136,6 @@ function getConceptpowerAuthorities(modalType, personType, page) {
         async: false,
         beforeSend: function(){
             $('#authoritySpinner').show();
-            $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
   		},
         success: function(data) {
             $("#conceptpowerAuthoritySearchResult").empty();
@@ -151,9 +173,6 @@ function getConceptpowerAuthorities(modalType, personType, page) {
                 });
 
             }
-            else if(data['foundAuthorities'] != null) {
-            	setTimeout(getConceptpowerAuthorities(modalType, personType, page), 1000)
-            }
 
             $("#conceptpowerAuthoritySearchResult").append(content);
             $(".conceptpower-authority-entry").click(function() {
@@ -171,7 +190,6 @@ function getConceptpowerAuthorities(modalType, personType, page) {
         },
         complete:function(data){
             $('#authoritySpinner').hide();
-            $('#conceptpowerAuthoritiesTabContent').toggleClass('greyout');
         },
         error: function(data) {
             $('#conceptpowerAuthoritySearchResult').parents('table').hide()
@@ -194,7 +212,6 @@ function getViafAuthorities(modalType, personType, page) {
   		async: false,
   		beforeSend: function(){
   			$('#authoritySpinner').show();
-  			$('#viafAuthoritiesTabContent').toggleClass('greyout');
   		},
   		success: function(data) {
   			$("#viafAuthoritySearchResult").empty();
@@ -225,10 +242,7 @@ function getViafAuthorities(modalType, personType, page) {
                 });
 
             }
-            else if(data['foundAuthorities'] != null) {
-                 setTimeout(getViafAuthorities(modalType, personType, page), 1000)
-            }
-
+  			
             $("#viafAuthoritySearchResult").append(content);
             $(".viaf-authority-entry").click(function() {
                 name = $(this).closest("tr").find(".name").text();
@@ -246,7 +260,6 @@ function getViafAuthorities(modalType, personType, page) {
         },
         complete:function(data){
             $('#authoritySpinner').hide();
-            $('#viafAuthoritiesTabContent').toggleClass('greyout');
         },
         error: function(data) {
             $('#viafAuthoritySearchResult').parents('table').hide()
@@ -383,7 +396,7 @@ function getPersonAuthority(uri, personType) {
             <label for="lastNameAuthor">Last Name:</label>
             <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
           </div>
-          <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
+          <button class="btn btn-primary" data-target="#selectAuthorityModel" id="searchAuthor"
                         style="margin-left: 80%" disabled>Search Author 
                         <i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
           </button>
@@ -410,6 +423,7 @@ function getPersonAuthority(uri, personType) {
 
 <div id="selectAuthorityModel" class="modal fade" tabindex="-1"
     role="dialog" aria-labelledby="selectAuthorityLabel">
+    <div id="overlay"></div>
     <div class="modal-dialog" style="width: 1000px" role="document">
         <div class="modal-content">
             
