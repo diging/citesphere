@@ -3,9 +3,6 @@
 <head>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
 <style>
-.greyout {
-  opacity: 0.2;
-}
 #overlay {
   position: absolute;
   display: none;
@@ -49,11 +46,11 @@ $(function() {
 
     $("#searchAuthor").click(function() {
     	$('#selectAuthorityModel').modal('show');
-		$("#authoritySpinner").show();
-		$("#overlay").show();
+        $("#authoritySpinner").show();
+        $("#overlay").show();
 		
-		$("#conceptpowerAuthoritySearchResult").empty();
-		$("#viafAuthoritySearchResult").empty();
+        $("#conceptpowerAuthoritySearchResult").empty();
+        $("#viafAuthoritySearchResult").empty();
 		
         $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
             $('#selectAuthorityModel a:first').tab('show');
@@ -61,7 +58,7 @@ $(function() {
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         $('#viafAuthority-pagination-top').twbsPagination('destroy');
         $("#selectAuthorityModel").on('shown.bs.modal', function(e) {
-			$("#overlay").hide();
+            $("#overlay").hide();
             getViafAuthorities('Author', 'Author', 0)
             getConceptpowerAuthorities('Author', 'Author', 0)
         })
@@ -136,7 +133,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
         async: false,
         beforeSend: function(){
             $('#authoritySpinner').show();
-  		},
+        },
         success: function(data) {
             $("#conceptpowerAuthoritySearchResult").empty();
             var content = '';
