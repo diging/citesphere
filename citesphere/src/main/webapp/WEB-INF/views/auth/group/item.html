@@ -1,5 +1,7 @@
 <html layout:decorate="~{layouts/main}">
 <head>
+<script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
+<link th:href="@{/resources/notify/animate.css}" rel="stylesheet"/>
 <script th:inline="javascript">
 //# sourceURL=modal.js
 	$(function() {
@@ -60,7 +62,58 @@
 	        });
   
 	    });
-	    
+
+		$("#delete-file-button").click(function(e) {
+			e.preventDefault();
+			var fileId = $(this).data("upload-file");
+			
+			// var formData = new FormData();
+			// formData.append("fileToDelete", fileToDelete);
+			// formData.append("citation", citation);
+			// var baseurl = "file/delete/";
+			$('body').append('<div id="deletingFileDiv" class="modal-backdrop" style="opacity:0.5"><i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i></div>');
+			$.ajax({
+				'type': "POST",
+				'url': "[(@{|/auth/group/${zoteroGroupId}/file/delete|})]",
+				// 'cache'       : false,
+				// 'contentType' : false,
+				// 'processData' : false,
+				// 'enctype': 'multipart/form-data',
+				'data': {
+					"fileToDelete": fileId,
+					[[${_csrf.parameterName}]]:[[${_csrf.token}]],
+					"itemId": [[${itemId}]]
+				},
+				'success': function(data) {
+					// alert("ajax successfull.");
+					// let message = " "+success.length;
+					// if(success.length > 1) {
+					// 	message += " Citations deleted successfully! <br />";
+					// } else {
+					// 	message += " Citation deleted successfully! <br />";
+					// }
+					// $('body').append('<div id="deletingDiv" class="modal-backdrop" style="opacity:0.5"><i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i></div>');
+					$("#deletingFileDiv").remove();
+					showNotification("File deleted successfully! ", "success", 10000);
+					window.location.reload();
+				},
+				'error': function(data) {
+					$("#deletingFileDiv").remove();
+					showNotification("Error while deleting the file!", "danger", 10000)
+					// console.log("ERR: " + data);
+				}
+			});
+			$('#file-delete-confirmation').modal("hide");
+			event.preventDefault();
+			$(this).removeData();
+	    });
+
+
+		$(".delete-file").click(function(e) {
+			$("#delete-file-button").attr("data-upload-file", $(this).data("upload-file"));
+			$('#file-delete-confirmation').modal("show");
+		});
+
 	    var queryParams = window.location.search;
 	    if(queryParams)  {
 	        var params = new URLSearchParams(queryParams);
@@ -77,6 +130,21 @@
 	    })
 	});
 	
+
+function showNotification(message, status, time){
+	$.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
+		type: status,
+		offset: {
+			x: 50,
+			y: 90
+		},
+		timer: time,
+		animate: {
+			enter: 'animated fadeInRight',
+			exit: 'animated fadeOutRight'
+		},
+	});
+}
 </script>
 </head>
 
@@ -331,10 +399,11 @@
         <h3 style="margin-top: 0">Files</h3>
         
         <ul class="list-group" >
-	        <li class="list-group-item" th:each="upload:${citation.gilesUploads}">
+	        <li class="list-group-item" th:each="upload,index:${citation.gilesUploads}">
 	        <i class="icon-giles"></i>
 	        <span th:if="${upload.uploadedFile?.filename}">
 	        <a th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}">[[${upload.uploadedFile?.filename}]]</a>
+			<button th:id="|delete-file-btn-${index.index}|" type="button" th:data-upload-file="${upload.documentId}" class="btn icon-trash delete-file"></button>
 	        </span>
 	        <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
 	        File is being processed... ([[${upload.progressId}]])
@@ -441,6 +510,27 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+
+<div class="modal fade" id="file-delete-confirmation" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		  <h4 class="modal-title">Delete File</h4>
+		</div>
+		<div class="modal-body">
+		  <p>Are you sure you want to delete this file?</p>
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
+		  <button id="delete-file-button" data-upload-file="" type="button" class="btn btn-primary">Yes, delete!</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+
+
 </div>
 </body>
 </html>
