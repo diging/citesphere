@@ -15,16 +15,11 @@
 }
 #overlay {
   position: absolute;
-  display: none;
   width: 100%;
   height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   background-color: rgba(0,0,0,0.5);
   z-index: 10;
-  opacity: 0.2;
+  opacity: 0.5;
 }
 </style>
 <script th:inline="javascript">
@@ -409,8 +404,8 @@ function addAffiliation(modalType, counter) {
 
 function searchAuthorities(modalType, personType) {
   $('#selectAuthorityModel').modal('show');
-	$("#authoritySpinner").show();
-	$("#overlay").show();
+  $("#authoritySpinner").show();
+  $("#overlay").show();
   
   $("#userAuthoritySearchResult").empty();
 	$("#groupAuthoritySearchResult").empty();
@@ -426,7 +421,7 @@ function searchAuthorities(modalType, personType) {
 	$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 	$('#viafAuthority-pagination-top').twbsPagination('destroy');
 	$("#selectAuthorityModel").on('shown.bs.modal', function(e) {
-			$("#overlay").hide();
+        $("#overlay").hide();
 	    getUserAuthorities(modalType, personType, 0)
 	    getViafAuthorities(modalType, personType, 0)
 	    getGroupAuthorities(modalType, personType, 0)
