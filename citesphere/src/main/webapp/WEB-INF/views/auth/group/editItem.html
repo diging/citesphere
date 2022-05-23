@@ -421,11 +421,11 @@ function searchAuthorities(modalType, personType) {
 	$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
 	$('#viafAuthority-pagination-top').twbsPagination('destroy');
 	$("#selectAuthorityModel").on('shown.bs.modal', function(e) {
-        $("#overlay").hide();
-	    getUserAuthorities(modalType, personType, 0)
-	    getViafAuthorities(modalType, personType, 0)
-	    getGroupAuthorities(modalType, personType, 0)
-	    getconceptpowerAuthorities(modalType, personType, 0)
+		$("#overlay").hide();
+		getUserAuthorities(modalType, personType, 0)
+		getViafAuthorities(modalType, personType, 0)
+		getGroupAuthorities(modalType, personType, 0)
+		getconceptpowerAuthorities(modalType, personType, 0)
   })
 }
 
