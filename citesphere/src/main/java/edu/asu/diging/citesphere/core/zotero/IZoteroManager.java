@@ -3,8 +3,8 @@ package edu.asu.diging.citesphere.core.zotero;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
+import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
@@ -36,9 +36,13 @@ public interface IZoteroManager {
 
     ICitationGroup getGroup(IUser user, String groupId, boolean refresh);
 
-    ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    ICitation updateCitation(IUser user, String groupId, ICitation citation)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
     
     ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, JsonProcessingException;
+    
+    ZoteroUpdateItemsStatuses moveCitationsToCollection(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, JsonProcessingException;
 
     List<BibField> getFields(IUser user, ItemType itemType);
@@ -64,7 +68,7 @@ public interface IZoteroManager {
 
     Map<String, Long> getGroupItemsVersions(IUser user, String groupId, long version, boolean includeTrashed);
 
-    ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed);
+    ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed) throws ZoteroHttpStatusException;
 
     DeletedZoteroElements getDeletedElements(IUser user, String groupId, long version);
 
@@ -73,5 +77,6 @@ public interface IZoteroManager {
     ZoteroCollectionsResponse getCollectionsByKey(IUser user, String groupId, List<String> keys);
 
     long getLatestGroupVersion(IUser user, String groupId);
-
+        
+    Map<ItemDeletionResponse, List<String>> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
 }

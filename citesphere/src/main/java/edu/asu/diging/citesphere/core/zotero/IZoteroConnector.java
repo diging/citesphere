@@ -1,7 +1,7 @@
 package edu.asu.diging.citesphere.core.zotero;
 
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.Map;
 
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -9,6 +9,7 @@ import org.springframework.social.zotero.api.DeletedElements;
 import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
+import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
@@ -28,6 +29,8 @@ public interface IZoteroConnector {
 
     Item getItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
     
+    Item getCitesphereMetaData(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
+
     List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
 
     ZoteroResponse<Group> getGroupsVersions(IUser user);
@@ -39,7 +42,7 @@ public interface IZoteroConnector {
 
     Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException;
-    
+        
     ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
             List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, JsonProcessingException;
@@ -50,7 +53,7 @@ public interface IZoteroConnector {
 
     Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException;
-
+    
     CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType);
 
     ZoteroResponse<Collection> getCitationCollections(IUser user, String groupId, String collectionId, int page,
@@ -77,5 +80,7 @@ public interface IZoteroConnector {
     ZoteroResponse<Collection> getCitationCollectionVersions(IUser user, String groupId, Long lastGroupVersion);
 
     ZoteroResponse<Collection> getCitationCollectionsByKey(IUser user, String groupId, List<String> keys);
+    
+    Map<ItemDeletionResponse, List<String>> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
 
 }
