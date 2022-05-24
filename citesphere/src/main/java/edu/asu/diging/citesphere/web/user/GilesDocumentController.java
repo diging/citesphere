@@ -92,18 +92,18 @@ public class GilesDocumentController {
                 List<IGilesFile> gilesFiles = new ArrayList<>();
                 for(IGilesUpload gilesUpload : uploadOptionalList) {
                     
-                    gilesFiles.add(gilesUpload.getUploadedFile());
+                    gilesFiles.add(gilesUpload.getUploadedFile()); 
                     gilesFiles.add(gilesUpload.getExtractedText());
-                    if(gilesUpload.getPages() != null) {
+                    if(gilesUpload.getPages() != null) {      //Extracting pages 
                         gilesUpload.getPages().forEach(p -> {
                            gilesFiles.add(p.getImage());
                            gilesFiles.add(p.getOcr());
                            gilesFiles.add(p.getText());
-                           p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));
+                           p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));  //Extracting additional files of pages
                        });
                     }
                     if(gilesUpload.getAdditionaFiles() != null) {
-                       gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a));
+                       gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a)); //Extracting additional files
                     }
                 }
                 return gilesFiles;
