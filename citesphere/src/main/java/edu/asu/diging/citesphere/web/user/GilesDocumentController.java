@@ -55,12 +55,12 @@ public class GilesDocumentController {
             List<IGilesFile> gilesFiles = (List<IGilesFile>) gilesFilesArray[0];
                 
             for(IGilesFile gilesFile : gilesFiles) {
-               if(gilesFile != null && gilesFile.getId().equals(fileId)) {
-                  contentType = gilesFile.getContentType();
-                  fileName = gilesFile.getFilename();
-                  break;
+                if(gilesFile != null && gilesFile.getId().equals(fileId)) {
+                    contentType = gilesFile.getContentType();
+                    fileName = gilesFile.getFilename();
+                    break;
+                    }
                 }
-            }
         }
         else if(uploadOptionalList.size()==0 || contentType==null){
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
@@ -96,14 +96,14 @@ public class GilesDocumentController {
                     gilesFiles.add(gilesUpload.getExtractedText());
                     if(gilesUpload.getPages() != null) {      //Extracting pages 
                         gilesUpload.getPages().forEach(p -> {
-                           gilesFiles.add(p.getImage());
-                           gilesFiles.add(p.getOcr());
-                           gilesFiles.add(p.getText());
-                           p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));  //Extracting additional files of pages
+                            gilesFiles.add(p.getImage());
+                            gilesFiles.add(p.getOcr());
+                            gilesFiles.add(p.getText());
+                            p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));  //Extracting additional files of pages
                        });
                     }
                     if(gilesUpload.getAdditionaFiles() != null) {
-                       gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a)); //Extracting additional files
+                        gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a)); //Extracting additional files
                     }
                 }
                 return gilesFiles;
