@@ -100,7 +100,7 @@ public class GilesDocumentController {
                             gilesFiles.add(p.getOcr());
                             gilesFiles.add(p.getText());
                             p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));  //Extracting additional files of pages
-                            });
+                        });
                     }
                     if(gilesUpload.getAdditionaFiles() != null) {
                         gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a)); //Extracting additional files
