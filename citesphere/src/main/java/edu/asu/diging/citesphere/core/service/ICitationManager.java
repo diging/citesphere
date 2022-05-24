@@ -78,5 +78,9 @@ public interface ICitationManager {
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
     
     void deleteLocalGroupCitations(String groupId);
-    
+
+    void deleteFile(IUser user, String zoteroGroupId, String itemId, String documentId)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+            ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException;
+
 }

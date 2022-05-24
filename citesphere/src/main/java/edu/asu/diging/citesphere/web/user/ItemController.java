@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -73,25 +75,14 @@ public class ItemController {
         return "auth/group/item";
     }
 
-    // change here: 1. return type of fn: @ResponseBody AsyncDeleteCitationsResponse
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/file/delete", method = RequestMethod.POST)
-    public @ResponseBody AsyncDeleteCitationsResponse delete(Authentication authentication,
+    public ResponseEntity<String> deleteFile(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId,
-            @RequestParam(value = "fileToDelete", required = false) String fileToDelete,
-           @RequestParam(value = "itemId", required = false) String itemId)
-               throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException
-    {
-        // asyncCitationManager.deleteCitations((IUser) authentication.getPrincipal(), zoteroGroupId, citationList);
-//        citation.getGilesUploads().remove(fileToDelete);
-        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-//        citation.getGilesUploads().remove(fileToDelete);
-        for (Iterator<IGilesUpload> gileUpload = citation.getGilesUploads().iterator(); gileUpload.hasNext(); ) {
-            IGilesUpload g = gileUpload.next();
-            if (g.getDocumentId() != null && g.getDocumentId().equals(fileToDelete))
-                gileUpload.remove();
-        }
-        citationManager.
-        updateCitation((IUser)authentication.getPrincipal(), zoteroGroupId, citation);
-        return new AsyncDeleteCitationsResponse();
+            @RequestParam(value = "documentId", required = false) String documentId,
+            @RequestParam(value = "itemId", required = false) String itemId)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+            ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        citationManager.deleteFile((IUser) authentication.getPrincipal(), zoteroGroupId, itemId, documentId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

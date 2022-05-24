@@ -66,41 +66,23 @@
 		$("#delete-file-button").click(function(e) {
 			e.preventDefault();
 			var fileId = $(this).data("upload-file");
-			
-			// var formData = new FormData();
-			// formData.append("fileToDelete", fileToDelete);
-			// formData.append("citation", citation);
-			// var baseurl = "file/delete/";
 			$('body').append('<div id="deletingFileDiv" class="modal-backdrop" style="opacity:0.5"><i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i></div>');
 			$.ajax({
 				'type': "POST",
 				'url': "[(@{|/auth/group/${zoteroGroupId}/file/delete|})]",
-				// 'cache'       : false,
-				// 'contentType' : false,
-				// 'processData' : false,
-				// 'enctype': 'multipart/form-data',
 				'data': {
-					"fileToDelete": fileId,
+					"documentId": fileId,
 					[[${_csrf.parameterName}]]:[[${_csrf.token}]],
 					"itemId": [[${itemId}]]
 				},
 				'success': function(data) {
-					// alert("ajax successfull.");
-					// let message = " "+success.length;
-					// if(success.length > 1) {
-					// 	message += " Citations deleted successfully! <br />";
-					// } else {
-					// 	message += " Citation deleted successfully! <br />";
-					// }
-					// $('body').append('<div id="deletingDiv" class="modal-backdrop" style="opacity:0.5"><i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i></div>');
 					$("#deletingFileDiv").remove();
 					showNotification("File deleted successfully! ", "success", 10000);
-					window.location.reload();
+					location.reload();
 				},
 				'error': function(data) {
 					$("#deletingFileDiv").remove();
 					showNotification("Error while deleting the file!", "danger", 10000)
-					// console.log("ERR: " + data);
 				}
 			});
 			$('#file-delete-confirmation').modal("hide");
