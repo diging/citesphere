@@ -59,8 +59,8 @@ public class GilesDocumentController {
                     contentType = gilesFile.getContentType();
                     fileName = gilesFile.getFilename();
                     break;
-                    }
                 }
+            }
         }
         else if(uploadOptionalList.size()==0 || contentType==null){
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
@@ -100,7 +100,7 @@ public class GilesDocumentController {
                             gilesFiles.add(p.getOcr());
                             gilesFiles.add(p.getText());
                             p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));  //Extracting additional files of pages
-                       });
+                            });
                     }
                     if(gilesUpload.getAdditionaFiles() != null) {
                         gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a)); //Extracting additional files
