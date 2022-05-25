@@ -11,7 +11,7 @@
     <properties>
         <org.slf4j-version>1.7.32</org.slf4j-version>
         <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
-        <spring-security-version>5.3.10.RELEASE</spring-security-version>
+        <spring-security-version>5.5.7</spring-security-version>
         <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
         <spring-elasticsearch.version>3.2.12.RELEASE</spring-elasticsearch.version>
