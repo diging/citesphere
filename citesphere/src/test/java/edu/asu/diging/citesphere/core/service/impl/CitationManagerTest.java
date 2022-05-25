@@ -357,4 +357,20 @@ public class CitationManagerTest {
         Assert.assertNull(actualResult.getNext());
         Assert.assertNull(actualResult.getPrev());
     }
+
+    @Test
+    public void test_deleteFile() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+        ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        String documentId = "43";
+        Set<IGilesUpload> gilesUploads = new HashSet<>();
+        Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(currentVersion);
+        existingCitation.setKey(EXISTING_ID);
+        existingCitation.setVersion(currentVersion);
+        existingCitation.setGroup(GROUP_ID);
+        existingCitation.setGilesUploads(gilesUploads);
+        Mockito.when(zoteroManager.updateCitation(user, GROUP_ID, existingCitation)).thenReturn(existingCitation);
+        Mockito.when(citationStore.findById(EXISTING_ID)).thenReturn(Optional.of(existingCitation));
+        managerToTest.deleteFile(user, GROUP_ID, EXISTING_ID, documentId);
+        Mockito.verify(citationStore).save(existingCitation);
+    }
 }
