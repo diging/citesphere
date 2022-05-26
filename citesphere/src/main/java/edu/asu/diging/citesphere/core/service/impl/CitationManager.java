@@ -383,7 +383,7 @@ public class CitationManager implements ICitationManager {
         List<ICitation> finalCitations = new ArrayList<>();
         for(ICitation citation : citations) {
             if(!hiddenItemSet.contains(citation.getKey())) {
-               finalCitations.add(citation); 
+                finalCitations.add(citation); 
             }
             else {
                 total--;
