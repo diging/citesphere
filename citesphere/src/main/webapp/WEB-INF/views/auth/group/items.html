@@ -16,7 +16,6 @@
 <link th:href="@{/resources/bootstrap/grid.css}" rel="stylesheet"/>
 <script th:inline="javascript">
 //# sourceURL=page.js
-var hiddenItemCount = 0;
 $(function() {
 	$('#pagination-top').twbsPagination({
 	    totalPages: [(${totalPages})],
@@ -645,25 +644,6 @@ function pollStatus(){
 </div>
 
 </div>
-
-<div id="removeCitationPopUp" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Remove Citation</h4>
-      </div>
-      <div class="modal-body">
-        <p>Please select a citation to remove it.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Alright!</button>
-      </div>
-    </div>
-
-  </div>
-</div>
 <script >
 	//# sourceURL=move.js
 $("#selectAll").click(function(){
@@ -753,14 +733,6 @@ $(".list-group-item").droppable( {
 		}
 		
 });
-
-$(".selected").droppable({
-	drop: function(event, ui){
-        console.log(event);
-        console.log(ui);
-    }
-});
-
 });	
 
 function pollMovedItemsStatuses(response,collectionName, collectionHTMLElement, collectionId){
@@ -851,6 +823,7 @@ $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
 	},
 });
 }
+
 </script>
 </div>
 </body>
