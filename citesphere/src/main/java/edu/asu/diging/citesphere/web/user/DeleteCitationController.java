@@ -29,7 +29,7 @@ public class DeleteCitationController {
             @PathVariable("groupId") String groupId,
             @RequestParam(value = "citationList", required = false) List<String> citationList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, GroupDoesNotExistException {
-        return asyncCitationManager.deleteCitations((IUser) authentication.getPrincipal(), groupId, citationList);
+        return asyncCitationManager.hideCitations((IUser) authentication.getPrincipal(), groupId, citationList);
     }
 
     @RequestMapping("/auth/group/{zoteroGroupId}/references/delete/{taskID}/status")

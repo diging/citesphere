@@ -191,8 +191,10 @@ $(function() {
 					[[${_csrf.parameterName}]] : [[${_csrf.token}]]
 				},
 				'success': function(response) {
-					$('body').append('<div id="deletingDiv" class="modal-backdrop" style="opacity:0.5"><i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i></div>');
-					pollDeleteItemsStatuses(response);
+					
+					$.each(rows, function(index, value) {
+						$("#tr-" + value).remove();
+					});
 				},
 				'error': function(data) {
 					showNotification(" Error while deleting citations!", "danger", 10000);
@@ -327,8 +329,7 @@ $.ajax({
 Items in Group <span th:text="${group.name}"></span></br>
 </span>
 	
-	<small><span th:text="${total}"></span> records, </small>
-	<p id = "hiddenCount"><small> hidden </small></p>
+	<small><span th:text="${total}"></span> records </small>
 </h2>
 <div class="pull-right">
 	<div class="progress" style="width: 200px">
@@ -441,9 +442,6 @@ function pollStatus(){
 <div class="pull-right" style="margin-top: 20px;">
 <a th:href="@{|/auth/group/${zoteroGroupId}/items/create|}" class="btn btn-primary"><i class="icon-circle-add"></i> Create Citation</a>
 <a class="btn btn-primary delete-link"><i class="icon-trash" style="color: #FFFFFF; font-size: 13px;"></i> Delete Citations</a>
-</div>
-<div class="pull-right" style="margin-top: 20px; margin-right: 10px;">
-<a class="btn btn-primary" id="hideItem"> Remove Citation</a>
 </div>
 
 <div class="btn-group pull-right" style="margin-top: 20px; margin-right: 10px;">
@@ -756,41 +754,6 @@ $(".list-group-item").droppable( {
 		
 });
 
-$("#hideItem").click(function() {
-	
-	let selected = $(".selected");
-	if(selected.length==0) {
-		$('#removeCitationPopUp').modal('show');
-		return ;
-	}
-	//hides only one item
-	document.getElementsByClassName("selected")[0].style.display='none';
-	//$(".items").removeClass('selected');
-	let temp1 = $(".items");
-	console.log(temp1.length);
-	$(".selected").removeClass('items');
-	let temp2 = $(".items");
-	console.log(temp2.length);
-	let temp3 = $(".selected");
-	console.log(temp3.val());
-	hiddenItemCount = hiddenItemCount+1;
-	//console.log(hiddenItemCount);
-	/* let itemsKeys = [];
-	ui.helper.find('ul').children().each(function(){
-		itemsKeys.push($(this).text());
-		});
-	let itemsMoveData ={};
-	itemsMoveData["itemIds"] = itemsKeys;
-	console.log(itemsMoveData); */
-	$(".selected").droppable({
-		drop: function(event, ui){
-	        console.log(event);
-	        console.log(ui);
-	    }
-	});
-	document.getElementById('hiddenCount').innerHTML = hiddenItemCount;
-});
-
 $(".selected").droppable({
 	drop: function(event, ui){
         console.log(event);
@@ -888,10 +851,6 @@ $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
 	},
 });
 }
-
-window.onload = function(){
-	document.getElementById('hiddenCount').innerHTML = hiddenItemCount;
-};
 </script>
 </div>
 </body>

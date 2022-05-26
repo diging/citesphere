@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -38,6 +39,7 @@ public class AsyncCitationManager implements IAsyncCitationManager {
     private final Map<String, Future<ZoteroUpdateItemsStatuses>> updateTaskTracker;
     private final Map<String, Future<Map<ItemDeletionResponse, List<String>>>> deleteTaskTracker;
     private final Map<String, Long> deleteTaskTimestamps;
+    private HashSet<String> hiddenItemsSet;
     
     @Value("${task_cleanup_cycle}")
     private long cleanupCycle;
@@ -46,6 +48,11 @@ public class AsyncCitationManager implements IAsyncCitationManager {
         this.updateTaskTracker = new ConcurrentHashMap<>();
         this.deleteTaskTracker = new ConcurrentHashMap<>();
         this.deleteTaskTimestamps = new ConcurrentHashMap<>();
+        this.hiddenItemsSet = new HashSet<>();
+    }
+
+    public HashSet<String> getHiddenItemsList() {
+        return hiddenItemsSet;
     }
 
     /* (non-Javadoc)
@@ -151,6 +158,16 @@ public class AsyncCitationManager implements IAsyncCitationManager {
         AsyncUpdateCitationsResponse asyncResponse = new AsyncUpdateCitationsResponse();
         asyncResponse.setTaskID(taskId);
         asyncResponse.setTaskStatus(AsyncTaskStatus.PENDING);
+        return asyncResponse;
+    }
+    
+    public AsyncDeleteCitationsResponse hideCitations(IUser user, String groupId, List<String> citationIdList) {
+        String taskId = UUID.randomUUID().toString();
+        
+        hiddenItemsSet.addAll(citationIdList);
+        AsyncDeleteCitationsResponse asyncResponse = new AsyncDeleteCitationsResponse();
+        asyncResponse.setTaskID(taskId);
+        asyncResponse.setTaskStatus(AsyncTaskStatus.COMPLETE);
         return asyncResponse;
     }
 
