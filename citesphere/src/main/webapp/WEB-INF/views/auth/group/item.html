@@ -30,18 +30,15 @@
 		
 		$(".item-note").click(function(e) {
 			var note = $(this).find(".note-info")
-			var index = note.attr('data-note-index');
-			var displayIndex = parseInt(index)+1;
-			$('#note-header').text('Note '+displayIndex);
-			var noteText = truncateNote($(note.attr('data-note-text')));
-			$('#note-text').html(noteText);
+			$('#note-text').html(note.attr('data-note-text'));
 			$('#noteModal').modal();
 		});
 	});
 	
-	function truncateNote(note) {
-		var truncatedNote = $('<span>');
+	function truncateNote(noteText) {
+		var truncatedNote = ' ';
 		var count = 0;
+		note = $(noteText);
 		note.each(function () {
 			var curr = $(this).text();
 			if (count >= 20) {
@@ -51,7 +48,7 @@
 				curr = curr.substring(0, 20-count) + "...";
 				$(this).text(curr);
 			}
-			truncatedNote.append(this);
+			truncatedNote += $(this).text();
 			count += curr.length;
 		});
 		return truncatedNote;
@@ -102,6 +99,10 @@
 	    
 	    $('.btn-nav').each(function() {
 	    	$(this).attr("href", $(this).attr("href") + "&" + queryParams);
+	    })
+	    
+	    $('.note-info').each(function() {
+	    	$(this).text(truncateNote($(this).attr('data-note-text')));
 	    })
 	});
 	
@@ -377,7 +378,7 @@
         
         <ul class="list-group">
             <li class="item-note list-group-item" th:each="note, status:${notes}">
-                <span class="icon-sticky-note note-info" style="color: #337ab7; font-size: 14px" th:data-note-index="${status.index}" th:data-note-text="${note.note}"></span><span> Note [[${status.index + 1}]]</span>
+                <span class="icon-sticky-note" style="color: #337ab7; font-size: 14px"></span><span class="note-info" th:data-note-text="${note.note}"></span>
             </li>
         </ul>
 	</div>
@@ -481,12 +482,7 @@
     <div id="noteModal" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="note-header"></h4>
-          </div>
-          <div class="modal-body" id="note-text">
-          </div>
+          <div class="modal-body" id="note-text"></div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
