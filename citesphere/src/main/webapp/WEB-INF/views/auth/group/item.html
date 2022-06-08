@@ -33,10 +33,29 @@
 			var index = note.attr('data-note-index');
 			var displayIndex = parseInt(index)+1;
 			$('#note-header').text('Note '+displayIndex);
-			$('#note-text').html(note.attr('data-note-text'));
+			var noteText = truncateNote($(note.attr('data-note-text')));
+			$('#note-text').html(noteText);
 			$('#noteModal').modal();
 		});
 	});
+	
+	function truncateNote(note) {
+		var truncatedNote = $('<span>');
+		var count = 0;
+		note.each(function () {
+			var curr = $(this).text();
+			if (count >= 20) {
+				return false;
+			}
+			if (count + curr.length > 20) {
+				curr = curr.substring(0, 20-count) + "...";
+				$(this).text(curr);
+			}
+			truncatedNote.append(this);
+			count += curr.length;
+		});
+		return truncatedNote;
+	}
 
 	$(document).ready(function(){
 	
