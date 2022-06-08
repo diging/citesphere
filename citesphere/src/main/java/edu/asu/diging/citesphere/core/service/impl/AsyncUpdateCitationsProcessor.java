@@ -30,4 +30,12 @@ public class AsyncUpdateCitationsProcessor {
             ExecutionException, JsonProcessingException {
         return new AsyncResult<ZoteroUpdateItemsStatuses>(zoteroManager.updateCitations(user, groupId, citations));
     }
+    
+    @Async
+    public Future<ZoteroUpdateItemsStatuses> moveCitationsToCollection(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
+            ExecutionException, JsonProcessingException {
+        return new AsyncResult<ZoteroUpdateItemsStatuses>(zoteroManager.moveCitationsToCollection(user, groupId, citations));
+    }
+    
 }

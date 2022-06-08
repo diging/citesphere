@@ -29,6 +29,8 @@ public interface IZoteroConnector {
 
     Item getItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
     
+    Item getCitesphereMetaData(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
+
     List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
 
     ZoteroResponse<Group> getGroupsVersions(IUser user);
@@ -40,7 +42,7 @@ public interface IZoteroConnector {
 
     Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException;
-    
+        
     ZoteroUpdateItemsStatuses updateItems(IUser user, List<Item> items, String groupId,
             List<List<String>> ignoreFieldsList, List<List<String>> validCreatorTypesList)
             throws ZoteroConnectionException, ZoteroHttpStatusException, JsonProcessingException;
@@ -51,7 +53,7 @@ public interface IZoteroConnector {
 
     Item createItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroItemCreationFailedException, ZoteroHttpStatusException;
-
+    
     CreatorType[] getItemTypeCreatorTypes(IUser user, String itemType);
 
     ZoteroResponse<Collection> getCitationCollections(IUser user, String groupId, String collectionId, int page,

@@ -46,9 +46,9 @@ public interface ICitationManager {
     List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException,
             GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 
-    void updateCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException;
-    
+    void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
+            CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
+   
     ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
             ExecutionException, JsonProcessingException;

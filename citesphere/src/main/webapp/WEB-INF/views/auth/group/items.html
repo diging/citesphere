@@ -542,7 +542,7 @@ function pollStatus(){
 				</div>
 			  </span>
 			</td>
-			<td th:data-key="${entry.key}" th:data-index="${loop.index}">
+			<td th:data-index="${loop.index}">
 			    <a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
 			        <th:block th:each="author,status : ${entry.authors}">
 			            <strong style="color: black">[[${author.lastName}]]<span style="color: black" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
@@ -559,7 +559,7 @@ function pollStatus(){
 			        </th:block>
 			    </a>
 		 	</td>
-		 	<td th:data-key="${entry.key}" th:data-index="${loop.index}">
+		 	<td th:data-index="${loop.index}">
 			    <a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
 			        <em style="color: black">[[${entry.title}]]</em>
 			    </a>
@@ -570,7 +570,7 @@ function pollStatus(){
 			        <em style="color: black">[[${entry.title}]]</em>
 			    </a>
 		 	</td>
-		 	<td th:data-key="${entry.key}" th:data-index="${loop.index}">
+		 	<td th:data-index="${loop.index}">
 			    <a class="bib-entry" style="color: black" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
 			        [[${entry.dateFreetext}]]
 			    </a>
