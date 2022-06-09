@@ -25,7 +25,13 @@ public interface IAuthorityService {
 
     IAuthorityEntry save(IAuthorityEntry entry);
 
-    List<IAuthorityEntry> getAll(IUser user);
+    /**
+     * Fetches all the authorities that the user has access to.
+     * @param user     User for which the authorities are to be retrieved
+     * @param groupIds Group Ids to which the user belongs
+     * @return the retrieved authority list
+     */
+    List<IAuthorityEntry> getAll(IUser user, List<Long> groupIds);
 
     boolean deleteAuthority(String id);
 

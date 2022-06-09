@@ -31,14 +31,20 @@ public interface IZoteroManager {
     ICitation getGroupItem(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
     
     List<ICitation> getGroupItemAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
+    
+    List<ICitation> getGroupItemNotes(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
 
     Map<Long, Long> getGroupsVersion(IUser user);
 
     ICitationGroup getGroup(IUser user, String groupId, boolean refresh);
 
-    ICitation updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException, ZoteroHttpStatusException;
+    ICitation updateCitation(IUser user, String groupId, ICitation citation)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
     
     ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
+            throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, JsonProcessingException;
+    
+    ZoteroUpdateItemsStatuses moveCitationsToCollection(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, ZoteroHttpStatusException, ExecutionException, JsonProcessingException;
 
     List<BibField> getFields(IUser user, ItemType itemType);
@@ -64,7 +70,7 @@ public interface IZoteroManager {
 
     Map<String, Long> getGroupItemsVersions(IUser user, String groupId, long version, boolean includeTrashed);
 
-    ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed);
+    ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys, boolean includeTrashed) throws ZoteroHttpStatusException;
 
     DeletedZoteroElements getDeletedElements(IUser user, String groupId, long version);
 

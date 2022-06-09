@@ -283,9 +283,12 @@ public class AuthorityService implements IAuthorityService {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.core.service.IAuthorityService#getAll(edu.asu.diging.citesphere.user.IUser, java.util.List)
+     */
     @Override
-    public List<IAuthorityEntry> getAll(IUser user) {
-        return entryRepository.findByUsernameOrderByName(user.getUsername());
+    public List<IAuthorityEntry> getAll(IUser user, List<Long> groupIds) {
+        return entryRepository.findByUsernameOrGroupsInOrderByName(user.getUsername(), groupIds);
     }
     
     @Override

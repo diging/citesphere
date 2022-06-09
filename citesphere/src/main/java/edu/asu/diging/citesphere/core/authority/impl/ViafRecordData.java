@@ -3,11 +3,17 @@ package edu.asu.diging.citesphere.core.authority.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Holds the data for VIAF authority record
+ * @author Maulik Limbadiya
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class ViafResponse {
+public class ViafRecordData {
 
     private String nameType;
     private MainHeadings mainHeadings;
@@ -39,6 +45,8 @@ public class ViafResponse {
     }
 
     static public class MainHeadings {
+        
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         private List<Data> data;
 
         public List<Data> getData() {
