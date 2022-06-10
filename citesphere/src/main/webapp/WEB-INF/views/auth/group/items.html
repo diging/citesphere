@@ -427,6 +427,9 @@ function getCurrentItemsData(parameter){
 		dataType: "json",
 		success: function (data){
 			if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
+				console.log("requested page: " + pageNumber);
+				console.log("response page: " + data['currentPage']);
+				console.log("pagination page: " + $(".page-item.active").text());
 				rewriteCitationsTable(data);
 				rewriteCollectionsList(data);
 				rewriteGroupInfo(data);
@@ -437,7 +440,7 @@ function getCurrentItemsData(parameter){
 				totalpages=data['totalPages'];
 				//console.log("tot "+totalpages);
 				showPages(data['totalPages'], data['currentPage']);
-
+				console.log("set page: " + $(".page-item.active").text());
 				}
 			}
 	});
