@@ -446,20 +446,17 @@ public class CitationManager implements ICitationManager {
     
     @Override
     public Persons getAllPeople(String groupId, Integer page) {
-        Persons persons = (Persons) citationDao.findAllPeople(groupId, (page - 1) * zoteroPageSize, zoteroPageSize);
-        return persons;
+        return (Persons) citationDao.findAllPeople(groupId, (page - 1) * zoteroPageSize, zoteroPageSize);
     }
     
     @Override
     public Citations getCitationsByPersonUri(String uri) {
-        Citations citations =  citationDao.findCitationsByPersonUri(uri);
-        return citations;
+        return citationDao.findCitationsByPersonUri(uri);
     }
     
     @Override
     public Citations getCitationsByPersonCitationKey(String citationKey) {
-        Citations citations =  citationDao.findCitationsByPersonCitationKey(citationKey);
-        return citations;
+        return citationDao.findCitationsByPersonCitationKey(citationKey);
     }
     
     @Override

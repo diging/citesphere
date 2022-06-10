@@ -40,30 +40,29 @@ public class ShowPeopleController {
     @Autowired
     private ICitationManager citationManager;
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/people")
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/people")
     public String showPeople(Model model, Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
+            logger.warn("Trying to access invalid page number: " + page, ex);
         }
         Persons personList = citationManager.getAllPeople(groupId, pageInt);
         model.addAttribute("groupIdNo", groupId);
-        model.addAttribute("total", personList.getTotalResults());
-        model.addAttribute("totalPages", Math.ceil(new Float(personList.getTotalResults()) / new Float(zoteroPageSize)));
+        
         model.addAttribute("currentPage", pageInt);
         if (personList != null) {
             model.addAttribute("people", personList.getPersons());
-        } else {
-            model.addAttribute("people", null);
+            model.addAttribute("total", personList.getTotalResults());
+            model.addAttribute("totalPages", Math.ceil(new Float(personList.getTotalResults()) / new Float(zoteroPageSize)));
         }
         return "auth/group/showPeople";
     }
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/showCitation")
-    public String showCitation(Model model, Authentication authentication,
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/citations")
+    public String showCitations(Model model, Authentication authentication,
             @PathVariable("zoteroGroupId") String groupId,
             @RequestParam(defaultValue = "", required = false, value = "uri") String uri,
             @RequestParam(defaultValue = "", required = false, value = "citationKey") String citationKey) {
@@ -75,8 +74,7 @@ public class ShowPeopleController {
         Citations citations = new Citations();
         if (uri != null && !uri.trim().isEmpty()) {
             citations = citationManager.getCitationsByPersonUri(uri);
-        }
-        else {
+        } else {
             citations = citationManager.getCitationsByPersonCitationKey(citationKey);
         }
         if (citations != null) {
