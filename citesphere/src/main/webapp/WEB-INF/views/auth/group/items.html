@@ -16,39 +16,9 @@
 <link th:href="@{/resources/bootstrap/grid.css}" rel="stylesheet"/>
 <script th:inline="javascript">
 //# sourceURL=page.js
+var totalpages=0;
+var currentpage=0;
 $(function() {
-	$('#pagination-top').twbsPagination({
-	    totalPages: [(${totalPages})],
-	    startPage: [(${currentPage})],
-	    prev: "«",
-	    next: "»",
-	    visiblePages: 10,
-	    initiateStartPageClick: false,
-	    onPageClick: function (event, page) {
-	        var queryParams = window.location.search;
-	        if (!queryParams) {
-	            queryParams = "?";
-    	        } else {
-    	            var params = new URLSearchParams(queryParams);
-    	            params.delete('page');
-    	            params.delete('searchTerm');
-    	            queryParams = "?" + params.toString();
-    	        }
-            
-	        var currentURL = window.location.href;
-	        if (currentURL.match(/search/)) {
-	            var key = $("#search").val();
-	            if (key != undefined && key != '') {
-	                window.location.href = "search" + queryParams + "&searchTerm=" + key + "&page=" + page;
-	            }
-	        } else {
-	            window.location.href = "items" + queryParams + "&page=" + page;
-	        }
-	    }
-	});
-	
-	$('.collapse').collapse();
-	
 	if(sessionStorage.getItem("collectionsHidden") == "true"){
 		$("#collectionsList").hide()
 	    $("#toggleCollection").attr('class', "icon-arrow-right")
@@ -67,12 +37,59 @@ $(function() {
 	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
 	  })
 
+		addEventListeners();
+		console.log("firstload");
+		getCurrentItemsData("onFirstLoad");
+		if(totalpages>0){
+			console.log("totalPage "+totalpages);
+		}
+	});
 	
-	var shownColumns = [ /*[# th:each="col : ${columns}"]*/ /*[[${col}]]*/, /*[/]*/ ];
+function showPages(totalPages, currentPage){
+	$("#pagination-top").remove();
+	$(".col-md-12").prepend($('<ul id="pagination-top" class="pagination-sm"></ul>'))
+	$('#pagination-top').twbsPagination({
+	    totalPages: totalPages,
+	    startPage: currentPage,
+	    prev: "«",
+	    next: "»",
+	    visiblePages: 10,
+	    initiateStartPageClick: false,
+	    onPageClick: function (event, page) {
+    	       onPageClickFunction();
+	    }
+	});
+}
+
+function onPageClickFunction(){
+	 var key = $("#search").val();
+    if (key != undefined && key != '') {
+    	let pageNumber = $(".page-item.active").text();
+        $.ajax({
+    		type: "GET",
+    		url: "search?searchTerm="+key+"&columns=" + shownColumns+"&page=" + pageNumber,
+    		dataType: "json",
+    		success: function (data){
+    			rewriteCitationsTable(data);
+    			rewriteColumnsList(data);
+				addEventListeners();
+				showPages(data['totalPages'], data['currentPage']);
+    		}
+    	});
+     } else {
+        getCurrentItemsData("requestingNewPage");
+    }
+}
+
+var shownColumns = [];
+
+function addEventListeners(){
+	$('.collapse').collapse();
 	
 	$("#addionalColumns a").click(function(event) {
 		var isShown = $(this).data("is-shown");
 		var col = $(this).data("column-name");
+		var searchKey = $("#search").val();
 
 		if (isShown) {
 			shownColumns = shownColumns.filter(function(value, index, arr){
@@ -88,8 +105,24 @@ $(function() {
 			params.delete('columns');
 			queryParams = params.toString();
 		}
-		window.location.href = "items?" + queryParams + "&columns=" + shownColumns;
-	});
+		if(searchKey != undefined && searchKey != ''){
+			return getSearchResults(searchKey);
+		}
+
+		let pageNumber = $(".page-item.active").text();
+		$.ajax({
+			type: "GET",
+			url: "items/data?page="+pageNumber+"&columns=" + shownColumns,
+			dataType: "json",
+			success: function (data){
+				rewriteCitationsTable(data);
+				rewriteColumnsList(data);
+				addEventListeners();
+				addCheckboxesEventListeners();
+				addMoveItemListeners();
+			 }
+		});
+		});
 	
 	$("#select-all-concept").click(function(){
 		var checkbox = $(this).find(".all-concept-checkbox");
@@ -148,7 +181,7 @@ $(function() {
 	$("#searchBtn").click(function() {
         var key = $("#search").val();
         if (key != undefined && key != '') {
-            window.location.href="search?searchTerm=" + key;
+        	getSearchResults(key);
         }
     });
 	
@@ -156,7 +189,7 @@ $(function() {
         if(e.which == 13) {
         	var key = $("#search").val();
             if (key != undefined && key != '') {
-                window.location.href="search?searchTerm=" + key;
+            	getSearchResults(key);
             }
         }
     });
@@ -203,7 +236,6 @@ $(function() {
 			$(this).removeData();
 		});
 	});
-});
 
 function filterConcept(searchText) {
 	searchText = searchText.toLowerCase();
@@ -216,22 +248,28 @@ function filterConcept(searchText) {
 	});
 }
 
-$(document).ready(function() {
-    var queryParams = window.location.search;
-    if (queryParams)  {
-        var params = new URLSearchParams(queryParams);
-        params.delete('page');
-        params.delete('searchTerm');
-        params.delete('sortBy');
-        params.delete('index');
-        queryParams = params.toString();
-    }
+function getSearchResults(key){
+	$.ajax({
+		type: "GET",
+		url: "search?searchTerm="+key+"&columns=" + shownColumns,
+		dataType: "json",
+		success: function (data){
+			rewriteCitationsTable(data);
+			rewriteColumnsList(data);
+			addEventListeners();
+			addCheckboxesEventListeners();
+			addMoveItemListeners();
+			showPages(data['totalPages'], data['currentPage']);
+		 }
+	});
+}
     
     $('.bib-entry').each(function() {
-        $(this).attr("href", $(this).attr("href") + "&" + queryParams);
+        $(this).attr("href", $(this).attr("href"));
     });
     
-});
+}
+
 
 function pollDeleteItemsStatuses(response) {
 $.ajax({
@@ -326,7 +364,7 @@ $.ajax({
 Items in Group <span th:text="${group.name}"></span></br>
 </span>
 	
-	<small><span th:text="${total}"></span> records </small>
+	<small><span id="total-records" th:text="${total}"></span> records </small>
 </h2>
 <div class="pull-right">
 	<div class="progress" style="width: 200px">
@@ -337,7 +375,7 @@ Items in Group <span th:text="${group.name}"></span></br>
 	    <small><a th:href="@{items}"><i class="icon-redo-alt"></i> Reload page</a></small>
 	</div>
 
-<script>
+<script th:inline="javascript">
 //# sourceURL=poll.js
 var syncUrl= "sync/info";
 var currentURL = window.location.href;
@@ -353,6 +391,7 @@ $.get(syncUrl, pollStatus);
 
 function pollStatus(){
     $.get(syncUrl, function(data) {
+    	console.log("sync url "+syncUrl);
         if(data['status'] == 'PREPARED' || data['status'] == 'STARTED') {
         	if (data['total'] == 0) {
         		$("#syncProgress").attr('style', "width:" + "100%");
@@ -361,6 +400,7 @@ function pollStatus(){
                 $("#syncProgress").addClass("progress-bar-striped active");
         	} else {
         		var percent = data['current']/data['total']*100;
+        		console.log("sync percent "+data['current']+" "+data['total']);
                 $("#syncProgress").attr('style', "width:" + percent + "%");
                 $("#syncProgress").attr('aria-valuenow', data['current']);
                 $("#syncProgress").attr('aria-valuemax', data['total']);
@@ -375,8 +415,166 @@ function pollStatus(){
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
         }
+        getCurrentItemsData("notFirstLoad");
     });
 }
+function getCurrentItemsData(parameter){
+	let pageNumber = $(".page-item.active").text();
+	//console.log(parameter);
+	$.ajax({
+		type: "GET",
+		url: "items/data?page="+pageNumber+"&columns=" + shownColumns,
+		dataType: "json",
+		success: function (data){
+			if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
+				rewriteCitationsTable(data);
+				rewriteCollectionsList(data);
+				rewriteGroupInfo(data);
+				rewriteColumnsList(data)
+				addEventListeners();
+				addCheckboxesEventListeners();
+				addMoveItemListeners();
+				totalpages=data['totalPages'];
+				//console.log("tot "+totalpages);
+				showPages(data['totalPages'], data['currentPage']);
+
+				}
+			}
+	});
+	}
+	let prevdata=null;
+	function rewriteCitationsTable(data){
+		console.log("table data "+data['citationsData']);
+		let groupId = data['zoteroGroupId']
+		let collectionId = data['collectionId']
+		let tablebody = $('<tbody>');
+		let headerRow = $('<tr>'+
+				'<th title="Move to collection">'+ 
+				'<div class="btn-group">' +
+				'<button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle icon-move-to" style="font-size:160%"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+				'<span class="caret"></span></button>'+
+				'<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">' +
+				'<li id="selectAll" class="dropdown-item"><a>All</a></li>'+
+				'<li id="deSelectAll" class="dropdown-item"><a>None</a></li>' +
+				'</div>'+
+				'</div>' +
+				'</th>'+
+				'<th>'+"Type"+'</th>'+
+				'<th>'+"Author"+'</th>'+
+				'<th>'+"Title"+'</th>'+
+				'<th>'+"Date"+'</th>'+
+				'<th>'+"URL"+'</th>'+
+				'</tr>')
+		for(const c of data['shownColumns']){
+			let header = data['availableColumnsData'].filter(colData => colData.column === c).map(colData => colData.columnLabel)
+			let shownColumnsHeaders = $('<th>'+header+'</th>')
+			headerRow.append(shownColumnsHeaders)
+		}
+
+		 tablebody.append(headerRow);
+		 let i=0;
+		 for (const citationData of data['citationsData']){
+			  let checkboxes = $('<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes"/>&nbsp;</td>')
+
+			  let citation = citationData['citation']
+			  let citationIcon =  citationData['citationIcon'] ? citationData['citationIcon'] : "icon-docs"
+			  let citationLabel = citationData['citationLabel'] ? citationData['citationLabel'] : citation.itemType
+
+			  let divIconData = $('<div>').append($('<i class="'+citationIcon+'" title="'+citationLabel +'">'+'</i>')).append(citationLabel);
+			  let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
+			  let iconData = $('<td>').append(spanElement);
+
+			  let href;
+			  if(collectionId){
+				  href = '"items/'+citation.key+'?index='+i+'&collectionId='+collectionId+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
+			  } else{
+				  href = '"items/'+citation.key+'?index='+i+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
+			  }
+
+			  let authors = $('<td data-key='+citation.key+' data-index='+i+'>'+'</td>');
+			  let authorHref = $('<a class="bib-entry" href='+href+'>');
+			  authors.append(authorHref);
+
+			  for(const author of citation['authors']){
+				  let authorsData
+				  if(author.firstName){
+					  authorsData = $('<strong style="color: black">' + author.lastName + 
+							  '<span style="color: black">, ' + author.firstName + '</span>'+ '</strong>'+
+							  '<span>'+'; '+'</span>')
+				  }else{
+					  authorsData = $('<strong style="color: black">' + author.lastName + '</strong>'+
+							  '<span>'+'; '+'</span>')
+				  }
+				  authorHref.append(authorsData);
+			  }
+			  authorHref.find("span").last().remove()
+
+			  let title = $('<td data-key='+citation.key+' data-index='+i+'>' +'</td>');
+			  title.append($('<a class="bib-entry" href='+href+'>'+ '<em style="color: black">'+ citation.title+'</em>'+'</a>'));
+
+			  let date = $('<td data-key='+citation.key+' data-index='+i+'>' +'</td>'); 
+			  date.append($('<a class="bib-entry" style="color: black" href='+href+'>'+ citation.dateFreetext+'</a>'));
+
+			  let url = $('<td>');
+			  if(citation.url || citation.url !== ""){
+				 let  urlElement = $('<span>' +'<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www></i>'+'</a>' +'</span>');
+				 url.append(urlElement);
+			  }
+
+			  let row = $('<tr data-action="draggable" class="items">').append(checkboxes).append(iconData).append(authors).append(title).append(date).append(url);
+
+			  for(const column of data['shownColumns']){
+				  let colData = (citation[column])?citation[column]:"";
+				  row.append($('<td "style="max-width:300px;">'+colData+'</td>'))
+			  } 
+
+			 tablebody.append(row);
+			 i++;
+		 };
+		 $("#items-table tbody").replaceWith(tablebody);
+		 $("#total-records").text(data['totalResults']);
+		  prevdata=data;
+	}
+
+	function rewriteCollectionsList(data){
+		let unOrderedList = $('<ul class="list-group" id="collectionsList">'+'</ul>');
+		for(const collection of data['citationCollections']){
+			let list = $('<li class="list-group-item collections">'+'</li>');
+			list.append($('<span class="badge">'+'</span>').text(collection.numberOfItems));
+			let collectionURL = window.location.href +"/../collection/"+collection.key+"/items";
+			if((window.location.href).match(/collection/)){
+				collectionURL = window.location.href +"/../../"+collection.key+"/items";
+			}
+			list.append($('<a href= '+collectionURL+'>'+'</a>').append($('<span/>').text(collection.name)));
+			unOrderedList.append(list);
+		 }
+		 $("#collectionsDiv ul").replaceWith(unOrderedList);
+	}
+
+	function rewriteGroupInfo(data) {
+		$("#collapseOne .panel-body").replaceWith($('<div id="groupInfo" class="panel-body">'+ data['group'].description+ '<div class="col-md-6">'+
+			'<b>Local Metadata Version:</b> <span>'+ data['group'].metadataVersion +'</span><br>'+
+			'<b>Local Library Version:</b> <span>'+ data['group'].contentVersion+'</span><br>'+ 
+			'<b>Created on:</b> <span class="date">'+ data['group'].created+'</span><br>'+
+			'<b>Last Modified on:</b> <span class="date">'+ data['group'].lastModified+'</span>'+'</div>'+'<div class="col-md-6">'+
+			'<b>Owner:</b><span">'+data['group'].owner+'</span><br><br>'+'<b>Last synced:</b> <span class="date">'+data['group'].updatedOn+'</span></div></div>'))
+	}
+
+	function rewriteColumnsList(data){
+	  let columnsList = $('<ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1"></ul> ');
+	  for(const columnData of data['availableColumnsData']){
+		  let dataShown = shownColumns.includes(columnData['column']);
+		  let columnHTML = $('<li>')
+		  let anchorTag = $('<a data-column-name='+columnData['column']+' data-is-shown='+dataShown+'>'+'</a>')
+		  if(dataShown){
+			  anchorTag.append($('<span><i class="icon-checkmark-alt"></i> </span>'))
+		  }
+		  anchorTag.append(columnData['columnLabel'])
+		  columnHTML.append(anchorTag)
+		  columnsList.append(columnHTML)
+	  }
+	  $("#addionalColumns").replaceWith(columnsList);
+	}
 </script>
 </div>
 
@@ -406,7 +604,7 @@ function pollStatus(){
       </h4>
     </div>
     <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-      <div class="panel-body">
+      <div id="groupInfo" class="panel-body">
       	[(${group.description})]
         <div class="col-md-6">
         <b>Local Metadata Version:</b> <span th:text="${group.metadataVersion}"></span><br>
@@ -456,18 +654,13 @@ function pollStatus(){
 </div>
 
 <div>
-<div class="col-md-2 sticky">
+<div class="col-md-2 sticky" id="collectionsDiv">
 	<div>
 	    <p class="lead" style="display:inline;padding-left:20px">Collections</p>
 	    <big><i class="icon-arrow-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
 	</div> 
 	<ul class="list-group" id="collectionsList">
-	<th:block th:each="collection:${citationCollections}">
-	  <li class="list-group-item collections">
-		  <span class="badge" th:text="${collection.numberOfItems}"/>
-		  <a th:href="@{|/auth/group/${zoteroGroupId}/collection/${collection.key}/items|}"><span th:text="${collection.name}"/></a>
-	  </li>
-	</th:block>
+
 	</ul>
 </div>
 
@@ -497,19 +690,11 @@ function pollStatus(){
                 Columns
                 <span class="caret"></span>
 	        </button>
-	        <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu2">
-	            <tbody th:each="column:${availableColumns}">
-	                <li th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}"><a th:data-column-name="${column}" th:data-is-shown="${#lists.contains(columns,column)}">
-	                    <span th:if ="${#lists.contains(columns,column)}"><i class="icon-checkmark-alt"></i> </span>
-	                    [[${columnLabel}]]
-	                    </a>
-	                </li>
-	            </tbody>
-	        </ul>
+	          <ul id="addionalColumns" class="dropdown-menu" aria-labelledby="dropdownMenu1"></ul> 
 	    </div>
 	</div>
 
-	<table class="table table-striped table-bordered">
+	<table id="items-table" class="table table-striped table-bordered">
 		<tr>
 			<th title="Move to a collection">
 			<div class="btn-group">
@@ -527,81 +712,6 @@ function pollStatus(){
 			<th>Date</th>
 			<th>URL</th>
 			<th>Files</th>
-			<th th:each="column:${columns}" th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}">
-				[[${columnLabel}]]
-			</th>
-		</tr>
-		
-		<tr th:id="'tr-'+${entry.key}" data-action='draggable' class="items" th:each="entry,loop : ${items}">
-			<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes" th:data-entry-key="${entry.key}" th:data-index="${loop.index}"/>&nbsp;</td>
-			<td>
-			  <span class="text-warning">
-			  <div th:with="iconClass=${@iconsResource.getProperty(entry.itemType + '_icon')}
-			  , iconLabel=${@iconsResource.getProperty(entry.itemType + '_label')}">
-				<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
-				</div>
-			  </span>
-			</td>
-			<td th:data-index="${loop.index}">
-			    <a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
-			        <th:block th:each="author,status : ${entry.authors}">
-			            <strong style="color: black">[[${author.lastName}]]<span style="color: black" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
-			        </th:block>
-			    </a>
-			    <a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
-			        <th:block th:each="author,status : ${entry.authors}">
-			            <strong style="color: black">[[${author.lastName}]]<span style="color: black" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
-			        </th:block>
-			    </a>
-			    <a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
-			        <th:block th:each="author,status : ${entry.authors}">
-			            <strong style="color: black">[[${author.lastName}]]<span style="color: black" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
-			        </th:block>
-			    </a>
-		 	</td>
-		 	<td th:data-index="${loop.index}">
-			    <a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
-			        <em style="color: black">[[${entry.title}]]</em>
-			    </a>
-			    <a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
-			        <em style="color: black">[[${entry.title}]]</em>
-			    </a>
-			    <a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
-			        <em style="color: black">[[${entry.title}]]</em>
-			    </a>
-		 	</td>
-		 	<td th:data-index="${loop.index}">
-			    <a class="bib-entry" style="color: black" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
-			        [[${entry.dateFreetext}]]
-			    </a>
-			    <a class="bib-entry" style="color: black" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
-			        [[${entry.dateFreetext}]]
-			    </a>
-			    <a class="bib-entry" style="color: black" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
-			        [[${entry.dateFreetext}]]
-			    </a>
-		 	</td>
-		 	<td>
-		 		<span th:if="${!#strings.isEmpty(entry.url)}">
-		 		<a href="${entry.url}" target="_blank" th:title="${entry.url} "><i class="icon-www"></i></a>
-		 		</span>
-		 	</td>
-			<td>
-				<span th:if="${!#sets.isEmpty(entry.gilesUploads)}">
-				<a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
-					<i class="icon-multiple-doc"></i>
-				</a>
-				<a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
-					<i class="icon-multiple-doc"></i>
-				</a>
-				<a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
-					<i class="icon-multiple-doc"></i>
-				</a>
-				</span>
-			</td>
-		 	<td th:each="column:${columns}" style="max-width:300px;">
-		 		[[${entry[column]}]]
-		 	</td>
 		</tr>
 	</table>
 </div>
@@ -644,27 +754,34 @@ function pollStatus(){
 </div>
 <script >
 	//# sourceURL=move.js
-$("#selectAll").click(function(){
-	$('input:checkbox').prop('checked',true);
-	$(".items").addClass('selected');
+$(function() {
+	addCheckboxesEventListeners();
+	addMoveItemListeners();
 });
-$("#deSelectAll").click(function(){
-	$('input:checkbox').prop('checked',false);
-	$(".items").removeClass('selected');
-});
-$('.checkboxes').change(function(){
-	if ($(this).is(':checked')) {
-		$(this).parents('tr').addClass('selected');
-		$(this).parents('tr').attr("title", "Drag to move citations to a collecton");
-		} 
-	else {
-		$(this).parents('tr').removeClass('selected');
-		$(this).parents('tr').removeAttr("title");
-		$('.icon-arrow-left').show();
-	}
-	$('.checkboxes:checked').length > 0? $('.icon-arrow-left').hide(): $('.icon-arrow-left').show();
-});
-$(function(){
+function addCheckboxesEventListeners(){
+	$("#selectAll").click(function(){
+		$('input:checkbox').prop('checked',true);
+		$(".items").addClass('selected');
+	});
+	$("#deSelectAll").click(function(){
+		$('input:checkbox').prop('checked',false);
+		$(".items").removeClass('selected');
+	});
+	$('.checkboxes').change(function(){
+		if ($(this).is(':checked')) {
+			$(this).parents('tr').addClass('selected');
+			$(this).parents('tr').attr("title", "Drag to move citations to a collecton");
+			} 
+		else {
+			$(this).parents('tr').removeClass('selected');
+			$(this).parents('tr').removeAttr("title");
+			$('.icon-arrow-left').show();
+		}
+		$('.checkboxes:checked').length > 0? $('.icon-arrow-left').hide(): $('.icon-arrow-left').show();
+	});
+}
+
+function addMoveItemListeners() {
 $(".items").draggable({
 	scroll: true,
 	cursor: "grabbing",
@@ -731,7 +848,7 @@ $(".list-group-item").droppable( {
 		}
 		
 });
-});	
+}	
 
 function pollMovedItemsStatuses(response,collectionName, collectionHTMLElement, collectionId){
 $.ajax({
@@ -784,6 +901,7 @@ $.ajax({
 	type: 'GET',
 	url: 'items/move/'+collectionId+'/sync/start?page=[(${currentPage})]',
 	success: function (data) {
+		console.log("sync data "+data);
 		if(data.status === "sync-started"){
 			pollStatus();
 		}
@@ -797,6 +915,7 @@ $.ajax({
 	type: 'GET',
 	url: 'items/move/'+collectionId+'/totalItems',
 	success: function (totalItems) {
+		console.log("update citations "+totalItems);
 		if($("#syncText").text() === "Up to date"){
 			collectionHTMLElement.children('span').text(totalItems);
 			collectionHTMLElement.children('div').remove();

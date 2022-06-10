@@ -54,7 +54,7 @@ public class GroupItemsController {
     @Autowired
     private ICitationConceptManager conceptManager;
 
-    @RequestMapping(value= { "/auth/group/{zoteroGroupId}","/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}", "/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items" })
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
@@ -79,7 +79,7 @@ public class GroupItemsController {
             return "error/404";
         }
         
-        model.addAttribute("items", results.getCitations());
+       // model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
@@ -87,25 +87,25 @@ public class GroupItemsController {
         model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sort", sort);
-        model.addAttribute("results", results);
-        // more than 200 really don't make sense here, this needs to be changed
-        try {
-            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
-        } catch(GroupDoesNotExistException e) {
-            logger.error("Exception occured", e);
-            return "error/404";
-        }
-        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
-        List<String> shownColumns = new ArrayList<>();
-        if (columns != null && columns.length > 0) {
-            for (String column : columns) {
-                if (allowedColumns.contains(column)) {
-                    shownColumns.add(column);
-                }
-            }
-        }
-        model.addAttribute("columns", shownColumns);
-        model.addAttribute("availableColumns", allowedColumns);
+//        model.addAttribute("results", results);
+//        // more than 200 really don't make sense here, this needs to be changed
+//        try {
+//            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
+//        } catch(GroupDoesNotExistException e) {
+//            logger.error("Exception occured", e);
+//            return "error/404";
+//        }
+//        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
+//        List<String> shownColumns = new ArrayList<>();
+//        if (columns != null && columns.length > 0) {
+//            for (String column : columns) {
+//                if (allowedColumns.contains(column)) {
+//                    shownColumns.add(column);
+//                }
+//            }
+//        }
+//        model.addAttribute("columns", shownColumns);
+//        model.addAttribute("availableColumns", allowedColumns);
         model.addAttribute("concepts", conceptManager.findAll(user));
         model.addAttribute("selectedConceptIds", Arrays.asList(conceptIds));
         

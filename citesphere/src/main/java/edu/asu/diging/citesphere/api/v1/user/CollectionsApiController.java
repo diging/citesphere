@@ -51,9 +51,7 @@ public class CollectionsApiController extends V1Controller {
     @Autowired
     private JsonUtil jsonUtil;
 
-    @RequestMapping(value = { "/groups/{zoteroGroupId}/collections",
-            "/groups/{zoteroGroupId}/collections/{collectionId}/collections" }, produces = {
-                    MediaType.APPLICATION_JSON_VALUE })
+    @RequestMapping(value = { "/groups/{zoteroGroupId}/collections", "/groups/{zoteroGroupId}/collections/{collectionId}/collections" }, produces = {MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<Collections> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
             @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = false) String collectionId,

@@ -2,7 +2,7 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.stream.Collectors;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -20,14 +20,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import edu.asu.diging.citesphere.core.search.service.SearchEngine;
 import edu.asu.diging.citesphere.core.search.service.impl.ResultPage;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
-import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
-import edu.asu.diging.citesphere.web.BreadCrumb;
-import edu.asu.diging.citesphere.web.BreadCrumbType;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
 @Controller
 @PropertySource("classpath:/config.properties")
+@PropertySource("classpath:/item_type_icons.properties")
+@PropertySource("classpath:/labels.properties")
 public class SearchController {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -43,9 +45,12 @@ public class SearchController {
 
     @Value("${_available_item_columns}")
     private String availableColumns;
+    
+    @Autowired
+    private Environment env;
 
     @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search" })
-    public String search(@PathVariable String zoteroGroupId,
+    public  @ResponseBody  String search(@PathVariable String zoteroGroupId,
             @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
             @RequestParam(defaultValue = "0", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
@@ -70,35 +75,58 @@ public class SearchController {
             logger.warn("Trying to access invalid page number: " + page);
         }
         
+//        pageInt = pageInt > 0 ? pageInt : 1;
+//
+//        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
+//
+//        model.addAttribute("searchTerm", searchTerm);
+//        model.addAttribute("items", citations.getResults());
+//        model.addAttribute("totalPages", Math.max(1, citations.getTotalPages()));
+//        model.addAttribute("total", citations.getTotalResults());
+//        model.addAttribute("currentPage", pageInt);
+//        model.addAttribute("zoteroGroupId", zoteroGroupId);
+//        model.addAttribute("group", groupManager.getGroup(user, zoteroGroupId));
+//        model.addAttribute("sort", sort);
         pageInt = pageInt > 0 ? pageInt : 1;
+        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt - 1, 50);
 
-        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
+        SearchItemsDataDto searchItemsData = new SearchItemsDataDto();
+        searchItemsData.setSearchTerm(searchTerm);
+        searchItemsData.setCurrentPage(pageInt);
+        searchItemsData.setCitationsData(citations.getResults().stream().map(c -> new CitationsDto(c,
+                env.getProperty(c.getItemType() + "_label"), env.getProperty(c.getItemType() + "_icon")))
+                .collect(Collectors.toList()));
+        searchItemsData.setTotalPages(Math.max(1, citations.getTotalPages()));
+        searchItemsData.setZoteroGroupId(zoteroGroupId);
+        searchItemsData.setSort(sort);
+        searchItemsData.setTotalResults(citations.getTotalResults());
+        searchItemsData.setGroup(group);
 
-        model.addAttribute("searchTerm", searchTerm);
-        model.addAttribute("items", citations.getResults());
-        model.addAttribute("totalPages", Math.max(1, citations.getTotalPages()));
-        model.addAttribute("total", citations.getTotalResults());
-        model.addAttribute("currentPage", pageInt);
-        model.addAttribute("zoteroGroupId", zoteroGroupId);
-        model.addAttribute("group", groupManager.getGroup(user, zoteroGroupId));
-        model.addAttribute("sort", sort);
-
-        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
+        List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));
+        //List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();
         if (columns != null && columns.length > 0) {
             for (String column : columns) {
-                if (allowedColumns.contains(column)) {
+                if (availableColumnsList.contains(column)) {
                     shownColumns.add(column);
                 }
             }
         }
-        model.addAttribute("columns", shownColumns);
-        model.addAttribute("availableColumns", allowedColumns);
+        searchItemsData.setShownColumns(shownColumns);
+        searchItemsData.setAvailableColumnsData(availableColumnsList.stream()
+                .map(c -> new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_" + c)))
+                .collect(Collectors.toList()));
 
-        List<BreadCrumb> breadCrumbs = new ArrayList<>();
-        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
-        Collections.reverse(breadCrumbs);
-        model.addAttribute("breadCrumbs", breadCrumbs);
-        return "auth/group/items";
+        Gson gson = new Gson();
+
+        return gson.toJson(searchItemsData, SearchItemsDataDto.class);
+//        model.addAttribute("columns", shownColumns);
+//        model.addAttribute("availableColumns", availableColumnsList);
+//
+//        List<BreadCrumb> breadCrumbs = new ArrayList<>();
+//        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
+//        Collections.reverse(breadCrumbs);
+//        model.addAttribute("breadCrumbs", breadCrumbs);
+//        return "auth/group/items";
     }
 }
