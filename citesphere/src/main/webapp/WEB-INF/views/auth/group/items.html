@@ -420,7 +420,7 @@ function pollStatus(){
 }
 function getCurrentItemsData(parameter){
 	let pageNumber = $(".page-item.active").text();
-	//console.log(parameter);
+	console.log(parameter);
 	$.ajax({
 		type: "GET",
 		url: "items/data?page="+pageNumber+"&columns=" + shownColumns,
@@ -438,7 +438,7 @@ function getCurrentItemsData(parameter){
 				addCheckboxesEventListeners();
 				addMoveItemListeners();
 				totalpages=data['totalPages'];
-				//console.log("tot "+totalpages);
+				console.log("tot "+totalpages);
 				showPages(data['totalPages'], data['currentPage']);
 				console.log("set page: " + $(".page-item.active").text());
 				}
@@ -537,6 +537,8 @@ function getCurrentItemsData(parameter){
 		 $("#items-table tbody").replaceWith(tablebody);
 		 $("#total-records").text(data['totalResults']);
 		  prevdata=data;
+		  console.log(prevdata);
+
 	}
 
 	function rewriteCollectionsList(data){
@@ -552,6 +554,7 @@ function getCurrentItemsData(parameter){
 			unOrderedList.append(list);
 		 }
 		 $("#collectionsDiv ul").replaceWith(unOrderedList);
+		 console.log(data);
 	}
 
 	function rewriteGroupInfo(data) {
