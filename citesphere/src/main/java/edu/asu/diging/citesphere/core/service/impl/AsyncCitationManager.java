@@ -35,6 +35,9 @@ public class AsyncCitationManager implements IAsyncCitationManager {
 
     @Autowired
     private AsyncDeleteCitationsProcessor asyncDeleteCitationsProcessor;
+    
+    @Autowired
+    private CitationManager citationManager;
 
     private final Map<String, Future<ZoteroUpdateItemsStatuses>> updateTaskTracker;
     private final Map<String, Future<Map<ItemDeletionResponse, List<String>>>> deleteTaskTracker;
@@ -164,7 +167,16 @@ public class AsyncCitationManager implements IAsyncCitationManager {
     public AsyncDeleteCitationsResponse hideCitations(IUser user, String groupId, List<String> citationIdList) {
         String taskId = UUID.randomUUID().toString();
         
-        hiddenItemsSet.addAll(citationIdList);
+//        hiddenItemsSet.addAll(citationIdList);
+        for(String item : citationIdList) {
+            try {
+            ICitation citation = citationManager.getCitation(user, groupId, item); 
+            citationManager.updateCitation(user, groupId, citation);
+            }
+            catch(Exception ex) {
+               
+            }
+        }
         AsyncDeleteCitationsResponse asyncResponse = new AsyncDeleteCitationsResponse();
         asyncResponse.setTaskID(taskId);
         asyncResponse.setTaskStatus(AsyncTaskStatus.COMPLETE);

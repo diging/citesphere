@@ -372,24 +372,26 @@ public class CitationManager implements ICitationManager {
             }
         } else {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
-                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds);
+                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds, false);
             if (groupOptional.isPresent()) {
                 total = groupOptional.get().getNumItems();
             } else {
                 total = citations.size();
             }
         }
-        HashSet<String> hiddenItemSet = asyncCitationManager.getHiddenItemsList();
-        List<ICitation> finalCitations = new ArrayList<>();
-        for(ICitation citation : citations) {
-            if(!hiddenItemSet.contains(citation.getKey())) {
-                finalCitations.add(citation); 
-            }
-            else {
-                total--;
-            }
-        }
-        results.setCitations(finalCitations);
+        
+        results.setCitations(citations != null ? citations : new ArrayList<>());
+//        HashSet<String> hiddenItemSet = asyncCitationManager.getHiddenItemsList();
+//        List<ICitation> finalCitations = new ArrayList<>();
+//        for(ICitation citation : citations) {
+//            if(!hiddenItemSet.contains(citation.getKey())) {
+//                finalCitations.add(citation); 
+//            }
+//            else {
+//                total--;
+//            }
+//        }
+//        results.setCitations(finalCitations);
         results.setTotalResults(total);
         return results;
 
