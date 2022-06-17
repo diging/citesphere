@@ -171,7 +171,7 @@ public class AsyncCitationManager implements IAsyncCitationManager {
         for(String item : citationIdList) {
             try {
             ICitation citation = citationManager.getCitation(user, groupId, item);
-            citation.setHidden(true);
+            citation.setRemoved(1);
             citationManager.updateCitation(user, groupId, citation);
             }
             catch(Exception ex) {
