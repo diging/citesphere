@@ -372,7 +372,7 @@ public class CitationManager implements ICitationManager {
             }
         } else {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
-                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds, false);
+                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds);
             if (groupOptional.isPresent()) {
                 total = groupOptional.get().getNumItems();
             } else {
