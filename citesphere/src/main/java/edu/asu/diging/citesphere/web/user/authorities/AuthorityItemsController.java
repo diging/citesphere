@@ -34,9 +34,9 @@ public class AuthorityItemsController {
         iCitationDao.getCitationIterator("authorityId", authorityId);
 	Citations citations = iCitationDao.findCitatationByName(entry.getName());
 	if (citations != null) {
-	   model.addAttribute("items", citations.getCitations());
+		model.addAttribute("items", citations.getCitations());
 	} else {
-	   model.addAttribute("items", new ArrayList<ICitation>());
+		model.addAttribute("items", new ArrayList<ICitation>());
 	}
 	return "auth/authorities/showItemsByName";
     }
