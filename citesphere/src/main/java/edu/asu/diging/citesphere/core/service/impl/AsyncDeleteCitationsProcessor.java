@@ -32,6 +32,9 @@ public class AsyncDeleteCitationsProcessor {
 
     @Autowired
     private ICitationStore citationStore;
+    
+    @Autowired
+    private CitationManager citationManager;
 
     @Async
     public Future<Map<ItemDeletionResponse, List<String>>> deleteCitations(IUser user, String groupId,
@@ -57,5 +60,19 @@ public class AsyncDeleteCitationsProcessor {
             }
         });
         return result;
+    }
+    
+    public void hideCitations(IUser user, String groupId, List<String> citationIdList) {
+        for(String item : citationIdList) {
+            try {
+            ICitation citation = citationManager.getCitation(user, groupId, item);
+            citation.setRemoved(1);
+            citationManager.updateCitation(user, groupId, citation);
+//            citationStore.save(citation);
+            }
+            catch(Exception ex) {
+                logger.error("Error while hiding citations.", ex);
+            }
+        }
     }
 }

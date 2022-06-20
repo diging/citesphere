@@ -318,6 +318,7 @@ public class ZoteroManager implements IZoteroManager {
         itemTypeFields.add(ZoteroFields.VERSION);
         itemTypeFields.add(ZoteroFields.ITEM_TYPE);
         itemTypeFields.add(ZoteroFields.CREATOR);
+        itemTypeFields.add(ZoteroFields.HIDDEN);
         
 
         List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, false);
@@ -520,6 +521,7 @@ public class ZoteroManager implements IZoteroManager {
         for (CreatorType type : creatorTypes) {
             validTypes.add(type.getCreatorType());
         }
+        validTypes.add("remove");
         return validTypes;
     }
 

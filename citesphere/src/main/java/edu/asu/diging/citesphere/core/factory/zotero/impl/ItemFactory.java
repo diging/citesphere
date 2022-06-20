@@ -69,6 +69,7 @@ public class ItemFactory implements IItemFactory {
         data.setVolume(citation.getVolume());
         data.setVersion(citation.getVersion());
         data.setCollections(collectionIds);
+        data.setRemoved(citation.getRemoved());
 
         data.setCreators(new ArrayList<>());
         citation.getAuthors().forEach(a -> {
