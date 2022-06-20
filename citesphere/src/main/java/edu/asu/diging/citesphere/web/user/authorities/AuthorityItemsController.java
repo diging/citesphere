@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.web.user.authorities;
 
 import java.util.ArrayList;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -31,15 +30,14 @@ public class AuthorityItemsController {
     @RequestMapping("/auth/authority/{authorityId}/items")
     public String showPage(Model model, @PathVariable("authorityId") String authorityId, Authentication authentication)
     		throws GroupDoesNotExistException, ZoteroHttpStatusException {
-        IAuthorityEntry entry = authorityService.find(authorityId);
-        iCitationDao.getCitationIterator("authorityId", authorityId);
-        Citations citations=iCitationDao.findCitatationByName(entry.getName());
-        if(citations!=null) {
-        	model.addAttribute("items", citations.getCitations());
-        }
-        else {
-        	model.addAttribute("items", new ArrayList<ICitation>());
-        }
-        return "auth/authorities/showItemsByName";
+		IAuthorityEntry entry = authorityService.find(authorityId);
+		iCitationDao.getCitationIterator("authorityId", authorityId);
+		Citations citations = iCitationDao.findCitatationByName(entry.getName());
+		if (citations != null) {
+			model.addAttribute("items", citations.getCitations());
+		} else {
+			model.addAttribute("items", new ArrayList<ICitation>());
+		}
+		return "auth/authorities/showItemsByName";
     }
 }
