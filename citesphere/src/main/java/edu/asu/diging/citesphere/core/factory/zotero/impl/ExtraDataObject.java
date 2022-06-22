@@ -27,6 +27,8 @@ public class ExtraDataObject {
     private Set<IReference> references;
     
     private Set<IGilesUpload> gilesUploads;
+    
+    private int remove;
 
     public Set<ICreator> getOtherCreators() {
         return otherCreators;
@@ -74,6 +76,14 @@ public class ExtraDataObject {
 
     public void setGilesUploads(Set<IGilesUpload> gilesUploads) {
         this.gilesUploads = gilesUploads;
+    }
+    
+    public int getRemoved() {
+        return remove;
+    }
+    
+    public void setRemoved(int remove) {
+        this.remove = remove;
     }
 
 }
