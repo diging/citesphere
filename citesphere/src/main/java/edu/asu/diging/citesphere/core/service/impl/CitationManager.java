@@ -373,11 +373,7 @@ public class CitationManager implements ICitationManager {
         } else {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
                 (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds);
-            if (groupOptional.isPresent()) {
-                total = groupOptional.get().getNumItems();
-            } else {
-                total = citations.size();
-            }
+            total = citations.size();
         }
         
         results.setCitations(citations != null ? citations : new ArrayList<>());

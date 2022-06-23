@@ -333,7 +333,6 @@ public class ZoteroManager implements IZoteroManager {
         Item updatedMetaData = null;
         //If the metadata note already exists, update it or else create a new note
         itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
-        itemTypeFields.add(ZoteroFields.HIDDEN);
         if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
             itemTypeFields.add(ZoteroFields.KEY);
             itemTypeFields.add(ZoteroFields.VERSION);
