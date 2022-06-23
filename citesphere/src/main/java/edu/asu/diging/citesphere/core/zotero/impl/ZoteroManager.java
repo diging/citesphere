@@ -318,7 +318,6 @@ public class ZoteroManager implements IZoteroManager {
         itemTypeFields.add(ZoteroFields.VERSION);
         itemTypeFields.add(ZoteroFields.ITEM_TYPE);
         itemTypeFields.add(ZoteroFields.CREATOR);
-        itemTypeFields.add(ZoteroFields.HIDDEN);
         
 
         List<String> ignoreFields = createIgnoreFields(itemTypeFields, item, false);
@@ -334,6 +333,7 @@ public class ZoteroManager implements IZoteroManager {
         Item updatedMetaData = null;
         //If the metadata note already exists, update it or else create a new note
         itemTypeFields = getItemTypeFields(user, ItemType.NOTE);
+        itemTypeFields.add(ZoteroFields.HIDDEN);
         if (metaData.getKey() != null && !metaData.getKey().isEmpty()) {
             itemTypeFields.add(ZoteroFields.KEY);
             itemTypeFields.add(ZoteroFields.VERSION);
@@ -521,7 +521,6 @@ public class ZoteroManager implements IZoteroManager {
         for (CreatorType type : creatorTypes) {
             validTypes.add(type.getCreatorType());
         }
-        validTypes.add("remove");
         return validTypes;
     }
 

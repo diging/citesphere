@@ -62,13 +62,13 @@ public class AsyncDeleteCitationsProcessor {
         return result;
     }
     
+    @Async
     public void hideCitations(IUser user, String groupId, List<String> citationIdList) {
         for(String item : citationIdList) {
             try {
-            ICitation citation = citationManager.getCitation(user, groupId, item);
-            citation.setRemoved(1);
-            citationManager.updateCitation(user, groupId, citation);
-//            citationStore.save(citation);
+                ICitation citation = citationManager.getCitation(user, groupId, item);
+                citation.setHidden(1);
+                citationManager.updateCitation(user, groupId, citation);
             }
             catch(Exception ex) {
                 logger.error("Error while hiding citations.", ex);

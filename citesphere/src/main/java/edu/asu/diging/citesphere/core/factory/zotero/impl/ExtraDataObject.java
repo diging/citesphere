@@ -28,7 +28,7 @@ public class ExtraDataObject {
     
     private Set<IGilesUpload> gilesUploads;
     
-    private int remove;
+    private int hidden;
 
     public Set<ICreator> getOtherCreators() {
         return otherCreators;
@@ -78,12 +78,12 @@ public class ExtraDataObject {
         this.gilesUploads = gilesUploads;
     }
     
-    public int getRemoved() {
-        return remove;
+    public int getHidden() {
+        return hidden;
     }
     
-    public void setRemoved(int remove) {
-        this.remove = remove;
+    public void setHidden(int hidden) {
+        this.hidden = hidden;
     }
 
 }

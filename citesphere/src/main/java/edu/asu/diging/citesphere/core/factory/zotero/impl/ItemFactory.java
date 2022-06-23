@@ -69,7 +69,6 @@ public class ItemFactory implements IItemFactory {
         data.setVolume(citation.getVolume());
         data.setVersion(citation.getVersion());
         data.setCollections(collectionIds);
-        data.setRemoved(citation.getRemoved());
 
         data.setCreators(new ArrayList<>());
         citation.getAuthors().forEach(a -> {
@@ -167,14 +166,13 @@ public class ItemFactory implements IItemFactory {
         data.setVersion(citation.getMetaDataItemVersion());
         data.setItemType(ItemType.NOTE.getZoteroKey());
         data.setParentItem(citation.getKey());
-//        data.setRemoved(citation.getRemoved());
 
         ExtraDataObject extraDataObject = new ExtraDataObject();
         extraDataObject.setAuthors(citation.getAuthors());
         extraDataObject.setEditors(citation.getEditors());
         extraDataObject.setOtherCreators(citation.getOtherCreators());
         extraDataObject.setGilesUploads(citation.getGilesUploads());
-        extraDataObject.setRemoved(citation.getRemoved());
+        extraDataObject.setHidden(citation.getHidden());
         
         if (citation.getConceptTags() != null) {
             extraDataObject.setConceptTags(citation.getConceptTags());

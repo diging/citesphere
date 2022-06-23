@@ -381,17 +381,6 @@ public class CitationManager implements ICitationManager {
         }
         
         results.setCitations(citations != null ? citations : new ArrayList<>());
-//        HashSet<String> hiddenItemSet = asyncCitationManager.getHiddenItemsList();
-//        List<ICitation> finalCitations = new ArrayList<>();
-//        for(ICitation citation : citations) {
-//            if(!hiddenItemSet.contains(citation.getKey())) {
-//                finalCitations.add(citation); 
-//            }
-//            else {
-//                total--;
-//            }
-//        }
-//        results.setCitations(finalCitations);
         results.setTotalResults(total);
         return results;
 

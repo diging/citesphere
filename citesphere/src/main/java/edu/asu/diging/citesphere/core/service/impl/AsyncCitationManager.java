@@ -158,7 +158,6 @@ public class AsyncCitationManager implements IAsyncCitationManager {
     public AsyncDeleteCitationsResponse hideCitations(IUser user, String groupId, List<String> citationIdList) {
         String taskId = UUID.randomUUID().toString();
         
-//        hiddenItemsSet.addAll(citationIdList);
         asyncDeleteCitationsProcessor.hideCitations(user, groupId, citationIdList);
         AsyncDeleteCitationsResponse asyncResponse = new AsyncDeleteCitationsResponse();
         asyncResponse.setTaskID(taskId);
