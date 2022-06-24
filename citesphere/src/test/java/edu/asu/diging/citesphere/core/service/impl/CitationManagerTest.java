@@ -51,9 +51,6 @@ public class CitationManagerTest {
     @Mock
     private ICitationDao citationDao;
     
-    @Mock
-    private AsyncCitationManager asyncCitationManager;
-    
     @InjectMocks
     private CitationManager managerToTest;
     

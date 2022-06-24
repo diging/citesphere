@@ -3,7 +3,6 @@ package edu.asu.diging.citesphere.core.service.impl;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,9 +83,6 @@ public class CitationManager implements ICitationManager {
 
     @Autowired
     private IAsyncCitationProcessor asyncCitationProcessor;
-    
-    @Autowired
-    private AsyncCitationManager asyncCitationManager;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
@@ -373,7 +369,11 @@ public class CitationManager implements ICitationManager {
         } else {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
                 (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds);
-            total = citations.size();
+            if (groupOptional.isPresent()) {
+                total = groupOptional.get().getNumItems();
+            } else {
+                total = citations.size();
+            }
         }
         
         results.setCitations(citations != null ? citations : new ArrayList<>());

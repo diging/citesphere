@@ -1,6 +1,5 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
