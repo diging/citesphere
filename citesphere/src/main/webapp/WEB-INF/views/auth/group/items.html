@@ -855,7 +855,25 @@ $(".list-group-item").droppable( {
 		
 });
 }	
-
+function onPageClick(){
+	 var key = $("#search").val();
+   if (key != undefined && key != '') {
+   	let pageNumber = $(".page-item.active").text();
+       $.ajax({
+   		type: "GET",
+   		url: "search?searchTerm="+key+"&columns=" + shownColumns+"&page=" + pageNumber,
+   		dataType: "json",
+   		success: function (data){
+   			rewriteCitationsTable(data);
+   			rewriteColumnsList(data);
+				addEventListeners();
+				showPages(data['totalPages'], data['currentPage']);
+   		}
+   	});
+    } else {
+       getCurrentItemsData("requestingNewPage");
+   }
+}
 function pollMovedItemsStatuses(response,collectionName, collectionHTMLElement, collectionId){
 $.ajax({
 	type: 'GET',
