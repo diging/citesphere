@@ -36,7 +36,8 @@ $(function() {
 	    
 	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
 	  })
-
+		totalpages = "${total/_zotero_page_size}";
+		console.log("Tot pages:" +totalpages);
 		addEventListeners();
 		console.log("firstload");
 		getCurrentItemsData("onFirstLoad");
@@ -65,6 +66,7 @@ function onPageClickFunction(){
 	 var key = $("#search").val();
     if (key != undefined && key != '') {
     	let pageNumber = $(".page-item.active").text();
+    	console.log("pagenumber from onclick:"+pageNumber);
         $.ajax({
     		type: "GET",
     		url: "search?searchTerm="+key+"&columns=" + shownColumns+"&page=" + pageNumber,
@@ -248,6 +250,22 @@ function filterConcept(searchText) {
 	});
 }
 
+function onPageClick(page){
+
+   	//let pageNumber = $(".page-item.active").text();
+   	console.log("pagenumber from onclick:"+page);
+       $.ajax({
+   		type: "GET",
+   		url: "search?searchTerm="+key+"&columns=" + shownColumns+"&page=" + page,
+   		dataType: "json",
+   		success: function (data){
+   			rewriteCitationsTable(data);
+   			rewriteColumnsList(data);
+				addEventListeners();
+   		}
+});
+}
+
 function getSearchResults(key){
 	$.ajax({
 		type: "GET",
@@ -429,7 +447,8 @@ function getCurrentItemsData(parameter){
 			if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
 				console.log("requested page: " + pageNumber);
 				console.log("response page: " + data['currentPage']);
-				console.log("pagination page: " + $(".page-item.active").text());
+				let page = $(".page-item.active").text();
+				console.log("pagination page: " + page);
 				rewriteCitationsTable(data);
 				rewriteCollectionsList(data);
 				rewriteGroupInfo(data);
@@ -439,8 +458,9 @@ function getCurrentItemsData(parameter){
 				addMoveItemListeners();
 				totalpages=data['totalPages'];
 				console.log("tot "+totalpages);
-				showPages(data['totalPages'], data['currentPage']);
-				console.log("set page: " + $(".page-item.active").text());
+				currentpage = data['currentPage'];
+				//showPages(data['totalPages'], data[page]);
+				//console.log("set page: " + $(".page-item.active").text());
 				}
 			}
 	});
@@ -855,25 +875,7 @@ $(".list-group-item").droppable( {
 		
 });
 }	
-function onPageClick(){
-	 var key = $("#search").val();
-   if (key != undefined && key != '') {
-   	let pageNumber = $(".page-item.active").text();
-       $.ajax({
-   		type: "GET",
-   		url: "search?searchTerm="+key+"&columns=" + shownColumns+"&page=" + pageNumber,
-   		dataType: "json",
-   		success: function (data){
-   			rewriteCitationsTable(data);
-   			rewriteColumnsList(data);
-				addEventListeners();
-				showPages(data['totalPages'], data['currentPage']);
-   		}
-   	});
-    } else {
-       getCurrentItemsData("requestingNewPage");
-   }
-}
+
 function pollMovedItemsStatuses(response,collectionName, collectionHTMLElement, collectionId){
 $.ajax({
 	type: 'GET',
