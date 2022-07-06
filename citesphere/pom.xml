@@ -24,7 +24,7 @@
         <javers.version>6.2.3</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
         <spring-social-zotero.version>0.12</spring-social-zotero.version>
-        <citesphere.messages.version>0.4</citesphere.messages.version>
+        <citesphere.messages.version>0.5</citesphere.messages.version>
         <citesphere.model.version>1.17</citesphere.model.version>
         <crossref-connect-version>0.1</crossref-connect-version>
 

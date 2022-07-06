@@ -17,7 +17,7 @@ import edu.asu.diging.crossref.service.CrossrefWorksService;
 import edu.asu.diging.crossref.service.impl.CrossrefWorksServiceImpl;
 
 @Service
-@PropertySource("config.properties")
+@PropertySource("classpath:config.properties")
 public class CrossrefServiceImpl implements CrossrefService {
     
     @Value("${_crossref_default_pagesize}")

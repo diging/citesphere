@@ -1,0 +1,105 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<script th:inline="javascript">
+//@ sourceURL=submit.js
+var selectedDois = new Set();
+
+$(function() {
+	$("#searchButton").click(function(e) {
+		e.preventDefault();
+		$.ajax({
+            type: 'GET',
+            url: [[@{|/auth/import/crossref/search|}]] + "?page=1&query=" + $("#searchQuery").val(),
+            async: false,
+            success: function(data) {
+            	var container = $("#resultsContainer");
+                data.forEach(function(result) {
+                	var panel = $('<div class="panel panel-default"></div>');
+                	var item = $('<div class="panel-body"></>');
+                	panel.append(item);
+                	var checkbox = $('<input class="reference" data-doi="' + result.DOI + '" type="checkbox" style="margin-right: 7px;" /> ');
+                	item.append(checkbox);
+                	checkbox.click(function() {
+                		updateButton(checkbox);
+                	});
+                	item.append(result.title);
+                	container.append(panel);
+                });
+            }
+        });
+	});
+	
+	$("#importBtn").click(function(e)  {
+		e.preventDefault();
+		console.log(Array.from(selectedDois.values()));
+		var group = $("#groupSelect").val()
+		$.ajax({
+            type: 'POST',
+            url: [[@{|/auth/import/crossref|}]],
+            dataType: "json",
+            data: {
+            	[[${_csrf.parameterName}]]: [[${_csrf.token}]],
+            	"groupId": group,
+            	"dois": Array.from(selectedDois.values()),
+            },
+            success: function(data) {
+            	console.print("success");
+            }
+        })
+	});
+});
+
+function updateButton(checkbox) {
+	var doi = checkbox.data("doi");
+	var selected = checkbox.prop("checked");
+	if (selected) {
+		selectedDois.add(doi);
+	} else {
+		selectedDois.delete(doi);
+	}
+	
+	$("#importBtn").text("Import Selected (" + selectedDois.size +  ")");
+}
+</script>
+<style>
+	#searchButton {
+	    cursor: pointer;
+	}
+</style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+        <h2>Import from Crossref</h2>
+        <form>
+	        <div class="form-group">
+			    <div class="input-group">
+			      <input class="form-control" id="searchQuery" name="searchQuery" />
+			      <div id="searchButton" class="input-group-addon">Search</div>
+			    </div>
+			</div>
+        </form>
+        
+        <h2>Results</h2>
+        <div id="resultsContainer"></div>
+        
+        <div>
+            <p>
+            Import into Group: 
+            <select id="groupSelect" class="form-control">
+            <option th:each="group : ${groups}" th:value="${group.groupId}" th:text="${group.name}">
+            </select>
+            </p>
+            <p>
+            <button id="importBtn" class="btn btn-primary">Import Selected</button>
+            </p>
+        </div>
+        </div>
+        
+    </div>
+    </div>
+</div>
+</body>
+</html>

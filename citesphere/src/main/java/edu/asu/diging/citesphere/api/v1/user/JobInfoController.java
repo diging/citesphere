@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.core.export.IExportTaskManager;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
 import edu.asu.diging.citesphere.core.model.export.IExportTask;
 import edu.asu.diging.citesphere.core.model.jobs.IExportJob;
+import edu.asu.diging.citesphere.core.model.jobs.IImportCrossrefJob;
 import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
@@ -62,15 +64,17 @@ public class JobInfoController extends BaseJobInfoController {
         // FIXME: ugly, needs better solution
         if (job instanceof IUploadJob) {
             node.put("groupId", ((IUploadJob)job).getCitationGroup());
-        }
-        if (job instanceof IExportJob) {
+        } else if (job instanceof IExportJob) {
             IExportTask exportTask = exportTaskManager.get(((IExportJob)job).getTaskId());
             node.put("groupId", exportTask.getGroupId());
             node.put("collectionId", exportTask.getCollectionId());
             node.put("exportType", exportTask.getExportType().name());
             node.put("taskId", exportTask.getId());
+        } else if (job instanceof IImportCrossrefJob) {
+            ArrayNode doisNode = mapper.createArrayNode();
+            ((IImportCrossrefJob)job).getDois().forEach(d -> doisNode.add(d));
+            node.set("dois", doisNode);
         }
-        
         
         return new ResponseEntity<>(node.toString(), HttpStatus.OK);
     }
