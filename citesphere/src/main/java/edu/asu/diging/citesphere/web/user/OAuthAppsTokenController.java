@@ -30,4 +30,14 @@ public class OAuthAppsTokenController {
         model.addAttribute("clientList",clientManager.getClientsDetails(clientList));
         return "auth/tokens";
     }    
+    
+    @RequestMapping(value="/auth/personalToken", method=RequestMethod.GET)
+    public String getPersonalAccessToken(Authentication authentication, Model model) {
+//        List<DbAccessToken> tokens = tokenStore.findTokensByUserName(authentication.getName());
+//        List<String> clientList = new ArrayList<>();
+//        tokens.forEach(t -> clientList.add(t.getClientId()));
+//        model.addAttribute("clientList",clientManager.getClientsDetails(clientList));
+        return "auth/personalToken";
+    }
+    
 }
