@@ -11,7 +11,7 @@
     <properties>
         <org.slf4j-version>1.7.32</org.slf4j-version>
         <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
-        <spring-security-version>5.3.3.RELEASE</spring-security-version>
+        <spring-security-version>5.3.10.RELEASE</spring-security-version>
         <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
         <spring-elasticsearch.version>3.2.12.RELEASE</spring-elasticsearch.version>
@@ -23,9 +23,9 @@
 
         <javers.version>6.2.3</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
-        <spring-social-zotero.version>0.11</spring-social-zotero.version>
+        <spring-social-zotero.version>0.12</spring-social-zotero.version>
         <citesphere.messages.version>0.4</citesphere.messages.version>
-        <citesphere.model.version>1.14</citesphere.model.version>
+        <citesphere.model.version>1.17</citesphere.model.version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -376,7 +376,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.16</version>
+            <version>8.0.28</version>
         </dependency>
 
         <dependency>
