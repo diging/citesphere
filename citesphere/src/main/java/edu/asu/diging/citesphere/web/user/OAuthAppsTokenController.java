@@ -33,10 +33,11 @@ public class OAuthAppsTokenController {
     
     @RequestMapping(value="/auth/personalToken", method=RequestMethod.GET)
     public String getPersonalAccessToken(Authentication authentication, Model model) {
-//        List<DbAccessToken> tokens = tokenStore.findTokensByUserName(authentication.getName());
-//        List<String> clientList = new ArrayList<>();
-//        tokens.forEach(t -> clientList.add(t.getClientId()));
-//        model.addAttribute("clientList",clientManager.getClientsDetails(clientList));
+        List<DbAccessToken> tokens = tokenStore.findTokensByUserName(authentication.getName());
+        if (tokens.size() > 0) {
+            clientManager.savePersonalAccessToken(tokens.get(0).getToken(), authentication.getName());
+        }
+        
         return "auth/personalToken";
     }
     

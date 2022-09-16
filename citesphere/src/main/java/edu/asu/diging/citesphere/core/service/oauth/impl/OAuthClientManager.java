@@ -29,11 +29,14 @@ import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
+import edu.asu.diging.citesphere.core.repository.PersonalAccessTokenRepository;
 
 @Transactional
 public class OAuthClientManager implements ClientDetailsService, IOAuthClientManager {
 
     private OAuthClientRepository clientRepo;
+    
+    private PersonalAccessTokenRepository personalAccessTokenRepository;
     
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     
@@ -128,5 +131,11 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
             clients = clientRepo.findAllById(clientList);
         }
         return clients;
+    }
+
+    @Override
+    public boolean savePersonalAccessToken(String token, String username){
+        personalAccessTokenRepository.save(bCryptPasswordEncoder.encode(username + "|" + token));
+        return true;
     }
 }
