@@ -41,6 +41,10 @@ public class GilesDocumentController {
     @Autowired
     private ICitationManager citationManager;
     
+    private IGilesUpload gilesUpload;
+    
+    private IGilesFile gilesFile;
+    
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/giles/{fileId}")
     public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication) {
         
@@ -85,15 +89,16 @@ public class GilesDocumentController {
     
     private static Stream<Object> generateStream(List<IGilesUpload> uploadOptionalList) {
         
-        Stream<Object> gilesUpload = Stream.generate(new Supplier<Object>() {
+        Stream<Object> gilesUploadStream = Stream.generate(new Supplier<Object>() {
             
             @Override
-            public List<IGilesFile> get() {
+            public IGilesFile get() {
                 List<IGilesFile> gilesFiles = new ArrayList<>();
                 for(IGilesUpload gilesUpload : uploadOptionalList) {
                     
                     gilesFiles.add(gilesUpload.getUploadedFile()); 
                     gilesFiles.add(gilesUpload.getExtractedText());
+                    
                     if(gilesUpload.getPages() != null) {      //Extracting pages 
                         gilesUpload.getPages().forEach(p -> {
                             gilesFiles.add(p.getImage());
@@ -109,6 +114,6 @@ public class GilesDocumentController {
                 return gilesFiles;
             }
         });
-        return gilesUpload;
+        return gilesUploadStream;
     }
 }
