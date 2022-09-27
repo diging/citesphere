@@ -54,7 +54,14 @@ public class GilesDocumentController {
         List<IGilesUpload> uploadOptionalList = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null && u.getDocumentStatus().equals(GilesStatus.COMPLETE)).collect(Collectors.toList());
         
         if(uploadOptionalList.size()!=0) {
-            Stream<Object> gilesFilesStream = generateStream(uploadOptionalList);
+            Stream<Object> gilesFilesStream;
+            
+            for(IGilesUpload gilesUpload : uploadOptionalList) {
+                gilesFilesStream = generateStream(gilesUpload);
+                
+                
+            }
+            
             Object[] gilesFilesArray = gilesFilesStream.limit(1).toArray();
             List<IGilesFile> gilesFiles = (List<IGilesFile>) gilesFilesArray[0];
                 
@@ -116,7 +123,7 @@ public class GilesDocumentController {
 //        return gilesUpload;
 //    }
     
-    private static Stream<Object> generateStream(List<IGilesUpload> uploadOptionalList) {
+    private static Stream<Object> generateStream(IGilesUpload gilesUpload) {
         
         Stream<Object> gilesUploadStream = Stream.generate(new Supplier<Object>() {
             
