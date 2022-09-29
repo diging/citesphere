@@ -27,6 +27,7 @@ import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
 import edu.asu.diging.citesphere.model.bib.GilesStatus;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
+import edu.asu.diging.citesphere.model.bib.impl.GilesPage;
 import edu.asu.diging.citesphere.model.bib.impl.IGilesFile;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -43,7 +44,7 @@ public class GilesDocumentController {
     
     private IGilesUpload gilesUpload;
     
-    private List<IGilesFile> gilesFile;
+    private List<GilesPage> gilesFile;
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/giles/{fileId}")
     public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication) {
@@ -58,6 +59,11 @@ public class GilesDocumentController {
             
             for(IGilesUpload gilesUpload : uploadOptionalList) {
                 gilesFilesStream = generateStream(gilesUpload);
+                
+                gilesFile = gilesUpload.getPages();
+                for(GilesPage gilesPage: gilesFile) {
+                    gilesFilesStream = generateGilesPageStream(gilesPage);
+                }
                 
                 
             }
@@ -131,6 +137,20 @@ public class GilesDocumentController {
             @Override
             public IGilesFile get() {
                     return gilesUpload.getUploadedFile();
+                }
+            
+           });
+        return gilesUploadStream;
+    }
+    
+    private static Stream<Object> generateGilesPageStream(GilesPage gilesPage) {
+        
+        Stream<Object> gilesUploadStream = Stream.generate(new Supplier<Object>() {
+            
+            
+            @Override
+            public IGilesFile get() {
+                    return gilesPage.getImage();
                 }
             
            });
