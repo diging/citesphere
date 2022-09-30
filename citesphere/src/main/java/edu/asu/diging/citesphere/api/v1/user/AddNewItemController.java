@@ -50,14 +50,15 @@ public class AddNewItemController extends V1Controller {
 
     @Autowired
     private ICitationManager citationManager;
-    
+
     @Autowired
     private IUserManager userManager;
-    
+
     @Autowired
     private UploadItemFileController uploadItemFileController;
 
-    @RequestMapping(value = "/items/create/item/{zoteroGroupId}", method = RequestMethod.POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @RequestMapping(value = "/items/create/item/{zoteroGroupId}", method = RequestMethod.POST, consumes = {
+            MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<String> createNewItem(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @ModelAttribute ItemWithGiles itemWithGiles)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
@@ -73,7 +74,7 @@ public class AddNewItemController extends V1Controller {
         }
         citation.setCollections(collectionIds);
         citationHelper.updateCitation(citation, itemWithGiles, user);
-        
+
         try {
             citation = citationManager.createCitation(user, zoteroGroupId, collectionIds, citation);
         } catch (ZoteroItemCreationFailedException e) {

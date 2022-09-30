@@ -183,7 +183,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
     public static class ResourceServerConfigurer extends ResourceServerConfigurerAdapter {
 
         private static final String RESOURCE_ID = "my_rest_api";
-        
+
         @Autowired
         private IPersonalAccessTokenService personalAccessTokenService;
 
@@ -195,9 +195,10 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             TokenAuthenticationFilter tokenFilter = new TokenAuthenticationFilter(personalAccessTokenService);
-            
+
             http.csrf().disable().authorizeRequests().antMatchers("/api/**").authenticated().and().exceptionHandling()
-                    .accessDeniedHandler(new OAuth2AccessDeniedHandler()).and().addFilterBefore(tokenFilter, BasicAuthenticationFilter.class);
+                    .accessDeniedHandler(new OAuth2AccessDeniedHandler()).and()
+                    .addFilterBefore(tokenFilter, BasicAuthenticationFilter.class);
         }
 
     }

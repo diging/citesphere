@@ -16,14 +16,14 @@ public class PersonalAccessTokenManager implements IPersonalAccessTokenManager {
 
     @Autowired
     private PersonalAccessTokenRepository personalAccessTokenRepository;
-    
+
     @Override
-    public void savePersonalAccessToken(String username){
+    public void savePersonalAccessToken(String username) {
         PersonalAccessToken tokenObj = new PersonalAccessToken();
         tokenObj.setUsername(username);
         tokenObj.setToken(Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes()));
         tokenObj.setCreatedOn(OffsetDateTime.now());
-        tokenObj.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
+        tokenObj.setId(UUID.randomUUID().toString() + UUID.randomUUID().toString());
         personalAccessTokenRepository.save(tokenObj);
     }
 }
