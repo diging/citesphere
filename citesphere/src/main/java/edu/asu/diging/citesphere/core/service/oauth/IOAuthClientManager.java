@@ -26,6 +26,4 @@ public interface IOAuthClientManager {
     OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException;
 
     List<OAuthClient> getClientsDetails(List<String> clientList);
-
-    public boolean savePersonalAccessToken(String token, String username);
 }

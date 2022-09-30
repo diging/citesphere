@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import edu.asu.diging.citesphere.api.v1.model.impl.ItemWithGiles;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
@@ -50,6 +51,81 @@ public class CitationHelper implements ICitationHelper {
      */
     @Override
     public void updateCitation(ICitation citation, CitationForm form, IUser user) {
+        citation.setAbstractNote(form.getAbstractNote());
+        citation.setArchive(form.getArchive());
+        citation.setArchiveLocation(form.getArchiveLocation());
+        citation.setCallNumber(form.getCallNumber());
+        citation.setDateFreetext(form.getDateFreetext());
+        citation.setDoi(form.getDoi());
+        citation.setIssn(form.getIssn());
+        citation.setIssue(form.getIssue());
+        citation.setItemType(form.getItemType());
+        citation.setJournalAbbreviation(form.getJournalAbbreviation());
+        citation.setLanguage(form.getLanguage());
+        citation.setLibraryCatalog(form.getLibraryCatalog());
+        citation.setPages(form.getPages());
+        citation.setPublicationTitle(form.getPublicationTitle());
+        citation.setRights(form.getRights());
+        citation.setSeries(form.getSeries());
+        citation.setSeriesText(form.getSeriesText());
+        citation.setSeriesTitle(form.getSeriesTitle());
+        citation.setShortTitle(form.getShortTitle());
+        citation.setTitle(form.getTitle());
+        citation.setUrl(form.getUrl());
+        citation.setVolume(form.getVolume());
+
+        citation.setAuthors(new HashSet<>());
+        if (form.getAuthors() != null) {
+            mapPersonFields(form.getAuthors(), citation.getAuthors());
+        }
+
+        citation.setEditors(new HashSet<>());
+        if (form.getEditors() != null) {
+            mapPersonFields(form.getEditors(), citation.getEditors());
+        }
+
+        citation.setOtherCreators(new HashSet<>());
+        if (form.getOtherCreators() != null) {
+            mapCreatorFields(form.getOtherCreators(), citation.getOtherCreators());
+        }
+
+        citation.setConceptTags(new HashSet<>());
+        if (form.getConceptTags() != null) {
+            for (ConceptAssignmentForm assignment : form.getConceptTags()) {
+                if (assignment.getConceptId() != null && assignment.getConceptTypeId() != null) {
+                    ICitationConceptTag tag = new CitationConceptTag();
+                    ICitationConcept concept = conceptManager.getByUriAndOwner(assignment.getConceptUri(), user);
+                    IConceptType type = typeManager.getByUriAndOwner(assignment.getConceptTypeUri(), user);
+                    if (concept == null) {
+                        concept = new CitationConcept();
+                        concept.setName(assignment.getConceptName());
+                        concept.setUri(assignment.getConceptUri());
+                        concept.setOwner(user);
+                        concept = conceptManager.save(concept);
+                    }
+                    if (type == null) {
+                        type = new ConceptType();
+                        type.setName(assignment.getConceptTypeName());
+                        type.setUri(assignment.getConceptTypeUri());
+                        type.setOwner(user);
+                        type = typeManager.save(type);
+                    }
+
+                    tag.setConceptName(concept.getName());
+                    tag.setConceptUri(concept.getUri());
+                    tag.setLocalConceptId(concept.getId());
+                    tag.setTypeName(type.getName());
+                    tag.setTypeUri(type.getUri());
+                    tag.setLocalConceptTypeId(type.getId());
+
+                    citation.getConceptTags().add(tag);
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void updateCitation(ICitation citation, ItemWithGiles form, IUser user) {
         citation.setAbstractNote(form.getAbstractNote());
         citation.setArchive(form.getArchive());
         citation.setArchiveLocation(form.getArchiveLocation());

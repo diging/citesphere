@@ -11,9 +11,9 @@ public interface IPersonalAccessToken {
 
     public void setId(String id);
 
-    public OAuth2AccessToken getToken();
+    public String getToken();
 
-    public void setToken(OAuth2AccessToken token);
+    public void setToken(String token);
     
     public String getUsername();
 

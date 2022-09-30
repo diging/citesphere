@@ -30,15 +30,4 @@ public class OAuthAppsTokenController {
         model.addAttribute("clientList",clientManager.getClientsDetails(clientList));
         return "auth/tokens";
     }    
-    
-    @RequestMapping(value="/auth/personalToken", method=RequestMethod.GET)
-    public String getPersonalAccessToken(Authentication authentication, Model model) {
-        List<DbAccessToken> tokens = tokenStore.findTokensByUserName(authentication.getName());
-        if (tokens.size() > 0) {
-            clientManager.savePersonalAccessToken(tokens.get(0).getToken(), authentication.getName());
-        }
-        
-        return "auth/personalToken";
-    }
-    
 }
