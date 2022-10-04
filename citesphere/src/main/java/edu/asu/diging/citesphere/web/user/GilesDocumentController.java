@@ -55,21 +55,21 @@ public class GilesDocumentController {
         List<IGilesUpload> uploadOptionalList = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null && u.getDocumentStatus().equals(GilesStatus.COMPLETE)).collect(Collectors.toList());
         
         if(uploadOptionalList.size()!=0) {
-            Stream<Object> gilesFilesStream;
+            Stream<IGilesFile> gilesFilesStream = Stream.empty();;
             
             for(IGilesUpload gilesUpload : uploadOptionalList) {
                 gilesFilesStream = generateStream(gilesUpload);
                 
                 gilesFile = gilesUpload.getPages();
                 for(GilesPage gilesPage: gilesFile) {
-                    gilesFilesStream = generateGilesPageStream(gilesPage);
+                    Stream.concat(gilesFilesStream, generateGilesPageStream(gilesPage));
                 }
                 
                 
             }
             
-            Object[] gilesFilesArray = gilesFilesStream.limit(1).toArray();
-            List<IGilesFile> gilesFiles = (List<IGilesFile>) gilesFilesArray[0];
+//            Object[] gilesFilesArray = gilesFilesStream.limit(1).toArray();
+            List<IGilesFile> gilesFiles = gilesFilesStream.collect(Collectors.toList());
                 
             for(IGilesFile gilesFile : gilesFiles) {
                 if(gilesFile != null && gilesFile.getId().equals(fileId)) {
@@ -129,17 +129,17 @@ public class GilesDocumentController {
 //        return gilesUpload;
 //    }
     
-    private static Stream<Object> generateStream(IGilesUpload gilesUpload) {
+    private static Stream<IGilesFile> generateStream(IGilesUpload gilesUpload) {
         
-        Stream<Object> gilesUploadStream = Stream.generate(new Supplier<Object>() {
-            
-            
+        Stream<IGilesFile> gilesUploadStream = Stream.generate(new Supplier<IGilesFile>() {
+                
             @Override
             public IGilesFile get() {
                     return gilesUpload.getUploadedFile();
                 }
             
            });
+        
         return gilesUploadStream;
     }
     
