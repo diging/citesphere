@@ -59,13 +59,13 @@ public class AddNewItemController extends V1Controller {
 
     @RequestMapping(value = "/items/create/item/{zoteroGroupId}", method = RequestMethod.POST, consumes = {
             MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<String> createNewItem(Authentication authentication,
+    public ResponseEntity<ICitation> createNewItem(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @ModelAttribute ItemWithGiles itemWithGiles)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
+            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
 
         IUser user = userManager.findByUsername((String) authentication.getPrincipal());
         if (user == null) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<ICitation>(HttpStatus.NOT_FOUND);
         }
         ICitation citation = new Citation();
         List<String> collectionIds = new ArrayList<>();
@@ -78,17 +78,19 @@ public class AddNewItemController extends V1Controller {
         try {
             citation = citationManager.createCitation(user, zoteroGroupId, collectionIds, citation);
         } catch (ZoteroItemCreationFailedException e) {
-            return new ResponseEntity<String>("Failed!", HttpStatus.OK);
+            throw new ZoteroItemCreationFailedException();
         }
 
-        try {
-            Principal principal = new UsernamePasswordAuthenticationToken(user, null);
-            uploadItemFileController.uploadFile(principal, zoteroGroupId, citation.getKey(), itemWithGiles.getFiles());
-        } catch (CannotFindCitationException | ZoteroHttpStatusException | ZoteroConnectionException
-                | CitationIsOutdatedException | ZoteroItemCreationFailedException e) {
-            e.printStackTrace();
+        if (itemWithGiles.getFiles() != null && itemWithGiles.getFiles().length > 0) {
+            try {
+                Principal principal = new UsernamePasswordAuthenticationToken(user, null);
+                uploadItemFileController.uploadFile(principal, zoteroGroupId, citation.getKey(), itemWithGiles.getFiles());
+            } catch (CannotFindCitationException | ZoteroHttpStatusException | ZoteroConnectionException
+                    | CitationIsOutdatedException | ZoteroItemCreationFailedException e) {
+                e.printStackTrace();
+            }
         }
-        return new ResponseEntity<String>("Success!", HttpStatus.OK);
+        return new ResponseEntity<ICitation>(citation, HttpStatus.OK);
     }
 
 }
