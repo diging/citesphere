@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.google.common.base.Supplier;
+import com.sun.xml.bind.v2.runtime.reflect.ListIterator;
 
 import java.util.stream.Stream;
 
@@ -45,6 +46,10 @@ public class GilesDocumentController {
     private IGilesUpload gilesUpload;
     
     private List<GilesPage> gilesFile;
+    
+    private static List<IGilesFile> giles = new ArrayList<>();
+    
+    private static ListIterator<IGilesFile> gilesListIterator = (ListIterator<IGilesFile>) giles.listIterator();
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/giles/{fileId}")
     public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication) {
@@ -135,25 +140,24 @@ public class GilesDocumentController {
                 
             @Override
             public IGilesFile get() {
-                    return gilesUpload.getUploadedFile();
+                giles.add(gilesUpload.getUploadedFile()); 
+                giles.add(gilesUpload.getExtractedText());
+                if(gilesUpload.getPages() != null) {      //Extracting pages 
+                    gilesUpload.getPages().forEach(p -> {
+                        giles.add(p.getImage());
+                        giles.add(p.getOcr());
+                        giles.add(p.getText());
+                        p.getAdditionalFiles().forEach(a -> giles.add(a));  //Extracting additional files of pages
+                    });
                 }
-            
-           });
+                if(gilesUpload.getAdditionaFiles() != null) {
+                    gilesUpload.getAdditionaFiles().forEach(a -> giles.add(a)); //Extracting additional files
+                }
+                return gilesListIterator.next();
+            }
+        });
         
         return gilesUploadStream;
     }
     
-    private static Stream<Object> generateGilesPageStream(GilesPage gilesPage) {
-        
-        Stream<Object> gilesUploadStream = Stream.generate(new Supplier<Object>() {
-            
-            
-            @Override
-            public IGilesFile get() {
-                    return gilesPage.getImage();
-                }
-            
-           });
-        return gilesUploadStream;
-    }
 }
