@@ -4,6 +4,7 @@ import java.awt.TrayIcon.MessageType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.google.common.base.Supplier;
-import com.sun.xml.bind.v2.runtime.reflect.ListIterator;
 
 import java.util.stream.Stream;
 
@@ -47,9 +47,9 @@ public class GilesDocumentController {
     
     private List<GilesPage> gilesFile;
     
-    private static List<IGilesFile> giles = new ArrayList<>();
+    private static ArrayList<IGilesFile> giles = new ArrayList<>();
     
-    private static ListIterator<IGilesFile> gilesListIterator = (ListIterator<IGilesFile>) giles.listIterator();
+    private static ListIterator<IGilesFile> gilesListIterator = giles.listIterator();
     
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/giles/{fileId}")
     public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication) {
@@ -60,29 +60,34 @@ public class GilesDocumentController {
         List<IGilesUpload> uploadOptionalList = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null && u.getDocumentStatus().equals(GilesStatus.COMPLETE)).collect(Collectors.toList());
         
         if(uploadOptionalList.size()!=0) {
-            Stream<IGilesFile> gilesFilesStream = Stream.empty();;
+//            Stream<IGilesFile> gilesFilesStream = Stream.empty();;
             
             for(IGilesUpload gilesUpload : uploadOptionalList) {
-                gilesFilesStream = generateStream(gilesUpload);
-                
-                gilesFile = gilesUpload.getPages();
-                for(GilesPage gilesPage: gilesFile) {
-                    Stream.concat(gilesFilesStream, generateGilesPageStream(gilesPage));
+                Stream<IGilesFile> gilesFilesStream = generateStream(gilesUpload);
+                List<IGilesFile> gilesFiles = gilesFilesStream.collect(Collectors.toList());
+                    
+                for(IGilesFile gilesFile : gilesFiles) {
+                    if(gilesFile != null && gilesFile.getId().equals(fileId)) {
+                        contentType = gilesFile.getContentType();
+                        fileName = gilesFile.getFilename();
+                        break;
+                    }
                 }
                 
                 
             }
             
 //            Object[] gilesFilesArray = gilesFilesStream.limit(1).toArray();
-            List<IGilesFile> gilesFiles = gilesFilesStream.collect(Collectors.toList());
-                
-            for(IGilesFile gilesFile : gilesFiles) {
-                if(gilesFile != null && gilesFile.getId().equals(fileId)) {
-                    contentType = gilesFile.getContentType();
-                    fileName = gilesFile.getFilename();
-                    break;
-                }
-            }
+//            Stream<Object> gilesFilesStream = generateStream(uploadOptionalList);
+//            List<IGilesFile> gilesFiles = gilesFilesStream.collect(Collectors.toList());
+//                
+//            for(IGilesFile gilesFile : gilesFiles) {
+//                if(gilesFile != null && gilesFile.getId().equals(fileId)) {
+//                    contentType = gilesFile.getContentType();
+//                    fileName = gilesFile.getFilename();
+//                    break;
+//                }
+//            }
         }
         else if(uploadOptionalList.size()==0 || contentType==null){
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
