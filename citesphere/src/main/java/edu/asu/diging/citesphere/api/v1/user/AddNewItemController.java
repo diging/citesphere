@@ -58,7 +58,7 @@ public class AddNewItemController extends V1Controller {
     private UploadItemFileController uploadItemFileController;
 
     @RequestMapping(value = "/items/create/item/{zoteroGroupId}", method = RequestMethod.POST, consumes = {
-            MediaType.MULTIPART_FORM_DATA_VALUE })
+        MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ICitation> createNewItem(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @ModelAttribute ItemWithGiles itemWithGiles)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
