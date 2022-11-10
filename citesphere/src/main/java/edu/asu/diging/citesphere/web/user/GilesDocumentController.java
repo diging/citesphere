@@ -66,7 +66,7 @@ public class GilesDocumentController {
                 List<IGilesFile> gilesFiles = gilesFilesStream.collect(Collectors.toList());
                     
                 for(IGilesFile gilesFile : gilesFiles) {
-                    if(gilesFile != null && gilesFile.getId().equals(fileId)) {
+                    if(gilesFile.getId().equals(fileId)) {
                         contentType = gilesFile.getContentType();
                         fileName = gilesFile.getFilename();
                         break;
