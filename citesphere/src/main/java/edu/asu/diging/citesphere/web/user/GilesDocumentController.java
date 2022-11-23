@@ -62,10 +62,12 @@ public class GilesDocumentController {
         if(uploadOptionalList.size()!=0) {
             
             for(IGilesUpload gilesUpload : uploadOptionalList) {
-                Stream<IGilesFile> gilesFilesStream = generateStream(gilesUpload);
-                List<IGilesFile> gilesFiles = gilesFilesStream.collect(Collectors.toList());
+                Stream<Object> gilesFilesStream = generateStream(gilesUpload);
+                List<Object> gilesFiles = gilesFilesStream.collect(Collectors.toList());
                     
-                for(IGilesFile gilesFile : gilesFiles) {
+                for(Object tempFile : gilesFiles) {
+                    
+                    IGilesFile gilesFile = (IGilesFile) tempFile;
                     if(gilesFile.getId().equals(fileId)) {
                         contentType = gilesFile.getContentType();
                         fileName = gilesFile.getFilename();
@@ -101,14 +103,16 @@ public class GilesDocumentController {
     }
     
     
-    private static Stream<IGilesFile> generateStream(IGilesUpload gilesUpload) {
+    private static Stream<Object> generateStream(IGilesUpload gilesUpload) {
         
-        Stream<IGilesFile> gilesUploadStream = Stream.generate(new Supplier<IGilesFile>() {
+        Stream<Object> gilesUploadStream = Stream.generate(new Supplier<Object>() {
                 
             @Override
-            public IGilesFile get() {
-                giles.add(gilesUpload.getUploadedFile()); 
-                giles.add(gilesUpload.getExtractedText());
+            public Object get() {
+                
+                    return gilesUpload.getUploadedFile();
+//                giles.add(gilesUpload.getUploadedFile()); 
+//                giles.add(gilesUpload.getExtractedText());
 //                if(gilesUpload.getPages() != null) {      //Extracting pages 
 //                    gilesUpload.getPages().forEach(p -> {
 //                        giles.add(p.getImage());
@@ -120,7 +124,9 @@ public class GilesDocumentController {
 //                if(gilesUpload.getAdditionaFiles() != null) {
 //                    gilesUpload.getAdditionaFiles().forEach(a -> giles.add(a)); //Extracting additional files
 //                }
-                return gilesListIterator.next();
+//                
+//                IGilesFile nextGilesFile = gilesListIterator.next();
+//                return nextGilesFile;
             }
         });
         
