@@ -62,7 +62,7 @@ public class GilesDocumentController {
         if(uploadOptionalList.size()!=0) {
             
             for(IGilesUpload gilesUpload : uploadOptionalList) {
-                Stream<Object> gilesFilesStream = generateStream(gilesUpload);
+                Stream<Object> gilesFilesStream = generateStream(gilesUpload).limit(2);
                 List<Object> gilesFiles = gilesFilesStream.collect(Collectors.toList());
                     
                 for(Object tempFile : gilesFiles) {
@@ -105,12 +105,17 @@ public class GilesDocumentController {
     
     private static Stream<Object> generateStream(IGilesUpload gilesUpload) {
         
+        Object nextStreamElement = gilesUpload;
         Stream<Object> gilesUploadStream = Stream.generate(new Supplier<Object>() {
                 
             @Override
             public Object get() {
                 
-                    return gilesUpload.getUploadedFile();
+                    if(nextStreamElement.getClass()==List.class) {
+                        
+                    }
+                    nextStreamElement = gilesUpload.getUploadedFile();
+                    return nextStreamElement;
 //                giles.add(gilesUpload.getUploadedFile()); 
 //                giles.add(gilesUpload.getExtractedText());
 //                if(gilesUpload.getPages() != null) {      //Extracting pages 
