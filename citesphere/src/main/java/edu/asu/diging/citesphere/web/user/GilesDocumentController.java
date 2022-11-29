@@ -112,9 +112,12 @@ public class GilesDocumentController {
             public Object get() {
                 
                     if(nextStreamElement.getClass()==List.class) {
-                        
-                    }
+                        List<Object> tempList = (List<Object>) nextStreamElement;
+                        nextStreamElement = tempList.get(0);
+                    } else {
+                    
                     nextStreamElement = gilesUpload.getUploadedFile();
+                    }
                     return nextStreamElement;
 //                giles.add(gilesUpload.getUploadedFile()); 
 //                giles.add(gilesUpload.getExtractedText());
