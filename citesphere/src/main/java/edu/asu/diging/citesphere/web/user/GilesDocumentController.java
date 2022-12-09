@@ -120,24 +120,9 @@ public class GilesDocumentController {
                     } else {
                     
                     nextStreamElement = gilesUpload.getUploadedFile();
+                    i=0;
                     }
                     return nextStreamElement;
-//                giles.add(gilesUpload.getUploadedFile()); 
-//                giles.add(gilesUpload.getExtractedText());
-//                if(gilesUpload.getPages() != null) {      //Extracting pages 
-//                    gilesUpload.getPages().forEach(p -> {
-//                        giles.add(p.getImage());
-//                        giles.add(p.getOcr());
-//                        giles.add(p.getText());
-//                        p.getAdditionalFiles().forEach(a -> giles.add(a));  //Extracting additional files of pages
-//                    });
-//                }
-//                if(gilesUpload.getAdditionaFiles() != null) {
-//                    gilesUpload.getAdditionaFiles().forEach(a -> giles.add(a)); //Extracting additional files
-//                }
-//                
-//                IGilesFile nextGilesFile = gilesListIterator.next();
-//                return nextGilesFile;
             }
         });
         
