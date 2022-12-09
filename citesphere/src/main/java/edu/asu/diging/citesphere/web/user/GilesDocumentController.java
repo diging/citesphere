@@ -105,16 +105,18 @@ public class GilesDocumentController {
     
     private static Stream<Object> generateStream(IGilesUpload gilesUpload) {
         
-        
         Stream<Object> gilesUploadStream = Stream.generate(new Supplier<Object>() {
                 
             Object nextStreamElement = gilesUpload;
+            int i=0;
+            
             @Override
             public Object get() {
                 
                     if(nextStreamElement.getClass()==List.class) {
                         List<Object> tempList = (List<Object>) nextStreamElement;
-                        nextStreamElement = tempList.get(0);
+                        nextStreamElement = tempList.get(i);
+                        i++;
                     } else {
                     
                     nextStreamElement = gilesUpload.getUploadedFile();
