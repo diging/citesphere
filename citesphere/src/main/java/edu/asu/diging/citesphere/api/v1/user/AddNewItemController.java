@@ -65,7 +65,7 @@ public class AddNewItemController extends V1Controller {
 
         IUser user = userManager.findByUsername((String) authentication.getPrincipal());
         if (user == null) {
-            return new ResponseEntity<ICitation>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<ICitation>(HttpStatus.UNAUTHORIZED);
         }
         ICitation citation = new Citation();
         List<String> collectionIds = new ArrayList<>();
@@ -87,7 +87,7 @@ public class AddNewItemController extends V1Controller {
                 uploadItemFileController.uploadFile(principal, zoteroGroupId, citation.getKey(), itemWithGiles.getFiles());
             } catch (CannotFindCitationException | ZoteroHttpStatusException | ZoteroConnectionException
                     | CitationIsOutdatedException | ZoteroItemCreationFailedException e) {
-                e.printStackTrace();
+                return new ResponseEntity<ICitation>(HttpStatus.NOT_FOUND);
             }
         }
         return new ResponseEntity<ICitation>(citation, HttpStatus.OK);
