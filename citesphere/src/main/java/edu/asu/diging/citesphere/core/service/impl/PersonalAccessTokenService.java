@@ -13,6 +13,7 @@ import edu.asu.diging.citesphere.core.model.oauth.IPersonalAccessToken;
 import edu.asu.diging.citesphere.core.repository.PersonalAccessTokenRepository;
 import edu.asu.diging.citesphere.core.service.IPersonalAccessTokenService;
 import edu.asu.diging.citesphere.core.user.IUserManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Service
 public class PersonalAccessTokenService implements IPersonalAccessTokenService {
@@ -27,6 +28,9 @@ public class PersonalAccessTokenService implements IPersonalAccessTokenService {
         this.personalAccessTokenRepository = personalAccessTokenRepository;
         this.userManager = userManager;
     }
+
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
     @Override
     public Optional<Authentication> verifyToken(Optional<String> token) {
@@ -43,10 +47,10 @@ public class PersonalAccessTokenService implements IPersonalAccessTokenService {
         List<IPersonalAccessToken> personalAccessTokensByUsername = personalAccessTokenRepository
                 .findByUsername(userName);
 
-        String encodedTokenString = Base64.getEncoder().encodeToString(password.getBytes());
+        // String encodedTokenString = Base64.getEncoder().encodeToString(password.getBytes());
 
         for (IPersonalAccessToken tokenItem : personalAccessTokensByUsername) {
-            if (tokenItem.getToken().equals(encodedTokenString)) {
+            if (encoder.matches(password, tokenItem.getToken())){
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userName,
                         password, userManager.findByUsername(userName).getRoles());
                 return Optional.of(authentication);

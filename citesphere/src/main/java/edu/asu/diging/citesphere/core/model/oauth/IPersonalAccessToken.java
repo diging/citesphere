@@ -7,9 +7,9 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
 public interface IPersonalAccessToken {
 
-    public String getId();
+    public Long getId();
 
-    public void setId(String id);
+    public void setId(Long id);
 
     public String getToken();
 

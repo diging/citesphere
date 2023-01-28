@@ -12,6 +12,7 @@ import edu.asu.diging.citesphere.core.model.oauth.IPersonalAccessToken;
 import edu.asu.diging.citesphere.core.model.oauth.impl.PersonalAccessToken;
 import edu.asu.diging.citesphere.core.repository.PersonalAccessTokenRepository;
 import edu.asu.diging.citesphere.core.service.IPersonalAccessTokenManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Service
 public class PersonalAccessTokenManager implements IPersonalAccessTokenManager {
@@ -19,14 +20,18 @@ public class PersonalAccessTokenManager implements IPersonalAccessTokenManager {
     @Autowired
     private PersonalAccessTokenRepository personalAccessTokenRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Override
     public String savePersonalAccessToken(String username) {
         PersonalAccessToken tokenObj = new PersonalAccessToken();
         tokenObj.setUsername(username);
-        String tokenGenerated = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
+        // String tokenGenerated = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
+        String tokenGenerated = bCryptPasswordEncoder.encode(UUID.randomUUID().toString());
         tokenObj.setToken(tokenGenerated);
         tokenObj.setCreatedOn(OffsetDateTime.now());
-        tokenObj.setId(UUID.randomUUID().toString() + UUID.randomUUID().toString());
+        // tokenObj.setId(UUID.randomUUID().toString() + UUID.randomUUID().toString());
         personalAccessTokenRepository.save(tokenObj);
         return tokenGenerated;
     }

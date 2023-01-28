@@ -5,6 +5,9 @@ import java.time.OffsetDateTime;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
 
 import edu.asu.diging.citesphere.core.model.oauth.IPersonalAccessToken;
 
@@ -12,19 +15,21 @@ import edu.asu.diging.citesphere.core.model.oauth.IPersonalAccessToken;
 public class PersonalAccessToken implements IPersonalAccessToken {
 
     @Id
-    private String id;
+    @GeneratedValue(generator="personal_access_token_generator", strategy=GenerationType.SEQUENCE)
+    @SequenceGenerator(name="personal_access_token_generator")
+    private Long id;
     @Lob
     private String token;
     private String username;
     private OffsetDateTime createdOn;
 
     @Override
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
     @Override
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
