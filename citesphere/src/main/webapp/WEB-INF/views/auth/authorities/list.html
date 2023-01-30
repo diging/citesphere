@@ -1,10 +1,30 @@
 <html layout:decorate="~{layouts/main}">
 <head>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
 <link th:href="@{/resources/notify/animate.css}" rel="stylesheet"/>
 
 <script th:inline="javascript">
 $(function() {
+  	$('#pagination-top').twbsPagination({
+        totalPages: [(${totalPages})],
+	    startPage: [(${currentPage})],
+	    prev: "«",
+	    next: "»",
+	    visiblePages: 10,
+	    initiateStartPageClick: false,
+        onPageClick: function (event, page) {
+     	    if($("#displayAuthorities").val() === 'all'){
+     	    	 console.log("all")
+     	    	 window.location.href = [[@{/auth/authority/list}]] + "?" + "page=" + page;
+    	    } else if($("#displayAuthorities").val() === 'userSpecific'){
+    	    	window.location.href = [[@{/auth/authority/user/list}]] + "?" + "page=" + page;
+    	    } else {
+    	    	var zoteroGroupId = $("#displayAuthorities").val();
+    	    	window.location.href = [[@{/auth/authority/}]] + zoteroGroupId + "/list" + "?" + "page=" + page;
+    	    }
+        }
+    }); 
 	$(".delete-link").click(function(event) {
 		var id = $(this).data('authority-id');
 		$("#delete-authority-button").data("authority-id", id);
@@ -50,7 +70,7 @@ $(function() {
 		event.preventDefault();
 	});
 	
-	$("#displayAuthorities").change(function () {
+ 	$("#displayAuthorities").change(function () {
 	    if($("#displayAuthorities").val() === 'all'){
 	    	window.location.href = [[@{/auth/authority/list}]];
 	    } else if($("#displayAuthorities").val() === 'userSpecific'){
@@ -79,7 +99,8 @@ $(function() {
 		<option th:selected="${#strings.equals(displayBy, groupDetail.groupId)}" th:value="${groupDetail.groupId}">Group - [[${groupDetail.name}]]</option>
 	</span>  
 </select><br><br> 
-	
+
+<ul id="pagination-top" class="pagination-sm"></ul>	
 <table class="table table-striped table-bordered">
 <tr>
 	<th width="20%">URI</th>
