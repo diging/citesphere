@@ -1,0 +1,28 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+</head>
+
+<body>
+	<div layout:fragment="content">
+
+		<div style="width: 100%; display: table;">
+			<div style="display: table-row">
+				<div style="width: 600px; display: table-cell;">
+					New Personal Access Token created for user [[${userName}]] :
+					<h3>[[${tokenGenerated}]]</h3>
+
+					<h5 style="padding-top: 50px;">
+						<i>* Please note down this personal access token for future *</i>
+					</h5>
+				</div>
+				<div style="display: table-cell;">
+					<a class="btn btn-primary btn-nav"
+						style="font-size: 10px; float: right;"
+						th:href="@{/auth/personalAccessToken}">Back</a>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

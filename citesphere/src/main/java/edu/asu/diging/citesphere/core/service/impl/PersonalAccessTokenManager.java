@@ -28,12 +28,13 @@ public class PersonalAccessTokenManager implements IPersonalAccessTokenManager {
         PersonalAccessToken tokenObj = new PersonalAccessToken();
         tokenObj.setUsername(username);
         // String tokenGenerated = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
-        String tokenGenerated = bCryptPasswordEncoder.encode(UUID.randomUUID().toString());
+        String randomId = UUID.randomUUID().toString();
+        String tokenGenerated = bCryptPasswordEncoder.encode(randomId);
         tokenObj.setToken(tokenGenerated);
         tokenObj.setCreatedOn(OffsetDateTime.now());
         // tokenObj.setId(UUID.randomUUID().toString() + UUID.randomUUID().toString());
         personalAccessTokenRepository.save(tokenObj);
-        return tokenGenerated;
+        return randomId;
     }
 
     @Override

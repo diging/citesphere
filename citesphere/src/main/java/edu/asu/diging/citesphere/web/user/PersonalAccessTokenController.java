@@ -20,17 +20,13 @@ public class PersonalAccessTokenController {
     private IPersonalAccessTokenManager personalAccessTokenManager;
 
     @RequestMapping(value = "/auth/personalAccessToken", method = RequestMethod.GET)
-    public String savePersonalAccessToken(Authentication authentication, Model model) {
+    public String getPersonalAccessToken(Authentication authentication, Model model) {
         model.addAttribute("userName", authentication.getName());
-
         List<IPersonalAccessToken> listOfPersonalTokens = personalAccessTokenManager
                 .getPersonalAccessTokens(authentication.getName());
         listOfPersonalTokens.sort(Comparator.comparing(IPersonalAccessToken::getCreatedOn).reversed());
         model.addAttribute("listOfPersonalTokens", listOfPersonalTokens);
-
-        String tokenGenerated = personalAccessTokenManager.savePersonalAccessToken(authentication.getName());
-        model.addAttribute("tokenGenerated", tokenGenerated);
+        model.addAttribute("personalTokensCount", listOfPersonalTokens.size());
         return "auth/personalAccessToken";
     }
-
 }

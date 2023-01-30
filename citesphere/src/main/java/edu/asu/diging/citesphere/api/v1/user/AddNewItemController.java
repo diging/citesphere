@@ -1,17 +1,10 @@
 package edu.asu.diging.citesphere.api.v1.user;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.http.ResponseEntity;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
-import edu.asu.diging.citesphere.api.v1.model.impl.ItemDetails;
-import edu.asu.diging.citesphere.api.v1.model.impl.ItemWithGiles;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.user.IUser;
@@ -60,7 +50,7 @@ public class AddNewItemController extends V1Controller {
     @RequestMapping(value = "/items/create/item/{zoteroGroupId}", method = RequestMethod.POST, consumes = {
         MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ICitation> createNewItem(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @ModelAttribute ItemWithGiles itemWithGiles)
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
 
         IUser user = userManager.findByUsername((String) authentication.getPrincipal());
