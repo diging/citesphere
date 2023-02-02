@@ -5,35 +5,43 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import java.security.Principal;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.http.ResponseEntity;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
 import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
+import edu.asu.diging.citesphere.core.util.model.IGilesUtil;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.jobs.IUploadFileJobManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
-import edu.asu.diging.citesphere.web.user.UploadItemFileController;
 
 @Controller
 public class AddNewItemController extends V1Controller {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ICitationHelper citationHelper;
@@ -45,13 +53,17 @@ public class AddNewItemController extends V1Controller {
     private IUserManager userManager;
 
     @Autowired
-    private UploadItemFileController uploadItemFileController;
+    private IGilesUtil gilesUtil;
+
+    @Autowired
+    private IUploadFileJobManager jobManager;
 
     @RequestMapping(value = "/items/create/item/{zoteroGroupId}", method = RequestMethod.POST, consumes = {
-        MediaType.MULTIPART_FORM_DATA_VALUE })
+            MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ICitation> createNewItem(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
+            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
+            ZoteroItemCreationFailedException {
 
         IUser user = userManager.findByUsername((String) authentication.getPrincipal());
         if (user == null) {
@@ -73,8 +85,19 @@ public class AddNewItemController extends V1Controller {
 
         if (itemWithGiles.getFiles() != null && itemWithGiles.getFiles().length > 0) {
             try {
-                Principal principal = new UsernamePasswordAuthenticationToken(user, null);
-                uploadItemFileController.uploadFile(principal, zoteroGroupId, citation.getKey(), itemWithGiles.getFiles());
+                List<byte[]> fileBytes = new ArrayList<>();
+                gilesUtil.convertFilesToBytesList(fileBytes, itemWithGiles.getFiles());
+                IGilesUpload job;
+                try {
+                    job = jobManager.createGilesJob(user, itemWithGiles.getFiles()[0], fileBytes.get(0), zoteroGroupId,
+                            citation.getKey());
+                } catch (GroupDoesNotExistException e) {
+                    logger.error("Could not create job because group does not exist.", e);
+                    return new ResponseEntity<ICitation>(HttpStatus.BAD_REQUEST);
+                }
+                ObjectMapper mapper = new ObjectMapper();
+                ObjectNode root = mapper.createObjectNode(); 
+                gilesUtil.createJobObjectNode(root, job);
             } catch (CannotFindCitationException | ZoteroHttpStatusException | ZoteroConnectionException
                     | CitationIsOutdatedException | ZoteroItemCreationFailedException e) {
                 return new ResponseEntity<ICitation>(HttpStatus.NOT_FOUND);
