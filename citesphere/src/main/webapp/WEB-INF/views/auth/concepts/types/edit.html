@@ -220,7 +220,7 @@
 		<td width="20%"><a data-toggle="modal"
 			data-target="#selectConceptModelEdit" id="searchConceptEdit" disabled
 			title="Enter Name to Search">
-			Search Concept 
+			<i class="icon-search"></i> Search Concept 
 			<i id="searchConceptSpinnerEdit" class="icon-spinner"
 				style="color: white"></i>
 		</a></td>
@@ -292,11 +292,15 @@
 									<span> Error occurred while searching concepts in conceptpower </span>
 								</div>
 								</br>
-								<table class="table table-striped table-bordered table-fixed">
-									<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
-									<tbody id="conceptpowerConceptSearchResultEdit">
-									</tbody>
-								</table>                            
+								<div style="position: relative;">
+									<div style="height: 350px; overflow:auto; margin-top: 20px;">
+										<table class="table table-striped table-bordered table-fixed">
+											<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+											<tbody id="conceptpowerConceptSearchResultEdit">
+											</tbody>
+										</table>                            
+									</div>
+								</div>
 							</div>
 							
 							<div role="tabpanel" class="tab-pane" id="viafConceptsTabContentEdit">
@@ -305,11 +309,15 @@
 									<span> Error occurred while searching concepts in VIAF </span>
 								</div>
 								</br>
-								<table class="table table-striped table-bordered table-fixed">
-									<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
-									<tbody id="viafConceptsSearchResultEdit">
-									</tbody>
-								</table>
+								<div style="position: relative;">
+									<div style="height: 350px; overflow:auto; margin-top: 20px;">
+										<table class="table table-striped table-bordered table-fixed">
+											<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+											<tbody id="viafConceptsSearchResultEdit">
+											</tbody>
+										</table>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
