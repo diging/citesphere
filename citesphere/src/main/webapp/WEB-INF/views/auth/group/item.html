@@ -323,6 +323,12 @@
 			</td>
 		</tr>
 		<tr>
+			<td>Same As</td>
+			<td> 
+				<p th:each="resourceUrl:${resourceUrls}">[[${resourceUrl}]]</p>
+			</td>
+		</tr>
+		<tr>
 			<td>References</td>
 			<td>
 			<th:block th:each="ref:${citation.references}">
