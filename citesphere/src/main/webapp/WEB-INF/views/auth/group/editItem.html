@@ -1758,6 +1758,10 @@ function creatorLinkHandler(target) {
                             <a href="#viafAuthoritiesTabContent"
                                 aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from VIAF</a>
                         </li>
+						<li role="presentation">
+                            <a href="#isisCBAuthoritiesTabContent"
+                                aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from IsisCB</a>
+                        </li>
 					</ul>
 					<!-- Tab panes -->
 					<div class="tab-content">
@@ -1816,6 +1820,19 @@ function creatorLinkHandler(target) {
                             <table class="table table-striped table-bordered table-fixed">
                                 <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
                                 <tbody id="viafAuthoritySearchResult">
+                                </tbody>
+                            </table>
+                        </div>
+
+						<div role="tabpanel" class="tab-pane" id="isisCBAuthoritiesTabContent">
+                            <ul id="isisCBAuthority-pagination-top" class="pagination-sm"></ul>
+                            <div id="isisCBAuthoritiesError" class="text-warning" style="display: none">
+                                <span> Error occurred while searching authorities in ISISCB </span>
+                            </div>
+                            </br>
+                            <table class="table table-striped table-bordered table-fixed">
+                                <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+                                <tbody id="isisCBAuthoritiesTabContent">
                                 </tbody>
                             </table>
                         </div>
