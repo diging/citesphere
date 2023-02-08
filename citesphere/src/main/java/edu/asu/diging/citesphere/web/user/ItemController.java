@@ -54,7 +54,6 @@ public class ItemController {
             List<ICitation> notes = citationManager.getNotes((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
             model.addAttribute("notes", notes);
             model.addAttribute("citation", citation);
-            model.addAttribute("resourceUrls",  citation.getResouceUrls());
             List<String> fields = new ArrayList<>();
             citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
             model.addAttribute("fields", fields);
