@@ -5,9 +5,35 @@
 .popover {
 	min-width: 300px;
 }
-
+.modal-body {
+    max-height: 75vh;
+    overflow-y: auto;
+}
+.icon-circle-add{
+	cursor: pointer; 
+	color: #337ab7;
+}
 </style>
 <script th:inline="javascript">
+
+var affCount = 0;
+var affiliationTemplate = $($.parseHTML('<div class="aff-entry">' +
+		  '<hr>' + 
+		  '<div class="form-group">' +
+		    '<div class="pull-right remove-aff"><a>Remove</a></div>' +
+		    '<label for="affiliation">Affiliation:</label>' + 
+		    '<input type="text" class="form-control" id="firstName" placeholder="Affiliation">' +
+		  '</div>' +
+		  '<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel"' +
+			'style="margin-left: 76%" disabled>Search Affiliation <i id="searchSpinner"class="fas fa-spinner fa-spin text-info" style="color: white" hidden></i>' +
+		  '</button>' +
+		  '<div class="form-group">' +
+			'<label for="uri">Affiliation URI:</label>' +
+		    	'<input type="text" class="form-control affUri" placeholder="URI"/>' +
+		  '</div>' +
+		'</div>')
+);
+
 //# sourceURL=submit.js
 $(function() {
 	$("#uriLoadingSpinnerAuthor").hide();
@@ -61,73 +87,44 @@ $(function() {
 	
 	/* Disable search authority button when first name and last name fields are empty*/
     $("#firstNameAuthor").keyup(function(e){
-    	allowAuthoritySearch("Author");
-     });
-		
+    	allowSearchAndAdd("Author");
+    });
+    
     $("#lastNameAuthor").keyup(function(e){
-    	allowAuthoritySearch("Author");
-     });
+    	allowSearchAndAdd("Author");
+    });
+    
     $("#firstNameEditor").keyup(function(e){
-    	allowAuthoritySearch("Editor");
-     });
+    	allowSearchAndAdd("Editor");
+    });
 		
     $("#lastNameEditor").keyup(function(e){
-    	allowAuthoritySearch("Editor");
-     });
+    	allowSearchAndAdd("Editor");
+    });
+    
     $("#firstNameCreator").keyup(function(e){
-    	allowAuthoritySearch("Creator");
-     });
+    	allowSearchAndAdd("Creator");
+    });
 		
     $("#lastNameCreator").keyup(function(e){
-    	allowAuthoritySearch("Creator");
-     });
-	$("#searchAuthor").click(function() {
-		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
-			$('#selectAuthorityModel a:first').tab('show');
-		})  
-		$("#searchAuthorSpinner").show();
-		$('#userAuthority-pagination-top').twbsPagination('destroy');
-		$('#groupAuthority-pagination-top').twbsPagination('destroy');
-		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-		
-		getUserAuthorities('Author','Author', 0)
-		getGroupAuthorities('Author','Author', 0)
-		getconceptpowerAuthorities('Author','Author',0)
-		$("#searchAuthorSpinner").hide();
-	});
+    	allowSearchAndAdd("Creator");
+    });
 	
-	$("#searchEditor").click(function() {
-		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
-			$('#selectAuthorityModel a:first').tab('show');
-		})  
-		$("#searchEditorSpinner").show();
-		
-		$('#userAuthority-pagination-top').twbsPagination('destroy');
-		$('#groupAuthority-pagination-top').twbsPagination('destroy');
-		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-		
-		getUserAuthorities('Editor','Editor', 0)
-		getGroupAuthorities('Editor','Editor', 0)
-		getconceptpowerAuthorities('Editor','Editor',0)
-		$("#searchEditorSpinner").hide();
-	});
+    $(document).on("click", ".remove-aff", function() {
+    	$(this).closest('.aff-entry').remove();
+    });
+    
+    $("#searchAuthor").click(function() {
+        searchAuthorities('Author', 'Author');
+    });
 	
-	$("#searchCreator").click(function() {
-		$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
-			$('#selectAuthorityModel a:first').tab('show');
-		})  
-		$("#searchCreatorSpinner").show();
-		
-		$('#userAuthority-pagination-top').twbsPagination('destroy');
-		$('#groupAuthority-pagination-top').twbsPagination('destroy');
-		$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-		
-		getUserAuthorities('Creator','Creator', 0)
-		getGroupAuthorities('Creator','Creator', 0)
-		getconceptpowerAuthorities('Creator','Creator',0)
-		$("#searchCreatorSpinner").hide();
-	});
+    $("#searchEditor").click(function() {
+        searchAuthorities('Editor', 'Editor');
+    });
 	
+    $("#searchCreator").click(function() {
+        searchAuthorities('Creator', 'Creator');
+    }); 
 	
 	$(".edit-author").click(function(){
 		var authorItem = $(this).parent();
@@ -142,12 +139,15 @@ $(function() {
 	$(".remove-concept").css('cursor', 'pointer');
 	
 	$("#addAuthorAffiliation").click(function() {
-		var affiliationCopy = $("#authorAffiliationTemplate").clone();
-		affiliationCopy.removeAttr("id");
-		affiliationCopy.addClass("aff-info");
-		affiliationCopy.find("input").val("");
-		affiliationCopy.show();
-		$("#authorAffiliations").append(affiliationCopy);
+		addAffiliation("Author", affCount + 1);
+	});
+	
+	$("#addEditorAffiliation").click(function() {
+		addAffiliation("Editor", affCount + 1);
+	});
+	
+	$("#addCreatorAffiliation").click(function() {
+		addAffiliation("Creator", affCount + 1);
 	});
 	
 	$("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
@@ -166,6 +166,7 @@ $(function() {
 				$("#authorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
 				showPersonNameInModal(data['name'], "Author");
 				$("#uriLoadingFoundAuthor").popover('hide');
+				$("#addAuthorButton").prop("disabled", false);
 			}
 		});
 	});
@@ -176,9 +177,10 @@ $(function() {
 		$("#authorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
 		showPersonNameInModal($(this).attr('data-authority-name'), "Author");
 		$("#uriLoadingFoundAuthor").popover('hide');
+		$("#addAuthorButton").prop("disabled", false);
 		event.preventDefault();
-	});
-	
+	});	
+
 	var timer = null;
 	$("#uriAuthor").change(function() {
 		resetPersonAuthorityCreation("Author");
@@ -189,7 +191,7 @@ $(function() {
 	    	getPersonAuthority(uri, "Author");
 	    }, 1000);
 	});
-	
+
 	$("#closeAuthoritySearchResult").click(function() {
 		$("#selectAuthorityModel").modal('hide');
 		$('#selectAuthorityModel a:first').tab('show');
@@ -214,15 +216,6 @@ $(function() {
 	
 	$(".remove-editor").click(removePerson);
 	$(".remove-editor").css('cursor', 'pointer');
-	
-	$("#addEditorAffiliation").click(function() {
-		var affiliationCopy = $("#editorAffiliationTemplate").clone();
-		affiliationCopy.removeAttr("id");
-		affiliationCopy.addClass("aff-info");
-		affiliationCopy.find("input").val("");
-		affiliationCopy.show();
-		$("#editorAffiliations").append(affiliationCopy);
-	});
 	
 	$("#uriEditor").change(function() {
 		resetPersonAuthorityCreation("Editor");
@@ -250,6 +243,7 @@ $(function() {
 				$("#editorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
 				showPersonNameInModal(data['name'], "Editor");
 				$("#uriLoadingFoundEditor").popover('hide');
+				$("#addEditorButton").prop("disabled", false);
 			}
 		});
 	});
@@ -260,6 +254,7 @@ $(function() {
 		$("#editorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
 		showPersonNameInModal($(this).attr('data-authority-name'), "Editor");
 		$("#uriLoadingFoundEditor").popover('hide');
+		$("#addEditorButton").prop("disabled", false);
 		event.preventDefault();
 	});
 	
@@ -295,15 +290,6 @@ $(function() {
 		
 	$(".remove-creator").click(removePerson);
 	$(".remove-creator").css('cursor', 'pointer');
-
-	$("#addCreatorAffiliation").click(function() {
-		var affiliationCopy = $("#creatorAffiliationTemplate").clone();
-		affiliationCopy.removeAttr("id");
-		affiliationCopy.addClass("aff-info");
-		affiliationCopy.find("input").val("");
-		affiliationCopy.show();
-		$("#creatorAffiliations").append(affiliationCopy);
-	});
 	
 	$("#uriCreator").change(function() {
 		resetPersonAuthorityCreation("Creator");
@@ -331,6 +317,7 @@ $(function() {
 				$("#creatorAuthorityCreationFeedback").html('<div class="text-success" style="margin-top:10px;">Authority entry has been created!</div>');
 				showPersonNameInModal(data['name'], "Creator");
 				$("#uriLoadingFoundCreator").popover('hide');
+				$("#addCreatorButton").prop("disabled", false);
 			}
 		});
 	});
@@ -341,6 +328,7 @@ $(function() {
 		$("#creatorAuthorityUsed").html("Using stored authority entry <i>" + $(this).attr('data-authority-name') + "</i>.");
 		showPersonNameInModal($(this).attr('data-authority-name'), "Creator");
 		$("#uriLoadingFoundCreator").popover('hide');
+		$("#addCreatorButton").prop("disabled", false);
 		event.preventDefault();
 	});
 	
@@ -367,13 +355,76 @@ $(function() {
 	});
 });
 
-function allowAuthoritySearch(element){
+/*Clones the affiliation template, modifies it appropriately and appends it to the given modal type*/
+function addAffiliation(modalType, counter) {
+	modalTypeL = modalType.toLowerCase();
+	var affiliationCopy = affiliationTemplate.clone();
+	affiliationCopy.attr('id', modalTypeL+'AffiliationTemplate'+counter);
+	affiliationCopy.addClass('aff-info');
+	
+	affiliationCopy.find('label[for="affiliation"]').attr('for', 'firstName'+modalType+'Affiliation'+counter);
+	affiliationCopy.find('label[for="uri"]').attr('for', 'uri'+modalType+'Affiliation'+counter);
+	
+	var affInput = affiliationCopy.find('#firstName');
+	affInput.addClass('firstName'+modalType+'Affiliation');
+	affInput.attr('id', 'firstName'+modalType+'Affiliation'+counter);
+	affInput.attr('data-client-id', affInput.attr('id'));
+	
+	var searchButton = affiliationCopy.find('button');
+	searchButton.attr('id', 'search'+modalType+'Affiliation'+counter);
+	searchButton.attr('data-client-id', searchButton.attr('id'));
+	searchButton.find('#searchSpinner').attr('id', 'search'+modalType+'Affiliation'+counter+'Spinner');
+	searchButton.prop('disabled', true);
+	
+	var affUri = affiliationCopy.find('.affUri');
+	affUri.attr('id', 'uri'+modalType+'Affiliation'+counter);
+	affUri.attr('data-client-id', affUri.attr('id'));
+	
+	$("#"+modalTypeL+"Affiliations").append(affiliationCopy);
+	
+	var affiliationCounter = modalType + 'Affiliation' + counter;
+	$('#firstName'+affiliationCounter).keyup(function(e) {
+		allowSearchAndAdd(affiliationCounter);
+	});
+	
+	$("#search"+affiliationCounter).click(function() {
+		searchAuthorities(affiliationCounter, affiliationCounter);
+	});
+	
+	affCount++;
+}
+
+function searchAuthorities(modalType, personType) {
+	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+	    $('#selectAuthorityModel a:first').tab('show');
+	})  
+	$("#search"+modalType+"Spinner").show();
+	$('#userAuthority-pagination-top').twbsPagination('destroy');
+	$('#groupAuthority-pagination-top').twbsPagination('destroy');
+	$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+	$('#viafAuthority-pagination-top').twbsPagination('destroy');
+	
+	getUserAuthorities(modalType, personType, 0)
+	getViafAuthorities(modalType, personType, 0)
+	getGroupAuthorities(modalType, personType, 0)
+	getconceptpowerAuthorities(modalType, personType, 0)
+	$("#search"+modalType+"Spinner").hide();
+}
+
+function allowSearchAndAdd(element){
     if($("#firstName"+element).val() == "" && $("#lastName"+element).val()==""){
-        $("#search"+element).prop("disabled", true);
+    	$("#search"+element).prop("disabled", true);
+    	$("#add"+element+"Button").prop("disabled", true);
     }
     else{
-        $("#search"+element).prop("disabled", false);
+    	$("#search"+element).prop("disabled", false);
+    	$("#add"+element+"Button").prop("disabled", false);
     }
+}
+
+function showAffiliationNameInModal(name, uri, personType){
+	$("#firstName"+personType).val(name);
+	$("#uri"+personType).val(uri);
 }
 
 /* Function to populate name in modal fetched from uri */
@@ -419,21 +470,53 @@ function editPerson(modalName, item){
 	$("#uri"+modalName).val(personItem.attr("data-"+modalNameLCase+"-uri"));
 	$("#id"+modalName).attr("data-"+modalNameLCase+"-id", personItem.attr("id"));
 	
-	personItem.children("span").each(function(idx, elem){
-		var affInput = $("#"+modalNameLCase+"AffiliationTemplate").clone();
-		affInput.removeAttr("id");
-		affInput.addClass("aff-info");
-		affInput.find("input").attr("data-affiliation-name", $(elem).data("affiliationName"));
-		affInput.find("input").attr("data-affiliation-id", $(elem).data("affiliationId"));
-		affInput.find("input").val($(elem).data("affiliationName"));
-		$("#"+modalNameLCase+"Modal #"+modalNameLCase+"Affiliations").append(affInput);
+	var counter = 0;
+	personItem.children(".affiliation-class").each(function(idx, elem) {
+		var affiliationCopy = affiliationTemplate.clone();
+		affiliationCopy.attr('id', modalNameLCase+'AffiliationTemplate'+counter);
+		affiliationCopy.addClass('aff-info');
+		
+		affiliationCopy.find('label[for="affiliation"]').attr('for', 'firstName'+modalName+'Affiliation'+counter);
+		affiliationCopy.find('label[for="uri"]').attr('for', 'uri'+modalName+'Affiliation'+counter);
+		
+		var affInput = affiliationCopy.find('#firstName');
+		affInput.addClass('firstName'+modalName+'Affiliation');
+		affInput.attr('id', 'firstName'+modalName+'Affiliation'+counter);
+		affInput.attr('data-client-id', affInput.attr('id'));
+		affInput.attr("data-affiliation-name", $(elem).data("affiliationName"));
+		affInput.attr("data-affiliation-id", $(elem).data("affiliationId"));
+		affInput.val($(elem).data("affiliationName"));
+		
+		var searchButton = affiliationCopy.find('button');
+		searchButton.attr('id', 'search'+modalName+'Affiliation'+counter);
+		searchButton.attr('data-client-id', searchButton.attr('id'));
+		searchButton.find('#searchSpinner').attr('id', 'search'+modalName+'Affiliation'+counter+'Spinner');
+		searchButton.prop('disabled', false);
+		
+		var affUri = affiliationCopy.find('.affUri');
+		affUri.attr('id', 'uri'+modalName+'Affiliation'+counter);
+		affUri.attr('data-client-id', affUri.attr('id'));
+		affUri.attr("data-affiliation-uri", $(elem).data("affiliationUri"));
+		affUri.val($(elem).data("affiliationUri"));
+		
+		$("#"+modalNameLCase+"Affiliations").append(affiliationCopy);
+		
+		var affiliationCounter = modalName + 'Affiliation' + counter;
+		$('#firstName'+affiliationCounter).keyup(function(e) {
+			allowSearchAndAdd(affiliationCounter);
+		});
+		
+		$("#search"+affiliationCounter).click(function() {
+			searchAuthorities(affiliationCounter, affiliationCounter);
+		});
+		
+		counter++;
 	});
-	
-	if(personItem.children("span").length > 0) {
-		$("#"+modalNameLCase+"AffiliationTemplate").hide();
-	}
+	/*Need to fast forward the affiliation counter which is used while adding a new affiliation entry*/
+	affCount = counter;
 	$("#addCreatorButton").attr("data-"+modalNameLCase+"-type", personItem.attr("data-"+modalNameLCase+"type"));
 	$("#add"+modalName+"Button").text("Update "+modalName);
+	$("#add"+modalName+"Button").prop("disabled", false);
 	
 	$("#"+modalNameLCase+"Modal").modal('show');
 	if($("#firstName"+modalName).val() != "" || $("#lastName"+modalName).val() != ""){
@@ -459,21 +542,26 @@ function savePersonDetails(personType, modalName){
 	
 	var firstname = $("#firstName"+modalName).val();
 	var lastname = $("#lastName"+modalName).val();
+	
 	var uri = $("#uri"+modalName).val();
 	var localAuthority = $("#uri"+modalName+"LocalId").val();
 	personSpan.attr("data-"+modalNameLCase+"-firstname", firstname);
 	personSpan.attr("data-"+modalNameLCase+"-lastname", lastname);
 	personSpan.attr("data-"+modalNameLCase+"-uri", uri);
 	personSpan.attr("data-"+modalNameLCase+"-authority-id", localAuthority);
+	personSpan.attr("data-creator-type", personTypeLCase);
 	
 	var affiliationsList = [];
 	var affSpan = $("<span>");
 	$("#"+modalNameLCase+"Affiliations").children().each(function(idx, elem) {
-		var input = $(elem).find("input");
-		if(input.val().length!=0){
+		var affName = $(elem).find(".firstName"+modalName+"Affiliation");
+		var affUri = $(elem).find(".affUri");
+		if(affName.val().length!=0){
 			var affSpan = $("<span>");
-			affSpan.attr("data-affiliation-name", input.val());
-			affiliationsList.push(input.val());
+			affSpan.addClass("affiliation-class");
+			affSpan.attr("data-affiliation-name", affName.val());
+			affSpan.attr("data-affiliation-uri", affUri.val());
+			affiliationsList.push(affName.val());
 			personSpan.append(affSpan);
 		}
 	});
@@ -554,7 +642,7 @@ function constructPersonArray(arrayName, role, iter){
 		personAuthorityField.attr("value", $(person).attr("data-"+arrayName+"-authority-id"));
 		$("#editForm").append(personAuthorityField);
 		
-		$(person).children("span").each(function(idx2, affiliation) {
+		$(person).children(".affiliation-class").each(function(idx2, affiliation) {
 			var affiliationField = $("<input>");
 			affiliationField.attr("type", "hidden");
 			affiliationField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".name");
@@ -568,6 +656,13 @@ function constructPersonArray(arrayName, role, iter){
 			affiliationIdField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].id");
 			affiliationIdField.attr("value", $(affiliation).attr("data-affiliation-id"));
 			$("#editForm").append(affiliationIdField);
+			
+			var affiliationUriField = $("<input>");
+			affiliationUriField.attr("type", "hidden");
+			affiliationUriField.attr("id", creator+"s" + creatorSubmitCount + ".affiliations" + idx2 + ".uri");
+			affiliationUriField.attr("name", creator+"s[" + creatorSubmitCount + "].affiliations[" + idx2 + "].uri");
+			affiliationUriField.attr("value", $(affiliation).attr("data-affiliation-uri"));
+			$("#editForm").append(affiliationUriField);
 		});
 		otherCreatorCount += 1;
 	});
@@ -625,12 +720,7 @@ function resetPersonCreationModal(modalType) {
 	$("#firstName"+modalType).val("");
 	$("#lastName"+modalType).val("");
 	$("#id"+modalType).attr("data-"+modalType+"-id", "");
-	var affTemplate = $("#"+modalNameLCase+"AffiliationTemplate");
 	$("#"+modalNameLCase+"Affiliations").children().remove();
-	$("#"+modalNameLCase+"Affiliations").append(affTemplate);
-	$("#"+modalNameLCase+"AffiliationTemplate").find("input").val("");
-	$("#"+modalNameLCase+"AffiliationTemplate").show();
-	$(".aff-info").remove();
 	$("#uri"+modalType).val("");
 	if(modalType == "Creator") {
 		$("#addCreatorButton").attr("data-creator-type", "");
@@ -639,7 +729,9 @@ function resetPersonCreationModal(modalType) {
 	}
 	
 	$("#add"+modalType+"Button").text("Add "+modalType);
+	$("#add"+modalType+"Button").prop("disabled",true);
 	resetPersonAuthorityCreation(modalType);
+	affCount = 0;
 }
 
 function resetPersonAuthorityCreation(personType) {
@@ -649,8 +741,6 @@ function resetPersonAuthorityCreation(personType) {
 	$("#uriLoadingFound"+personType).popover('hide');
 	$("#uriLoadingFailure"+personType).popover('hide');
 	$("#"+personType.toLowerCase()+"AuthorityUsed").html("");
-	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").html("");
-	$("#"+personType.toLowerCase()+"AuthorityCreationFeedback").hide();
 }
 
 function getPersonAuthority(uri, personType) {
@@ -679,8 +769,12 @@ function getPersonAuthority(uri, personType) {
 			});
 			content += "</ul>";
 		}
-		content += "<br><br>Do you want to create a managed authority entry?<br>" +
-					'<span id="'+personType_lowerCase+'AuthorityCreationFeedback"><button id="'+personType_lowerCase+'CreateAuthority" type="submit" class="btn btn-link pull-right"><b>Yes, create a new entry!</b></button></span>';
+		
+		if((data['userAuthorityEntries'] == null || data['userAuthorityEntries'].length == 0) 
+				&& (data['datasetAuthorityEntries'] == null || data['datasetAuthorityEntries'].length == 0)) {
+			content += "<br><br>No authorities found for the given URI<br>";
+		}
+		
 		$("#uriLoadingFound"+personType).attr("data-content", content);
 		$("#uriLoadingFound"+personType).attr("data-authority-uri", uri);
 		$("#uriLoadingFound"+personType).show();
@@ -698,6 +792,9 @@ function getPersonAuthority(uri, personType) {
 function getUserAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
+	if (lastName === undefined) {
+	    lastName = "";
+	}
 	personType_lowerCase = personType.toLowerCase();
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/user|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
 	$.ajax({
@@ -740,8 +837,14 @@ function getUserAuthorities(modalType, personType, page) {
 		$(".user-authority-entry").click(function() {
 			name = $(this).closest("tr").find(".name").text();
 			uri = $(this).closest("tr").find(".uri").text();
-				
-			showPersonNameInModal(name, personType)
+			
+			if (modalType.includes("Affiliation")) {
+			    showAffiliationNameInModal(name, uri, personType);
+			} else {
+			    showPersonNameInModal(name, personType)
+			    $("#uri"+modalType).val( uri);
+			}
+			
 			$("#uri"+modalType).val( uri);
 			$("#"+personType_lowerCase+"AuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
 			$("#selectAuthorityModel").modal('hide');
@@ -759,6 +862,9 @@ function getUserAuthorities(modalType, personType, page) {
 function getGroupAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
+	if (lastName === undefined) {
+	    lastName = "";
+	}
 	personType_lowerCase = personType.toLowerCase();
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/group|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;
 	$.ajax({
@@ -801,7 +907,13 @@ function getGroupAuthorities(modalType, personType, page) {
 		$(".group-authority-entry").click(function() {
 			name = $(this).closest("tr").find(".name").text();
 			uri = $(this).closest("tr").find(".uri").text();
-				
+			
+			if (modalType.includes("Affiliation")) {
+			    showAffiliationNameInModal(name, uri, personType);
+			} else {
+			    showPersonNameInModal(name, personType)
+			    $("#uri"+modalType).val( uri);
+			}
 			showPersonNameInModal(name, personType)
 			$("#uri"+modalType).val( uri);
 			$("#"+personType_lowerCase+"AuthorityUsed").html("Using stored authority entry <i>" + name + "</i>.");
@@ -820,6 +932,9 @@ function getGroupAuthorities(modalType, personType, page) {
 function getconceptpowerAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
+	if (lastName === undefined) {
+	    lastName = "";
+	}
 	personType_lowerCase = personType.toLowerCase();
 	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/conceptpower|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
@@ -865,11 +980,15 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 			name = $(this).closest("tr").find(".name").text();
 			uri = $(this).closest("tr").find(".uri").text();
 			
-			showPersonNameInModal(name, personType)
-			$("#uri"+modalType).val( uri);
+			if (modalType.includes("Affiliation")) {
+			    showAffiliationNameInModal(name, uri, personType);
+			} else {
+			    showPersonNameInModal(name, personType)
+			    $("#uri"+modalType).val( uri);
+			}
 			
 			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=conceptpower&uri=' + uri;	
-			if($("#mycheckbox").is(":checked")){
+			if($("#cp-checkbox").is(":checked")){
 				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
 			}
 			$.ajax({
@@ -894,6 +1013,96 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 	error: function(data){
 		$('#conceptpowerAuthoritySearchResult').parents('table').hide()
 		$("#conceptpowerAuthoritiesError").show();	
+	}
+	
+	});
+}
+
+function getViafAuthorities(modalType, personType, page) {
+	var firstName = $("#firstName"+personType).val();
+	var lastName = $("#lastName"+personType).val();
+	if (lastName === undefined) {
+	    lastName = "";
+	}
+	
+	personType_lowerCase = personType.toLowerCase();
+	url = [[@{|/auth/authority/${zoteroGroupId}/find/authorities/viaf|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
+
+	$.ajax({
+  		dataType: "json",
+  		type: 'GET',
+  		url: url ,
+  		async: false,
+  		success: function(data) {
+  			$('#viaf-groupName').text(data['groupName']);
+  			$("#viafAuthoritySearchResult").empty();
+  			var content = '';
+  				
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  				data['foundAuthorities'].forEach(function(elem) {	
+  					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
+  					if(elem['description']==null) {
+  						content += ' - </td>';
+  					}
+  					else {
+  						content +=elem['description'] + '</td>';
+  					}
+  					content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+  					
+  				}); 				
+  				
+  				$('#viafAuthority-pagination-top').twbsPagination({
+  				    totalPages: data['totalPages'],
+  				    startPage: data['currentPage'],
+  				    prev: "«",
+  				    next: "»",
+  				    visiblePages: 5,
+  				    initiateStartPageClick: false,
+  				    onPageClick:function(event, page) {
+  				    	getViafAuthorities(modalType, personType, page-1)
+  				    }
+  				});
+  				
+  			}
+  			
+		$("#viafAuthoritySearchResult").append(content); 	
+		$(".viaf-authority-entry").click(function() {
+			name = $(this).closest("tr").find(".name").text();
+			uri = $(this).closest("tr").find(".uri").text();
+			
+			if (modalType.includes("Affiliation")) {
+			    showAffiliationNameInModal(name, uri, personType);
+			} else {
+			    showPersonNameInModal(name, personType)
+			    $("#uri"+modalType).val( uri);
+			}
+			
+			createManageAuthorityURL = [[@{/auth/authority/add?}]]+ '&source=viaf&uri=' + uri;	
+			if($("#viaf-checkbox").is(":checked")) {
+				createManageAuthorityURL += '&zoteroGroupId=' + [(${zoteroGroupId})];						
+			}
+			$.ajax({
+				dataType: "json",
+				type: 'POST',
+				url: createManageAuthorityURL,
+				data: { [[${_csrf.parameterName}]] : [[${_csrf.token}]] },
+				async:false,
+				success: function(data) {
+					$("#"+personType_lowerCase+"AuthorityUsed").html("Created new authority entry <i>" + name + "</i>.");
+				},
+				error: function(data) {					
+					$("#uri"+modalType).val("");
+		  			$("#"+personType_lowerCase+"AuthorityUsed").html("Failed to create new authority entry <i>" + name + "</i>.");
+				}
+			});				
+						
+			$("#selectAuthorityModel").modal('hide');
+		});	
+		
+        },
+	error: function(data){
+		$('#viafAuthoritySearchResult').parents('table').hide()
+		$("#viafAuthoritiesError").show();	
 	}
 	
 	});
@@ -1132,13 +1341,15 @@ function creatorLinkHandler(target) {
 						<th:block th:each="author,status : ${citation.authors}">	
 						<span th:id="|author${status.index}|" class="label label-primary author-item" th:data-author-id="|author${status.index}|" th:data-author-firstname="${author.firstName}" th:data-author-lastname="${author.lastName}" th:data-author-uri="${author.uri}" th:data-creator-type="author" th:data-author-authority-id="${author.localAuthorityId}">
 						<th:block th:each="aff,affStatus : ${author.affiliations}">
-							<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|author${status.index}-aff${affStatus.index}|">
+							<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|author${status.index}-aff${affStatus.index}|" th:data-affiliation-uri="${aff.uri}">
 							</span>
 						</th:block>
 								[[${author.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
+								<span th:if="${author.getAffiliations() != null && !author.getAffiliations().isEmpty()}">(</span>
 								<th:block th:each="aff:${author.affiliations}">
 									<span th:remove="tag" th:if="${!#strings.isEmpty(aff.name)}"> [[${aff.name}]]</span>
 								</th:block>
+								<span th:if="${author.getAffiliations() != null && !author.getAffiliations().isEmpty()}">)</span>
 									&nbsp;
 							<i class="icon-edit edit-author" style="cursor: pointer; color: white; font-size: 12px;"></i>
 									&nbsp;
@@ -1157,10 +1368,12 @@ function creatorLinkHandler(target) {
 						<th:block th:each="editor,status:${citation.editors}">
 						<span th:id="|editor${status.index}|" class="label label-info editor-item" th:data-editor-id="|editor${status.index}|" th:data-editor-firstname="${editor.firstName}" th:data-editor-lastname="${editor.lastName}" th:data-editor-uri="${editor.uri}" th:data-editor-authority-id="${editor.localAuthorityId}" th:data-creator-type="editor">
 						<th:block th:each="aff,affStatus:${editor.affiliations}"> 
-							<span th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|editor${status.index}-aff${affStatus.index}|"></span>
+							<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|editor${status.index}-aff${affStatus.index}|" th:data-affiliation-uri="${aff.uri}"></span>
 						</th:block>
 						  [[${editor.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
+						      <span th:if="${editor.getAffiliations() != null && !editor.getAffiliations().isEmpty()}">(</span>
 						      <th:block th:each="aff:${editor.affiliations}"> [[${aff.name}]]</th:block>
+						      <span th:if="${editor.getAffiliations() != null && !editor.getAffiliations().isEmpty()}">)</span>
 							&nbsp;
 							<i class="icon-edit edit-editor" style="color: white; font-size: 12px;"></i>
 							&nbsp;
@@ -1182,11 +1395,13 @@ function creatorLinkHandler(target) {
 					<span th:id="|${role}List|" style="font-size: 18px">
 					<span th:each="creator,loop:${citation.otherCreators}" th:if="${#strings.equals(#strings.substringAfter(curCreator.key, '_item_attribute_label_'), creator.role)}">
 				 		<span th:id="|${role}${loop.index}|" th:class="|label label-info ${role}-item|" th:data-creator-id="${creator.id}" th:data-creator-type="${#strings.substringAfter(curCreator.key, '_item_attribute_label_')}" th:data-creator-firstname="${creator.person.firstName}" th:data-creator-lastname="${creator.person.lastName}" th:data-creator-uri="${creator.person.uri}" th:data-creator-authority-id="${creator.person.localAuthorityId}">
-				 			<th:block th:each="aff:${creator.person.affiliations}"> 
-				 				<span th:data-affiliation-name="${aff.name}"></span>
+				 			<th:block th:each="aff,affStatus:${creator.person.affiliations}"> 
+				 				<span class="affiliation-class" th:data-affiliation-name="${aff.name}" th:data-affiliation-id="|creator${loop.index}-aff${affStatus.index}|" th:data-affiliation-uri="${aff.uri}"></span>
 				 			</th:block>
 								[[${creator.person.lastName}]]<span th:remove="tag" th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
+							<span th:if="${creator.person.getAffiliations() != null && !creator.person.getAffiliations().isEmpty()}">(</span>
 							<th:block th:each="aff:${creator.person.affiliations}">[[${aff.name}]]</th:block>
+							<span th:if="${creator.person.getAffiliations() != null && !creator.person.getAffiliations().isEmpty()}">)</span>
 							&nbsp;<i class="icon-edit edit-creator" style="color: white; font-size: 12px;"></i>
 									<i class="icon-circle-close remove-creator" style="cursor: pointer; color: white; font-size: 12px;"></i>
 						</span>
@@ -1370,7 +1585,7 @@ function creatorLinkHandler(target) {
 		    <label for="lastNameAuthor">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
 		  </div>
-		  <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
+		  <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="Author" id="searchAuthor"
 						style="margin-left: 80%" disabled>Search Author 
 						<i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
 		  </button>
@@ -1385,22 +1600,15 @@ function creatorLinkHandler(target) {
 			    </div>
 			    <input type="hidden" id="uriAuthorLocalId" />
 		    </div>
-		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div>
+		    <div class="text-warning pull-right" id="authorAuthorityUsed"></div><br>
 		  </div>
-		  <div id="authorAffiliations">
-		  <div id="authorAffiliationTemplate" class="form-group">
-		    <label for="affiliationAuthor">Affiliation:</label>
-		    <input type="text" class="form-control" placeholder="Affiliation">
-		  </div>
-		  </div>
-		  <div>
+		  <div id="authorAffiliations"></div>
 		  <div class="text-right"><a id="addAuthorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
-      	  </div>
       </div>
       
       <div class="modal-footer">
         <button type="button" class="btn btn-default" id="addAuthorModalCancel">Close</button>
-        <button id="addAuthorButton" type="button" class="btn btn-primary">Add Author</button>
+        <button id="addAuthorButton" type="button" class="btn btn-primary" disabled>Add Author</button>
       </div>
     </div>
   </div>
@@ -1429,7 +1637,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  
 		  <div>
-			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchEditor"
+			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" id="searchEditor" data-client-id="Editor"
 						style="margin-left: 80%" disabled>Search Editor 
 						<i id="searchEditorSpinner"class="icon-spinner" style="color: white"></i>
 			</button>
@@ -1446,14 +1654,9 @@ function creatorLinkHandler(target) {
 			    </div>
 			    <input type="hidden" id="uriEditorLocalId" />
 		    </div>
-		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div>
+		    <div class="text-warning pull-right" id="editorAuthorityUsed"></div><br>
 		  </div>
-		  <div id="editorAffiliations">
-		  <div id="editorAffiliationTemplate" class="form-group">
-		    <label for="editorAffiliation">Affiliation:</label>
-		    <input type="text" class="form-control" placeholder="Affiliation">
-		  </div>
-		  </div>
+		  <div id="editorAffiliations"></div>
 		  <div>
 		  <div class="text-right"><a id="addEditorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
@@ -1461,7 +1664,7 @@ function creatorLinkHandler(target) {
       
       <div class="modal-footer">
         <button type="button" id="addEditorModalCancel" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button id="addEditorButton" type="button" class="btn btn-primary">Add Editor</button>
+        <button id="addEditorButton" type="button" class="btn btn-primary" disabled>Add Editor</button>
       </div>
     </div>
   </div>
@@ -1489,7 +1692,7 @@ function creatorLinkHandler(target) {
 		    <input type="text" class="form-control" id="lastNameCreator" placeholder="Last Name">
 		  </div>
 		  <div>
-			<button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchCreator"
+			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" id="searchCreator" data-client-id="Creator"
 				style="margin-left: 80%" disabled> Search Creator 
 				<i id="searchCreatorSpinner" class="icon-spinner rotating" style="color: white"></i>
 			</button>
@@ -1505,14 +1708,11 @@ function creatorLinkHandler(target) {
 			    </div>
 			    <input type="hidden" id="uriCreatorLocalId" />
 		    </div>
-		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div>
+		    <div class="text-warning pull-right" id="creatorAuthorityUsed"></div><br>
 		  </div>
-		  <div id="creatorAffiliations">
-		  <div id="creatorAffiliationTemplate" class="form-group">
-		    <label for="affiliationCreator">Affiliation:</label>
-		    <input type="text" class="form-control" placeholder="Affiliation">
-		  </div>
-		  </div>
+		  
+		  <div id="creatorAffiliations"></div>
+		  
 		  <div>
 		  <div class="text-right"><a id="addCreatorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
       	  </div>
@@ -1520,7 +1720,7 @@ function creatorLinkHandler(target) {
       
       <div class="modal-footer">
         <button type="button" class="btn btn-default" id="addCreatorModalCancel">Close</button>
-        <button id="addCreatorButton" type="button" class="btn btn-primary">Add Creator</button>
+        <button id="addCreatorButton" type="button" class="btn btn-primary" disabled>Add Creator</button>
       </div>
     </div>
   </div>
@@ -1554,6 +1754,10 @@ function creatorLinkHandler(target) {
 							<a href="#conceptpowerAuthoritiesTabContent"
 								aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from Conceptpower</a>
 						</li>
+                        <li role="presentation">
+                            <a href="#viafAuthoritiesTabContent"
+                                aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from VIAF</a>
+                        </li>
 					</ul>
 					<!-- Tab panes -->
 					<div class="tab-content">
@@ -1588,8 +1792,8 @@ function creatorLinkHandler(target) {
 							<div id="conceptpowerAuthoritiesError" class="text-warning" style="display: none">
 								<span> Error occurred while searching authorities in conceptpower </span>
 							</div>
-							<div id="mycheckboxDiv">
-							<input type="checkbox" id="mycheckbox" name="mycheckbox" th:checked="checked"> Add authority to group <span id="cp-groupName"></span>
+							<div id="cp-checkboxDiv">
+							<input type="checkbox" id="cp-checkbox" name="cp-checkbox" th:checked="checked"> Add authority to group <span id="cp-groupName"></span>
 							</div>
 							</br>
 							<table class="table table-striped table-bordered table-fixed">
@@ -1599,6 +1803,23 @@ function creatorLinkHandler(target) {
 							</table>
 							
 						</div>
+                        
+                        <div role="tabpanel" class="tab-pane" id="viafAuthoritiesTabContent">
+                            <ul id="viafAuthority-pagination-top" class="pagination-sm"></ul>
+                            <div id="viafAuthoritiesError" class="text-warning" style="display: none">
+                                <span> Error occurred while searching authorities in VIAF </span>
+                            </div>
+                            <div id="viaf-checkboxDiv">
+                            <input type="checkbox" id="viaf-checkbox" name="viaf-checkbox" th:checked="checked"> Add authority to group <span id="viaf-groupName"></span>
+                            </div>
+                            </br>
+                            <table class="table table-striped table-bordered table-fixed">
+                                <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+                                <tbody id="viafAuthoritySearchResult">
+                                </tbody>
+                            </table>
+                        </div>
+                        
 					</div>
 				</div>
 				<div class="modal-footer">

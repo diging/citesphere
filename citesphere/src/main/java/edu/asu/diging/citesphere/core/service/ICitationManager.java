@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.core.service;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -29,7 +28,7 @@ public interface ICitationManager {
 
     List<ICitationGroup> getGroups(IUser user);
 
-    CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy)
+    CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds)
             throws GroupDoesNotExistException, ZoteroHttpStatusException;
 
     /**
@@ -46,10 +45,13 @@ public interface ICitationManager {
     
     List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException,
             GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
-
-    void updateCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException;
     
+    List<ICitation> getNotes(IUser user, String groupId, String key)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
+
+    void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
+            CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
+   
     ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
             ExecutionException, JsonProcessingException;
@@ -63,6 +65,9 @@ public interface ICitationManager {
     
     List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
+    
+    List<ICitation> updateNotesFromZotero(IUser user, String groupId, String itemKey)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 
     ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException,
@@ -71,13 +76,13 @@ public interface ICitationManager {
     List<String> getValidCreatorTypes(IUser user, ItemType itemType);
     
     CitationPage getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy,
-            int index) throws GroupDoesNotExistException, ZoteroHttpStatusException;
+            int index, List<String> conceptIds) throws GroupDoesNotExistException, ZoteroHttpStatusException;
 
     void forceGroupItemsRefresh(IUser user, String groupId, String collectionId, int page, String sortBy);
 
     CloseableIterator<ICitation> getAllGroupItems(IUser user, String groupId, String collectionId) throws
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
-
+    
     void deleteLocalGroupCitations(String groupId);
     
 }

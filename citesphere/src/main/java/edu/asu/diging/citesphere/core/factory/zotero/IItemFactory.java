@@ -10,4 +10,6 @@ public interface IItemFactory {
 
     Item createItem(ICitation citation, List<String> collectionIds);
 
+    Item createMetaDataItem(ICitation citation);
+    
 }

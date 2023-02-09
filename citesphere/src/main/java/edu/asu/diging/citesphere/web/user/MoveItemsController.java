@@ -22,6 +22,8 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.impl.AsyncCitationManager;
+import edu.asu.diging.citesphere.core.service.impl.async.AsyncUpdateCitationsResponse;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
@@ -45,8 +47,10 @@ public class MoveItemsController {
     @Autowired
     private ICitationCollectionManager collectionManager;
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/move",
-            "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move" }, method = RequestMethod.POST)
+    @RequestMapping(value = { 
+        "/auth/group/{zoteroGroupId}/items/move",
+        "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move" 
+    }, method = RequestMethod.POST)
     public @ResponseBody String moveItemsToCollection(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @RequestBody String itemsData) throws Exception {
         Gson gson = new Gson();
@@ -65,33 +69,39 @@ public class MoveItemsController {
                     (IUser) authentication.getPrincipal());
         }
         AsyncUpdateCitationsResponse asyncResponse = asyncCitationManager
-                .updateCitations((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
+                .moveCitationsToCollection((IUser) authentication.getPrincipal(), zoteroGroupId, citations);
         return gson.toJson(asyncResponse, AsyncUpdateCitationsResponse.class);
     }
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/move/{taskID}/status",
-            "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/{taskID}/status" })
+    @RequestMapping(value = {
+        "/auth/group/{zoteroGroupId}/items/move/{taskID}/status",
+        "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/{taskID}/status"
+    })
     public @ResponseBody AsyncUpdateCitationsResponse getMoveItemsStatus(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID)
             throws Exception {
         return asyncCitationManager.getUpdateCitationsResponse(taskID);
     }
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/move/task/{taskID}/clear",
-            "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/task/{taskID}/clear" }, method = RequestMethod.POST)
+    @RequestMapping(value = {
+        "/auth/group/{zoteroGroupId}/items/move/task/{taskID}/clear",
+        "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/move/task/{taskID}/clear"
+    }, method = RequestMethod.POST)
     public @ResponseBody void clearTask(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("taskID") String taskID) {
-        asyncCitationManager.clearTask(taskID);
+        asyncCitationManager.clearUpdateTask(taskID);
     }
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/move/{targetCollectionId}/sync/start",
-            "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/sync/start" })
+    @RequestMapping(value = {
+        "/auth/group/{zoteroGroupId}/items/move/{targetCollectionId}/sync/start",
+        "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/sync/start"
+    })
     public @ResponseBody Sync startSync(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("targetCollectionId") String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
         try {
             citationManager.getGroupItems((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId,
-                    new Integer(page), null);
+                    new Integer(page), null, null);
             Sync sync = new Sync();
             sync.setStatus("sync-started");
             return sync;
@@ -104,8 +114,10 @@ public class MoveItemsController {
         }
     }
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/items/move/{targetCollectionId}/totalItems",
-            "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/totalItems" })
+    @RequestMapping(value = {
+        "/auth/group/{zoteroGroupId}/items/move/{targetCollectionId}/totalItems",
+        "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/totalItems"
+    })
     public @ResponseBody Long getTotalCitationsCollection(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("targetCollectionId") String collectionId) {
         ICitationCollection collection = collectionManager.getCollection((IUser) authentication.getPrincipal(),
