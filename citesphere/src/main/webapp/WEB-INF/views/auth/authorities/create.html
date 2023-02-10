@@ -36,8 +36,10 @@ $(function() {
         $("#searchAuthorSpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         $('#viafAuthority-pagination-top').twbsPagination('destroy');
+        $('#isisCBAuthority-pagination-top').twbsPagination('destroy');
         getViafAuthorities('Author', 'Author', 0)
         getConceptpowerAuthorities('Author', 'Author', 0)
+        getIsisCBAuthorities('Author', 'Author', 0)
         $("#searchAuthorSpinner").hide();
     });
 
@@ -231,6 +233,75 @@ function getViafAuthorities(modalType, personType, page) {
     });
 }
 
+function getIsisCBAuthorities(modalType, personType, page) {
+    var firstName = $("#firstName" + personType).val();
+    var lastName = $("#lastName" + personType).val();
+    personType_lowerCase = personType.toLowerCase();
+    var authorizationToken = "Token 5e86a6fa0f3e18ea265cdc328c13018a6fc85cff";
+    var limit = 20;
+    url = 'http://isiscb-staging-p3-2.us-west-2.elasticbeanstalk.com/rest/authority/search' + '?query=' + firstName + '+' + lastName + '&limit=' + limit + '&offset=' + page*limit;
+    $.ajax({
+        dataType: "json",
+        type: 'GET',
+        beforeSend: function(request) {
+            request.setRequestHeader("Authorization", authorizationToken);
+            request.setRequestHeader("Access-Control-Allow-Origin", "*");
+            request.setRequestHeader("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS");
+            request.setRequestHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+        },
+        url: url,
+        async: false,
+        success: function(data) {
+            $("#isisCBAuthoritySearchResult").empty();
+            var content = '';
+
+            if (data['results'] != null && data['results'].length > 0) {
+                data['results'].forEach(function(elem) {
+                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['id'] + '</td> <td class="description">';
+                    if (elem['description'] == null) {
+                        content += ' - </td>';
+                    } else {
+                        content += elem['description'] + '</td>';
+                    }
+                    content += '<td style="vertical-align: middle;"><span class="isisCB-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+
+                });
+
+                $('#isisCBAuthority-pagination-top').twbsPagination({
+                    totalPages: data['count']/limit,
+                    startPage: 1,
+                    prev: "«",
+                    next: "»",
+                    visiblePages: 5,
+                    initiateStartPageClick: false,
+                    onPageClick: function(event, page) {
+                        getIsisCBAuthorities(modalType, personType, page)
+                    }
+                });
+
+            }
+
+            $("#isisCBAuthoritySearchResult").append(content);
+            $(".isisCB-authority-entry").click(function() {
+                name = $(this).closest("tr").find(".name").text();
+                uri = $(this).closest("tr").find(".uri").text();
+
+                description = $(this).closest("tr").find(".description").text();
+                
+                showPerson(name, description, uri, undefined);
+                $("#selectAuthorityModel").modal('hide');
+                $("#authorModal").modal('hide');
+                resetPersonCreationModal("Author");
+            });
+        },
+        error: function(data) {
+            $('#isisCBAuthoritySearchResult').parents('table').hide()
+            $("#isisCBAuthoritiesError").show();
+        }
+
+    });
+}
+
 function resetPersonCreationModal(modalType) {
     var modalNameLCase = modalType.toLowerCase();
     $("#firstName" + modalType).val("");
@@ -409,7 +480,7 @@ function getPersonAuthority(uri, personType) {
                         </li>
                         <li role="presentation">
                             <a href="#isisCBAuthoritiesTabContent"
-                                aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from IsisCB</a>
+                                aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from IsisCB_create</a>
                         </li>
                     </ul>
                     
@@ -444,12 +515,12 @@ function getPersonAuthority(uri, personType) {
                         <div role="tabpanel" class="tab-pane" id="isisCBAuthoritiesTabContent">
                             <ul id="isisCBAuthority-pagination-top" class="pagination-sm"></ul>
                             <div id="isisCBAuthoritiesError" class="text-warning" style="display: none">
-                                <span> Error occurred while searching authorities in ISISCB </span>
+                                <span> Error occurred while searching authorities in ISISCB1 </span>
                             </div>
                             </br>
                             <table class="table table-striped table-bordered table-fixed">
                                 <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
-                                <tbody id="isisCBAuthoritiesTabContent">
+                                <tbody id="isisCBAuthoritySearchResult">
                                 </tbody>
                             </table>
                         </div>
