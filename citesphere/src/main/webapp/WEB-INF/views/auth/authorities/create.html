@@ -239,16 +239,10 @@ function getIsisCBAuthorities(modalType, personType, page) {
     personType_lowerCase = personType.toLowerCase();
     var authorizationToken = "Token 5e86a6fa0f3e18ea265cdc328c13018a6fc85cff";
     var limit = 20;
-    url = 'http://isiscb-staging-p3-2.us-west-2.elasticbeanstalk.com/rest/authority/search' + '?query=' + firstName + '+' + lastName + '&limit=' + limit + '&offset=' + page*limit;
+    url = [[@{|/auth/authority/find/authorities/isiscb|}]] + '?firstName=' + firstName + '&lastName=' + lastName + '&page=' +page;
     $.ajax({
         dataType: "json",
         type: 'GET',
-        beforeSend: function(request) {
-            request.setRequestHeader("Authorization", authorizationToken);
-            request.setRequestHeader("Access-Control-Allow-Origin", "*");
-            request.setRequestHeader("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS");
-            request.setRequestHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-        },
         url: url,
         async: false,
         success: function(data) {
