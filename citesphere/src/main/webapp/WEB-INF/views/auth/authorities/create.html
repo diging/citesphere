@@ -249,9 +249,9 @@ function getIsisCBAuthorities(modalType, personType, page) {
             $("#isisCBAuthoritySearchResult").empty();
             var content = '';
 
-            if (data['results'] != null && data['results'].length > 0) {
-                data['results'].forEach(function(elem) {
-                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['id'] + '</td> <td class="description">';
+            if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+                data['foundAuthorities'].forEach(function(elem) {
+                    content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
                     if (elem['description'] == null) {
                         content += ' - </td>';
                     } else {
@@ -262,8 +262,8 @@ function getIsisCBAuthorities(modalType, personType, page) {
                 });
 
                 $('#isisCBAuthority-pagination-top').twbsPagination({
-                    totalPages: data['count']/limit,
-                    startPage: 1,
+                    totalPages: data['totalPages'],
+                    startPage: data['currentPage'],
                     prev: "«",
                     next: "»",
                     visiblePages: 5,
@@ -275,7 +275,7 @@ function getIsisCBAuthorities(modalType, personType, page) {
 
             }
 
-            $("#isisCBAuthoritySearchResult").append(content);
+            $("#isisCBAuthoritySearchResult").append(content) ;
             $(".isisCB-authority-entry").click(function() {
                 name = $(this).closest("tr").find(".name").text();
                 uri = $(this).closest("tr").find(".uri").text();
@@ -474,7 +474,7 @@ function getPersonAuthority(uri, personType) {
                         </li>
                         <li role="presentation">
                             <a href="#isisCBAuthoritiesTabContent"
-                                aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from IsisCB_create</a>
+                                aria-controls="browseTab" role="tab" data-toggle="tab">Authorities from IsisCB</a>
                         </li>
                     </ul>
                     
@@ -509,7 +509,7 @@ function getPersonAuthority(uri, personType) {
                         <div role="tabpanel" class="tab-pane" id="isisCBAuthoritiesTabContent">
                             <ul id="isisCBAuthority-pagination-top" class="pagination-sm"></ul>
                             <div id="isisCBAuthoritiesError" class="text-warning" style="display: none">
-                                <span> Error occurred while searching authorities in ISISCB1 </span>
+                                <span> Error occurred while searching authorities in ISISCB </span>
                             </div>
                             </br>
                             <table class="table table-striped table-bordered table-fixed">

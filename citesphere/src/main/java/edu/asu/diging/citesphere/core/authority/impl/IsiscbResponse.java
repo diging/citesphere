@@ -11,11 +11,11 @@ public class IsiscbResponse {
 
     private int count;
 
-    public List<IsiscbEntry> getIsiscbEntries() {
+    public List<IsiscbEntry> getResults() {
         return results;
     }
 
-    public void setIsiscbEntries(List<IsiscbEntry> results) {
+    public void setResults(List<IsiscbEntry> results) {
         this.results = results;
     }
 
@@ -27,4 +27,5 @@ public class IsiscbResponse {
         this.count = count;
     }
 
+    
 }

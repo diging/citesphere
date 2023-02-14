@@ -44,6 +44,9 @@ public class IsiscbImporter extends BaseAuthorityImporter {
 
     @Value("${_isiscb_url}")
     private String isiscbURL;
+    
+    @Value("${isiscb_uri_string}")
+    private String isiscbUriString;
 
     private RestTemplate restTemplate;
 
@@ -98,23 +101,6 @@ public class IsiscbImporter extends BaseAuthorityImporter {
     @Override
     public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
             throws AuthorityServiceConnectionException {
-
-//        RequestEntity<Void> request;
-//        try {
-//            String url = isiscbURL + isiscbSearchKeyword + URLEncoder
-//                    .encode(this.getIsiscbSearchString(firstName, lastName), StandardCharsets.UTF_8.toString())
-//                    + "&page=" + page;
-//            URI uri = UriComponentsBuilder.fromUriString(url.toString()).build(true).toUri();
-//            
-//            HttpHeaders isisCBheader = new HttpHeaders();
-//            String isisCBtoken = "Token 5e86a6fa0f3e18ea265cdc328c13018a6fc85cff";
-//            isisCBheader.set("Authorization", isisCBtoken);
-//            
-//            request = RequestEntity.get(uri).accept(MediaType.APPLICATION_JSON).headers(isisCBheader).build();
-//        } catch (UnsupportedEncodingException e) {
-//            throw new AuthorityServiceConnectionException("Exception occured while creating URI for authority search",
-//                    e);
-//        }
         
         String url = isiscbURL + isiscbSearchKeyword + this.getIsiscbSearchString(firstName, lastName);
         
@@ -131,28 +117,23 @@ public class IsiscbImporter extends BaseAuthorityImporter {
             throw new AuthorityServiceConnectionException(ex);
         }
         
-//        try {
-//            response = restTemplate.exchange(request, IsiscbResponse.class);
-//        } catch (RestClientException ex) {
-//            throw new AuthorityServiceConnectionException(ex);
-//        }
-
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
         AuthoritySearchResult searchResult = new AuthoritySearchResult();
         if (response.getStatusCode() == HttpStatus.OK) {
             IsiscbResponse isiscbEntries = response.getBody();
-            if (isiscbEntries.getIsiscbEntries() != null) {
-                for (IsiscbEntry isiscbEntry : isiscbEntries.getIsiscbEntries()) {
+            if (isiscbEntries.getResults() != null) {
+                for (IsiscbEntry isiscbEntry : isiscbEntries.getResults()) {
                     IAuthorityEntry authority = new AuthorityEntry();
                     authority.setName(isiscbEntry.getName());
-//                    authority.setUri(isiscbEntry.getConcept_uri());
+                    authority.setId(isiscbEntry.getId());
+                    authority.setUri(isiscbUriString.replace("{0}",  isiscbEntry.getId()));
                     authority.setDescription(isiscbEntry.getDescription());
 //                    authority.setAutorityType(isiscbEntry.getAuthority_type());
                     authorityEntries.add(authority);
                 }
                 searchResult.setFoundAuthorities(authorityEntries);
-//                searchResult.setTotalPages((int) Math
-//                        .ceil(isiscbEntries.getPagination().getTotalNumberOfRecords() / new Float(pageSize)));
+                searchResult.setTotalPages((int) Math
+                        .ceil(isiscbEntries.getCount() / new Float(pageSize)));
             }
         } else {
             throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
