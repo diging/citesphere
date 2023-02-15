@@ -172,6 +172,7 @@ public class ItemFactory implements IItemFactory {
         extraDataObject.setEditors(citation.getEditors());
         extraDataObject.setOtherCreators(citation.getOtherCreators());
         extraDataObject.setGilesUploads(citation.getGilesUploads());
+        extraDataObject.setSameAs(citation.getSameAs());
         
         if (citation.getConceptTags() != null) {
             extraDataObject.setConceptTags(citation.getConceptTags());
