@@ -44,7 +44,7 @@ public class IsiscbImporter extends BaseAuthorityImporter {
 
     @Value("${_isiscb_url}")
     private String isiscbURL;
-    
+
     @Value("${isiscb_uri_string}")
     private String isiscbUriString;
 
@@ -101,9 +101,10 @@ public class IsiscbImporter extends BaseAuthorityImporter {
     @Override
     public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
             throws AuthorityServiceConnectionException {
-        
-        String url = isiscbURL + isiscbSearchKeyword + this.getIsiscbSearchString(firstName, lastName);
-        
+
+        String url = isiscbURL + isiscbSearchKeyword + this.getIsiscbSearchString(firstName, lastName)
+                + this.getLimitOffsetString(page, pageSize);
+
         HttpHeaders isisCBheader = new HttpHeaders();
         String isisCBtoken = "Token 5e86a6fa0f3e18ea265cdc328c13018a6fc85cff";
         isisCBheader.set("Authorization", isisCBtoken);
@@ -116,7 +117,7 @@ public class IsiscbImporter extends BaseAuthorityImporter {
         } catch (RestClientException ex) {
             throw new AuthorityServiceConnectionException(ex);
         }
-        
+
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
         AuthoritySearchResult searchResult = new AuthoritySearchResult();
         if (response.getStatusCode() == HttpStatus.OK) {
@@ -126,14 +127,13 @@ public class IsiscbImporter extends BaseAuthorityImporter {
                     IAuthorityEntry authority = new AuthorityEntry();
                     authority.setName(isiscbEntry.getName());
                     authority.setId(isiscbEntry.getId());
-                    authority.setUri(isiscbUriString.replace("{0}",  isiscbEntry.getId()));
+                    authority.setUri(isiscbUriString.replace("{0}", isiscbEntry.getId()));
                     authority.setDescription(isiscbEntry.getDescription());
 //                    authority.setAutorityType(isiscbEntry.getAuthority_type());
                     authorityEntries.add(authority);
                 }
                 searchResult.setFoundAuthorities(authorityEntries);
-                searchResult.setTotalPages((int) Math
-                        .ceil(isiscbEntries.getCount() / new Float(pageSize)));
+                searchResult.setTotalPages((int) Math.ceil(isiscbEntries.getCount() / new Float(pageSize)));
             }
         } else {
             throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
@@ -142,13 +142,19 @@ public class IsiscbImporter extends BaseAuthorityImporter {
     }
 
     private String getIsiscbSearchString(String firstName, String lastName) {
-        String conceptpowerSearchString;
+        String isisCBSearchString;
         if (firstName != null && lastName != null) {
-            conceptpowerSearchString = firstName + "+" + lastName;
+            isisCBSearchString = firstName + "+" + lastName;
         } else {
-            conceptpowerSearchString = firstName == null ? lastName : firstName;
+            isisCBSearchString = firstName == null ? lastName : firstName;
         }
-        return conceptpowerSearchString;
+        return isisCBSearchString;
+    }
+
+    private String getLimitOffsetString(int page, int pageSize) {
+        String isisCblimitOffsetString;
+        isisCblimitOffsetString = "&limit=" + pageSize + "&offset=" + pageSize * page;
+        return isisCblimitOffsetString;
     }
 
 }
