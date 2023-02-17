@@ -45,7 +45,7 @@ public class IsiscbImporter extends BaseAuthorityImporter {
     @Value("${_isiscb_url}")
     private String isiscbURL;
 
-    @Value("${isiscb_uri_string}")
+    @Value("${_isiscb_uri_string}")
     private String isiscbUriString;
 
     private RestTemplate restTemplate;
@@ -129,7 +129,6 @@ public class IsiscbImporter extends BaseAuthorityImporter {
                     authority.setId(isiscbEntry.getId());
                     authority.setUri(isiscbUriString.replace("{0}", isiscbEntry.getId()));
                     authority.setDescription(isiscbEntry.getDescription());
-//                    authority.setAutorityType(isiscbEntry.getAuthority_type());
                     authorityEntries.add(authority);
                 }
                 searchResult.setFoundAuthorities(authorityEntries);
