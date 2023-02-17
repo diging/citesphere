@@ -269,7 +269,7 @@ function getIsisCBAuthorities(modalType, personType, page) {
                     visiblePages: 5,
                     initiateStartPageClick: false,
                     onPageClick: function(event, page) {
-                        getIsisCBAuthorities(modalType, personType, page)
+                        getIsisCBAuthorities(modalType, personType, page-1)
                     }
                 });
 
