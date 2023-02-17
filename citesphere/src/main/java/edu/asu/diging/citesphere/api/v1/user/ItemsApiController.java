@@ -107,4 +107,29 @@ public class ItemsApiController extends V1Controller {
         return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
     }
 
+    @RequestMapping(value = { "/groups/items" }, produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<String> getItemsByUri(@RequestHeader HttpHeaders headers,
+			@RequestParam(defaultValue = "1", required = false, value = "page") String page,
+			@RequestParam(value = "uri") String uri, Principal principal) {
+
+		IUser user = userManager.findByUsername(principal.getName());
+
+		CitationResults results;
+
+		results = citationManager.getItemsByUri(user, uri, page);
+
+		Items itemsResponse = new Items();
+		itemsResponse.setItems(results.getCitations());
+
+		String jsonResponse = "";
+		try {
+			jsonResponse = objectMapper.writeValueAsString(itemsResponse);
+		} catch (IOException e) {
+			logger.error("Unable to process JSON response ", e);
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
+	}
+
 }

@@ -84,5 +84,7 @@ public interface ICitationManager {
             ZoteroHttpStatusException, SyncInProgressException, GroupDoesNotExistException, AccessForbiddenException;
     
     void deleteLocalGroupCitations(String groupId);
+
+	CitationResults getItemsByUri(IUser user, String uri, String page);
     
 }
