@@ -15,6 +15,28 @@ $(function() {
             window.location.href = "[(@{|/auth/jobs/sync/list|})]?page=" + (page - 1);
         }
     });
+    
+ 	$("#jobStatus").change(function () {
+		console.log("job status val"+$("#jobStatus").val());
+		var jobStatus = $("#jobStatus").val();
+		var jobId = $("#jobId").val();
+	    if($("#jobStatus").val() === 'All'){
+	    	window.location.href = [[@{/auth/jobs/sync/list}]];
+	    } else {
+	    	window.location.href = [[@{/auth/jobs/sync/list}]] + "?jobStatus=" + jobStatus + "&jobId=" + jobId;
+	    }
+	}); 
+ 	
+ 	$("#jobId").change(function () {
+		console.log("job id val"+$("#jobId").val());
+		var jobStatus = $("#jobStatus").val();
+		var jobId = $("#jobId").val();
+	    if($("#jobId").val() === 'All'){
+	    	window.location.href = [[@{/auth/jobs/sync/list}]];
+	    } else {
+	    	window.location.href = [[@{/auth/jobs/sync/list}]] + "?jobStatus=" + jobStatus + "&jobId=" + jobId;
+	    }
+	}); 
 });
 </script>
 </head>
@@ -22,6 +44,23 @@ $(function() {
 <body>
 <div layout:fragment="content">
 <h1>Jobs</h1>
+
+
+<label for="jobStatus">Job Status</label>
+<select class="form-control" id="jobStatus" name="jobStatus" >
+	<span >
+		<option>All</option>
+		<option th:each="status:${T(edu.asu.diging.citesphere.core.model.jobs.JobStatus).values()}" th:value="${status}" th:text="${status}">[[${status}]]</option>
+	</span>  
+</select><br>
+
+<label for="jobId">Job Id</label>
+<select class="form-control" id="jobId" name="jobId">
+	<span >
+		<option>All</option>
+		<option th:each="job:${jobs}" th:value="${job.id}" th:text="${job.id}">[[${job.id}]]</option>
+	</span>  
+</select><br>
 
 <ul id="pagination-top" class="pagination-sm"></ul>
 

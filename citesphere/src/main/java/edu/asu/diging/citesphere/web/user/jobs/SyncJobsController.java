@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.user.IUser;
@@ -19,8 +20,11 @@ public class SyncJobsController {
     private ISyncJobManager jobManager;
 
     @RequestMapping("/auth/jobs/sync/list")
-    public String list(Model model, @PageableDefault(sort = { "createdOn" }, direction = Direction.DESC) Pageable page,
-            Authentication authentication) {
+    public String list(Model model, @PageableDefault(sort = { "createdOn" }, direction = Direction.DESC) Pageable page, Authentication authentication,
+            @RequestParam(defaultValue = "All", required = false, value = "jobId") String jobId,
+            @RequestParam(defaultValue = "All", required = false, value = "jobStatus") String jobStatus) {
+        System.out.println("job status :"+jobStatus);
+        System.out.println("job id :"+jobId);
         long total = jobManager.getJobsCount((IUser) authentication.getPrincipal());
         if (total == -1) {
             return "redirect:/";
