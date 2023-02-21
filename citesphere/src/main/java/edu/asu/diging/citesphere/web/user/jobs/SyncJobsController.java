@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -29,7 +30,21 @@ public class SyncJobsController {
         if (total == -1) {
             return "redirect:/";
         }
-        model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), page));
+        
+        JobStatus status;
+        
+        if (jobStatus.equals("All") && jobId.equals("All")) {
+            model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), page));
+        } else if (!jobStatus.equals("All") && jobId.equals("All")) {
+            status = JobStatus.valueOf(jobStatus);
+            model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), status, page));
+        }  else if (jobStatus.equals("All") && !jobId.equals("All")) {
+            model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), jobId, page));
+        } else {
+            status = JobStatus.valueOf(jobStatus);
+            model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(),status, jobId, page));
+        }
+       
         model.addAttribute("total", Math.ceil(total/page.getPageSize()));
         model.addAttribute("page", page.getPageNumber() + 1);
         return "auth/jobs/list";
