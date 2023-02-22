@@ -17,7 +17,7 @@ public interface GroupSyncJobRepository extends PagingAndSortingRepository<Group
     
     public List<GroupSyncJob> findByGroupIdInAndStatus(List<String> groupIds, JobStatus status, Pageable page);
     
-    public List<GroupSyncJob> findByGroupIdInAndId(List<String> groupIds, String id, Pageable page);
+    public List<GroupSyncJob> findByGroupIdInAndIdStartsWith(List<String> groupIds, String id, Pageable page);
     
     public List<GroupSyncJob> findByGroupIdInAndStatusAndIdStartsWith(List<String> groupIds, JobStatus status, String id, Pageable page);
     
