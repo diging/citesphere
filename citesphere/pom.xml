@@ -99,6 +99,9 @@
         <cleanupCycle>86400000</cleanupCycle>
         <javers.default.author>Sync Process</javers.default.author>
 
+        <isiscb.url>http://isiscb-staging-p3-2.us-west-2.elasticbeanstalk.com/rest/</isiscb.url>
+        <isiscb.uriString>https://data.isiscb.org/isis/authority/{0}/</isiscb.uriString>
+
     </properties>
 
     <dependencyManagement>

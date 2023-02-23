@@ -105,11 +105,11 @@ public class IsiscbImporter extends BaseAuthorityImporter {
         String url = isiscbURL + isiscbSearchKeyword + this.getIsiscbSearchString(firstName, lastName)
                 + this.getLimitOffsetString(page, pageSize);
 
-        HttpHeaders isisCBheader = new HttpHeaders();
+        HttpHeaders isisCbHeader = new HttpHeaders();
         String isisCBtoken = "Token 5e86a6fa0f3e18ea265cdc328c13018a6fc85cff";
-        isisCBheader.set("Authorization", isisCBtoken);
+        isisCbHeader.set("Authorization", isisCBtoken);
 
-        HttpEntity<String> entityReq = new HttpEntity<String>(isisCBheader);
+        HttpEntity<String> entityReq = new HttpEntity<String>(isisCbHeader);
 
         ResponseEntity<IsiscbResponse> response = null;
         try {
@@ -120,23 +120,25 @@ public class IsiscbImporter extends BaseAuthorityImporter {
 
         List<IAuthorityEntry> authorityEntries = new ArrayList<IAuthorityEntry>();
         AuthoritySearchResult searchResult = new AuthoritySearchResult();
-        if (response.getStatusCode() == HttpStatus.OK) {
-            IsiscbResponse isiscbEntries = response.getBody();
-            if (isiscbEntries.getResults() != null) {
-                for (IsiscbEntry isiscbEntry : isiscbEntries.getResults()) {
-                    IAuthorityEntry authority = new AuthorityEntry();
-                    authority.setName(isiscbEntry.getName());
-                    authority.setId(isiscbEntry.getId());
-                    authority.setUri(isiscbUriString.replace("{0}", isiscbEntry.getId()));
-                    authority.setDescription(isiscbEntry.getDescription());
-                    authorityEntries.add(authority);
-                }
-                searchResult.setFoundAuthorities(authorityEntries);
-                searchResult.setTotalPages((int) Math.ceil(isiscbEntries.getCount() / new Float(pageSize)));
-            }
-        } else {
+        
+        if (response.getStatusCode() != HttpStatus.OK) {
             throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
         }
+        
+        IsiscbResponse isiscbEntries = response.getBody();
+        if (isiscbEntries.getResults() != null) {
+            for (IsiscbEntry isiscbEntry : isiscbEntries.getResults()) {
+                IAuthorityEntry authority = new AuthorityEntry();
+                authority.setName(isiscbEntry.getName());
+                authority.setId(isiscbEntry.getId());
+                authority.setUri(isiscbUriString.replace("{0}", isiscbEntry.getId()));
+                authority.setDescription(isiscbEntry.getDescription());
+                authorityEntries.add(authority);
+            }
+            searchResult.setFoundAuthorities(authorityEntries);
+            searchResult.setTotalPages((int) Math.ceil(isiscbEntries.getCount() / new Float(pageSize)));
+        }
+
         return searchResult;
     }
 
@@ -151,9 +153,7 @@ public class IsiscbImporter extends BaseAuthorityImporter {
     }
 
     private String getLimitOffsetString(int page, int pageSize) {
-        String isisCblimitOffsetString;
-        isisCblimitOffsetString = "&limit=" + pageSize + "&offset=" + pageSize * page;
-        return isisCblimitOffsetString;
+        return "&limit=" + pageSize + "&offset=" + pageSize * page; 
     }
 
 }
