@@ -106,7 +106,10 @@ public class IsiscbImporter extends BaseAuthorityImporter {
                 + this.getLimitOffsetString(page, pageSize);
 
         HttpHeaders isisCbHeader = new HttpHeaders();
-        String isisCBtoken = "Token 5e86a6fa0f3e18ea265cdc328c13018a6fc85cff";
+        // Get token from DB:
+        
+//        List<> tokensByUsername = tokenRepository.findByUsername(userName);
+        
         isisCbHeader.set("Authorization", isisCBtoken);
 
         HttpEntity<String> entityReq = new HttpEntity<String>(isisCbHeader);
