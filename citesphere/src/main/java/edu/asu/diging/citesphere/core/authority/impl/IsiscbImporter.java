@@ -47,6 +47,9 @@ public class IsiscbImporter extends BaseAuthorityImporter {
 
     @Value("${_isiscb_uri_string}")
     private String isiscbUriString;
+    
+    @Value("${_isiscb_token}")
+    private String isisCBtoken;
 
     private RestTemplate restTemplate;
 
@@ -106,10 +109,6 @@ public class IsiscbImporter extends BaseAuthorityImporter {
                 + this.getLimitOffsetString(page, pageSize);
 
         HttpHeaders isisCbHeader = new HttpHeaders();
-        // Get token from DB:
-        
-//        List<> tokensByUsername = tokenRepository.findByUsername(userName);
-        
         isisCbHeader.set("Authorization", isisCBtoken);
 
         HttpEntity<String> entityReq = new HttpEntity<String>(isisCbHeader);
