@@ -490,7 +490,9 @@ function pollStatus(){
 	                </li>
 	            </tbody>
 	        </ul>
-	    </div>
+        </div>
+        
+     
         
 	    <div class="dropdown pull-right" style="padding-bottom: 10px;">
 	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -521,7 +523,17 @@ function pollStatus(){
     			</div>
 			</div>
 			</th>
-			<th>Type</th>
+			<th>Type
+				   </div>
+	    			<label for="itemType"></label>
+			    	<select class="form-control" id="itemType" name="itemType" >
+						<span >
+							<option>All</option>
+							<option th:each="itemType:${T(edu.asu.diging.citesphere.model.bib.ItemType).values()}" th:value="${itemType}" th:text="${itemType}">[[${itemType}]]</option>
+						</span> 
+					</select>
+        		<div>
+			</th>
 			<th>Authors</th>
 			<th>Title</th>
 			<th>Date</th>
