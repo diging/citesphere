@@ -2,6 +2,8 @@ package edu.asu.diging.citesphere.api.v1.user;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +71,7 @@ public class ItemsApiController extends V1Controller {
             @RequestParam(required = false, value = "columns") String[] columns, Principal principal)
             throws GroupDoesNotExistException {
         Integer pageInt = 1;
+
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
@@ -109,14 +112,17 @@ public class ItemsApiController extends V1Controller {
 
     @RequestMapping(value = { "/groups/items" }, produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<String> getItemsByUri(@RequestHeader HttpHeaders headers,
-			@RequestParam(defaultValue = "1", required = false, value = "page") String page,
+			@RequestParam(defaultValue = "1", required = false, value = "page") int page,
 			@RequestParam(value = "uri") String uri, Principal principal) {
 
 		IUser user = userManager.findByUsername(principal.getName());
 
 		CitationResults results;
+		List<ICitationGroup> groups = citationManager.getGroups(user);
+		System.out.print(groups.get(0).getGroupId());
+		List<String> groupIds = new ArrayList<String>();
 
-		results = citationManager.getItemsByUri(user, uri, page);
+		results = citationManager.getItemsByUri(groupIds, user, uri, page);
 
 		Items itemsResponse = new Items();
 		itemsResponse.setItems(results.getCitations());
