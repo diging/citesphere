@@ -833,7 +833,12 @@ $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
 	},
 });
 }
-		
+
+$("#itemType").change(function () {
+	var itemType = $("#itemType").val();
+	console.log("itemType " + itemType);
+	console.log(window.location.href);
+});
 </script>
 </div>
 </body>
