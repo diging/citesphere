@@ -413,22 +413,22 @@ function searchAuthorities(modalType, personType) {
   })
   
   $("#userAuthoritySearchResult").empty();
-	$("#groupAuthoritySearchResult").empty();
-	$("#conceptpowerAuthoritySearchResult").empty();
-	$("#viafAuthoritySearchResult").empty();
-  
-	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
-	    $('#selectAuthorityModel a:first').tab('show');
-	})  
-  
-	$('#userAuthority-pagination-top').twbsPagination('destroy');
-	$('#groupAuthority-pagination-top').twbsPagination('destroy');
-	$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-	$('#viafAuthority-pagination-top').twbsPagination('destroy');
-	getUserAuthorities(modalType, personType, 0)
-	getViafAuthorities(modalType, personType, 0)
-	getGroupAuthorities(modalType, personType, 0)
-	getconceptpowerAuthorities(modalType, personType, 0)
+  $("#groupAuthoritySearchResult").empty();
+  $("#conceptpowerAuthoritySearchResult").empty();
+  $("#viafAuthoritySearchResult").empty();
+	 
+  $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+	  $('#selectAuthorityModel a:first').tab('show');
+  })  
+	 
+  $('#userAuthority-pagination-top').twbsPagination('destroy');
+  $('#groupAuthority-pagination-top').twbsPagination('destroy');
+  $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+  $('#viafAuthority-pagination-top').twbsPagination('destroy');
+  getUserAuthorities(modalType, personType, 0)
+  getViafAuthorities(modalType, personType, 0)
+  getGroupAuthorities(modalType, personType, 0)
+  getconceptpowerAuthorities(modalType, personType, 0)
 	
 }
 
@@ -1782,9 +1782,6 @@ function creatorLinkHandler(target) {
 					</ul>
 					<!-- Tab panes -->
 					<div class="tab-content">
-						<!-- <div class="loader" style="font-size: 30px; text-align: center;">
-	                             <i id="authoritySpinner"class="icon-spinner" style="color:#337ab7"></i>
-	                    </div> -->
 						<div role="tabpanel" class="tab-pane active" id="userAuthoritiesTabContent">
 							<ul id="userAuthority-pagination-top" class="pagination-sm"></ul>
 							<div id="userAuthoritiesError" class="text-warning"
