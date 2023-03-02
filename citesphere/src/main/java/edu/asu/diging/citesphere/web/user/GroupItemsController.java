@@ -60,7 +60,8 @@ public class GroupItemsController {
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns,
-            @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) {
+            @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds,
+            @RequestParam(defaultValue = "All", required = false, value = "itemType") String itemType) {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
