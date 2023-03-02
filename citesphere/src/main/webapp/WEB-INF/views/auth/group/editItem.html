@@ -409,8 +409,7 @@ function searchAuthorities(modalType, personType) {
   $("#selectAuthorityModel").on('shown.bs.modal', function(e) {
 	  e.preventDefault();
 	  $("#overlay").hide();
-		/* $("#authoritySpinner").hide(); */
-	
+	  $("#authoritySpinner").hide();
   })
   
   $("#userAuthoritySearchResult").empty();
@@ -824,9 +823,6 @@ function getUserAuthorities(modalType, personType, page) {
   		type: 'GET',
   		url: url ,
   		async: false,
-  		beforeSend: function(){
-  			/* $('#authoritySpinner').show();  */
-  		},
   		success: function(data) {
 			
   			$("#userAuthoritySearchResult").empty();
@@ -873,9 +869,6 @@ function getUserAuthorities(modalType, personType, page) {
 		});	
 		 	
         },
-        complete:function(data){
-        	/* $('#authoritySpinner').hide(); */
-        },
     	error: function(data){
     		$('#userAuthoritySearchResult').parents('table').hide()
     		$("#userAuthoritiesError").show();	
@@ -897,9 +890,6 @@ function getGroupAuthorities(modalType, personType, page) {
   		type: 'GET',
   		url: url ,
   		async: false,
-  		beforeSend: function(){
-  			/* $('#authoritySpinner').show(); */
-  		},
   		success: function(data) {
 			
   			$("#groupAuthoritySearchResult").empty();
@@ -947,9 +937,6 @@ function getGroupAuthorities(modalType, personType, page) {
 		});	
 		 	
         },
-        complete:function(data){
-        	/* $('#authoritySpinner').hide(); */
-        },
     	error: function(data){
     		$('#groupAuthoritySearchResult').parents('table').hide()
     		$("#groupAuthoritiesError").show();	
@@ -972,9 +959,6 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		type: 'GET',
   		url: url ,
   		async: false,
-  		beforeSend: function(){
-  			/* $('#authoritySpinner').show(); */
-  		},
   		success: function(data) {	
   			$('#cp-groupName').text(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
@@ -1042,9 +1026,6 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 		});	
 		
         },
-        complete:function(data){
-        	/* $('#authoritySpinner').hide(); */
-        },
         error: function(data){
             $('#conceptpowerAuthoritySearchResult').parents('table').hide()
             $("#conceptpowerAuthoritiesError").show();	
@@ -1068,9 +1049,6 @@ function getViafAuthorities(modalType, personType, page) {
   		type: 'GET',
   		url: url ,
   		async: false,
-  		beforeSend: function(){
-  			/* $('#authoritySpinner').show(); */
-  		},
   		success: function(data) {
   			$('#viaf-groupName').text(data['groupName']);
   			$("#viafAuthoritySearchResult").empty();
@@ -1138,9 +1116,6 @@ function getViafAuthorities(modalType, personType, page) {
 		});	
 		
         },
-    	complete:function(data){
-            /* $('#authoritySpinner').hide(); */
-    	},
         error: function(data){
             $('#viafAuthoritySearchResult').parents('table').hide()
             $("#viafAuthoritiesError").show();	
@@ -1773,18 +1748,11 @@ function creatorLinkHandler(target) {
 	role="dialog" aria-labelledby="selectAuthorityLabel">
 	
 	<div class="modal-dialog" style="width: 1000px" role="document">
-		<div class="modal-content">
-			<div style="z-index: 1000;" class="spinner justify-content-center align-items-center 
-				position-absolute top-50 start-50 translate-middle">
-				
-				<div id="authoritySpinner" class="loader icon-spinner" style="font-size: 30px; color:#337ab7; text-align: center;" role="status">
-					<!-- <i id="authoritySpinner"class="icon-spinner" style="color:#337ab7"></i> -->
-				</div>
-				<div id="overlay"></div>
+		<div class="modal-content" style="display: grid; align-items: center;">
+			<div id="overlay"></div>
+			<div id="authoritySpinner" class="loader icon-spinner" style="font-size: 50px; color:#337ab7; z-index: 10;
+					position: absolute; justify-self: center;" role="status">
 			</div>
-		
-		
-		
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
