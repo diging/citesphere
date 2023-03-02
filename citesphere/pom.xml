@@ -11,14 +11,14 @@
     <properties>
         <org.slf4j-version>1.7.32</org.slf4j-version>
         <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
-        <spring-security-version>5.3.10.RELEASE</spring-security-version>
+        <spring-security-version>5.5.7</spring-security-version>
         <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
         <spring-elasticsearch.version>3.2.12.RELEASE</spring-elasticsearch.version>
 
         <thymeleaf.version>3.0.13.RELEASE</thymeleaf.version>
 
-        <spring.version>5.2.9.RELEASE</spring.version>
+        <spring.version>5.3.13</spring.version>
         <spring-data.version>Neumann-SR3</spring-data.version>
 
         <javers.version>6.2.3</javers.version>
@@ -626,7 +626,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.3.1</version>
                 <configuration>
                     <webResources>
                         <resource>
