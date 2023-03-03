@@ -74,15 +74,13 @@ public class SyncJobManager implements ISyncJobManager {
     }
     
     @Override
-    public List<GroupSyncJob> getJobs(IUser user, String id, Pageable page) {
-        List<ICitationGroup> groups = citationManager.getGroups(user);
-        return jobRepo.findByGroupIdInAndIdStartsWith(groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList()), id, page); 
+    public List<GroupSyncJob> getJobs(String groupId, Pageable page) {
+        return jobRepo.findByGroupId(groupId, page); 
     }
     
     @Override
-    public List<GroupSyncJob> getJobs(IUser user, JobStatus status, String id, Pageable page) {
-        List<ICitationGroup> groups = citationManager.getGroups(user);
-        return jobRepo.findByGroupIdInAndStatusAndIdStartsWith(groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList()), status, id, page); 
+    public List<GroupSyncJob> getJobs(String groupId, JobStatus status, Pageable page) {
+        return jobRepo.findByGroupIdAndStatus(groupId, status, page); 
     }
     
     @Override

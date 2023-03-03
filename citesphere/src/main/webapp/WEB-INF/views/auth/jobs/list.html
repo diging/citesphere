@@ -17,20 +17,20 @@ $(function() {
     });
     
  	$("#jobStatus").change(function () {
-		var jobId = $("#findJobId").val();
+		var groupId = $("#findgroupId").val();
 		var jobStatus = $("#jobStatus").val();
-	    if($("#jobStatus").val() === 'All'){
+	    if ($("#jobStatus").val() === 'All') {
 	    	window.location.href = [[@{/auth/jobs/sync/list}]];
 	    } else {
-	    	window.location.href = [[@{/auth/jobs/sync/list}]] + "?jobStatus=" + jobStatus + "&jobId=" + jobId;
+	    	window.location.href = [[@{/auth/jobs/sync/list}]] + "?jobStatus=" + jobStatus + "&groupId=" + groupId;
 	    }
 	}); 
  	
-	$("#findByJobIdBtn").click(function() {
-		var jobId = $("#findJobId").val();
+	$("#findBygroupIdBtn").click(function() {
+		var groupId = $("#findgroupId").val();
 		var jobStatus = $("#jobStatus").val();
-		if (jobId != undefined && jobId != '') {
-			window.location.href = [[@{/auth/jobs/sync/list}]] + "?jobStatus=" + jobStatus + "&jobId=" + jobId;
+		if (groupId != undefined && groupId != '') {
+			window.location.href = [[@{/auth/jobs/sync/list}]] + "?jobStatus=" + jobStatus + "&groupId=" + groupId;
 		} 
 	});
 });
@@ -42,8 +42,8 @@ $(function() {
 <h1>Jobs</h1>
 
 <div class="input-group">
-    <input type="text" id="findJobId" name="findJobId" class="form-control" placeholder="Find by job id"/>
-    <div class="input-group-addon" id="findByJobIdBtn" style="cursor: pointer;"><i class="icon-search"></i></div>
+    <input type="text" id="findgroupId" name="findgroupId" class="form-control" placeholder="Find by group id"/>
+    <div class="input-group-addon" id="findBygroupIdBtn" style="cursor: pointer;"><i class="icon-search"></i></div>
 </div>
 <br>
 

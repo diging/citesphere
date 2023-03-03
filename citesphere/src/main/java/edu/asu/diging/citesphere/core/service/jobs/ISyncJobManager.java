@@ -18,9 +18,9 @@ public interface ISyncJobManager {
     
     List<GroupSyncJob> getJobs(IUser user, JobStatus status, Pageable page);
     
-    List<GroupSyncJob> getJobs(IUser user, String id, Pageable page);
+    List<GroupSyncJob> getJobs(String groupId, Pageable page);
     
-    List<GroupSyncJob> getJobs(IUser user, JobStatus status, String id, Pageable page);
+    List<GroupSyncJob> getJobs(String groupId, JobStatus status, Pageable page);
     
     long getJobsCount(IUser user);
 

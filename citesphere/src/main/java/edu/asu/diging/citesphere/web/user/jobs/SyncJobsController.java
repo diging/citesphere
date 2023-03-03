@@ -22,25 +22,25 @@ public class SyncJobsController {
 
     @RequestMapping("/auth/jobs/sync/list")
     public String list(Model model, @PageableDefault(sort = { "createdOn" }, direction = Direction.DESC) Pageable page, Authentication authentication,
-            @RequestParam(defaultValue = "All", required = false, value = "jobId") String jobId,
-            @RequestParam(defaultValue = "All", required = false, value = "jobStatus") String jobStatus) {
+            @RequestParam(value = "groupId", required = false, defaultValue = "All") String groupId,
+            @RequestParam(value = "jobStatus", required = false, defaultValue = "All") String jobStatus) {
         long total = jobManager.getJobsCount((IUser) authentication.getPrincipal());
         if (total == -1) {
             return "redirect:/";
         }
         JobStatus status;
-        if (jobStatus.equals("All") && jobId.equals("All")) {
+        if (jobStatus.equals("All") && groupId.equals("All")) {
             model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), page));
-        } else if (!jobStatus.equals("All") && jobId.equals("All")) {
+        } else if (!jobStatus.equals("All") && groupId.equals("All")) {
             status = JobStatus.valueOf(jobStatus);
             model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), status, page));
-        }  else if (jobStatus.equals("All") && !jobId.equals("All")) {
-            model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), jobId, page));
+        }  else if (jobStatus.equals("All") && !groupId.equals("All")) {
+            model.addAttribute("jobs", jobManager.getJobs(groupId, page));
         } else {
             status = JobStatus.valueOf(jobStatus);
-            model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(),status, jobId, page));
+            model.addAttribute("jobs", jobManager.getJobs(groupId, status, page));
         }
-        model.addAttribute("jobId", jobId);
+        model.addAttribute("groupId", groupId);
         model.addAttribute("total", Math.ceil(total/page.getPageSize()));
         model.addAttribute("page", page.getPageNumber() + 1);
         return "auth/jobs/list";
