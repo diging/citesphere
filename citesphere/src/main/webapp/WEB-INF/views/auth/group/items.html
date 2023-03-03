@@ -600,9 +600,9 @@ function pollStatus(){
 				</a>
 				</span>
 			</td>
-			<td th:data-index="${loop.index}">
-				    <a class="bib-entry" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}" style="color: black">
-				        <i class="icon-arrow-right"></i>
+			<td>
+			    <a class="text-warning" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+			        <i class="icon-arrow-right" style="color: #8a6d3b"></i>
 			    </a>
 			</td>    
 		 	<td th:each="column:${columns}" style="max-width:300px;">
