@@ -13,9 +13,10 @@ $(function() {
             async: false,
             success: function(data) {
             	var container = $("#resultsContainer");
+            	document.getElementById('resultsContainer').innerHTML = '';
                 data.forEach(function(result) {
-                	var panel = $('<div class="panel panel-default"></div>');
-                	var item = $('<div class="panel-body"></>');
+                	panel = $('<div class="panel panel-default"></div>');
+                	item = $('<div class="panel-body"></>');
                 	panel.append(item);
                 	var checkbox = $('<input class="reference" data-doi="' + result.DOI + '" type="checkbox" style="margin-right: 7px;" /> ');
                 	item.append(checkbox);
@@ -46,6 +47,9 @@ $(function() {
             	console.print("success");
             }
         })
+        document.getElementById('resultsContainer').innerHTML = '';
+		selectedDois.clear();
+		$("#importBtn").text("Import Selected");
 	});
 });
 
