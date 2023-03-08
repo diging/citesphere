@@ -130,7 +130,5 @@ public interface IAuthorityService {
     
     Page<IAuthorityEntry> getAuthoritiesByGroup(long groupId, int page, int pageSize);
         
-    List<IAuthorityEntry> getUserSpecificAuthorities(IUser user);
-    
     Page<IAuthorityEntry> getUserSpecificAuthorities(IUser user, int page, int pageSize);
 }

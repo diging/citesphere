@@ -43,8 +43,9 @@ public class AuthorityListController {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
+            ex.printStackTrace();
         }
-        pageInt = pageInt - 1;
+        pageInt = (pageInt - 1) < 0 ? 0 : pageInt - 1;
         IUser user = (IUser)authentication.getPrincipal();
         List<ICitationGroup> userGroups = citationManager.getGroups((IUser) authentication.getPrincipal());
         Page<IAuthorityEntry> authoritiesPage = authorityService.getAll(user,
@@ -69,8 +70,9 @@ public class AuthorityListController {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
+            ex.printStackTrace();
         }
-        pageInt = pageInt - 1;
+        pageInt = (pageInt - 1) < 0 ? 0 : pageInt - 1;
         IUser user = (IUser)authentication.getPrincipal();
         Page<IAuthorityEntry> authoritiesPage = authorityService.getAuthoritiesByGroup(Long.valueOf(zoteroGroupId), pageInt, authorityPageSize);
         model.addAttribute("authorities", authoritiesPage.getContent());
@@ -91,8 +93,9 @@ public class AuthorityListController {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
+            ex.printStackTrace();
         }
-        pageInt = pageInt - 1;
+        pageInt = (pageInt - 1) < 0 ? 0 : pageInt - 1;
         IUser user = (IUser)authentication.getPrincipal();
         Page<IAuthorityEntry> authoritiesPage = authorityService.getUserSpecificAuthorities(user, pageInt, authorityPageSize);
         model.addAttribute("authorities", authoritiesPage.getContent());   

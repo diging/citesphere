@@ -309,11 +309,6 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public List<IAuthorityEntry> getUserSpecificAuthorities(IUser user) {
-        return entryRepository.findByUsernameAndGroupsOrderByName(user.getUsername(), null);
-    }
-
-    @Override
     public Page<IAuthorityEntry> getUserSpecificAuthorities(IUser user, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
         return entryRepository.findByUsernameAndGroupsOrderByName(user.getUsername(), null, pageable);

@@ -599,7 +599,7 @@ public class AuthorityServiceTest {
     }
 
     @Test()
-    public void test_getAll() {
+    public void test_getAll_success() {
         List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
         entriesAlbert.add(entry2);
         entriesAlbert.add(entry3);
@@ -622,7 +622,7 @@ public class AuthorityServiceTest {
     }
     
     @Test()
-    public void test_getAuthoritiesByGroup() {
+    public void test_getAuthoritiesByGroup_success() {
         List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
         entriesAlbert.add(entry2);
         entriesAlbert.add(entry3);
@@ -645,7 +645,7 @@ public class AuthorityServiceTest {
     }
     
     @Test()
-    public void test_getUserSpecificAuthorities() {
+    public void test_getUserSpecificAuthorities_success() {
         List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
         entriesAlbert.add(entry2);
         entriesAlbert.add(entry3);
