@@ -111,34 +111,33 @@ public class ItemsApiController extends V1Controller {
     }
 
     @RequestMapping(value = { "/groups/items" }, produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<String> getItemsByUri(@RequestHeader HttpHeaders headers,
-			@RequestParam(defaultValue = "1", required = false, value = "page") int page,
-			@RequestParam(value = "uri") String uri, Principal principal) {
+    public ResponseEntity<String> getItemsByUri(@RequestHeader HttpHeaders headers,
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page,
+            @RequestParam(value = "uri") String uri, Principal principal) {
 
-		IUser user = userManager.findByUsername(principal.getName());
+        IUser user = userManager.findByUsername(principal.getName());
 
-		CitationResults results;
+        CitationResults results;
 
-		List<ICitationGroup> groups = citationManager.getGroups(user);
-		List<String> groupIds = new ArrayList<String>();
-		for (ICitationGroup group : groups) {
-			groupIds.add(Long.toString(group.getGroupId()));
+        List<ICitationGroup> groups = citationManager.getGroups(user);
+        List<String> groupIds = new ArrayList<String>();
+        for (ICitationGroup group : groups) {
+            groupIds.add(Long.toString(group.getGroupId()));
+        }
+
+        results = citationManager.getItemsByUri(groupIds, user, uri, page);
+
+        Items itemsResponse = new Items();
+        itemsResponse.setItems(results.getCitations());
+
+        String jsonResponse = "";
+        try {
+            jsonResponse = objectMapper.writeValueAsString(itemsResponse);
+	    } catch (IOException e) {
+	        logger.error("Unable to process JSON response ", e);
+	        return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		results = citationManager.getItemsByUri(groupIds, user, uri, page);
-
-		Items itemsResponse = new Items();
-		itemsResponse.setItems(results.getCitations());
-
-		String jsonResponse = "";
-		try {
-			jsonResponse = objectMapper.writeValueAsString(itemsResponse);
-		} catch (IOException e) {
-			logger.error("Unable to process JSON response ", e);
-			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-
-		return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
-	}
-
+        return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
+    }
 }
