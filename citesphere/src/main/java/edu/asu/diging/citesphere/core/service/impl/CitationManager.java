@@ -433,11 +433,13 @@ public class CitationManager implements ICitationManager {
     @Override
     public CitationResults getItemsByUri(List<String> groupIds, IUser user, String uri, int page) {
         CitationResults results = new CitationResults();
-        groupIds = new List();
+        List<ICitation> citations = null;
+        long total = 0;
 
         citations = (List<ICitation>) citationDao.findCitationsByUri(groupIds, (page - 1) * zoteroPageSize, zoteroPageSize, uri);
         total = citations.size();
         results.setCitations(citations != null ? citations : new ArrayList<>());
+        results.setTotalResults(total);
 
         return results;
     }
