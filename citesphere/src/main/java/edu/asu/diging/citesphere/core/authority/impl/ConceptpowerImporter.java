@@ -124,6 +124,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
                     IAuthorityEntry authority = new AuthorityEntry();
                     authority.setName(conceptEntry.getLemma());
                     authority.setUri(conceptEntry.getConcept_uri());
+                    authority.setSource("Conceptpower");
                     authority.setDescription(conceptEntry.getDescription());
                     authorityEntries.add(authority);
                 }
