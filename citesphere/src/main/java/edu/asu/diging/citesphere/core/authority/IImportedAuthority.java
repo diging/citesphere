@@ -8,6 +8,10 @@ public interface IImportedAuthority {
 
     void setName(String name);
 
+    String getSource();
+
+    void setSource(String source);
+
     String getUri();
 
     void setUri(String uri);
