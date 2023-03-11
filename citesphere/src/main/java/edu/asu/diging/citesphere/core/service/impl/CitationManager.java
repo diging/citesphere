@@ -431,15 +431,18 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public CitationResults getItemsByUri(List<String> groupIds, IUser user, String uri, int page) {
-        CitationResults results = new CitationResults();
-        List<ICitation> citations = null;
-        long total = 0;
+    public CitationResults getItemsByUri(IUser user, String uri, int page) {
+        List<ICitationGroup> groups = getGroups(user);
+        List<String> groupIds = new ArrayList<String>();
+        for (ICitationGroup group : groups) {
+            groupIds.add(Long.toString(group.getGroupId()));
+        }
 
+        List<ICitation> citations = null;
         citations = (List<ICitation>) citationDao.findCitationsByUri(groupIds, (page - 1) * zoteroPageSize, zoteroPageSize, uri);
-        total = citations.size();
+        CitationResults results = new CitationResults();
         results.setCitations(citations != null ? citations : new ArrayList<>());
-        results.setTotalResults(total);
+        results.setTotalResults(citations.size());
 
         return results;
     }

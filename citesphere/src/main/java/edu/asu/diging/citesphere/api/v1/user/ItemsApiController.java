@@ -117,15 +117,7 @@ public class ItemsApiController extends V1Controller {
 
         IUser user = userManager.findByUsername(principal.getName());
 
-        CitationResults results;
-
-        List<ICitationGroup> groups = citationManager.getGroups(user);
-        List<String> groupIds = new ArrayList<String>();
-        for (ICitationGroup group : groups) {
-            groupIds.add(Long.toString(group.getGroupId()));
-        }
-
-        results = citationManager.getItemsByUri(groupIds, user, uri, page);
+        CitationResults results = citationManager.getItemsByUri(user, uri, page);;
 
         Items itemsResponse = new Items();
         itemsResponse.setItems(results.getCitations());
