@@ -430,6 +430,16 @@ public class CitationManager implements ICitationManager {
 
     }
 
+    /**
+     * Get all citations that will be matched to citation author uri
+     * , editor uri or contributor uri with that of the query parameter uri.
+     *
+     * @param user    User who is accessing Zotero.
+     * @param uri     Uri is the query parameter.
+     * @param page    page is to paginate/limit the data returned.
+     * @return all matching citations.
+     *
+     */
     @Override
     public CitationResults getItemsByUri(IUser user, String uri, int page) {
         List<ICitationGroup> groups = getGroups(user);

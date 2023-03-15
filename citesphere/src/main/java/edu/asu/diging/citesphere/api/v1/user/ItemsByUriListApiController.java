@@ -28,7 +28,6 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
-import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
@@ -36,7 +35,7 @@ import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 @PropertySource("classpath:/config.properties")
-public class ItemsApiController extends V1Controller {
+public class ItemsByUriListApiController extends V1Controller {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -48,58 +47,25 @@ public class ItemsApiController extends V1Controller {
 
     @Autowired
     private ICitationManager citationManager;
-    
-    @Autowired
-    private IGroupManager groupManager;
 
     @Autowired
     private IUserManager userManager;
-
-    @Autowired
-    private JsonUtil jsonUtil;
     
     @Autowired
     private ObjectMapper objectMapper;
 
-    @RequestMapping(value = { "/groups/{zoteroGroupId}/items", "/groups/{zoteroGroupId}/collections/{collectionId}/items" },
-            produces = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
-            @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value = "collectionId", required = false) String collectionId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
-            @RequestParam(required = false, value = "columns") String[] columns, Principal principal)
-            throws GroupDoesNotExistException {
-        Integer pageInt = 1;
+    @RequestMapping(value = { "/groups/items" }, produces = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<String> getItemsByUri(@RequestHeader HttpHeaders headers,
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page,
+            @RequestParam(value = "uri") String uri, Principal principal) {
 
-        try {
-            pageInt = new Integer(page);
-        } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-        }
-        
-        // TODO: Get logged in user, remove:
         IUser user = userManager.findByUsername(principal.getName());
-        
-        ICitationGroup group =groupManager.getGroup(user, groupId);
-        if (group == null) {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-        }
-        
-        CitationResults results;
-        try {
-            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, null);
-        } catch(AccessForbiddenException ex) {
-            return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
-        } catch (ZoteroHttpStatusException e1) {
-            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } 
+
+        CitationResults results = citationManager.getItemsByUri(user, uri, page);;
 
         Items itemsResponse = new Items();
-        itemsResponse.setGroup(jsonUtil.createGroup(group));
-        itemsResponse.getGroup().setSyncInfo(getSyncInfo(group));
         itemsResponse.setItems(results.getCitations());
-        
+
         String jsonResponse = "";
         try {
             jsonResponse = objectMapper.writeValueAsString(itemsResponse);
@@ -107,6 +73,7 @@ public class ItemsApiController extends V1Controller {
             logger.error("Unable to process JSON response ", e);
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
         return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
     }
 }
