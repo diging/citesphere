@@ -31,7 +31,7 @@ public interface ICitationManager {
 
     List<ICitationGroup> getGroups(IUser user);
 
-    CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds)
+    CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds, String itemType)
             throws GroupDoesNotExistException, ZoteroHttpStatusException;
 
     /**

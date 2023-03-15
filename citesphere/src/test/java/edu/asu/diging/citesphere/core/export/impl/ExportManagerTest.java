@@ -85,8 +85,8 @@ public class ExportManagerTest {
         group.setGroupId(groupId);
         group.setName(GROUP_NAME);
         
-        Mockito.when(citationManager.getGroupItems(user, groupId.toString(), null, 1, SORT_BY, null)).thenReturn(results1);
-        Mockito.when(citationManager.getGroupItems(user, groupId.toString(), COLLECTION_ID, 1, SORT_BY, null)).thenReturn(results1);
+        Mockito.when(citationManager.getGroupItems(user, groupId.toString(), null, 1, SORT_BY, null, null)).thenReturn(results1);
+        Mockito.when(citationManager.getGroupItems(user, groupId.toString(), COLLECTION_ID, 1, SORT_BY, null, null)).thenReturn(results1);
         Mockito.when(groupManager.getGroup(user, groupId.toString())).thenReturn(group);
         
         task = new ExportTask();
@@ -135,7 +135,7 @@ public class ExportManagerTest {
         CitationResults results2 = new CitationResults();
         results2.setTotalResults(400);
         String GROUP2 = "GROUP2";
-        Mockito.when(citationManager.getGroupItems(user, GROUP2, null, 1, SORT_BY, null)).thenReturn(results2);
+        Mockito.when(citationManager.getGroupItems(user, GROUP2, null, 1, SORT_BY, null, null)).thenReturn(results2);
         Mockito.when(groupManager.getGroup(user, GROUP2)).thenReturn(new CitationGroup());
         
         managerToTest.export(ExportType.CSV, user, GROUP2, null);
