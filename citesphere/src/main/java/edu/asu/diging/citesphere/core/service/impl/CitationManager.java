@@ -365,7 +365,7 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds)
+    public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds, String itemType)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
 
         ICitationGroup group = null;
@@ -408,7 +408,7 @@ public class CitationManager implements ICitationManager {
         List<ICitation> citations = null;
         long total = 0;
         if (collectionId != null && !collectionId.trim().isEmpty()) {
-            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds);
+            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds, itemType);
             ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
             if (collection != null) {
                 total = collection.getNumberOfItems();
@@ -417,7 +417,7 @@ public class CitationManager implements ICitationManager {
             }
         } else {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
-                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds);
+                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds, itemType);
             if (groupOptional.isPresent()) {
                 total = groupOptional.get().getNumItems();
             } else {
@@ -454,7 +454,7 @@ public class CitationManager implements ICitationManager {
     @Override
     public CitationPage getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy,
             int index, List<String> conceptIds) throws GroupDoesNotExistException, ZoteroHttpStatusException {
-        CitationResults citationResults = getGroupItems(user, groupId, collectionId, page, sortBy, conceptIds);
+        CitationResults citationResults = getGroupItems(user, groupId, collectionId, page, sortBy, conceptIds, null);
         List<ICitation> citations = citationResults.getCitations();
         CitationPage result = new CitationPage();
         result.setIndex(String.valueOf(index));
@@ -464,7 +464,7 @@ public class CitationManager implements ICitationManager {
         if (citations != null && citations.size() > 0) {
             int maxPage = (int) Math.ceil((citationResults.getTotalResults() / Float.valueOf(zoteroPageSize)));
             if (index == citations.size() - 1 && page < maxPage) {
-                CitationResults nextPageCitationResults = getGroupItems(user, groupId, collectionId, page + 1, sortBy, conceptIds);
+                CitationResults nextPageCitationResults = getGroupItems(user, groupId, collectionId, page + 1, sortBy, conceptIds, null);
                 if (nextPageCitationResults != null && nextPageCitationResults.getCitations().size() > 0) {
                     result.setNext(nextPageCitationResults.getCitations().get(0).getKey());
                     result.setNextIndex(String.valueOf(0));
@@ -480,7 +480,7 @@ public class CitationManager implements ICitationManager {
                 result.setPrevIndex(String.valueOf(index - 1));
                 result.setPrevPage(String.valueOf(page));
             } else if (index == 0 && page > 1) {
-                CitationResults prevPageCitationResults = getGroupItems(user, groupId, collectionId, page - 1, sortBy, conceptIds);
+                CitationResults prevPageCitationResults = getGroupItems(user, groupId, collectionId, page - 1, sortBy, conceptIds, null);
                 int pageSize = prevPageCitationResults.getCitations().size();
                 result.setPrev(prevPageCitationResults.getCitations().get(pageSize - 1).getKey());
                 result.setPrevIndex(String.valueOf(pageSize - 1));

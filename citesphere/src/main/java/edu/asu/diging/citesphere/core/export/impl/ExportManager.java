@@ -129,7 +129,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
         }
 
         // FIXME: sort field should not be hard coded!
-        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, 1, "title", null);
+        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, 1, "title", null, null);
         if (results.getTotalResults() > maxExportSize) {
             throw new ExportTooBigException("Can't export " + results.getTotalResults() + " records.");
         }
@@ -180,7 +180,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
             task.setCollectionName(collection.getName());
         }
 
-        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, 1, SORT_BY_TITLE, null);
+        CitationResults results = citationManager.getGroupItems(user, groupId, collectionId, 1, SORT_BY_TITLE, null, null);
         task.setTotalRecords(results.getTotalResults());
 
         task = taskManager.saveAndFlush(task);

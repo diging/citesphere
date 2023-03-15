@@ -61,7 +61,11 @@ public class GroupItemsController {
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns,
             @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds,
-            @RequestParam(defaultValue = "All", required = false, value = "itemType") String itemType) {
+            @RequestParam(value = "itemType", required = false, defaultValue = "All") String itemType) {
+        String citationType = null;
+        if (!itemType.equals("All")) {
+            citationType = itemType;
+        }
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
@@ -71,7 +75,7 @@ public class GroupItemsController {
         IUser user = (IUser) authentication.getPrincipal();
         CitationResults results;
         try {
-            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, Arrays.asList(conceptIds));
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, Arrays.asList(conceptIds), citationType);
         } catch(ZoteroHttpStatusException e) {
             logger.error("Exception occured", e);
             return "error/500";
@@ -89,6 +93,7 @@ public class GroupItemsController {
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sort", sort);
         model.addAttribute("results", results);
+        model.addAttribute("itemType", itemType);
         // more than 200 really don't make sense here, this needs to be changed
         try {
             model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));

@@ -85,7 +85,7 @@ public class ItemsApiController extends V1Controller {
         
         CitationResults results;
         try {
-            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, null);
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, null, null);
         } catch(AccessForbiddenException ex) {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         } catch (ZoteroHttpStatusException e1) {

@@ -528,8 +528,10 @@ function pollStatus(){
 	    			<label for="itemType"></label>
 			    	<select class="form-control" id="itemType" name="itemType" >
 						<span >
-							<option>All</option>
-							<option th:each="itemType:${T(edu.asu.diging.citesphere.model.bib.ItemType).values()}" th:value="${itemType}" th:text="${itemType}">[[${itemType}]]</option>
+							<option th:selected="${#strings.equals(itemType, 'All')}">All</option>
+							<span th:each="citationType:${T(edu.asu.diging.citesphere.model.bib.ItemType).values()}">
+								<option th:selected="${#strings.equals(itemType, citationType)}" th:value="${citationType}" th:text="${citationType}">[[${citationType}]]</option>
+							</span>
 						</span> 
 					</select>
         		<div>
@@ -837,6 +839,8 @@ $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
 $("#itemType").change(function () {
 	var itemType = $("#itemType").val();
 	console.log("itemType " + itemType);
+	console.log(window.location.href);
+	window.location.href = "?itemType=" + itemType;
 	console.log(window.location.href);
 });
 </script>
