@@ -71,7 +71,6 @@ public class ItemsApiController extends V1Controller {
             @RequestParam(required = false, value = "columns") String[] columns, Principal principal)
             throws GroupDoesNotExistException {
         Integer pageInt = 1;
-
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
@@ -109,4 +108,5 @@ public class ItemsApiController extends V1Controller {
         }
         return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
     }
+
 }
