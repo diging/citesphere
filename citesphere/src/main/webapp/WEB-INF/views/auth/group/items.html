@@ -530,6 +530,7 @@ function pollStatus(){
 			<th th:each="column:${columns}" th:with="columnLabel=${@labelsResource.getProperty('_item_attribute_label_' + column)}">
 				[[${columnLabel}]]
 			</th>
+			<th>Details</th>
 		</tr>
 		
 		<tr th:id="'tr-'+${entry.key}" data-action='draggable' class="items" th:each="entry,loop : ${items}">
@@ -599,6 +600,11 @@ function pollStatus(){
 				</a>
 				</span>
 			</td>
+			<td>
+			    <a class="bib-entry" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+			        <i class="icon-arrow-right-alt"></i>
+			    </a>
+			</td>    
 		 	<td th:each="column:${columns}" style="max-width:300px;">
 		 		[[${entry[column]}]]
 		 	</td>

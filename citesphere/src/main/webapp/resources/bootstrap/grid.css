@@ -93,6 +93,11 @@ body{
   color: #337ab7;
 }
 
+[class*="icon-arrow-right-alt"]{
+  font-size: 18px;
+  color: #8a6d3b;
+}
+
 [class*="icon-arrow-left"]{
   font-size: 18px;
   color: #337ab7;
