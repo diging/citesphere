@@ -15,8 +15,7 @@ $(function() {
 	    initiateStartPageClick: false,
         onPageClick: function (event, page) {
     		var displayAuthoritiesVal = $("#displayAuthorities").val();
-     		var zoteroGroupId = displayAuthoritiesVal;
-     		window.location.href = getAuthorityUrl(displayAuthoritiesVal, zoteroGroupId) + "?" + "page=" + page; 
+     		window.location.href = getAuthorityUrl(displayAuthoritiesVal) + "?" + "page=" + page; 
         }
     }); 
 	$(".delete-link").click(function(event) {
@@ -66,18 +65,17 @@ $(function() {
 	
  	$("#displayAuthorities").change(function () {
  		var displayAuthoritiesVal = $("#displayAuthorities").val();
- 		var zoteroGroupId = displayAuthoritiesVal;
- 		window.location.href = getAuthorityUrl(displayAuthoritiesVal, zoteroGroupId);
+ 		window.location.href = getAuthorityUrl(displayAuthoritiesVal);
 	});
 });
 
-function getAuthorityUrl(displayAuthoritiesVal, zoteroGroupId) {
+function getAuthorityUrl(displayAuthoritiesVal) {
  	if (displayAuthoritiesVal === 'all') {
  		return [[@{/auth/authority/list}]];
  	} else if (displayAuthoritiesVal === 'userSpecific') {
  		return [[@{/auth/authority/user/list}]];
  	} else {
- 		return [[@{/auth/authority/}]] + zoteroGroupId + "/list";
+ 		return [[@{/auth/authority/}]] + displayAuthoritiesVal + "/list";
  	}
 }
 

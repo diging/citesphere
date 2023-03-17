@@ -126,8 +126,6 @@ public interface IAuthorityService {
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
-    List<IAuthorityEntry> getAuthoritiesByGroup(long groupId);
-    
     Page<IAuthorityEntry> getAuthoritiesByGroup(long groupId, int page, int pageSize);
         
     Page<IAuthorityEntry> getUserSpecificAuthorities(IUser user, int page, int pageSize);

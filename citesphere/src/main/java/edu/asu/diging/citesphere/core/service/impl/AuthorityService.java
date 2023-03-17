@@ -296,12 +296,7 @@ public class AuthorityService implements IAuthorityService {
         Pageable pageable = PageRequest.of(page, pageSize);
         return entryRepository.findByUsernameOrGroupsInOrderByName(user.getUsername(), groupIds, pageable);
     }
-    
-    @Override
-    public List<IAuthorityEntry> getAuthoritiesByGroup(long groupId) {
-        return entryRepository.findByGroupsOrderByName(groupId);
-    }
-    
+ 
     @Override
     public Page<IAuthorityEntry> getAuthoritiesByGroup(long groupId, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);

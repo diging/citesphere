@@ -42,8 +42,7 @@ public class AuthorityListController {
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-            ex.printStackTrace();
+            logger.error("Trying to access invalid page number: ", ex);
         }
         pageInt = (pageInt - 1) < 0 ? 0 : pageInt - 1;
         IUser user = (IUser)authentication.getPrincipal();
@@ -69,8 +68,7 @@ public class AuthorityListController {
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-            ex.printStackTrace();
+            logger.error("Trying to access invalid page number: ", ex);
         }
         pageInt = (pageInt - 1) < 0 ? 0 : pageInt - 1;
         IUser user = (IUser)authentication.getPrincipal();
@@ -92,8 +90,7 @@ public class AuthorityListController {
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-            ex.printStackTrace();
+            logger.error("Trying to access invalid page number: ", ex);
         }
         pageInt = (pageInt - 1) < 0 ? 0 : pageInt - 1;
         IUser user = (IUser)authentication.getPrincipal();

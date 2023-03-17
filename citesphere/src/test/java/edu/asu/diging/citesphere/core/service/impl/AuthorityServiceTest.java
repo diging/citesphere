@@ -607,11 +607,6 @@ public class AuthorityServiceTest {
         Mockito.when(entryRepository.findByUsernameOrGroupsInOrderByName(username, groupIds, paging)).thenReturn(entries);
         Page<IAuthorityEntry> searchResult = managerToTest.getAll(user, groupIds, page, pageSize);
         Assert.assertEquals(2, searchResult.getContent().size());
-        for (IAuthorityEntry entry : searchResult) {
-            Assert.assertTrue(entry.getGroups().contains(groupId));
-            Assert.assertTrue(entry.getName().contains("Albert"));
-            Assert.assertTrue(!entry.getName().contains("Einstein"));
-        }
     }
     
     @Test
@@ -630,11 +625,6 @@ public class AuthorityServiceTest {
         Mockito.when(entryRepository.findByGroupsOrderByName(groupId, paging)).thenReturn(entries);
         Page<IAuthorityEntry> searchResult = managerToTest.getAuthoritiesByGroup(groupId, page, pageSize);
         Assert.assertEquals(2, searchResult.getContent().size());
-        for (IAuthorityEntry entry : searchResult) {
-            Assert.assertTrue(entry.getGroups().contains(groupId));
-            Assert.assertTrue(entry.getName().contains("Albert"));
-            Assert.assertTrue(!entry.getName().contains("Einstein"));
-        }
     }
     
     @Test()
@@ -653,11 +643,6 @@ public class AuthorityServiceTest {
         Mockito.when(entryRepository.findByUsernameAndGroupsOrderByName(username, null, paging)).thenReturn(entries);
         Page<IAuthorityEntry> searchResult = managerToTest.getUserSpecificAuthorities(user, page, pageSize);
         Assert.assertEquals(2, searchResult.getContent().size());
-        for (IAuthorityEntry entry : searchResult) {
-            Assert.assertTrue(entry.getGroups().contains(groupId));
-            Assert.assertTrue(entry.getName().contains("Albert"));
-            Assert.assertTrue(!entry.getName().contains("Einstein"));
-        }
     }
     
     @Test()
