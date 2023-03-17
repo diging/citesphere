@@ -55,12 +55,10 @@ public class ItemsByUriListApiController extends V1Controller {
         IUser user = userManager.findByUsername(principal.getName());
 
         CitationResults results = citationManager.getItemsByUri(user, uri, page);
-        Items itemsResponse = new Items();
-        itemsResponse.setItems(results.getCitations());
 
         String jsonResponse = "";
         try {
-            jsonResponse = objectMapper.writeValueAsString(itemsResponse);
+            jsonResponse = objectMapper.writeValueAsString(results.getCitations());
         } catch (IOException e) {
             logger.error("Unable to process JSON response ", e);
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
