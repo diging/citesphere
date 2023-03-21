@@ -337,7 +337,7 @@ public class CitationManagerTest {
         ICitationGroup mockGroup = Mockito.mock(ICitationGroup.class);
         Mockito.when(zoteroManager.getGroup(user, GROUP_ID, true)).thenReturn(mockGroup);
         
-        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-1)*50, 50, false, null);
+        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-1)*50, 50, false, null, null);
         
         CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index, null);
         Assert.assertEquals("key2", actualResult.getNext());
@@ -379,8 +379,8 @@ public class CitationManagerTest {
         Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page, sortBy, 0L)).thenReturn(citationResultsPage1);
         Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page + 1, sortBy, 0L)).thenReturn(citationResultsPage2);
 
-        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page - 1) * 9, 9, false, null);
-        Mockito.doReturn(citationsPage2).when(citationDao).findCitations(GROUP_ID, page * 9, 9, false, null);
+        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page - 1) * 9, 9, false, null, null);
+        Mockito.doReturn(citationsPage2).when(citationDao).findCitations(GROUP_ID, page * 9, 9, false, null, null);
 
         CitationPage actualResult = managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index, null);
 
@@ -413,8 +413,8 @@ public class CitationManagerTest {
         ICitationGroup mockGroup = Mockito.mock(ICitationGroup.class);
         Mockito.when(zoteroManager.getGroup(user, GROUP_ID, true)).thenReturn(mockGroup);
         
-        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-2)*9, 9, false, null);
-        Mockito.doReturn(citationsPage2).when(citationDao).findCitations(GROUP_ID, (page-1)*9, 9, false, null);
+        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-2)*9, 9, false, null, null);
+        Mockito.doReturn(citationsPage2).when(citationDao).findCitations(GROUP_ID, (page-1)*9, 9, false, null, null);
         CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index, null);
         Assert.assertNull(actualResult.getNext());
         Assert.assertEquals("key8", actualResult.getPrev());
@@ -440,7 +440,7 @@ public class CitationManagerTest {
         Mockito.when(zoteroManager.getGroup(user, GROUP_ID, true)).thenReturn(mockGroup);
         
         Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page, sortBy, new Long(0))).thenReturn(citationResults);
-        Mockito.when(citationDao.findCitations(GROUP_ID, page-1, 0, false, null)).thenReturn(new ArrayList<>());
+        Mockito.when(citationDao.findCitations(GROUP_ID, page-1, 0, false, null, null)).thenReturn(new ArrayList<>());
        
         
         CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index, null);
