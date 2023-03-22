@@ -28,18 +28,8 @@ public class SyncJobsController {
         if (total == -1) {
             return "redirect:/";
         }
-        JobStatus status;
-        if (jobStatus.equals("All") && groupId.equals("All")) {
-            model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), page));
-        } else if (!jobStatus.equals("All") && groupId.equals("All")) {
-            status = JobStatus.valueOf(jobStatus);
-            model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), status, page));
-        }  else if (jobStatus.equals("All") && !groupId.equals("All")) {
-            model.addAttribute("jobs", jobManager.getJobs(groupId, page));
-        } else {
-            status = JobStatus.valueOf(jobStatus);
-            model.addAttribute("jobs", jobManager.getJobs(groupId, status, page));
-        }
+        model.addAttribute("jobs", jobManager.getJobs((IUser) authentication.getPrincipal(), groupId, jobStatus, page));
+        model.addAttribute("jobStatus", jobStatus);
         model.addAttribute("groupId", groupId);
         model.addAttribute("total", Math.ceil(total/page.getPageSize()));
         model.addAttribute("page", page.getPageNumber() + 1);

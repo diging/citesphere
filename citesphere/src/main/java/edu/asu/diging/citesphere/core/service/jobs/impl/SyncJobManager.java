@@ -84,6 +84,15 @@ public class SyncJobManager implements ISyncJobManager {
     }
     
     @Override
+    public List<GroupSyncJob> getJobs(IUser user, String groupId, String jobStatus, Pageable page) {
+        if (groupId.equals("All")) {
+            return jobStatus.equals("All") ? getJobs(user, page) : getJobs(user, JobStatus.valueOf(jobStatus), page);
+        } else {
+            return jobStatus.equals("All") ? getJobs(groupId, page) : getJobs(groupId, JobStatus.valueOf(jobStatus), page);
+        }
+    }
+    
+    @Override
     public long getJobsCount(IUser user) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
         if (groups == null) {
@@ -105,4 +114,5 @@ public class SyncJobManager implements ISyncJobManager {
             jobRepo.save(job);
         }
     }
+
 }
