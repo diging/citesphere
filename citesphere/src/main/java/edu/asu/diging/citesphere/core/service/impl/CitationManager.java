@@ -435,9 +435,12 @@ public class CitationManager implements ICitationManager {
      * editor uri or contributor uri with that of the query parameter uri.
      *
      * @param user    User who is accessing Zotero.
-     * @param uri     Uri is the query parameter.
+     * @param uri     Uri is the contributor uri that the citations' authors uri or
+     * 				  editors uri or other creators uri should be.
      * @param page    page is to paginate/limit the data returned.
-     * @return all matching citations.
+     * @return all citations of user's groups' that has its author's
+     * uri or editor's uri or contributor's uri matched to that of
+     * the argument uri
      *
      */
     @Override
