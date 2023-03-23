@@ -28,7 +28,7 @@ import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 @PropertySource("classpath:/config.properties")
-public class ItemsByUriListApiController extends V1Controller {
+public class ItemsByContributorUriApiController extends V1Controller {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
