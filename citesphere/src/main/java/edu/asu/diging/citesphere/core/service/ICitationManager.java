@@ -85,6 +85,6 @@ public interface ICitationManager {
     
     void deleteLocalGroupCitations(String groupId);
 
-    CitationResults getItemsByUri(IUser user, String uri, int page);
+    CitationResults getItemsByContributorUri(IUser user, String uri, int page);
     
 }

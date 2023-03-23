@@ -48,13 +48,13 @@ public class ItemsByUriListApiController extends V1Controller {
     private ObjectMapper objectMapper;
 
     @RequestMapping(value = { "/groups/items" }, produces = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<String> getItemsByUri(@RequestHeader HttpHeaders headers,
+    public ResponseEntity<String> getItemsByContributorUri(@RequestHeader HttpHeaders headers,
             @RequestParam(defaultValue = "1", required = false, value = "page") int page,
             @RequestParam(value = "uri") String uri, Principal principal) {
 
         IUser user = userManager.findByUsername(principal.getName());
 
-        CitationResults results = citationManager.getItemsByUri(user, uri, page);
+        CitationResults results = citationManager.getItemsByContributorUri(user, uri, page);
 
         String jsonResponse = "";
         try {

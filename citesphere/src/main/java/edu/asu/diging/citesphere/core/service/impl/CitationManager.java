@@ -441,7 +441,7 @@ public class CitationManager implements ICitationManager {
      *
      */
     @Override
-    public CitationResults getItemsByUri(IUser user, String uri, int page) {
+    public CitationResults getItemsByContributorUri(IUser user, String uri, int page) {
         List<ICitationGroup> groups = getGroups(user);
         List<String> groupIds = new ArrayList<String>();
         for (ICitationGroup group : groups) {
@@ -449,7 +449,7 @@ public class CitationManager implements ICitationManager {
         }
 
         List<ICitation> citations = null;
-        citations = (List<ICitation>) citationDao.findCitationsByUri(groupIds, (page - 1) * zoteroPageSize, zoteroPageSize, uri);
+        citations = (List<ICitation>) citationDao.findCitationsByContributorUri(groupIds, (page - 1) * zoteroPageSize, zoteroPageSize, uri);
         CitationResults results = new CitationResults();
         results.setCitations(citations != null ? citations : new ArrayList<>());
         results.setTotalResults(citations.size());
