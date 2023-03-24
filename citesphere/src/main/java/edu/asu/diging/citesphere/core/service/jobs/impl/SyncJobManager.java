@@ -84,11 +84,11 @@ public class SyncJobManager implements ISyncJobManager {
     }
     
     @Override
-    public List<GroupSyncJob> getJobs(IUser user, String groupId, String jobStatus, Pageable page) {
+    public List<GroupSyncJob> getJobs(IUser user, String groupId, JobStatus jobStatus, Pageable page) {
         if (groupId.equals("All")) {
-            return jobStatus.equals("All") ? getJobs(user, page) : getJobs(user, JobStatus.valueOf(jobStatus), page);
+            return jobStatus == null ? getJobs(user, page) : getJobs(user, jobStatus, page);
         } else {
-            return jobStatus.equals("All") ? getJobs(groupId, page) : getJobs(groupId, JobStatus.valueOf(jobStatus), page);
+            return jobStatus == null ? getJobs(groupId, page) : getJobs(groupId, jobStatus, page);
         }
     }
     

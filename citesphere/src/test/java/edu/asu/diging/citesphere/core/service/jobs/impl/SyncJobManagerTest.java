@@ -41,7 +41,7 @@ public class SyncJobManagerTest {
     private ICitationGroup citationGroup1;
     private ICitationGroup citationGroup2;
     private List<GroupSyncJob> groupSyncJobList;
-    private List<GroupSyncJob> groupSyncJobs;
+    private List<GroupSyncJob> groupSyncJobEmptyList;
     private GroupSyncJob groupSyncJob1;
     private GroupSyncJob groupSyncJob2;
     private List<String> groupIds;
@@ -72,21 +72,21 @@ public class SyncJobManagerTest {
 
         groupIds = new ArrayList<>();
 
-        groupSyncJobs = new ArrayList<>();
+        groupSyncJobEmptyList = new ArrayList<>();
         status = JobStatus.DONE;
         groupId = "group1";
     }
 
     @Test
-    public void test_getJobs() {
+    public void test_getJobs_succsess() {
         Mockito.when(jobRepo.findByGroupIdIn(groupIds, paging)).thenReturn(groupSyncJobList);
         List<GroupSyncJob> actualResponse = managerToTest.getJobs(user, paging);
-        Assert.assertEquals(groupSyncJobList.size(), actualResponse.size());
+        Assert.assertEquals(2, actualResponse.size());
     }
 
     @Test
     public void test_getJobs_resultsNotFound() {
-        Mockito.when(jobRepo.findByGroupIdIn(groupIds, paging)).thenReturn(groupSyncJobs);
+        Mockito.when(jobRepo.findByGroupIdIn(groupIds, paging)).thenReturn(groupSyncJobEmptyList);
         List<GroupSyncJob> actualResponse = managerToTest.getJobs(user, paging);
         Assert.assertTrue(actualResponse.isEmpty());
     }
@@ -95,12 +95,12 @@ public class SyncJobManagerTest {
     public void test_getJobs_byJobStatus() {
         Mockito.when(jobRepo.findByGroupIdInAndStatus(groupIds, status, paging)).thenReturn(groupSyncJobList);
         List<GroupSyncJob> actualResponse = managerToTest.getJobs(user, status, paging);
-        Assert.assertEquals(groupSyncJobList.size(), actualResponse.size());
+        Assert.assertEquals(2, actualResponse.size());
     }
 
     @Test
     public void test_getJobs_byJobStatus_resultsNotFound() {
-        Mockito.when(jobRepo.findByGroupIdInAndStatus(groupIds, status, paging)).thenReturn(groupSyncJobs);
+        Mockito.when(jobRepo.findByGroupIdInAndStatus(groupIds, status, paging)).thenReturn(groupSyncJobEmptyList);
         List<GroupSyncJob> actualResponse = managerToTest.getJobs(user, status, paging);
         Assert.assertTrue(actualResponse.isEmpty());
     }
@@ -109,12 +109,12 @@ public class SyncJobManagerTest {
     public void test_getJobs_byGroupId() {
         Mockito.when(jobRepo.findByGroupId(groupId, paging)).thenReturn(groupSyncJobList);
         List<GroupSyncJob> actualResponse = managerToTest.getJobs(groupId, paging);
-        Assert.assertEquals(groupSyncJobList.size(), actualResponse.size());
+        Assert.assertEquals(2, actualResponse.size());
     }
 
     @Test
     public void test_getJobs_byGroupId_resultsNotFound() {
-        Mockito.when(jobRepo.findByGroupId(groupId, paging)).thenReturn(groupSyncJobs);
+        Mockito.when(jobRepo.findByGroupId(groupId, paging)).thenReturn(groupSyncJobEmptyList);
         List<GroupSyncJob> actualResponse = managerToTest.getJobs(groupId, paging);
         Assert.assertTrue(actualResponse.isEmpty());
     }
@@ -124,13 +124,13 @@ public class SyncJobManagerTest {
         Mockito.when(jobRepo.findByGroupIdAndStatus(groupId, status, paging))
                 .thenReturn(groupSyncJobList);
         List<GroupSyncJob> actualResponse = managerToTest.getJobs(groupId, status, paging);
-        Assert.assertEquals(groupSyncJobList.size(), actualResponse.size());
+        Assert.assertEquals(2, actualResponse.size());
     }
 
     @Test
     public void test_getJobs_byJobStatusAndGroupId_resultsNotFound() {
         Mockito.when(jobRepo.findByGroupIdAndStatus(groupId, status, paging))
-                .thenReturn(groupSyncJobs);
+                .thenReturn(groupSyncJobEmptyList);
         List<GroupSyncJob> actualResponse = managerToTest.getJobs(groupId, status, paging);
         Assert.assertTrue(actualResponse.isEmpty());
     }

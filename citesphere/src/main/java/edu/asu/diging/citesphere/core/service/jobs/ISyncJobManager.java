@@ -22,7 +22,7 @@ public interface ISyncJobManager {
     
     List<GroupSyncJob> getJobs(String groupId, JobStatus status, Pageable page);
     
-    List<GroupSyncJob> getJobs(IUser user, String groupId, String jobStatus, Pageable page);
+    List<GroupSyncJob> getJobs(IUser user, String groupId, JobStatus jobStatus, Pageable page);
     
     long getJobsCount(IUser user);
 
