@@ -55,7 +55,7 @@ public class AuthorityListController {
         model.addAttribute("displayBy", "all");
         model.addAttribute("username", user.getUsername());
         model.addAttribute("total", authoritiesPage.getTotalElements());
-        model.addAttribute("totalPages", authoritiesPage.getTotalPages());
+        model.addAttribute("totalPages", authoritiesPage.getTotalPages() > 0 ? authoritiesPage.getTotalPages() : 1);
         model.addAttribute("currentPage", page);
         return "auth/authorities/list";
     }
@@ -78,7 +78,7 @@ public class AuthorityListController {
         model.addAttribute("displayBy", zoteroGroupId);
         model.addAttribute("username", user.getUsername());
         model.addAttribute("total", authoritiesPage.getTotalElements());
-        model.addAttribute("totalPages", authoritiesPage.getTotalPages());
+        model.addAttribute("totalPages", authoritiesPage.getTotalPages() > 0 ? authoritiesPage.getTotalPages() : 1);
         model.addAttribute("currentPage", page);
         return "auth/authorities/list";
     }
@@ -100,7 +100,7 @@ public class AuthorityListController {
         model.addAttribute("displayBy", "userSpecific");
         model.addAttribute("username", user.getUsername());
         model.addAttribute("total", authoritiesPage.getTotalElements());
-        model.addAttribute("totalPages", authoritiesPage.getTotalPages());
+        model.addAttribute("totalPages", authoritiesPage.getTotalPages() > 0 ? authoritiesPage.getTotalPages() : 1);
         model.addAttribute("currentPage", page);
         return "auth/authorities/list";
     }
