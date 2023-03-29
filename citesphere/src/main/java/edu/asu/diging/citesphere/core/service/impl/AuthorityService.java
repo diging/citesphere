@@ -296,6 +296,11 @@ public class AuthorityService implements IAuthorityService {
         return entryRepository.findByGroupsOrderByName(groupId);
     }
     
+    @override
+    public List<IAuthorityEntry> getAuthoritiesBySource(IUser user, String source) {
+        return entryRepository.findByUsernameAndSourceOrderByName(user, source);
+    }
+    
     @Override
     public List<IAuthorityEntry> getUserSpecificAuthorities(IUser user) {
         return entryRepository.findByUsernameAndGroupsOrderByName(user.getUsername(), null);

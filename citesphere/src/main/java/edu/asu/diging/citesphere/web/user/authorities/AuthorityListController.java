@@ -32,7 +32,7 @@ public class AuthorityListController {
         List<IAuthorityEntry> allAuthorities = authorityService.getAll(user, userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
         model.addAttribute("authorities", allAuthorities);
         model.addAttribute("groups", userGroups);
-        model.addAttribute("importerAuthoritySourceList", allAuthorities.stream().map(authorityEntry -> authorityEntry.source).collect(Collectors.toList()));
+        model.addAttribute("importedAuthoritySourceList", allAuthorities.stream().map(authorityEntry -> authorityEntry.getSource()).distinct().collect(Collectors.toList()));
         model.addAttribute("displayBy", "all");
         model.addAttribute("username", user.getUsername());
         return "auth/authorities/list";
@@ -61,9 +61,9 @@ public class AuthorityListController {
 
     @RequestMapping("/auth/authority/{source}/list")
     public String getAuthoritiesForSource(Model model, Authentication authentication,
-            @PathVariable("zoteroGroupId") String source) {
+            @PathVariable("source") String source) {
         IUser user = (IUser)authentication.getPrincipal();
-        model.addAttribute("authorities", authorityService.getUserSpecificAuthorities(user));
+        model.addAttribute("authorities", authorityService.getAuthoritiesBySource(user, source));
         model.addAttribute("groups", citationManager.getGroups((IUser)authentication.getPrincipal()));
         model.addAttribute("displayBy", source);
         model.addAttribute("username", user.getUsername());
