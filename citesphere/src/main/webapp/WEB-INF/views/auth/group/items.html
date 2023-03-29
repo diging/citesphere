@@ -492,7 +492,17 @@ function pollStatus(){
 	        </ul>
         </div>
         
-     
+        <span class="dropdown pull-left" style= "margin-left:20px;margin-top:-20px;">
+   		    <label for="itemType"></label> 
+			<select class="form-control" id="itemType" name="itemType" >
+				<span >
+					<option th:selected="${#strings.equals(itemType, 'All')}" th:value="All">Filter by Type</option>
+					<span th:each="citationType:${T(edu.asu.diging.citesphere.model.bib.ItemType).values()}">
+						<option th:selected="${#strings.equals(itemType, citationType)}" th:value="${citationType}" th:text="${citationType}">[[${citationType}]]</option>
+					</span>
+				</span> 
+			</select> 
+        </span>
         
 	    <div class="dropdown pull-right" style="padding-bottom: 10px;">
 	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -523,19 +533,7 @@ function pollStatus(){
     			</div>
 			</div>
 			</th>
-			<th>Type
-				   </div>
-	    			<label for="itemType"></label>
-			    	<select class="form-control" id="itemType" name="itemType" >
-						<span >
-							<option th:selected="${#strings.equals(itemType, 'All')}">All</option>
-							<span th:each="citationType:${T(edu.asu.diging.citesphere.model.bib.ItemType).values()}">
-								<option th:selected="${#strings.equals(itemType, citationType)}" th:value="${citationType}" th:text="${citationType}">[[${citationType}]]</option>
-							</span>
-						</span> 
-					</select>
-        		<div>
-			</th>
+			<th>Type</th>
 			<th>Authors</th>
 			<th>Title</th>
 			<th>Date</th>
@@ -838,10 +836,7 @@ $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
 
 $("#itemType").change(function () {
 	var itemType = $("#itemType").val();
-	console.log("itemType " + itemType);
-	console.log(window.location.href);
 	window.location.href = "?itemType=" + itemType;
-	console.log(window.location.href);
 });
 </script>
 </div>
