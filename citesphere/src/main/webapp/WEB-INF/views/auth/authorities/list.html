@@ -55,6 +55,9 @@ $(function() {
 	    	window.location.href = [[@{/auth/authority/list}]];
 	    } else if($("#displayAuthorities").val() === 'userSpecific'){
 	    	window.location.href = [[@{/auth/authority/user/list}]];
+	    } else if($("#displayAuthorities").val().startsWith('source')){
+	    	var source = $("#displayAuthorities").val().split("-")[1];
+	    	window.location.href = [[@{/auth/authority/list/}]] + source;
 	    } else {
 	    	var zoteroGroupId = $("#displayAuthorities").val();
 	    	window.location.href = [[@{/auth/authority/}]] + zoteroGroupId + "/list";
@@ -79,7 +82,7 @@ $(function() {
 		<option th:selected="${#strings.equals(displayBy, groupDetail.groupId)}" th:value="${groupDetail.groupId}">Group - [[${groupDetail.name}]]</option>
 	</span>
 	<span th:each="source:${importedAuthoritySourceList}">
-		<option th:selected="${#strings.equals(displayBy, source)}" th:value="${source}">Source - [[${source}]]</option>
+		<option th:selected="${#strings.equals(displayBy, 'source-' + source)}" th:value="${'source-' + source}">Source - [[${source}]]</option>
 	</span>  
 </select><br><br> 
 	
