@@ -1,9 +1,7 @@
 package edu.asu.diging.citesphere.config.core;
 
-import java.io.IOException;
 import java.net.UnknownHostException;
 
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +15,8 @@ import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.config.ElasticsearchConfigurationSupport;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.retry.support.RetryTemplate;
-import org.springframework.retry.annotation.Backoff;
-
 
 @Configuration
-@EnableRetry
 @EnableElasticsearchRepositories(basePackages = { "edu.asu.diging.citesphere.core.search.data" })
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
 public class ElasticConfig extends ElasticsearchConfigurationSupport {
@@ -56,44 +48,41 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
     
     @Bean
     public RestHighLevelClient elasticsearchRestClient() {
-        logger.info("Connecting to ES at: " + host);
-        TerminalClientConfigurationBuilder builder = ClientConfiguration.builder()
-                .connectedTo(host).withConnectTimeout(connectTimeout).withSocketTimeout(connectTimeout);
-                //.usingSsl();
-        if (user != null && !user.trim().isEmpty()) {
-            logger.info("Using user info: " + user);
-            builder.withBasicAuth(user, password); 
+        try {
+            logger.info("Connecting to ES at: " + host);
+            TerminalClientConfigurationBuilder builder = ClientConfiguration.builder()
+                    .connectedTo(host).withConnectTimeout(connectTimeout).withSocketTimeout(connectTimeout);
+                    //.usingSsl();
+            if (user != null && !user.trim().isEmpty()) {
+                logger.info("Using user info: " + user);
+                builder.withBasicAuth(user, password); 
+            }
+            if (pathPrefix != null && !pathPrefix.trim().isEmpty()) {
+                logger.info("Using path prefix: " + pathPrefix);
+                builder.withPathPrefix(pathPrefix);
+            }
+            final ClientConfiguration clientConfiguration = builder.build();
+            RestHighLevelClient restClient = RestClients.create(clientConfiguration).rest();  
+            return restClient;
+        } catch (Exception ex) {
+            logger.error("Error Connecting to ES at: " + ex);
+            return null;
         }
-        if (pathPrefix != null && !pathPrefix.trim().isEmpty()) {
-            logger.info("Using path prefix: " + pathPrefix);
-            builder.withPathPrefix(pathPrefix);
-        }
-        final ClientConfiguration clientConfiguration = builder.build();
-        return RestClients.create(clientConfiguration).rest();
+
     }
 
 
     @Bean(name = { "elasticsearchOperations", "elasticsearchTemplate" })
     public ElasticsearchRestTemplate elasticsearchTemplate() throws UnknownHostException {
-        return new ElasticsearchRestTemplate(elasticsearchRestClient());
-    }
-    
-    @Bean
-    public RetryTemplate retryTemplate() {
-        return new RetryTemplate();
-    }
-    
-    @Retryable(maxAttempts = 10, backoff = @Backoff(delay = 1000))
-    public void connectToElasticsearch() {
         try {
-            RequestOptions options = RequestOptions.DEFAULT;
-            elasticsearchRestClient().ping(options);
-//            elasticsearchRestClient().info();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            System.out.println("Elasticsearch is not running: " + e.getMessage());
-            e.printStackTrace();
+            RestHighLevelClient esClient = elasticsearchRestClient();
+            ElasticsearchRestTemplate esRestTemplate = new ElasticsearchRestTemplate(esClient);
+            return esRestTemplate;
+        } catch (Exception ex) {
+            logger.error("Error Connecting to ES at: " + ex);
+            return null;
         }
+        
     }
 
 }
