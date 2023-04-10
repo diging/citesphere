@@ -55,6 +55,8 @@
 	}
 
 	$(document).ready(function(){
+		
+		$("#searchAuthorSpinner").hide();
 	
 		$("#uploadFileIcon").click(function() {
 	        $("#uploadFileModal").modal('show');
@@ -352,8 +354,7 @@
 			
 			</th:block></td>
 			<td>
-			<button id="addReferences" type="button" class="btn btn-primary">Add References</button>
-			<div class="pull-right"><a data-toggle="modal" data-target="#refernceModal"><i class="icon-circle-add"></i> Add Author</a></div>
+				<button id="addReferences" type="button" class="btn btn-primary" data-toggle="modal" data-target="#refernceModal"><i class="icon-circle-add"></i>Add References</button> 
 			</td>
 		</tr>
 		<tr>
@@ -506,44 +507,25 @@
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title" id="authorLabel">Enter Reference Information</h4>
+	        <h4 class="modal-title" id="authorLabel">Add References</h4>
 	      </div>
 	      <div class="modal-body">
 	      	  <div class="form-group">
 	      	  	<input type="hidden" class="form-control" id="idAuthor">
 	      	  </div>
 	          <div class="form-group">
-			    <label for="firstNameAuthor">First Name:</label>
-			    <input type="text" class="form-control" id="firstNameAuthor" placeholder="First Name">
-			  </div>
-			  <div class="form-group">
-			    <label for="lastNameAuthor">Last Name:</label>
-			    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
+			    <label for="firstNameAuthor">References:</label>
+			    <input type="text" class="form-control" id="firstNameAuthor" placeholder="Reference">
 			  </div>
 			  <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="Author" id="searchAuthor"
-							style="margin-left: 80%" disabled>Search Reference 
+							style="margin-left: 76%" >Search Reference 
 							<i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
 			  </button>
-			  <div class="form-group">
-			    <label for="uriAuthor">URI:</label>
-			    <div class="input-group">
-				    <input type="text" class="form-control" id="uriAuthor" placeholder="URI">
-				    <div id="authorIconContainer" class="input-group-addon" style="min-width: 35px;">
-				    	<i id="uriLoadingSpinnerAuthor" class="icon-spinner" data-toggle="popover" data-html="true" data-placement="right"></i>
-				    	<i id="uriLoadingFoundAuthor" class="icon-info-circle" data-toggle="popover" data-html="true" data-placement="right"></i>
-				    	<i id="uriLoadingFailureAuthor" class="icon-warning" data-toggle="popover" data-html="true" data-placement="right" data-content="Could not find any data for this URI."></i>
-				    </div>
-				    <input type="hidden" id="uriAuthorLocalId" />
-			    </div>
-			    <div class="text-warning pull-right" id="authorAuthorityUsed"></div><br>
-			  </div>
-			  <div id="authorAffiliations"></div>
-			  <div class="text-right"><a id="addAuthorAffiliation"><i class="icon-circle-add" title="Add another affiliation"></i> Add Affiliation</a></div>
 	      </div>
 	      
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" id="addRefernceModalBtn">Close</button>
-	        <button id="addAuthorButton" type="button" class="btn btn-primary" disabled>Add Reference</button>
+	        <button id="addAuthorButton" type="button" class="btn btn-primary" disabled>Add</button>
 	      </div>
 	    </div>
 	  </div>
