@@ -56,7 +56,7 @@
 
 	$(document).ready(function(){
 		
-		$("#searchAuthorSpinner").hide();
+		$("#searchReferenceSpinner").hide();
 	
 		$("#uploadFileIcon").click(function() {
 	        $("#uploadFileModal").modal('show');
@@ -107,12 +107,50 @@
 	    	$(this).text(truncateNote($(this).attr('data-note-text')));
 	    })
 	    
-		$("#addRefernceModalBtn").click(function() {
+		$("#closeRefernceModalBtn").click(function() {
 			$("#refernceModal").modal('hide');
 			//resetPersonCreationModal("Author");
 		});
 	    
+	    $("#searchReference").click(function() {
+	        $("#selectReferenceModel").show()
+	        $("#searchReferenceSpinner").show();
+			var searchTerm = $("#citationReference").val();
+			var pathName = window.location.pathname;
+			var pathNameArray = pathName.split('/');
+			var zoteroGroupId = pathNameArray[4];
+	        getReferences(zoteroGroupId, searchTerm);
+	        $("#searchReferenceSpinner").hide();
+	    });
+	    
+	    $("#closeReferenceSearchResult").click(function() {
+	        $("#selectReferenceModel").modal('hide');
+	        $("#searchReferenceSpinner").hide();
+	    });
 	});
+	
+	function getReferences(zoteroGroupId, searchTerm) {
+		console.log("zoteroGroupId " + zoteroGroupId);
+		console.log("search term " + searchTerm);
+		var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/find/references' + '?searchTerm=' + searchTerm;
+		console.log(url);
+		$.ajax({
+	        dataType: "json",
+	        type: 'GET',
+	        url: url,
+	        async: false,
+	        success: function(data) {
+	            console.log(data);
+	            var results = data["results"];
+	  			$("#citationSearchResult").empty();
+	  
+	  			$("#citationSearchResult").append(content);
+	        },
+	        error: function(data) {
+	        	console.log("An error occured");
+	        }
+		}); 
+	}
 	
 </script>
 </head>
@@ -502,35 +540,59 @@
     </div>
     
 	    	<!-- Reference Modal -->
-	<div class="modal fade" id="refernceModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
+	<div class="modal fade" id="refernceModal" tabindex="-1" role="dialog" aria-labelledby="referenceLabel">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title" id="authorLabel">Add References</h4>
+	        <h4 class="modal-title" id="referenceLabel">Add References</h4>
 	      </div>
 	      <div class="modal-body">
 	      	  <div class="form-group">
 	      	  	<input type="hidden" class="form-control" id="idAuthor">
 	      	  </div>
 	          <div class="form-group">
-			    <label for="firstNameAuthor">References:</label>
-			    <input type="text" class="form-control" id="firstNameAuthor" placeholder="Reference">
+			    <label for="citationReference">References:</label>
+			    <input type="text" class="form-control" id="citationReference" placeholder="Reference">
 			  </div>
-			  <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="Author" id="searchAuthor"
+			  <button class="btn btn-primary search" data-toggle="modal" data-target="#selectReferenceModel" data-client-id="Author" id="searchReference"
 							style="margin-left: 76%" >Search Reference 
-							<i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
+							<i id="searchReferenceSpinner"class="icon-spinner" style="color: white"></i>
 			  </button>
 	      </div>
 	      
 	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" id="addRefernceModalBtn">Close</button>
-	        <button id="addAuthorButton" type="button" class="btn btn-primary" disabled>Add</button>
+	        <button type="button" class="btn btn-default" id="closeRefernceModalBtn">Close</button>
+	        <button type="button" class="btn btn-primary" id="addRefernceButton" disabled>Add</button>
 	      </div>
 	    </div>
 	  </div>
 	</div>
-
+	
+		<!-- Select Reference Modal -->
+	<div id="selectReferenceModel" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selectReferenceLabel">
+	    <div class="modal-dialog" style="width: 1000px" role="document">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	                    <span aria-hidden="true">&times;</span>
+	                </button>
+	                <h4 class="modal-title" id="referenceLabel">Reference Search Result</h4>
+	            </div>
+	            <div class="modal-body">
+     		    	<table class="table table-striped table-bordered table-fixed">                        
+                    	 <tr><th>Name</th><th>URI</th><th>Description</th></tr>           
+                         <tbody id="citationSearchResult">       
+                         </tbody>    
+                    </table>          
+	            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="closeReferenceSearchResult">Close</button>
+                </div>
+	        </div>
+	    </div>
+	</div>
+		<!-- End modal -->
 </div>
 </body>
 </html>
