@@ -4,6 +4,7 @@
 //# sourceURL=modal.js
 	$(function() {
 		$(".parse-ref-info").click(function(e) {
+			console.log(e);
 			var clicked = e.target;
 			$("#ref-unparsed").text($(clicked).text());
 			$("#parsed-ref-authors").text($(clicked).attr('data-authors'));
@@ -56,7 +57,7 @@
 
 	$(document).ready(function(){
 		
-		$("#searchReferenceSpinner").hide();
+	    $("#searchReferenceSpinner").hide();
 	
 		$("#uploadFileIcon").click(function() {
 	        $("#uploadFileModal").modal('show');
@@ -109,12 +110,25 @@
 	    
 		$("#closeRefernceModalBtn").click(function() {
 			$("#refernceModal").modal('hide');
-			//resetPersonCreationModal("Author");
 		});
 	    
+		$("#addReferenceButton").click(function() {
+			console.log("Add reference button clicked");
+			$("#refernceModal").modal('hide');
+			var content = '';
+			content += '<p>';
+			content += $("#itemReference").val();
+			content += '</p>';
+			console.log(content);
+			$('#citationReferences').append(content);
+		});
+		
 	    $("#searchReference").click(function() {
-	        $("#selectReferenceModel").show()
+	        $("#selectReferenceModal").show()
 	        $("#searchReferenceSpinner").show();
+	        $("#addReferenceButton").prop('disabled', true);
+	        $("#itemReference").val('');
+	        
 			var searchTerm = $("#citationReference").val();
 			var pathName = window.location.pathname;
 			var pathNameArray = pathName.split('/');
@@ -124,7 +138,7 @@
 	    });
 	    
 	    $("#closeReferenceSearchResult").click(function() {
-	        $("#selectReferenceModel").modal('hide');
+	        $("#selectReferenceModal").modal('hide');
 	        $("#searchReferenceSpinner").hide();
 	    });
 	});
@@ -142,9 +156,25 @@
 	        success: function(data) {
 	            console.log(data);
 	            var results = data["results"];
+	            console.log(results);
 	  			$("#citationSearchResult").empty();
-	  
+	  			var content = '';
+	  			results.forEach(function (elem) {
+	  				content += '<tr>'
+	  				content += '<td class="reference">' + elem['title'] + '</td>' ;
+	  				content += '<td style="vertical-align: middle;"><span class="item-reference btn btn-primary" title="Use Reference" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td>';
+	  				content += '</tr>';
+	  				
+	  			});
 	  			$("#citationSearchResult").append(content);
+	  			$(".item-reference").click(function() {
+	  				var reference = $(this).closest("tr").find(".reference").text();
+	  				$("#itemReference").val(reference);
+	  				console.log('reference is '+reference);
+	  				$("#addReferenceButton").prop('disabled', false);
+	  				$("#selectReferenceModal").modal('hide');
+	  			});
+	  			
 	        },
 	        error: function(data) {
 	        	console.log("An error occured");
@@ -370,7 +400,7 @@
 		</tr>
 		<tr>
 			<td>References</td>
-			<td>
+			<td id="citationReferences">
 			<th:block th:each="ref:${citation.references}">
 					<p class="parse-ref-info" th:data-authors="${ref.authorString}" th:data-title="${ref.title}"
 	                        th:data-year="${ref.year}"
@@ -548,29 +578,31 @@
 	        <h4 class="modal-title" id="referenceLabel">Add References</h4>
 	      </div>
 	      <div class="modal-body">
-	      	  <div class="form-group">
-	      	  	<input type="hidden" class="form-control" id="idAuthor">
-	      	  </div>
 	          <div class="form-group">
 			    <label for="citationReference">References:</label>
 			    <input type="text" class="form-control" id="citationReference" placeholder="Reference">
 			  </div>
-			  <button class="btn btn-primary search" data-toggle="modal" data-target="#selectReferenceModel" data-client-id="Author" id="searchReference"
+			  <button class="btn btn-primary search" data-toggle="modal" data-target="#selectReferenceModal" data-client-id="Author" id="searchReference"
 							style="margin-left: 76%" >Search Reference 
 							<i id="searchReferenceSpinner"class="icon-spinner" style="color: white"></i>
 			  </button>
+			  <div class="form-group">
+			    <label for="itemReference">Reference</label>
+			    <input type="text" class="form-control" id="itemReference">
+			  </div>
 	      </div>
 	      
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" id="closeRefernceModalBtn">Close</button>
-	        <button type="button" class="btn btn-primary" id="addRefernceButton" disabled>Add</button>
+	        <button type="button" class="btn btn-primary" id="addReferenceButton" disabled>Add</button>
 	      </div>
 	    </div>
 	  </div>
 	</div>
+		<!-- End Reference modal -->
 	
 		<!-- Select Reference Modal -->
-	<div id="selectReferenceModel" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selectReferenceLabel">
+	<div id="selectReferenceModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="selectReferenceLabel">
 	    <div class="modal-dialog" style="width: 1000px" role="document">
 	        <div class="modal-content">
 	            <div class="modal-header">
@@ -581,7 +613,7 @@
 	            </div>
 	            <div class="modal-body">
      		    	<table class="table table-striped table-bordered table-fixed">                        
-                    	 <tr><th>Name</th><th>URI</th><th>Description</th></tr>           
+                    	 <tr><th>Reference</th></tr>           
                          <tbody id="citationSearchResult">       
                          </tbody>    
                     </table>          
@@ -592,7 +624,7 @@
 	        </div>
 	    </div>
 	</div>
-		<!-- End modal -->
+		<!-- End Select Reference modal -->
 </div>
 </body>
 </html>
