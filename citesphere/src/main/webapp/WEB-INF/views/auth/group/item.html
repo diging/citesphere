@@ -115,8 +115,8 @@
 		$("#addReferenceButton").click(function() {
 			console.log("Add reference button clicked");
 			$("#refernceModal").modal('hide');
-			var content = '';
-			content += '<p>';
+			var content = '<p>';
+			content += '<span class="icon-info-circle"></span>';
 			content += $("#itemReference").val();
 			content += '</p>';
 			console.log(content);
@@ -159,16 +159,32 @@
 	            console.log(results);
 	  			$("#citationSearchResult").empty();
 	  			var content = '';
-	  			results.forEach(function (elem) {
+	  			results.forEach(function (elem, index) {
 	  				content += '<tr>'
-	  				content += '<td class="reference">' + elem['title'] + '</td>' ;
+	  				content += '<td class="reference"'+ "data-idx="+index+'>' + elem['title'] + '</td>' ;
 	  				content += '<td style="vertical-align: middle;"><span class="item-reference btn btn-primary" title="Use Reference" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td>';
 	  				content += '</tr>';
 	  				
 	  			});
 	  			$("#citationSearchResult").append(content);
 	  			$(".item-reference").click(function() {
-	  				var reference = $(this).closest("tr").find(".reference").text();
+	  				console.log($(this).closest("tr"));
+	  				var reference = $(this).closest("tr").find(".reference").attr('data-idx');
+	  				var citationItem = results[reference];
+	  				var authors = citationItem["authors"];
+	  				var reference = " ";
+	  				if (authors.length > 0) {
+	  					var firstName = authors[0].firstName;
+	  					var lastName = authors[0].lastName;
+	  					if (lastName) {
+	  						reference += lastName;
+	  					}
+	  					if (firstName) {
+	  						reference += " "+firstName;
+	  					}
+	  				}
+	  				reference += ", "+citationItem["dateFreetext"]+", "+citationItem["title"];
+	  			
 	  				$("#itemReference").val(reference);
 	  				console.log('reference is '+reference);
 	  				$("#addReferenceButton").prop('disabled', false);
@@ -402,6 +418,7 @@
 			<td>References</td>
 			<td id="citationReferences">
 			<th:block th:each="ref:${citation.references}">
+					
 					<p class="parse-ref-info" th:data-authors="${ref.authorString}" th:data-title="${ref.title}"
 	                        th:data-year="${ref.year}"
 	                        th:data-identifier="${ref.identifier}"
