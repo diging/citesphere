@@ -87,27 +87,6 @@ public class GroupItemsController {
         model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sort", sort);
-        model.addAttribute("results", results);
-        // more than 200 really don't make sense here, this needs to be changed
-        try {
-            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
-        } catch(GroupDoesNotExistException e) {
-            logger.error("Exception occured", e);
-            return "error/404";
-        }
-        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
-        List<String> shownColumns = new ArrayList<>();
-        if (columns != null && columns.length > 0) {
-            for (String column : columns) {
-                if (allowedColumns.contains(column)) {
-                    shownColumns.add(column);
-                }
-            }
-        }
-        model.addAttribute("columns", shownColumns);
-        model.addAttribute("availableColumns", allowedColumns);
-        model.addAttribute("concepts", conceptManager.findAll(user));
-        model.addAttribute("selectedConceptIds", Arrays.asList(conceptIds));
         
         ICitationGroup group = groupManager.getGroup(user, groupId);
         List<BreadCrumb> breadCrumbs = new ArrayList<>();
