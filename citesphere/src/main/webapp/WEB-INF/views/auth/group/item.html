@@ -121,6 +121,14 @@
 			content += '</p>';
 			console.log(content);
 			$('#citationReferences').append(content);
+			var pathName = window.location.pathname;
+			console.log("pathName "+pathName);
+			var pathNameArray = pathName.split('/');
+			var zoteroGroupId = pathNameArray[4];
+			var itemId = pathNameArray[6];
+			var reference =  $("#itemReference").val();
+			console.log("reference "+reference);
+			updateItemReference(zoteroGroupId, itemId, reference);
 		});
 		
 	    $("#searchReference").click(function() {
@@ -194,6 +202,32 @@
 	        },
 	        error: function(data) {
 	        	console.log("An error occured");
+	        }
+		}); 
+	}
+	
+	function updateItemReference(zoteroGroupId, itemId, referenceVal) {
+		console.log("zoteroGroupId " + zoteroGroupId);
+		console.log("itemId" + itemId);
+		console.log("reference " + referenceVal);
+	/* 	var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/items/'+ itemId + '/update' + '?reference=' + reference; */
+		/* var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/items/'+ itemId + '/update'; */
+		var url = 'localhost:8080/citesphere/auth/group/' + zoteroGroupId + '/items/'+ itemId + '/update';
+		
+		console.log(url);
+		$.ajax({
+			dataType: "json",
+			type: 'POST',
+			crossDomain: true,
+	        url: url,
+	        data: JSON.stringify({"reference": referenceVal}),
+	        async: false,
+	        success: function(data) {
+	            console.log(data);
+	        },
+	        error: function(data) {
+	        	console.log("An error occured updateItemReference" );
+	        	console.log(data);
 	        }
 		}); 
 	}
