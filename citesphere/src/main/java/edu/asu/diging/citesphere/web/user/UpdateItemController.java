@@ -37,30 +37,36 @@ public class UpdateItemController {
     @Autowired
     private ICitationStore citationStore;
     
-//    @RequestParam(required = false, value = "reference" String reference,
-    
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/update", method = RequestMethod.POST)
-    public ResponseEntity<String> resolveConflict(Authentication authentication,
+    public ResponseEntity<String> updateReference(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @RequestBody String reference)
+            @RequestParam(value = "reference", required = false) String reference)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         try {
-            ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
-                    itemId);
-           
+            ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
             Set<IReference> references = citation.getReferences();
+            Boolean referenceExists = false;
+            IReference iReference = new Reference();
+            iReference.setReferenceString(reference);
             if (references == null) {
                 references = new HashSet<>();
+                references.add(iReference);
+            } else {
+               for (IReference refer : references) {
+                   if (refer.getReferenceString().equals(reference)) {
+                       referenceExists = true;
+                       break;
+                   }
+               }
             }
-            IReference refer = new Reference();
-            refer.setReferenceString(reference);
-            references.add(refer);
-            citation.setVersion(Long.valueOf(3083));
+            if (!referenceExists) {
+                references.add(iReference);
+            }
             citationStore.save(citation);
         } catch (Exception ex) {
-            logger.error(ex.toString());
+            ex.printStackTrace();
+            return new ResponseEntity<String>("Failed",HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         return new ResponseEntity<String>("success",HttpStatus.OK);
     }
 }

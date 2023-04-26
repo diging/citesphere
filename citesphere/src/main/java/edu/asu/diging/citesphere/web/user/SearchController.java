@@ -112,10 +112,6 @@ public class SearchController {
             @RequestParam(value = "searchTerm", required = false) String searchTerm,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize ) {
-    
-        IUser user = (IUser) authentication.getPrincipal();
-        ICitationGroup group = groupManager.getGroup(user, zoteroGroupId);
-
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);

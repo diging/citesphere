@@ -1,10 +1,10 @@
 <html layout:decorate="~{layouts/main}">
 <head>
+<script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
 <script th:inline="javascript">
 //# sourceURL=modal.js
 	$(function() {
 		$(".parse-ref-info").click(function(e) {
-			console.log(e);
 			var clicked = e.target;
 			$("#ref-unparsed").text($(clicked).text());
 			$("#parsed-ref-authors").text($(clicked).attr('data-authors'));
@@ -113,21 +113,17 @@
 		});
 	    
 		$("#addReferenceButton").click(function() {
-			console.log("Add reference button clicked");
 			$("#refernceModal").modal('hide');
 			var content = '<p>';
 			content += '<span class="icon-info-circle"></span>';
 			content += $("#itemReference").val();
 			content += '</p>';
-			console.log(content);
 			$('#citationReferences').append(content);
 			var pathName = window.location.pathname;
-			console.log("pathName "+pathName);
 			var pathNameArray = pathName.split('/');
 			var zoteroGroupId = pathNameArray[4];
 			var itemId = pathNameArray[6];
-			var reference =  $("#itemReference").val();
-			console.log("reference "+reference);
+			var reference =  $("#itemReference").val().trim();
 			updateItemReference(zoteroGroupId, itemId, reference);
 		});
 		
@@ -149,22 +145,23 @@
 	        $("#selectReferenceModal").modal('hide');
 	        $("#searchReferenceSpinner").hide();
 	    });
+	    
+	    $("#addReferences").click(function() {
+	        $("#citationReference").val('');
+	        $("#itemReference").val('');
+	    });
+	    
 	});
 	
 	function getReferences(zoteroGroupId, searchTerm) {
-		console.log("zoteroGroupId " + zoteroGroupId);
-		console.log("search term " + searchTerm);
 		var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/find/references' + '?searchTerm=' + searchTerm;
-		console.log(url);
 		$.ajax({
 	        dataType: "json",
 	        type: 'GET',
 	        url: url,
 	        async: false,
 	        success: function(data) {
-	            console.log(data);
 	            var results = data["results"];
-	            console.log(results);
 	  			$("#citationSearchResult").empty();
 	  			var content = '';
 	  			results.forEach(function (elem, index) {
@@ -176,7 +173,6 @@
 	  			});
 	  			$("#citationSearchResult").append(content);
 	  			$(".item-reference").click(function() {
-	  				console.log($(this).closest("tr"));
 	  				var reference = $(this).closest("tr").find(".reference").attr('data-idx');
 	  				var citationItem = results[reference];
 	  				var authors = citationItem["authors"];
@@ -194,44 +190,52 @@
 	  				reference += ", "+citationItem["dateFreetext"]+", "+citationItem["title"];
 	  			
 	  				$("#itemReference").val(reference);
-	  				console.log('reference is '+reference);
 	  				$("#addReferenceButton").prop('disabled', false);
 	  				$("#selectReferenceModal").modal('hide');
 	  			});
 	  			
 	        },
 	        error: function(data) {
-	        	console.log("An error occured");
+	        	showNotification(" Error while fetching references!", "danger", 10000);
 	        }
 		}); 
 	}
 	
 	function updateItemReference(zoteroGroupId, itemId, referenceVal) {
-		console.log("zoteroGroupId " + zoteroGroupId);
-		console.log("itemId" + itemId);
-		console.log("reference " + referenceVal);
-	/* 	var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/items/'+ itemId + '/update' + '?reference=' + reference; */
-		/* var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/items/'+ itemId + '/update'; */
-		var url = 'localhost:8080/citesphere/auth/group/' + zoteroGroupId + '/items/'+ itemId + '/update';
-		
-		console.log(url);
+		var url = "[(@{|/auth/group/${zoteroGroupId}/items/${itemId}/update|})]"
 		$.ajax({
 			dataType: "json",
 			type: 'POST',
-			crossDomain: true,
 	        url: url,
-	        data: JSON.stringify({"reference": referenceVal}),
+			data: {
+				"reference": referenceVal,
+				[[${_csrf.parameterName}]] : [[${_csrf.token}]]
+			},
 	        async: false,
 	        success: function(data) {
-	            console.log(data);
+	        	var message = "Reference added successfully";
+	        	showNotification(message, "success", 1000);
 	        },
 	        error: function(data) {
-	        	console.log("An error occured updateItemReference" );
-	        	console.log(data);
+	        	showNotification(" Error while updating reference!", "danger", 500);
 	        }
 		}); 
 	}
-	
+
+	function showNotification(message, status, time){
+		$.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
+			type: status,
+			offset: {
+				x: 50,
+				y: 90
+			},
+			timer: time,
+			animate: {
+				enter: 'animated fadeInRight',
+				exit: 'animated fadeOutRight'
+			},
+		});
+	}
 </script>
 </head>
 
