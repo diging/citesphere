@@ -1,0 +1,40 @@
+Results of doctest builder run on 2023-04-14 09:42:04
+=====================================================
+
+Document: usage
+---------------
+**********************************************************************
+File "usage.rst", line 41, in default
+Failed example:
+    import lumache
+Exception raised:
+    Traceback (most recent call last):
+      File "/Users/ajayyadav/opt/anaconda3/lib/python3.9/doctest.py", line 1334, in __run
+        exec(compile(example.source, filename, "single",
+      File "<doctest default[0]>", line 1, in <module>
+        import lumache
+    ModuleNotFoundError: No module named 'lumache'
+**********************************************************************
+File "usage.rst", line 42, in default
+Failed example:
+    lumache.get_random_ingredients()
+Exception raised:
+    Traceback (most recent call last):
+      File "/Users/ajayyadav/opt/anaconda3/lib/python3.9/doctest.py", line 1334, in __run
+        exec(compile(example.source, filename, "single",
+      File "<doctest default[1]>", line 1, in <module>
+        lumache.get_random_ingredients()
+    NameError: name 'lumache' is not defined
+**********************************************************************
+1 items had failures:
+   2 of   2 in default
+2 tests in 1 items.
+0 passed and 2 failed.
+***Test Failed*** 2 failures.
+
+Doctest summary
+===============
+    2 tests
+    2 failures in tests
+    0 failures in setup code
+    0 failures in cleanup code
