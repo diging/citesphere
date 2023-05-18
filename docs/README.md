@@ -105,7 +105,7 @@ pip install -U sphinx
 
 3. To verify the installation, type `sphinx-build --version` in the command prompt. If everything is installed correctly, you will see the version number for the Sphinx package.
 
-### Using virtual environments
+# Using virtual environments
 
 When installing Sphinx using pip, it is highly recommended to use virtual environments to isolate the installed packages. This avoids the need for administrator privileges. To create a virtual environment in the `.venv` directory, use the following command:
 
@@ -125,7 +125,7 @@ Docker images for Sphinx are available on the Docker Hub. There are two types of
 
 - `sphinxdoc/sphinx`: Used for standard usage of Sphinx.
 - `sphinxdoc/sphinx-latexpdf`: Primarily used for PDF builds using LaTeX
-# Documentation Theme Customization
+# Theme Customization
 
 This repository contains documentation for a project and provides instructions on how to customize the appearance of the documentation using themes in Sphinx.
 
