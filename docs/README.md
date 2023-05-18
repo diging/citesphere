@@ -1,6 +1,6 @@
 # Installing Sphinx
 
-[API Documentation](doc:https://documenter.getpostman.com/view/19365454/UVeMJiyx)
+[API Documentation](https://documenter.getpostman.com/view/19365454/UVeMJiyx)
 
 ## Overview
 
