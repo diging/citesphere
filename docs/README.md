@@ -170,4 +170,4 @@ To use a third-party theme like "Furo" for your HTML documentation, follow the s
 
 ## Conclusion
 
-By following the steps outlined above, you can easily customize the appearance of your documentation using themes in Sphinx. Experiment with different themes to find the one that best suits your project's needs and enhances the overall user experience.
+By following the steps outlined above, you can easily setup the sphinx documentation site for citesphere locally.
