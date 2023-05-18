@@ -1,0 +1,187 @@
+Using Citesphere to Authenticate Users for Single Sign-On
+=========================================================
+
+.. autosummary::
+   :toctree: generated
+
+You can use any form of OAuth Client to get the token, which needs to be passed to other APIs as a header.
+
+1. Authorizing Application
+--------------------------
+**Prerequisites**
+
+* You should have created an application in Citesphere. If not, create one! Make sure to choose “Apps need user information (Authorization Code)” as application type and to provide a url to which Citesphere should redirect after authorizing a user in “Redirect URL.”
+
+* You should have the following information for the application with you:
+    * client_id - A unique identifier for your application. This is auto-generated for you during the application creation.
+    
+    * Example: OAUTHCLIENT007
+    
+    * client_secret - An auto-generated secret identifier which will be visible only right after you create the application. If you had lost it, go back and regenerate the secret.
+    
+    * redirect_url - You should have given a callback URL while creating the application in Citesphere. If you forgot this, you can check it back in Citesphere.
+
+**Authorization Flow**
+
+From your application, redirect your user to the following URL with specified parameters. Maybe have a button that says  
+``LOGIN VIA CITESPHERE`` which has the hyperlink.
+
+``ENDPOINT URL`` ``GET`` ``/api/oauth/authorize``
+
+**Query Parameters**
+
+.. list-table:: 
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - **Name**
+     - **Type**
+     - **Description**
+   * - ``client_id``
+     - ``string``
+     - **Required.** The client ID you received from Citesphere for your App.
+   * - ``scope``
+     - ``string``
+     - **Required.** A space-delimited list of scopes. 
+     
+       Example: ``read``
+   * - ``response_type``
+     - ``string``
+     - **Required.** Tells the authorization server which grant to execute.
+       
+       Example: ``code`` (In our case)
+   * - ``state``
+     - ``string``
+     - An unguessable random string. It is used to protect against cross-site request forgery attacks.
+
+       You will need to use the same ``state`` for the **Get Access Token** flow if you use the ``code`` returned by this request as it’s query parameter.
+
+This request will take you to Citesphere, where the user will enter the credentials and 
+``APPROVE`` or  ``DENY`` your application.
+
+If the user ``APPROVES`` your application, Citesphere will redirect you back to your application’s ``redirect_url`` with the following **query parameters.**
+
+.. list-table:: 
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - **Name**
+     - **Type**
+     - **Description**
+   * - ``code``
+     - ``string``
+     - A unique string you should use to get the ``access_token`` in the next step
+   * - ``state``
+     - ``string``
+     - The same ``string`` you provided in the previous request.
+   
+**Example:** ``https://<your_app_redirect_url>?code=xyz123&state=mystate``
+
+    **Note** Note that this step happens in the browser, initiated by your application’s user. That means ``code`` and ``state`` are visible in the address bar. 
+
+    Your application should have a controller in the backend to retrieve ``code`` and ``state`` from ``<your_app_redirect_url endpoint>``. 
+    That way, you can use ``code`` and ``state`` to get the ``access_token`` from your backend.
+
+2. Get Access Token
+-------------------
+
+    This step should **NOT** be done in the browser. Why? You have to pass your ``client_secret`` for getting the ``access_token``. 
+
+    At any cost, you should **NOT** expose your ``client_secret`` to your user.
+
+``ENDPOINT URL`` ``POST`` ``/api/oauth/token``
+
+**Query Parameters**
+
+.. list-table:: 
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - **Name**
+     - **Type**
+     - **Description**
+   * - ``client_id``
+     - ``string``
+     - **Required.** The client ID you received from Citesphere for your App.
+   * - ``client_secret``
+     - ``string``
+     - **Required.** The client secret you received from Citesphere for your App.
+   * - ``code``
+     - ``string``
+     - **Required.** The code you received as a response in the previous step
+   * - ``redirect_uri``
+     - ``string``
+     - The URL of the application you configured in Citesphere
+   * - ``state``
+     - ``string``
+     - An unguessable random string. It is used to protect against cross-site request forgery attacks.
+   * - ``grant_type``
+     - ``string``
+     - **Required.** Use ``authorization_code`` for retrieving an ``access_token``.
+     
+       For a list of values, check ``https://auth0.com/docs/applications/application-grant-types``
+
+**Response**
+    
+|    
+    ``{
+    "access_token": "2c7c0f10-adf5-ed55-a931-caeea29464ee",
+    "token_type": "bearer",
+    "refresh_token": "0d06219a-1b49-7895-9220-ef3b9810f09d",
+    "expires_in": 406,
+    "scope": "read"
+    }``
+* ``expires_in`` specifies the number of seconds remaining for the ``access_token`` to expire.
+
+* You should use the ``access_token`` as the **Bearer token** header for accessing any resource. 
+    * Header Name - ``Authorization``
+    * Header Value -  ``Bearer 2c7c0f10-adf5-ed55-a931-caeea29464ee``
+
+* You should use the ``refresh_token`` in order to get a new ``access_token`` once it is expired
+
+3. Refresh Token
+----------------
+
+You would need to call this API for getting a new ``access_token`` if it expired. Your application should 
+ideally store the refresh_token generated previously (ex. database). Use the ``refresh_token`` to retrieve a new ``access_token``. 
+
+Of course, you should pass ``client_id`` and ``client_secret`` similar to the previous request.
+
+``ENDPOINT URL`` ``POST`` ``/api/oauth/token``
+
+.. list-table:: 
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - **Name**
+     - **Type**
+     - **Description**
+   * - ``client_id``
+     - ``string``
+     - **Required.** The client ID you received from Citesphere for your App.
+   * - ``client_secret``
+     - ``string``
+     - **Required.** The client secret you received from Citesphere for your App.
+   * - ``refresh_token``
+     - ``string``
+     - **Required.** Use the ``refresh_token`` you got from the previous step.
+
+       Example: ``0d06219a-1b49-7895-9220-ef3b9810f09d``
+   * - ``grant_type``
+     - ``string``
+     - **Required.** Use ``refresh_token`` in this scenario
+
+Example: ``POST /api/oauth/token?client_id=OAUTHCLIENT007&client_secret=xyz&refresh_token=
+0d06219a-1b49-7895-9220-ef3b9810f09d&grant_type=refresh_token``
+
+**Response**
+ 
+| ``{``
+|    ``"access_token": "c322172e-16ac-8952-95e7-19639745bbaf",``
+|    ``"token_type": "bearer",``
+|    ``"refresh_token": "0d06219a-1b49-7895-9220-ef3b9810f09d",``
+|    ``"expires_in": 3600,``
+|    ``"scope": "read"``
+| ``}``
+You can use the newly generated ``access_token`` for accessing resources.
+
