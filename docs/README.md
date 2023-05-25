@@ -7,8 +7,8 @@
 This README file provides instructions for installing Sphinx documentation for Citesphere on various platforms, including Linux, macOS, Windows, and Docker. It also includes information on installing Sphinx from PyPI (Python Package Index) and from source. and customizing the theme of the site
 Following are the steps:
 1. Install Sphinx: you can find the link to Sphinx Installation here [Sphinx install](https://www.sphinx-doc.org/en/master/usage/installation.html)
-2. Cutomize theme to Furo: you can find link to Furo Theme installation here [Furo](https://www.sphinx-doc.org/en/master/tutorial/more-sphinx-customization.html)
-3. Create a virtual environment
+2. Create a virtual environment: it is recommended to use a virtual environment for Sphinx.
+3. Cutomize theme to Furo: you can find link to Furo Theme installation here [Furo](https://www.sphinx-doc.org/en/master/tutorial/more-sphinx-customization.html)
 
 # Installing Sphinx
 Sphinx is written in Python and supports Python 3.8+. It builds upon the shoulders of many third-party libraries such as Docutils and Jinja, which are installed when Sphinx is installed. Following are the steps to install Sphinx on different Operating Systems.
