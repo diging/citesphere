@@ -7,7 +7,8 @@ Developer Documentation
 
 Tech Stack
 ----------
-* MySQL
+* MySQL 5.7
+* Java 11
 * MongoDB
 * Apache Zookeeper
 * Apache Kafka
