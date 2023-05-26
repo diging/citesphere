@@ -2,7 +2,7 @@
 
 ## Overview
 
-This README file provides instructions for installing Sphinx documentation for Citesphere on various platforms, including Linux, macOS, Windows, and Docker. It also includes information on installing Sphinx from PyPI (Python Package Index) and from source. and customizing the theme of the site
+This README file provides instructions for installing Sphinx documentation for Citesphere on various platforms, including Linux, macOS, Windows, and Docker. It also includes information on installing Sphinx from PyPI (Python Package Index) and from source, and about customizing the theme of the site.
 Following are the steps:
 1. Install Sphinx: you can find the link to Sphinx Installation here [Sphinx install](https://www.sphinx-doc.org/en/master/usage/installation.html)
 2. Create a virtual environment: it is recommended to use a virtual environment for Sphinx.
