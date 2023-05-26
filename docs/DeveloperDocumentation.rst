@@ -67,7 +67,7 @@ in the above xml the variables need to be adjusted to the specific system settin
    
    * Type ``exit`` you will come out of MySQL terminal.
    
-   * Now start MySQL with new username and password you just created ``/usr/local/mysql/bin/mysql -u your_mysql_db_username -p``.
+   * Now connect to MySQL with new username and password you just created ``/usr/local/mysql/bin/mysql -u your_mysql_db_username -p``.
    
    * Create a database citesphere using this command. ``create database citesphere;`` press enter.
    
