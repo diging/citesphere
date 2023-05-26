@@ -65,7 +65,7 @@ in the above xml the variables need to be adjusted to the specific system settin
    
    * update new username and password in ``settings.xml`` file which is inside .m2 folder.
    
-   * Type ``exit`` you will come out of mysql terminal.
+   * Type ``exit`` you will come out of MySQL terminal.
    
    * Now start MySQL with new username and password you just created ``/usr/local/mysql/bin/mysql -u your_mysql_db_username -p``.
    
