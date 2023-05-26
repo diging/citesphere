@@ -83,17 +83,17 @@ in the above xml the variables need to be adjusted to the specific system settin
 
 3. Open the ``Servers view`` (``Window → Show View → Servers``, or maybe ``Window → Show View → Other`` ...  and select ``Server``, then ``Open``) and click ``New →  Server``. 
 
-4. Now select ``Tomcat v8.5 Server`` and click ``Next``. Select the Tomcat installation directory and click ``Finish``.
+4. Now select ``Tomcat v9 Server`` and click ``Next``. Select the Tomcat installation directory and click ``Finish``.
 
-5. In the ``Servers`` view, it can be noted that the ``Tomcat v8.5 Server at localhost`` will be present. Double click on this. Click on the Timeouts section. Specify the start time limit as 500s and stop time limit as 15s and press ``Command + S/Ctrl + S`` to save.
+5. In the ``Servers`` view, it can be noted that the ``Tomcat v9 Server at localhost`` will be present. Double click on this. Click on the Timeouts section. Specify the start time limit as 500s and stop time limit as 15s and press ``Command + S/Ctrl + S`` to save.
 
 6. Right click on the citesphere project ``Maven → Select Maven Profiles``...Select the ``profile id`` and ensure that the id is same as the id specified in the ``settings.xml`` file in ./m2 folder. Click ``Ok``.
 
-7. In the servers view, right click on the ``Tomcat v8.5 Server at localhost`` and select ``Add and Remove``...If citesphere is not added, add the same and click Finish.
+7. In the servers view, right click on the ``Tomcat v9 Server at localhost`` and select ``Add and Remove``...If citesphere is not added, add the same and click Finish.
 
-8. Right click on ``Tomcat v8.5 Server at localhost`` and click ``Clean``....
+8. Right click on ``Tomcat v9 Server at localhost`` and click ``Clean``....
 
-9. Right click on ``Tomcat v8.5 Server at localhost`` and click ``Start``....
+9. Right click on ``Tomcat v9 Server at localhost`` and click ``Start``....
 
 10. Once the server is started up and running, go to ``http://localhost:8080/citesphere`` and verify if the citesphere page is loaded.
 
