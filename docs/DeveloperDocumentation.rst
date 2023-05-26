@@ -52,7 +52,8 @@ Project Local Setup
             </profile>
          </profiles>
       </settings>
-
+      
+in the above xml the variables need to be adjusted to the specific system settings (e.g. zotero.client.key needs to be replaced with the client key created earlier in Zotero, MySLQ username and password need to be replaced, etc).
 
 * Start MySQL
    * Open terminal enter this command ``/usr/local/mysql/bin/mysql -u your_mysql_db_username -p``. 
