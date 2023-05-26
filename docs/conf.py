@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Citesphere'
-copyright = '2023, Diging'
+copyright = '2023, DigInG'
 author = 'Diging'
 
 # -- General configuration ---------------------------------------------------
