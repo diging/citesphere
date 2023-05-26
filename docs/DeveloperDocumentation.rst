@@ -13,7 +13,7 @@ Tech Stack
 * Apache Kafka
 * Eclipse IDE for Enterprise Java Developers
 * MongoDB Compass
-* Apache Tomcat 8.5.x
+* Apache Tomcat 9
 
 Project Local Setup
 -------------------
