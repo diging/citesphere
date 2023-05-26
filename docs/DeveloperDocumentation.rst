@@ -20,7 +20,7 @@ Project Local Setup
 
 * Create Zotero account
    * After creating an account go to this link and create an application.  ``https://www.zotero.org/oauth/apps/new``
-   * Give Application name: Citesphere dev, select Browser as Application type. Enter callback URL as ``http://localhost:8080/citesphere``. Click register application.
+   * Give Application name: Citesphere dev, select Browser as Application type. Enter callback URL as ``http://localhost:8080/citesphere`` (if you use a different port, make sure to adjust the url). Click register application.
    * Keep client key and client secret ready.
 
 * Creating "settings.xml" file.
