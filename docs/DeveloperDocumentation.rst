@@ -103,7 +103,7 @@ in the above xml the variables need to be adjusted to the specific system settin
 
 13. Click on ``Users`` tab. The user that was created should appear here. Add the user and click on ``Make Admin``. Now, you can logout and login back with your own credentials.
 
-14. Click on ``Connect Zotero``. It will redirect the page to the Zotero application. Click on ``Accept defaults``.
+14. Click on ``Connect Zotero``. It will redirect the page to the Zotero application. Check the settings for the key (do not click "Accept Defaults" but click "Change Permission"). The key needs to have read and write access to all groups of a user.
 
 15. Now in the MySQL shell, you can find all the citesphere tables by using this command ``show tables;``
 
