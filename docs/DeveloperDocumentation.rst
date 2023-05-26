@@ -69,10 +69,6 @@ in the above xml the variables need to be adjusted to the specific system settin
    
    * Now connect to MySQL with new username and password you just created ``/usr/local/mysql/bin/mysql -u your_mysql_db_username -p``.
    
-   * Create a database citesphere using this command. ``create database citesphere;`` press enter.
-   
-   * Use newly created database. ``use citesphere;`` press enter. You will get a message saying ``Database changed``.
-
 
 * Start Apache Kafka and Zookeeper.
    * To start Zookeeper open terminal and use this command. ``sudo /Users/your_path/zookeeper-3.3.6/bin/zkServer.sh start``. 
