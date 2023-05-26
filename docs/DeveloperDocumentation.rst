@@ -35,7 +35,7 @@ Project Local Setup
       <settings>
          <profiles>
             <profile>
-               <id>mysql_username</id>
+               <id>citesphere</id>
                <properties>
                   <zotero.client.key>your_zotero_key</zotero.client.key>
                   <zotero.client.secret>your_zotero_secret</zotero.client.secret>
