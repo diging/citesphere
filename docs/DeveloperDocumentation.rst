@@ -71,8 +71,9 @@ in the above xml the variables need to be adjusted to the specific system settin
    
 
 * Start Apache Kafka and Zookeeper.
-   * To start Zookeeper open terminal and use this command. ``sudo /Users/your_path/zookeeper-[version]/bin/zkServer.sh start``.  Make sure to replace `your_path` with the path to where Zookeeper is installed on your system and replace`[version]` with the version of Zookeeper you have installed. If you did not download Zookeeper through the website but used `brew` or another way to install it, this command might be different.
-   * To start Kafka use this ``sudo /Users/your_path/kafka_2.11-1.1.1/bin/kafka-server-start.sh /Users/your_path/kafka_2.11-1.1.1/config/server.properties``  (there is space in between start.sh and /Users)
+   * To start Zookeeper open terminal and use this command. ``sudo /Users/your_path/zookeeper-3.3.6/bin/zkServer.sh start``. 
+   
+   * To start Kafka use this ``sudo /Users/your_path/kafka_2.11-1.1.1/bin/kafka-server-start.sh /Users/your_path/kafka_2.11   1.1.1/config/server.properties``  (there is space in between start.sh and /Users)
 
 **Perform the following steps after starting Apache Kafka and Zookeeper:**
 
