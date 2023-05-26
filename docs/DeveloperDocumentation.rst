@@ -101,7 +101,7 @@ in the above xml the variables need to be adjusted to the specific system settin
 
 12. Then logout and login with the credentials username: admin and password: admin.
 
-13. Click on ``Users`` tab. The user that was created should appear here. Add the user and click on ``Make Admin``. Now, you can logout and login back with your own credentials.
+13. Click on ``Users`` tab. The user that was created should appear here. Activate the user and click on ``Make Admin``. Now, you can logout and login back with your own credentials.
 
 14. Click on ``Connect Zotero``. It will redirect the page to the Zotero application. Check the settings for the key (do not click "Accept Defaults" but click "Change Permission"). The key needs to have read and write access to all groups of a user.
 
