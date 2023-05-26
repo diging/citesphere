@@ -27,7 +27,7 @@ Project Local Setup
 * Creating "settings.xml" file.
    * Create a file named "settings.xml" inside ``.m2`` folder. It is a hidden folder. To view it go to your home directory press ``command + shift + .`` (if you are on a Mac, if you are on a different OS, show all hidden files using your OS specific method). All hidden files should show up.
    * Now open .m2 folder and create a file ``settings.xml``.
-   * Create two folders uploadFiles and keep note of its path.
+   * Create a folder uploadFiles and keep note of its path.
    * Copy below code into it.
 
 .. code-block:: xml
