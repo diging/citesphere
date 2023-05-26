@@ -77,7 +77,7 @@ in the above xml the variables need to be adjusted to the specific system settin
 
 **Perform the following steps after starting Apache Kafka and Zookeeper:**
 
-1. Clone the citesphere repository in local from ``https://github.com/diging/citesphere``
+1. Clone the Citesphere repository in local from ``https://github.com/diging/citesphere``
 
 2. Import the project in eclipse → While importing make sure the import is done from the directory - ``{directory where the project is cloned}/citesphere``
 
