@@ -85,26 +85,20 @@ in the above xml the variables need to be adjusted to the specific system settin
 
 4. Now select ``Tomcat v9 Server`` and click ``Next``. Select the Tomcat installation directory and click ``Finish``.
 
-5. In the ``Servers`` view, it can be noted that the ``Tomcat v9 Server at localhost`` will be present. Double click on this. Click on the Timeouts section. Specify the start time limit as 500s and stop time limit as 15s and press ``Command + S/Ctrl + S`` to save.
+5. In the ``Servers`` view, it can be noted that the ``Tomcat v9 Server at localhost`` will be present. Double click on this. Click on the Timeouts section. Specify the start time limit as 300s and stop time limit as 15s and press ``Command + S/Ctrl + S`` to save.
 
-6. Right click on the citesphere project ``Maven → Select Maven Profiles``...Select the ``profile id`` and ensure that the id is same as the id specified in the ``settings.xml`` file in `.m2` folder. Click ``Ok``.
+6. Right click on the citesphere project ``Maven → Select Maven Profiles``...Select the ``profile id`` and ensure that the id is same as the id specified in the ``settings.xml`` file in ./m2 folder. Click ``Ok``.
 
-7. In the servers view, right click on the ``Tomcat v9 Server at localhost`` and select ``Add and Remove``...If citesphere is not added, add the same and click Finish.
+7. Right click on ``Tomcat v9 Server at localhost`` and click ``Start``....
 
-8. Right click on ``Tomcat v9 Server at localhost`` and click ``Clean``....
+8. Once the server is started up and running, go to ``http://localhost:8080/citesphere`` and verify if the citesphere page is loaded.
 
-9. Right click on ``Tomcat v9 Server at localhost`` and click ``Start``....
+9. Now, click on ``Sign Up`` at the bottom and create a new user with your credentials.
 
-10. Once the server is started up and running, go to ``http://localhost:8080/citesphere`` and verify if the citesphere page is loaded.
+10. Then logout and login with the credentials username: admin and password: admin.
 
-11. Now, click on ``Sign Up`` at the bottom and create a new user with your credentials.
+11. Click on ``Users`` tab. The user that was created should appear here. Add the user and click on ``Make Admin``. Now, you can logout and login back with your own credentials.
 
-12. Then logout and login with the credentials username: admin and password: admin.
+12. Click on ``Connect Zotero``. It will redirect the page to the Zotero application. Click on ``Accept defaults``.
 
-13. Click on ``Users`` tab. The user that was created should appear here. Activate the user and click on ``Make Admin``. Now, you can logout and login back with your own credentials.
-
-14. Click on ``Connect Zotero``. It will redirect the page to the Zotero application. Check the settings for the key (do not click "Accept Defaults" but click "Change Permission"). The key needs to have read and write access to all groups of a user.
-
-15. Now in the MySQL shell, you can find all the citesphere tables by using this command ``show tables;``
-
-16. Similarly in MongoDB Compass, click on connect (need not specify any credentials). The list of collections in citesphere can be seen.
+13. After you ensure the correct key settings click "Save Key". You will be redirected to Citesphere where your groups should now show up.
