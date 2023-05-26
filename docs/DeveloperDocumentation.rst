@@ -87,7 +87,7 @@ in the above xml the variables need to be adjusted to the specific system settin
 
 5. In the ``Servers`` view, it can be noted that the ``Tomcat v9 Server at localhost`` will be present. Double click on this. Click on the Timeouts section. Specify the start time limit as 500s and stop time limit as 15s and press ``Command + S/Ctrl + S`` to save.
 
-6. Right click on the citesphere project ``Maven → Select Maven Profiles``...Select the ``profile id`` and ensure that the id is same as the id specified in the ``settings.xml`` file in ./m2 folder. Click ``Ok``.
+6. Right click on the citesphere project ``Maven → Select Maven Profiles``...Select the ``profile id`` and ensure that the id is same as the id specified in the ``settings.xml`` file in `.m2` folder. Click ``Ok``.
 
 7. In the servers view, right click on the ``Tomcat v9 Server at localhost`` and select ``Add and Remove``...If citesphere is not added, add the same and click Finish.
 
