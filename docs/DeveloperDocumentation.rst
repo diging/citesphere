@@ -63,7 +63,7 @@ in the above xml the variables need to be adjusted to the specific system settin
    
    * Grant all privileges.  ``GRANT ALL PRIVILEGES ON * . * TO 'user_name'@'localhost';``.
    
-   * update new username and password in ``"settings.xml"`` file which is inside .m2 folder.
+   * update new username and password in ``settings.xml`` file which is inside .m2 folder.
    
    * Type ``exit`` you will come out of mysql terminal.
    
