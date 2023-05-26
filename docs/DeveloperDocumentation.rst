@@ -81,7 +81,7 @@ in the above xml the variables need to be adjusted to the specific system settin
 
 2. Import the project in eclipse → While importing make sure the import is done from the directory - ``{directory where the project is cloned}/citesphere``
 
-3. Open the ``Servers view`` (Window → Show View → Servers, or maybe ``Window → Show View → Other`` ...  and select ``Server``, then ``Open``) and click ``New →  Server``. 
+3. Open the ``Servers view`` (``Window → Show View → Servers``, or maybe ``Window → Show View → Other`` ...  and select ``Server``, then ``Open``) and click ``New →  Server``. 
 
 4. Now select ``Tomcat v8.5 Server`` and click ``Next``. Select the Tomcat installation directory and click ``Finish``.
 
