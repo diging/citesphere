@@ -12,4 +12,5 @@ public interface IGilesConnector {
 
     byte[] getFile(IUser user, String fileId);
 
+    void deleteDocument(String documentId);
 }

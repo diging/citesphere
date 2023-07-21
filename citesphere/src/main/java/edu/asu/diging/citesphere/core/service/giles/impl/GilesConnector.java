@@ -65,4 +65,9 @@ public class GilesConnector implements IGilesConnector {
         ResponseEntity<byte[]> content = sendRequest(user, fileEndpoint.replace("{0}",  fileId), byte[].class);
         return content.getBody();
     }
+    
+    @Override
+    public void deleteDocument(String documentId) {
+        
+    }
 }

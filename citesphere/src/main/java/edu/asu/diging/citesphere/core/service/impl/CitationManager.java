@@ -38,6 +38,7 @@ import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
@@ -85,6 +86,9 @@ public class CitationManager implements ICitationManager {
 
     @Autowired
     private IAsyncCitationProcessor asyncCitationProcessor;
+    
+    @Autowired
+    private IGilesConnector gilesConnector;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
@@ -506,6 +510,7 @@ public class CitationManager implements ICitationManager {
         for (Iterator<IGilesUpload> gileUpload = citation.getGilesUploads().iterator(); gileUpload.hasNext();) {
             IGilesUpload g = gileUpload.next();
             if (g.getDocumentId() != null && g.getDocumentId().equals(documentId))
+                gilesConnector.deleteDocument(documentId);
                 gileUpload.remove();
         }
         updateCitation(user, zoteroGroupId, citation);
