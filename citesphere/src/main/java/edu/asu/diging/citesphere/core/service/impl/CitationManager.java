@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.http.HttpStatus;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
@@ -509,9 +510,12 @@ public class CitationManager implements ICitationManager {
 
         for (Iterator<IGilesUpload> gileUpload = citation.getGilesUploads().iterator(); gileUpload.hasNext();) {
             IGilesUpload g = gileUpload.next();
-            if (g.getDocumentId() != null && g.getDocumentId().equals(documentId))
-                gilesConnector.deleteDocument(documentId);
-                gileUpload.remove();
+            if (g.getDocumentId() != null && g.getDocumentId().equals(documentId)) {
+                HttpStatus deletionStatus = gilesConnector.deleteDocument(user, documentId);
+                if (deletionStatus.equals(HttpStatus.OK)) {
+                    gileUpload.remove();
+                }
+            }
         }
         updateCitation(user, zoteroGroupId, citation);
     }
