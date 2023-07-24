@@ -13,6 +13,14 @@ public interface IGilesConnector {
             throws HttpClientErrorException;
 
     byte[] getFile(IUser user, String fileId);
+    
+    /**
 
+      * Deletes a document for the given user.
+      * @param user The user performing the document deletion.
+      * @param documentId The ID of the document to be deleted.
+      * @return The HTTP status code indicating the success or failure of the delete operation.
+      * @throws RestClientException if there is an issue sending the delete request to the server.
+    */
     HttpStatus deleteDocument(IUser user, String documentId);
 }
