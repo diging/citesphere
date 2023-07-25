@@ -50,7 +50,6 @@ public class GilesConnector implements IGilesConnector {
     @Override
     public <T> ResponseEntity<T> sendRequest(IUser user, String endpoint,Class<T> returnType, HttpMethod httpMethod) throws HttpClientErrorException {
         String token = internalTokenManager.getAccessToken(user).getValue();
-        System.out.println(endpoint);
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(
