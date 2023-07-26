@@ -40,6 +40,7 @@ import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
+import edu.asu.diging.citesphere.core.service.giles.IGilesDeletionChecker;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
@@ -90,6 +91,9 @@ public class CitationManager implements ICitationManager {
     
     @Autowired
     private IGilesConnector gilesConnector;
+    
+    @Autowired
+    private IGilesDeletionChecker gilesDeletionChecker;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
@@ -507,16 +511,14 @@ public class CitationManager implements ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
-
         for (Iterator<IGilesUpload> gileUpload = citation.getGilesUploads().iterator(); gileUpload.hasNext();) {
             IGilesUpload g = gileUpload.next();
             if (g.getDocumentId() != null && g.getDocumentId().equals(documentId)) {
                 HttpStatus deletionStatus = gilesConnector.deleteDocument(user, documentId);
                 if (deletionStatus.equals(HttpStatus.OK)) {
-                    gileUpload.remove();
+                    gilesDeletionChecker.add(g, citation, zoteroGroupId);
                 }
             }
         }
-        updateCitation(user, zoteroGroupId, citation);
     }
 }
