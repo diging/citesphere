@@ -516,7 +516,7 @@ public class CitationManager implements ICitationManager {
             if (g.getDocumentId() != null && g.getDocumentId().equals(documentId)) {
                 HttpStatus deletionStatus = gilesConnector.deleteDocument(user, documentId);
                 if (deletionStatus.equals(HttpStatus.OK)) {
-                    gilesDeletionChecker.add(g, citation, zoteroGroupId);
+                    gilesDeletionChecker.add(g, citation, zoteroGroupId, user);
                 }
             }
         }

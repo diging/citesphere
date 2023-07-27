@@ -54,7 +54,7 @@ public class GilesConnector implements IGilesConnector {
         headers.setBearerAuth(token);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(
                 headers);
-
+        System.out.println(endpoint);
         return restTemplate.exchange(
                     gilesBaseurl + endpoint,
                     httpMethod, requestEntity, returnType);
@@ -71,7 +71,7 @@ public class GilesConnector implements IGilesConnector {
     
     @Override
     public HttpStatus deleteDocument(IUser user, String documentId) {
-        ResponseEntity<String> response = sendRequest(user, String.format(documentEndpoint, documentId), String.class, HttpMethod.DELETE);
+        ResponseEntity<String> response = sendRequest(user, documentEndpoint.replace("{documentId}",  documentId), String.class, HttpMethod.DELETE);
         return response.getStatusCode();
     }
 }

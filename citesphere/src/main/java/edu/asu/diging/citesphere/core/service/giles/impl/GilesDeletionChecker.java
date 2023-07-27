@@ -54,11 +54,12 @@ public class GilesDeletionChecker implements IGilesDeletionChecker {
     }
     
     @Override
-    public void add(IGilesUpload upload, ICitation citation, String zoteroId) {
+    public void add(IGilesUpload upload, ICitation citation, String zoteroId, IUser user) {
         Map<String, String> documentCitationMap = new HashMap<String, String>();
+        System.out.println(upload.getUploadingUser());
         documentCitationMap.put("documentId", upload.getDocumentId());
         documentCitationMap.put("citationKey", citation.getKey());
-        documentCitationMap.put("userName", upload.getUploadingUser());
+        documentCitationMap.put("userName", user.getUsername());
         documentCitationMap.put("zoteroId", zoteroId);
         if (!deletionQueue.contains(documentCitationMap)) {
             deletionQueue.add(documentCitationMap);
@@ -69,12 +70,16 @@ public class GilesDeletionChecker implements IGilesDeletionChecker {
     @Scheduled(fixedDelay = 60000)
     public void checkDeletion() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         for (Map<String, String> documentCitationMap: deletionQueue) {
+            System.out.println(documentCitationMap.keySet());
             String documentId = documentCitationMap.get("documentId");
             String citationKey = documentCitationMap.get("citationKey");
+            System.out.println(documentId);
+            System.out.println(citationKey);
+            System.out.println("Iamawesome");
             ICitation citation = citationManager.getCitation(citationKey);
             System.out.println(documentCitationMap.get("userName"));
             IUser user = userManager.findByUsername(documentCitationMap.get("userName"));
-            ResponseEntity<String> response = gilesConnector.sendRequest(user, String.format(gilesDeletionCheckEndpoint, documentId), String.class, HttpMethod.GET);
+            ResponseEntity<String> response = gilesConnector.sendRequest(user, gilesDeletionCheckEndpoint.replace("{documentId}",  documentId), String.class, HttpMethod.GET);
             if(response.getStatusCode().equals(HttpStatus.OK)) {
                 for (Iterator<IGilesUpload> gileUpload = citation.getGilesUploads().iterator(); gileUpload.hasNext();) {
                     IGilesUpload g = gileUpload.next();

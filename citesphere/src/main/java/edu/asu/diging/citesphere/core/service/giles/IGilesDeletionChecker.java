@@ -7,9 +7,10 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface IGilesDeletionChecker {
-    void add(IGilesUpload upload, ICitation citation, String zoteroId);
+    void add(IGilesUpload upload, ICitation citation, String zoteroId, IUser user);
     
     void checkDeletion() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
 }
