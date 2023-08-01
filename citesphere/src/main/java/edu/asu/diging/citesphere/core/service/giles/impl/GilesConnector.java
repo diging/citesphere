@@ -54,7 +54,6 @@ public class GilesConnector implements IGilesConnector {
         headers.setBearerAuth(token);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(
                 headers);
-        System.out.println(endpoint);
         return restTemplate.exchange(
                     gilesBaseurl + endpoint,
                     httpMethod, requestEntity, returnType);

@@ -511,13 +511,12 @@ public class CitationManager implements ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
-        System.out.println(zoteroGroupId);
         for (Iterator<IGilesUpload> gileUpload = citation.getGilesUploads().iterator(); gileUpload.hasNext();) {
             IGilesUpload g = gileUpload.next();
             if (g.getDocumentId() != null && g.getDocumentId().equals(documentId)) {
                 HttpStatus deletionStatus = gilesConnector.deleteDocument(user, documentId);
                 if (deletionStatus.equals(HttpStatus.OK)) {
-                    gilesDeletionChecker.add(g, citation, zoteroGroupId, user);
+                    gilesDeletionChecker.addDocumentCitationMap(g, citation, zoteroGroupId, user);
                 }
             }
         }

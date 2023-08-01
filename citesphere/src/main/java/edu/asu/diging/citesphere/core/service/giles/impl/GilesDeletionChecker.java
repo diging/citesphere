@@ -54,13 +54,13 @@ public class GilesDeletionChecker implements IGilesDeletionChecker {
     }
     
     @Override
-    public void add(IGilesUpload upload, ICitation citation, String zoteroId, IUser user) {
-        Map<String, String> documentCitationMap = new HashMap<String, String>();
-        System.out.println(upload.getUploadingUser());
+    public void addDocumentCitationMap(IGilesUpload upload, ICitation citation, String zoteroId, IUser user) {
+        HashMap<String, String> documentCitationMap = new HashMap<String, String>();
         documentCitationMap.put("documentId", upload.getDocumentId());
         documentCitationMap.put("citationKey", citation.getKey());
         documentCitationMap.put("userName", user.getUsername());
         documentCitationMap.put("zoteroId", zoteroId);
+        System.out.println(documentCitationMap.get("zoteroId"));
         if (!deletionQueue.contains(documentCitationMap)) {
             deletionQueue.add(documentCitationMap);
         }
@@ -70,14 +70,10 @@ public class GilesDeletionChecker implements IGilesDeletionChecker {
     @Scheduled(fixedDelay = 60000)
     public void checkDeletion() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         for (Map<String, String> documentCitationMap: deletionQueue) {
-            System.out.println(documentCitationMap.keySet());
             String documentId = documentCitationMap.get("documentId");
             String citationKey = documentCitationMap.get("citationKey");
-            System.out.println(documentId);
-            System.out.println(citationKey);
-            System.out.println("Iamawesome");
+            String zoteroId = documentCitationMap.get("zoteroId");
             ICitation citation = citationManager.getCitation(citationKey);
-            System.out.println(documentCitationMap.get("userName"));
             IUser user = userManager.findByUsername(documentCitationMap.get("userName"));
             ResponseEntity<String> response = gilesConnector.sendRequest(user, gilesDeletionCheckEndpoint.replace("{documentId}",  documentId), String.class, HttpMethod.GET);
             if(response.getStatusCode().equals(HttpStatus.OK)) {
@@ -87,8 +83,8 @@ public class GilesDeletionChecker implements IGilesDeletionChecker {
                         gileUpload.remove();
                     }
                 }
-                System.out.println(documentCitationMap.get("zoteroGroupId"));
-                citationManager.updateCitation(user, documentCitationMap.get("zoteroGroupId"), citation);
+                System.out.println(zoteroId);
+                citationManager.updateCitation(user, zoteroId, citation);
                 deletionQueue.remove(documentCitationMap);
             }
         }
