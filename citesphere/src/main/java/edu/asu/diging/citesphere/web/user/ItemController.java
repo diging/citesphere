@@ -84,6 +84,7 @@ public class ItemController {
             @RequestParam(value = "itemId", required = false) String itemId)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        System.out.println(zoteroGroupId);
         citationManager.deleteFile((IUser) authentication.getPrincipal(), zoteroGroupId, itemId, documentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

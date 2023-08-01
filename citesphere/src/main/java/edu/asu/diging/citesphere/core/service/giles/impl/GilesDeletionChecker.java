@@ -87,6 +87,7 @@ public class GilesDeletionChecker implements IGilesDeletionChecker {
                         gileUpload.remove();
                     }
                 }
+                System.out.println(documentCitationMap.get("zoteroGroupId"));
                 citationManager.updateCitation(user, documentCitationMap.get("zoteroGroupId"), citation);
                 deletionQueue.remove(documentCitationMap);
             }

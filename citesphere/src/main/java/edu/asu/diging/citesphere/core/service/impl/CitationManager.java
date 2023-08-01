@@ -511,6 +511,7 @@ public class CitationManager implements ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
+        System.out.println(zoteroGroupId);
         for (Iterator<IGilesUpload> gileUpload = citation.getGilesUploads().iterator(); gileUpload.hasNext();) {
             IGilesUpload g = gileUpload.next();
             if (g.getDocumentId() != null && g.getDocumentId().equals(documentId)) {
