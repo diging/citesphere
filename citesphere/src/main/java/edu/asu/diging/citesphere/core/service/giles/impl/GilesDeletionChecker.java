@@ -60,7 +60,6 @@ public class GilesDeletionChecker implements IGilesDeletionChecker {
         documentCitationMap.put("citationKey", citation.getKey());
         documentCitationMap.put("userName", user.getUsername());
         documentCitationMap.put("zoteroId", zoteroId);
-        System.out.println(documentCitationMap.get("zoteroId"));
         if (!deletionQueue.contains(documentCitationMap)) {
             deletionQueue.add(documentCitationMap);
         }
@@ -83,7 +82,6 @@ public class GilesDeletionChecker implements IGilesDeletionChecker {
                         gileUpload.remove();
                     }
                 }
-                System.out.println(zoteroId);
                 citationManager.updateCitation(user, zoteroId, citation);
                 deletionQueue.remove(documentCitationMap);
             }
