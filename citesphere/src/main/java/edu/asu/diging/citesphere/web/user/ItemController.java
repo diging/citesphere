@@ -5,16 +5,22 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
+import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.search.service.SearchEngine;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.impl.CitationPage;
@@ -65,5 +71,16 @@ public class ItemController {
             model.addAttribute("sortBy", sortBy);
         }
         return "auth/group/item";
+    }
+    
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/file/reprocess", method = RequestMethod.POST)
+    public ResponseEntity<String> deleteFile(Authentication authentication,
+            @PathVariable("zoteroGroupId") String zoteroGroupId,
+            @RequestParam(value = "documentId", required = false) String documentId,
+            @RequestParam(value = "itemId", required = false) String itemId)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+            ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
