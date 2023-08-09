@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.service.impl;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.http.HttpStatus;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
@@ -37,12 +39,15 @@ import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.core.service.giles.GilesUploadChecker;
+import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
@@ -83,6 +88,12 @@ public class CitationManager implements ICitationManager {
 
     @Autowired
     private IAsyncCitationProcessor asyncCitationProcessor;
+    
+    @Autowired
+    private IGilesConnector gilesConnector;
+    
+    @Autowired
+    private GilesUploadChecker gilesUploadChecker;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
@@ -493,5 +504,19 @@ public class CitationManager implements ICitationManager {
     @Override
     public void deleteLocalGroupCitations(String groupId) {
         citationStore.deleteCitationByGroupId(groupId);
+    }
+    
+    @Override
+    public void reprocessFile(IUser user, String zoteroGroupId, String itemId, String documentId)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+            ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        ICitation citation = getCitation(user, zoteroGroupId, itemId);
+        for (Iterator<IGilesUpload> gileUpload = citation.getGilesUploads().iterator(); gileUpload.hasNext();) {
+            IGilesUpload g = gileUpload.next();
+            HttpStatus reprocessingStatus = gilesConnector.reprocessDocument(user, documentId);
+            if (reprocessingStatus.equals(HttpStatus.OK)) {
+                gilesUploadChecker.add(citation);
+            }
+        }
     }
 }
