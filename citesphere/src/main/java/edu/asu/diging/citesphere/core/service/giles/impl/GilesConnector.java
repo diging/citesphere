@@ -72,6 +72,7 @@ public class GilesConnector implements IGilesConnector {
     
     @Override
     public HttpStatus reprocessDocument(IUser user, String documentId) {
-        return HttpStatus.OK;
+        ResponseEntity<String> response = sendRequest(user, reprocessingEndpoint.replace("{0}", documentId), String.class, HttpMethod.POST);
+        return response.getStatusCode();
     }
 }
