@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.core.service.giles;
 
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -14,5 +13,5 @@ public interface IGilesConnector {
 
     byte[] getFile(IUser user, String fileId);
     
-    HttpStatus reprocessDocument(IUser user, String documentId);
+    ResponseEntity<String> reprocessDocument(IUser user, String documentId);
 }

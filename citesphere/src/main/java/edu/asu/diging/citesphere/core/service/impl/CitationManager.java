@@ -1,12 +1,15 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 
@@ -20,12 +23,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
@@ -44,6 +50,7 @@ import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
+import edu.asu.diging.citesphere.model.bib.GilesStatus;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -511,12 +518,73 @@ public class CitationManager implements ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
-        for (Iterator<IGilesUpload> gileUpload = citation.getGilesUploads().iterator(); gileUpload.hasNext();) {
-            IGilesUpload g = gileUpload.next();
-            HttpStatus reprocessingStatus = gilesConnector.reprocessDocument(user, documentId);
-            if (reprocessingStatus.equals(HttpStatus.OK)) {
-                gilesUploadChecker.add(citation);
+        for (Iterator<IGilesUpload> gilesUpload = citation.getGilesUploads().iterator(); gilesUpload.hasNext();) {
+            IGilesUpload upload = gilesUpload.next();
+            ResponseEntity<String> reprocessingResponse = gilesConnector.reprocessDocument(user, documentId);
+            if (reprocessingResponse.getStatusCode().equals(HttpStatus.OK)) {
+                String responseBody = reprocessingResponse.getBody();
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode;
+                try {
+                    jsonNode = objectMapper.readTree(responseBody);
+                    String checkUrl = jsonNode.get("checkUrl").asText();
+                    String[] urlSegments = checkUrl.split("/");
+                    String progressId = urlSegments[urlSegments.length - 1];
+                    upload.setUploadingUser(user.getUsername());
+                    upload.setProgressId(progressId);
+                    upload.setDocumentStatus(GilesStatus.SUBMITTED);
+                    Set<IGilesUpload> checkedUploads = new HashSet<>();
+                    checkedUploads.add(upload);
+                    updateCitationWithUpdatedGilesUpload(checkedUploads, user, citation);
+                    gilesUploadChecker.add(citation);
+                } catch (IOException e) {
+                    logger.error("Could not deserialize response.", e);
+                }
             }
+        }
+    }
+    
+    private void updateCitationWithUpdatedGilesUpload(Set<IGilesUpload> checkedUploads, IUser user, ICitation citation) {
+        ICitation currentCitation = getCurrentCitation(citation, user);
+        if (currentCitation != null) {
+            updateCitation(citation, checkedUploads, user, currentCitation);
+        }
+    }
+    
+    private ICitation getCurrentCitation(ICitation citation, IUser user) {
+        try {
+            return getCitation(user,
+                    citation.getGroup(), citation.getKey());
+        } catch (GroupDoesNotExistException e) {
+            logger.error("Could not get citation.", e);
+        } catch (CannotFindCitationException e) {
+            logger.error("Could not get citation.", e);
+        } catch (ZoteroHttpStatusException e) {
+            logger.error("Could not get citation.", e);
+        }
+        return null;
+    }
+    
+    private void updateCitation(ICitation citation, Set<IGilesUpload> checkedUploads,
+            IUser user, ICitation currentCitation) {
+        for (IGilesUpload upload : checkedUploads) {
+            Optional<IGilesUpload> oldUpload = currentCitation
+                    .getGilesUploads().stream()
+                    .filter(u -> u.getProgressId() != null && u
+                            .getProgressId().equals(upload.getProgressId()))
+                    .findFirst();
+            if (oldUpload.isPresent()) {
+                currentCitation.getGilesUploads().remove(oldUpload.get());
+            }
+            currentCitation.getGilesUploads().add(upload);
+        }
+
+        try {
+            updateCitation(user, citation.getGroup(),
+                    currentCitation);
+        } catch (ZoteroConnectionException | CitationIsOutdatedException
+                | ZoteroHttpStatusException | ZoteroItemCreationFailedException e) {
+            logger.error("Could not update citation.", e);
         }
     }
 }
