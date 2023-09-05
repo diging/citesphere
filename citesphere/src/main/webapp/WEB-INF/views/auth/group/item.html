@@ -97,8 +97,9 @@
 				'url': "[(@{|/auth/group/${zoteroGroupId}/file/reprocess|})]",
 				'data': {
 					"documentId": fileId,
-					[_csrf.parameterName]: _csrf.token,
-					"itemId": itemId
+					[[${_csrf.parameterName}]]:[[${_csrf.token}]],
+					"itemId": [[${itemId}]]
+					
 				},
 				'success': function(data) {
 					$("#reprocessFileDiv").remove();
@@ -553,7 +554,7 @@
 			</div>
 			<div class="modal-footer">
 			  <button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
-			  <button id="delete-file-button" data-upload-file="" type="button" class="btn btn-primary">Yes, reprocess!</button>
+			  <button id="reprocess-file-button" data-upload-file="" type="button" class="btn btn-primary">Yes, reprocess!</button>
 			</div>
 		  </div>
 		</div>

@@ -570,8 +570,8 @@ public class CitationManager implements ICitationManager {
         for (IGilesUpload upload : checkedUploads) {
             Optional<IGilesUpload> oldUpload = currentCitation
                     .getGilesUploads().stream()
-                    .filter(u -> u.getProgressId() != null && u
-                            .getProgressId().equals(upload.getProgressId()))
+                    .filter(u -> u.getDocumentId() != null && u
+                            .getProgressId().equals(upload.getDocumentId()))
                     .findFirst();
             if (oldUpload.isPresent()) {
                 currentCitation.getGilesUploads().remove(oldUpload.get());

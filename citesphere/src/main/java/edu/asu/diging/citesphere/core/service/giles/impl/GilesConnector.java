@@ -30,7 +30,7 @@ public class GilesConnector implements IGilesConnector {
     @Value("${giles_file_endpoint}")
     private String fileEndpoint;
     
-    @Value("giles_file_reprocessing_endpoint")
+    @Value("${giles_file_reprocessing_endpoint}")
     private String reprocessingEndpoint;
     
     @Autowired
