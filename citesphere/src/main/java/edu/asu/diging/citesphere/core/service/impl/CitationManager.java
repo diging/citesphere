@@ -59,6 +59,7 @@ import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.impl.GilesUpload;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
@@ -520,27 +521,35 @@ public class CitationManager implements ICitationManager {
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
         for (Iterator<IGilesUpload> gilesUpload = citation.getGilesUploads().iterator(); gilesUpload.hasNext();) {
             IGilesUpload upload = gilesUpload.next();
-            ResponseEntity<String> reprocessingResponse = gilesConnector.reprocessDocument(user, documentId);
-            if (reprocessingResponse.getStatusCode().equals(HttpStatus.OK)) {
-                String responseBody = reprocessingResponse.getBody();
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonNode;
-                try {
-                    jsonNode = objectMapper.readTree(responseBody);
-                    String checkUrl = jsonNode.get("checkUrl").asText();
-                    String[] urlSegments = checkUrl.split("/");
-                    String progressId = urlSegments[urlSegments.length - 1];
-                    upload.setUploadingUser(user.getUsername());
-                    upload.setProgressId(progressId);
-                    upload.setDocumentStatus(GilesStatus.SUBMITTED);
-                    Set<IGilesUpload> checkedUploads = new HashSet<>();
-                    checkedUploads.add(upload);
-                    updateCitationWithUpdatedGilesUpload(checkedUploads, user, citation);
-                    gilesUploadChecker.add(citation);
-                } catch (IOException e) {
-                    logger.error("Could not deserialize response.", e);
+            System.out.println(documentId);
+            System.out.println(upload.getDocumentId());
+            if (upload.getDocumentId() != null && upload.getDocumentId().equals(documentId)) {
+                ResponseEntity<String> reprocessingResponse = gilesConnector.reprocessDocument(user, documentId);
+                if (reprocessingResponse.getStatusCode().equals(HttpStatus.OK)) {
+                    IGilesUpload reprocessedUpload = new GilesUpload();
+                    String responseBody = reprocessingResponse.getBody();
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode;
+                    try {
+                        jsonNode = objectMapper.readTree(responseBody);
+                        String checkUrl = jsonNode.get("checkUrl").asText();
+                        String[] urlSegments = checkUrl.split("/");
+                        String progressId = urlSegments[urlSegments.length - 1];
+                        reprocessedUpload.setUploadingUser(user.getUsername());
+                        reprocessedUpload.setProgressId(progressId);
+                        reprocessedUpload.setDocumentStatus(GilesStatus.SUBMITTED);
+                        reprocessedUpload.setDocumentId(documentId);
+                        reprocessedUpload.setUploadedDate(upload.getUploadedDate());
+                        Set<IGilesUpload> checkedUploads = new HashSet<>();
+                        checkedUploads.add(reprocessedUpload);
+                        updateCitationWithUpdatedGilesUpload(checkedUploads, user, citation);
+                        gilesUploadChecker.add(citation);
+                    } catch (IOException e) {
+                        logger.error("Could not deserialize response.", e);
+                    }
                 }
             }
+            
         }
     }
     
