@@ -103,12 +103,12 @@
 				},
 				'success': function(data) {
 					$("#reprocessFileDiv").remove();
-					showNotification("File deleted successfully! ", "success", 10000);
+					showNotification("File submitted successfully for reprocessing! ", "success", 10000);
 					location.reload();
 				},
 				'error': function(data) {
 					$("#reprocessFileDiv").remove();
-					showNotification("Error while deleting the file!", "danger", 10000)
+					showNotification("Error while reprocessing the file!", "danger", 10000)
 				}
 			});
 			$('#file-reprocess-confirmation').modal("hide");
@@ -415,7 +415,6 @@
 	        <i class="icon-giles"></i>
 	        <span th:if="${upload.uploadedFile?.filename}">
 	        	<a th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}">[[${upload.uploadedFile?.filename}]]</a>
-	        	<button th:id="|reprocess-file-btn-${index.index}|" type="button" th:data-upload-file="${upload.documentId}" class="fa fa-redo reprocess-file"></button>
 	        </span>
 	        <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
 	        File is being processed... ([[${upload.progressId}]])
@@ -423,6 +422,7 @@
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
+	        <button th:id="|reprocess-file-btn-${index.index}|" type="button" th:data-upload-file="${upload.documentId}" class="fa fa-redo fa-xs reprocess-file"></button>
 	        </li>
         </ul>
         

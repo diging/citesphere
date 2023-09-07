@@ -521,8 +521,6 @@ public class CitationManager implements ICitationManager {
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
         for (Iterator<IGilesUpload> gilesUpload = citation.getGilesUploads().iterator(); gilesUpload.hasNext();) {
             IGilesUpload upload = gilesUpload.next();
-            System.out.println(documentId);
-            System.out.println(upload.getDocumentId());
             if (upload.getDocumentId() != null && upload.getDocumentId().equals(documentId)) {
                 ResponseEntity<String> reprocessingResponse = gilesConnector.reprocessDocument(user, documentId);
                 if (reprocessingResponse.getStatusCode().equals(HttpStatus.OK)) {
@@ -537,12 +535,9 @@ public class CitationManager implements ICitationManager {
                         String progressId = urlSegments[urlSegments.length - 1];
                         reprocessedUpload.setUploadingUser(user.getUsername());
                         reprocessedUpload.setProgressId(progressId);
-                        reprocessedUpload.setDocumentStatus(GilesStatus.SUBMITTED);
-                        reprocessedUpload.setDocumentId(documentId);
-                        reprocessedUpload.setUploadedDate(upload.getUploadedDate());
                         Set<IGilesUpload> checkedUploads = new HashSet<>();
                         checkedUploads.add(reprocessedUpload);
-                        updateCitationWithUpdatedGilesUpload(checkedUploads, user, citation);
+                        updateCitationWithUpdatedGilesUpload(checkedUploads, user, citation, documentId);
                         gilesUploadChecker.add(citation);
                     } catch (IOException e) {
                         logger.error("Could not deserialize response.", e);
@@ -553,10 +548,10 @@ public class CitationManager implements ICitationManager {
         }
     }
     
-    private void updateCitationWithUpdatedGilesUpload(Set<IGilesUpload> checkedUploads, IUser user, ICitation citation) {
+    private void updateCitationWithUpdatedGilesUpload(Set<IGilesUpload> checkedUploads, IUser user, ICitation citation, String documentId) {
         ICitation currentCitation = getCurrentCitation(citation, user);
         if (currentCitation != null) {
-            updateCitation(citation, checkedUploads, user, currentCitation);
+            updateCitation(citation, checkedUploads, user, currentCitation, documentId);
         }
     }
     
@@ -575,12 +570,12 @@ public class CitationManager implements ICitationManager {
     }
     
     private void updateCitation(ICitation citation, Set<IGilesUpload> checkedUploads,
-            IUser user, ICitation currentCitation) {
+            IUser user, ICitation currentCitation, String documentId) {
         for (IGilesUpload upload : checkedUploads) {
             Optional<IGilesUpload> oldUpload = currentCitation
                     .getGilesUploads().stream()
                     .filter(u -> u.getDocumentId() != null && u
-                            .getProgressId().equals(upload.getDocumentId()))
+                            .getDocumentId().equals(documentId))
                     .findFirst();
             if (oldUpload.isPresent()) {
                 currentCitation.getGilesUploads().remove(oldUpload.get());
