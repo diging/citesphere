@@ -2,6 +2,8 @@
 <head>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
 <link th:href="@{/resources/notify/animate.css}" rel="stylesheet"/>
+<link th:href="@{/resources/bootstrap/css/word-wrap.css}" type="text/css"
+	rel="stylesheet">
 <script th:inline="javascript">
 //# sourceURL=modal.js
 	$(function() {
@@ -411,7 +413,7 @@
         <h3 style="margin-top: 0">Files</h3>
         
         <ul class="list-group" >
-	        <li class="list-group-item" th:each="upload,index:${citation.gilesUploads}">
+	        <li class="list-group-item word-wrap" th:each="upload,index:${citation.gilesUploads}">
 	        <i class="icon-giles"></i>
 	        <span th:if="${upload.uploadedFile?.filename}">
 	        	<a th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}">[[${upload.uploadedFile?.filename}]]</a>
