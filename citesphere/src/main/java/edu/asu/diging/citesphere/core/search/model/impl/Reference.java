@@ -10,7 +10,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import edu.asu.diging.citesphere.model.bib.ItemType;
 
-@Document(indexName="#{@indexName}", type = "_doc")
+@Document(indexName="#{@indexName}", type = "_doc", createIndex = false)
 public class Reference {
 
     @Id
