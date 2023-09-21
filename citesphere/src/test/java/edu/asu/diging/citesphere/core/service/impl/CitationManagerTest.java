@@ -411,8 +411,8 @@ public class CitationManagerTest {
     }
     
     @Test
-    public void test_reprocessFile() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, 
-       ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+    public void test_reprocessFile() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+        ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
         String documentId = "43";
         Set<IGilesUpload> gilesUploads = new HashSet<>();
         IGilesUpload gilesUpload = new GilesUpload();
