@@ -17,8 +17,10 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.search.service.SearchEngine;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.impl.CitationPage;
 import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
@@ -30,6 +32,9 @@ public class ItemController {
     @Autowired
     private SearchEngine engine;
     
+    @Autowired
+    private IGroupManager groupManager;
+    
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
             @RequestParam(defaultValue = "", required = false, value = "searchTerm") String searchTerm, @RequestParam(defaultValue = "0",required = false, value = "index") String index,
@@ -38,6 +43,9 @@ public class ItemController {
             @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
+        
+        ICitationGroup group = groupManager.getGroup((IUser)authentication.getPrincipal(), zoteroGroupId);
+        model.addAttribute("group", group);
         
         CitationPage citationPage = null;
         searchTerm = searchTerm.trim();
