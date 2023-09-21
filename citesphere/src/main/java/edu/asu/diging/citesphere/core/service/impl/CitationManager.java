@@ -551,7 +551,25 @@ public class CitationManager implements ICitationManager {
     private void updateCitationWithUpdatedGilesUpload(Set<IGilesUpload> checkedUploads, IUser user, ICitation citation, String documentId) {
         ICitation currentCitation = getCurrentCitation(citation, user);
         if (currentCitation != null) {
-            updateCitation(citation, checkedUploads, user, currentCitation, documentId);
+            for (IGilesUpload upload : checkedUploads) {
+                Optional<IGilesUpload> oldUpload = currentCitation
+                        .getGilesUploads().stream()
+                        .filter(u -> u.getDocumentId() != null && u
+                                .getDocumentId().equals(documentId))
+                        .findFirst();
+                if (oldUpload.isPresent()) {
+                    currentCitation.getGilesUploads().remove(oldUpload.get());
+                }
+                currentCitation.getGilesUploads().add(upload);
+            }
+
+            try {
+                updateCitation(user, citation.getGroup(),
+                        currentCitation);
+            } catch (ZoteroConnectionException | CitationIsOutdatedException
+                    | ZoteroHttpStatusException | ZoteroItemCreationFailedException e) {
+                logger.error("Could not update citation.", e);
+            }
         }
     }
     
@@ -567,28 +585,5 @@ public class CitationManager implements ICitationManager {
             logger.error("Could not get citation.", e);
         }
         return null;
-    }
-    
-    private void updateCitation(ICitation citation, Set<IGilesUpload> checkedUploads,
-            IUser user, ICitation currentCitation, String documentId) {
-        for (IGilesUpload upload : checkedUploads) {
-            Optional<IGilesUpload> oldUpload = currentCitation
-                    .getGilesUploads().stream()
-                    .filter(u -> u.getDocumentId() != null && u
-                            .getDocumentId().equals(documentId))
-                    .findFirst();
-            if (oldUpload.isPresent()) {
-                currentCitation.getGilesUploads().remove(oldUpload.get());
-            }
-            currentCitation.getGilesUploads().add(upload);
-        }
-
-        try {
-            updateCitation(user, citation.getGroup(),
-                    currentCitation);
-        } catch (ZoteroConnectionException | CitationIsOutdatedException
-                | ZoteroHttpStatusException | ZoteroItemCreationFailedException e) {
-            logger.error("Could not update citation.", e);
-        }
     }
 }
