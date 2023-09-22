@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
@@ -43,7 +44,7 @@ import edu.asu.diging.citesphere.user.IUser;
 public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
+    
     @Autowired
     private IZoteroManager zoteroManager;
 
@@ -82,7 +83,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
      */
     @Override
     @Async
-    public void sync(IUser user, String groupId, long contentVersion, String collectionId) {
+    public void sync(IUser user, String groupId, long contentVersion, String collectionId) throws ZoteroHttpStatusException {
         GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
         // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
         // more activate job statuses than inactive ones, so it's less error prone to use the list that
@@ -92,6 +93,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             return;
         }
 
+        logger.info("Starting sync for " + groupId);
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
         job.setGroupId(groupId + "");
@@ -138,7 +140,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     }
 
     private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
-            AtomicInteger counter) {
+            AtomicInteger counter) throws ZoteroHttpStatusException {
         List<String> keysToRetrieve = new ArrayList<>();
         for (String key : versions.keySet()) {
             Optional<ICitation> citation = citationStore.findById(key);
@@ -204,16 +206,18 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
     }
 
-    private long retrieveCitations(IUser user, String groupId, List<String> keysToRetrieve) {
+    private long retrieveCitations(IUser user, String groupId, List<String> keysToRetrieve) throws ZoteroHttpStatusException {
         try {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             logger.error("Could not wait.", e);
         }
+        logger.debug("Retrieving: " + keysToRetrieve);
         ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, groupId,
                 keysToRetrieve, true);
         retrievedCitations.getCitations().forEach(c -> storeCitation(c));
+        logger.debug("Saved retrieved citations.");
         return retrievedCitations.getContentVersion();
     }
 
@@ -237,6 +241,17 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
 
         citationStore.save((Citation) citation);
+        //If the citation is a deleted metadata note and if the parent item has a link to it then remove it
+        if (citation.getDeleted() == 1 && citation.isMetaDataNote()) {
+            Optional<ICitation> parentOptional = citationStore.findById(citation.getParentItem());
+            if (parentOptional.isPresent() && parentOptional.get().getMetaDataItemKey() != null
+                    && parentOptional.get().getMetaDataItemKey().equals(citation.getKey())) {
+                ICitation parent = parentOptional.get();
+                parent.setMetaDataItemKey(null);
+                parent.setMetaDataItemVersion(0);
+                citationStore.save(parent);
+            }
+        }
     }
 
     private void storeCitationCollection(ICitationCollection collection) {

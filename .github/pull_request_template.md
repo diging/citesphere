@@ -15,9 +15,12 @@ Please confirm the following by adding an x for each item (turn `[ ]` into `[x]`
 - [ ] I have explained any part of my code/implementation decisions that is not be self-explanatory
 
 ## Please provide a brief description of your ticket 
-(you can copy the ticket if it hasn't changed) 
+<!-- you can copy the ticket if it hasn't changed --> 
 
-...Put description here...
+... Put ticket description here and add link to ticket ...
+
+## Are there any other pull requests that this one depends on?
+<!-- list pull request here (with links) -->
   
 ## Anything else the reviewer needs to know?
 

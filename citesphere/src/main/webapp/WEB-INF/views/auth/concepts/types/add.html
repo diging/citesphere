@@ -1,6 +1,207 @@
 <html layout:decorate="~{layouts/main}">
 <head>
-
+    <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+    <script th:inline="javascript">
+    $(function() {
+    
+        $("#searchConceptTypeSpinner").hide();
+        $("#searchConceptType").click(function() {
+            if (allowConceptTypeSearch("ConceptType")) {
+                $("#selectConceptTypeModel").on('hidden.bs.modal', function(e) {
+                    $('#selectConceptTypeModel a:first').tab('show');
+                })
+                $("#searchConceptTypeSpinner").show();
+                $('#conceptpowerConceptType-pagination-top').twbsPagination('destroy');
+                $('#viafConceptType-pagination-top').twbsPagination('destroy');
+                getViafConceptTypes('ConceptType', 'ConceptType', 0)
+                getConceptpowerConceptTypes('ConceptType', 'ConceptType', 0)
+                $("#searchConceptTypeSpinner").hide();
+            }
+        });
+    
+        $("#clearConceptTypeFields").click(function() {
+            $("#conceptTypeName").val("");
+            $("#conceptTypeDescription").val("");
+            $("#URI").val("");
+            allowConceptTypeSearch("ConceptType");
+        });
+    
+        $("#conceptTypeName").keyup(function(e) {
+            allowConceptTypeSearch("ConceptType");
+        });
+    
+        $("#closeConceptTypeSearchResult").click(function() {
+            $("#selectConceptTypeModel").modal('hide');
+            $('#selectConceptTypeModel a:first').tab('show');
+        });
+    
+    });
+    
+    function populateInfo(name, description, uri, importerId) {
+        $("#conceptTypeName").val(name);
+        
+        if (description != undefined && description != ' - ') {
+            $("#conceptTypeDescription").val(description);
+        }
+        
+        if (uri != undefined && uri != '') {
+            $("#URI").val(uri);
+        }
+    }
+    
+    function getConceptpowerConceptTypes(modalType, personType, page) {
+        var conceptTypeName = $("#conceptTypeName").val();
+        personType_lowerCase = personType.toLowerCase();
+        url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?firstName=' + conceptTypeName + '&lastName=' + "" + '&page=' + page;
+        $("#loadingMessageConceptPower").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+            " Loading Results.");
+        $("#loadingModalConceptPower").modal('show');
+        $.ajax({
+            dataType: "json",
+            type: 'GET',
+            url: url,
+            async: false,
+            success: function(data) {
+                $("#conceptpowerConceptTypeSearchResult").empty();
+                var content = '';
+    
+                if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+                    data['foundAuthorities'].forEach(function(elem) {
+                        content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
+                        if (elem['description'] == null) {
+                            content += ' - </td>';
+                        } else {
+                            content += elem['description'] + '</td>';
+                        }
+    
+                        content += '<div class="importerId" style="display: none;">';
+                        if (elem['importerId'] == null) {
+                            content += '</div>';
+                        } else {
+                            content += elem['importerId'] + '</div>';
+                        }
+                        content += '<td style="vertical-align: middle;"><span class="conceptpower-conceptType-entry btn btn-primary" title="Create new managed concept type" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+    
+                    });
+    
+                    $('#conceptpowerConceptType-pagination-top').twbsPagination({
+                        totalPages: data['totalPages'],
+                        startPage: data['currentPage'],
+                        prev: "«",
+                        next: "»",
+                        visiblePages: 5,
+                        initiateStartPageClick: false,
+                        onPageClick: function(event, page) {
+                            getConceptpowerConceptTypes(modalType, personType, page)
+                        }
+                    });
+    
+                }
+    
+                $("#conceptpowerConceptTypeSearchResult").append(content);
+                $(".conceptpower-conceptType-entry").click(function() {
+                    name = $(this).closest("tr").find(".name").text();
+                    uri = $(this).closest("tr").find(".uri").text();
+    
+                    description = $(this).closest("tr").find(".description").text();
+                    
+                    populateInfo(name, description, uri);
+                    $("#selectConceptTypeModel").modal('hide');
+                });
+    
+                $("#loadingModalConceptPower").modal('hide');
+            },
+            error: function(data) {
+                $("#loadingMessageConceptPower").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+                "Error loading results. Try again later.");
+                $('#loadingModalConceptPower').modal('show');
+                $('#conceptpowerConceptTypeSearchResult').parents('table').hide()
+                $("#conceptpowerConceptTypesError").show();
+                setTimeout(function() {
+                    $('#loadingModalConceptPower').modal('hide');
+                  }, 3000);
+            }
+    
+        });
+    }
+    
+    function getViafConceptTypes(modalType, personType, page) {
+        var conceptTypeName = $("#conceptTypeName").val();
+        personType_lowerCase = personType.toLowerCase();
+        url = [[@{|/auth/authority/find/authorities/viaf|}]] + '?firstName='+ conceptTypeName + '&lastName=' + "" +'&page='+page;		
+        $("#loadingMessageViaf").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+            " Loading Results.");
+        $("#loadingModalViaf").modal('show');
+        $.ajax({
+              dataType: "json",
+              type: 'GET',
+              url: url ,
+              async: false,
+              success: function(data) {
+                  $("#viafConceptTypeSearchResult").empty();
+                  var content = '';
+                  
+                  if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+                    data['foundAuthorities'].forEach(function(elem) {
+                        content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
+                        if (elem['description'] == null) {
+                            content += ' - </td>';
+                        } else {
+                            content += elem['description'] + '</td>';
+                        }
+                        content += '<td style="vertical-align: middle;"><span class="viaf-conceptType-entry btn btn-primary" title="Create new managed concept type" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+    
+                    });
+    
+                    $('#viafConceptType-pagination-top').twbsPagination({
+                        totalPages: data['totalPages'],
+                        startPage: data['currentPage'],
+                        prev: "«",
+                        next: "»",
+                        visiblePages: 5,
+                        initiateStartPageClick: false,
+                        onPageClick: function(event, page) {
+                            getViafConceptTypes(modalType, personType, page-1)
+                        }
+                    });
+                }
+    
+                $("#viafConceptTypeSearchResult").append(content);
+                $(".viaf-conceptType-entry").click(function() {
+                    name = $(this).closest("tr").find(".name").text();
+                    uri = $(this).closest("tr").find(".uri").text();
+                    
+                    description = $(this).closest("tr").find(".description").text();
+    
+                    populateInfo(name, description, uri);
+                    $("#selectConceptTypeModel").modal('hide');
+                });
+                $("#loadingModalViaf").modal('hide');
+            },
+            error: function(data) {
+                $("#loadingMessageViaf").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+                "Error loading results. Try again later.");
+                $('#loadingModalViaf').modal('show');
+                $('#viafConceptTypeSearchResult').parents('table').hide()
+                $("#viafConceptTypesError").show();
+                setTimeout(function() {
+                    $('#loadingModalViaf').modal('hide');
+                  }, 3000);
+            }
+    
+        });
+    }
+    
+    function allowConceptTypeSearch(element) {
+        if ($("#conceptTypeName").val() == "") {
+            $("#search" + element).prop("disabled", true);
+            return false;
+        } else {
+            $("#search" + element).prop("disabled", false);
+            return true;
+        }
+    }
+    </script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -11,26 +212,126 @@
 <table class="table table-striped">
 	
 <tr>
-<td width="20%"><label>Name</label></td>
-<td><input th:field="*{name}" class="form-control"></input></td>
+<td width="20%"><label for="conceptTypeName">Name</label></td>
+<td width="60%"><input th:field="*{name}" class="form-control" id="conceptTypeName"></input>
+<span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span></td>
+<td width="20%"><a data-toggle="modal"
+    data-target="#selectConceptTypeModel" id="searchConceptType" disabled
+    title="Enter Name to Search">
+    <i class="icon-search"></i> Search Concept Type 
+    <i id="searchConceptTypeSpinner" class="icon-spinner"
+        style="color: white"></i>
+</a></td>
 </tr>
 
 <tr>
-<td width="20%"><label>Description</label></td>
-<td><input th:field="*{description}" class="form-control"></input></td>
+<td width="20%"><label for="conceptTypeDescription">Description</label></td>
+<td><input th:field="*{description}" class="form-control" id="conceptTypeDescription"></input></td>
 </tr>
 
 <tr>
 <td width="20%"><label>URI</label></td>
-<td><input th:field="*{uri}" class="form-control"></input>
-<p class="text-danger"><th:errors path="uri"/></p></td>
+<td><input th:field="*{uri}" class="form-control" id = "URI"></input>
+<span class="text-danger" th:if="${#fields.hasErrors('uri')}" th:errors="*{uri}"></span></td>
 </tr>
 </table>
 
 <p class="pull-right">
+<button class="btn btn-default" data-toggle="modal" id="clearConceptFields" type="button">Clear 
+</button>
 <button class="btn btn-primary" type="submit">Create</button>
 </p>
 </form>
+
+<div id="selectConceptTypeModel" class="modal fade" tabindex="-1"
+    role="dialog" aria-labelledby="selectConceptTypeLabel">
+    <div class="modal-dialog" style="width: 1000px" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="conceptTypeLabel">Concept Type Search Result</h4>
+            </div>
+
+            <div class="modal-body">
+                <div role="tabpanel">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#conceptpowerConceptTypesTabContent" aria-controls="uploadTab"
+                                role="tab" data-toggle="tab">Concept Types from Conceptpower</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#viafConceptTypesTabContent"
+                                aria-controls="browseTab" role="tab" data-toggle="tab">Concept Types from VIAF</a>
+                        </li>
+                    </ul>
+                    
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="conceptpowerConceptTypesTabContent">
+                            <ul id="conceptpowerConceptType-pagination-top" class="pagination-sm"></ul>
+                            <div id="conceptpowerConceptTypesError" class="text-warning" style="display: none">
+                                <span> Error occurred while searching concept types in conceptpower </span>
+                            </div>
+                            </br>
+                            <div style="position: relative;">
+                                <div style="height: 350px; overflow:auto; margin-top: 20px;">
+                                    <table class="table table-striped table-bordered table-fixed">
+                                        <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+                                        <tbody id="conceptpowerConceptTypeSearchResult">
+                                        </tbody>
+                                    </table>    
+                                </div>
+                            </div>                        
+                        </div>
+                        
+                        <div role="tabpanel" class="tab-pane" id="viafConceptTypesTabContent">
+                            <ul id="viafConceptType-pagination-top" class="pagination-sm"></ul>
+                            <div id="viafConceptTypesError" class="text-warning" style="display: none">
+                                <span> Error occurred while searching concept types in VIAF </span>
+                            </div>
+                            </br>
+                            <div style="position: relative;">
+                                <div style="height: 350px; overflow:auto; margin-top: 20px;">
+                                    <table class="table table-striped table-bordered table-fixed">
+                                        <tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+                                        <tbody id="viafConceptTypeSearchResult">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                        id="closeConceptTypeSearchResult">Close</button>
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="loadingModalConceptPower" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="loadingMessageConceptPower" class="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="loadingModalViaf" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="loadingMessageViaf" class="modal-body"></div>
+        </div>
+    </div>
+</div>
 </div>
 </body>
 
