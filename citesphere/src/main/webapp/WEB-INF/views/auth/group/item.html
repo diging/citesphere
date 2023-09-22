@@ -173,27 +173,31 @@
 	  			});
 	  			$("#citationSearchResult").append(content);
 	  			$(".item-reference").click(function() {
-	  				var reference = $(this).closest("tr").find(".reference").attr('data-idx');
-	  				var citationItem = results[reference];
-	  				var authors = citationItem["authors"];
-	  				var reference = " ";
-	  				if (authors.length > 0) {
-	  					var firstName = authors[0].firstName;
-	  					var lastName = authors[0].lastName;
-	  					if (lastName) {
-	  						reference += lastName;
-	  					}
-	  					if (firstName) {
-	  						reference += " "+firstName;
-	  					}
-	  				}
-	  				reference += ", "+citationItem["dateFreetext"]+", "+citationItem["title"];
-	  			
-	  				$("#itemReference").val(reference);
-	  				$("#addReferenceButton").prop('disabled', false);
-	  				$("#selectReferenceModal").modal('hide');
+	  			    var referenceIndex = $(this).closest("tr").find(".reference").attr('data-idx');
+	  			    var citationItem = results[referenceIndex];
+	  			    var authors = citationItem["authors"];
+	  			    var reference = "";
+	  			    if (authors.length > 0) {
+	  			        var firstName = authors[0].firstName ? authors[0].firstName.trim() : "";  
+	  			        var lastName = authors[0].lastName ? authors[0].lastName.trim() : "";   
+	  			        
+	  			        if (lastName) {
+	  			            reference += lastName;
+	  			        }
+	  			        if (firstName && lastName) {  
+	  			            reference += " ";
+	  			        }
+	  			        if (firstName) {
+	  			            reference += firstName;
+	  			        }
+	  			    }
+	  			    reference += ", " + citationItem["dateFreetext"]+", " + citationItem["title"];
+	  			    
+	  			    $("#itemReference").val(reference);
+	  			    $("#addReferenceButton").prop('disabled', false);
+	  			    $("#selectReferenceModal").modal('hide');
 	  			});
-	  			
+
 	        },
 	        error: function(data) {
 	        	showNotification(" Error while fetching references!", "danger", 10000);
@@ -204,7 +208,7 @@
 	function updateItemReference(zoteroGroupId, itemId, referenceVal) {
 		var url = "[(@{|/auth/group/${zoteroGroupId}/items/${itemId}/update|})]"
 		$.ajax({
-			dataType: "json",
+			dataType: "text",
 			type: 'POST',
 	        url: url,
 			data: {
