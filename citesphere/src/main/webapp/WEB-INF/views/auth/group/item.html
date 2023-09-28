@@ -137,7 +137,7 @@
 		$(uploadItem).children().each(function() {
 			
            if($(this).attr('class')=="page-item"){
-               $('#page-list').append('<li><p style="margin : 0; padding-top:0;">Page'+pageCount+': </p></li>');
+               $('#page-list').append('<li><p style="margin : 0; padding-top:0;">Page '+pageCount+': </p></li>');
            }
            $(this).children().each(function() {
                 pageItems = "page-items"+pageCount
@@ -152,7 +152,7 @@
            		$('#page-items'+pageCount).append('<ul id="'+additionalItems+'"></ul>')
            		$(this).children().each(function() {
            			$(this).children().each(function() {
-           				$('#additional-list'+pageCount).append('<li><p style="margin-bottom:0;">Additional Files'+additionalFilesCount+': <a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></p></li>');
+           				$('#additional-list'+pageCount).append('<li><p style="margin-bottom:0;">Additional Files '+additionalFilesCount+': <a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></p></li>');
                    })
                    additionalFilesCount += 1;
                })

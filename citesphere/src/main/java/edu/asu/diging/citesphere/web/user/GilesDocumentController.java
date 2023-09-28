@@ -51,6 +51,10 @@ public class GilesDocumentController {
     
     private static ListIterator<IGilesFile> gilesListIterator = giles.listIterator();
     
+    private static IGilesUpload currentUpload;
+
+    private static IGilesFile currentFile;
+
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/giles/{fileId}")
     public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication) {
         
@@ -62,7 +66,7 @@ public class GilesDocumentController {
         if(uploadOptionalList.size()!=0) {
             
             for(IGilesUpload gilesUpload : uploadOptionalList) {
-                Stream<Object> gilesFilesStream = generateStream(gilesUpload).limit(2);
+                Stream<Object> gilesFilesStream = generateStream(uploadOptionalList);
                 List<Object> gilesFiles = gilesFilesStream.collect(Collectors.toList());
                     
                 for(Object tempFile : gilesFiles) {
@@ -103,30 +107,32 @@ public class GilesDocumentController {
     }
     
     
-    private static Stream<Object> generateStream(IGilesUpload gilesUpload) {
-        
-        Stream<Object> gilesUploadStream = Stream.generate(new Supplier<Object>() {
-                
-            Object nextStreamElement = gilesUpload;
-            int i=0;
-            
+    private static Stream<Object> generateStream(List<IGilesUpload> uploadOptionalList) {
+
+        Stream<Object> gilesUpload = Stream.generate(new Supplier<Object>() {
+
             @Override
-            public Object get() {
-                
-                    if(nextStreamElement.getClass()==List.class) {
-                        List<Object> tempList = (List<Object>) nextStreamElement;
-                        nextStreamElement = tempList.get(i);
-                        i++;
-                    } else {
-                    
-                    nextStreamElement = gilesUpload.getUploadedFile();
-                    i=0;
+            public List<IGilesFile> get() {
+                List<IGilesFile> gilesFiles = new ArrayList<>();
+                for(IGilesUpload gilesUpload : uploadOptionalList) {
+
+                    gilesFiles.add(gilesUpload.getUploadedFile()); 
+                    gilesFiles.add(gilesUpload.getExtractedText());
+                    if(gilesUpload.getPages() != null) {      //Extracting pages 
+                        gilesUpload.getPages().forEach(p -> {
+                            gilesFiles.add(p.getImage());
+                            gilesFiles.add(p.getOcr());
+                            gilesFiles.add(p.getText());
+                            p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));  //Extracting additional files of pages
+                        });
                     }
-                    return nextStreamElement;
+                    if(gilesUpload.getAdditionaFiles() != null) {
+                        gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a)); //Extracting additional files
+                    }
+                }
+                return gilesFiles;
             }
         });
-        
-        return gilesUploadStream;
+        return gilesUpload;
     }
-    
 }
