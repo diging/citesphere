@@ -61,28 +61,9 @@ public class GilesDocumentController {
         String contentType = null;
         String fileName = null;
         ICitation citation = citationManager.getCitation(itemId);
-        List<IGilesUpload> uploadOptionalList = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null && u.getUploadedFile().getId().equals(fileId) && u.getDocumentStatus().equals(GilesStatus.COMPLETE)).collect(Collectors.toList());
+        List<IGilesUpload> uploadOptionalList = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null && u.getDocumentStatus().equals(GilesStatus.COMPLETE)).collect(Collectors.toList());
         
         if(uploadOptionalList.size()!=0) {
-            
-//            for(IGilesUpload gilesUpload : uploadOptionalList) {
-//                Stream<Object> gilesFilesStream = generateStream(uploadOptionalList);
-//                List<Object> gilesFiles = gilesFilesStream.collect(Collectors.toList());
-//                    
-//                for(Object tempFile : gilesFiles) {
-//                    
-//                    IGilesFile gilesFile = (IGilesFile) tempFile;
-//                    if(gilesFile.getId().equals(fileId)) {
-//                        contentType = gilesFile.getContentType();
-//                        fileName = gilesFile.getFilename();
-//                        break;
-//                    }
-//                }
-//                
-//                if(contentType!=null) {
-//                    break;
-//                }
-//            }
             Stream<IGilesFile> gilesFilesStream = generateStream(uploadOptionalList);
             IGilesFile foundFile = gilesFilesStream.filter(file -> file.getId().equals(fileId)).findFirst().orElse(null);
 
@@ -119,43 +100,19 @@ public class GilesDocumentController {
             List<IGilesFile> gilesFiles = new ArrayList<>();
             gilesFiles.add(gilesUpload.getUploadedFile()); 
             gilesFiles.add(gilesUpload.getExtractedText());
-            if(gilesUpload.getPages() != null) {      // Extracting pages 
+            if(gilesUpload.getPages() != null) {
                 gilesUpload.getPages().forEach(p -> {
                     gilesFiles.add(p.getImage());
                     gilesFiles.add(p.getOcr());
                     gilesFiles.add(p.getText());
-                    p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));  // Extracting additional files of pages
+                    p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));
                 });
             }
             if(gilesUpload.getAdditionaFiles() != null) {
-                gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a)); // Extracting additional files
+                gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a));
             }
             return gilesFiles.stream();
         });
-        
-
-//            @Override
-//            public List<IGilesFile> get() {
-//                List<IGilesFile> gilesFiles = new ArrayList<>();
-//                for(IGilesUpload gilesUpload : uploadOptionalList) {
-//
-//                    gilesFiles.add(gilesUpload.getUploadedFile()); 
-//                    gilesFiles.add(gilesUpload.getExtractedText());
-//                    if(gilesUpload.getPages() != null) {      //Extracting pages 
-//                        gilesUpload.getPages().forEach(p -> {
-//                            gilesFiles.add(p.getImage());
-//                            gilesFiles.add(p.getOcr());
-//                            gilesFiles.add(p.getText());
-//                            p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));  //Extracting additional files of pages
-//                        });
-//                    }
-//                    if(gilesUpload.getAdditionaFiles() != null) {
-//                        gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a)); //Extracting additional files
-//                    }
-//                }
-//                return gilesFiles;
-//            }
-//        });
         return gilesFilesStream;
     }
 }
