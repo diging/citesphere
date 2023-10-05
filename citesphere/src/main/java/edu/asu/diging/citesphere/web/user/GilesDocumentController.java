@@ -42,18 +42,6 @@ public class GilesDocumentController {
     
     @Autowired
     private ICitationManager citationManager;
-    
-    private IGilesUpload gilesUpload;
-    
-    private List<GilesPage> gilesFile;
-    
-    private static ArrayList<IGilesFile> giles = new ArrayList<>();
-    
-    private static ListIterator<IGilesFile> gilesListIterator = giles.listIterator();
-    
-    private static IGilesUpload currentGilesUpload;
-
-    private static IGilesFile currentFile;
 
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/giles/{fileId}")
     public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication) {
@@ -62,7 +50,6 @@ public class GilesDocumentController {
         String fileName = null;
         ICitation citation = citationManager.getCitation(itemId);
         List<IGilesUpload> uploadOptionalList = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null && u.getDocumentStatus().equals(GilesStatus.COMPLETE)).collect(Collectors.toList());
-        
         if(uploadOptionalList.size()!=0) {
             Stream<IGilesFile> gilesFilesStream = generateStream(uploadOptionalList);
             IGilesFile foundFile = gilesFilesStream.filter(file -> file.getId().equals(fileId)).findFirst().orElse(null);

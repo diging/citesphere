@@ -104,15 +104,11 @@
 	    $('.btn-nav').each(function() {
 	    	$(this).attr("href", $(this).attr("href") + "&" + queryParams);
 	    })
-	    var viewCounter = 0
 	    $(".view-link").click(function() {
-	        if(viewCounter<=0) {	
-           	   var item = $(this).parent()
-           	   showFiles('viewUpload', item[0]);
-	        }
-	        modalName = 'viewUpload'
+	    	var item = $(this).parent();
+	        var modalName = 'viewUpload';
+	        showFiles(modalName, item);
 	        $("#"+modalName.toLowerCase()+"Modal").modal('show');
-	        viewCounter++;	
 		});
 	    $('.note-info').each(function() {
 	    	$(this).text(truncateNote($(this).attr('data-note-text')));
