@@ -50,6 +50,9 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     @Value("${_viaf_url}")
     private String viafURL;
 
+    @Value("${_importer_name_authority.importer.viaf}")
+    private String viafImporter;
+    
     private RestTemplate restTemplate;
 
     @PostConstruct
@@ -181,7 +184,8 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
                     if (iterator.hasNext()) {
                         String name = iterator.next().getText();
                         authority.setName(name);
-                        authority.setSource("Viaf");
+//                        authority.setSource("Viaf");
+                        authority.setImporterId(viafImporter);
                         authority.setUri(record.getDocument().get("@about") + "");
                         authorityEntries.add(authority);
                     }
