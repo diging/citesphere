@@ -110,6 +110,14 @@
 	        showFiles(modalName, item);
 	        $("#"+modalName.toLowerCase()+"Modal").modal('show');
 		});
+	    /* $('#viewuploadModal .close').click(function() {
+	        // Reset the content of elements
+	        $("#uploadedFileName").attr('href', '').text('');
+	        $("#extractedFileName").attr('href', '').text(''); 
+	        
+	        $("#viewUploadBody modal-body page-title").empty();
+	        $("#viewUploadBody modal-body page-list").empty();
+	    }); */
 	    $('.note-info').each(function() {
 	    	$(this).text(truncateNote($(this).attr('data-note-text')));
 	    })
@@ -120,13 +128,24 @@
 		var uploadItem = $(item);
 		var modalNameLCase = modalName.toLowerCase();
 		
+		/* $("#uploadedFileName").removeAttr('href').text('');
+	    $("#extractedFileName").removeAttr('href').text('');
+	    $('.modal-body ul').empty(); */
+		
+	    /* $(uploadItem).children().each(function() {
+	        // Clear content of each child element
+	    	$('#page-list').empty();
+	    }); */
+
+	    $('#page-title, #page-list').remove();
+		
 		$("#uploadedFileName").attr('href', uploadItem.attr("upload-href"));
 		$("#uploadedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-uploadedFile-filename"));
 		
 		$("#extractedFileName").attr('href', uploadItem.attr("extractedText-href"));
 		$("#extractedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-extractedText-filename"));
 		
-		$('.modal-body ul').append('<li><p style="margin-bottom:0;">Pages: </p></li>');
+		$('.modal-body ul').append('<li id="page-title"><p style="margin-bottom:0;">Pages: </p></li>');
 		var pageCount=1
 		$('.modal-body ul').append('<ul id="page-list"></ul>');
 		
