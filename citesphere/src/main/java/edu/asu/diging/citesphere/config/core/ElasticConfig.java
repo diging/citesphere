@@ -71,18 +71,14 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
 
     }
 
-
     @Bean(name = { "elasticsearchOperations", "elasticsearchTemplate" })
     public ElasticsearchRestTemplate elasticsearchTemplate() throws UnknownHostException {
         try {
-            RestHighLevelClient esClient = elasticsearchRestClient();
-            ElasticsearchRestTemplate esRestTemplate = new ElasticsearchRestTemplate(esClient);
-            return esRestTemplate;
+            return new ElasticsearchRestTemplate(elasticsearchRestClient());
         } catch (Exception ex) {
-            logger.error("Error Connecting to ES at: " + ex);
+            logger.error("Error Connecting to ES", ex);
             return null;
         }
-        
     }
 
 }
