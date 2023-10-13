@@ -28,5 +28,4 @@ public interface SearchEngine {
      */
     CitationPage getPrevAndNextCitation(String searchTerm, String groupId, int page, int index, int pageSize);
 
-    ResultPage searchReferences(String searchReference, String groupId, int page, int pageSize);
 }

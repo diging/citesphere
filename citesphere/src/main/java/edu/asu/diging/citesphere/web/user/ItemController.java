@@ -38,6 +38,7 @@ public class ItemController {
             @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
+        model.addAttribute("itemId", itemId);
         
         CitationPage citationPage = null;
         searchTerm = searchTerm.trim();

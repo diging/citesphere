@@ -196,20 +196,4 @@ public class SearchEngineImpl implements SearchEngine {
             citation.getConceptTags().add(citTag);
         }
     }
-
-    @Override
-    public ResultPage searchReferences(String searchReference, String groupId, int page, int pageSize) {
-        BoolQueryBuilder orFieldsBuilder = QueryBuilders.boolQuery()
-                .should(QueryBuilders.queryStringQuery(searchReference).field("title").field("creators.name"));
-        BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
-        boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId));
-        NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder).withPageable(PageRequest.of(page, pageSize));
-
-        AggregatedPage<Reference> results = template.queryForPage(b.build(), Reference.class);
-        List<ICitation> foundCitations = new ArrayList<ICitation>();
-        results.get().forEach(r -> {
-            foundCitations.add(mapReference(r));
-        });
-        return new ResultPage(foundCitations, results.getTotalElements(), results.getTotalPages());
-    }
 }

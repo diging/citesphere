@@ -121,8 +121,8 @@
 			$('#citationReferences').append(content);
 			var pathName = window.location.pathname;
 			var pathNameArray = pathName.split('/');
-			var zoteroGroupId = pathNameArray[4];
-			var itemId = pathNameArray[6];
+		    var zoteroGroupId = $("#addReferences").data('zotero-group-id');
+		    var itemId = $("#addReferences").data('item-id'); 
 			var reference =  $("#itemReference").val().trim();
 			updateItemReference(zoteroGroupId, itemId, reference);
 		});
@@ -205,25 +205,50 @@
 		}); 
 	}
 	
+	function updateCitationReferences(data) {
+	    $('#citationReferences').empty();
+	    $.each(data.references, function(index, ref) {
+	        var referenceElement = $('<p>').addClass('parse-ref-info')
+	            .attr('data-authors', ref.authorString)
+	            .attr('data-title', ref.title)
+	            .attr('data-year', ref.year)
+	            .attr('data-identifier', ref.identifier)
+	            .attr('data-identifier-type', ref.identifierType)
+	            .attr('data-first-page', ref.firstPage)
+	            .attr('data-last-page', ref.endPage)
+	            .attr('data-volume', ref.volume)
+	            .attr('data-source', ref.source)
+	            .attr('data-publication-type', ref.publicationType)
+	            .attr('data-reference-id', ref.referenceId)
+	            .attr('data-reference-label', ref.referenceLabel)
+	            .attr('data-citation-id', ref.citationId)
+	            .attr('data-ref-raw', ref.referenceStringRaw)
+	            .html('<span class="icon-info-circle"></span>' + ref.referenceString);
+
+	        $('#citationReferences').append(referenceElement);
+	    });
+	}
+
 	function updateItemReference(zoteroGroupId, itemId, referenceVal) {
-		var url = "[(@{|/auth/group/${zoteroGroupId}/items/${itemId}/update|})]"
-		$.ajax({
-			dataType: "text",
-			type: 'POST',
+	    var url = "[(@{|/auth/group/${zoteroGroupId}/items/${itemId}/update|})]";
+	    $.ajax({
+	        dataType: "json",
+	        type: 'POST',
 	        url: url,
-			data: {
-				"reference": referenceVal,
-				[[${_csrf.parameterName}]] : [[${_csrf.token}]]
-			},
+	        data: {
+	            "reference": referenceVal,
+	            [[${_csrf.parameterName}]] : [[${_csrf.token}]]
+	        },
 	        async: false,
 	        success: function(data) {
-	        	var message = "Reference added successfully";
-	        	showNotification(message, "success", 1000);
+	            updateCitationReferences(data);
+	            var message = "Reference added successfully";
+	            showNotification(message, "success", 1000);
 	        },
 	        error: function(data) {
-	        	showNotification(" Error while updating reference!", "danger", 500);
+	            showNotification(" Error while updating reference!", "danger");
 	        }
-		}); 
+	    }); 
 	}
 
 	function showNotification(message, status, time){
@@ -481,7 +506,7 @@
 			
 			</th:block></td>
 			<td>
-				<button id="addReferences" type="button" class="btn btn-primary" data-toggle="modal" data-target="#refernceModal"><i class="icon-circle-add"></i>Add References</button> 
+				<button id="addReferences" type="button" class="btn btn-primary" data-toggle="modal" data-target="#refernceModal" th:data-zotero-group-id="${zoteroGroupId}" th:data-item-id="${itemId}"><i class="icon-circle-add"></i>Add References</button> 
 			</td>
 		</tr>
 		<tr>

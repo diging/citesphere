@@ -85,4 +85,6 @@ public interface ICitationManager {
     
     void deleteLocalGroupCitations(String groupId);
     
+    ICitation updateCitationReference(ICitation citation, String reference);
+    
 }

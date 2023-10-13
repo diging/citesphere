@@ -3,9 +3,11 @@ package edu.asu.diging.citesphere.core.service.impl;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 
@@ -43,10 +45,12 @@ import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IReference;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.impl.Reference;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
@@ -494,4 +498,26 @@ public class CitationManager implements ICitationManager {
     public void deleteLocalGroupCitations(String groupId) {
         citationStore.deleteCitationByGroupId(groupId);
     }
+
+	@Override
+	public ICitation updateCitationReference(ICitation citation, String reference) {
+		Set<IReference> references = citation.getReferences();
+        Boolean referenceExists = false;
+        if (references == null) {
+            references = new HashSet<>();
+        } else {
+            for (IReference refer : references) {
+                if (refer.getReferenceString().equals(reference)) {
+                    referenceExists = true;
+                    break;
+                }
+            }
+        }
+        if (!referenceExists) {
+            IReference iReference = new Reference();
+            iReference.setReferenceString(reference);
+            references.add(iReference);
+        }
+        return citationStore.save(citation);
+	}
 }
