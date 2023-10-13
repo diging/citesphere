@@ -48,37 +48,26 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
     
     @Bean
     public RestHighLevelClient elasticsearchRestClient() {
-        try {
-            logger.info("Connecting to ES at: " + host);
-            TerminalClientConfigurationBuilder builder = ClientConfiguration.builder()
-                    .connectedTo(host).withConnectTimeout(connectTimeout).withSocketTimeout(connectTimeout);
-                    //.usingSsl();
-            if (user != null && !user.trim().isEmpty()) {
-                logger.info("Using user info: " + user);
-                builder.withBasicAuth(user, password); 
-            }
-            if (pathPrefix != null && !pathPrefix.trim().isEmpty()) {
-                logger.info("Using path prefix: " + pathPrefix);
-                builder.withPathPrefix(pathPrefix);
-            }
-            final ClientConfiguration clientConfiguration = builder.build();
-            RestHighLevelClient restClient = RestClients.create(clientConfiguration).rest();  
-            return restClient;
-        } catch (Exception ex) {
-            logger.error("Error Connecting to ES at: " + ex);
-            return null;
+        logger.info("Connecting to ES at: " + host);
+        TerminalClientConfigurationBuilder builder = ClientConfiguration.builder()
+                .connectedTo(host).withConnectTimeout(connectTimeout).withSocketTimeout(connectTimeout);
+                //.usingSsl();
+        if (user != null && !user.trim().isEmpty()) {
+            logger.info("Using user info: " + user);
+            builder.withBasicAuth(user, password); 
         }
-
+        if (pathPrefix != null && !pathPrefix.trim().isEmpty()) {
+            logger.info("Using path prefix: " + pathPrefix);
+            builder.withPathPrefix(pathPrefix);
+        }
+        final ClientConfiguration clientConfiguration = builder.build();
+        RestHighLevelClient restClient = RestClients.create(clientConfiguration).rest();  
+        return restClient;
     }
 
     @Bean(name = { "elasticsearchOperations", "elasticsearchTemplate" })
     public ElasticsearchRestTemplate elasticsearchTemplate() throws UnknownHostException {
-        try {
-            return new ElasticsearchRestTemplate(elasticsearchRestClient());
-        } catch (Exception ex) {
-            logger.error("Error Connecting to ES", ex);
-            return null;
-        }
+    	return new ElasticsearchRestTemplate(elasticsearchRestClient());
     }
 
 }
