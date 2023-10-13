@@ -61,8 +61,7 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
             builder.withPathPrefix(pathPrefix);
         }
         final ClientConfiguration clientConfiguration = builder.build();
-        RestHighLevelClient restClient = RestClients.create(clientConfiguration).rest();  
-        return restClient;
+        return RestClients.create(clientConfiguration).rest();
     }
 
     @Bean(name = { "elasticsearchOperations", "elasticsearchTemplate" })
