@@ -18,30 +18,25 @@ import edu.asu.diging.citesphere.core.search.service.impl.ResultPage;
 @Controller
 @PropertySource("classpath:/config.properties")
 public class ReferenceController {
-	
-	private Logger logger = LoggerFactory.getLogger(getClass());
-	
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private SearchEngine engine;
-    
-    @RequestMapping(value = {"/auth/group/{zoteroGroupId}/find/references"})
-    public ResponseEntity<ResultPage> getReferences(Authentication authentication,
-            @PathVariable String zoteroGroupId,
+
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/find/references" })
+    public ResponseEntity<ResultPage> getReferences(Authentication authentication, @PathVariable String zoteroGroupId,
             @RequestParam(value = "searchTerm", required = false) String searchTerm,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
-            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize ) {
+            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize) {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
         }
-        
-        pageInt = pageInt > 0 ? pageInt : 1;
-
-        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
-        
-        return new ResponseEntity<ResultPage>(citations, HttpStatus.OK);
+        pageInt = Math.max(pageInt, 1) - 1;
+        return new ResponseEntity<ResultPage>(engine.search(searchTerm, zoteroGroupId, pageInt, 50), HttpStatus.OK);
     }
 
 }

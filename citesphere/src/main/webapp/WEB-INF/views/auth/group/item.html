@@ -108,35 +108,32 @@
 	    	$(this).text(truncateNote($(this).attr('data-note-text')));
 	    })
 	    
-		$("#closeRefernceModalBtn").click(function() {
-			$("#refernceModal").modal('hide');
+		$("#closeReferenceModalBtn").click(function() {
+			$("#referenceModal").modal('hide');
 		});
 	    
-		$("#addReferenceButton").click(function() {
-			$("#refernceModal").modal('hide');
-			var content = '<p>';
-			content += '<span class="icon-info-circle"></span>';
-			content += $("#itemReference").val();
-			content += '</p>';
-			$('#citationReferences').append(content);
-			var pathName = window.location.pathname;
-			var pathNameArray = pathName.split('/');
-		    var zoteroGroupId = $("#addReferences").data('zotero-group-id');
-		    var itemId = $("#addReferences").data('item-id'); 
-			var reference =  $("#itemReference").val().trim();
-			updateItemReference(zoteroGroupId, itemId, reference);
-		});
-		
+	    
+	    $("#addReferenceButton").click(function() {
+	    	$("#referenceModal").modal('hide');
+	    	var content = '<p>';
+	    	content += '<span class="icon-info-circle"></span>';
+	    	content += $("#itemReference").val();
+	    	content += '</p>';
+	    	$('#citationReferences').append(content);
+	    	var pathName = window.location.pathname;
+	    	var zoteroGroupId = $("#addReferences").data('zotero-group-id');
+	    	var itemId = $("#addReferences").data('item-id');
+	    	var reference =  $("#itemReference").val().trim();
+	    	updateItemReference(zoteroGroupId, itemId, reference);
+	    });
+	    
 	    $("#searchReference").click(function() {
 	        $("#selectReferenceModal").show()
 	        $("#searchReferenceSpinner").show();
 	        $("#addReferenceButton").prop('disabled', true);
 	        $("#itemReference").val('');
-	        
-			var searchTerm = $("#citationReference").val();
-			var pathName = window.location.pathname;
-			var pathNameArray = pathName.split('/');
-			var zoteroGroupId = pathNameArray[4];
+	        var searchTerm = $("#citationReference").val();
+	        var zoteroGroupId = $("#addReferences").data('zotero-group-id');
 	        getReferences(zoteroGroupId, searchTerm);
 	        $("#searchReferenceSpinner").hide();
 	    });
@@ -161,6 +158,7 @@
 	        url: url,
 	        async: false,
 	        success: function(data) {
+	        	console.log(data);
 	            var results = data["results"];
 	  			$("#citationSearchResult").empty();
 	  			var content = '';
@@ -506,7 +504,7 @@
 			
 			</th:block></td>
 			<td>
-				<button id="addReferences" type="button" class="btn btn-primary" data-toggle="modal" data-target="#refernceModal" th:data-zotero-group-id="${zoteroGroupId}" th:data-item-id="${itemId}"><i class="icon-circle-add"></i>Add References</button> 
+				<button id="addReferences" type="button" class="btn btn-primary" data-toggle="modal" data-target="#referenceModal" th:data-zotero-group-id="${zoteroGroupId}" th:data-item-id="${itemId}"><i class="icon-circle-add"></i>Add References</button> 
 			</td>
 		</tr>
 		<tr>
@@ -654,7 +652,7 @@
     </div>
     
 	    	<!-- Reference Modal -->
-	<div class="modal fade" id="refernceModal" tabindex="-1" role="dialog" aria-labelledby="referenceLabel">
+	<div class="modal fade" id="referenceModal" tabindex="-1" role="dialog" aria-labelledby="referenceLabel">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -677,7 +675,7 @@
 	      </div>
 	      
 	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" id="closeRefernceModalBtn">Close</button>
+	        <button type="button" class="btn btn-default" id="closeReferenceModalBtn">Close</button>
 	        <button type="button" class="btn btn-primary" id="addReferenceButton" disabled>Add</button>
 	      </div>
 	    </div>

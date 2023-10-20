@@ -499,9 +499,9 @@ public class CitationManager implements ICitationManager {
         citationStore.deleteCitationByGroupId(groupId);
     }
 
-	@Override
-	public ICitation updateCitationReference(ICitation citation, String reference) {
-		Set<IReference> references = citation.getReferences();
+    @Override
+    public ICitation updateCitationReference(ICitation citation, String reference) {
+        Set<IReference> references = citation.getReferences();
         Boolean referenceExists = false;
         if (references == null) {
             references = new HashSet<>();
@@ -519,5 +519,5 @@ public class CitationManager implements ICitationManager {
             references.add(iReference);
         }
         return citationStore.save(citation);
-	}
+    }
 }

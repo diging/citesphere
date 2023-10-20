@@ -30,28 +30,27 @@ public class UpdateItemController {
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/update", method = RequestMethod.POST)
     public ResponseEntity<?> updateReference(Authentication authentication,
-                                             @PathVariable("zoteroGroupId") String zoteroGroupId, 
-                                             @PathVariable("itemId") String itemId,
-                                             @RequestParam(value = "reference", required = false) String reference) {
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
+            @RequestParam(value = "reference", required = false) String reference) {
         ICitation citation = null;
         try {
             IUser user = (IUser) authentication.getPrincipal();
             citation = citationManager.getCitation(user, zoteroGroupId, itemId);
             citation = citationManager.updateCitationReference(citation, reference);
+            return new ResponseEntity<>(citation, HttpStatus.OK);
         } catch (GroupDoesNotExistException e) {
             logger.error("Group does not exist.", e);
             return new ResponseEntity<>("{\"error\": \"Group " + zoteroGroupId + " not found.\"}", HttpStatus.NOT_FOUND);
         } catch (CannotFindCitationException e) {
-            logger.error("Citation not found.", e); 
+            logger.error("Citation not found.", e);
             return new ResponseEntity<>("{\"error\": \"Item " + itemId + " not found.\"}", HttpStatus.NOT_FOUND);
         } catch (AccessForbiddenException e) {
             logger.error("Access forbidden.", e);
             return new ResponseEntity<>("{\"error\": \"Access forbidden to item " + itemId + ".\"}", HttpStatus.FORBIDDEN);
         } catch (ZoteroHttpStatusException e) {
             logger.error("Zotero threw exception.", e);
-            return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);  
+            return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(citation, HttpStatus.OK);
     }
 }
 
