@@ -5,7 +5,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -519,36 +518,36 @@ public class CitationManager implements ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
-        for (Iterator<IGilesUpload> gilesUpload = citation.getGilesUploads().iterator(); gilesUpload.hasNext();) {
-            IGilesUpload upload = gilesUpload.next();
-            if (upload.getDocumentId() != null && upload.getDocumentId().equals(documentId)) {
-                ResponseEntity<String> reprocessingResponse = gilesConnector.reprocessDocument(user, documentId);
-                if (reprocessingResponse.getStatusCode().equals(HttpStatus.OK)) {
-                    IGilesUpload reprocessedUpload = new GilesUpload();
-                    String responseBody = reprocessingResponse.getBody();
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode jsonNode;
-                    try {
-                        jsonNode = objectMapper.readTree(responseBody);
-                        String checkUrl = jsonNode.get("checkUrl").asText();
-                        String[] urlSegments = checkUrl.split("/");
-                        String progressId = urlSegments[urlSegments.length - 1];
-                        reprocessedUpload.setUploadingUser(user.getUsername());
-                        reprocessedUpload.setProgressId(progressId);
-                        Set<IGilesUpload> checkedUploads = new HashSet<>();
-                        checkedUploads.add(reprocessedUpload);
-                        updateCitationWithUpdatedGilesUpload(checkedUploads, user, citation, documentId);
-                        gilesUploadChecker.add(citation);
-                    } catch (IOException e) {
-                        logger.error("Could not deserialize response.", e);
-                    }
-                }
+        citation.getGilesUploads().stream()
+        .filter(upload -> upload.getDocumentId() != null && upload.getDocumentId().equals(documentId))
+        .forEach(upload -> {
+            initiateReprocessing(user, documentId, citation);
+        });
+    }
+    
+    private void initiateReprocessing(IUser user, String documentId, ICitation citation) {
+        ResponseEntity<String> reprocessingResponse = gilesConnector.reprocessDocument(user, documentId);
+        if (reprocessingResponse.getStatusCode().equals(HttpStatus.OK)) {
+            IGilesUpload reprocessedUpload = new GilesUpload();
+            String responseBody = reprocessingResponse.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            String progressId = null;
+            try {
+                JsonNode jsonNode = objectMapper.readTree(responseBody);
+                progressId = jsonNode.get("id").asText();
+            } catch (IOException e) {
+                logger.error("Could not deserialize response.", e);
             }
-            
+            reprocessedUpload.setUploadingUser(user.getUsername());
+            reprocessedUpload.setProgressId(progressId);
+            Set<IGilesUpload> checkedUploads = new HashSet<>();
+            checkedUploads.add(reprocessedUpload);
+            updateReprocessedUpload(checkedUploads, user, citation, documentId);
+            gilesUploadChecker.add(citation);
         }
     }
     
-    private void updateCitationWithUpdatedGilesUpload(Set<IGilesUpload> checkedUploads, IUser user, ICitation citation, String documentId) {
+    private void updateReprocessedUpload(Set<IGilesUpload> checkedUploads, IUser user, ICitation citation, String documentId) {
         ICitation currentCitation = getCurrentCitation(citation, user);
         if (currentCitation != null) {
             for (IGilesUpload upload : checkedUploads) {
@@ -562,7 +561,6 @@ public class CitationManager implements ICitationManager {
                 }
                 currentCitation.getGilesUploads().add(upload);
             }
-
             try {
                 updateCitation(user, citation.getGroup(),
                         currentCitation);

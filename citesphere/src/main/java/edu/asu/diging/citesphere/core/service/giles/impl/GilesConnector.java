@@ -72,7 +72,6 @@ public class GilesConnector implements IGilesConnector {
     
     @Override
     public ResponseEntity<String> reprocessDocument(IUser user, String documentId) {
-        ResponseEntity<String> response = sendRequest(user, reprocessingEndpoint.replace("{0}", documentId), String.class, HttpMethod.POST);
-        return response;
+        return sendRequest(user, reprocessingEndpoint.replace("{0}", documentId), String.class, HttpMethod.POST);
     }
 }
