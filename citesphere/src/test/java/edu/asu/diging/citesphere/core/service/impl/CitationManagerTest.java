@@ -426,7 +426,7 @@ public class CitationManagerTest {
         Mockito.when(groupManager.getGroup(Mockito.any(IUser.class), Mockito.anyString())).thenReturn(group);
         Mockito.when(zoteroManager.updateCitation(user, GROUP_ID, existingCitation)).thenReturn(existingCitation);
         Mockito.when(citationStore.findById(EXISTING_ID)).thenReturn(Optional.of(existingCitation));
-        String responseBody = "{\"checkUrl\": \"http://localhost:8085/giles/api/v2/files/upload/check/PROG12345\"}";
+        String responseBody = "{\"checkUrl\": \"http://localhost:8085/giles/api/v2/files/upload/check/PROG12345\", \"id\": \"PROG12345\"}}";
         ResponseEntity<String> response = new ResponseEntity<>(responseBody, HttpStatus.OK);
         Mockito.when(gilesConnector.reprocessDocument(user, documentId)).thenReturn(response);
         managerToTest.reprocessFile(user, GROUP_ID, EXISTING_ID, documentId);
