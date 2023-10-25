@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -518,11 +519,11 @@ public class CitationManager implements ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
-        citation.getGilesUploads().stream()
-        .filter(upload -> upload.getDocumentId() != null && upload.getDocumentId().equals(documentId))
-        .forEach(upload -> {
+        List<IGilesUpload> uploadsToReprocess = citation.getGilesUploads().stream()
+        .filter(upload -> upload.getDocumentId() != null && upload.getDocumentId().equals(documentId)).collect(Collectors.toList());
+        for(IGilesUpload upload : uploadsToReprocess) {
             initiateReprocessing(user, documentId, citation);
-        });
+        }
     }
     
     private void initiateReprocessing(IUser user, String documentId, ICitation citation) {
