@@ -31,12 +31,11 @@ public class UpdateItemController {
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/update", method = RequestMethod.POST)
     public ResponseEntity<?> updateReference(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @RequestParam(value = "reference", required = false) String reference) {
-        ICitation citation = null;
+            @RequestParam(value = "referenceCitationKey") String referenceCitationKey,
+            @RequestParam(value = "reference") String reference) {
         try {
             IUser user = (IUser) authentication.getPrincipal();
-            citation = citationManager.getCitation(user, zoteroGroupId, itemId);
-            citation = citationManager.updateCitationReference(citation, reference);
+            ICitation citation = citationManager.updateCitationReference(user, zoteroGroupId, itemId, referenceCitationKey, reference);
             return new ResponseEntity<>(citation, HttpStatus.OK);
         } catch (GroupDoesNotExistException e) {
             logger.error("Group does not exist.", e);
@@ -44,14 +43,10 @@ public class UpdateItemController {
         } catch (CannotFindCitationException e) {
             logger.error("Citation not found.", e);
             return new ResponseEntity<>("{\"error\": \"Item " + itemId + " not found.\"}", HttpStatus.NOT_FOUND);
-        } catch (AccessForbiddenException e) {
-            logger.error("Access forbidden.", e);
-            return new ResponseEntity<>("{\"error\": \"Access forbidden to item " + itemId + ".\"}", HttpStatus.FORBIDDEN);
         } catch (ZoteroHttpStatusException e) {
             logger.error("Zotero threw exception.", e);
             return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
 }
-
-
