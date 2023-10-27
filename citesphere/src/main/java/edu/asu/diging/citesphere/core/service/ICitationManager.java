@@ -85,7 +85,6 @@ public interface ICitationManager {
     
     void deleteLocalGroupCitations(String groupId);
     
-    ICitation updateCitationReference(IUser user, String groupId, String key, String referenceCitationKey,
-            String reference) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
+    ICitation updateCitationReference(ICitation citation, String referenceCitationKey, String reference);
 
 }

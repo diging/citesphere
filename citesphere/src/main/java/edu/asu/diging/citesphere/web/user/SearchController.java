@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import edu.asu.diging.citesphere.core.search.service.SearchEngine;
 import edu.asu.diging.citesphere.core.search.service.impl.ResultPage;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.BreadCrumb;
@@ -100,5 +101,4 @@ public class SearchController {
         model.addAttribute("breadCrumbs", breadCrumbs);
         return "auth/group/items";
     }
-    
 }

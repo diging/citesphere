@@ -34,8 +34,8 @@ public class UpdateItemController {
             @RequestParam(value = "referenceCitationKey") String referenceCitationKey,
             @RequestParam(value = "reference") String reference) {
         try {
-            IUser user = (IUser) authentication.getPrincipal();
-            ICitation citation = citationManager.updateCitationReference(user, zoteroGroupId, itemId, referenceCitationKey, reference);
+            ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
+            citation = citationManager.updateCitationReference(citation, referenceCitationKey, reference);
             return new ResponseEntity<>(citation, HttpStatus.OK);
         } catch (GroupDoesNotExistException e) {
             logger.error("Group does not exist.", e);

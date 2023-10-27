@@ -500,15 +500,12 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public ICitation updateCitationReference(IUser user, String groupId, String key, String referenceCitationKey,
-            String reference)
-            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
-        ICitation citation = getCitation(user, groupId, key);
+    public ICitation updateCitationReference(ICitation citation, String referenceCitationKey, String reference) {
         Set<IReference> references = citation.getReferences();
         if (references == null) {
             references = new HashSet<>();
         }
-        if (!key.equals(referenceCitationKey)) {
+        if (!citation.getKey().equals(referenceCitationKey)) {
             IReference iReference = new Reference();
             iReference.setReferenceString(reference);
             references.add(iReference);
