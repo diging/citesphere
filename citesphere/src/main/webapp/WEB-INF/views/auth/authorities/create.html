@@ -118,21 +118,13 @@ function getConceptpowerAuthorities(modalType, personType, page) {
 
             if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
                 data['foundAuthorities'].forEach(function(elem) {
-                	console.log(elem);
                     content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
                     if (elem['description'] == null) {
                         content += ' - </td>';
                     } else {
                         content += elem['description'] + '</td>';
                     }
-					
                     content += '<td style="display: none;" class="importerId">' + elem['importerId'] + '</td>';
-             /*        content += '<div class="importerId">';
-                    if (elem['importerId'] == null) {
-                        content += '</div>';
-                    } else {
-                        content += elem['importerId'] + '</div>';
-                    } */
                     content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
@@ -336,9 +328,9 @@ function getPersonAuthority(uri, personType) {
         <td><input id="uri" th:field="*{uri}" class="form-control" readonly/></td>
     </tr>
     
-    <tr id="tr-importerId"> <!-- Changed the id here -->
-        <td width="20%"><label for="importerId">Imported Id</label></td>
-        <td><input id="importerId" th:field="*{importerId}" class="form-control" readonly/></td> <!-- Changed the tag from <id to <input -->
+    <tr id="tr-importerId"> 
+        <td width="20%"><label for="importerId">Importer Id</label></td>
+        <td><input id="importerId" th:field="*{importerId}" class="form-control" readonly/></td>
     </tr>
    
     </table>

@@ -90,7 +90,6 @@ public class AuthorityService implements IAuthorityService {
                 IAuthorityEntry entry = new AuthorityEntry();
                 entry.setName(importedAuthority.getName());
                 entry.setUri(importedAuthority.getUri());
-                entry.setSource(importedAuthority.getSource());
                 entry.setImporterId(importer.getId());
                 return entry;
             }

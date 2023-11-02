@@ -8,9 +8,9 @@ public class ImportedAuthority implements IImportedAuthority {
 
     private String name;
     private String uri;
-    private String source;
     private Map<String, Object> properties;
-    
+    private String importerId;
+
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.authority.impl.IImportedAuthority#getName()
      */
@@ -40,20 +40,6 @@ public class ImportedAuthority implements IImportedAuthority {
         this.uri = uri;
     }
     /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.authority.impl.IImportedAuthority#getSource()
-     */
-    @Override
-    public String getSource() {
-        return source;
-    }
-    /* (non-Javadoc)
-     * @see edu.asu.diging.citesphere.authority.impl.IImportedAuthority#setSource(java.lang.String)
-     */
-    @Override
-    public void setSource(String source) {
-        this.source = source;
-    }
-    /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.authority.impl.IImportedAuthority#getProperties()
      */
     @Override
@@ -66,5 +52,20 @@ public class ImportedAuthority implements IImportedAuthority {
     @Override
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
+    }
+    
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.authority.impl.IImportedAuthority#getImporterId()
+     */
+    @Override
+    public String getImporterId() {
+        return importerId;
+    }
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.authority.impl.IImportedAuthority#setImporterId(java.lang.String)
+     */
+    @Override
+    public void setImporterId(String importerId) {
+        this.importerId = importerId;
     }
 }

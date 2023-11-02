@@ -83,6 +83,7 @@ $(function() {
 <table class="table table-striped table-bordered">
 <tr>
 	<th width="20%">URI</th>
+	<th>Import Source</th>
 	<th>Name</th>
 	<th>Created on</th>
 	<th>Group</th>
@@ -91,6 +92,7 @@ $(function() {
 </tr>
 <tr th:id="'tr-'+${authority.id}" th:each="authority : ${authorities}">
 	<td>[[${#uris.escapePath(authority.uri)}]]</td>
+	<td><span th:text="${authority.importerId}"/></td>
 	<td><span th:text="${authority.name}"/></td>
 	<td><span class="date" th:text="${authority.createdOn}"/></td>
 	<td>

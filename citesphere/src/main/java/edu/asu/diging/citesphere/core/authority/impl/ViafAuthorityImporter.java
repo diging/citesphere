@@ -113,7 +113,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
                 String name = iterator.next().getText();
                 ImportedAuthority authority = new ImportedAuthority();
                 authority.setName(name);
-                authority.setSource("Viaf");
+                authority.setImporterId(viafImporter);
                 authority.setUri(viaf.getDocument().get("@about") + "");
                 return authority;
             }
@@ -184,7 +184,6 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
                     if (iterator.hasNext()) {
                         String name = iterator.next().getText();
                         authority.setName(name);
-//                        authority.setSource("Viaf");
                         authority.setImporterId(viafImporter);
                         authority.setUri(record.getDocument().get("@about") + "");
                         authorityEntries.add(authority);
