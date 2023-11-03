@@ -9,6 +9,8 @@ import java.util.UUID;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,11 +19,16 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
 import edu.asu.diging.citesphere.core.model.Role;
+import edu.asu.diging.citesphere.core.model.oauth.IOAuthClient;
+import edu.asu.diging.citesphere.core.model.oauth.IUserAccessToken;
+import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
 import edu.asu.diging.citesphere.core.model.oauth.impl.UserAccessToken;
 import edu.asu.diging.citesphere.core.repository.oauth.UserAccessTokenRepository;
 import edu.asu.diging.citesphere.core.service.oauth.IUserTokenManager;
+import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
+import edu.asu.diging.citesphere.core.service.oauth.UserAccessTokenResultPage;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Transactional
@@ -57,5 +64,28 @@ public class UserAccessTokenManager implements IUserTokenManager {
         userAccessToken.setUser(user);
         UserAccessToken storeToken = userAccessTokenRepository.save(userAccessToken);
         return new OAuthCredentials(storeToken.getClientId(), token);
+    }
+    
+    @Override
+    public UserAccessTokenResultPage getAllAccessTokensDetails(Pageable pageable, IUser user) {
+        List<IUserAccessToken> userAccessTokenList = new ArrayList<>();
+        Page<UserAccessToken> userAccessTokens = userAccessTokenRepository.findAllByUser(user, pageable);
+        userAccessTokens.forEach(userAccessToken -> userAccessTokenList.add(userAccessToken));
+        UserAccessTokenResultPage result = new UserAccessTokenResultPage();
+        result.setClientList(userAccessTokenList);
+        result.setTotalPages(userAccessTokens.getTotalPages());
+        return result;
+    }
+    
+    @Override
+    public List<UserAccessToken> getAllUserAccessTokenDetails(IUser user) {
+        return userAccessTokenRepository.findAllByUser(user);
+    }
+    
+    @Override
+    public void deleteClient(String clientId) {
+        if(clientId != null) {
+            userAccessTokenRepository.deleteById(clientId);
+        }
     }
 }
