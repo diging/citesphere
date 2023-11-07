@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.model.oauth.impl.UserAccessToken;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -21,5 +22,7 @@ public interface IUserTokenManager {
     List<UserAccessToken> getAllUserAccessTokenDetails(IUser user);
 
     void deleteClient(String clientId);
+
+    OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException;
     
 }

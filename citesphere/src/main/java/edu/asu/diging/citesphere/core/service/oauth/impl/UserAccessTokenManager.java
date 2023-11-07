@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.common.exceptions.InvalidClientExcept
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.model.Role;
 import edu.asu.diging.citesphere.core.model.oauth.IOAuthClient;
 import edu.asu.diging.citesphere.core.model.oauth.IUserAccessToken;
@@ -87,5 +88,18 @@ public class UserAccessTokenManager implements IUserTokenManager {
         if(clientId != null) {
             userAccessTokenRepository.deleteById(clientId);
         }
+    }
+    
+    @Override
+    public OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException {
+        Optional<UserAccessToken> userAccessTokenOptional = userAccessTokenRepository.findById(clientId);
+        if (userAccessTokenOptional.isPresent()) {
+            UserAccessToken accessToken = userAccessTokenOptional.get();
+            String token = UUID.randomUUID().toString();
+            accessToken.setToken(bCryptPasswordEncoder.encode(token));
+            UserAccessToken storeAccessToken = userAccessTokenRepository.save(accessToken);
+            return new OAuthCredentials(storeAccessToken.getClientId(), token);
+        }
+        throw new CannotFindClientException("Client with id " + clientId + " does not exist.");
     }
 }
