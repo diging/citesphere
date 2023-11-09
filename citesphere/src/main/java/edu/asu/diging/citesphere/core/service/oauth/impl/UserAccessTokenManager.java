@@ -91,7 +91,7 @@ public class UserAccessTokenManager implements IUserTokenManager {
     }
     
     @Override
-    public OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException {
+    public OAuthCredentials updateSecret(String clientId) throws CannotFindClientException {
         Optional<UserAccessToken> userAccessTokenOptional = userAccessTokenRepository.findById(clientId);
         if (userAccessTokenOptional.isPresent()) {
             UserAccessToken accessToken = userAccessTokenOptional.get();

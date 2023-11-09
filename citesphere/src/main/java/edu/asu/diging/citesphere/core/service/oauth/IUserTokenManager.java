@@ -23,6 +23,6 @@ public interface IUserTokenManager {
 
     void deleteClient(String clientId);
 
-    OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException;
+    OAuthCredentials updateSecret(String clientId) throws CannotFindClientException;
     
 }
