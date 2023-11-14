@@ -27,6 +27,6 @@ public class ShowAccessTokensController {
         model.addAttribute("clientList", result.getClientList());
         model.addAttribute("currentPage", pageable.getPageNumber()+1);
         model.addAttribute("totalPages", result.getTotalPages());
-        return "admin/apps/show";
+        return "admin/user/auth/show";
     }
 }

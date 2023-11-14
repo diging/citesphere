@@ -31,6 +31,6 @@ public class AddUserAccessTokenController {
         OAuthCredentials creds = userTokenManager.create(userAccessTokenForm.getName(), user);
         redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
         redirectAttrs.addFlashAttribute("secret", creds.getSecret());
-        return "redirect:/admin/apps/" + creds.getClientId();
+        return "redirect:/admin/user/auth" + creds.getClientId();
     }
 }

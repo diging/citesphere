@@ -1,0 +1,15 @@
+<html layout:decorate="~{layouts/main}">
+
+<h2>Add User Access Token</h2>
+<div layout:fragment="content">
+<form action="#" th:action="@{/admin/users/accessTokens/add}" method="POST" th:object="${userAccessTokenForm}">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+	
+	<label>Access Token Name: </label>
+	<input th:field="*{name}" class="form-control input-sm"></input>
+	<p class="text-danger"><th:errors path="name"/></p>
+	
+	<button type="submit" class="btn btn-primary">Add</button>
+	
+</form>
+</div>

@@ -18,6 +18,6 @@ public class AccessTokenDetailsController {
         IUserAccessToken details = (IUserAccessToken) userTokenManager.loadClientByClientId(accessTokenId);
         model.addAttribute("clientName", details.getName());
         model.addAttribute("clientId", details.getClientId());
-        return "admin/users/accessTokenId/details";
+        return "admin/user/auth/accessTokenId/details";
     }
 }
