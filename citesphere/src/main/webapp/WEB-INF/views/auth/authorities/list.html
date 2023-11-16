@@ -81,7 +81,7 @@ $(function() {
 	<span th:each="groupDetail:${groups}">
 		<option th:selected="${#strings.equals(displayBy, groupDetail.groupId)}" th:value="${groupDetail.groupId}">Group - [[${groupDetail.name}]]</option>
 	</span>
-	<span th:each="source:${importedAuthoritySourceList}">
+	<span th:each="source:${importedAuthoritySources}">
 		<option th:selected="${#strings.equals(displayBy, 'source-' + source)}" th:value="${'source-' + source}">Source - [[${source}]]</option>
 	</span>  
 </select><br><br> 

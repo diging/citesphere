@@ -298,7 +298,7 @@ public class AuthorityService implements IAuthorityService {
     
     @Override
     public List<IAuthorityEntry> getAuthoritiesBySource(IUser user, String source) {
-        return entryRepository.findByUsernameAndSourceOrderByName(user.getUsername(), source);
+        return entryRepository.findByUsernameAndImporterIdOrderByName(user.getUsername(), source);
     }
     
     @Override

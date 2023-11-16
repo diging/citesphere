@@ -29,22 +29,26 @@ public class AuthorityListController {
     public String list(Model model, Authentication authentication) {
         IUser user = (IUser)authentication.getPrincipal();
         List<ICitationGroup> userGroups = citationManager.getGroups((IUser) authentication.getPrincipal());
-        List<IAuthorityEntry> allAuthorities = authorityService.getAll(user, userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
-        model.addAttribute("authorities", allAuthorities);
+        List<IAuthorityEntry> authorities = authorityService.getAll(user,
+                userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
+        model.addAttribute("importedAuthoritySources", authorities.stream()
+                .map(authorityEntry -> authorityEntry.getImporterId()).distinct().collect(Collectors.toList()));
+        model.addAttribute("authorities", authorities);
         model.addAttribute("groups", userGroups);
-        model.addAttribute("importedAuthoritySourceList", allAuthorities.stream().map(authorityEntry -> authorityEntry.getSource()).distinct().collect(Collectors.toList()));
         model.addAttribute("displayBy", "all");
         model.addAttribute("username", user.getUsername());
         return "auth/authorities/list";
     }
     
     @RequestMapping("/auth/authority/{zoteroGroupId}/list")
-    public String getAuthoritiesForGroup(Model model, Authentication authentication, 
+    public String getAuthoritiesForGroup(Model model, Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId) {
         IUser user = (IUser)authentication.getPrincipal();
-        List<ICitationGroup> userGroups = citationManager.getGroups((IUser) authentication.getPrincipal());
-        List<IAuthorityEntry> allAuthorities = authorityService.getAll(user, userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
-        model.addAttribute("importedAuthoritySourceList", allAuthorities.stream().map(authorityEntry -> authorityEntry.getSource()).distinct().collect(Collectors.toList()));
+        List<ICitationGroup> userGroups = citationManager.getGroups(user);
+        List<IAuthorityEntry> authorities = authorityService.getAll(user,
+                userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
+        model.addAttribute("importedAuthoritySources", authorities.stream()
+                .map(authorityEntry -> authorityEntry.getImporterId()).distinct().collect(Collectors.toList()));
         model.addAttribute("authorities", authorityService.getAuthoritiesByGroup(Long.valueOf(zoteroGroupId)));
         model.addAttribute("groups", userGroups);
         model.addAttribute("displayBy", zoteroGroupId);
@@ -55,10 +59,12 @@ public class AuthorityListController {
     @RequestMapping("/auth/authority/user/list")
     public String getAuthoritiesForUser(Model model, Authentication authentication) {
         IUser user = (IUser)authentication.getPrincipal();
-        List<ICitationGroup> userGroups = citationManager.getGroups((IUser) authentication.getPrincipal());
-        List<IAuthorityEntry> allAuthorities = authorityService.getAll(user, userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
-        model.addAttribute("importedAuthoritySourceList", allAuthorities.stream().map(authorityEntry -> authorityEntry.getSource()).distinct().collect(Collectors.toList()));
-        model.addAttribute("authorities", authorityService.getUserSpecificAuthorities(user));   
+        List<ICitationGroup> userGroups = citationManager.getGroups(user);
+        List<IAuthorityEntry> authorities = authorityService.getAll(user,
+                userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
+        model.addAttribute("importedAuthoritySources", authorities.stream()
+                .map(authorityEntry -> authorityEntry.getImporterId()).distinct().collect(Collectors.toList()));
+        model.addAttribute("authorities", authorityService.getUserSpecificAuthorities(user));
         model.addAttribute("groups", userGroups);
         model.addAttribute("displayBy", "userSpecific");
         model.addAttribute("username", user.getUsername());
@@ -68,11 +74,14 @@ public class AuthorityListController {
     @RequestMapping("/auth/authority/list/{source}")
     public String getAuthoritiesForSource(Model model, Authentication authentication,
             @PathVariable("source") String source) {
-        IUser user = (IUser)authentication.getPrincipal();
-        model.addAttribute("authorities", authorityService.getAuthoritiesBySource(user, source));
-        List<ICitationGroup> userGroups = citationManager.getGroups((IUser) authentication.getPrincipal());
-        List<IAuthorityEntry> allAuthorities = authorityService.getAll(user, userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
-        model.addAttribute("importedAuthoritySourceList", allAuthorities.stream().map(authorityEntry -> authorityEntry.getSource()).distinct().collect(Collectors.toList()));
+        IUser user = (IUser) authentication.getPrincipal();
+        List<ICitationGroup> userGroups = citationManager.getGroups(user);
+        List<IAuthorityEntry> authorities = authorityService.getAll(user,
+                userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
+        model.addAttribute("importedAuthoritySources", authorities.stream()
+                .map(authorityEntry -> authorityEntry.getImporterId()).distinct().collect(Collectors.toList()));
+        model.addAttribute("authorities",
+                authorityService.getAuthoritiesBySource(user, source.equals("null") ? null : source));
         model.addAttribute("groups", userGroups);
         model.addAttribute("displayBy", "source-" + source);
         model.addAttribute("username", user.getUsername());
