@@ -15,7 +15,7 @@ public class UpdateAccessTokenController {
     @Autowired
     private IUserTokenManager userTokenManager;
     
-    @RequestMapping(value="/admin/apps/{accessTokenId}/secret/update", method=RequestMethod.POST)
+    @RequestMapping(value="/admin/users/{accessTokenId}/secret/update", method=RequestMethod.POST)
     public @ResponseBody OAuthCredentials regenerateClientSecret(Model model, @PathVariable("accessTokenId") String accessTokenId) throws CannotFindClientException {
         return userTokenManager.updateSecret(accessTokenId);
     }

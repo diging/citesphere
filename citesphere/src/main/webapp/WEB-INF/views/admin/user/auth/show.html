@@ -15,7 +15,7 @@ $(function() {
         visiblePages: 10,
         initiateStartPageClick: false,
         onPageClick: function (event, page) {
-            window.location.href = "apps?page=" + (page-1);
+            window.location.href = "admin/users/accessTokens?page=" + (page-1);
         }
     });
 });
@@ -30,13 +30,13 @@ $(function() {
 	});
 	$("#delete-client-button").click(function() {
 		var id = $(this).data("client-id");
-		var baseurl = 'apps/' + id;
+		var baseurl = 'admin/users/acessTokens/' + id;
 		$.ajax({
 			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "DELETE",
 			'success': function(data) {
 				$("#tr-" + id).remove();
-				$.notify('<i class="icon-checkmark-alt"></i> App successfully deleted!', {
+				$.notify('<i class="icon-checkmark-alt"></i> Access Token successfully deleted!', {
 					type: 'success',
 					offset: {
 						x: 50,
@@ -49,7 +49,7 @@ $(function() {
 				});
 			},
 			'error': function(data) {
-				$.notify('<i class="icon-warning"></i> App could not be deleted!', {
+				$.notify('<i class="icon-warning"></i> Access Token could not be deleted!', {
 					type: 'danger',
 					offset: {
 						x: 50,
@@ -75,14 +75,13 @@ $(function() {
 
 <body>
 <div layout:fragment="content">
-<h2>Apps</h2>
+<h2>Tokens</h2>
 <ul id="pagination-top" class="pagination-sm"></ul>
 <div class="pull-right" style="margin-top: 20px;margin-bottom:10px"><a th:href="@{/admin/apps/add}" class="btn btn-primary"><i class="icon-circle-add"></i> Add App</a></div>
 <table class="table table-striped" id="table">
 <tr>
 	<th>Client Id</th>
 	<th>Name</th>
-	<th>Description</th>
 	<th/>
 
 </tr>
