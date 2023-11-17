@@ -88,7 +88,6 @@ public class InternalTokenManagerImpl implements InternalTokenManager {
         
         OAuth2Authentication authentication = getOAuth2Authentication(clientDetailsService.loadClientByClientId(citesphereClientId), implicitRequest, user);
         tokenStore.storeAccessToken(token, authentication);
-        System.out.println(extractTokenKey(token.getValue()));
         return token;
     }
     

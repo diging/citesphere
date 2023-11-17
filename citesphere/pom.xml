@@ -324,9 +324,9 @@
 
         <!-- https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api -->
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>javax.servlet.jsp-api</artifactId>
-            <version>2.3.3</version>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>3.1.1</version>
             <scope>provided</scope>
         </dependency>
         
@@ -626,7 +626,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <configuration>
                     <webResources>
                         <resource>
@@ -639,6 +639,8 @@
                                 <exclude>**/*.woff</exclude>
                                 <exclude>**/*.ttf</exclude>
                                 <exclude>**/*.woff2</exclude>
+                                <exclude>**/*.eot</exclude>
+                                <exclude>**/*.otf</exclude>
                             </excludes>
                         </resource>
 
