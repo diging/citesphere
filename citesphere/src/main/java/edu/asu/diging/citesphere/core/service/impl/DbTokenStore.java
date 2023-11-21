@@ -53,10 +53,34 @@ public class DbTokenStore implements TokenStore {
     public OAuth2Authentication readAuthentication(OAuth2AccessToken accessToken) {
         return readAuthentication(accessToken.getValue());
     }
+    
+    private Optional<DbAccessToken> findTokenById(String tokenId) {
+        List<DbAccessToken> tokens = dbAccessTokenRepository.findByTokenId(extractTokenKey(tokenId));
+        
+        tokens.sort(new Comparator<DbAccessToken>() {
+
+            @Override
+            public int compare(DbAccessToken o1, DbAccessToken o2) {
+                if (o1.getToken().getExpiration().before(o2.getToken().getExpiration())) {
+                    return -1;
+                } 
+                if (o1.getToken().getExpiration().after(o2.getToken().getExpiration())) {
+                    return 1;
+                } 
+                return 0;
+            }
+        });
+        
+        if (!tokens.isEmpty()) {
+            return Optional.of(tokens.get(0));
+        }
+        
+        return Optional.empty();
+    }
 
     @Override
     public OAuth2Authentication readAuthentication(String token) {
-        Optional<DbAccessToken> accessToken = dbAccessTokenRepository.findByTokenId(extractTokenKey(token));
+        Optional<DbAccessToken> accessToken = findTokenById(extractTokenKey(token));
         if (accessToken.isPresent()) {
             return accessToken.get().getAuthentication();
         }
@@ -93,7 +117,7 @@ public class DbTokenStore implements TokenStore {
 
     @Override
     public OAuth2AccessToken readAccessToken(String tokenValue) {
-        Optional<DbAccessToken> accessToken = dbAccessTokenRepository.findByTokenId(extractTokenKey(tokenValue));
+        Optional<DbAccessToken> accessToken = findTokenById(extractTokenKey(tokenValue));
         if (accessToken.isPresent()) {
             return accessToken.get().getToken();
         }
@@ -102,7 +126,7 @@ public class DbTokenStore implements TokenStore {
 
     @Override
     public void removeAccessToken(OAuth2AccessToken oAuth2AccessToken) {
-        Optional<DbAccessToken> accessToken = dbAccessTokenRepository.findByTokenId(extractTokenKey(oAuth2AccessToken.getValue()));
+        Optional<DbAccessToken> accessToken = findTokenById(extractTokenKey(oAuth2AccessToken.getValue()));
         if (accessToken.isPresent()) {
             dbAccessTokenRepository.delete(accessToken.get());
         }
