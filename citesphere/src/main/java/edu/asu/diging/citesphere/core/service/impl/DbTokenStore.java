@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hibernate.StaleStateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
@@ -32,6 +35,8 @@ import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
  */
 @Transactional
 public class DbTokenStore implements TokenStore {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private DbAccessTokenRepository dbAccessTokenRepository;
 
@@ -66,7 +71,11 @@ public class DbTokenStore implements TokenStore {
         }
 
         if (readAccessToken(accessToken.getValue()) != null) {
-            this.removeAccessToken(accessToken);
+            try {
+                this.removeAccessToken(accessToken);
+            } catch(StaleStateException ex) {
+                logger.error("Could not delete token since it likely doesn't exist. Outdated data.", ex);
+            }
         }
 
         DbAccessToken cat =  new DbAccessToken();
