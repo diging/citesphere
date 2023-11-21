@@ -13,7 +13,7 @@ public class AccessTokenDetailsController {
     @Autowired
     private IUserTokenManager userTokenManager;
     
-    @RequestMapping(value="/admin/users/accessTokens/{accessTokenId}", method=RequestMethod.GET)
+    @RequestMapping(value="/admin/user/accessTokens/{accessTokenId}", method=RequestMethod.GET)
     public String showAppDetails(Model model, @PathVariable("accessTokenId") String accessTokenId) {
         IUserAccessToken details = (IUserAccessToken) userTokenManager.loadClientByClientId(accessTokenId);
         model.addAttribute("clientName", details.getName());

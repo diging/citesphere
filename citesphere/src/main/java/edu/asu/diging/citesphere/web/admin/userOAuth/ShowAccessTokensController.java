@@ -20,7 +20,7 @@ public class ShowAccessTokensController {
     @Autowired
     private IUserManager userManager;
     
-    @RequestMapping(value="/admin/users/accessTokens", method=RequestMethod.GET)
+    @RequestMapping(value="/admin/user/accessTokens", method=RequestMethod.GET)
     public String showAllApps(Model model, Pageable pageable, Principal principal) {
         IUser user = userManager.findByUsername(principal.getName());
         UserAccessTokenResultPage result = userTokenManager.getAllAccessTokensDetails(pageable, user);

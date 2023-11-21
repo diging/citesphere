@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
+import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.model.Role;
@@ -32,6 +33,7 @@ import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
 import edu.asu.diging.citesphere.core.service.oauth.UserAccessTokenResultPage;
 import edu.asu.diging.citesphere.user.IUser;
 
+@Service
 @Transactional
 public class UserAccessTokenManager implements IUserTokenManager {
 

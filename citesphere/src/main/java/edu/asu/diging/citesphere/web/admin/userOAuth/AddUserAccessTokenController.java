@@ -25,7 +25,7 @@ public class AddUserAccessTokenController {
     @Autowired
     private IUserManager userManager;
     
-    @RequestMapping(value="/admin/users/accessTokens/add", method=RequestMethod.GET)
+    @RequestMapping(value="/admin/user/accessTokens/add", method=RequestMethod.GET)
     public String add(@Validated UserAccessTokenForm userAccessTokenForm, Model model, BindingResult errors, RedirectAttributes redirectAttrs, Principal principal) {
         IUser user = userManager.findByUsername(principal.getName());
         OAuthCredentials creds = userTokenManager.create(userAccessTokenForm.getName(), user);
