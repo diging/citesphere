@@ -62,10 +62,10 @@ public class DbTokenStore implements TokenStore {
             @Override
             public int compare(DbAccessToken o1, DbAccessToken o2) {
                 if (o1.getToken().getExpiration().before(o2.getToken().getExpiration())) {
-                    return -1;
+                    return 1;
                 } 
                 if (o1.getToken().getExpiration().after(o2.getToken().getExpiration())) {
-                    return 1;
+                    return -1;
                 } 
                 return 0;
             }
