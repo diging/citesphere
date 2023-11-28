@@ -23,7 +23,7 @@ public class UserAccessToken implements IUserAccessToken {
     @Id
     @GeneratedValue(generator = "access_token_id_generator")
     @GenericGenerator(name = "access_token_id_generator",    
-                    parameters = @Parameter(name = "prefix", value = "AT"), 
+                    parameters = @Parameter(name = "prefix", value = "ACCESSTOKEN"), 
                     strategy = "edu.asu.diging.citesphere.core.repository.IdGenerator"
     )
     private String clientId;
