@@ -2,7 +2,7 @@
 
 <h2>Add User Access Token</h2>
 <div layout:fragment="content">
-<form action="#" th:action="@{/admin/users/accessTokens/add}" method="POST" th:object="${userAccessTokenForm}">
+<form action="#" th:action="@{/admin/user/accessTokens/add}" method="POST" th:object="${userAccessTokenForm}">
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 	
 	<label>Access Token Name: </label>

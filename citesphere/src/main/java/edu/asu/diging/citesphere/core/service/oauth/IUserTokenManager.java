@@ -13,7 +13,7 @@ import edu.asu.diging.citesphere.user.IUser;
 
 public interface IUserTokenManager {
 
-    ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException;
+    UserAccessToken loadClientByClientId(String clientId) throws ClientRegistrationException;
 
     OAuthCredentials create(String name, IUser user);
 

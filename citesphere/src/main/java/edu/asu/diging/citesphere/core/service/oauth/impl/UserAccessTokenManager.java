@@ -44,10 +44,10 @@ public class UserAccessTokenManager implements IUserTokenManager {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     
     @Override
-    public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
+    public UserAccessToken loadClientByClientId(String clientId) throws ClientRegistrationException {
         Optional<UserAccessToken> userAccessTokenOptional = userAccessTokenRepository.findById(clientId);
         if (userAccessTokenOptional.isPresent()) {
-            ClientDetails details = (ClientDetails) userAccessTokenOptional.get();
+            UserAccessToken details = (UserAccessToken) userAccessTokenOptional.get();
             return details;
         }
         throw new InvalidClientException("Client with id " + clientId + " does not exist.");

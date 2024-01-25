@@ -10,7 +10,7 @@ $(function() {
 	});
 	
 	$("#update-client-button").click(function() {
-		var url = "admin/users/[(${clientId})]/secret/update";
+		var url = "admin/user/[(${clientId})]/secret/update";
 		$.ajax({
 			'url': url + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "POST",
