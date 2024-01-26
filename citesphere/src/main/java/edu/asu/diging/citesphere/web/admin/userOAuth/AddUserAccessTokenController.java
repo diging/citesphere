@@ -15,7 +15,6 @@ import edu.asu.diging.citesphere.core.service.oauth.IUserTokenManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.user.IUser;
-import edu.asu.diging.citesphere.web.admin.forms.AppForm;
 import edu.asu.diging.citesphere.web.admin.forms.UserAccessTokenForm;
 
 @Controller
@@ -26,13 +25,13 @@ public class AddUserAccessTokenController {
     @Autowired
     private IUserManager userManager;
     
-    @RequestMapping(value="/admin/user/accessTokens/add", method=RequestMethod.GET)
+    @RequestMapping(value="/admin/user/auth/accessTokens/add", method=RequestMethod.GET)
     public String show(Model model) {
         model.addAttribute("userAccessTokenForm", new UserAccessTokenForm());
         return "admin/user/auth/add";
     }
     
-    @RequestMapping(value="/admin/user/accessTokens/add", method=RequestMethod.POST)
+    @RequestMapping(value="/admin/user/auth/accessTokens/add", method=RequestMethod.POST)
     public String add(@Validated UserAccessTokenForm userAccessTokenForm, Model model, BindingResult errors, RedirectAttributes redirectAttrs, Principal principal) {
         IUser user = userManager.findByUsername(principal.getName());
         OAuthCredentials creds = userTokenManager.create(userAccessTokenForm.getName(), user);

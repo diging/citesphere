@@ -15,7 +15,7 @@ public class DeleteAccessTokenController {
     @Autowired
     private IUserTokenManager userTokenManager;
     
-    @RequestMapping(value = "/admin/user/accessTokens/{accessTokenId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/admin/user/auth/accessTokens/{accessTokenId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteApp(@PathVariable("accessTokenId") String accessTokenId) {
         userTokenManager.deleteClient(accessTokenId);
         return new ResponseEntity<>(HttpStatus.OK);

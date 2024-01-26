@@ -30,7 +30,7 @@ $(function() {
 	});
 	$("#delete-client-button").click(function() {
 		var id = $(this).data("client-id");
-		var baseurl = 'admin/user/acessTokens/' + id;
+		var baseurl = 'accessTokens/' + id;
 		$.ajax({
 			'url': baseurl + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "DELETE",
@@ -86,8 +86,8 @@ $(function() {
 
 </tr>
 <tr th:id="'tr-'+${client.clientId}" th:each="client : ${clientList}">
-	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.clientId}"/></a></td>
-	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.name}"/></a></td>
+	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/user/auth/'+ ${client.clientId}}"><span th:text="${client.clientId}"/></a></td>
+	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/user/auth/'+ ${client.clientId}}"><span th:text="${client.name}"/></a></td>
 	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="icon-trash-alt"></i></button></td>
 </tr>
 </table>
