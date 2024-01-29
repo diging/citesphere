@@ -6,17 +6,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
+import org.javers.common.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
+import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.security.oauth2.provider.ClientDetails;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
+import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.TokenRequest;
+import org.springframework.security.oauth2.provider.implicit.ImplicitTokenRequest;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
@@ -34,14 +49,29 @@ import edu.asu.diging.citesphere.core.service.oauth.UserAccessTokenResultPage;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
+@PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
+@SuppressWarnings("deprecation")
 @Transactional
 public class UserAccessTokenManager implements IUserTokenManager {
-
+ 
+    @Value("${_citephere_oauth2_app_clientid}")
+    private String citesphereClientId;
+    
     @Autowired
     private UserAccessTokenRepository userAccessTokenRepository;
     
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    
+    @Autowired
+    private ClientDetailsService clientDetailsService;
+    
+    private OAuth2RequestFactory requestFactory;
+    
+    @PostConstruct
+    public void init() {
+        this.requestFactory = new DefaultOAuth2RequestFactory(clientDetailsService);
+    }
     
     @Override
     public UserAccessToken loadClientByClientId(String clientId) throws ClientRegistrationException {
@@ -56,9 +86,14 @@ public class UserAccessTokenManager implements IUserTokenManager {
     @Override
     public OAuthCredentials create(String name, IUser user) {
         final UserAccessToken userAccessToken = new UserAccessToken();
-        userAccessToken.setName(name);
+        userAccessToken.setName(name);   
         String token = UUID.randomUUID().toString();
-        userAccessToken.setToken(bCryptPasswordEncoder.encode(token));
+//        userAccessToken.setToken(bCryptPasswordEncoder.encode(token));
+        DefaultOAuth2AccessToken accessToken = new DefaultOAuth2AccessToken(UUID.randomUUID().toString());
+        accessToken.setScope(Sets.asSet(OAuthScope.READ.getScope()));
+        AuthorizationRequest request = new AuthorizationRequest(citesphereClientId, accessToken.getScope());
+        TokenRequest implicitRequest = new ImplicitTokenRequest(requestFactory.createTokenRequest(request, "implicit"), requestFactory.createOAuth2Request(request));
+        OAuth2Authentication authentication = getOAuth2Authentication(clientDetailsService.loadClientByClientId(citesphereClientId), implicitRequest, user);
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(Role.TRUSTED_CLIENT));
         userAccessToken.setAuthorities(authorities);
@@ -66,7 +101,14 @@ public class UserAccessTokenManager implements IUserTokenManager {
         userAccessToken.getScope().add(OAuthScope.READ.getScope());
         userAccessToken.setUser(user);
         UserAccessToken storeToken = userAccessTokenRepository.save(userAccessToken);
+        
         return new OAuthCredentials(storeToken.getClientId(), token);
+    }
+    
+    private OAuth2Authentication getOAuth2Authentication(ClientDetails client, TokenRequest tokenRequest, IUser user) {
+        OAuth2Request storedOAuth2Request = requestFactory.createOAuth2Request(client, tokenRequest);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getRoles());
+        return new OAuth2Authentication(storedOAuth2Request, authentication);
     }
     
     @Override
