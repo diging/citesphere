@@ -46,6 +46,7 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
     private int accessTokenValiditySeconds;
     private int refereshTokenValiditySeconds;
     private boolean autoApprove;
+    private boolean isUserAccessToken;
 
     @Override
     public String getClientId() {
@@ -191,5 +192,15 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
     @Override
     public void setAutoApprove(boolean autoApprove) {
         this.autoApprove = autoApprove;
+    }
+
+    @Override
+    public boolean getIsUserAccessToken() {
+        return isUserAccessToken;
+    }
+
+    @Override
+    public void setisUserAccessToken(boolean isUserAccessToken) {
+        this.isUserAccessToken = isUserAccessToken;
     }
 }

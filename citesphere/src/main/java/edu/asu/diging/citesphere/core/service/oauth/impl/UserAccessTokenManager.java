@@ -90,10 +90,7 @@ public class UserAccessTokenManager implements IUserTokenManager {
         String token = UUID.randomUUID().toString();
 //        userAccessToken.setToken(bCryptPasswordEncoder.encode(token));
         DefaultOAuth2AccessToken accessToken = new DefaultOAuth2AccessToken(UUID.randomUUID().toString());
-        accessToken.setScope(Sets.asSet(OAuthScope.READ.getScope()));
-        AuthorizationRequest request = new AuthorizationRequest(citesphereClientId, accessToken.getScope());
-        TokenRequest implicitRequest = new ImplicitTokenRequest(requestFactory.createTokenRequest(request, "implicit"), requestFactory.createOAuth2Request(request));
-        OAuth2Authentication authentication = getOAuth2Authentication(clientDetailsService.loadClientByClientId(citesphereClientId), implicitRequest, user);
+        
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(Role.TRUSTED_CLIENT));
         userAccessToken.setAuthorities(authorities);
@@ -101,7 +98,10 @@ public class UserAccessTokenManager implements IUserTokenManager {
         userAccessToken.getScope().add(OAuthScope.READ.getScope());
         userAccessToken.setUser(user);
         UserAccessToken storeToken = userAccessTokenRepository.save(userAccessToken);
-        
+        accessToken.setScope(Sets.asSet(OAuthScope.READ.getScope()));
+        AuthorizationRequest request = new AuthorizationRequest(citesphereClientId, accessToken.getScope());
+        TokenRequest implicitRequest = new ImplicitTokenRequest(requestFactory.createTokenRequest(request, "implicit"), requestFactory.createOAuth2Request(request));
+        OAuth2Authentication authentication = getOAuth2Authentication(clientDetailsService.loadClientByClientId(citesphereClientId), implicitRequest, user);
         return new OAuthCredentials(storeToken.getClientId(), token);
     }
     

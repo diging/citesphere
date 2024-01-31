@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface IOAuthClientManager {
 
@@ -26,4 +27,8 @@ public interface IOAuthClientManager {
     OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException;
 
     List<OAuthClient> getClientsDetails(List<String> clientList);
+    
+    UserAccessTokenResultPage getAllUserAccessTokenDetails(Pageable pageable, IUser user);
+
+    OAuthCredentials createUserAccessToken(String name, IUser user);
 }

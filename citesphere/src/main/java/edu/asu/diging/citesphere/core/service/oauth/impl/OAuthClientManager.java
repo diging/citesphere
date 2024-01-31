@@ -29,6 +29,8 @@ import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
+import edu.asu.diging.citesphere.core.service.oauth.UserAccessTokenResultPage;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Transactional
 public class OAuthClientManager implements ClientDetailsService, IOAuthClientManager {
@@ -128,5 +130,16 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
             clients = clientRepo.findAllById(clientList);
         }
         return clients;
+    }
+
+    @Override
+    public UserAccessTokenResultPage getAllUserAccessTokenDetails(Pageable pageable, IUser user) {
+        List<IOAuthClient> clientList = new ArrayList<>();
+        Page<OAuthClient> userAccessClients = clientRepo.findByIsUserAccessTokenAndCreatedBy_Username(true, user.getUsername(), pageable);
+        userAccessClients.forEach(oAuthClient -> clientList.add(oAuthClient));
+        UserAccessTokenResultPage result = new UserAccessTokenResultPage();
+        result.setClientList(clientList);
+        result.setTotalPages(userAccessClients.getTotalPages());
+        return result;
     }
 }
