@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
+import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.IUserTokenManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 
@@ -17,8 +18,11 @@ public class UpdateAccessTokenController {
     @Autowired
     private IUserTokenManager userTokenManager;
     
+    @Autowired
+    private IOAuthClientManager clientManager;
+    
     @RequestMapping(value="/admin/user/auth/accessTokens/{accessTokenId}/secret/update", method=RequestMethod.POST)
     public @ResponseBody OAuthCredentials regenerateClientSecret(Model model, @PathVariable("accessTokenId") String accessTokenId) throws CannotFindClientException {
-        return userTokenManager.updateSecret(accessTokenId);
+        return clientManager.updateClientSecret(accessTokenId);
     }
 }

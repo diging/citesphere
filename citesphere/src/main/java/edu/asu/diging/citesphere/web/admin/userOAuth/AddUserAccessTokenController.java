@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.IUserTokenManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.user.IUserManager;
@@ -25,6 +26,9 @@ public class AddUserAccessTokenController {
     @Autowired
     private IUserManager userManager;
     
+    @Autowired
+    private IOAuthClientManager clientManager;
+    
     @RequestMapping(value="/admin/user/auth/accessTokens/add", method=RequestMethod.GET)
     public String show(Model model) {
         model.addAttribute("userAccessTokenForm", new UserAccessTokenForm());
@@ -34,7 +38,7 @@ public class AddUserAccessTokenController {
     @RequestMapping(value="/admin/user/auth/accessTokens/add", method=RequestMethod.POST)
     public String add(@Validated UserAccessTokenForm userAccessTokenForm, Model model, BindingResult errors, RedirectAttributes redirectAttrs, Principal principal) {
         IUser user = userManager.findByUsername(principal.getName());
-        OAuthCredentials creds = userTokenManager.create(userAccessTokenForm.getName(), user);
+        OAuthCredentials creds = clientManager.createUserAccessToken(userAccessTokenForm.getName(), user);
         redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
         redirectAttrs.addFlashAttribute("secret", creds.getSecret());
         return "redirect:/admin/user/auth/" + creds.getClientId();

@@ -9,21 +9,30 @@ import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import org.javers.common.collections.Sets;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
+import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.TokenRequest;
+import org.springframework.security.oauth2.provider.implicit.ImplicitTokenRequest;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
+import edu.asu.diging.citesphere.core.model.Role;
 import edu.asu.diging.citesphere.core.model.oauth.IOAuthClient;
 import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
+import edu.asu.diging.citesphere.core.model.oauth.impl.UserAccessToken;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
@@ -141,5 +150,22 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         result.setClientList(clientList);
         result.setTotalPages(userAccessClients.getTotalPages());
         return result;
+    }
+    
+    @Override
+    public OAuthCredentials createUserAccessToken(String name, IUser user) {
+        final OAuthClient client = new OAuthClient();
+        client.setName(name);
+        String clientSecret = UUID.randomUUID().toString();
+        client.setClientSecret(bCryptPasswordEncoder.encode(clientSecret));
+        final UserAccessToken userAccessToken = new UserAccessToken();
+        userAccessToken.setName(name);           
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(Role.TRUSTED_CLIENT));
+        client.setAuthorities(authorities);
+        client.setScope(new HashSet<>());
+        client.getScope().add(OAuthScope.READ.getScope());
+        OAuthClient storeClient = clientRepo.save(client);
+        return new OAuthCredentials(storeClient.getClientId(), clientSecret);
     }
 }
