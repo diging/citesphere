@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
-import edu.asu.diging.citesphere.core.service.oauth.IUserTokenManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.user.IUser;
@@ -20,8 +19,6 @@ import edu.asu.diging.citesphere.web.admin.forms.UserAccessTokenForm;
 
 @Controller
 public class AddUserAccessTokenController {
-    @Autowired
-    private IUserTokenManager userTokenManager;
     
     @Autowired
     private IUserManager userManager;
@@ -41,6 +38,6 @@ public class AddUserAccessTokenController {
         OAuthCredentials creds = clientManager.createUserAccessToken(userAccessTokenForm.getName(), user);
         redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
         redirectAttrs.addFlashAttribute("secret", creds.getSecret());
-        return "redirect:/admin/user/auth/" + creds.getClientId();
+        return "redirect:/admin/user/auth/accessTokens/" + creds.getClientId();
     }
 }

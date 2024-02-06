@@ -51,7 +51,7 @@ $(function() {
 <body>
 <div layout:fragment="content">
 <div class="pull-right" style="float:left;margin-top: 20px;">
-	<form action="#" th:action="@{/admin/apps}" method="GET"><button class="btn btn-primary" type="submit">Show All Tokens</button></form>
+	<form action="#" th:action="@{/admin/user/auth/accessTokens}" method="GET"><button class="btn btn-primary" type="submit">Show All Tokens</button></form>
 </div>
 <div class="pull-right" style="float:right;margin-top: 20px;">
 	<button id="secret" type="submit" class="btn btn-primary">Regenerate Token</button>&nbsp;&nbsp;

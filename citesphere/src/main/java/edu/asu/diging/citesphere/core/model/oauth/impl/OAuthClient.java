@@ -47,6 +47,7 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
     private int refereshTokenValiditySeconds;
     private boolean autoApprove;
     private boolean isUserAccessToken;
+    private String createdByUsername;
 
     @Override
     public String getClientId() {
@@ -202,5 +203,15 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
     @Override
     public void setisUserAccessToken(boolean isUserAccessToken) {
         this.isUserAccessToken = isUserAccessToken;
+    }
+    
+    @Override
+    public String getCreatedByUsername() {
+        return createdByUsername;
+    }
+
+    @Override
+    public void setCreatedByUsername(String createdByUsername) {
+        this.createdByUsername = createdByUsername;
     }
 }

@@ -10,15 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
-import edu.asu.diging.citesphere.core.service.oauth.IUserTokenManager;
 import edu.asu.diging.citesphere.core.service.oauth.UserAccessTokenResultPage;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class ShowAccessTokensController {
-    @Autowired
-    private IUserTokenManager userTokenManager;
     
     @Autowired
     private IUserManager userManager;

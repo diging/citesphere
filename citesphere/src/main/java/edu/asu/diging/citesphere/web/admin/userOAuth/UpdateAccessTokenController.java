@@ -10,13 +10,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
-import edu.asu.diging.citesphere.core.service.oauth.IUserTokenManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 
 @Controller
 public class UpdateAccessTokenController {
-    @Autowired
-    private IUserTokenManager userTokenManager;
     
     @Autowired
     private IOAuthClientManager clientManager;

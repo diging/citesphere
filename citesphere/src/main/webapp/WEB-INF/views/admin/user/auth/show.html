@@ -77,7 +77,7 @@ $(function() {
 <div layout:fragment="content">
 <h2>Tokens</h2>
 <ul id="pagination-top" class="pagination-sm"></ul>
-<div class="pull-right" style="margin-top: 20px;margin-bottom:10px"><a th:href="@{/admin/user/accessTokens/add}" class="btn btn-primary"><i class="icon-circle-add"></i> Add Token</a></div>
+<div class="pull-right" style="margin-top: 20px;margin-bottom:10px"><a th:href="@{/admin/user/auth/accessTokens/add}" class="btn btn-primary"><i class="icon-circle-add"></i> Add Token</a></div>
 <table class="table table-striped" id="table">
 <tr>
 	<th>Client Id</th>
@@ -86,8 +86,8 @@ $(function() {
 
 </tr>
 <tr th:id="'tr-'+${client.clientId}" th:each="client : ${clientList}">
-	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/user/auth/'+ ${client.clientId}}"><span th:text="${client.clientId}"/></a></td>
-	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/user/auth/'+ ${client.clientId}}"><span th:text="${client.name}"/></a></td>
+	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/user/auth/accessTokens/'+ ${client.clientId}}"><span th:text="${client.clientId}"/></a></td>
+	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/user/auth/accessTokens/'+ ${client.clientId}}"><span th:text="${client.name}"/></a></td>
 	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="icon-trash-alt"></i></button></td>
 </tr>
 </table>

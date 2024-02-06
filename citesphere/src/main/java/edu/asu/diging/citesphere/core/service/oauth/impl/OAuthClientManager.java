@@ -32,7 +32,6 @@ import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.model.Role;
 import edu.asu.diging.citesphere.core.model.oauth.IOAuthClient;
 import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
-import edu.asu.diging.citesphere.core.model.oauth.impl.UserAccessToken;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
@@ -144,7 +143,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
     @Override
     public UserAccessTokenResultPage getAllUserAccessTokenDetails(Pageable pageable, IUser user) {
         List<IOAuthClient> clientList = new ArrayList<>();
-        Page<OAuthClient> userAccessClients = clientRepo.findByIsUserAccessTokenAndCreatedBy_Username(true, user.getUsername(), pageable);
+        Page<OAuthClient> userAccessClients = clientRepo.findByIsUserAccessTokenAndCreatedByUsername(true, user.getUsername(), pageable);
         userAccessClients.forEach(oAuthClient -> clientList.add(oAuthClient));
         UserAccessTokenResultPage result = new UserAccessTokenResultPage();
         result.setClientList(clientList);
@@ -157,14 +156,14 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         final OAuthClient client = new OAuthClient();
         client.setName(name);
         String clientSecret = UUID.randomUUID().toString();
-        client.setClientSecret(bCryptPasswordEncoder.encode(clientSecret));
-        final UserAccessToken userAccessToken = new UserAccessToken();
-        userAccessToken.setName(name);           
+        client.setClientSecret(bCryptPasswordEncoder.encode(clientSecret));          
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(Role.TRUSTED_CLIENT));
         client.setAuthorities(authorities);
         client.setScope(new HashSet<>());
         client.getScope().add(OAuthScope.READ.getScope());
+        client.setCreatedByUsername(user.getUsername());
+        client.setisUserAccessToken(true);
         OAuthClient storeClient = clientRepo.save(client);
         return new OAuthCredentials(storeClient.getClientId(), clientSecret);
     }

@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
 
 public interface OAuthClientRepository extends JpaRepository<OAuthClient, String> {
-    Page<OAuthClient> findByIsUserAccessTokenAndCreatedBy_Username(boolean isUserAccessToken, String createdByUsername, Pageable pageable);
+    Page<OAuthClient> findByIsUserAccessTokenAndCreatedByUsername(boolean isUserAccessToken, String createdByUsername, Pageable pageable);
 }
