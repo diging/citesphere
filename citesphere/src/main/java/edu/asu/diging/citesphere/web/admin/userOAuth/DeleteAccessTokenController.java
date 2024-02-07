@@ -9,12 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
-import edu.asu.diging.citesphere.core.service.oauth.IUserTokenManager;
 
 @Controller
 public class DeleteAccessTokenController {
-    @Autowired
-    private IUserTokenManager userTokenManager;
     
     @Autowired
     private IOAuthClientManager clientManager;

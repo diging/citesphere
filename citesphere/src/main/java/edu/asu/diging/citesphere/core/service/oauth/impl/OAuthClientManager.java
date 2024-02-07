@@ -1,5 +1,9 @@
 package edu.asu.diging.citesphere.core.service.oauth.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,23 +14,30 @@ import java.util.UUID;
 import javax.transaction.Transactional;
 
 import org.javers.common.collections.Sets;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
+import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.TokenRequest;
 import org.springframework.security.oauth2.provider.implicit.ImplicitTokenRequest;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.model.Role;
@@ -38,6 +49,7 @@ import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
 import edu.asu.diging.citesphere.core.service.oauth.UserAccessTokenResultPage;
+import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Transactional
@@ -48,11 +60,23 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     
     private int accessTokenValidity;
+    
+    private OAuth2RequestFactory requestFactory;
+    
+    @Autowired
+    private TokenStore tokenStore;
+    
+    @Autowired
+    private ClientDetailsService clientDetailsService;
+    
+    @Autowired
+    private IUserManager userManager;
        
     public OAuthClientManager(OAuthClientRepository repo, BCryptPasswordEncoder bCryptPasswordEncoder, int accessTokenValidity) {
         this.clientRepo = repo;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.accessTokenValidity = accessTokenValidity;
+        this.requestFactory = new DefaultOAuth2RequestFactory(clientDetailsService);
     }
 
     /* (non-Javadoc)
@@ -123,6 +147,13 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         Optional<OAuthClient> clientOptional = clientRepo.findById(clientId);
         if (clientOptional.isPresent()) {
             OAuthClient client = clientOptional.get();
+            if (client.getIsUserAccessToken()) {
+                IUser user = userManager.findByUsername(client.getCreatedByUsername());
+                OAuth2AccessToken accessToken = createAccessToken(client.getClientId(), user);
+                client.setClientSecret(bCryptPasswordEncoder.encode(accessToken.getValue()));
+                OAuthClient storeClient = clientRepo.save(client);
+                return new OAuthCredentials(storeClient.getClientId(), accessToken.getValue());
+            }
             String clientSecret = UUID.randomUUID().toString();
             client.setClientSecret(bCryptPasswordEncoder.encode(clientSecret));
             OAuthClient storeClient = clientRepo.save(client);
@@ -165,6 +196,46 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         client.setCreatedByUsername(user.getUsername());
         client.setisUserAccessToken(true);
         OAuthClient storeClient = clientRepo.save(client);
-        return new OAuthCredentials(storeClient.getClientId(), clientSecret);
+        OAuth2AccessToken accessToken = createAccessToken(storeClient.getClientId(), user);
+        storeClient.setClientSecret(bCryptPasswordEncoder.encode(accessToken.getValue()));
+        clientRepo.save(storeClient);
+        return new OAuthCredentials(storeClient.getClientId(), accessToken.getValue());
+    }
+    
+    private OAuth2AccessToken createAccessToken(String clientId, IUser user) {
+        DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(UUID.randomUUID().toString());
+        token.setScope(Sets.asSet(OAuthScope.READ.getScope()));
+        AuthorizationRequest request = new AuthorizationRequest(clientId, token.getScope());
+        TokenRequest implicitRequest = new ImplicitTokenRequest(requestFactory.createTokenRequest(request, "implicit"), requestFactory.createOAuth2Request(request));
+        OAuth2Authentication authentication = getOAuth2Authentication(clientDetailsService.loadClientByClientId(clientId), implicitRequest, user);
+        tokenStore.storeAccessToken(token, authentication);
+        System.out.println(extractTokenKey(token.getValue()));
+        return token;
+    }
+    
+    private OAuth2Authentication getOAuth2Authentication(ClientDetails client, TokenRequest tokenRequest, IUser user) {
+        OAuth2Request storedOAuth2Request = requestFactory.createOAuth2Request(client, tokenRequest);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getRoles());
+        return new OAuth2Authentication(storedOAuth2Request, authentication);
+    }
+    
+    private String extractTokenKey(String value) {
+        if(value == null) {
+            return null;
+        } else {
+            MessageDigest digest;
+            try {
+                digest = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException var5) {
+                throw new IllegalStateException("MD5 algorithm not available.  Fatal (should be in the JDK).");
+            }
+
+            try {
+                byte[] e = digest.digest(value.getBytes("UTF-8"));
+                return String.format("%032x", new Object[]{new BigInteger(1, e)});
+            } catch (UnsupportedEncodingException var4) {
+                throw new IllegalStateException("UTF-8 encoding not available.  Fatal (should be in the JDK).");
+            }
+        }
     }
 }
