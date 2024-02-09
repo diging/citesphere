@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.oauth.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,10 +11,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 
+import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
+import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
+import edu.asu.diging.citesphere.core.service.oauth.UserAccessTokenResultPage;
+import edu.asu.diging.citesphere.core.user.IUserManager;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.user.impl.User;
 
 public class OAuthClientManagerTest {
     
@@ -22,6 +38,21 @@ public class OAuthClientManagerTest {
     
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    
+    @Mock
+    private TokenStore tokenStore;
+    
+    @Mock
+    private ClientDetailsService clientDetailsService;
+    
+    @Mock
+    private IUserManager userManager;
+    
+    @Mock
+    private OAuth2RequestFactory requestFactory;
+    
+    @Mock
+    private DefaultOAuth2RequestFactory defaultOAuth2RequestFactory;
     
     private int accessTokenValidity = 3600;
     
@@ -104,4 +135,41 @@ public class OAuthClientManagerTest {
         Assert.assertEquals(0, managerToTest.getAllApps().size());
     }
     
+    @Test
+    public void test_getAllUserAccessTokenDetails_success() {
+        Pageable pageable = PageRequest.of(0, 10);
+        IUser user = new User();
+        user.setUsername("testuser");
+
+        List<OAuthClient> mockClientList = new ArrayList<>();
+        mockClientList.add(new OAuthClient());
+
+        Page<OAuthClient> mockPage = new PageImpl<>(mockClientList);
+
+        Mockito.when(clientRepo.findByIsUserAccessTokenAndCreatedByUsername(
+                true, "testuser", pageable))
+                .thenReturn(mockPage);
+
+        UserAccessTokenResultPage resultPage = managerToTest.getAllUserAccessTokenDetails(pageable, user);
+
+        Assert.assertEquals(1, resultPage.getClientList().size());
+    }
+    
+    @Test
+    public void test_getAllUserAccessTokenDetails_returnsEmptyList() {
+        Pageable pageable = PageRequest.of(0, 10);
+        IUser user = new User();
+        user.setUsername("testuser");
+
+        List<OAuthClient> mockClientList = new ArrayList<>();
+        Page<OAuthClient> mockPage = new PageImpl<>(mockClientList);
+
+        Mockito.when(clientRepo.findByIsUserAccessTokenAndCreatedByUsername(
+                true, "testuser", pageable))
+                .thenReturn(mockPage);
+
+        UserAccessTokenResultPage resultPage = managerToTest.getAllUserAccessTokenDetails(pageable, user);
+
+        Assert.assertEquals(0, resultPage.getClientList().size());
+    }
 }
