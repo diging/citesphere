@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.search.service.SearchEngine;
 import edu.asu.diging.citesphere.core.search.service.impl.ResultPage;
+import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.BreadCrumb;
@@ -37,6 +39,9 @@ public class SearchController {
 
     @Autowired
     private IGroupManager groupManager;
+    
+    @Autowired
+    private ICitationCollectionManager collectionManager;
 
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
@@ -44,8 +49,9 @@ public class SearchController {
     @Value("${_available_item_columns}")
     private String availableColumns;
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search" })
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search", "/auth/group/{zoteroGroupId}/collection/{collectionId}/search" })
     public String search(@PathVariable String zoteroGroupId,
+            @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
             @RequestParam(defaultValue = "0", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
@@ -60,7 +66,10 @@ public class SearchController {
         }
 
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
-            return "redirect:/auth/group/" + zoteroGroupId + "/items";
+            if (collectionId == null) {
+                return "redirect:/auth/group/" + zoteroGroupId + "/items";
+            }
+            return "redirect:/auth/group/" + zoteroGroupId + "/collection/" + collectionId + "/items";
         }
         
         Integer pageInt = 1;
@@ -71,8 +80,16 @@ public class SearchController {
         }
         
         pageInt = pageInt > 0 ? pageInt : 1;
+        
+        ResultPage citations;
+        
+        if (collectionId == null) {
+            citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
+        } else {
+            citations = engine.search(searchTerm, zoteroGroupId, collectionId, pageInt-1, 50);
+        }
 
-        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
+        
 
         model.addAttribute("searchTerm", searchTerm);
         model.addAttribute("items", citations.getResults());
@@ -80,6 +97,7 @@ public class SearchController {
         model.addAttribute("total", citations.getTotalResults());
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
+        model.addAttribute("collectionId", collectionId);
         model.addAttribute("group", groupManager.getGroup(user, zoteroGroupId));
         model.addAttribute("sort", sort);
 
@@ -96,6 +114,21 @@ public class SearchController {
         model.addAttribute("availableColumns", allowedColumns);
 
         List<BreadCrumb> breadCrumbs = new ArrayList<>();
+        ICitationCollection collection = null;
+        if (collectionId != null) {
+            collection = collectionManager.getCollection(user, zoteroGroupId, collectionId);
+            if(collection != null) {
+                model.addAttribute("collectionName", collection.getName()); 
+            }
+        }
+        while(collection != null) {
+            breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
+            if (collection.getParentCollectionKey() != null) {
+                collection = collectionManager.getCollection(user, zoteroGroupId, collection.getParentCollectionKey());
+            } else {
+                collection = null;
+            }
+        }
         breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
         Collections.reverse(breadCrumbs);
         model.addAttribute("breadCrumbs", breadCrumbs);

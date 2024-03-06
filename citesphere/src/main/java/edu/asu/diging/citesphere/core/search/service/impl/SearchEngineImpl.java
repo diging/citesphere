@@ -56,6 +56,30 @@ public class SearchEngineImpl implements SearchEngine {
                 .should(QueryBuilders.queryStringQuery(searchTerm).field("title").field("creators.name"));
         BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
         boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId));
+        
+        NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder).withPageable(PageRequest.of(page, pageSize));
+
+        AggregatedPage<Reference> results = template.queryForPage(b.build(), Reference.class);
+        List<ICitation> foundCitations = new ArrayList<ICitation>();
+        results.get().forEach(r -> {
+            foundCitations.add(mapReference(r));
+        });
+        return new ResultPage(foundCitations, results.getTotalElements(), results.getTotalPages());
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * This method searches in the title and creators name field for references that are
+     * not deleted in a collection in a group.
+     * 
+     */
+    @Override
+    public ResultPage search(String searchTerm, String groupId, String collectionId, int page, int pageSize) {
+        BoolQueryBuilder orFieldsBuilder = QueryBuilders.boolQuery()
+                .should(QueryBuilders.queryStringQuery(searchTerm).field("title").field("creators.name"));
+        BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
+        boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId)).must(QueryBuilders.termsQuery("collections", collectionId));
         NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder).withPageable(PageRequest.of(page, pageSize));
 
         AggregatedPage<Reference> results = template.queryForPage(b.build(), Reference.class);
