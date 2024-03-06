@@ -68,7 +68,7 @@ public interface IOAuthClient {
     
     boolean getIsUserAccessToken();
     
-    void setisUserAccessToken(boolean isUserAccessToken);
+    void setIsUserAccessToken(boolean isUserAccessToken);
 
     String getCreatedByUsername();
 

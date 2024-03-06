@@ -194,7 +194,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         client.setScope(new HashSet<>());
         client.getScope().add(OAuthScope.READ.getScope());
         client.setCreatedByUsername(user.getUsername());
-        client.setisUserAccessToken(true);
+        client.setIsUserAccessToken(true);
         OAuthClient storeClient = clientRepo.save(client);
         OAuth2AccessToken accessToken = createAccessToken(storeClient.getClientId(), user);
         storeClient.setClientSecret(bCryptPasswordEncoder.encode(accessToken.getValue()));

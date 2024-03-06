@@ -201,7 +201,7 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
     }
 
     @Override
-    public void setisUserAccessToken(boolean isUserAccessToken) {
+    public void setIsUserAccessToken(boolean isUserAccessToken) {
         this.isUserAccessToken = isUserAccessToken;
     }
     
