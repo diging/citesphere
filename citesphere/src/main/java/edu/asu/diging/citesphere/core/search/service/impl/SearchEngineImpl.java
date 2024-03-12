@@ -71,7 +71,7 @@ public class SearchEngineImpl implements SearchEngine {
      * {@inheritDoc}
      * 
      * This method searches in the title and creators name field for references that are
-     * not deleted in a collection in a group.
+     * not deleted in a collection within a group.
      * 
      */
     @Override
@@ -79,12 +79,8 @@ public class SearchEngineImpl implements SearchEngine {
         BoolQueryBuilder orFieldsBuilder = QueryBuilders.boolQuery()
                 .should(QueryBuilders.queryStringQuery(searchTerm).field("title").field("creators.name"));
         BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
-        boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId)).must(QueryBuilders.termsQuery("collections", collectionId));
+        boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId)).must(QueryBuilders.matchQuery("collections", collectionId));
         NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder).withPageable(PageRequest.of(page, pageSize));
-        System.out.println("Diya Biju");
-        System.out.println(collectionId + groupId);
-        System.out.println(boolBuilder.toString());
-        System.out.println(b.toString());
         AggregatedPage<Reference> results = template.queryForPage(b.build(), Reference.class);
         List<ICitation> foundCitations = new ArrayList<ICitation>();
         results.get().forEach(r -> {
@@ -132,7 +128,6 @@ public class SearchEngineImpl implements SearchEngine {
     }
 
     private ICitation mapReference(Reference ref) {
-        System.out.println(ref.getTitle());
         ICitation citation = new Citation();
         citation.setAbstractNote(ref.getAbstractNote());
         citation.setAccessDate(ref.getAccessDate());

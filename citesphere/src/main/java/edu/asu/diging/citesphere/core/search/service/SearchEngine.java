@@ -17,7 +17,7 @@ public interface SearchEngine {
     ResultPage search(String searchTerm, String groupId, int page, int pageSize);
     
     /**
-     * Search for a given term in a group.
+     * Search for a given term in a collection within the group.
      * 
      * @param searchTerm Term to search for.
      * @param groupId Group id of the group that should be searched.
