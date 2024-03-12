@@ -81,10 +81,14 @@ public class SearchEngineImpl implements SearchEngine {
         BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
         boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId)).must(QueryBuilders.termsQuery("collections", collectionId));
         NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder).withPageable(PageRequest.of(page, pageSize));
-
+        System.out.println("Diya Biju");
+        System.out.println(collectionId + groupId);
+        System.out.println(boolBuilder.toString());
+        System.out.println(b.toString());
         AggregatedPage<Reference> results = template.queryForPage(b.build(), Reference.class);
         List<ICitation> foundCitations = new ArrayList<ICitation>();
         results.get().forEach(r -> {
+            
             foundCitations.add(mapReference(r));
         });
         return new ResultPage(foundCitations, results.getTotalElements(), results.getTotalPages());
@@ -128,6 +132,7 @@ public class SearchEngineImpl implements SearchEngine {
     }
 
     private ICitation mapReference(Reference ref) {
+        System.out.println(ref.getTitle());
         ICitation citation = new Citation();
         citation.setAbstractNote(ref.getAbstractNote());
         citation.setAccessDate(ref.getAccessDate());
