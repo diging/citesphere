@@ -71,7 +71,11 @@ public class DbTokenStore implements TokenStore {
 
         DbAccessToken cat =  new DbAccessToken();
         cat.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
-        cat.setTokenId(extractTokenKey(accessToken.getValue()));
+        String tokenId = extractTokenKey(accessToken.getValue());
+        if(tokenIdPresent(tokenId)) {
+            deleteByTokenId(tokenId);
+        }
+        cat.setTokenId(extractTokenKey(tokenId));
         cat.setToken(accessToken);
         cat.setAuthenticationId(authenticationKeyGenerator.extractKey(authentication));
         cat.setUsername(authentication.isClientOnly() ? null : authentication.getName());
@@ -210,6 +214,19 @@ public class DbTokenStore implements TokenStore {
     public void revokeAccessToken(String clientId, String username) {
         if(clientId != null) {
             dbAccessTokenRepository.deleteByClientIdAndUsername(clientId,username);
+        }
+    }
+    
+    private boolean tokenIdPresent(String tokenId) {
+        Optional<DbAccessToken> token = dbAccessTokenRepository.findByRefreshToken(tokenId);
+        return token.isPresent();
+    }
+    
+    private void deleteByTokenId(String tokenId) {
+        Optional<DbAccessToken> token = dbAccessTokenRepository.findByRefreshToken(tokenId);
+        if(token.isPresent()) {
+            DbAccessToken accessToken = token.get();
+            dbAccessTokenRepository.delete(accessToken);
         }
     }
 }
