@@ -49,9 +49,8 @@ public class SearchController {
     @Value("${_available_item_columns}")
     private String availableColumns;
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search", "/auth/group/{zoteroGroupId}/collection/{collectionId}/search" })
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search" })
     public String search(@PathVariable String zoteroGroupId,
-            @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
             @RequestParam(defaultValue = "0", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
@@ -66,9 +65,64 @@ public class SearchController {
         }
 
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
-            if (collectionId == null) {
-                return "redirect:/auth/group/" + zoteroGroupId + "/items";
+            return "redirect:/auth/group/" + zoteroGroupId + "/items";
+        }
+        
+        Integer pageInt = 1;
+        try {
+            pageInt = new Integer(page);
+        } catch (NumberFormatException ex) {
+            logger.warn("Trying to access invalid page number: " + page);
+        }
+        
+        pageInt = pageInt > 0 ? pageInt : 1;
+
+        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
+
+        model.addAttribute("searchTerm", searchTerm);
+        model.addAttribute("items", citations.getResults());
+        model.addAttribute("totalPages", Math.max(1, citations.getTotalPages()));
+        model.addAttribute("total", citations.getTotalResults());
+        model.addAttribute("currentPage", pageInt);
+        model.addAttribute("zoteroGroupId", zoteroGroupId);
+        model.addAttribute("group", groupManager.getGroup(user, zoteroGroupId));
+        model.addAttribute("sort", sort);
+
+        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
+        List<String> shownColumns = new ArrayList<>();
+        if (columns != null && columns.length > 0) {
+            for (String column : columns) {
+                if (allowedColumns.contains(column)) {
+                    shownColumns.add(column);
+                }
             }
+        }
+        model.addAttribute("columns", shownColumns);
+        model.addAttribute("availableColumns", allowedColumns);
+
+        List<BreadCrumb> breadCrumbs = new ArrayList<>();
+        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
+        Collections.reverse(breadCrumbs);
+        model.addAttribute("breadCrumbs", breadCrumbs);
+        return "auth/group/items";
+    }
+    
+    @RequestMapping(value = {"/auth/group/{zoteroGroupId}/collection/{collectionId}/search"})
+    public String searchCollection(@PathVariable String zoteroGroupId,
+            @PathVariable(value="collectionId", required=false) String collectionId,
+            @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
+            @RequestParam(defaultValue = "0", required = false, value = "page") String page,
+            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
+            @RequestParam(required = false, value = "columns") String[] columns, Authentication authentication) {
+        IUser user = (IUser) authentication.getPrincipal();
+        ICitationGroup group = groupManager.getGroup(user, zoteroGroupId);
+
+        if (group == null) {
+            logger.error("User " + user.getUsername() + " does not have access to group " + zoteroGroupId);
+            return "error/404";
+        }
+
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
             return "redirect:/auth/group/" + zoteroGroupId + "/collection/" + collectionId + "/items";
         }
         
@@ -81,16 +135,8 @@ public class SearchController {
         
         pageInt = pageInt > 0 ? pageInt : 1;
         
-        ResultPage citations;
+        ResultPage citations = engine.search(searchTerm, zoteroGroupId, collectionId, pageInt-1, 50);
         
-        if (collectionId == null) {
-            citations = engine.search(searchTerm, zoteroGroupId, pageInt-1, 50);
-        } else {
-            citations = engine.search(searchTerm, zoteroGroupId, collectionId, pageInt-1, 50);
-        }
-
-        
-
         model.addAttribute("searchTerm", searchTerm);
         model.addAttribute("items", citations.getResults());
         model.addAttribute("totalPages", Math.max(1, citations.getTotalPages()));
