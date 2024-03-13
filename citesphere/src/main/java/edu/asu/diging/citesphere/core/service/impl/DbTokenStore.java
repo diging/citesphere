@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -64,18 +65,24 @@ public class DbTokenStore implements TokenStore {
         if (accessToken.getRefreshToken() != null) {
             refreshToken = accessToken.getRefreshToken().getValue();
         }
-
-        if (readAccessToken(accessToken.getValue()) != null) {
-            this.removeAccessToken(accessToken);
+        
+        List<DbAccessToken> existingTokens = getAccessTokens(authentication);
+        if(existingTokens != null && !existingTokens.isEmpty()) {
+            List<DbAccessToken> filteredTokens = existingTokens.stream()
+                    .filter(token -> {
+                        String tokenId = extractTokenKey(token.getTokenId());
+                        String givenTokenId = extractTokenKey(accessToken.getValue());
+                        return tokenId.equals(givenTokenId);
+                    })
+                    .collect(Collectors.toList());
+            if(filteredTokens != null && !filteredTokens.isEmpty()) {
+                deleteAccessTokens(filteredTokens);
+            }   
         }
-
+        
         DbAccessToken cat =  new DbAccessToken();
         cat.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
-        String tokenId = extractTokenKey(accessToken.getValue());
-        if(tokenIdPresent(tokenId)) {
-            deleteByTokenId(tokenId);
-        }
-        cat.setTokenId(extractTokenKey(tokenId));
+        cat.setTokenId(extractTokenKey(accessToken.getValue()));
         cat.setToken(accessToken);
         cat.setAuthenticationId(authenticationKeyGenerator.extractKey(authentication));
         cat.setUsername(authentication.isClientOnly() ? null : authentication.getName());
@@ -93,6 +100,7 @@ public class DbTokenStore implements TokenStore {
             return accessToken.get().getToken();
         }
         return null;
+        
     }
 
     @Override
@@ -143,7 +151,6 @@ public class DbTokenStore implements TokenStore {
 
     @Override
     public OAuth2AccessToken getAccessToken(OAuth2Authentication authentication) {
-        OAuth2AccessToken accessToken = null;
         String authenticationId = authenticationKeyGenerator.extractKey(authentication);
         List<DbAccessToken> tokens = dbAccessTokenRepository.findByAuthenticationId(authenticationId);
 
@@ -160,15 +167,11 @@ public class DbTokenStore implements TokenStore {
                 return 0;
             }
         });
-        
         if(!tokens.isEmpty()) {
-            accessToken = tokens.get(0).getToken();
-            if(accessToken != null && !authenticationId.equals(this.authenticationKeyGenerator.extractKey(this.readAuthentication(accessToken)))) {
-                this.removeAccessToken(accessToken);
-                this.storeAccessToken(accessToken, authentication);
-            }
+            OAuth2AccessToken accessToken = tokens.get(0).getToken();
+            return accessToken;
         }
-        return accessToken;
+        return null;
     }
 
     @Override
@@ -217,16 +220,29 @@ public class DbTokenStore implements TokenStore {
         }
     }
     
-    private boolean tokenIdPresent(String tokenId) {
-        Optional<DbAccessToken> token = dbAccessTokenRepository.findByRefreshToken(tokenId);
-        return token.isPresent();
+    private List<DbAccessToken> getAccessTokens(OAuth2Authentication authentication) {
+        String authenticationId = authenticationKeyGenerator.extractKey(authentication);
+        List<DbAccessToken> tokens = dbAccessTokenRepository.findByAuthenticationId(authenticationId);
+
+        tokens.sort(new Comparator<DbAccessToken>() {
+
+            @Override
+            public int compare(DbAccessToken o1, DbAccessToken o2) {
+                if (o1.getToken().getExpiration().before(o2.getToken().getExpiration())) {
+                    return -1;
+                } 
+                if (o1.getToken().getExpiration().after(o2.getToken().getExpiration())) {
+                    return 1;
+                } 
+                return 0;
+            }
+        });
+        return tokens;
     }
     
-    private void deleteByTokenId(String tokenId) {
-        Optional<DbAccessToken> token = dbAccessTokenRepository.findByRefreshToken(tokenId);
-        if(token.isPresent()) {
-            DbAccessToken accessToken = token.get();
-            dbAccessTokenRepository.delete(accessToken);
+    private void deleteAccessTokens(List<DbAccessToken> tokens) {
+        for(DbAccessToken token: tokens) {
+            dbAccessTokenRepository.delete(token);
         }
     }
 }
