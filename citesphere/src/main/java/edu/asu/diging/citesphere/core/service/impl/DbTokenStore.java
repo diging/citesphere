@@ -67,18 +67,7 @@ public class DbTokenStore implements TokenStore {
         }
         
         List<DbAccessToken> existingTokens = getAccessTokens(authentication);
-        if(existingTokens != null && !existingTokens.isEmpty()) {
-            List<DbAccessToken> filteredTokens = existingTokens.stream()
-                    .filter(token -> {
-                        String tokenId = extractTokenKey(token.getTokenId());
-                        String givenTokenId = extractTokenKey(accessToken.getValue());
-                        return tokenId.equals(givenTokenId);
-                    })
-                    .collect(Collectors.toList());
-            if(filteredTokens != null && !filteredTokens.isEmpty()) {
-                deleteAccessTokens(filteredTokens);
-            }   
-        }
+        deleteExistingTokens(existingTokens, accessToken);
         
         DbAccessToken cat =  new DbAccessToken();
         cat.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
@@ -243,6 +232,21 @@ public class DbTokenStore implements TokenStore {
     private void deleteAccessTokens(List<DbAccessToken> tokens) {
         for(DbAccessToken token: tokens) {
             dbAccessTokenRepository.delete(token);
+        }
+    }
+    
+    private void deleteExistingTokens(List<DbAccessToken> existingTokens, OAuth2AccessToken accessToken) {
+        if(existingTokens != null && !existingTokens.isEmpty()) {
+            List<DbAccessToken> filteredTokens = existingTokens.stream()
+                    .filter(token -> {
+                        String tokenId = extractTokenKey(token.getTokenId());
+                        String givenTokenId = extractTokenKey(accessToken.getValue());
+                        return tokenId.equals(givenTokenId);
+                    })
+                    .collect(Collectors.toList());
+            if(filteredTokens != null && !filteredTokens.isEmpty()) {
+                deleteAccessTokens(filteredTokens);
+            }   
         }
     }
 }
