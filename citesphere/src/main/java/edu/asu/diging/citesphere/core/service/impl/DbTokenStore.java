@@ -11,7 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.GrantedAuthority;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -33,6 +34,8 @@ import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
  */
 @Transactional
 public class DbTokenStore implements TokenStore {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private DbAccessTokenRepository dbAccessTokenRepository;
 
@@ -68,7 +71,7 @@ public class DbTokenStore implements TokenStore {
         
         List<DbAccessToken> existingTokens = getAccessTokens(authentication);
         deleteExistingTokens(existingTokens, accessToken);
-        
+
         DbAccessToken cat =  new DbAccessToken();
         cat.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
         cat.setTokenId(extractTokenKey(accessToken.getValue()));
