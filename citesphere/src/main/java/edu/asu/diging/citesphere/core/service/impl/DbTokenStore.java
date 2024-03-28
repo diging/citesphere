@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +69,8 @@ public class DbTokenStore implements TokenStore {
         }
         
         List<DbAccessToken> existingTokens = getAccessTokens(authentication);
-        deleteExistingTokens(existingTokens, accessToken);
+        logger.debug("Inside storeAccessToken " + existingTokens.isEmpty());
+        deleteAccessTokens(existingTokens);
 
         DbAccessToken cat =  new DbAccessToken();
         cat.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
@@ -213,7 +213,9 @@ public class DbTokenStore implements TokenStore {
     }
     
     private List<DbAccessToken> getAccessTokens(OAuth2Authentication authentication) {
+        System.out.println(authentication);
         String authenticationId = authenticationKeyGenerator.extractKey(authentication);
+        System.out.println(authenticationId);
         List<DbAccessToken> tokens = dbAccessTokenRepository.findByAuthenticationId(authenticationId);
 
         tokens.sort(new Comparator<DbAccessToken>() {
@@ -234,22 +236,8 @@ public class DbTokenStore implements TokenStore {
     
     private void deleteAccessTokens(List<DbAccessToken> tokens) {
         for(DbAccessToken token: tokens) {
+            logger.debug("Inside deleteAccessTokens " + token.getTokenId());
             dbAccessTokenRepository.delete(token);
-        }
-    }
-    
-    private void deleteExistingTokens(List<DbAccessToken> existingTokens, OAuth2AccessToken accessToken) {
-        if(existingTokens != null && !existingTokens.isEmpty()) {
-            List<DbAccessToken> filteredTokens = existingTokens.stream()
-                    .filter(token -> {
-                        String tokenId = extractTokenKey(token.getTokenId());
-                        String givenTokenId = extractTokenKey(accessToken.getValue());
-                        return tokenId.equals(givenTokenId);
-                    })
-                    .collect(Collectors.toList());
-            if(filteredTokens != null && !filteredTokens.isEmpty()) {
-                deleteAccessTokens(filteredTokens);
-            }   
         }
     }
 }
