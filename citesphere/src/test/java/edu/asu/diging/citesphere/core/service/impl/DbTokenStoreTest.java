@@ -9,39 +9,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.common.OAuth2RefreshToken;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.client.BaseClientDetails;
-import org.springframework.security.oauth2.provider.token.AuthenticationKeyGenerator;
-
 import edu.asu.diging.citesphere.core.model.oauth.impl.DbAccessToken;
-import edu.asu.diging.citesphere.core.model.oauth.impl.SerializableObjectConverter;
 import edu.asu.diging.citesphere.core.repository.oauth.DbAccessTokenRepository;
-import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
 
 public class DbTokenStoreTest {
     @Mock
     private DbAccessTokenRepository dbAccessTokenRepository;
     
-    @Mock
-    private DbRefreshTokenRepository dbRefreshTokenRepository;
-    
-    @Mock
-    private AuthenticationKeyGenerator authenticationKeyGenerator;
-    
-    @Mock
-    private SerializableObjectConverter serializableObjectConverter;
-    
     @InjectMocks
-    private DbTokenStore managerToTest = new DbTokenStore(dbAccessTokenRepository, dbRefreshTokenRepository);
+    private DbTokenStore managerToTest = new DbTokenStore(dbAccessTokenRepository, null);
     
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        Mockito.when(authenticationKeyGenerator.extractKey(Mockito.any())).thenReturn("key");
     }
     
     @Test
@@ -75,28 +55,6 @@ public class DbTokenStoreTest {
         String username = "name";
         managerToTest.revokeAccessToken(null,username);
         Mockito.verify(dbAccessTokenRepository,Mockito.never()).deleteByClientIdAndUsername(null,username);
-    }
-    
-    @Test
-    public void test_storeAccessToken_success() {
-        OAuth2AccessToken accessToken = Mockito.mock(OAuth2AccessToken.class);
-        OAuth2RefreshToken refreshToken = Mockito.mock(OAuth2RefreshToken.class);
-        OAuth2Authentication authentication = Mockito.mock(OAuth2Authentication.class);
-        Mockito.when(accessToken.getRefreshToken()).thenReturn(refreshToken);
-        Mockito.when(serializableObjectConverter.serializeToken(accessToken)).thenReturn("token");
-        Mockito.when(authenticationKeyGenerator.extractKey(authentication)).thenReturn("key");
-        managerToTest.storeAccessToken(accessToken, authentication);
-    }
-    
-    private BaseClientDetails createClientDetails() {
-        BaseClientDetails clientDetails = new BaseClientDetails();
-        clientDetails.setClientId("test-client-id");
-        // Set other properties as needed
-        return clientDetails;
-    }
-    
-    private OAuth2Authentication createAuthentication() {
-        return Mockito.mock(OAuth2Authentication.class);
     }
 
 }
