@@ -215,9 +215,7 @@ public class DbTokenStore implements TokenStore {
     
     private List<DbAccessToken> getAccessTokens(OAuth2Authentication authentication) {
         String authenticationId = authenticationKeyGenerator.extractKey(authentication);
-        List<DbAccessToken> tokens = dbAccessTokenRepository.findByAuthenticationId(authenticationId);
-
-        return tokens;
+        return dbAccessTokenRepository.findByAuthenticationId(authenticationId);
     }
     
     private void deleteAccessTokens(List<DbAccessToken> tokens) {
