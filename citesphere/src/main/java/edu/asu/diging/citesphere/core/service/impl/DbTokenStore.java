@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.security.core.GrantedAuthority;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -32,6 +33,8 @@ import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
  */
 @Transactional
 public class DbTokenStore implements TokenStore {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private DbAccessTokenRepository dbAccessTokenRepository;
 
@@ -64,10 +67,11 @@ public class DbTokenStore implements TokenStore {
         if (accessToken.getRefreshToken() != null) {
             refreshToken = accessToken.getRefreshToken().getValue();
         }
-
-        if (readAccessToken(accessToken.getValue()) != null) {
-            this.removeAccessToken(accessToken);
-        }
+        
+        // If tokens already exist for the given authentication ID it will be deleted before creating a new token
+        List<DbAccessToken> existingTokens = getAccessTokens(authentication);
+        logger.debug("Inside storeAccessToken - Existing tokens already present - " + existingTokens.isEmpty());
+        deleteAccessTokens(existingTokens);
 
         DbAccessToken cat =  new DbAccessToken();
         cat.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
@@ -89,6 +93,7 @@ public class DbTokenStore implements TokenStore {
             return accessToken.get().getToken();
         }
         return null;
+        
     }
 
     @Override
@@ -139,7 +144,6 @@ public class DbTokenStore implements TokenStore {
 
     @Override
     public OAuth2AccessToken getAccessToken(OAuth2Authentication authentication) {
-        OAuth2AccessToken accessToken = null;
         String authenticationId = authenticationKeyGenerator.extractKey(authentication);
         List<DbAccessToken> tokens = dbAccessTokenRepository.findByAuthenticationId(authenticationId);
 
@@ -156,15 +160,11 @@ public class DbTokenStore implements TokenStore {
                 return 0;
             }
         });
-        
         if(!tokens.isEmpty()) {
-            accessToken = tokens.get(0).getToken();
-            if(accessToken != null && !authenticationId.equals(this.authenticationKeyGenerator.extractKey(this.readAuthentication(accessToken)))) {
-                this.removeAccessToken(accessToken);
-                this.storeAccessToken(accessToken, authentication);
-            }
+            OAuth2AccessToken accessToken = tokens.get(0).getToken();
+            return accessToken;
         }
-        return accessToken;
+        return null;
     }
 
     @Override
@@ -210,6 +210,20 @@ public class DbTokenStore implements TokenStore {
     public void revokeAccessToken(String clientId, String username) {
         if(clientId != null) {
             dbAccessTokenRepository.deleteByClientIdAndUsername(clientId,username);
+        }
+    }
+    
+    private List<DbAccessToken> getAccessTokens(OAuth2Authentication authentication) {
+        String authenticationId = authenticationKeyGenerator.extractKey(authentication);
+        List<DbAccessToken> tokens = dbAccessTokenRepository.findByAuthenticationId(authenticationId);
+
+        return tokens;
+    }
+    
+    private void deleteAccessTokens(List<DbAccessToken> tokens) {
+        for(DbAccessToken token: tokens) {
+            logger.debug("Deleting Access Token " + token.getTokenId());
+            dbAccessTokenRepository.delete(token);
         }
     }
 }
