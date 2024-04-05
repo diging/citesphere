@@ -69,12 +69,15 @@ public class DbTokenStore implements TokenStore {
         }
         
         // If access token with the same token id is present it will be deleted before creating the token.
-        Optional<DbAccessToken> existingToken = getExistingAccessToken(accessToken);
+        Optional<DbAccessToken> existingToken = getExistingAccessTokenByTokenId(accessToken);
         if (existingToken.isPresent()) {
             DbAccessToken token = existingToken.get();
             logger.info("Inside storeAccessToken - Existing tokens already present - " + token.getTokenId());
             dbAccessTokenRepository.delete(token);
         }
+        
+        List<DbAccessToken> tokensByAuthId = getAccessTokensByAuthenticationId(authentication);
+        deleteAccessTokens(tokensByAuthId);
         
         DbAccessToken cat =  new DbAccessToken();
         cat.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
@@ -216,7 +219,20 @@ public class DbTokenStore implements TokenStore {
         }
     }
     
-    private Optional<DbAccessToken> getExistingAccessToken(OAuth2AccessToken accessToken) {
+    private Optional<DbAccessToken> getExistingAccessTokenByTokenId(OAuth2AccessToken accessToken) {
         return dbAccessTokenRepository.findByTokenId(extractTokenKey(accessToken.getValue()));
     }
+    
+    private List<DbAccessToken> getAccessTokensByAuthenticationId(OAuth2Authentication authentication) {
+        String authenticationId = authenticationKeyGenerator.extractKey(authentication);
+        return dbAccessTokenRepository.findByAuthenticationId(authenticationId);
+    }
+    
+    private void deleteAccessTokens(List<DbAccessToken> tokens) {
+        for(DbAccessToken token: tokens) {
+            logger.debug("Deleting Access Token " + token.getTokenId());
+            dbAccessTokenRepository.delete(token);
+        }
+    }
+    
 }
