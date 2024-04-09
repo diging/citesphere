@@ -67,7 +67,6 @@ public class DbTokenStore implements TokenStore {
         if (accessToken.getRefreshToken() != null) {
             refreshToken = accessToken.getRefreshToken().getValue();
         }
-        
         // If access token with the same token id is present it will be deleted before creating the token.
         Optional<DbAccessToken> existingToken = getExistingAccessTokenByTokenId(accessToken);
         if (existingToken.isPresent()) {
@@ -78,7 +77,7 @@ public class DbTokenStore implements TokenStore {
         
         List<DbAccessToken> tokensByAuthId = getAccessTokensByAuthenticationId(authentication);
         deleteAccessTokens(tokensByAuthId);
-        
+
         DbAccessToken cat =  new DbAccessToken();
         cat.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
         cat.setTokenId(extractTokenKey(accessToken.getValue()));
@@ -234,5 +233,4 @@ public class DbTokenStore implements TokenStore {
             dbAccessTokenRepository.delete(token);
         }
     }
-    
 }
