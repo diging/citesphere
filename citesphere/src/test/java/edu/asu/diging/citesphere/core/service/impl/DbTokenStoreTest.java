@@ -152,7 +152,17 @@ public class DbTokenStoreTest {
         cat.setClientId(authentication.getOAuth2Request().getClientId());
         cat.setAuthentication(authentication);
         cat.setRefreshToken("refreshToken");
+        DbAccessToken token = new DbAccessToken();
+        token.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
+        token.setTokenId("tokenId");
+        token.setToken(accessToken);
+        token.setAuthenticationId(authenticationKeyGenerator.extractKey(authentication));
+        token.setUsername(authentication.isClientOnly() ? null : authentication.getName());
+        token.setClientId(authentication.getOAuth2Request().getClientId());
+        token.setAuthentication(authentication);
+        token.setRefreshToken("refreshToken");
         Mockito.when(dbAccessTokenRepository.findByTokenId(Mockito.anyString())).thenReturn(Optional.of(cat));
+        Mockito.when(dbAccessTokenRepository.findByAuthenticationId(Mockito.anyString())).thenReturn(List.of(token));
         managerToTest.storeAccessToken(accessToken, authentication);
         Mockito.verify(dbAccessTokenRepository, Mockito.atLeastOnce()).save(Mockito.any(DbAccessToken.class));
         Mockito.verify(dbAccessTokenRepository, Mockito.atLeastOnce()).delete(Mockito.any(DbAccessToken.class));
