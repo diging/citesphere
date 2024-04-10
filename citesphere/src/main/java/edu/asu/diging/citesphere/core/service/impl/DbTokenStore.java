@@ -67,11 +67,16 @@ public class DbTokenStore implements TokenStore {
         if (accessToken.getRefreshToken() != null) {
             refreshToken = accessToken.getRefreshToken().getValue();
         }
+        // If access token with the same token id is present it will be deleted before creating the token.
+        Optional<DbAccessToken> existingToken = getExistingAccessTokenByTokenId(accessToken);
+        if (existingToken.isPresent()) {
+            DbAccessToken token = existingToken.get();
+            logger.info("Inside storeAccessToken - Existing tokens already present - " + token.getTokenId());
+            dbAccessTokenRepository.delete(token);
+        }
         
-        // If tokens already exist for the given authentication ID it will be deleted before creating a new token
-        List<DbAccessToken> existingTokens = getAccessTokens(authentication);
-        logger.debug("Inside storeAccessToken - Existing tokens already present - " + existingTokens.isEmpty());
-        deleteAccessTokens(existingTokens);
+        List<DbAccessToken> tokensByAuthId = getAccessTokensByAuthenticationId(authentication);
+        deleteAccessTokens(tokensByAuthId);
 
         DbAccessToken cat =  new DbAccessToken();
         cat.setId(UUID.randomUUID().toString()+UUID.randomUUID().toString());
@@ -213,11 +218,13 @@ public class DbTokenStore implements TokenStore {
         }
     }
     
-    private List<DbAccessToken> getAccessTokens(OAuth2Authentication authentication) {
+    private Optional<DbAccessToken> getExistingAccessTokenByTokenId(OAuth2AccessToken accessToken) {
+        return dbAccessTokenRepository.findByTokenId(extractTokenKey(accessToken.getValue()));
+    }
+    
+    private List<DbAccessToken> getAccessTokensByAuthenticationId(OAuth2Authentication authentication) {
         String authenticationId = authenticationKeyGenerator.extractKey(authentication);
-        List<DbAccessToken> tokens = dbAccessTokenRepository.findByAuthenticationId(authenticationId);
-
-        return tokens;
+        return dbAccessTokenRepository.findByAuthenticationId(authenticationId);
     }
     
     private void deleteAccessTokens(List<DbAccessToken> tokens) {
