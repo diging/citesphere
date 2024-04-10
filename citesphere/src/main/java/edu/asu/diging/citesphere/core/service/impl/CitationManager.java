@@ -41,10 +41,12 @@ import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
+import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IPerson;
 import edu.asu.diging.citesphere.model.bib.IReference;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
@@ -87,6 +89,9 @@ public class CitationManager implements ICitationManager {
 
     @Autowired
     private IAsyncCitationProcessor asyncCitationProcessor;
+    
+    @Autowired
+    private CitationRepository citationRepository;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
@@ -501,15 +506,50 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public ICitation updateCitationReference(ICitation citation, String referenceCitationKey, String reference) {
+    	System.out.println("Inside updateCitationReference =================================================");
         Set<IReference> references = citation.getReferences();
         if (references == null) {
             references = new HashSet<>();
         }
         if (!citation.getKey().equals(referenceCitationKey)) {
-            IReference iReference = new Reference();
-            iReference.setReferenceString(reference);
-            references.add(iReference);
+        	Optional<ICitation> referenceCitation = citationRepository.findByKey(referenceCitationKey);
+        	if(referenceCitation != null) {
+        		System.out.println(referenceCitation.toString());
+	            IReference iReference = new Reference();
+	            iReference.setReferenceString(reference);
+	            System.out.println(iReference.toString());
+	            references.add(iReference);
+        	}
         }
+        System.out.println(references.toString());
         return citationStore.save(citation);
+    }
+    
+    public IReference mapCitationToReference(ICitation referenceCitation) {
+    	IReference iReference = new Reference();
+//    	iReference.setAuthorString(referenceCitation.getA);
+//    	iReference.setContributors(referenceCitation.getC);
+    	iReference.setTitle(referenceCitation.getTitle());
+    	iReference.setYear(referenceCitation.getDateFreetext());
+    	if(referenceCitation.getDoi()!=null || !referenceCitation.getDoi().isBlank()) {
+    		iReference.setIdentifier(referenceCitation.getDoi());
+    		iReference.setIdentifierType("doi");
+    	} else if(referenceCitation.getIssn()!=null || !referenceCitation.getIssn().isBlank()) {
+    		iReference.setIdentifier(referenceCitation.getIssn());
+    		iReference.setIdentifierType("ISSN");
+    	}
+//    	iReference.setFirstPage(referenceCitation.getPages());
+//    	iReference.setEndPage(referenceCitation.getPages());
+    	iReference.setVolume(referenceCitation.getVolume());
+//    	iReference.setSource(referenceCitation.getSeries());
+//    	iReference.setReferenceString(referenceCitation.getPublicationTitle());
+    	StringBuilder referenceString = new StringBuilder();
+    	StringBuilder authorString = new StringBuilder();
+    	for(IPerson author: referenceCitation.getAuthors()) {
+    		referenceString.append(author.getLastName()).append(", ").append(author.getFirstName());
+    		authorString.append(author.getLastName()).append(", ").append(author.getFirstName());
+    	}
+    	
+    	return iReference;
     }
 }
