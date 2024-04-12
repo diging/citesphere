@@ -3,30 +3,36 @@
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
 <script th:inline="javascript">
 //# sourceURL=modal.js
-	$(function() {
-		$(".parse-ref-info").click(function(e) {
+	$(function() {		
+		$(document).on('click', '.parse-ref-info', function(e) {
 			var clicked = e.target;
-			$("#ref-unparsed").text($(clicked).text());
-			$("#parsed-ref-authors").text($(clicked).attr('data-authors'));
-			$("#parsed-ref-title").text($(clicked).attr('data-title'));
-			$("#parsed-ref-year").text($(clicked).attr('data-year'));
-			var identifier = $(clicked).attr('data-identifier');
-			var identType = $(clicked).attr('data-identifier-type');
-			if (identType != undefined && identType != "") {
-				identifier = identifier + " (" + identType + ")";
+			citationID = $(clicked).attr('data-citation-id');
+			if(citationID != undefined && citationID != "") {
+				zoteroGroupId = $(clicked).attr('data-zotero-group-id') 
+				window.location.href = "../items/" + citationID;
+			} else {
+				$("#ref-unparsed").text($(clicked).text());
+				$("#parsed-ref-authors").text($(clicked).attr('data-authors'));
+				$("#parsed-ref-title").text($(clicked).attr('data-title'));
+				$("#parsed-ref-year").text($(clicked).attr('data-year'));
+				var identifier = $(clicked).attr('data-identifier');
+				var identType = $(clicked).attr('data-identifier-type');
+				if (identType != undefined && identType != "") {
+					identifier = identifier + " (" + identType + ")";
+				}
+				$("#parsed-ref-ident").text(identifier);
+				$("#parsed-ref-first-page").text($(clicked).attr('data-first-page'));
+				$("#parsed-ref-last-page").text($(clicked).attr('data-last-page'));
+				$("#parsed-ref-volume").text($(clicked).attr('data-volume'));
+				$("#parsed-ref-source").text($(clicked).attr('data-source'));
+				$("#parsed-ref-publication-type").text($(clicked).attr('data-publication-type'));
+				$("#parsed-ref-reference-id").text($(clicked).attr('data-reference-id'));
+				$("#parsed-ref-reference-label").text($(clicked).attr('data-reference-label'));
+				$("#parsed-ref-citation-id").text($(clicked).attr('data-citation-id'));
+				$("#parsed-ref-ref-raw").text($(clicked).attr('data-ref-raw'));
+	            
+				$("#parsed-ref-modal").modal();
 			}
-			$("#parsed-ref-ident").text(identifier);
-			$("#parsed-ref-first-page").text($(clicked).attr('data-first-page'));
-			$("#parsed-ref-last-page").text($(clicked).attr('data-last-page'));
-			$("#parsed-ref-volume").text($(clicked).attr('data-volume'));
-			$("#parsed-ref-source").text($(clicked).attr('data-source'));
-			$("#parsed-ref-publication-type").text($(clicked).attr('data-publication-type'));
-			$("#parsed-ref-reference-id").text($(clicked).attr('data-reference-id'));
-			$("#parsed-ref-reference-label").text($(clicked).attr('data-reference-label'));
-			$("#parsed-ref-citation-id").text($(clicked).attr('data-citation-id'));
-			$("#parsed-ref-ref-raw").text($(clicked).attr('data-ref-raw'));
-            
-			$("#parsed-ref-modal").modal();
 		});
 		
 		$(".item-note").click(function(e) {
@@ -111,7 +117,7 @@
 	    $("#closeReferenceModalBtn").click(function() {
 	    	$("#referenceModal").modal('hide');
 	    });	    
-	    
+
 	    $("#addReferenceButton").click(function() {
 	        $("#referenceModal").modal('hide');
 	        var content = '<p>';
@@ -199,7 +205,7 @@
 	    }); 
 	}
 	
-	function updateCitationReferences(data) {
+	function updateCitationReferences(data, zoteroGroupId) {
 	    $('#citationReferences').empty();
 	    $.each(data.references, function(index, ref) {
 	        var referenceElement = $('<p>').addClass('parse-ref-info')
@@ -217,9 +223,10 @@
 	            .attr('data-reference-label', ref.referenceLabel)
 	            .attr('data-citation-id', ref.citationId)
 	            .attr('data-ref-raw', ref.referenceStringRaw)
+	            .attr('data-zotero-group-id', zoteroGroupId)
 	            .html('<span class="icon-info-circle"></span>' + ref.referenceString);
 	        $('#citationReferences').append(referenceElement);
-	    });
+	    });	    
 	}
 	
 	function updateItemReference(zoteroGroupId, itemId, referenceCitationKey, referenceVal) {
@@ -235,7 +242,7 @@
 	        },
 	        async: false,
 	        success: function(data) {
-	            updateCitationReferences(data);
+	            updateCitationReferences(data, zoteroGroupId);
 	            var message = "Reference added successfully";
 	            showNotification(message, "success", 1000);
 	        },
@@ -493,6 +500,7 @@
 	                        th:data-reference-label="${ref.referenceLabel}"
 	                        th:data-citation-id="${ref.citationId}"
 	                        th:data-ref-raw="${#strings.escapeXml(ref.referenceStringRaw)}"
+	                        th:data-zotero-group-id="${zoteroGroupId}"
 	                        >
 						<span class="icon-info-circle"></span>
 						[[${ref.referenceString}]]
