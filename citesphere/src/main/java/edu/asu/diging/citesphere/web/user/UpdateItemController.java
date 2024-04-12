@@ -26,40 +26,42 @@ import edu.asu.diging.citesphere.user.IUser;
 @Controller
 public class UpdateItemController {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private ICitationManager citationManager;
+	@Autowired
+	private ICitationManager citationManager;
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/update", method = RequestMethod.POST)
-    public ResponseEntity<?> updateReference(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
-            @RequestParam(value = "referenceCitationKey") String referenceCitationKey,
-            @RequestParam(value = "reference") String reference) {
-        try {
-            ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
-            citation = citationManager.updateCitationReference(citation, referenceCitationKey, reference);
-            citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
-            return new ResponseEntity<>(citation, HttpStatus.OK);
-        } catch (GroupDoesNotExistException e) {
-            logger.error("Group does not exist.", e);
-            return new ResponseEntity<>("{\"error\": \"Group " + zoteroGroupId + " not found.\"}", HttpStatus.NOT_FOUND);
-        } catch (CannotFindCitationException e) {
-            logger.error("Citation not found.", e);
-            return new ResponseEntity<>("{\"error\": \"Item " + itemId + " not found.\"}", HttpStatus.NOT_FOUND);
-        } catch (ZoteroHttpStatusException e) {
-            logger.error("Zotero threw exception.", e);
-            return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (ZoteroConnectionException e) {
-        	logger.error("Zotero connection failed.", e);
-            return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+	@RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/update", method = RequestMethod.POST)
+	public ResponseEntity<?> updateReference(Authentication authentication,
+			@PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
+			@RequestParam(value = "referenceCitationKey") String referenceCitationKey,
+			@RequestParam(value = "reference") String reference) {
+		try {
+			ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
+					itemId);
+			citation = citationManager.updateCitationReference(citation, referenceCitationKey, reference);
+			citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+			return new ResponseEntity<>(citation, HttpStatus.OK);
+		} catch (GroupDoesNotExistException e) {
+			logger.error("Group does not exist.", e);
+			return new ResponseEntity<>("{\"error\": \"Group " + zoteroGroupId + " not found.\"}",
+					HttpStatus.NOT_FOUND);
+		} catch (CannotFindCitationException e) {
+			logger.error("Citation not found.", e);
+			return new ResponseEntity<>("{\"error\": \"Item " + itemId + " not found.\"}", HttpStatus.NOT_FOUND);
+		} catch (ZoteroHttpStatusException e) {
+			logger.error("Zotero threw exception.", e);
+			return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (ZoteroConnectionException e) {
+			logger.error("Zotero connection failed.", e);
+			return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (CitationIsOutdatedException e) {
 			logger.error("Citation is outdated.", e);
-            return new ResponseEntity<>("{\"error\": \"Item " + itemId + " is outdated.\"}", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("{\"error\": \"Item " + itemId + " is outdated.\"}", HttpStatus.NOT_FOUND);
 		} catch (ZoteroItemCreationFailedException e) {
 			logger.error("Zotero Item creation failed.", e);
-            return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
-		} 
-    }
-    
+			return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }
