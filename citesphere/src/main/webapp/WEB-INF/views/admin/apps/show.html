@@ -83,6 +83,7 @@ $(function() {
 	<th>Client Id</th>
 	<th>Name</th>
 	<th>Description</th>
+	<th>CreatedBy</th>
 	<th/>
 
 </tr>
@@ -90,6 +91,7 @@ $(function() {
 	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.clientId}"/></a></td>
 	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/apps/'+ ${client.clientId}}"><span th:text="${client.name}"/></a></td>
 	<td class="client-entry" th:data-id="${client.clientId}"> <span th:text="${client.description}"/></td>
+	<td class="client-entry" th:data-id="${client.clientId}"> <span th:if="${client.createdBy}" th:text="${client.createdBy.getUsername()}"/></td>
 	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="icon-trash-alt"></i></button></td>
 </tr>
 </table>
