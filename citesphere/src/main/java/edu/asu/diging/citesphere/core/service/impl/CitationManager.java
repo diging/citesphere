@@ -500,4 +500,13 @@ public class CitationManager implements ICitationManager {
     public void deleteLocalGroupCitations(String groupId) {
         citationStore.deleteCitationByGroupId(groupId);
     }
+    
+    @Override
+    public CitationResults getCitationsByContributorUri(List<String> groupIds, long start, int pageSize, String uri) {
+    	List<ICitation> citations = (List<ICitation>) citationDao.findCitationsByContributorUri(groupIds, start, pageSize, uri);
+    	CitationResults results = new CitationResults();
+    	results.setCitations(citations);
+    	results.setTotalResults(citations.size());
+        return results;
+    }
 }
