@@ -61,7 +61,7 @@ public class SearchController {
 
         if (group == null) {
             logger.error("User " + user.getUsername() + " does not have access to group " + zoteroGroupId);
-            return "error/404";
+            return "error/403";
         }
 
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
@@ -99,11 +99,7 @@ public class SearchController {
         }
         model.addAttribute("columns", shownColumns);
         model.addAttribute("availableColumns", allowedColumns);
-
-        List<BreadCrumb> breadCrumbs = new ArrayList<>();
-        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
-        Collections.reverse(breadCrumbs);
-        model.addAttribute("breadCrumbs", breadCrumbs);
+        model.addAttribute("breadCrumbs", getBreadCrumbs(null, group, user, zoteroGroupId));
         return "auth/group/items";
     }
     
@@ -119,7 +115,7 @@ public class SearchController {
 
         if (group == null) {
             logger.error("User " + user.getUsername() + " does not have access to group " + zoteroGroupId);
-            return "error/404";
+            return "error/403";
         }
 
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
@@ -158,8 +154,6 @@ public class SearchController {
         }
         model.addAttribute("columns", shownColumns);
         model.addAttribute("availableColumns", allowedColumns);
-
-        List<BreadCrumb> breadCrumbs = new ArrayList<>();
         ICitationCollection collection = null;
         if (collectionId != null) {
             collection = collectionManager.getCollection(user, zoteroGroupId, collectionId);
@@ -167,6 +161,12 @@ public class SearchController {
                 model.addAttribute("collectionName", collection.getName()); 
             }
         }
+        model.addAttribute("breadCrumbs", getBreadCrumbs(collection, group, user, zoteroGroupId));
+        return "auth/group/items";
+    }
+    
+    private List<BreadCrumb> getBreadCrumbs(ICitationCollection collection, ICitationGroup group, IUser user, String zoteroGroupId) {
+        List<BreadCrumb> breadCrumbs = new ArrayList<>();
         while(collection != null) {
             breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
             if (collection.getParentCollectionKey() != null) {
@@ -177,7 +177,6 @@ public class SearchController {
         }
         breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
         Collections.reverse(breadCrumbs);
-        model.addAttribute("breadCrumbs", breadCrumbs);
-        return "auth/group/items";
+        return breadCrumbs;
     }
 }
