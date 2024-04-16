@@ -2,6 +2,8 @@ package edu.asu.diging.citesphere.api.v1.user;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +73,7 @@ public class ItemsApiController extends V1Controller {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
+            logger.info("I am here");
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
         }
@@ -131,5 +134,33 @@ public class ItemsApiController extends V1Controller {
 
 		return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
 	}
+    
+    @RequestMapping(value = {"/user/citations"}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<String> getCitationsByContributorUri(@RequestHeader HttpHeaders headers, @RequestParam(defaultValue = "1", required = false, value = "page") long page,
+            @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
+            @RequestParam(value = "uri") String uri, Principal principal){
+    	
+    	List<String> groupIds = new ArrayList<>();
+    	IUser user = userManager.findByUsername(principal.getName());
+    	List<ICitationGroup> groups = citationManager.getGroups(user);
+    	
+    	for (ICitationGroup group : groups) {
+    	    String groupId = String.valueOf(group.getGroupId());
+    	    groupIds.add(groupId);
+    	}
+    	
+    	CitationResults results;
+    	results = citationManager.getCitationsByContributorUri(groupIds, page, pageSize, uri);
+    	
+    	String jsonResponse = "";
+		try {
+			jsonResponse = objectMapper.writeValueAsString(results.getCitations());
+		} catch (IOException e) {
+			logger.error("Unable to process JSON response ", e);
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
+    }
 
 }
