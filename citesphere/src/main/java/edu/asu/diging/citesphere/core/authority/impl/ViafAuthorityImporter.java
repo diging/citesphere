@@ -38,6 +38,9 @@ import edu.asu.diging.citesphere.web.user.AuthoritySearchResult;
 @Component
 @PropertySource(value = "classpath:/config.properties")
 public class ViafAuthorityImporter extends BaseAuthorityImporter {
+    
+    @Value("${_importer_name_authority.importer.viaf.id}")
+    private String ID;
 
     @Value("${_viaf_url_regex}")
     private String viafUrlRegex;
@@ -49,7 +52,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
     private String viafURL;
 
     @Value("${_importer_name_authority.importer.viaf}")
-    private String ID;
+    private String viafImporter;
     
     private RestTemplate restTemplate;
 
@@ -182,7 +185,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
                     if (iterator.hasNext()) {
                         String name = iterator.next().getText();
                         authority.setName(name);
-                        authority.setImporterId(ID);
+                        authority.setImporterId(viafImporter);
                         authority.setUri(record.getDocument().get("@about") + "");
                         authorityEntries.add(authority);
                     }
