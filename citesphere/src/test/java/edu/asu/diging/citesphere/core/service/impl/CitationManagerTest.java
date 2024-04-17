@@ -395,4 +395,25 @@ public class CitationManagerTest {
         List<ICitation> response = managerToTest.getNotes(user, GROUP_ID, EXISTING_ID);
         Assert.assertTrue(response.size() == 0);
     }
+    
+    
+    @Test
+    public void test_getCitationsByContributorUri() {
+    	List<String> groupIds  = new ArrayList<>();
+    	groupIds.add("groupId1");
+        groupIds.add("groupId2");
+        long start = 1;
+        int pageSize = 10;
+        String uri = "testUri";
+        
+        List<? extends ICitation> mockCitations = new ArrayList<>();
+        
+        Mockito.doReturn(mockCitations).when(citationDao).findCitationsByContributorUri(groupIds, start, pageSize, uri);
+        
+        CitationResults result = managerToTest.getCitationsByContributorUri(groupIds, start, pageSize, uri);
+        
+        Assert.assertEquals(mockCitations.size(), result.getTotalResults());
+        Assert.assertEquals(mockCitations, result.getCitations());
+
+    }
 }
