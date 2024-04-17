@@ -110,7 +110,7 @@ public class ItemsApiController extends V1Controller {
     }
     
     @RequestMapping(value = {"/user/citations"}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<String> getCitationsByContributorUri(@RequestHeader HttpHeaders headers, @RequestParam(defaultValue = "1", required = false, value = "page") long page,
+    public ResponseEntity<String> getCitationsByContributorUri(@RequestHeader HttpHeaders headers, @RequestParam(defaultValue = "0", required = false, value = "page") long page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam(value = "uri") String uri, Principal principal){
     	
@@ -122,7 +122,6 @@ public class ItemsApiController extends V1Controller {
     	    String groupId = String.valueOf(group.getGroupId());
     	    groupIds.add(groupId);
     	}
-    	
     	CitationResults results;
     	results = citationManager.getCitationsByContributorUri(groupIds, page, pageSize, uri);
     	
