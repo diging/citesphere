@@ -431,12 +431,6 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public CitationResults getItemsByUri(IUser user, String uri, String page) {
-        CitationResults results = new CitationResults();
-        return results;
-    }
-
-    @Override
     public void forceGroupItemsRefresh(IUser user, String groupId, String collectionId, int page, String sortBy) {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (groupOptional.isPresent()) {
