@@ -73,7 +73,6 @@ public class ItemsApiController extends V1Controller {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
-            logger.info("I am here");
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
         }
