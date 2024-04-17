@@ -128,12 +128,12 @@ public class ItemsApiController extends V1Controller {
     	String jsonResponse = "";
 		try {
 			jsonResponse = objectMapper.writeValueAsString(results.getCitations());
-		} catch (IOException e) {
-			logger.error("Unable to process JSON response ", e);
-			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+        } catch (IOException e) {
+            logger.error("Unable to process JSON response ", e);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-		return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
+        return new ResponseEntity<String>(jsonResponse, HttpStatus.OK);
     }
 
 }
