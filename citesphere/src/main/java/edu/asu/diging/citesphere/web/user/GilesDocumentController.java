@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -44,62 +45,16 @@ public class GilesDocumentController {
     private ICitationManager citationManager;
 
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/giles/{fileId}")
-    public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication) {
+    public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication, Model model) {
         
         String contentType = null;
         String fileName = null;
         ICitation citation = citationManager.getCitation(itemId);
         List<IGilesUpload> uploadOptionalList = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null && u.getDocumentStatus().equals(GilesStatus.COMPLETE)).collect(Collectors.toList());
-        if(uploadOptionalList.size()!=0) {
-            Stream<IGilesFile> gilesFilesStream = generateStream(uploadOptionalList);
-            IGilesFile foundFile = gilesFilesStream.filter(file -> file.getId().equals(fileId)).findFirst().orElse(null);
-
-            if(foundFile != null) {
-                contentType = foundFile.getContentType();
-                fileName = foundFile.getFilename();
-            }
-        }
-        else if(uploadOptionalList.size()==0 || contentType==null){
+        if(uploadOptionalList.size()==0 || contentType==null){
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
             return;
         }
-        
-        byte[] content = gilesConnector.getFile((IUser)authentication.getPrincipal(), fileId);
-
-        response.setContentType(contentType);
-        response.setHeader("Content-disposition", "inline; filename=\"" + fileName + "\""); 
-        try {
-            if (content != null) {
-                response.setContentLength(content.length);
-                response.getOutputStream().write(content);
-                response.getOutputStream().close();
-            }
-        } catch (IOException e) {
-            logger.error("Could not write file.", e);
-        }
-
-    }
-    
-    
-    private static Stream<IGilesFile> generateStream(List<IGilesUpload> uploadOptionalList) {
-
-        Stream<IGilesFile> gilesFilesStream = uploadOptionalList.stream().flatMap(gilesUpload -> {
-            List<IGilesFile> gilesFiles = new ArrayList<>();
-            gilesFiles.add(gilesUpload.getUploadedFile()); 
-            gilesFiles.add(gilesUpload.getExtractedText());
-            if(gilesUpload.getPages() != null) {
-                gilesUpload.getPages().forEach(p -> {
-                    gilesFiles.add(p.getImage());
-                    gilesFiles.add(p.getOcr());
-                    gilesFiles.add(p.getText());
-                    p.getAdditionalFiles().forEach(a -> gilesFiles.add(a));
-                });
-            }
-            if(gilesUpload.getAdditionaFiles() != null) {
-                gilesUpload.getAdditionaFiles().forEach(a -> gilesFiles.add(a));
-            }
-            return gilesFiles.stream();
-        });
-        return gilesFilesStream;
+        model.addAttribute("uploadOptionalList", uploadOptionalList);
     }
 }

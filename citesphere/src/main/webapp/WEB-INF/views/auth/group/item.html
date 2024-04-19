@@ -107,35 +107,18 @@
 	    $(".view-link").click(function() {
 	    	var item = $(this).parent();
 	        var modalName = 'viewUpload';
-	        showFiles(modalName, item);
+	        /* showFiles(modalName, item); */
 	        $("#"+modalName.toLowerCase()+"Modal").modal('show');
 		});
-	    /* $('#viewuploadModal .close').click(function() {
-	        // Reset the content of elements
-	        $("#uploadedFileName").attr('href', '').text('');
-	        $("#extractedFileName").attr('href', '').text(''); 
-	        
-	        $("#viewUploadBody modal-body page-title").empty();
-	        $("#viewUploadBody modal-body page-list").empty();
-	    }); */
 	    $('.note-info').each(function() {
 	    	$(this).text(truncateNote($(this).attr('data-note-text')));
 	    })
 	});
 	
-	function showFiles(modalName, item) {
+	/* function showFiles(modalName, item) {
 		
 		var uploadItem = $(item);
 		var modalNameLCase = modalName.toLowerCase();
-		
-		/* $("#uploadedFileName").removeAttr('href').text('');
-	    $("#extractedFileName").removeAttr('href').text('');
-	    $('.modal-body ul').empty(); */
-		
-	    /* $(uploadItem).children().each(function() {
-	        // Clear content of each child element
-	    	$('#page-list').empty();
-	    }); */
 
 	    $('#page-title, #page-list').remove();
 		
@@ -174,7 +157,7 @@
                pageCount = pageCount+1;
            })
        }) 
-	}
+	} */
 	
 </script>
 </head>
