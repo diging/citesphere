@@ -32,6 +32,8 @@ public interface IZoteroConnector {
     Item getCitesphereMetaData(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
 
     List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
+    
+    List<Item> getNotes(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException;
 
     ZoteroResponse<Group> getGroupsVersions(IUser user);
 

@@ -198,6 +198,19 @@ public class ZoteroConnector implements IZoteroConnector {
     }
 
     @Override
+    public List<Item> getNotes(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            return zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey).stream()
+                    .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()) && !item.getData()
+                            .getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG)))
+                    .collect(Collectors.toList());
+        } catch (HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
+    
+    @Override
     public Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException {
         Zotero zotero = getApi(user);

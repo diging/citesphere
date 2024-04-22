@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import edu.asu.diging.citesphere.user.IUser;
+
 public interface IOAuthClient {
 
     void setAutoApprove(boolean autoApprove);
@@ -66,6 +68,7 @@ public interface IOAuthClient {
 
     String getDescription();
 
+    IUser getCreatedBy();
     
-
+    void setCreatedBy(IUser user);
 }

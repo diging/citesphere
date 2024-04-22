@@ -47,6 +47,9 @@ public interface ICitationManager {
     
     List<ICitation> getAttachments(IUser user, String groupId, String key) throws AccessForbiddenException,
             GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
+    
+    List<ICitation> getNotes(IUser user, String groupId, String key)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 
     void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
             CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException;
@@ -63,6 +66,9 @@ public interface ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
     
     List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
+    
+    List<ICitation> updateNotesFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException;
 
     ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
