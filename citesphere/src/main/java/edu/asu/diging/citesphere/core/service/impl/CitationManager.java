@@ -435,12 +435,11 @@ public class CitationManager implements ICitationManager {
     
     @Override
     public boolean cancel() {
-        boolean result = false;
         if(future != null) {
-            result = future.cancel(true);
-        } 
+            return future.cancel(true);
+        }
         
-        return result;
+        return false;
     }
 
     @Override

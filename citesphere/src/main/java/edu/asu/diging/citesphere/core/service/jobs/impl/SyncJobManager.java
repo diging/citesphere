@@ -85,7 +85,7 @@ public class SyncJobManager implements ISyncJobManager {
                 job = jobOptional.get();
             }
            
-            if(!citationManager.cancel()) {
+            if(citationManager.cancel()) {
                 job.setStatus(JobStatus.CANCELED);
                 job.setFinishedOn(OffsetDateTime.now());
                 jobRepo.save(job);
