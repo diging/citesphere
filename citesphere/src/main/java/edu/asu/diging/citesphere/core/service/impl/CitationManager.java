@@ -371,8 +371,6 @@ public class CitationManager implements ICitationManager {
     @Override
     public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
-    	
-    	System.out.println("I am coming here");
 
         ICitationGroup group = null;
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
@@ -417,8 +415,7 @@ public class CitationManager implements ICitationManager {
         } else {
             results.setNotModified(true);
         }
-        
-        System.out.println(futureMap.toString());
+       
         List<ICitation> citations = null;
         long total = 0;
         if (collectionId != null && !collectionId.trim().isEmpty()) {
@@ -446,7 +443,6 @@ public class CitationManager implements ICitationManager {
     
     @Override
     public boolean cancel(String groupId) {
-    	System.out.println("I am also coming here");
         Future<String> future = futureMap.get(groupId);
         if (future != null) {
             futureMap.remove(groupId);
