@@ -2,6 +2,8 @@ package edu.asu.diging.citesphere.core.model.jobs;
 
 import java.util.List;
 
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+
 public interface IImportCrossrefJob extends IJob {
 
     /**
@@ -11,5 +13,14 @@ public interface IImportCrossrefJob extends IJob {
     List<String> getDois();
 
     void setDois(List<String> dois);
+    
+    void setCitationGroup(String citationGroup);
+
+    String getCitationGroup();
+
+    ICitationGroup getCitationGroupDetail();
+
+    void setCitationGroupDetail(ICitationGroup citationGroupDetail);
+
 
 }

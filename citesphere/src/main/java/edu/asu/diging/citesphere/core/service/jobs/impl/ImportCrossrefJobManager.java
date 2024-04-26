@@ -61,6 +61,7 @@ public class ImportCrossrefJobManager implements IImportCrossrefJobManager {
         job.setCreatedOn(OffsetDateTime.now());
         job.setUsername(user.getUsername());
         job.setDois(dois);
+        job.setCitationGroup(groupId);
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save((ImportCrossrefJob)job);
         
