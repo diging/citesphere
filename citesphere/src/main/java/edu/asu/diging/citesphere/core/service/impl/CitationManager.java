@@ -50,7 +50,6 @@ import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
-import edu.asu.diging.citesphere.model.bib.GilesStatus;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -515,18 +514,20 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public void reprocessFile(IUser user, String zoteroGroupId, String itemId, String documentId)
+    public HttpStatus reprocessFile(IUser user, String zoteroGroupId, String itemId, String documentId)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
         List<IGilesUpload> uploadsToReprocess = citation.getGilesUploads().stream()
         .filter(upload -> upload.getDocumentId() != null && upload.getDocumentId().equals(documentId)).collect(Collectors.toList());
+        HttpStatus reprocessingStatus = null;
         for(IGilesUpload upload : uploadsToReprocess) {
-            initiateReprocessing(user, documentId, citation);
+            reprocessingStatus = initiateReprocessing(user, documentId, citation);
         }
+        return reprocessingStatus;
     }
     
-    private void initiateReprocessing(IUser user, String documentId, ICitation citation) {
+    private HttpStatus initiateReprocessing(IUser user, String documentId, ICitation citation) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ResponseEntity<String> reprocessingResponse = gilesConnector.reprocessDocument(user, documentId);
         if (reprocessingResponse.getStatusCode().equals(HttpStatus.OK)) {
             IGilesUpload reprocessedUpload = new GilesUpload();
@@ -546,10 +547,11 @@ public class CitationManager implements ICitationManager {
             updateReprocessedUpload(checkedUploads, user, citation, documentId);
             gilesUploadChecker.add(citation);
         }
+        return reprocessingResponse.getStatusCode();
     }
     
-    private void updateReprocessedUpload(Set<IGilesUpload> checkedUploads, IUser user, ICitation citation, String documentId) {
-        ICitation currentCitation = getCurrentCitation(citation, user);
+    private void updateReprocessedUpload(Set<IGilesUpload> checkedUploads, IUser user, ICitation citation, String documentId) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        ICitation currentCitation =getCitation(user, citation.getGroup(), citation.getKey());;
         if (currentCitation != null) {
             for (IGilesUpload upload : checkedUploads) {
                 Optional<IGilesUpload> oldUpload = currentCitation
@@ -570,19 +572,5 @@ public class CitationManager implements ICitationManager {
                 logger.error("Could not update citation.", e);
             }
         }
-    }
-    
-    private ICitation getCurrentCitation(ICitation citation, IUser user) {
-        try {
-            return getCitation(user,
-                    citation.getGroup(), citation.getKey());
-        } catch (GroupDoesNotExistException e) {
-            logger.error("Could not get citation.", e);
-        } catch (CannotFindCitationException e) {
-            logger.error("Could not get citation.", e);
-        } catch (ZoteroHttpStatusException e) {
-            logger.error("Could not get citation.", e);
-        }
-        return null;
     }
 }
