@@ -26,7 +26,7 @@ import edu.asu.diging.citesphere.user.IUser;
 
 public interface ICitationManager {
     
-    boolean cancel();
+    boolean cancel(String groupId);
     
     List<ICitationGroup> getGroups(IUser user);
 

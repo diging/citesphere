@@ -88,7 +88,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     public Future<String> sync(IUser user, String groupId, long contentVersion, String collectionId) throws ZoteroHttpStatusException {
         GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
         // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
-        // more activate job statuses than inactive ones, so it's less error prone to use the list that
+        // more active job statuses than inactive ones, so it's less error prone to use the list that
         // is less likely to change.
         if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
             // there is already a job running, let's not start another one

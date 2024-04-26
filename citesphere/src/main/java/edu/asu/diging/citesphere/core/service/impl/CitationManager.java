@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
@@ -87,7 +88,7 @@ public class CitationManager implements ICitationManager {
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
-    Future<String> future;
+    Map<String, Future<String>> futureMap = new ConcurrentHashMap<>();
     
     @PostConstruct
     public void init() {
@@ -370,6 +371,8 @@ public class CitationManager implements ICitationManager {
     @Override
     public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
+    	
+    	System.out.println("I am coming here");
 
         ICitationGroup group = null;
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
@@ -385,6 +388,12 @@ public class CitationManager implements ICitationManager {
 
         if (group == null) {
             throw new GroupDoesNotExistException("There is no group with id " + groupId);
+        }
+        
+        Future<String> existingFuture = futureMap.get(groupId);
+        if (existingFuture != null && !existingFuture.isDone()) {
+            existingFuture.cancel(true);
+            futureMap.remove(groupId);
         }
 
         boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
@@ -403,11 +412,13 @@ public class CitationManager implements ICitationManager {
 
             // then update content
             results.setNotModified(false);
-            future = asyncCitationProcessor.sync(user, group.getGroupId() + "", previousVersion, collectionId);
+            Future<String> future = asyncCitationProcessor.sync(user, group.getGroupId() + "", previousVersion, collectionId);
+            futureMap.put(groupId, future);
         } else {
             results.setNotModified(true);
         }
-
+        
+        System.out.println(futureMap.toString());
         List<ICitation> citations = null;
         long total = 0;
         if (collectionId != null && !collectionId.trim().isEmpty()) {
@@ -434,11 +445,13 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public boolean cancel() {
-        if(future != null) {
+    public boolean cancel(String groupId) {
+    	System.out.println("I am also coming here");
+        Future<String> future = futureMap.get(groupId);
+        if (future != null) {
+            futureMap.remove(groupId);
             return future.cancel(true);
         }
-        
         return false;
     }
 
