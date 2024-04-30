@@ -56,14 +56,14 @@ public class ImportCrossrefJobManager implements IImportCrossrefJobManager {
         if (group == null) {
             throw new GroupDoesNotExistException();
         }
-        
-        IImportCrossrefJob job = new ImportCrossrefJob();
+               
+        ImportCrossrefJob job = new ImportCrossrefJob();
         job.setCreatedOn(OffsetDateTime.now());
         job.setUsername(user.getUsername());
         job.setDois(dois);
         job.setCitationGroup(groupId);
-        job.setStatus(JobStatus.PREPARED);
-        jobRepo.save((ImportCrossrefJob)job);
+        job.setStatus(JobStatus.PREPARED);        
+        jobRepo.save(job);
         
         String token = tokenService.generateJobApiToken(job);
         try {
@@ -72,7 +72,7 @@ public class ImportCrossrefJobManager implements IImportCrossrefJobManager {
             logger.error("Could not send Kafka message.", e);
             job.setStatus(JobStatus.FAILURE);
             job.getPhases().add(new JobPhase(JobStatus.FAILURE, e.getMessage()));
-            jobRepo.save((ImportCrossrefJob)job);
+            jobRepo.save(job);
         }
         
         return job;

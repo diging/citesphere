@@ -74,6 +74,7 @@ public class JobInfoController extends BaseJobInfoController {
             ArrayNode doisNode = mapper.createArrayNode();
             ((IImportCrossrefJob)job).getDois().forEach(d -> doisNode.add(d));
             node.set("dois", doisNode);
+            node.put("groupId", ((IImportCrossrefJob)job).getCitationGroup());
         }
         
         return new ResponseEntity<>(node.toString(), HttpStatus.OK);
