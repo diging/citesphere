@@ -130,25 +130,25 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
-        
+
         syncCitations(user, groupId, job, versions, counter);
-        
+
         if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
-        
+
         syncCollections(user, groupId, job, collectionVersions, groupVersion, counter);
 
         if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
-        
+
         removeDeletedItems(deletedElements, job);
-        
+
         if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
-        
+
         // while this thread has been running, the group might have been updated by another thread
         // so, we have to make sure there is no group with the same group id but other object id
         // or we'll end up with two groups with the same group id.
@@ -179,7 +179,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
         return false;
     }
-    
+
     private void setJobToCanceledState(GroupSyncJob job, String groupId) {
         logger.info("Aborting sync for " + groupId);
         job.setStatus(JobStatus.CANCELED);
