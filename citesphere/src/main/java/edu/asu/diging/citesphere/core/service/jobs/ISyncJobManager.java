@@ -18,4 +18,5 @@ public interface ISyncJobManager {
     long getJobsCount(IUser user);
 
     void cancelJob(String jobId);
+
 }
