@@ -36,8 +36,7 @@ public class SyncJobManager implements ISyncJobManager {
     public void init() {
         currentJobs = new ConcurrentHashMap<>();
     }
-    
-    
+
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.jobs.impl.ISyncJobManager#addJobId(edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob)
      */

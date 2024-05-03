@@ -89,7 +89,7 @@ public class CitationManager implements ICitationManager {
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
     Map<String, Future<String>> futureMap = new ConcurrentHashMap<>();
-    
+
     @PostConstruct
     public void init() {
         sortFunctions = new HashMap<>();
@@ -387,7 +387,7 @@ public class CitationManager implements ICitationManager {
         if (group == null) {
             throw new GroupDoesNotExistException("There is no group with id " + groupId);
         }
-        
+
         Future<String> existingFuture = futureMap.get(groupId);
         if (existingFuture != null && !existingFuture.isDone()) {
             existingFuture.cancel(true);
@@ -415,7 +415,7 @@ public class CitationManager implements ICitationManager {
         } else {
             results.setNotModified(true);
         }
-       
+
         List<ICitation> citations = null;
         long total = 0;
         if (collectionId != null && !collectionId.trim().isEmpty()) {
@@ -440,7 +440,7 @@ public class CitationManager implements ICitationManager {
         return results;
 
     }
-    
+
     @Override
     public boolean cancel(String groupId) {
         Future<String> future = futureMap.get(groupId);

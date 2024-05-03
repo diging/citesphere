@@ -74,7 +74,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         inactiveJobStatuses.add(JobStatus.DONE);
         inactiveJobStatuses.add(JobStatus.FAILURE);
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -94,7 +94,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             // there is already a job running, let's not start another one
             return new AsyncResult<String>(null);
         }
-        
+
         logger.info("Starting sync for " + groupId);
         GroupSyncJob job = new GroupSyncJob();
         job.setCreatedOn(OffsetDateTime.now());
@@ -103,7 +103,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         jobRepo.save(job);
         jobManager.addJob(job);
         Thread currentThread = Thread.currentThread();
-        
+
         if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
@@ -153,7 +153,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         // so, we have to make sure there is no group with the same group id but other object id
         // or we'll end up with two groups with the same group id.
         Optional<ICitationGroup> group = groupRepo.findFirstByGroupId(new Long(groupId));
-        
+
         if (group.isPresent()) {
             group.get().setContentVersion(groupVersion);
             groupRepo.save((CitationGroup) group.get());
@@ -162,11 +162,11 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
-        
+
         job.setStatus(JobStatus.DONE);
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
-        
+
         Future<String> result = new AsyncResult<String>(job.getId());
         return result;
     }
@@ -186,7 +186,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
     }
-    
+
     private void syncCitations(IUser user, String groupId, GroupSyncJob job, Map<String, Long> versions,
             AtomicInteger counter) throws ZoteroHttpStatusException {
         List<String> keysToRetrieve = new ArrayList<>();
