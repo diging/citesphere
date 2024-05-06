@@ -41,9 +41,6 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
     @Value("${_conceptpower_url}")
     private String conceptpowerURL;
-
-    @Value("${_importer_name_authority.importer.conceptpower}")
-    private String conceptpowerImporter;
     
     private RestTemplate restTemplate;
 
@@ -127,7 +124,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
                     IAuthorityEntry authority = new AuthorityEntry();
                     authority.setName(conceptEntry.getLemma());
                     authority.setUri(conceptEntry.getConcept_uri());
-                    authority.setImporterId(conceptpowerImporter);
+                    authority.setImporterId(ID);
                     authority.setDescription(conceptEntry.getDescription());
                     authorityEntries.add(authority);
                 }
