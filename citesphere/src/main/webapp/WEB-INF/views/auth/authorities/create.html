@@ -105,6 +105,7 @@ function showPerson(name, description, uri, importerId) {
 function getConceptpowerAuthorities(modalType, personType, page) {
     var firstName = $("#firstName" + personType).val();
     var lastName = $("#lastName" + personType).val();
+    var importerId = [[${_importer_name_authority.importer.conceptpower}]];
     personType_lowerCase = personType.toLowerCase();
     url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?firstName=' + firstName + '&lastName=' + lastName + '&page=' + page;
     $.ajax({
@@ -124,7 +125,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
-                    content += '<td style="display: none;" class="importerId">' + elem['importerId'] + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + elem[importerId] + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
@@ -168,6 +169,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
 function getViafAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
+	var importerId = [[${_importer_name_authority.importer.viaf}]];
 	personType_lowerCase = personType.toLowerCase();
 	url = [[@{|/auth/authority/find/authorities/viaf|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
@@ -188,7 +190,7 @@ function getViafAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
-                    content += '<td style="display: none;" class="importerId">' + elem['importerId'] + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + elem[importerId] + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
