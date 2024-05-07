@@ -62,7 +62,7 @@ public class DbTokenStore implements TokenStore {
     }
 
     @Override
-    public void storeAccessToken(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+    public synchronized void storeAccessToken(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
         String refreshToken = null;
         if (accessToken.getRefreshToken() != null) {
             refreshToken = accessToken.getRefreshToken().getValue();
