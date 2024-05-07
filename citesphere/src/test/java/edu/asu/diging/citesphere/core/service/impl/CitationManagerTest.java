@@ -1,10 +1,13 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,9 +31,11 @@ import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IPerson;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.impl.Person;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
@@ -396,24 +401,89 @@ public class CitationManagerTest {
         Assert.assertTrue(response.size() == 0);
     }
     
-    
     @Test
-    public void test_getCitationsByContributorUri() {
-    	List<String> groupIds  = new ArrayList<>();
-    	groupIds.add("groupId1");
-        groupIds.add("groupId2");
+    public void test_getCitationsByContributorUri_CitationsNotFound() {
+    	
+    	List<String> groupIds  = List.of("group1", "group2");
         long start = 1;
         int pageSize = 10;
         String uri = "testUri";
+
+        List<? extends ICitation> mockCitations = new ArrayList<>();
+        long size = mockCitations.size();
+
+        Mockito.doReturn(mockCitations).when(citationDao).findCitationsByContributorUri(groupIds, start, pageSize, uri);
+        Mockito.doReturn(size).when(citationDao).countCitationsByContributorUri(groupIds, uri);
+
+        CitationResults result = managerToTest.getCitationsByContributorUri(groupIds, start, pageSize, uri);
+
+        Assert.assertEquals(0, result.getTotalResults());
+        Assert.assertEquals(mockCitations, result.getCitations());
+    }
+    
+    @Test
+    public void test_getCitationsByContributorUri_CitationsFound() {
+    	
+    	List<String> groupIds  = List.of("groupId1", "groupId2");
+        long start = 1;
+        int pageSize = 10;
+        String uri = "https://testauthor1";
         
         List<? extends ICitation> mockCitations = new ArrayList<>();
         
+        IPerson author1 = new Person();
+        author1.setFirstName("author1");
+        author1.setLastName("test");
+        author1.setUri("https://testauthor1");
+        
+        Set<IPerson> authors = new HashSet<>();
+        authors.add(author1);
+        
+        ICitation citation1 = new Citation();
+        citation1.setGroup("groupId1");
+        citation1.setAuthors(authors);
+
+        ICitation citation2 = new Citation();
+        citation2.setGroup("groupId2");
+        citation2.setEditors(authors);
+
+        ((List<Object>) mockCitations).add(citation1);
+        ((List<Object>) mockCitations).add(citation2);
+        long size = mockCitations.size();
         Mockito.doReturn(mockCitations).when(citationDao).findCitationsByContributorUri(groupIds, start, pageSize, uri);
+        Mockito.doReturn(size).when(citationDao).countCitationsByContributorUri(groupIds, uri);
         
         CitationResults result = managerToTest.getCitationsByContributorUri(groupIds, start, pageSize, uri);
         
-        Assert.assertEquals(mockCitations.size(), result.getTotalResults());
+        Assert.assertEquals(2, result.getTotalResults());
         Assert.assertEquals(mockCitations, result.getCitations());
-
     }
+    
+    @Test
+    public void testGetCitationsByContributorUri_EmptyInputLists() {
+
+        CitationResults results = managerToTest.getCitationsByContributorUri(Collections.emptyList(), 0, 10, "");
+
+        Assert.assertTrue(results.getCitations().isEmpty());
+        Assert.assertEquals(0, results.getTotalResults());
+    }
+
+    @Test
+    public void testGetCitationsByContributorUri_InvalidStartPageSize() {
+
+        List<String> groupIds = List.of("group1", "group2");
+        String uri = "testUri";
+
+        // Set up mock behavior
+        Mockito.doReturn(Collections.emptyList()).when(citationDao).findCitationsByContributorUri(groupIds, 0, 1, uri);
+        Mockito.doReturn(0L).when(citationDao).countCitationsByContributorUri(groupIds, uri);
+        
+        // Call the method under test with invalid start and page size
+        CitationResults results = managerToTest.getCitationsByContributorUri(groupIds, -1, 1, uri);
+
+        // Verify the results
+        Assert.assertTrue(results.getCitations().isEmpty());
+        Assert.assertEquals(0, results.getTotalResults());
+    }
+    
 }

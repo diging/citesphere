@@ -500,7 +500,7 @@ public class CitationManager implements ICitationManager {
     	List<ICitation> citations = (List<ICitation>) citationDao.findCitationsByContributorUri(groupIds, start, pageSize, uri);
     	CitationResults results = new CitationResults();
     	results.setCitations(citations);
-    	results.setTotalResults(citations.size());
+    	results.setTotalResults(citationDao.countCitationsByContributorUri(groupIds, uri));
         return results;
     }
 }
