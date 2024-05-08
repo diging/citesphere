@@ -49,7 +49,7 @@ public class ViafAuthorityImporter extends BaseAuthorityImporter {
 
     @Value("${_viaf_url}")
     private String viafURL;
-    
+
     private RestTemplate restTemplate;
 
     @PostConstruct

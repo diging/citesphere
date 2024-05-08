@@ -41,7 +41,7 @@ public class ConceptpowerImporter extends BaseAuthorityImporter {
 
     @Value("${_conceptpower_url}")
     private String conceptpowerURL;
-    
+
     private RestTemplate restTemplate;
 
     @PostConstruct
