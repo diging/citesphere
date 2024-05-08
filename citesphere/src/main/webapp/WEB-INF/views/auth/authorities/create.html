@@ -180,7 +180,7 @@ function getViafAuthorities(modalType, personType, page) {
   			$("#viafAuthoritySearchResult").empty();
   			var content = '';
   			var importerId = /*[[${@environment.getProperty('_importer_name_authority.importer.viaf')}]]*/ '';
-            if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
                 data['foundAuthorities'].forEach(function(elem) {
                     content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
                     if (elem['description'] == null) {
