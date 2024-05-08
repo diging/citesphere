@@ -105,7 +105,6 @@ function showPerson(name, description, uri, importerId) {
 function getConceptpowerAuthorities(modalType, personType, page) {
     var firstName = $("#firstName" + personType).val();
     var lastName = $("#lastName" + personType).val();
-    var importerId = [[${_importer_name_authority.importer.conceptpower}]];
     personType_lowerCase = personType.toLowerCase();
     url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?firstName=' + firstName + '&lastName=' + lastName + '&page=' + page;
     $.ajax({
@@ -116,7 +115,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
         success: function(data) {
             $("#conceptpowerAuthoritySearchResult").empty();
             var content = '';
-
+            var importerId = /*[[${@environment.getProperty('_importer_name_authority.importer.conceptpower')}]]*/ '';
             if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
                 data['foundAuthorities'].forEach(function(elem) {
                     content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
@@ -125,7 +124,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
-                    content += '<td style="display: none;" class="importerId">' + elem[importerId] + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + importerId + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
@@ -169,7 +168,6 @@ function getConceptpowerAuthorities(modalType, personType, page) {
 function getViafAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
-	var importerId = [[${_importer_name_authority.importer.viaf}]];
 	personType_lowerCase = personType.toLowerCase();
 	url = [[@{|/auth/authority/find/authorities/viaf|}]] + '?firstName='+ firstName + '&lastName=' + lastName +'&page='+page;		
 
@@ -181,16 +179,17 @@ function getViafAuthorities(modalType, personType, page) {
   		success: function(data) {
   			$("#viafAuthoritySearchResult").empty();
   			var content = '';
-  			
-  			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+  			var importerId = /*[[${@environment.getProperty('_importer_name_authority.importer.viaf')}]]*/ '';
+            if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
                 data['foundAuthorities'].forEach(function(elem) {
+                	console.log(elem);
                     content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
                     if (elem['description'] == null) {
                         content += ' - </td>';
                     } else {
                         content += elem['description'] + '</td>';
                     }
-                    content += '<td style="display: none;" class="importerId">' + elem[importerId] + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + importerId + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
@@ -342,6 +341,7 @@ function getPersonAuthority(uri, personType) {
         <button class="btn btn-primary" type="submit">Create</button>
     </p>
 </form>
+<p>Property Value: <span th:text="${@environment.getProperty('_importer_name_authority.importer.conceptpower')}"></span></p>
 
 <div class="modal fade" id="authorModal" tabindex="-1" role="dialog" aria-labelledby="authorLabel">
   <div class="modal-dialog" role="document">
