@@ -115,7 +115,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
         success: function(data) {
             $("#conceptpowerAuthoritySearchResult").empty();
             var content = '';
-            var importerId = /*[[${@environment.getProperty('_importer_name_authority.importer.conceptpower')}]]*/ '';
+            var importerName = /*[[${@environment.getProperty('_importer_name_authority.importer.conceptpower')}]]*/ '';
             if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
                 data['foundAuthorities'].forEach(function(elem) {
                     content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
@@ -124,7 +124,7 @@ function getConceptpowerAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
-                    content += '<td style="display: none;" class="importerId">' + importerId + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + importerName + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
@@ -179,7 +179,7 @@ function getViafAuthorities(modalType, personType, page) {
   		success: function(data) {
   			$("#viafAuthoritySearchResult").empty();
   			var content = '';
-  			var importerId = /*[[${@environment.getProperty('_importer_name_authority.importer.viaf')}]]*/ '';
+  			var importerName = /*[[${@environment.getProperty('_importer_name_authority.importer.viaf')}]]*/ '';
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
                 data['foundAuthorities'].forEach(function(elem) {
                     content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
@@ -188,7 +188,7 @@ function getViafAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
-                    content += '<td style="display: none;" class="importerId">' + importerId + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + importerName + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
