@@ -102,9 +102,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save(job);
         jobManager.addJob(job);
-        Thread currentThread = Thread.currentThread();
 
-        if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
+        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
@@ -127,25 +126,25 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
         AtomicInteger counter = new AtomicInteger();
         
-        if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
+        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
         syncCitations(user, groupId, job, versions, counter);
 
-        if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
+        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
         syncCollections(user, groupId, job, collectionVersions, groupVersion, counter);
 
-        if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
+        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
         removeDeletedItems(deletedElements, job);
 
-        if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
+        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
@@ -159,7 +158,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             groupRepo.save((CitationGroup) group.get());
         }
 
-        if(checkIfThreadIsInterrupted(currentThread, job, groupId)) {
+        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
@@ -167,12 +166,11 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
 
-        Future<String> result = new AsyncResult<String>(job.getId());
-        return result;
+        return new AsyncResult<String>(job.getId());
     }
 
-    private boolean checkIfThreadIsInterrupted(Thread thread, GroupSyncJob job, String groupId) {
-        
+    private boolean checkIfThreadIsInterruptedAndCancelJob(GroupSyncJob job, String groupId) {
+    	Thread thread = Thread.currentThread();
         if(thread.isInterrupted()) {
             setJobToCanceledState(job, groupId);
             return true;
