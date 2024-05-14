@@ -92,8 +92,8 @@ $(function() {
 </tr>
 <tr th:id="'tr-'+${authority.id}" th:each="authority : ${authorities}">
 	<td>[[${#uris.escapePath(authority.uri)}]]</td>
-	<td><span th:with="importerId=${#strings.toLowerCase(authority.importerId)}" 
-              th:text="${@environment.getProperty('_importer_name_authority.importer.' + importerId)}"></span>
+	<td><span th:with="importerName=${#strings.toLowerCase(authority.importerId)}" 
+              th:text="${@environment.getProperty('_importer_name_authority.importer.' + importerName)}"></span>
     </td>
 	<td><span th:text="${authority.name}"/></td>
 	<td><span class="date" th:text="${authority.createdOn}"/></td>
