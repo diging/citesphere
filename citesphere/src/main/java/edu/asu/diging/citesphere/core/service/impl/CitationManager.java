@@ -388,12 +388,6 @@ public class CitationManager implements ICitationManager {
             throw new GroupDoesNotExistException("There is no group with id " + groupId);
         }
 
-        Future<String> existingFuture = futureMap.get(groupId);
-        if (existingFuture != null && !existingFuture.isDone()) {
-            existingFuture.cancel(true);
-            futureMap.remove(groupId);
-        }
-
         boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
         CitationResults results = new CitationResults();
         if (isModified) {
