@@ -124,7 +124,8 @@ function getConceptpowerAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
-                    content += '<td style="display: none;" class="importerId">' + importerName + '</td>';
+                    content += '<td style="display: none;" class="importerName">' + importerName + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + 'authority.importer.conceptpower' + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
@@ -188,7 +189,8 @@ function getViafAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
-                    content += '<td style="display: none;" class="importerId">' + importerName + '</td>';
+                    content += '<td style="display: none;" class="importerName">' + importerName + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + 'authority.importer.viaf' + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
