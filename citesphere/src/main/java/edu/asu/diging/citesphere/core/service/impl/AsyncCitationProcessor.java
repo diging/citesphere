@@ -189,7 +189,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         List<String> keysToRetrieve = new ArrayList<>();
         for (String key : versions.keySet()) {
         	
-        	if (checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+            if (checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
                 return;
             }
         	
@@ -225,7 +225,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         
         for (String key : keys) {
         	
-        	if (checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+            if (checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
                 return; // Ensure we stop processing if the job is cancelled
             }
         	
