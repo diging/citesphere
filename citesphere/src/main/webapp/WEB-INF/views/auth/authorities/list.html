@@ -84,7 +84,6 @@ $(function() {
 <tr>
 	<th width="20%">URI</th>
 	<th>Import Source</th>
-	<th>Importer Id</th>
 	<th>Name</th>
 	<th>Created on</th>
 	<th>Group</th>
@@ -96,7 +95,6 @@ $(function() {
 	<td><span th:with="importerId=${#strings.toLowerCase(authority.importerId)}" 
               th:text="${@environment.getProperty('_importer_name_' + importerId)}"></span>
     </td>
-    <td><span th:text="${authority.importerId}" /></td>
 	<td><span th:text="${authority.name}"/></td>
 	<td><span class="date" th:text="${authority.createdOn}"/></td>
 	<td>
