@@ -78,11 +78,9 @@ public class SyncJobManager implements ISyncJobManager {
     @Override
     public void cancelJob(String jobId) {
         Optional<GroupSyncJob> jobOptional = jobRepo.findById(jobId);
-        String groupId;
         if (jobOptional.isPresent()) {
             GroupSyncJob job = currentJobs.get(jobOptional.get().getGroupId());
-            groupId = job.getGroupId();
-            if(citationManager.cancel(groupId)) {
+            if(citationManager.cancel(job.getGroupId())) {
                 job.setStatus(JobStatus.CANCELED);
                 job.setFinishedOn(OffsetDateTime.now());
                 jobRepo.save(job);

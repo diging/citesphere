@@ -170,8 +170,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     }
 
     private boolean checkIfThreadIsInterruptedAndCancelJob(GroupSyncJob job, String groupId) {
-    	Thread thread = Thread.currentThread();
-        if(thread.isInterrupted()) {
+        if(Thread.currentThread().isInterrupted()) {
             setJobToCanceledState(job, groupId);
             return true;
         }
@@ -189,6 +188,11 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             AtomicInteger counter) throws ZoteroHttpStatusException {
         List<String> keysToRetrieve = new ArrayList<>();
         for (String key : versions.keySet()) {
+        	
+        	if (checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+                return;
+            }
+        	
             Optional<ICitation> citation = citationStore.findById(key);
 
             if (citation.isPresent()) {
@@ -220,6 +224,11 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         keys.addAll(versions.keySet());
         
         for (String key : keys) {
+        	
+        	if (checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+                return; // Ensure we stop processing if the job is cancelled
+            }
+        	
             ICitationCollection collection = collectionRepo.findByKeyAndGroupId(key, groupId);
             if (collection == null || (versions.containsKey(key) && collection.getVersion() != versions.get(key))
                     || collection.getContentVersion() != groupVersion) {
