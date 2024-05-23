@@ -56,12 +56,12 @@ public class CreateAuthorityForm {
     public void setImporterId(String importerId) {
         this.importerId = importerId;
     }
+    
+    public String getImporterName() {
+        return importerName;
+    }
 
-	public String getImporterName() {
-		return importerName;
-	}
-
-	public void setImporterName(String importerName) {
-		this.importerName = importerName;
-	}
+    public void setImporterName(String importerName) {
+        this.importerName = importerName;
+    }
 }
