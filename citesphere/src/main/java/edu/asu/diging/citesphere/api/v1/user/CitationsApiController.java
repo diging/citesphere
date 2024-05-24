@@ -28,7 +28,7 @@ import edu.asu.diging.citesphere.user.IUser;
 @Controller
 public class CitationsApiController extends V1Controller {
 	
-	  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${_api_page_size}")
     private Integer apiPageSize;
@@ -45,7 +45,7 @@ public class CitationsApiController extends V1Controller {
     @Autowired
     private ObjectMapper objectMapper;
 	
-	@RequestMapping(value = {"/citations/search"}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = {"/citations/search"}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<String> getCitationsByContributor(@RequestParam(defaultValue = "0", required = false, value = "page") long page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
             @RequestParam(value = "uri") String contributorUri, Principal principal){
