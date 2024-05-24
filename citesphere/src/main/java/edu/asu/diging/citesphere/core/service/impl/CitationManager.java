@@ -496,11 +496,11 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public CitationResults getCitationsByContributorUri(List<String> groupIds, long start, int pageSize, String uri) {
-    	List<ICitation> citations = (List<ICitation>) citationDao.findCitationsByContributorUri(groupIds, start, pageSize, uri);
+    public CitationResults getCitationsByContributor(List<String> groupIds, long start, int pageSize, String contributorUri) {
+    	List<ICitation> citations = (List<ICitation>) citationDao.findCitationsByContributor(groupIds, start, pageSize, contributorUri);
     	CitationResults results = new CitationResults();
     	results.setCitations(citations);
-    	results.setTotalResults(citationDao.countCitationsByContributorUri(groupIds, uri));
+    	results.setTotalResults(citationDao.countCitationsByContributor(groupIds, contributorUri));
         return results;
     }
 }

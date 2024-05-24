@@ -46,9 +46,9 @@ public class CitationsApiController extends V1Controller {
     private ObjectMapper objectMapper;
 	
 	@RequestMapping(value = {"/citations/search"}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<String> getCitationsByContributorUri(@RequestParam(defaultValue = "0", required = false, value = "page") long page,
+    public ResponseEntity<String> getCitationsByContributor(@RequestParam(defaultValue = "0", required = false, value = "page") long page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
-            @RequestParam(value = "uri") String uri, Principal principal){
+            @RequestParam(value = "uri") String contributorUri, Principal principal){
     	
     	IUser user = userManager.findByUsername(principal.getName());
     	List<ICitationGroup> groups = citationManager.getGroups(user);
@@ -57,7 +57,7 @@ public class CitationsApiController extends V1Controller {
     		    .map(group -> String.valueOf(group.getGroupId()))
     		    .collect(Collectors.toList());
     	
-    	CitationResults results = citationManager.getCitationsByContributorUri(groupIds, page, pageSize, uri);
+    	CitationResults results = citationManager.getCitationsByContributor(groupIds, page, pageSize, contributorUri);
     	
     	String jsonResponse = "";
         try {
