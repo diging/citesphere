@@ -98,6 +98,7 @@
         
         <cleanupCycle>86400000</cleanupCycle>
         <javers.default.author>Sync Process</javers.default.author>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     </properties>
 
@@ -652,6 +653,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             <plugin>
