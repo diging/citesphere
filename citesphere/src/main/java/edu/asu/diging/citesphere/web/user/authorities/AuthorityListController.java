@@ -50,6 +50,8 @@ public class AuthorityListController {
         Page<IAuthorityEntry> authoritiesPage = authorityService.getAll(user,
                 userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()),pageInt, authorityPageSize);
         List<IAuthorityEntry> authorities = authoritiesPage.getContent();
+        model.addAttribute("importedAuthoritySources", authorities.stream()
+                .map(authorityEntry -> authorityEntry.getImporterId()).distinct().collect(Collectors.toList()));
         model.addAttribute("authorities", authorities);
         model.addAttribute("groups", userGroups);
         model.addAttribute("displayBy", "all");
@@ -73,8 +75,12 @@ public class AuthorityListController {
         pageInt = (pageInt - 1) < 0 ? 0 : pageInt - 1;
         IUser user = (IUser)authentication.getPrincipal();
         Page<IAuthorityEntry> authoritiesPage = authorityService.getAuthoritiesByGroup(Long.valueOf(zoteroGroupId), pageInt, authorityPageSize);
-        model.addAttribute("authorities", authoritiesPage.getContent());
-        model.addAttribute("groups", citationManager.getGroups((IUser)authentication.getPrincipal()));
+        List<IAuthorityEntry> authorities = authoritiesPage.getContent();
+        
+        model.addAttribute("importedAuthoritySources", authorities.stream()
+                .map(authorityEntry -> authorityEntry.getImporterId()).distinct().collect(Collectors.toList()));
+        model.addAttribute("authorities", authorities);
+        model.addAttribute("groups", citationManager.getGroups(user));
         model.addAttribute("displayBy", zoteroGroupId);
         model.addAttribute("username", user.getUsername());
         model.addAttribute("total", authoritiesPage.getTotalElements());
@@ -95,13 +101,35 @@ public class AuthorityListController {
         pageInt = (pageInt - 1) < 0 ? 0 : pageInt - 1;
         IUser user = (IUser)authentication.getPrincipal();
         Page<IAuthorityEntry> authoritiesPage = authorityService.getUserSpecificAuthorities(user, pageInt, authorityPageSize);
-        model.addAttribute("authorities", authoritiesPage.getContent());   
-        model.addAttribute("groups", citationManager.getGroups((IUser)authentication.getPrincipal()));
+        List<IAuthorityEntry> authorities = authoritiesPage.getContent();
+        
+        model.addAttribute("importedAuthoritySources", authorities.stream()
+                .map(authorityEntry -> authorityEntry.getImporterId()).distinct().collect(Collectors.toList()));
+        model.addAttribute("authorities", authorities);
+        model.addAttribute("groups", citationManager.getGroups(user));
         model.addAttribute("displayBy", "userSpecific");
         model.addAttribute("username", user.getUsername());
         model.addAttribute("total", authoritiesPage.getTotalElements());
         model.addAttribute("totalPages", authoritiesPage.getTotalPages() > 0 ? authoritiesPage.getTotalPages() : 1);
         model.addAttribute("currentPage", page);
+        return "auth/authorities/list";
+    }
+    
+    @RequestMapping("/auth/authority/list/{source}")
+    public String getAuthoritiesForSource(Model model, Authentication authentication,
+            @PathVariable("source") String source) {
+    	System.out.println(source);
+    	IUser user = (IUser) authentication.getPrincipal();
+        List<ICitationGroup> userGroups = citationManager.getGroups(user);
+        List<IAuthorityEntry> authorities = authorityService.getAll(user,
+                userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
+        model.addAttribute("importedAuthoritySources", authorities.stream()
+                .map(authorityEntry -> authorityEntry.getImporterId()).distinct().collect(Collectors.toList()));
+        model.addAttribute("authorities",
+                authorityService.getAuthoritiesBySource(user, source.equals("null") ? null : source));
+        model.addAttribute("groups", userGroups);
+        model.addAttribute("displayBy", "source-" + source);
+        model.addAttribute("username", user.getUsername());
         return "auth/authorities/list";
     }
 }

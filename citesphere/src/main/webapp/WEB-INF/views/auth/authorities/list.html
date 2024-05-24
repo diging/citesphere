@@ -65,18 +65,24 @@ $(function() {
 	
  	$("#displayAuthorities").change(function () {
  		var displayAuthoritiesVal = $("#displayAuthorities").val();
+ 		console.log(displayAuthoritiesVal);
  		window.location.href = getAuthorityUrl(displayAuthoritiesVal);
 	});
 });
 
 function getAuthorityUrl(displayAuthoritiesVal) {
- 	if (displayAuthoritiesVal === 'all') {
- 		return [[@{/auth/authority/list}]];
- 	} else if (displayAuthoritiesVal === 'userSpecific') {
- 		return [[@{/auth/authority/user/list}]];
- 	} else {
+    if (displayAuthoritiesVal === 'all') {
+        return [[@{/auth/authority/list}]];
+    } else if (displayAuthoritiesVal === 'userSpecific') {
+ 	    return [[@{/auth/authority/user/list}]];
+    } else if (displayAuthoritiesVal.startsWith('source')) {
+ 	    var source = displayAuthoritiesVal.split("-")[1];
+ 	    console.log(source);
+ 	    window.location.href = [[@{/auth/authority/list/}]] + source;
+    } else {
+    	console.log("coming here");
  		return [[@{/auth/authority/}]] + displayAuthoritiesVal + "/list";
- 	}
+    }
 }
 
 </script>
@@ -95,7 +101,10 @@ function getAuthorityUrl(displayAuthoritiesVal) {
 	<option th:selected="${#strings.equals(displayBy, 'userSpecific')}" value="userSpecific">[[${username}]]</option>
 	<span th:each="groupDetail:${groups}">
 		<option th:selected="${#strings.equals(displayBy, groupDetail.groupId)}" th:value="${groupDetail.groupId}">Group - [[${groupDetail.name}]]</option>
-	</span>  
+	</span>
+	<span th:each="source:${importedAuthoritySources}">
+        <option th:selected="${#strings.equals(displayBy, 'source-' + source)}" th:value="${'source-' + source}">Source - [[${source}]]</option>
+    </span>      
 </select><br><br> 
 
 <ul id="pagination-top" class="pagination-sm"></ul>	

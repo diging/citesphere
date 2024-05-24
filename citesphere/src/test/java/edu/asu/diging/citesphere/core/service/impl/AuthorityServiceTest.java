@@ -651,4 +651,28 @@ public class AuthorityServiceTest {
         Page<IAuthorityEntry> searchResult = managerToTest.getUserSpecificAuthorities(user, page, pageSize);
         Assert.assertTrue(searchResult.isEmpty());
     }
+    
+    @Test
+    public void test_getAuthoritiesBySource() {
+        String source = "testsource";
+        List<IAuthorityEntry> expectedEntries = new ArrayList<>();
+        expectedEntries.add(entry1);
+        expectedEntries.add(entry2);
+        Mockito.when(entryRepository.findByUsernameAndImporterIdOrderByName(user.getUsername(), source))
+                .thenReturn(expectedEntries);
+
+        List<IAuthorityEntry> actualEntries = managerToTest.getAuthoritiesBySource(user, source);
+        Assert.assertEquals(expectedEntries, actualEntries);
+    }
+
+    @Test
+    public void test_getAuthoritiesBySource_noEntriesFound() {
+        String source = "testsource";
+        List<IAuthorityEntry> expectedEntries = new ArrayList<>();
+        Mockito.when(entryRepository.findByUsernameAndImporterIdOrderByName(user.getUsername(), source))
+                .thenReturn(expectedEntries);
+
+        List<IAuthorityEntry> actualEntries = managerToTest.getAuthoritiesBySource(user, source);
+        Assert.assertEquals(expectedEntries, actualEntries);
+    }
 }

@@ -304,6 +304,11 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
+    public List<IAuthorityEntry> getAuthoritiesBySource(IUser user, String source) {
+        return entryRepository.findByUsernameAndImporterIdOrderByName(user.getUsername(), source);
+    }
+    
+    @Override
     public Page<IAuthorityEntry> getUserSpecificAuthorities(IUser user, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
         return entryRepository.findByUsernameAndGroupsOrderByName(user.getUsername(), null, pageable);
