@@ -97,8 +97,7 @@ public class MoveItemsController {
         "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/sync/start"
     })
     public @ResponseBody Sync startSync(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId,
-            @PathVariable("targetCollectionId") String collectionId,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("targetCollectionId") String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
         try {
             citationManager.getGroupItems((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId,
@@ -120,8 +119,7 @@ public class MoveItemsController {
         "/auth/group/{zoteroGroupId}/collection/{parentcollectionId}/items/move/{targetCollectionId}/totalItems"
     })
     public @ResponseBody Long getTotalCitationsCollection(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId,
-            @PathVariable("targetCollectionId") String collectionId) {
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("targetCollectionId") String collectionId) {
         ICitationCollection collection = collectionManager.getCollection((IUser) authentication.getPrincipal(),
                 zoteroGroupId, collectionId);
         return collection.getNumberOfItems();

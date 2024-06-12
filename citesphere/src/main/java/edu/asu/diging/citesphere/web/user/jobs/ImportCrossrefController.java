@@ -72,7 +72,7 @@ public class ImportCrossrefController {
             redirectAttrs.addFlashAttribute("alert_type", "success");
             redirectAttrs.addFlashAttribute("alert_msg", "Import in progress.");
         } catch (GroupDoesNotExistException e) {
-            logger.error("Group not found.", e);
+            logger.error("Could not create crossref job because group does not exist.", e);
             redirectAttrs.addFlashAttribute("show_alert", true);
             redirectAttrs.addFlashAttribute("alert_type", "danger");
             redirectAttrs.addFlashAttribute("alert_msg", e.getMessage());
