@@ -32,7 +32,6 @@ $(function() {
 	
 	$("#importBtn").click(function(e)  {
 		e.preventDefault();
-		console.log(Array.from(selectedDois.values()));
 		var group = $("#groupSelect").val()
 		$.ajax({
             type: 'POST',
@@ -44,7 +43,13 @@ $(function() {
             	"dois": Array.from(selectedDois.values()),
             },
             success: function(data) {
-            	console.print("success");
+            	var uploadedFilesList = $("#uploaded-files-list");
+	        	var alert = data;
+	        	if(alert.show_alert && alert.alert_type=="success") {
+					$("#uploadedAlert").show();
+				} else if (alert.show_alert && alert.alert_type=="success") {
+					$("#failAlert").show();
+				}
             }
         })
         document.getElementById('resultsContainer').innerHTML = '';
@@ -77,6 +82,15 @@ function updateButton(checkbox) {
     <div class="row">
         <div class="col-sm-12">
         <h2>Import from Crossref</h2>
+        
+       	<div id="uploadedAlert" style="display: none;" class="alert alert-success alert-dismissible fade in" role="alert">
+	      	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button>
+	      	<strong>Import started!</strong> Head over to the <a th:href="@{jobs}">job list</a> to see the status of your import.
+		</div>
+		<div id="failAlert" style="display: none;" class="alert alert-danger alert-dismissible fade in" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button>
+			Import Failed! Please check the logs
+		</div>
         <form>
 	        <div class="form-group">
 			    <div class="input-group">

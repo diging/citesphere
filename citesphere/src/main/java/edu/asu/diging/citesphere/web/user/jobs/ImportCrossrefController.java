@@ -2,7 +2,9 @@ package edu.asu.diging.citesphere.web.user.jobs;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
-import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.crossref.CrossrefService;
 import edu.asu.diging.citesphere.core.service.jobs.IImportCrossrefJobManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
@@ -64,20 +64,22 @@ public class ImportCrossrefController {
     }
 
     @RequestMapping(value="/auth/import/crossref", method=RequestMethod.POST)
-    public String post(Authentication authentication, @RequestParam("groupId") String groupId,
-            @RequestParam("dois[]") List<String> dois, RedirectAttributes redirectAttrs) {
+    public ResponseEntity<Map<String, Object>> post(Authentication authentication, @RequestParam("groupId") String groupId,
+            @RequestParam("dois[]") List<String> dois, Model model) {
+        Map<String, Object> response = new HashMap<>();
         try {
             jobManager.createJob((IUser) authentication.getPrincipal(), groupId, dois);
-            redirectAttrs.addFlashAttribute("show_alert", true);
-            redirectAttrs.addFlashAttribute("alert_type", "success");
-            redirectAttrs.addFlashAttribute("alert_msg", "Import in progress.");
+            System.out.println("=============================================================================================================");
+            response.put("show_alert", true);
+            response.put("alert_type", "success");
+            response.put("alert_msg", "Import in progress.");
         } catch (GroupDoesNotExistException e) {
             logger.error("Could not create crossref job because group does not exist.", e);
-            redirectAttrs.addFlashAttribute("show_alert", true);
-            redirectAttrs.addFlashAttribute("alert_type", "danger");
-            redirectAttrs.addFlashAttribute("alert_msg", e.getMessage());
+            response.put("show_alert", true);
+            response.put("alert_type", "danger");
+            response.put("alert_msg", e.getMessage());
+            return new ResponseEntity<Map<String, Object>>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return "redirect:/auth/import/crossref";
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
     }
 }
