@@ -22,6 +22,9 @@ public class OAuthClientDetailsController {
         model.addAttribute("description", details.getDescription());
         model.addAttribute("redirectUrl", String.join(", ", details.getRegisteredRedirectUri()));
         model.addAttribute("applicationType", details.getAuthorizedGrantTypes().contains("authorization_code")?"authorization_code":"client_credentials");
+        if(details.getCreatedBy() != null) {
+            model.addAttribute("createdBy", details.getCreatedBy().getUsername());
+        }
         return "admin/apps/details";
     }
 }

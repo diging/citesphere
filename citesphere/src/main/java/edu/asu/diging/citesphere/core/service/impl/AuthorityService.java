@@ -292,15 +292,23 @@ public class AuthorityService implements IAuthorityService {
     }
     
     @Override
-    public List<IAuthorityEntry> getAuthoritiesByGroup(long groupId) {
-        return entryRepository.findByGroupsOrderByName(groupId);
+    public Page<IAuthorityEntry> getAll(IUser user, List<Long> groupIds, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return entryRepository.findByUsernameOrGroupsInOrderByName(user.getUsername(), groupIds, pageable);
+    }
+ 
+    @Override
+    public Page<IAuthorityEntry> getAuthoritiesByGroup(long groupId, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return entryRepository.findByGroupsOrderByName(groupId, pageable);
     }
     
     @Override
-    public List<IAuthorityEntry> getUserSpecificAuthorities(IUser user) {
-        return entryRepository.findByUsernameAndGroupsOrderByName(user.getUsername(), null);
+    public Page<IAuthorityEntry> getUserSpecificAuthorities(IUser user, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return entryRepository.findByUsernameAndGroupsOrderByName(user.getUsername(), null, pageable);
     }
-
+    
     @Override
     public IAuthorityEntry create(IAuthorityEntry entry, IUser user) {
         entry.setUsername(user.getUsername());

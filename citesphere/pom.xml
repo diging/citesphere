@@ -11,22 +11,23 @@
     <properties>
         <org.slf4j-version>1.7.32</org.slf4j-version>
         <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
-        <spring-security-version>5.3.10.RELEASE</spring-security-version>
+        <spring-security-version>5.5.7</spring-security-version>
         <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
         <spring-elasticsearch.version>3.2.12.RELEASE</spring-elasticsearch.version>
 
         <thymeleaf.version>3.0.13.RELEASE</thymeleaf.version>
 
-        <spring.version>5.2.9.RELEASE</spring.version>
+        <spring.version>5.3.13</spring.version>
         <spring-data.version>Neumann-SR3</spring-data.version>
 
         <javers.version>6.2.3</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
         <spring-social-zotero.version>0.12</spring-social-zotero.version>
         <citesphere.messages.version>0.5</citesphere.messages.version>
-        <citesphere.model.version>1.17</citesphere.model.version>
+        <citesphere.model.version>1.19</citesphere.model.version>
         <crossref-connect-version>0.1</crossref-connect-version>
+
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -99,6 +100,7 @@
         
         <cleanupCycle>86400000</cleanupCycle>
         <javers.default.author>Sync Process</javers.default.author>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     </properties>
 
@@ -330,9 +332,9 @@
 
         <!-- https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api -->
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>javax.servlet.jsp-api</artifactId>
-            <version>2.3.3</version>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>3.1.1</version>
             <scope>provided</scope>
         </dependency>
         
@@ -382,7 +384,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.16</version>
+            <version>8.0.28</version>
         </dependency>
 
         <dependency>
@@ -406,7 +408,7 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.1.0</version>
+            <version>4.1.2</version>
         </dependency>
 
 
@@ -498,7 +500,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>29.0-jre</version>
+            <version>32.0.0-jre</version>
         </dependency>
 
         <!-- Javers -->
@@ -555,7 +557,7 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.2</version>
+            <version>2.7.3</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/xalan/serializer -->
         <dependency>
@@ -582,14 +584,14 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.22</version>
+            <version>1.28.3</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka -->
@@ -632,7 +634,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.4.0</version>
                 <configuration>
                     <webResources>
                         <resource>
@@ -645,6 +647,8 @@
                                 <exclude>**/*.woff</exclude>
                                 <exclude>**/*.ttf</exclude>
                                 <exclude>**/*.woff2</exclude>
+                                <exclude>**/*.eot</exclude>
+                                <exclude>**/*.otf</exclude>
                             </excludes>
                         </resource>
 
@@ -656,6 +660,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             <plugin>
