@@ -6,10 +6,10 @@
 	$(function() {		
 		$(document).on('click', '.parse-ref-info', function(e) {
 			var clicked = e.target;
-			citationID = $(clicked).attr('data-citation-id');
+			var citationID = $(clicked).attr('data-citation-id');
 			if(citationID != undefined && citationID != "") {
 				zoteroGroupId = $(clicked).attr('data-zotero-group-id') 
-				window.location.href = "../items/" + citationID;
+				window.location.href = "/citesphere/auth/group/"+zoteroGroupId+"/items/" + citationID;
 			} else {
 				$("#ref-unparsed").text($(clicked).text());
 				$("#parsed-ref-authors").text($(clicked).attr('data-authors'));
@@ -129,7 +129,7 @@
 	        var itemId = $("#addReferences").data('item-id');
 	        var reference =  $("#itemReference").val().trim();
 	        var referenceCitationKey =  $("#itemReference").data('citation-key');
-	        updateItemReference(zoteroGroupId, itemId, referenceCitationKey, reference);
+	        addItemReference(zoteroGroupId, itemId, referenceCitationKey, reference);
 	    });
 	    
 	    $("#searchReference").click(function() {
@@ -229,8 +229,8 @@
 	    });	    
 	}
 	
-	function updateItemReference(zoteroGroupId, itemId, referenceCitationKey, referenceVal) {
-	    var url = "[(@{|/auth/group/${zoteroGroupId}/items/${itemId}/update|})]";
+	function addItemReference(zoteroGroupId, itemId, referenceCitationKey, referenceVal) {
+	    var url = "[(@{|/auth/group/${zoteroGroupId}/items/${itemId}/addReference|})]";
 	    $.ajax({
 	        dataType: "json",
 	        type: 'POST',

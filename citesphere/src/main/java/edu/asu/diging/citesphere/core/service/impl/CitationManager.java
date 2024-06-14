@@ -31,6 +31,7 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.SelfCitationException;
 import edu.asu.diging.citesphere.core.exceptions.SyncInProgressException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
@@ -46,7 +47,6 @@ import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.model.bib.IPerson;
 import edu.asu.diging.citesphere.model.bib.IReference;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
@@ -134,7 +134,7 @@ public class CitationManager implements ICitationManager {
         }
         return updateCitationFromZotero(user, groupId, key);
     }
-
+    
     @Override
     public List<ICitation> getAttachments(IUser user, String groupId, String key)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
@@ -150,7 +150,7 @@ public class CitationManager implements ICitationManager {
         }
         return attachments;
     }
-
+    
     @Override
     public List<ICitation> getNotes(IUser user, String groupId, String key)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
@@ -185,8 +185,8 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public void updateCitation(IUser user, String groupId, ICitation citation) throws ZoteroConnectionException,
-            CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
+    public void updateCitation(IUser user, String groupId, ICitation citation) 
+            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         long citationVersion = zoteroManager.getGroupItemVersion(user, groupId, citation.getKey());
         Optional<ICitation> storedCitationOptional = citationStore.findById(citation.getKey());
         if (storedCitationOptional.isPresent()) {
@@ -200,7 +200,7 @@ public class CitationManager implements ICitationManager {
         ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         citationStore.save(updatedCitation);
     }
-
+    
     @Override
     public ZoteroUpdateItemsStatuses updateCitations(IUser user, String groupId, List<ICitation> citations)
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException,
@@ -306,7 +306,7 @@ public class CitationManager implements ICitationManager {
             throw new CannotFindCitationException(ex);
         }
     }
-
+    
     /*
      * (non-Javadoc)
      * 
@@ -374,8 +374,8 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy,
-            List<String> conceptIds) throws GroupDoesNotExistException, ZoteroHttpStatusException {
+    public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds)
+            throws GroupDoesNotExistException, ZoteroHttpStatusException {
 
         ICitationGroup group = null;
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
@@ -417,8 +417,7 @@ public class CitationManager implements ICitationManager {
         List<ICitation> citations = null;
         long total = 0;
         if (collectionId != null && !collectionId.trim().isEmpty()) {
-            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId,
-                    (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds);
+            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds);
             ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
             if (collection != null) {
                 total = collection.getNumberOfItems();
@@ -474,8 +473,7 @@ public class CitationManager implements ICitationManager {
         if (citations != null && citations.size() > 0) {
             int maxPage = (int) Math.ceil((citationResults.getTotalResults() / Float.valueOf(zoteroPageSize)));
             if (index == citations.size() - 1 && page < maxPage) {
-                CitationResults nextPageCitationResults = getGroupItems(user, groupId, collectionId, page + 1, sortBy,
-                        conceptIds);
+                CitationResults nextPageCitationResults = getGroupItems(user, groupId, collectionId, page + 1, sortBy, conceptIds);
                 if (nextPageCitationResults != null && nextPageCitationResults.getCitations().size() > 0) {
                     result.setNext(nextPageCitationResults.getCitations().get(0).getKey());
                     result.setNextIndex(String.valueOf(0));
@@ -501,14 +499,14 @@ public class CitationManager implements ICitationManager {
         }
         return result;
     }
-
+    
     @Override
     public void deleteLocalGroupCitations(String groupId) {
         citationStore.deleteCitationByGroupId(groupId);
     }
 
     @Override
-    public ICitation updateCitationReference(ICitation citation, String referenceCitationKey, String reference) {
+    public ICitation addCitationToReferences(ICitation citation, String referenceCitationKey, String reference) throws SelfCitationException {
         Set<IReference> references = citation.getReferences();
         if (references == null) {
             references = new HashSet<>();
@@ -518,6 +516,8 @@ public class CitationManager implements ICitationManager {
             iReference.setCitationId(referenceCitationKey);
             iReference.setReferenceString(reference);
             references.add(iReference);
+        } else {
+            throw new SelfCitationException("A citation cannot reference itself.");
         }
         return citationStore.save(citation);
     }

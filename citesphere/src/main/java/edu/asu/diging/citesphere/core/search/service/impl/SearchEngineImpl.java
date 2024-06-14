@@ -136,7 +136,7 @@ public class SearchEngineImpl implements SearchEngine {
         citation.setTitle(ref.getTitle());
         citation.setUrl(ref.getUrl());
         citation.setVolume(ref.getVolume());
-        
+
         mapPersons(ref, citation);
         mapConceptTags(ref, citation);
 

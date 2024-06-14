@@ -13,6 +13,7 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.SelfCitationException;
 import edu.asu.diging.citesphere.core.exceptions.SyncInProgressException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
@@ -85,6 +86,6 @@ public interface ICitationManager {
     
     void deleteLocalGroupCitations(String groupId);
     
-    ICitation updateCitationReference(ICitation citation, String referenceCitationKey, String reference);
+    ICitation addCitationToReferences(ICitation citation, String referenceCitationKey, String reference) throws SelfCitationException;
 
 }

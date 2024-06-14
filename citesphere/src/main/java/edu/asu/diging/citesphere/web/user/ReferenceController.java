@@ -29,7 +29,7 @@ public class ReferenceController {
             @RequestParam(value = "searchTerm", required = false) String searchTerm,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize) {
-        return new ResponseEntity<ResultPage>(engine.search(searchTerm, zoteroGroupId, Math.max(page - 1, 0), 50), HttpStatus.OK);
+        return new ResponseEntity<ResultPage>(engine.search(searchTerm, zoteroGroupId, Math.max(page - 1, 0), pageSize), HttpStatus.OK);
     }
 
 }

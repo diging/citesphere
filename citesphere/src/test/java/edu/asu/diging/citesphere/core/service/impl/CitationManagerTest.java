@@ -425,7 +425,7 @@ public class CitationManagerTest {
         String referenceCitationKey = "referenceCitationKey";
         citation.getReferences().add(iReference);
         when(citationStore.save(citation)).thenReturn(updatedCitation);
-        ICitation result = managerToTest.updateCitationReference(citation, referenceCitationKey, REFERENCE);
+        ICitation result = managerToTest.addCitationToReferences(citation, referenceCitationKey, REFERENCE);
         Assert.assertEquals(updatedCitation, result);
     }
 
@@ -434,7 +434,7 @@ public class CitationManagerTest {
         String referenceCitationKey = "referenceCitationKey";
         citation.setReferences(null);
         when(citationStore.save(citation)).thenReturn(updatedCitation);
-        ICitation result = managerToTest.updateCitationReference(citation, referenceCitationKey, REFERENCE);
+        ICitation result = managerToTest.addCitationToReferences(citation, referenceCitationKey, REFERENCE);
         Assert.assertEquals(updatedCitation, result);
     }
 
@@ -443,7 +443,7 @@ public class CitationManagerTest {
         String referenceCitationKey = CITATION_KEY;
         updatedCitation.setReferences(references);
         when(citationStore.save(citation)).thenReturn(updatedCitation);
-        ICitation result = managerToTest.updateCitationReference(citation, referenceCitationKey, REFERENCE);
+        ICitation result = managerToTest.addCitationToReferences(citation, referenceCitationKey, REFERENCE);
         Assert.assertEquals(updatedCitation, result);
     }
 }
