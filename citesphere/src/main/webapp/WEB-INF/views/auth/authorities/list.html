@@ -91,7 +91,7 @@ $(function() {
 </tr>
 <tr th:id="'tr-'+${authority.id}" th:each="authority : ${authorities}">
 	<td>[[${#uris.escapePath(authority.uri)}]]</td>
-	<td><a th:href="@{|/auth/authority/${authority.id}/items|}"><span th:text="${authority.name}"/></td>	
+	<td><a th:href="@{|/auth/authority/${authority.uri}/items|}"><span th:text="${authority.name}"/></td>	
 	<td><span class="date" th:text="${authority.createdOn}"/></td>
 	<td>
 	<span th:if="${#lists.isEmpty(authority.groups)}"> - </span>
