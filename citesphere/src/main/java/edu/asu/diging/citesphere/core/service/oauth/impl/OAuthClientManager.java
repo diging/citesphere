@@ -29,6 +29,7 @@ import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthClientResultPage;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Transactional
 public class OAuthClientManager implements ClientDetailsService, IOAuthClientManager {
@@ -66,7 +67,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
      * @see edu.asu.diging.citesphere.core.service.oauth.impl.IOAuthClientManager#store(org.springframework.security.oauth2.provider.ClientDetails)
      */
     @Override
-    public OAuthCredentials create(String name, String description, List<OAuthScope> scopes, Set<String> grantTypes, String redirectUrl, List<GrantedAuthority> authorities) {
+    public OAuthCredentials create(String name, String description, List<OAuthScope> scopes, Set<String> grantTypes, String redirectUrl, List<GrantedAuthority> authorities, IUser user) {
         final OAuthClient client = new OAuthClient();
         client.setName(name);
         client.setDescription(description);
@@ -79,6 +80,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         client.setRegisteredRedirectUri(new HashSet<>());
         client.getRegisteredRedirectUri().add(redirectUrl);
         client.setAuthorities(authorities);
+        client.setCreatedBy(user);
         scopes.forEach(s -> client.getScope().add(s.getScope()));
         OAuthClient storeClient = clientRepo.save(client);
         return new OAuthCredentials(storeClient.getClientId(), clientSecret);

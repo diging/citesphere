@@ -27,7 +27,32 @@
             
 			$("#parsed-ref-modal").modal();
 		});
+		
+		$(".item-note").click(function(e) {
+			var note = $(this).find(".note-info")
+			$('#note-text').html(note.attr('data-note-text'));
+			$('#noteModal').modal();
+		});
 	});
+	
+	function truncateNote(noteText) {
+		var truncatedNote = ' ';
+		var count = 0;
+		note = $(noteText);
+		note.each(function () {
+			var curr = $(this).text();
+			if (count >= 20) {
+				return false;
+			}
+			if (count + curr.length > 20) {
+				curr = curr.substring(0, 20-count) + "...";
+				$(this).text(curr);
+			}
+			truncatedNote += $(this).text();
+			count += curr.length;
+		});
+		return truncatedNote;
+	}
 
 	$(document).ready(function(){
 	
@@ -75,6 +100,10 @@
 	    $('.btn-nav').each(function() {
 	    	$(this).attr("href", $(this).attr("href") + "&" + queryParams);
 	    })
+	    
+	    $('.note-info').each(function() {
+	    	$(this).text(truncateNote($(this).attr('data-note-text')));
+	    })
 	});
 	
 </script>
@@ -84,7 +113,7 @@
 <div layout:fragment="content">
 	<ol class="breadcrumb">
 		<li><a th:href="@{/}">Home</a></li>
-		<li><a th:href="@{|/auth/group/${zoteroGroupId}/items|}">Group</a></li>
+		<li><a th:href="@{|/auth/group/${zoteroGroupId}/items|}">[[${group.name}]]</a></li>
 		<li class="active">[[${citation.key}]]</li>
 	</ol>
 	
@@ -344,6 +373,14 @@
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
 	        </li>
         </ul>
+        
+        <h3>Notes</h3>
+        
+        <ul class="list-group">
+            <li class="item-note list-group-item" th:each="note, status:${notes}">
+                <span class="icon-sticky-note" style="color: #337ab7; font-size: 14px"></span><span class="note-info" th:data-note-text="${note.note}"></span>
+            </li>
+        </ul>
 	</div>
 	
 	</div>
@@ -424,23 +461,34 @@
 	</div><!-- /.modal -->
 	
 	<div id="uploadFileModal" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Upload File</h4>
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Upload File</h4>
+          </div>
+          <div class="modal-body">
+            <label>Choose file to upload</label>
+            <input type="file" id="uploadFileInput">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button id="uploadFileBtn" type="button" class="btn btn-primary">Upload</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div id="noteModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body" id="note-text"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
       </div>
-      <div class="modal-body">
-        <label>Choose file to upload</label>
-        <input type="file" id="uploadFileInput">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button id="uploadFileBtn" type="button" class="btn btn-primary">Upload</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+    </div>
 </div>
 </body>
 </html>

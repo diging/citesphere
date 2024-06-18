@@ -141,6 +141,22 @@ public class CitationManager implements ICitationManager {
         }
         return attachments;
     }
+    
+    @Override
+    public List<ICitation> getNotes(IUser user, String groupId, String key)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        if (group != null && group.getGroupId() == new Long(groupId)) {
+            if (!group.getUsers().contains(user.getUsername())) {
+                throw new AccessForbiddenException("User does not have access this citation.");
+            }
+        }
+        List<ICitation> notes = citationStore.getNotes(key);
+        if (notes.isEmpty()) {
+            notes = updateNotesFromZotero(user, groupId, key);
+        }
+        return notes;
+    }
 
     /**
      * Retrieve a citation from Zotero bypassing the database cache. This method
@@ -208,7 +224,17 @@ public class CitationManager implements ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
-            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+            ICitationGroup group = groupManager.getGroup(user, groupId);
+            if (group == null) {
+                throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+            } else {
+                asyncCitationProcessor.sync(user, groupId, group.getContentVersion(), null);
+                try {
+                    return zoteroManager.getGroupItem(user, groupId, itemKey);
+                } catch (HttpClientErrorException ex) {
+                    throw new CannotFindCitationException(ex);
+                }
+            }
         }
         try {
             ICitation citation = zoteroManager.getGroupItem(user, groupId, itemKey);
@@ -249,6 +275,29 @@ public class CitationManager implements ICitationManager {
         }
     }
 
+    @Override
+    public List<ICitation> updateNotesFromZotero(IUser user, String groupId, String itemKey)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
+        try {
+            List<ICitation> notes = zoteroManager.getGroupItemNotes(user, groupId, itemKey);
+            notes.forEach(note -> {
+                note.setGroup(groupOptional.get().getGroupId() + "");
+                Optional<ICitation> oldNote = citationStore.findById(note.getKey());
+                if (oldNote.isPresent()) {
+                    citationStore.delete(oldNote.get());
+                }
+                citationStore.save(note);
+            });
+            return notes;
+        } catch (HttpClientErrorException ex) {
+            throw new CannotFindCitationException(ex);
+        }
+    }
+    
     /*
      * (non-Javadoc)
      * 
