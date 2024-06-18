@@ -5,6 +5,6 @@ import edu.asu.diging.citesphere.model.transfer.impl.Citations;
 
 public interface IAuthorityItemsService {
 
-    Citations findAuthorityItems(IAuthorityEntry entry);
+    public Citations findAuthorityItems(IAuthorityEntry entry);
 
 }
