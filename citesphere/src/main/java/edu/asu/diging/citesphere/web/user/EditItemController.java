@@ -30,6 +30,7 @@ import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationConceptManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IConceptTypeManager;
@@ -120,10 +121,13 @@ public class EditItemController {
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/edit", method = RequestMethod.POST)
     public String storeItem(@ModelAttribute CitationForm form, Authentication authentication, Model model,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
+            @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
+            @RequestParam(required = false, value = "index") String index,
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page,
+            @RequestParam(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
             throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
-            ZoteroHttpStatusException {
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         // load authors and editors before detaching
         citationHelper.updateCitation(citation, form, (IUser) authentication.getPrincipal());

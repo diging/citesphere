@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import edu.asu.diging.citesphere.core.authority.AuthorityImporter;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityImporterNotFoundException;
@@ -25,7 +26,15 @@ public interface IAuthorityService {
 
     IAuthorityEntry save(IAuthorityEntry entry);
 
-    List<IAuthorityEntry> getAll(IUser user);
+    /**
+     * Fetches all the authorities that the user has access to.
+     * @param user     User for which the authorities are to be retrieved
+     * @param groupIds Group Ids to which the user belongs
+     * @return the retrieved authority list
+     */
+    List<IAuthorityEntry> getAll(IUser user, List<Long> groupIds);
+    
+    Page<IAuthorityEntry> getAll(IUser user, List<Long> groupIds, int page, int pageSize);
 
     boolean deleteAuthority(String id);
 
@@ -117,7 +126,7 @@ public interface IAuthorityService {
 
     Set<IAuthorityEntry> findByUriInDataset(String uri, String citationGroupId) throws GroupDoesNotExistException;
 
-    List<IAuthorityEntry> getAuthoritiesByGroup(long groupId);
+    Page<IAuthorityEntry> getAuthoritiesByGroup(long groupId, int page, int pageSize);
         
-    List<IAuthorityEntry> getUserSpecificAuthorities(IUser user);
+    Page<IAuthorityEntry> getUserSpecificAuthorities(IUser user, int page, int pageSize);
 }

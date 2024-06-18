@@ -1,5 +1,206 @@
 <html layout:decorate="~{layouts/main}">
-<head></head>
+<head>
+<script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<script th:inline="javascript">
+	$(function() {
+
+		$("#searchConceptSpinnerEdit").hide();
+		$("#searchConceptEdit").click(function() {
+			if (allowConceptSearch("ConceptEdit")) {
+				$("#selectConceptModelEdit").on('hidden.bs.modal', function(e) {
+					$('#selectConceptModelEdit a:first').tab('show');
+				})
+				$("#searchConceptSpinnerEdit").show();
+				$('#conceptpowerConceptsEdit-pagination-top').twbsPagination('destroy');
+				$('#viafConceptsEdit-pagination-top').twbsPagination('destroy');
+				getViafConcepts(0)
+				getConceptpowerConcepts(0)
+				$("#searchConceptSpinnerEdit").hide();
+			}
+		});
+
+		$("#clearConceptFields").click(function() {
+			$("#conceptNameEdit").val("");
+			$("#conceptDescriptionEdit").val("");
+			$("#URIEdit").val("");
+			allowConceptSearch("ConceptEdit");
+    	});
+
+		$("#conceptNameEdit").keyup(function(e) {
+			allowConceptSearch("ConceptEdit");
+		});
+
+		$("#closeConceptSearchResultEdit").click(function() {
+			$("#selectConceptModelEdit").modal('hide');
+			$('#selectConceptModelEdit a:first').tab('show');
+		});
+	});
+
+	function populateInfo(name, description, uri, importerId) {
+		$("#conceptNameEdit").val(name);
+		
+		if (description != undefined && description != ' - ') {
+			$("#conceptDescriptionEdit").val(description);
+		}
+		
+		if (uri != undefined && uri != '') {
+			$("#URIEdit").val(uri);
+		}
+	}
+
+	function getConceptpowerConcepts(page) {
+		var conceptName = $("#conceptNameEdit").val();
+		url = [[@{|/auth/authority/find/authorities/conceptpower|}]] + '?firstName=' + conceptName + '&lastName=' + "" + '&page=' + page;
+		$("#loadingMessageConceptPowerEdit").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+			" Loading Results.");
+		$("#loadingModalConceptPowerEdit").modal('show');
+		$.ajax({
+			dataType: "json",
+			type: 'GET',
+			url: url,
+			async: false,
+			success: function(data) {
+				$("#conceptpowerConceptSearchResultEdit").empty();
+				var content = '';
+
+				if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+					data['foundAuthorities'].forEach(function(elem) {
+						content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
+						if (elem['description'] == null) {
+							content += ' - </td>';
+						} else {
+							content += elem['description'] + '</td>';
+						}
+
+						content += '<div class="importerId" style="display: none;">';
+						if (elem['importerId'] == null) {
+							content += '</div>';
+						} else {
+							content += elem['importerId'] + '</div>';
+						}
+						content += '<td style="vertical-align: middle;"><span class="conceptpower-concept-entry btn btn-primary" title="Create new managed concept" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+
+					});
+
+					$('#conceptpowerConceptsEdit-pagination-top').twbsPagination({
+						totalPages: data['totalPages'],
+						startPage: data['currentPage'],
+						prev: "«",
+						next: "»",
+						visiblePages: 5,
+						initiateStartPageClick: false,
+						onPageClick: function(event, page) {
+							getConceptpowerConcepts(page)
+						}
+					});
+
+				}
+
+				$("#conceptpowerConceptSearchResultEdit").append(content);
+				$(".conceptpower-concept-entry").click(function() {
+					name = $(this).closest("tr").find(".name").text();
+					uri = $(this).closest("tr").find(".uri").text();
+
+					description = $(this).closest("tr").find(".description").text();
+					
+					populateInfo(name, description, uri);
+					$("#selectConceptModelEdit").modal('hide');
+				});
+
+				$("#loadingModalConceptPowerEdit").modal('hide');
+			},
+			error: function(data) {
+				$("#loadingMessageConceptPowerEdit").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+				"Error loading results. Try again later.");
+				$('#loadingModalConceptPowerEdit').modal('show');
+				$('#conceptpowerConceptSearchResultEdit').parents('table').hide()
+				$("#conceptpowerConceptsErrorEdit").show();
+				setTimeout(function() {
+					$('#loadingModalConceptPowerEdit').modal('hide');
+				}, 3000);
+			}
+
+		});
+	}
+
+	function getViafConcepts(page) {
+		var conceptName = $("#conceptNameEdit").val();
+		url = [[@{|/auth/authority/find/authorities/viaf|}]] + '?firstName='+ conceptName + '&lastName=' + "" +'&page='+page;		
+		$("#loadingMessageViafEdit").html("<i class='glyphicon glyphicon-refresh spinning'></i>" +
+			" Loading Results.");
+		$("#loadingModalViafEdit").modal('show');
+		$.ajax({
+			dataType: "json",
+			type: 'GET',
+			url: url ,
+			async: false,
+			success: function(data) {
+				$("#viafConceptsSearchResultEdit").empty();
+				var content = '';
+				
+				if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
+					data['foundAuthorities'].forEach(function(elem) {
+						content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
+						if (elem['description'] == null) {
+							content += ' - </td>';
+						} else {
+							content += elem['description'] + '</td>';
+						}
+						content += '<td style="vertical-align: middle;"><span class="viaf-concept-entry btn btn-primary" title="Create new managed concept" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
+
+					});
+
+					$('#viafConceptsEdit-pagination-top').twbsPagination({
+						totalPages: data['totalPages'],
+						startPage: data['currentPage'],
+						prev: "«",
+						next: "»",
+						visiblePages: 5,
+						initiateStartPageClick: false,
+						onPageClick: function(event, page) {
+							getViafConcepts(page-1)
+						}
+					});
+
+				}
+
+				$("#viafConceptsSearchResultEdit").append(content);
+				$(".viaf-concept-entry").click(function() {
+					name = $(this).closest("tr").find(".name").text();
+					uri = $(this).closest("tr").find(".uri").text();
+					
+					description = $(this).closest("tr").find(".description").text();
+
+					populateInfo(name, description, uri);
+					$("#selectConceptModelEdit").modal('hide');
+				});
+				$("#loadingModalViafEdit").modal('hide');
+			},
+			error: function(data) {
+				$("#loadingMessageViafEdit").html("<i class='glyphicon glyphicon-remove-sign'></i>" +
+				"Error loading results. Try again later.");
+				$('#loadingModalViafEdit').modal('show');
+				$('#viafConceptsSearchResultEdit').parents('table').hide()
+				$("#viafConceptsErrorEdit").show();
+				setTimeout(function() {
+					$('#loadingModalViafEdit').modal('hide');
+				}, 3000);
+			}
+
+		});
+	}
+
+	function allowConceptSearch(element) {
+		if ($("#conceptNameEdit").val() == "") {
+			$("#search" + element).prop("disabled", true);
+			return false;
+		} else {
+			$("#search" + element).prop("disabled", false);
+			return true;
+		}
+	}
+</script>
+</head>
 <body>
 <div layout:fragment="content">
 	<ol class="breadcrumb">
@@ -13,19 +214,26 @@
 		<table class="table table-striped">
 	
 		<tr>
-		<td width="20%"><label>Name:</label></td>
-		<td><input th:field="*{name}" class="form-control" placeholder="Name" th:value="${form.name}"></input>
+		<td width="20%"><label for="conceptNameEdit">Name:</label></td>
+		<td width="60%"><input th:field="*{name}" class="form-control" placeholder="Name" th:value="${form.name}" id="conceptNameEdit"></input>
 		<span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span></td> 
+		<td width="20%"><a data-toggle="modal"
+			data-target="#selectConceptModelEdit" id="searchConceptEdit" disabled
+			title="Enter Name to Search">
+			<i class="icon-search"></i> Search Concept 
+			<i id="searchConceptSpinnerEdit" class="icon-spinner"
+				style="color: white"></i>
+		</a></td>
 		</tr>
 
 		<tr>
-		<td width="20%"><label>Description:</label></td>
-		<td><input th:field="*{description}" class="form-control" placeholder="Description" th:value="${form.description}"></input></td>
+		<td width="20%"><label for="conceptDescriptionEdit">Description:</label></td>
+		<td><input th:field="*{description}" class="form-control" placeholder="Description" th:value="${form.description}" id="conceptDescriptionEdit"></input></td>
 		</tr>
 
 		<tr>
 		<td width="20%"><label>URI:</label></td>
-		<td><input th:field="*{uri}" id = "URI" class="form-control" placeholder="URI" th:value="${form.uri}"></input>
+		<td><input th:field="*{uri}" id = "URIEdit" class="form-control" placeholder="URI" th:value="${form.uri}"></input>
 		<span class="text-danger" th:if="${#fields.hasErrors('uri')}" th:errors="*{uri}"></span>
 		<input type="hidden" class="form-control" th:value="${form.conceptId}" ></input></td> 
 		</tr>
@@ -45,8 +253,99 @@
 		
 		<a th:href="@{/auth/concepts/list}" class="btn btn-default">
 		<i class="icon-close-alt"></i>&nbsp;Cancel</a>
-		
+
+		<button class="btn btn-default" data-toggle="modal" id="clearConceptFields" type="button">Clear 
+    	</button>
+
 	</form>
+
+	<div id="selectConceptModelEdit" class="modal fade" tabindex="-1"
+	role="dialog" aria-labelledby="selectConceptLabelEdit">
+		<div class="modal-dialog" style="width: 1000px" role="document">
+			<div class="modal-content">
+				
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="ConceptLabelEdit">Concept Search Result</h4>
+				</div>
+
+				<div class="modal-body">
+					<div role="tabpanel">
+						<!-- Nav tabs -->
+						<ul class="nav nav-tabs" role="tablist">
+							<li role="presentation" class="active">
+								<a href="#conceptpowerConceptsTabContentEdit" aria-controls="uploadTab"
+									role="tab" data-toggle="tab">Concepts from Conceptpower</a>
+							</li>
+							<li role="presentation">
+								<a href="#viafConceptsTabContentEdit"
+									aria-controls="browseTab" role="tab" data-toggle="tab">Concepts from VIAF</a>
+							</li>
+						</ul>
+						
+						<!-- Tab panes -->
+						<div class="tab-content">
+							<div role="tabpanel" class="tab-pane active" id="conceptpowerConceptsTabContentEdit">
+								<ul id="conceptpowerConceptsEdit-pagination-top" class="pagination-sm"></ul>
+								<div id="conceptpowerConceptsErrorEdit" class="text-warning" style="display: none">
+									<span> Error occurred while searching concepts in conceptpower </span>
+								</div>
+								</br>
+								<div style="position: relative;">
+									<div style="height: 350px; overflow:auto; margin-top: 20px;">
+										<table class="table table-striped table-bordered table-fixed">
+											<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+											<tbody id="conceptpowerConceptSearchResultEdit">
+											</tbody>
+										</table>                            
+									</div>
+								</div>
+							</div>
+							
+							<div role="tabpanel" class="tab-pane" id="viafConceptsTabContentEdit">
+								<ul id="viafConceptsEdit-pagination-top" class="pagination-sm"></ul>
+								<div id="viafConceptsErrorEdit" class="text-warning" style="display: none">
+									<span> Error occurred while searching concepts in VIAF </span>
+								</div>
+								</br>
+								<div style="position: relative;">
+									<div style="height: 350px; overflow:auto; margin-top: 20px;">
+										<table class="table table-striped table-bordered table-fixed">
+											<tr><th>Name</th><th>URI</th><th>Description</th><th></th></tr>
+											<tbody id="viafConceptsSearchResultEdit">
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default"
+							id="closeConceptSearchResultEdit">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="loadingModalConceptPowerEdit" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div id="loadingMessageConceptPowerEdit" class="modal-body"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="loadingModalViafEdit" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div id="loadingMessageViafEdit" class="modal-body"></div>
+			</div>
+		</div>
+	</div>
 </div>
 </body>	
 </html>

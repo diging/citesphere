@@ -26,7 +26,6 @@ import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -35,7 +34,6 @@ import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
-
 
 public class CitationManagerTest {
 
@@ -72,7 +70,7 @@ public class CitationManagerTest {
     ICitationGroup group;
     private ICitationGroup group1;
     private ICitationGroup group2;
-    
+        
     @Before
     public void setUp() throws ZoteroHttpStatusException {
         MockitoAnnotations.initMocks(this);
@@ -104,7 +102,6 @@ public class CitationManagerTest {
         group2.setGroupId(GROUP2_ID);
         group2.setContentVersion(3L);
         Mockito.when(groupRepository.findFirstByGroupId(GROUP2_ID)).thenReturn(Optional.of((CitationGroup)group2));
-        
     }
     
     @Test
@@ -137,10 +134,11 @@ public class CitationManagerTest {
     @Test
     public void test_getCitationFromZotero_doesNotExist() {
         // FIXME: implement when bug is removed
-    }
+    } 
     
     @Test 
-    public void test_updateCitation_success() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {
+    public void test_updateCitation_success() throws ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(currentVersion);
         ICitation updatedCitation = new Citation();
         updatedCitation.setKey(EXISTING_ID);
@@ -152,7 +150,8 @@ public class CitationManagerTest {
     }
     
     @Test(expected=CitationIsOutdatedException.class)
-    public void test_updateCitation_conflict() throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException {
+    public void test_updateCitation_conflict() throws ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(new Long(2));
         managerToTest.updateCitation(user, GROUP_ID, existingCitation);
     }
@@ -284,9 +283,9 @@ public class CitationManagerTest {
             citations.add(citation);
         }
         
-        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-1)*50, 50, false);
+        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-1)*50, 50, false, null);
         
-        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index);
+        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index, null);
         Assert.assertEquals("key2", actualResult.getNext());
         Assert.assertEquals("key0", actualResult.getPrev());
     }
@@ -314,10 +313,10 @@ public class CitationManagerTest {
         citationOnPage2.setKey("key"+9);
         citationsPage2.add(citationOnPage2);
         
-        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-1)*9, 9, false);
-        Mockito.doReturn(citationsPage2).when(citationDao).findCitations(GROUP_ID, (page)*9, 9, false);
+        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-1)*9, 9, false, null);
+        Mockito.doReturn(citationsPage2).when(citationDao).findCitations(GROUP_ID, (page)*9, 9, false, null);
         
-        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index);
+        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index, null);
         Assert.assertEquals("key9", actualResult.getNext());
         Assert.assertEquals("key7", actualResult.getPrev());
     }
@@ -344,9 +343,9 @@ public class CitationManagerTest {
         citationOnPage2.setKey("key"+9);
         citationsPage2.add(citationOnPage2);
         
-        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-2)*9, 9, false);
-        Mockito.doReturn(citationsPage2).when(citationDao).findCitations(GROUP_ID, (page-1)*9, 9, false);
-        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index);
+        Mockito.doReturn(citations).when(citationDao).findCitations(GROUP_ID, (page-2)*9, 9, false, null);
+        Mockito.doReturn(citationsPage2).when(citationDao).findCitations(GROUP_ID, (page-1)*9, 9, false, null);
+        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index, null);
         Assert.assertNull(actualResult.getNext());
         Assert.assertEquals("key8", actualResult.getPrev());
     }
@@ -367,9 +366,47 @@ public class CitationManagerTest {
         citationResults.setTotalResults(10);
         citationResults.setNotModified(true);
         Mockito.when(zoteroManager.getGroupItems(user, GROUP_ID, page, sortBy, new Long(0))).thenReturn(citationResults);
-        Mockito.when(citationDao.findCitations(GROUP_ID, page-1, 0, false)).thenReturn(new ArrayList<>());
-        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index);
+        Mockito.when(citationDao.findCitations(GROUP_ID, page-1, 0, false, null)).thenReturn(new ArrayList<>());
+        CitationPage actualResult= managerToTest.getPrevAndNextCitation(user, GROUP_ID, "", page, sortBy, index, null);
         Assert.assertNull(actualResult.getNext());
         Assert.assertNull(actualResult.getPrev());
+    }
+    
+    @Test
+    public void test_getNotes_success() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        List<ICitation> notes = new ArrayList<>();
+        
+        Citation note1 = new Citation();
+        note1.setKey("note1");
+        note1.setGroup(GROUP_ID);
+        note1.setNote("note 1");
+        notes.add(note1);
+        
+        Citation note2 = new Citation();
+        note2.setKey("note2");
+        note2.setGroup(GROUP_ID);
+        note2.setNote("note 2");
+        notes.add(note2);
+        
+        Mockito.when(citationStore.getNotes(EXISTING_ID)).thenReturn(notes);
+        Mockito.when(groupManager.getGroup(user, GROUP_ID)).thenReturn(group);
+        
+        List<ICitation> actualNotes = managerToTest.getNotes(user, GROUP_ID, EXISTING_ID);
+        Assert.assertEquals(notes.size(), actualNotes.size());
+        for(ICitation citation : notes) {
+            Assert.assertTrue(actualNotes.stream().anyMatch(note->note.getKey().equals(citation.getKey())));
+        }
+    }
+    
+    @Test
+    public void test_getNotes_empty() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        List<ICitation> emptyList = new ArrayList<>();
+        
+        Mockito.when(citationStore.getNotes(EXISTING_ID)).thenReturn(emptyList);
+        Mockito.when(groupManager.getGroup(user, GROUP_ID)).thenReturn(group);
+        Mockito.when(zoteroManager.getGroupItemNotes(user, GROUP_ID, EXISTING_ID)).thenReturn(new ArrayList<>());
+        
+        List<ICitation> response = managerToTest.getNotes(user, GROUP_ID, EXISTING_ID);
+        Assert.assertTrue(response.size() == 0);
     }
 }

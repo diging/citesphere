@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.social.zotero.api.Creator;
 import org.springframework.social.zotero.api.Data;
 import org.springframework.social.zotero.api.Item;
+import org.springframework.social.zotero.api.Tag;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,23 +22,25 @@ import edu.asu.diging.citesphere.core.factory.zotero.IItemFactory;
 import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IPerson;
+import edu.asu.diging.citesphere.model.bib.ItemType;
 
 @Component
 public class ItemFactory implements IItemFactory {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.factory.zotero.impl.IItemFactory#createItem(edu.asu.diging.citesphere.core.model.bib.ICitation)
      */
     @Override
     public Item createItem(ICitation citation, List<String> collectionIds) {
         Item item = new Item();
         item.setKey(citation.getKey());
-        
+
         Data data = new Data();
         item.setData(data);
-        
+
         data.setKey(citation.getKey());
         data.setAbstractNote(citation.getAbstractNote());
         data.setAccessDate(citation.getAccessDate());
@@ -65,17 +69,17 @@ public class ItemFactory implements IItemFactory {
         data.setVolume(citation.getVolume());
         data.setVersion(citation.getVersion());
         data.setCollections(collectionIds);
-        
+
         data.setCreators(new ArrayList<>());
         citation.getAuthors().forEach(a -> {
-            if(a.getLastName() !=null || a.getFirstName()!=null) {
+            if (a.getLastName() != null || a.getFirstName() != null) {
                 Creator mappedCreator = mapCreatorFields(a, ZoteroConstants.CREATOR_TYPE_AUTHOR);
                 data.getCreators().add(mappedCreator);
             }
         });
         if (citation.getEditors() != null) {
             citation.getEditors().forEach(e -> {
-                if(e.getLastName() !=null || e.getFirstName()!=null) {
+                if (e.getLastName() != null || e.getFirstName() != null) {
                     Creator mappedCreator = mapCreatorFields(e, ZoteroConstants.CREATOR_TYPE_EDITOR);
                     data.getCreators().add(mappedCreator);
                 }
@@ -83,23 +87,31 @@ public class ItemFactory implements IItemFactory {
         }
         if (citation.getOtherCreators() != null) {
             citation.getOtherCreators().forEach(e -> {
-                if(e.getRole()!=null) {
+                if (e.getRole() != null) {
                     Creator mappedCreator = mapCreatorFields(e.getPerson(), e.getRole());
                     data.getCreators().add(mappedCreator);
                 }
             });
         }
-        
-        try {
-            writeExtraData(citation, data);
-        } catch (JsonProcessingException e1) {
-            // FIXME: hadnle this
-            logger.error("Could not serialize extra data.", e1);
-        }
-        
         return item;
     }
-    
+
+    @Override
+    public Item createMetaDataItem(ICitation citation) {
+        Item item = new Item();
+        item.setKey(citation.getMetaDataItemKey());
+
+        Data data = null;
+        try {
+            data = createMetaData(citation);
+        } catch (JsonProcessingException e1) {
+            // FIX : handle this
+            logger.error("Could not create citesphere meta data", e1);
+        }
+        item.setData(data);
+        return item;
+    }
+
     private Creator mapCreatorFields(IPerson creator, String creatorType) {
         Creator mappedCreator = new Creator();
         mappedCreator.setFirstName(creator.getFirstName());
@@ -107,9 +119,9 @@ public class ItemFactory implements IItemFactory {
         mappedCreator.setCreatorType(creatorType);
         return mappedCreator;
     }
-    
+
     private void writeExtraData(ICitation citation, Data data) throws JsonProcessingException {
-        
+
         ExtraDataObject extraDataObject = new ExtraDataObject();
         extraDataObject.setAuthors(citation.getAuthors());
         extraDataObject.setEditors(citation.getEditors());
@@ -122,10 +134,10 @@ public class ItemFactory implements IItemFactory {
         if (citation.getReferences() != null) {
             extraDataObject.setReferences(citation.getReferences());
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
-        
+
         String extraData = "";
         String citesphereData = ExtraData.CITESPHERE_PREFIX + " " + extraDataAsJson + "\n";
         if (citation.getExtra() != null && !citation.getExtra().trim().isEmpty()) {
@@ -137,14 +149,44 @@ public class ItemFactory implements IItemFactory {
                 extraData = extraData + citesphereData;
             } else {
                 // else replace citesphere data
-                extraData = citation.getExtra().replaceAll(ExtraData.CITESPHERE_PATTERN, citesphereData.replace("\\", "\\\\"));
+                extraData = citation.getExtra().replaceAll(ExtraData.CITESPHERE_PATTERN,
+                        citesphereData.replace("\\", "\\\\"));
             }
         } else {
             // if there is no extra data
             extraData = citesphereData;
         }
-        
+
         data.setExtra(extraData);
     }
- 
+
+    private Data createMetaData(ICitation citation) throws JsonProcessingException {
+        Data data = new Data();
+        data.setKey(citation.getMetaDataItemKey());
+        data.setVersion(citation.getMetaDataItemVersion());
+        data.setItemType(ItemType.NOTE.getZoteroKey());
+        data.setParentItem(citation.getKey());
+
+        ExtraDataObject extraDataObject = new ExtraDataObject();
+        extraDataObject.setAuthors(citation.getAuthors());
+        extraDataObject.setEditors(citation.getEditors());
+        extraDataObject.setOtherCreators(citation.getOtherCreators());
+        extraDataObject.setGilesUploads(citation.getGilesUploads());
+        
+        if (citation.getConceptTags() != null) {
+            extraDataObject.setConceptTags(citation.getConceptTags());
+        }
+        if (citation.getReferences() != null) {
+            extraDataObject.setReferences(citation.getReferences());
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        String extraDataAsJson = mapper.writer().writeValueAsString(extraDataObject);
+        data.setNote(extraDataAsJson);
+
+        List<Tag> tagList = Arrays.asList(new Tag(ExtraData.CITESPHERE_METADATA_TAG));
+        data.setTags(tagList);
+
+        return data;
+    }
+
 }
