@@ -212,24 +212,17 @@ public class CitationManager implements ICitationManager {
         citationStore.save(newCitation);
         
         // mark group outdated, so it'll be updated on the next loading
-        updateCitationGroup(groupId, false, 0);
+        updateCitationGroup(user, groupId);
         return newCitation;
     }
 
-    public void updateCitationGroup(String groupId, boolean shouldUpdateFromCitations, long citationsSize) {
-        
-        List<ICitationGroup> citationGroups = groupRepository.findByGroupId(new Long(groupId));
-        long size;
-        
-        if(shouldUpdateFromCitations) {
-            size = citationsSize;
-        } else {
-            size = citationGroups.get(0).getNumItems()+1;
-        }
-        
-        for(ICitationGroup citationGroup : citationGroups) {
+    public void updateCitationGroup(IUser user, String groupId) {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(Long.parseLong(groupId));
+        if (groupOptional.isPresent()) {
+            ICitationGroup citationGroup = groupOptional.get();
+            ICitationGroup group = zoteroManager.getGroup(user, groupId + "", true);
             citationGroup.setLastLocallyModifiedOn(OffsetDateTime.now().toString());
-            citationGroup.setNumItems(size);     
+            citationGroup.setNumItems(group.getNumItems()); 
             groupRepository.save((CitationGroup) citationGroup);
         }
     }
@@ -434,7 +427,7 @@ public class CitationManager implements ICitationManager {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
                 (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds);
             if (groupOptional.isPresent()) {
-                updateCitationGroup(groupId, true,citations.size());
+                updateCitationGroup(user, groupId);
                 
                 total = groupRepository.findFirstByGroupId(new Long(groupId)).get().getNumItems();
             } else {
