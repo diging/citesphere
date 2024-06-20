@@ -18,7 +18,7 @@
 
         <thymeleaf.version>3.0.13.RELEASE</thymeleaf.version>
 
-        <spring.version>5.3.13</spring.version>
+        <spring.version>6.0.0</spring.version>
         <spring-data.version>Neumann-SR3</spring-data.version>
 
         <javers.version>6.2.3</javers.version>
