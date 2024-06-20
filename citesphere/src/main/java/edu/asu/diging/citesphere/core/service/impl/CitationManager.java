@@ -216,7 +216,7 @@ public class CitationManager implements ICitationManager {
         return newCitation;
     }
 
-    public void updateCitationGroup(IUser user, String groupId) {
+    private void updateCitationGroup(IUser user, String groupId) {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(Long.parseLong(groupId));
         if (groupOptional.isPresent()) {
             ICitationGroup citationGroup = groupOptional.get();
