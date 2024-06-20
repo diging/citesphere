@@ -23,6 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.SelfCitationException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
@@ -421,7 +422,7 @@ public class CitationManagerTest {
     }
 
     @Test
-    public void test_updateCitationReference_addReference() {
+    public void test_updateCitationReference_addReference() throws SelfCitationException {
         String referenceCitationKey = "referenceCitationKey";
         citation.getReferences().add(iReference);
         when(citationStore.save(citation)).thenReturn(updatedCitation);
@@ -430,7 +431,7 @@ public class CitationManagerTest {
     }
 
     @Test
-    public void test_updateCitationReference_noReferences() {
+    public void test_updateCitationReference_noReferences() throws SelfCitationException {
         String referenceCitationKey = "referenceCitationKey";
         citation.setReferences(null);
         when(citationStore.save(citation)).thenReturn(updatedCitation);
@@ -438,12 +439,12 @@ public class CitationManagerTest {
         Assert.assertEquals(updatedCitation, result);
     }
 
-    @Test
-    public void test_updateCitationReference_sameCitationKey() {
+    @Test(expected = SelfCitationException.class)
+    public void test_updateCitationReference_sameCitationKey() throws SelfCitationException {
         String referenceCitationKey = CITATION_KEY;
         updatedCitation.setReferences(references);
+        
         when(citationStore.save(citation)).thenReturn(updatedCitation);
-        ICitation result = managerToTest.addCitationToReferences(citation, referenceCitationKey, REFERENCE);
-        Assert.assertEquals(updatedCitation, result);
+        ICitation result = managerToTest.addCitationToReferences(citation, referenceCitationKey, REFERENCE);        
     }
 }

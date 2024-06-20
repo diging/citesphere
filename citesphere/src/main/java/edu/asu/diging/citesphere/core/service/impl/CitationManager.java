@@ -42,7 +42,6 @@ import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
-import edu.asu.diging.citesphere.data.bib.CitationRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
@@ -89,9 +88,6 @@ public class CitationManager implements ICitationManager {
 
     @Autowired
     private IAsyncCitationProcessor asyncCitationProcessor;
-
-    @Autowired
-    private CitationRepository citationRepository;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
