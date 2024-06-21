@@ -14,7 +14,7 @@
         <spring-security-version>5.7.12</spring-security-version>
         <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
-        <spring-elasticsearch.version>3.2.12.RELEASE</spring-elasticsearch.version>
+        <spring-elasticsearch.version>5.0.0</spring-elasticsearch.version>
 
         <thymeleaf.version>3.0.13.RELEASE</thymeleaf.version>
 
@@ -22,7 +22,7 @@
         <spring-data.version>Neumann-SR3</spring-data.version>
 
         <javers.version>6.2.3</javers.version>
-        <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
+        <spring.kafka.version>3.1.0</spring.kafka.version>
         <spring-social-zotero.version>0.12</spring-social-zotero.version>
         <citesphere.messages.version>0.4</citesphere.messages.version>
         <citesphere.model.version>1.19</citesphere.model.version>
@@ -382,7 +382,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>5.3.2.Final</version>
+            <version>5.4.15.Final</version>
         </dependency>
 
         <dependency>
@@ -604,7 +604,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.9.9</version>
+            <version>2.9.10</version>
         </dependency>
 
     </dependencies>
