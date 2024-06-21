@@ -422,7 +422,7 @@ public class CitationManagerTest {
     }
 
     @Test
-    public void test_updateCitationReference_addReference() throws SelfCitationException {
+    public void test_addCitationToReferences_citationFound() throws SelfCitationException {
         String referenceCitationKey = "referenceCitationKey";
         citation.getReferences().add(iReference);
         when(citationStore.save(citation)).thenReturn(updatedCitation);
@@ -431,7 +431,7 @@ public class CitationManagerTest {
     }
 
     @Test
-    public void test_updateCitationReference_noReferences() throws SelfCitationException {
+    public void test_addCitationToReferences_citationNotFound() throws SelfCitationException {
         String referenceCitationKey = "referenceCitationKey";
         citation.setReferences(null);
         when(citationStore.save(citation)).thenReturn(updatedCitation);
@@ -440,7 +440,7 @@ public class CitationManagerTest {
     }
 
     @Test(expected = SelfCitationException.class)
-    public void test_updateCitationReference_sameCitationKey() throws SelfCitationException {
+    public void test_addCitationToReferences_selfCitation() throws SelfCitationException {
         String referenceCitationKey = CITATION_KEY;
         updatedCitation.setReferences(references);
         

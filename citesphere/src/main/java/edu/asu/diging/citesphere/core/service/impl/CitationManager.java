@@ -508,10 +508,10 @@ public class CitationManager implements ICitationManager {
             references = new HashSet<>();
         }
         if (!citation.getKey().equals(referenceCitationKey)) {
-            IReference iReference = new Reference();
-            iReference.setCitationId(referenceCitationKey);
-            iReference.setReferenceString(reference);
-            references.add(iReference);
+            IReference newReference = new Reference();
+            newReference.setCitationId(referenceCitationKey);
+            newReference.setReferenceString(reference);
+            references.add(newReference);
         } else {
             throw new SelfCitationException("A citation cannot reference itself.");
         }

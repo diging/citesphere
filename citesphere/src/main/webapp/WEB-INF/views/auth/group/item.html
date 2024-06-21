@@ -156,7 +156,7 @@
 	});
 
 	function getReferences(zoteroGroupId, searchTerm) {
-	    var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/find/references' + '?searchTerm=' + searchTerm;
+	    var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/references' + '?searchTerm=' + searchTerm;
 	    $.ajax({
 	        dataType: "json",
 	        type: 'GET',
