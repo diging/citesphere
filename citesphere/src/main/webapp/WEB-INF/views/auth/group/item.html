@@ -64,6 +64,8 @@
 	$(document).ready(function(){
 		
 	    $("#searchReferenceSpinner").hide();
+	    
+	    // $("#addReferenceSpinner").hide();
 	
 		$("#uploadFileIcon").click(function() {
 	        $("#uploadFileModal").modal('show');
@@ -119,7 +121,9 @@
 	    });	    
 
 	    $("#addReferenceButton").click(function() {
-	        $("#referenceModal").modal('hide');
+	    	console.log("Add")
+	        // $("#addReferenceSpinner").show();
+	    	document.getElementById('addReferenceSpinner').style.display = 'inline-block';
 	        var content = '<p>';
 	        content += '<span class="icon-info-circle"></span>';
 	        content += $("#itemReference").val();
@@ -130,6 +134,9 @@
 	        var reference =  $("#itemReference").val().trim();
 	        var referenceCitationKey =  $("#itemReference").data('citation-key');
 	        addItemReference(zoteroGroupId, itemId, referenceCitationKey, reference);
+	        // $("#addReferenceSpinner").hide();
+	        document.getElementById('addReferenceSpinner').style.display = 'none';
+	        $("#referenceModal").modal('hide');
 	    });
 	    
 	    $("#searchReference").click(function() {
@@ -191,6 +198,9 @@
 	                    if (firstName) {
 	                        reference += firstName;
 	                    }
+	                } 
+	                if(authors.length > 1) {
+	                	reference += " et al."
 	                }
 	                reference += ", " + citationItem["dateFreetext"]+", " + citationItem["title"];
 	                $("#itemReference").val(reference);
@@ -508,7 +518,7 @@
 			
 			</th:block></td>
 			<td>
-				<button id="addReferences" type="button" class="btn btn-primary" data-toggle="modal" data-target="#referenceModal" th:data-zotero-group-id="${zoteroGroupId}" th:data-item-id="${itemId}"><i class="icon-circle-add"></i>Add References</button> 
+				<button id="addReferences" type="button" class="btn btn-primary" data-toggle="modal" data-target="#referenceModal" th:data-zotero-group-id="${zoteroGroupId}" th:data-item-id="${itemId}"><i class="icon-circle-add"></i> Add References</button> 
 			</td>
 		</tr>
 		<tr>
@@ -681,7 +691,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" id="closeReferenceModalBtn">Close</button>
-                    <button type="button" class="btn btn-primary" id="addReferenceButton" disabled>Add</button>
+                    <button type="button" class="btn btn-primary" id="addReferenceButton" disabled>Add <i id="addReferenceSpinner" class="icon-spinner" style="color: white; display: none;"></i></button>
                 </div>
             </div>
         </div>

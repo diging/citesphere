@@ -81,7 +81,7 @@ public class CitationManagerTest {
     private final String CITATION_KEY = "citationKey";
     private ICitation updatedCitation;
     private  Set<IReference> references;
-    private IReference iReference;
+    private IReference reference;
 
     @Before
     public void setUp() throws ZoteroHttpStatusException {
@@ -122,9 +122,9 @@ public class CitationManagerTest {
         updatedCitation = new Citation();
         updatedCitation.setKey(CITATION_KEY);
         references = new HashSet<>();
-        iReference = new Reference();
-        iReference.setReferenceString(REFERENCE);
-        references.add(iReference);
+        reference = new Reference();
+        reference.setReferenceString(REFERENCE);
+        references.add(reference);
         updatedCitation.setReferences(references);
     }
     
@@ -424,7 +424,7 @@ public class CitationManagerTest {
     @Test
     public void test_addCitationToReferences_citationFound() throws SelfCitationException {
         String referenceCitationKey = "referenceCitationKey";
-        citation.getReferences().add(iReference);
+        citation.getReferences().add(reference);
         when(citationStore.save(citation)).thenReturn(updatedCitation);
         ICitation result = managerToTest.addCitationToReferences(citation, referenceCitationKey, REFERENCE);
         Assert.assertEquals(updatedCitation, result);
