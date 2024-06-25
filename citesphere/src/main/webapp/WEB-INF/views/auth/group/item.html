@@ -65,7 +65,7 @@
 		
 	    $("#searchReferenceSpinner").hide();
 	    
-	    // $("#addReferenceSpinner").hide();
+	    $("#addReferenceSpinner").hide();
 	
 		$("#uploadFileIcon").click(function() {
 	        $("#uploadFileModal").modal('show');
@@ -121,22 +121,14 @@
 	    });	    
 
 	    $("#addReferenceButton").click(function() {
-	    	console.log("Add")
-	        // $("#addReferenceSpinner").show();
+	        $("#addReferenceSpinner").show();
 	    	document.getElementById('addReferenceSpinner').style.display = 'inline-block';
-	        var content = '<p>';
-	        content += '<span class="icon-info-circle"></span>';
-	        content += $("#itemReference").val();
-	        content += '</p>';
-	        $('#citationReferences').append(content);
-	        var zoteroGroupId = $("#addReferences").data('zotero-group-id');
+
+			var zoteroGroupId = $("#addReferences").data('zotero-group-id');
 	        var itemId = $("#addReferences").data('item-id');
 	        var reference =  $("#itemReference").val().trim();
 	        var referenceCitationKey =  $("#itemReference").data('citation-key');
 	        addItemReference(zoteroGroupId, itemId, referenceCitationKey, reference);
-	        // $("#addReferenceSpinner").hide();
-	        document.getElementById('addReferenceSpinner').style.display = 'none';
-	        $("#referenceModal").modal('hide');
 	    });
 	    
 	    $("#searchReference").click(function() {
@@ -153,6 +145,7 @@
 	    $("#closeReferenceSearchResult").click(function() {
 	        $("#selectReferenceModal").modal('hide');
 	        $("#searchReferenceSpinner").hide();
+	        $("#addReferenceSpinner").hide();
 	    });
 	    
 	    $("#addReferences").click(function() {
@@ -186,23 +179,30 @@
 	                var authors = citationItem["authors"];
 	                var citationKey = citationItem["key"];
 	                var reference = "";
-	                if (authors.length > 0) {
-	                    var firstName = authors[0].firstName ? authors[0].firstName.trim() : "";  
-	                    var lastName = authors[0].lastName ? authors[0].lastName.trim() : "";   
-	                    if (lastName) {
-	                        reference += lastName;
-	                    }
-	                    if (firstName && lastName) {  
-	                        reference += " ";
-	                    }
-	                    if (firstName) {
-	                        reference += firstName;
-	                    }
-	                } 
-	                if(authors.length > 1) {
-	                	reference += " et al."
-	                }
-	                reference += ", " + citationItem["dateFreetext"]+", " + citationItem["title"];
+					if(authors != null && authors.length > 0) {
+						if(authors.length > 1) {
+							authors.sort((authorA,authorB) => {
+								return authorA.firstName.trim().localeCompare(authorB.firstName.trim(), undefined, { sensitivity: 'base' });
+							});
+						}
+						var firstName = authors[0].firstName ? authors[0].firstName.trim() : null;  
+						var lastName = authors[0].lastName ? authors[0].lastName.trim() : null;   
+						if (lastName) {
+							reference += lastName;
+						}
+						if (firstName && lastName) {  
+							reference += " ";
+						}
+						if (firstName) {
+							reference += firstName;
+						}
+						if(authors.length > 1) {
+							reference += " et al."
+						}
+						reference += ", "
+					}
+	                reference += (citationItem["dateFreetext"] != null && citationItem["dateFreetext"] != "") ? citationItem["dateFreetext"] + ", " : "";
+					reference += citationItem["title"];
 	                $("#itemReference").val(reference);
 	                $("#itemReference").attr("data-citation-key", citationKey);
 	                $("#addReferenceButton").prop('disabled', false);
@@ -250,7 +250,6 @@
 	            "reference": referenceVal,
 	            [[${_csrf.parameterName}]] : [[${_csrf.token}]]
 	        },
-	        async: false,
 	        success: function(data) {
 	            updateCitationReferences(data, zoteroGroupId);
 	            var message = "Reference added successfully";
@@ -258,7 +257,11 @@
 	        },
 	        error: function(data) {
 	            showNotification(" Error while updating reference!", "danger");
-	        }
+	        }, 
+			complete: function() {
+				$("#addReferenceSpinner").hide();
+				$("#referenceModal").modal('hide');
+			}
 	    }); 
 	}
 	
@@ -336,31 +339,31 @@
 	<table class="table table-striped">
 		<tr>
 			<td width="20%">Item Key</td>
-			<td>[[${citation.key}]]</td>
+			<td colspan="2">[[${citation.key}]]</td>
 		</tr>
 		<tr>
 			<td>Citation Type</td>
-			<td th:with="iconClass=${@iconsResource.getProperty(citation.itemType + '_icon')}, 
+			<td colspan="2" th:with="iconClass=${@iconsResource.getProperty(citation.itemType + '_icon')}, 
 			iconLabel=${@iconsResource.getProperty(citation.itemType + '_label')}">
 			
 			<i th:classappend="${!#strings.isEmpty(iconClass)} ? ${iconClass} : 'icon-docs'" th:title="${iconLabel} ?: ${entry.itemType}"></i> [[${iconLabel} ?: ${entry.itemType}]]
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'title')}">
 			<td>Title</td>
-			<td>[[${citation.title}]]</td>
+			<td colspan="2">[[${citation.title}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'shortTitle')}">
 			<td>Short Title</td>
-			<td>[[${citation.shortTitle}]]</td>
+			<td colspan="2">[[${citation.shortTitle}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'date')}">
 			<td>Date</td>
-			<td>[[${citation.dateFreetext}]]</td>
+			<td colspan="2">[[${citation.dateFreetext}]]</td>
 		</tr>
 
 		<tr>
 			<td>Authors</td>
-			<td><span th:each="author,status : ${citation.authors}">
+			<td colspan="2"><span th:each="author,status : ${citation.authors}">
 				[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span>
 				<!-- <span>[[${!#lists.isEmpty(author.affiliations)}]]-[[${author.affiliations}]]</span> -->
 				<span th:if="${!#lists.isEmpty(author.affiliations)}">
@@ -380,7 +383,7 @@
 		
 		<tr>
 			<td>Editors</td>
-			<td><span th:each="editor,status : ${citation.editors}">
+			<td colspan="2"><span th:each="editor,status : ${citation.editors}">
 				[[${editor.lastName}]]<span th:if="${!#strings.isEmpty(editor.firstName)}">, [[${editor.firstName}]]</span>
 				<span th:if="${!#lists.isEmpty(editor.affiliations)}">
 					 (<th:block th:each="aff,affStatus : ${editor.affiliations}">
@@ -400,7 +403,7 @@
 			<td>
 				[[${#strings.capitalizeWords(@labelsResource.getProperty('_item_attribute_label_${role}', role))}]]
 			</td>
-			<td>
+			<td colspan="2">
 				<span th:each="creator,creatorStatus: ${citation.otherCreators}" th:if="${#strings.equals(creator.role, role)}">
  					[[${creator.person.lastName}]]<span th:if="${!#strings.isEmpty(creator.person.firstName)}">, [[${creator.person.firstName}]]</span>
 					<span th:if="${!#lists.isEmpty(creator.person.affiliations)}">
@@ -421,75 +424,75 @@
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'publicationTitle')}">
 			<td>Publication Title</td>
-			<td>[[${citation.publicationTitle}]]</td>
+			<td colspan="2">[[${citation.publicationTitle}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'journalAbbreviation')}">
 			<td>Journal Abbreviation</td>
-			<td>[[${citation.journalAbbreviation}]]</td>
+			<td colspan="2">[[${citation.journalAbbreviation}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'volume')}">
 			<td>Volume</td>
-			<td>[[${citation.volume}]]</td>
+			<td colspan="2">[[${citation.volume}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'issue')}">
 			<td>Issue</td>
-			<td>[[${citation.issue}]]</td>
+			<td colspan="2">[[${citation.issue}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'pages')}">
 			<td>Pages</td>
-			<td>[[${citation.pages}]]</td>
+			<td colspan="2">[[${citation.pages}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'series')}">
 			<td>Series</td>
-			<td>[[${citation.series}]]</td>
+			<td colspan="2">[[${citation.series}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'seriesTitle')}">
 			<td>Series Title</td>
-			<td>[[${citation.seriesTitle}]]</td>
+			<td colspan="2">[[${citation.seriesTitle}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'seriesText')}">
 			<td>Series Text</td>
-			<td>[[${citation.seriesText}]]</td>
+			<td colspan="2">[[${citation.seriesText}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'url')}">
 			<td>URL</td>
-			<td><a href="${citation.url}">[[${citation.url}]]</a></td>
+			<td colspan="2"><a href="${citation.url}">[[${citation.url}]]</a></td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'language')}">
 			<td>Language</td>
-			<td>[[${citation.language}]]</td>
+			<td colspan="2">[[${citation.language}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'doi')}">
 			<td>DOI</td>
-			<td>[[${citation.doi}]]</td>
+			<td colspan="2">[[${citation.doi}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'issn')}">
 			<td>ISSN</td>
-			<td>[[${citation.issn}]]</td>
+			<td colspan="2">[[${citation.issn}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'archive')}">
 			<td>Archive</td>
-			<td>[[${citation.archive}]]</td>
+			<td colspan="2">[[${citation.archive}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'archiveLocation')}">
 			<td>Archive Location</td>
-			<td>[[${citation.archiveLocation}]]</td>
+			<td colspan="2">[[${citation.archiveLocation}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'libraryCatalog')}">
 			<td>Library Catalog</td>
-			<td>[[${citation.libraryCatalog}]]</td>
+			<td colspan="2">[[${citation.libraryCatalog}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'callNumber')}">
 			<td>Call Number</td>
-			<td>[[${citation.callNumber}]]</td>
+			<td colspan="2">[[${citation.callNumber}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'rights')}">
 			<td>Rights</td>
-			<td>[[${citation.rights}]]</td>
+			<td colspan="2">[[${citation.rights}]]</td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'rights')}">
 			<td>Concepts</td>
-			<td>
+			<td colspan="2">
 				<span th:each="tag:${citation.conceptTags}" class="badge">[[${tag.conceptName}]] | [[${tag.typeName}]]</span>
 			</td>
 		</tr>
@@ -515,15 +518,15 @@
 						<span class="icon-info-circle"></span>
 						[[${ref.referenceString}]]
 					</p>
-			
 			</th:block></td>
-			<td>
-				<button id="addReferences" type="button" class="btn btn-primary" data-toggle="modal" data-target="#referenceModal" th:data-zotero-group-id="${zoteroGroupId}" th:data-item-id="${itemId}"><i class="icon-circle-add"></i> Add References</button> 
+			<td style="width: 1%; white-space: nowrap; padding: 2px;">
+				<button id="addReferences" type="button" class="btn btn-primary" data-toggle="modal" data-target="#referenceModal" th:data-zotero-group-id="${zoteroGroupId}" 
+				th:data-item-id="${itemId}"><i class="icon-circle-add"></i> Add References</button> 
 			</td>
 		</tr>
 		<tr>
 		    <td>Attachments</td>
-		    <td>
+		    <td colspan="2">
 		        <th:block th:each="att:${attachments}">
 		            <p><span class="icon-attach" style="font-size: 14px"></span> [[${att.title}]]</p>
 		        </th:block>
@@ -691,7 +694,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" id="closeReferenceModalBtn">Close</button>
-                    <button type="button" class="btn btn-primary" id="addReferenceButton" disabled>Add <i id="addReferenceSpinner" class="icon-spinner" style="color: white; display: none;"></i></button>
+                    <button type="button" class="btn btn-primary" id="addReferenceButton" disabled>Add <i id="addReferenceSpinner" class="icon-spinner" style="color: white;"></i></button>
                 </div>
             </div>
         </div>
