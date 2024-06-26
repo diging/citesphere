@@ -282,7 +282,7 @@
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'url')}">
 			<td>URL</td>
-			<td><a href="${citation.url}">[[${citation.url}]]</a></td>
+			<td><a th:href="${citation.url}">[[${citation.url}]]</a></td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'language')}">
 			<td>Language</td>
