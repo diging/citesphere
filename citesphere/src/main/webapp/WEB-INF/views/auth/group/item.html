@@ -1,8 +1,27 @@
 <html layout:decorate="~{layouts/main}">
 <head>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
+
+<script id="citation-template" type="text/x-handlebars-template">
+	<div>
+    <th:block th:each="author,status : ${citation.authors}">
+		<strong th:if="${author != null}">
+            <span th:if="${author.lastName != null && !#strings.isEmpty(author.lastName)}">[[${author.lastName}]]</span>
+			<span th:if="${author.firstName != null && !#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
+		<span th:if="${!status.last}">; </span>
+	</th:block>
+        
+	<em th:if="${citation.title != null}">[[${citation.title}]]</em>
+	<span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
+		[[(${citation.dateFreetext})]]
+	</span>
+	</div>
+</script>
+
 <script th:inline="javascript">
 //# sourceURL=modal.js
+var citation = "[[${citation}]]";
+console.log(citation);
 	$(function() {		
 		$(document).on('click', '.parse-ref-info', function(e) {
 			var clicked = e.target;
@@ -284,6 +303,15 @@
 </head>
 
 <body>
+	<script>
+		var citation = "[[${citation}]]";
+		citationReady(citation);
+		console.log(citation)
+		// var source = $("#citation-template").html();
+		// var template = Handlebars.compile(source);
+
+		$("#citation-title").append(template({citation: citation}));
+	</script>
 <div layout:fragment="content">
 	<ol class="breadcrumb">
 		<li><a th:href="@{/}">Home</a></li>

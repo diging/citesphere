@@ -15,7 +15,7 @@ import edu.asu.diging.citesphere.core.search.service.impl.ResultPage;
 
 @Controller
 @PropertySource("classpath:/config.properties")
-public class SearchReferencesController {
+public class SearchCitationsController {
 
     @Autowired
     private SearchEngine engine;
