@@ -1,27 +1,23 @@
 <html layout:decorate="~{layouts/main}">
 <head>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
 
 <script id="citation-template" type="text/x-handlebars-template">
-	<div>
-    <th:block th:each="author,status : ${citation.authors}">
-		<strong th:if="${author != null}">
-            <span th:if="${author.lastName != null && !#strings.isEmpty(author.lastName)}">[[${author.lastName}]]</span>
-			<span th:if="${author.firstName != null && !#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
-		<span th:if="${!status.last}">; </span>
-	</th:block>
-        
-	<em th:if="${citation.title != null}">[[${citation.title}]]</em>
-	<span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
-		[[(${citation.dateFreetext})]]
-	</span>
-	</div>
+		<div>
+			<th:block th:each="author,status : ${citation.authors}">
+				<strong th:if="${author != null}"><span th:if="${author.lastName != null && !#strings.isEmpty(author.lastName)}">[[${author.lastName}]]</span><span th:if="${author.firstName != null && !#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
+			</th:block>
+				
+			<em th:if="${citation.title != null}">[[${citation.title}]]</em>
+			<span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
+				[[(${citation.dateFreetext})]]
+			</span>
+			</div>
 </script>
 
 <script th:inline="javascript">
 //# sourceURL=modal.js
-var citation = "[[${citation}]]";
-console.log(citation);
 	$(function() {		
 		$(document).on('click', '.parse-ref-info', function(e) {
 			var clicked = e.target;
@@ -195,35 +191,49 @@ console.log(citation);
 	            $(".item-reference").click(function() {
 	                var referenceIndex = $(this).closest("tr").find(".reference").attr('data-idx');
 	                var citationItem = results[referenceIndex];
-	                var authors = citationItem["authors"];
-	                var citationKey = citationItem["key"];
-	                var reference = "";
-					if(authors != null && authors.length > 0) {
-						if(authors.length > 1) {
-							authors.sort((authorA,authorB) => {
-								return authorA.firstName.trim().localeCompare(authorB.firstName.trim(), undefined, { sensitivity: 'base' });
-							});
-						}
-						var firstName = authors[0].firstName ? authors[0].firstName.trim() : null;  
-						var lastName = authors[0].lastName ? authors[0].lastName.trim() : null;   
-						if (lastName) {
-							reference += lastName;
-						}
-						if (firstName && lastName) {  
-							reference += " ";
-						}
-						if (firstName) {
-							reference += firstName;
-						}
-						if(authors.length > 1) {
-							reference += " et al."
-						}
-						reference += ", "
-					}
-	                reference += (citationItem["dateFreetext"] != null && citationItem["dateFreetext"] != "") ? citationItem["dateFreetext"] + ", " : "";
-					reference += citationItem["title"];
-	                $("#itemReference").val(reference);
-	                $("#itemReference").attr("data-citation-key", citationKey);
+	                // var authors = citationItem["authors"];
+	                // var citationKey = citationItem["key"];
+	                // var reference = "";
+					// if(authors != null && authors.length > 0) {
+					// 	if(authors.length > 1) {
+					// 		authors.sort((authorA,authorB) => {
+					// 			return authorA.firstName.trim().localeCompare(authorB.firstName.trim(), undefined, { sensitivity: 'base' });
+					// 		});
+					// 	}
+					// 	var firstName = authors[0].firstName ? authors[0].firstName.trim() : null;  
+					// 	var lastName = authors[0].lastName ? authors[0].lastName.trim() : null;   
+					// 	if (lastName) {
+					// 		reference += lastName;
+					// 	}
+					// 	if (firstName && lastName) {  
+					// 		reference += " ";
+					// 	}
+					// 	if (firstName) {
+					// 		reference += firstName;
+					// 	}
+					// 	if(authors.length > 1) {
+					// 		reference += " et al."
+					// 	}
+					// 	reference += ", "
+					// }
+	                // reference += (citationItem["dateFreetext"] != null && citationItem["dateFreetext"] != "") ? citationItem["dateFreetext"] + ", " : "";
+					// reference += citationItem["title"];
+					// $("#itemReference").val(reference);
+
+					console.log(citationItem);
+					var template = $("#citation-template")[0].innerHTML;
+					console.log(template);
+					var compiledTemplate = Handlebars.compile(template);
+					console.log(compiledTemplate);
+					var html = compiledTemplate(citationItem);
+					console.log(html);
+					// var modalContainer = document.createElement('div');
+					// modalContainer.innerHTML = html;
+					// console.log(modalContainer);
+					$("#itemReference").val(html);
+					// console.log($("#itemReference"));
+
+	                $("#itemReference").attr("data-citation-key", citationItem["key"]);
 	                $("#addReferenceButton").prop('disabled', false);
 	                $("#selectReferenceModal").modal('hide');
 	            });
@@ -303,15 +313,6 @@ console.log(citation);
 </head>
 
 <body>
-	<script>
-		var citation = "[[${citation}]]";
-		citationReady(citation);
-		console.log(citation)
-		// var source = $("#citation-template").html();
-		// var template = Handlebars.compile(source);
-
-		$("#citation-title").append(template({citation: citation}));
-	</script>
 <div layout:fragment="content">
 	<ol class="breadcrumb">
 		<li><a th:href="@{/}">Home</a></li>
