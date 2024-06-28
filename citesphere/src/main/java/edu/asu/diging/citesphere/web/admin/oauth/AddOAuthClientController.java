@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.web.admin.oauth;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,6 +27,8 @@ import edu.asu.diging.citesphere.core.service.oauth.GrantTypes;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.OAuthScope;
+import edu.asu.diging.citesphere.core.user.IUserManager;
+import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.admin.forms.AppForm;
 
 @Controller
@@ -33,6 +36,9 @@ public class AddOAuthClientController {
     
     @Autowired
     private IOAuthClientManager clientManager;
+    
+    @Autowired
+    private IUserManager userManager;
     
     private List<String> allowedGrantTypes;
     
@@ -50,7 +56,7 @@ public class AddOAuthClientController {
     }
     
     @RequestMapping(value="/admin/apps/add", method=RequestMethod.POST)
-    public String add(@Validated AppForm appForm, Model model, BindingResult errors, RedirectAttributes redirectAttrs) {
+    public String add(@Validated AppForm appForm, Model model, BindingResult errors, RedirectAttributes redirectAttrs, Principal principal) {
         if (!allowedGrantTypes.contains(appForm.getGrantType())) {
             errors.rejectValue("grantType", "app.creation.invalid.granttype");
             model.addAttribute("appForm", appForm);
@@ -67,7 +73,9 @@ public class AddOAuthClientController {
         if (appForm.getGrantType().equals(GrantTypes.CLIENT_CREDENTIALS)) {
             authorities.add(new SimpleGrantedAuthority(Role.TRUSTED_CLIENT));
         }
-        OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ), grantTypes, appForm.getRedirectUrl(), authorities);
+        
+        IUser user = userManager.findByUsername(principal.getName());
+        OAuthCredentials creds = clientManager.create(appForm.getName(), appForm.getDescription(), Arrays.asList(OAuthScope.READ), grantTypes, appForm.getRedirectUrl(), authorities, user);
         redirectAttrs.addFlashAttribute("clientId", creds.getClientId());
         redirectAttrs.addFlashAttribute("secret", creds.getSecret());
         return "redirect:/admin/apps/" + creds.getClientId();

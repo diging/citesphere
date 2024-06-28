@@ -91,6 +91,10 @@ $(function() {
 	<td>Application Type</td>
 	<td><span th:text="${applicationType}"/></td>
 </tr>
+<tr>
+	<td>Created By</td>
+	<td><span th:if="${createdBy}" th:text="${createdBy}"/></td>
+</tr>
 </table>
 <div class="modal fade" id="client-update-confirmation" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
