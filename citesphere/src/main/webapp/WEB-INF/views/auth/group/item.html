@@ -295,7 +295,7 @@
 <div layout:fragment="content">
 	<ol class="breadcrumb">
 		<li><a th:href="@{/}">Home</a></li>
-		<li><a th:href="@{|/auth/group/${zoteroGroupId}/items|}">Group</a></li>
+		<li><a th:href="@{|/auth/group/${zoteroGroupId}/items|}">[[${group.name}]]</a></li>
 		<li class="active">[[${citation.key}]]</li>
 	</ol>
 	
@@ -455,7 +455,7 @@
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'url')}">
 			<td>URL</td>
-			<td colspan="2"><a href="${citation.url}">[[${citation.url}]]</a></td>
+			<td colspan="2"><a th:href="${citation.url}">[[${citation.url}]]</a></td>
 		</tr>
 		<tr th:if="${#lists.contains(fields, 'language')}">
 			<td>Language</td>

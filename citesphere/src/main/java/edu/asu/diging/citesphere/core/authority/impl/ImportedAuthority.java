@@ -9,7 +9,8 @@ public class ImportedAuthority implements IImportedAuthority {
     private String name;
     private String uri;
     private Map<String, Object> properties;
-    
+    private String importerId;
+
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.authority.impl.IImportedAuthority#getName()
      */
@@ -51,5 +52,20 @@ public class ImportedAuthority implements IImportedAuthority {
     @Override
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
+    }
+    
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.authority.impl.IImportedAuthority#getImporterId()
+     */
+    @Override
+    public String getImporterId() {
+        return importerId;
+    }
+    /* (non-Javadoc)
+     * @see edu.asu.diging.citesphere.authority.impl.IImportedAuthority#setImporterId(java.lang.String)
+     */
+    @Override
+    public void setImporterId(String importerId) {
+        this.importerId = importerId;
     }
 }
