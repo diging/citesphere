@@ -88,6 +88,6 @@ public interface ICitationManager {
     
     ICitation addCitationToReferences(IUser user, ICitation citation, String zoteroGroupId, String referenceCitationKey, 
             String reference) throws SelfCitationException, ZoteroConnectionException, CitationIsOutdatedException, 
-    ZoteroHttpStatusException, ZoteroItemCreationFailedException;
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException;
 
 }
