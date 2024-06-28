@@ -4,16 +4,27 @@
 <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
 
 <script id="citation-template" type="text/x-handlebars-template">
-		<div>
-			<th:block th:each="author,status : ${citation.authors}">
-				<strong th:if="${author != null}"><span th:if="${author.lastName != null && !#strings.isEmpty(author.lastName)}">[[${author.lastName}]]</span><span th:if="${author.firstName != null && !#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
-			</th:block>
-				
-			<em th:if="${citation.title != null}">[[${citation.title}]]</em>
-			<span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
-				[[(${citation.dateFreetext})]]
-			</span>
-			</div>
+		{{#each authors}}
+            {{#if this}}
+                <strong>
+                    {{#if this.lastName}}
+                        {{this.lastName}}
+                    {{/if}}
+                    {{#if this.firstName}}
+                        , {{this.firstName}}
+                    {{/if}}
+                </strong>
+                {{#unless @last}}; {{/unless}}
+            {{/if}}
+        {{/each}}
+        
+        {{#if title}}
+            <em>{{title}}</em>
+        {{/if}}
+        
+        {{#if dateFreetext}}
+            {{dateFreetext}}
+        {{/if}}
 </script>
 
 <script th:inline="javascript">
@@ -76,7 +87,16 @@
 		return truncatedNote;
 	}
 
+	function renderCitation(citationData, element) {
+		var template = $("#citation-template")[0].innerHTML;
+		var compiledTemplate = Handlebars.compile(template);
+		var html = compiledTemplate(citationData);
+		$(element).html(html);
+	}
+
 	$(document).ready(function(){
+		var citation = [[${citation}]];
+		renderCitation(citation, "#citationTitleContainer");
 		
 	    $("#searchReferenceSpinner").hide();
 	    
@@ -141,7 +161,7 @@
 
 			var zoteroGroupId = $("#addReferences").data('zotero-group-id');
 	        var itemId = $("#addReferences").data('item-id');
-	        var reference =  $("#itemReference").val().trim();
+	        var reference =  $("#itemReference").text().trim();
 	        var referenceCitationKey =  $("#itemReference").data('citation-key');
 	        addItemReference(zoteroGroupId, itemId, referenceCitationKey, reference);
 	    });
@@ -165,7 +185,7 @@
 	    
 	    $("#addReferences").click(function() {
 	        $("#citationReference").val('');
-	        $("#itemReference").val('');
+			$("#itemReference")[0].innerHTML = '';
 	    });
 	    
 	});
@@ -191,48 +211,7 @@
 	            $(".item-reference").click(function() {
 	                var referenceIndex = $(this).closest("tr").find(".reference").attr('data-idx');
 	                var citationItem = results[referenceIndex];
-	                // var authors = citationItem["authors"];
-	                // var citationKey = citationItem["key"];
-	                // var reference = "";
-					// if(authors != null && authors.length > 0) {
-					// 	if(authors.length > 1) {
-					// 		authors.sort((authorA,authorB) => {
-					// 			return authorA.firstName.trim().localeCompare(authorB.firstName.trim(), undefined, { sensitivity: 'base' });
-					// 		});
-					// 	}
-					// 	var firstName = authors[0].firstName ? authors[0].firstName.trim() : null;  
-					// 	var lastName = authors[0].lastName ? authors[0].lastName.trim() : null;   
-					// 	if (lastName) {
-					// 		reference += lastName;
-					// 	}
-					// 	if (firstName && lastName) {  
-					// 		reference += " ";
-					// 	}
-					// 	if (firstName) {
-					// 		reference += firstName;
-					// 	}
-					// 	if(authors.length > 1) {
-					// 		reference += " et al."
-					// 	}
-					// 	reference += ", "
-					// }
-	                // reference += (citationItem["dateFreetext"] != null && citationItem["dateFreetext"] != "") ? citationItem["dateFreetext"] + ", " : "";
-					// reference += citationItem["title"];
-					// $("#itemReference").val(reference);
-
-					console.log(citationItem);
-					var template = $("#citation-template")[0].innerHTML;
-					console.log(template);
-					var compiledTemplate = Handlebars.compile(template);
-					console.log(compiledTemplate);
-					var html = compiledTemplate(citationItem);
-					console.log(html);
-					// var modalContainer = document.createElement('div');
-					// modalContainer.innerHTML = html;
-					// console.log(modalContainer);
-					$("#itemReference").val(html);
-					// console.log($("#itemReference"));
-
+					renderCitation(citationItem, "#itemReference");
 	                $("#itemReference").attr("data-citation-key", citationItem["key"]);
 	                $("#addReferenceButton").prop('disabled', false);
 	                $("#selectReferenceModal").modal('hide');
@@ -263,7 +242,7 @@
 	            .attr('data-citation-id', ref.citationId)
 	            .attr('data-ref-raw', ref.referenceStringRaw)
 	            .attr('data-zotero-group-id', zoteroGroupId)
-	            .html('<span class="icon-info-circle"></span>' + ref.referenceString);
+	            .html('<span class="icon-info-circle"></span> ' + ref.referenceString);
 	        $('#citationReferences').append(referenceElement);
 	    });	    
 	}
@@ -351,16 +330,7 @@
 	
 	<div class="row">
 	<div class="col-xs-12">
-	<h2 style="margin-top: 0">
-        <th:block th:each="author,status : ${citation.authors}">
-            <strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
-            <span th:if="${!status.last}">; </span>
-        </th:block>
-        
-        <em>[[${citation.title}]]</em>
-        <span th:if="${!#strings.isEmpty(citation.dateFreetext)}">
-          [[(${citation.dateFreetext})]]
-        </span>
+	<h2 style="margin-top: 0" id="citationTitleContainer">
     </h2>   
     
 	</div>
@@ -718,7 +688,7 @@
                     </button>
                     <div class="form-group">
                         <label for="itemReference">Reference</label>
-                        <input type="text" class="form-control" id="itemReference">
+                        <div class="form-control" id="itemReference" style="display: block; max-width: 100%; height: auto; min-height: 34px; word-wrap: break-word;"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
