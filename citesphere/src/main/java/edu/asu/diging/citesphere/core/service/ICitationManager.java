@@ -86,6 +86,8 @@ public interface ICitationManager {
     
     void deleteLocalGroupCitations(String groupId);
     
-    ICitation addCitationToReferences(ICitation citation, String referenceCitationKey, String reference) throws SelfCitationException;
+    ICitation addCitationToReferences(IUser user, ICitation citation, String zoteroGroupId, String referenceCitationKey, 
+            String reference) throws SelfCitationException, ZoteroConnectionException, CitationIsOutdatedException, 
+    ZoteroHttpStatusException, ZoteroItemCreationFailedException;
 
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -40,8 +39,8 @@ public class AddReferenceController {
         try {
             ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
                     itemId);
-            citation = citationManager.addCitationToReferences(citation, referenceCitationKey, reference);
-            citationManager.updateCitation((IUser) authentication.getPrincipal(), zoteroGroupId, citation);
+            citation = citationManager.addCitationToReferences((IUser) authentication.getPrincipal(), citation, 
+                    zoteroGroupId, referenceCitationKey, reference);
             return new ResponseEntity<>(citation, HttpStatus.OK);
         } catch (GroupDoesNotExistException e) {
             logger.error("Group does not exist.", e);

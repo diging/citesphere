@@ -59,8 +59,6 @@ import edu.asu.diging.citesphere.user.IUser;
 @Transactional
 public class CitationManager implements ICitationManager {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
 
@@ -502,7 +500,10 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public ICitation addCitationToReferences(ICitation citation, String referenceCitationKey, String reference) throws SelfCitationException {
+    public ICitation addCitationToReferences(IUser user, ICitation citation, String zoteroGroupId, 
+            String referenceCitationKey, String reference) throws SelfCitationException, 
+            ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, 
+            ZoteroItemCreationFailedException {
         Set<IReference> references = citation.getReferences();
         if (references == null) {
             references = new HashSet<>();
@@ -512,10 +513,13 @@ public class CitationManager implements ICitationManager {
             newReference.setCitationId(referenceCitationKey);
             newReference.setReferenceString(reference);
             references.add(newReference);
+            citation.setReferences(references);
         } else {
             throw new SelfCitationException("A citation cannot reference itself.");
         }
-        return citationStore.save(citation);
+        ICitation updatedCitation = citationStore.save(citation);
+        updateCitation(user, zoteroGroupId, updatedCitation);
+        return updatedCitation;
     }
 
 }
