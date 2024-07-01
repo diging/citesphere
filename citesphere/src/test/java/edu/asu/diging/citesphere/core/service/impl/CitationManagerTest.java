@@ -2,9 +2,11 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -23,14 +26,18 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
+import edu.asu.diging.citesphere.core.service.giles.IGilesDeletionChecker;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.impl.GilesUpload;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
@@ -50,6 +57,12 @@ public class CitationManagerTest {
     
     @Mock
     private ICitationDao citationDao;
+    
+    @Mock
+    private IGilesConnector gilesConnector;
+    
+    @Mock
+    private IGilesDeletionChecker gilesDeletionChecker;
     
     @InjectMocks
     private CitationManager managerToTest;
@@ -394,5 +407,25 @@ public class CitationManagerTest {
         
         List<ICitation> response = managerToTest.getNotes(user, GROUP_ID, EXISTING_ID);
         Assert.assertTrue(response.size() == 0);
+    }
+
+    @Test
+    public void test_deleteFile() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+        ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        String documentId = "43";
+        Set<IGilesUpload> gilesUploads = new HashSet<>();
+        IGilesUpload gilesUpload = new GilesUpload();
+        gilesUpload.setDocumentId(documentId);
+        gilesUploads.add(gilesUpload);
+        Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(currentVersion);
+        existingCitation.setKey(EXISTING_ID);
+        existingCitation.setVersion(currentVersion);
+        existingCitation.setGroup(GROUP_ID);
+        existingCitation.setGilesUploads(gilesUploads);
+        Mockito.when(zoteroManager.updateCitation(user, GROUP_ID, existingCitation)).thenReturn(existingCitation);
+        Mockito.when(citationStore.findById(EXISTING_ID)).thenReturn(Optional.of(existingCitation));
+        Mockito.when(gilesConnector.deleteDocument(user, documentId)).thenReturn(HttpStatus.OK);
+        managerToTest.deleteFile(user, GROUP_ID, EXISTING_ID, documentId);
+        Mockito.verify(gilesDeletionChecker).addDocumentCitationMap(gilesUpload, existingCitation, GROUP_ID, user);
     }
 }

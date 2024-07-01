@@ -8,6 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -29,6 +30,9 @@ public class GilesConnector implements IGilesConnector {
     @Value("${giles_file_endpoint}")
     private String fileEndpoint;
     
+    @Value("${giles_document_endpoint}")
+    private String documentEndpoint;
+    
     @Autowired
     private InternalTokenManager internalTokenManager;
 
@@ -44,17 +48,15 @@ public class GilesConnector implements IGilesConnector {
      * @see edu.asu.diging.citesphere.core.service.giles.impl.IGilesConnector#sendRequest(edu.asu.diging.citesphere.user.IUser, java.lang.String, java.lang.Class)
      */
     @Override
-    public <T> ResponseEntity<T> sendRequest(IUser user, String endpoint,Class<T> returnType) throws HttpClientErrorException {
+    public <T> ResponseEntity<T> sendRequest(IUser user, String endpoint,Class<T> returnType, HttpMethod httpMethod) throws HttpClientErrorException {
         String token = internalTokenManager.getAccessToken(user).getValue();
-
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(
                 headers);
-
         return restTemplate.exchange(
                     gilesBaseurl + endpoint,
-                    HttpMethod.GET, requestEntity, returnType);
+                    httpMethod, requestEntity, returnType);
     }
     
     /* (non-Javadoc)
@@ -62,7 +64,13 @@ public class GilesConnector implements IGilesConnector {
      */
     @Override
     public byte[] getFile(IUser user, String fileId) {
-        ResponseEntity<byte[]> content = sendRequest(user, fileEndpoint.replace("{0}",  fileId), byte[].class);
+        ResponseEntity<byte[]> content = sendRequest(user, fileEndpoint.replace("{0}",  fileId), byte[].class, HttpMethod.GET);
         return content.getBody();
+    }
+    
+    @Override
+    public HttpStatus deleteDocument(IUser user, String documentId) {
+        ResponseEntity<String> response = sendRequest(user, documentEndpoint.replace("{documentId}",  documentId), String.class, HttpMethod.DELETE);
+        return response.getStatusCode();
     }
 }
