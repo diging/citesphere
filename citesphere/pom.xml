@@ -26,7 +26,7 @@
         <spring-social-zotero.version>0.12</spring-social-zotero.version>
         <citesphere.messages.version>0.5</citesphere.messages.version>
         <citesphere.model.version>1.19</citesphere.model.version>
-        <crossref-connect-version>0.1</crossref-connect-version>
+        <crossref-connect-version>0.3-SNAPSHOT</crossref-connect-version>
 
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
