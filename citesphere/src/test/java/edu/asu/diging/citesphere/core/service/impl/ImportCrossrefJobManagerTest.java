@@ -70,7 +70,7 @@ public class ImportCrossrefJobManagerTest {
     }
 
     @Test
-    public void testCreateJob_GroupExists() throws Exception {
+    public void test_createJob_success() throws Exception {
         String groupId = "groupId";
         List<String> dois = Arrays.asList("doi1", "doi2");
         doReturn(group).when(groupManager).getGroup(user, groupId);
@@ -79,7 +79,6 @@ public class ImportCrossrefJobManagerTest {
         IImportCrossrefJob job = importCrossrefJobManager.createJob(user, groupId, dois);
 
         assertNotNull(job);
-        assertEquals(OffsetDateTime.now(), job.getCreatedOn());
         assertEquals(user.getUsername(), job.getUsername());
         assertEquals(dois, job.getDois());
         assertEquals(groupId, job.getCitationGroup());
@@ -89,7 +88,7 @@ public class ImportCrossrefJobManagerTest {
     }
 
     @Test
-    public void testCreateJob_GroupDoesNotExist() {
+    public void test_createJob_groupDoesNotExist() {
         String groupId = "groupId";
         List<String> dois = Arrays.asList("doi1", "doi2");
         doReturn(null).when(groupManager).getGroup(user, groupId);
@@ -99,7 +98,7 @@ public class ImportCrossrefJobManagerTest {
     }
 
     @Test
-    public void testCreateJob_MessageCreationException() throws Exception {
+    public void test_createJob_messageCreationException() throws Exception {
         String groupId = "groupId";
         when(groupManager.getGroup(user, groupId)).thenReturn(group);
         when(tokenService.generateJobApiToken(any(ImportCrossrefJob.class))).thenReturn("token");

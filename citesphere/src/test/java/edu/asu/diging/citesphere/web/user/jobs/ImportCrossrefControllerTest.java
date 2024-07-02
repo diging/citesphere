@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.web.user.jobs;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +78,7 @@ public class ImportCrossrefControllerTest {
     }
 
     @Test
-    public void testGet() {
+    public void test_get_successs() {
         List<ICitationGroup> groups = Arrays.asList(mock(ICitationGroup.class), mock(ICitationGroup.class));
         when(citationManager.getGroups(user)).thenReturn(groups);
 
@@ -87,7 +89,7 @@ public class ImportCrossrefControllerTest {
     }
 
     @Test
-    public void testSearch_Success() throws RequestFailedException, IOException {
+    public void test_search_success() throws RequestFailedException, IOException {
         String query = "sample query";
         int page = 1;
         List<Item> items = List.of(mock(Item.class), mock(Item.class));
@@ -100,7 +102,7 @@ public class ImportCrossrefControllerTest {
     }
 
     @Test
-    public void testSearch_Failure() throws RequestFailedException, IOException {
+    public void test_search_failure() throws RequestFailedException, IOException {
         String query = "sample query";
         int page = 1;
         when(crossrefService.search(query, page)).thenThrow(new IOException("IO Exception"));
@@ -112,33 +114,36 @@ public class ImportCrossrefControllerTest {
     }
 
     @Test
-    public void testPost_Success() throws GroupDoesNotExistException {
+    public void test_post_success() throws GroupDoesNotExistException {
         String groupId = "groupId";
         List<String> dois = Arrays.asList("doi1", "doi2");
         when(authentication.getPrincipal()).thenReturn(user);
 
-        String viewName = importCrossrefController.post(authentication, groupId, dois, redirectAttrs);
+        ResponseEntity<Map<String, Object>> responseEntity = importCrossrefController.post(authentication, groupId, dois, redirectAttrs);
 
-        assertEquals("redirect:/auth/import/crossref", viewName);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Map<String, Object> responseBody = responseEntity.getBody();
+        assertNotNull(responseBody);
+        assertEquals(true, responseBody.get("show_alert"));
+        assertEquals("success", responseBody.get("alert_type"));
+        assertEquals("Import in progress.", responseBody.get("alert_msg"));
         verify(jobManager).createJob(user, groupId, dois);
-        verify(redirectAttrs).addFlashAttribute("show_alert", true);
-        verify(redirectAttrs).addFlashAttribute("alert_type", "success");
-        verify(redirectAttrs).addFlashAttribute("alert_msg", "Import in progress.");
     }
 
     @Test
-    public void testPost_GroupDoesNotExistException() throws GroupDoesNotExistException {
+    public void test_post_groupDoesNotExistException() throws GroupDoesNotExistException {
         String groupId = "groupId";
         List<String> dois = Arrays.asList("doi1", "doi2");
         when(authentication.getPrincipal()).thenReturn(user);
         doThrow(new GroupDoesNotExistException("Group does not exist")).when(jobManager).createJob(user, groupId, dois);
 
-        String viewName = importCrossrefController.post(authentication, groupId, dois, redirectAttrs);
+        ResponseEntity<Map<String, Object>> responseEntity = importCrossrefController.post(authentication, groupId, dois, redirectAttrs);
 
-        assertEquals("redirect:/auth/import/crossref", viewName);
-        verify(jobManager).createJob(user, groupId, dois);
-        verify(redirectAttrs).addFlashAttribute("show_alert", true);
-        verify(redirectAttrs).addFlashAttribute("alert_type", "danger");
-        verify(redirectAttrs).addFlashAttribute("alert_msg", "Group does not exist");
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        Map<String, Object> responseBody = responseEntity.getBody();
+        assertNotNull(responseBody);
+        assertEquals(true, responseBody.get("show_alert"));
+        assertEquals("danger", responseBody.get("alert_type"));
+        assertEquals("Group does not exist", responseBody.get("alert_msg"));
     }
 }
