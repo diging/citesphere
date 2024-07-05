@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -108,6 +109,16 @@ public class AddItemController {
             String msg = e.getResponse().getFailed().get("0") != null
                     ? e.getResponse().getFailed().get("0").getMessage()
                     : "Sorry, item creation failed.";
+            model.addAttribute("alert_msg", msg);
+            return "auth/group/editItem";
+        } catch(DuplicateKeyException ex) {
+            model.addAttribute("form", form);
+            model.addAttribute("zoteroGroupId", zoteroGroupId);
+            model.addAttribute("show_alert", true);
+            model.addAttribute("alert_type", "danger");
+            String msg = ex.getMessage() != null
+                    ? ex.getMessage()
+                    : "Sorry, item creation failed because of duplicate entry.";
             model.addAttribute("alert_msg", msg);
             return "auth/group/editItem";
         }

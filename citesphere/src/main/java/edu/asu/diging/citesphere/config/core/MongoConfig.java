@@ -5,8 +5,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +32,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
-import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
 
 @Configuration
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
@@ -107,16 +105,16 @@ public class MongoConfig {
         }
     }
     
-//    @Configuration
-//    public class MongoIndex implements InitializingBean {
-//
-//        @Autowired
-//        private MongoTemplate mongoTemplate;
-//
-//        @PostConstruct
-//        public void afterPropertiesSet() throws Exception {
-//            IndexOperations indexOps = mongoTemplate.indexOps(IUser.class);
-//            indexOps.ensureIndex(new Index().on("email", org.springframework.data.domain.Sort.Direction.ASC).unique());
-//        }
-//    }
+    @Configuration
+    public static class MongoIndex implements InitializingBean {
+
+        @Autowired
+        private MongoTemplate mongoTemplate;
+
+        @Override
+        public void afterPropertiesSet() throws Exception {
+            IndexOperations indexOps = mongoTemplate.indexOps(Citation.class);
+            indexOps.ensureIndex(new Index().on("title", org.springframework.data.domain.Sort.Direction.ASC).unique());
+        }
+    }
 }
