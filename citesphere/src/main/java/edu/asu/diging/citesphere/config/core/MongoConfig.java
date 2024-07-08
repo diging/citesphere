@@ -14,6 +14,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
@@ -33,6 +34,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 
 @Configuration
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
@@ -113,8 +116,12 @@ public class MongoConfig {
 
         @Override
         public void afterPropertiesSet() throws Exception {
-            IndexOperations indexOps = mongoTemplate.indexOps(Citation.class);
-            indexOps.ensureIndex(new Index().on("title", org.springframework.data.domain.Sort.Direction.ASC).unique());
+            IndexOperations citationIndexOps = mongoTemplate.indexOps(Citation.class);
+            citationIndexOps.ensureIndex(new Index().on("key", Sort.Direction.ASC).unique());
+            IndexOperations citationCollectionIndexOps = mongoTemplate.indexOps(CitationCollection.class);
+            citationCollectionIndexOps.ensureIndex(new Index().on("key", Sort.Direction.ASC).unique());
+            IndexOperations citationGorupIndexOps = mongoTemplate.indexOps(CitationGroup.class);
+            citationGorupIndexOps.ensureIndex(new Index().on("groupId", Sort.Direction.ASC).unique());
         }
     }
 }
