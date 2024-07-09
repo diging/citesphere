@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mongodb.DuplicateKeyException;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
@@ -367,7 +367,7 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds)
-            throws GroupDoesNotExistException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, ZoteroHttpStatusException, DuplicateKeyException {
 
         ICitationGroup group = null;
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
@@ -454,7 +454,7 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public CitationPage getPrevAndNextCitation(IUser user, String groupId, String collectionId, int page, String sortBy,
-            int index, List<String> conceptIds) throws GroupDoesNotExistException, ZoteroHttpStatusException {
+            int index, List<String> conceptIds) throws GroupDoesNotExistException, ZoteroHttpStatusException, DuplicateKeyException {
         CitationResults citationResults = getGroupItems(user, groupId, collectionId, page, sortBy, conceptIds);
         List<ICitation> citations = citationResults.getCitations();
         CitationPage result = new CitationPage();

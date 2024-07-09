@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -90,7 +91,9 @@ public class ItemsApiController extends V1Controller {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         } catch (ZoteroHttpStatusException e1) {
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } 
+        } catch(DuplicateKeyException de) {
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         Items itemsResponse = new Items();
         itemsResponse.setGroup(jsonUtil.createGroup(group));

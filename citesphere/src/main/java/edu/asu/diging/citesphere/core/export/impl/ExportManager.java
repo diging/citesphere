@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
@@ -121,7 +122,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
     @Override
     public void export(ExportType exportType, IUser user, String groupId, String collectionId)
             throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException,
-            ExportTooBigException, ZoteroHttpStatusException, AccessForbiddenException {
+            ExportTooBigException, ZoteroHttpStatusException, AccessForbiddenException, DuplicateKeyException {
 
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
@@ -156,7 +157,7 @@ public class ExportManager implements IExportManager, ExportFinishedCallback {
     @Override
     public void distributedExport(ExportType exportType, IUser user, String groupId, String collectionId)
             throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException,
-            ExportTooBigException, ZoteroHttpStatusException, AccessForbiddenException {
+            ExportTooBigException, ZoteroHttpStatusException, AccessForbiddenException, DuplicateKeyException {
 
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
