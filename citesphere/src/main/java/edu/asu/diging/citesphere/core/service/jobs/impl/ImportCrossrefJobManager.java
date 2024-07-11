@@ -54,7 +54,7 @@ public class ImportCrossrefJobManager implements IImportCrossrefJobManager {
     public IImportCrossrefJob createJob(IUser user, String groupId, List<String> dois) throws GroupDoesNotExistException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
-            throw new GroupDoesNotExistException();
+            throw new GroupDoesNotExistException("Group does not exists");
         }
                
         ImportCrossrefJob job = new ImportCrossrefJob();

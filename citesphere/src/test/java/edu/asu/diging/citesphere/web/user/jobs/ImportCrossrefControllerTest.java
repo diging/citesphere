@@ -139,7 +139,7 @@ public class ImportCrossrefControllerTest {
 
         ResponseEntity<Map<String, Object>> responseEntity = importCrossrefController.post(authentication, groupId, dois, redirectAttrs);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         Map<String, Object> responseBody = responseEntity.getBody();
         assertNotNull(responseBody);
         assertEquals(true, responseBody.get("show_alert"));

@@ -47,11 +47,12 @@ $(function() {
 	        	var alert = data;
 	        	if(alert.show_alert && alert.alert_type=="success") {
 					$("#uploadedAlert").show();
-				} else if (alert.show_alert && alert.alert_type=="success") {
+				} else if (alert.show_alert && alert.alert_type=="danger") {
+					$("#failMessage").html(alert.alert_msg);
 					$("#failAlert").show();
 				}
             }
-        })
+        });
         document.getElementById('resultsContainer').innerHTML = '';
 		selectedDois.clear();
 		$("#importBtn").text("Import Selected");
@@ -89,7 +90,7 @@ function updateButton(checkbox) {
 		</div>
 		<div id="failAlert" style="display: none;" class="alert alert-danger alert-dismissible fade in" role="alert">
 			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">x</span></button>
-			Import Failed! Please check the logs
+			<strong>Import Failed!</strong> Error - <span id="failMessage"></span>
 		</div>
         <form>
 	        <div class="form-group">

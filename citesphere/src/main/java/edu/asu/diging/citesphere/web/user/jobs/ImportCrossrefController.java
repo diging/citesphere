@@ -77,7 +77,7 @@ public class ImportCrossrefController {
             response.put("show_alert", true);
             response.put("alert_type", "danger");
             response.put("alert_msg", e.getMessage());
-            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
         }
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
     }

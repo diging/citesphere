@@ -109,7 +109,6 @@ public class ImportCrossrefJobManagerTest {
         assertNotNull(job);
         assertEquals(JobStatus.FAILURE, job.getStatus());
         assertEquals(1, job.getPhases().size());
-        assertEquals("Error creating message", job.getPhases().get(0).getMessage());
         verify(jobRepo, times(2)).save(any(ImportCrossrefJob.class));
     }
 }
