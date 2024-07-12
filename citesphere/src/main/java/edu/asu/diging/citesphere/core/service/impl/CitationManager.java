@@ -14,8 +14,6 @@ import java.util.function.BiFunction;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -507,13 +505,13 @@ public class CitationManager implements ICitationManager {
         Set<IReference> references = citation.getReferences();
         if (references == null) {
             references = new HashSet<>();
+            citation.setReferences(references);
         }
         if (!citation.getKey().equals(referenceCitationKey)) {
             IReference newReference = new Reference();
             newReference.setCitationId(referenceCitationKey);
             newReference.setReferenceString(reference);
             references.add(newReference);
-            citation.setReferences(references);
         } else {
             throw new SelfCitationException("A citation cannot reference itself.");
         }

@@ -191,7 +191,7 @@
 	});
 
 	function getReferences(zoteroGroupId, searchTerm) {
-	    var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/references' + '?searchTerm=' + searchTerm;
+	    var url = [[@{|/auth/group/|}]] + zoteroGroupId + '/citations/search' + '?searchTerm=' + searchTerm;
 	    $.ajax({
 	        dataType: "json",
 	        type: 'GET',
@@ -248,7 +248,7 @@
 	}
 	
 	function addItemReference(zoteroGroupId, itemId, referenceCitationKey, referenceVal) {
-	    var url = "[(@{|/auth/group/${zoteroGroupId}/items/${itemId}/addReference|})]";
+	    var url = "[(@{|/auth/group/${zoteroGroupId}/items/${itemId}/references/add|})]";
 	    $.ajax({
 	        dataType: "json",
 	        type: 'POST',

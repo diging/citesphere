@@ -31,7 +31,7 @@ public class AddReferenceController {
     @Autowired
     private ICitationManager citationManager;
 
-    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/addReference", method = RequestMethod.POST)
+    @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/references/add", method = RequestMethod.POST)
     public ResponseEntity<?> addReference(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
             @RequestParam(value = "referenceCitationKey") String referenceCitationKey,

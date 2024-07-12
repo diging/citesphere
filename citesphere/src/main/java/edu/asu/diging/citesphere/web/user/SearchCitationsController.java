@@ -20,8 +20,8 @@ public class SearchCitationsController {
     @Autowired
     private SearchEngine engine;
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/references" })
-    public ResponseEntity<ResultPage> searchReferences(Authentication authentication, @PathVariable String zoteroGroupId,
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/citations/search" })
+    public ResponseEntity<ResultPage> searchCitations(Authentication authentication, @PathVariable String zoteroGroupId,
             @RequestParam(value = "searchTerm", required = false) String searchTerm,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize) {
