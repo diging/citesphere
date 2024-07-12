@@ -2,13 +2,13 @@ package edu.asu.diging.citesphere.api.v1.user;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +47,7 @@ public class ItemApiController extends V1Controller {
 
     @GetMapping(value = "/groups/{groupId}/items/{item}", produces = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<String> getItem(@PathVariable("groupId") String groupId, @PathVariable("item") String itemKey,
-            Principal principal) throws GroupDoesNotExistException {
+            Principal principal) throws GroupDoesNotExistException, DuplicateKeyException {
         IUser user = userManager.findByUsername(principal.getName());
 
         ICitationGroup group = groupManager.getGroup(user, groupId);

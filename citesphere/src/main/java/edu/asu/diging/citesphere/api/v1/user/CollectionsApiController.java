@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,7 +61,7 @@ public class CollectionsApiController extends V1Controller {
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "20", required = false, value = "maxCollectionNumber") String maxCollections,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort, Principal principal)
-            throws GroupDoesNotExistException {
+            throws GroupDoesNotExistException, DuplicateKeyException {
         // TODO add pagination
         
         IUser user = userManager.findByUsername(principal.getName());

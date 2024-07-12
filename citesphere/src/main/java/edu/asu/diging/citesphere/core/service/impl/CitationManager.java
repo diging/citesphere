@@ -108,7 +108,7 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public ICitation getCitation(IUser user, String groupId, String key)
-            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, DuplicateKeyException {
         Optional<ICitation> optional = citationStore.findById(key);
         if (optional.isPresent()) {
             ICitation citation = optional.get();
@@ -129,7 +129,7 @@ public class CitationManager implements ICitationManager {
     
     @Override
     public List<ICitation> getAttachments(IUser user, String groupId, String key)
-            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, DuplicateKeyException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group != null && group.getGroupId() == new Long(groupId)) {
             if (!group.getUsers().contains(user.getUsername())) {
@@ -145,7 +145,7 @@ public class CitationManager implements ICitationManager {
     
     @Override
     public List<ICitation> getNotes(IUser user, String groupId, String key)
-            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, DuplicateKeyException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group != null && group.getGroupId() == new Long(groupId)) {
             if (!group.getUsers().contains(user.getUsername())) {

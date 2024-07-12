@@ -68,7 +68,7 @@ public class ItemsApiController extends V1Controller {
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns, Principal principal)
-            throws GroupDoesNotExistException {
+            throws GroupDoesNotExistException, DuplicateKeyException {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);

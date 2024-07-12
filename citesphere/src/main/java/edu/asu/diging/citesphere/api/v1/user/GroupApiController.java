@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.api.v1.user;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,7 +38,7 @@ public class GroupApiController extends V1Controller {
     
     @RequestMapping(value = { "/groups/{zoteroGroupId}" }, produces = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<Group> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
-            @PathVariable("zoteroGroupId") String groupId, Principal principal) throws GroupDoesNotExistException {
+            @PathVariable("zoteroGroupId") String groupId, Principal principal) throws GroupDoesNotExistException, DuplicateKeyException {
 
         IUser user = userManager.findByUsername(principal.getName());
 

@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -46,7 +47,7 @@ public class CitationVersionManager implements ICitationVersionManager {
      */
     @Override
     public List<CitationVersion> getCitationVersions(IUser user, String groupId, String key, int page, int pageSize)
-            throws GroupDoesNotExistException {
+            throws GroupDoesNotExistException, DuplicateKeyException {
         ICitationGroup group;
         try {
             group = groupManager.getGroup(user, groupId);
@@ -76,7 +77,7 @@ public class CitationVersionManager implements ICitationVersionManager {
      */
     @Override
     public ICitation getCitationVersion(IUser user, String groupId, String key, Long version)
-            throws GroupDoesNotExistException {
+            throws GroupDoesNotExistException, DuplicateKeyException {
         ICitationGroup group;
         try {
             group = groupManager.getGroup(user, groupId);
@@ -92,7 +93,7 @@ public class CitationVersionManager implements ICitationVersionManager {
     @Override
     public void revertCitationVersion(IUser user, String groupId, String key, Long version)
             throws GroupDoesNotExistException, ZoteroConnectionException, CitationIsOutdatedException,
-            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException, ZoteroItemCreationFailedException {
+            ZoteroHttpStatusException, CannotFindCitationVersionException, CannotFindCitationException, ZoteroItemCreationFailedException, DuplicateKeyException {
         ICitationGroup group;
         try {
             group = groupManager.getGroup(user, groupId);
