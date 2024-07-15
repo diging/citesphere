@@ -222,7 +222,7 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey)
-            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, DuplicateKeyException {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
             ICitationGroup group = groupManager.getGroup(user, groupId);
@@ -330,7 +330,7 @@ public class CitationManager implements ICitationManager {
                 citGroup.setUpdatedOn(OffsetDateTime.now().toString());
                 addUserToGroup(citGroup, user);
                 groups.add(citGroup);
-                groupRepository.save((CitationGroup) citGroup);
+                groupRepository.insert((CitationGroup) citGroup);
             }
         }
         return groups;

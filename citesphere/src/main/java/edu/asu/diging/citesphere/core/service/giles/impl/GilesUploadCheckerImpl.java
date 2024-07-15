@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -216,6 +217,8 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
             logger.error("Could not get citation.", e);
         } catch (ZoteroHttpStatusException e) {
             logger.error("Could not get citation.", e);
+        } catch (DuplicateKeyException e) {
+            logger.error("Duplicate key found.", e);
         }
         return null;
     }

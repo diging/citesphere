@@ -42,37 +42,41 @@ public class ItemController {
             @RequestParam(defaultValue = "1", required = false, value = "page") int page, @RequestParam(defaultValue = "", value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy,
             @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, DuplicateKeyException {
-        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-        model.addAttribute("zoteroGroupId", zoteroGroupId);
-        
-        ICitationGroup group = groupManager.getGroup((IUser)authentication.getPrincipal(), zoteroGroupId);
-        model.addAttribute("group", group);
-        
-        CitationPage citationPage = null;
-        searchTerm = searchTerm.trim();
-        if (searchTerm.isEmpty()) {
-            citationPage = citationManager.getPrevAndNextCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
-                    collectionId, page, sortBy, Integer.valueOf(index), Arrays.asList(conceptIds));
-        } else {
-            citationPage = engine.getPrevAndNextCitation(searchTerm, zoteroGroupId, page - 1, Integer.valueOf(index), 50);
+        try {
+            ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+            model.addAttribute("zoteroGroupId", zoteroGroupId);
+            
+            ICitationGroup group = groupManager.getGroup((IUser)authentication.getPrincipal(), zoteroGroupId);
+            model.addAttribute("group", group);
+            
+            CitationPage citationPage = null;
+            searchTerm = searchTerm.trim();
+            if (searchTerm.isEmpty()) {
+                citationPage = citationManager.getPrevAndNextCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
+                        collectionId, page, sortBy, Integer.valueOf(index), Arrays.asList(conceptIds));
+            } else {
+                citationPage = engine.getPrevAndNextCitation(searchTerm, zoteroGroupId, page - 1, Integer.valueOf(index), 50);
+            }
+            
+            if (citation != null) {
+                List<ICitation> attachments = citationManager.getAttachments((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+                model.addAttribute("attachments", attachments);
+                List<ICitation> notes = citationManager.getNotes((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+                model.addAttribute("notes", notes);
+                model.addAttribute("citation", citation);
+                List<String> fields = new ArrayList<>();
+                citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
+                model.addAttribute("fields", fields);
+                model.addAttribute("adjacentCitations", citationPage);
+                model.addAttribute("searchTerm", searchTerm);
+                model.addAttribute("index", index);
+                model.addAttribute("page", page);
+                model.addAttribute("collectionId", collectionId);
+                model.addAttribute("sortBy", sortBy);
+            }
+            return "auth/group/item";
+        } catch(DuplicateKeyException e) {
+            return "redirect:/auth/group/{zoteroGroupId}/items";
         }
-        
-        if (citation != null) {
-            List<ICitation> attachments = citationManager.getAttachments((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-            model.addAttribute("attachments", attachments);
-            List<ICitation> notes = citationManager.getNotes((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-            model.addAttribute("notes", notes);
-            model.addAttribute("citation", citation);
-            List<String> fields = new ArrayList<>();
-            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
-            model.addAttribute("fields", fields);
-            model.addAttribute("adjacentCitations", citationPage);
-            model.addAttribute("searchTerm", searchTerm);
-            model.addAttribute("index", index);
-            model.addAttribute("page", page);
-            model.addAttribute("collectionId", collectionId);
-            model.addAttribute("sortBy", sortBy);
-        }
-        return "auth/group/item";
     }
 }

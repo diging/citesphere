@@ -7,12 +7,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -20,7 +20,6 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
-import edu.asu.diging.citesphere.model.bib.impl.IGilesFile;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
@@ -36,7 +35,7 @@ public class DownloadGilesFileController {
             @PathVariable("gilesFileId") String gilesFileId,
             HttpServletResponse response)
             throws GroupDoesNotExistException, CannotFindCitationException,
-            ZoteroHttpStatusException {
+            ZoteroHttpStatusException, DuplicateKeyException {
         IUser user = (IUser) authentication.getPrincipal();
         ICitation citation = citationManager.getCitation(
                 user, zoteroGroupId, itemId);

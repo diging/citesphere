@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -88,6 +89,9 @@ public class CitationEntryController extends V1Controller {
             return new ResponseEntity<String>("{\"error\": \"Access forbidden to item " + itemId + ".\"}", HttpStatus.FORBIDDEN);
         } catch (ZoteroHttpStatusException e) {
             logger.error("Zotero threw exception.", e);
+            return new ResponseEntity<String>("{\"error\": \"" + e.getMessage() + ".\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (DuplicateKeyException e) {
+            logger.error("Duplicate key found.", e);
             return new ResponseEntity<String>("{\"error\": \"" + e.getMessage() + ".\"}", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<String>(output, HttpStatus.OK);

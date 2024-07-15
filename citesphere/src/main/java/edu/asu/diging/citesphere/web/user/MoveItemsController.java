@@ -65,6 +65,9 @@ public class MoveItemsController {
             } catch (CannotFindCitationException e) {
                 logger.error("Cannot find citation.", e);
                 continue;
+            } catch(DuplicateKeyException e) {
+                logger.error("Duplicate key found.", e);
+                continue;
             }
             citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());

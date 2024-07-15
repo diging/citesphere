@@ -199,7 +199,7 @@ public class UploadJobManager implements IUploadJobManager {
     }
     
     @Override
-    public List<IUploadJob> getUploadJobs(IUser user, int page) throws DuplicateKeyException{
+    public List<IUploadJob> getUploadJobs(IUser user, int page) throws DuplicateKeyException {
         List<IUploadJob> results = new ArrayList<>();
         uploadJobRepository.findByUsername(user.getUsername(), PageRequest.of(page, jobPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(job -> {
             job.setCitationGroupDetail(groupManager.getGroup(user, job.getCitationGroup()));

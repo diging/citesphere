@@ -116,7 +116,7 @@ public class AuthorityEntryController {
             @PathVariable(required = false, value = "zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
-            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) throws DuplicateKeyException{
+            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) throws DuplicateKeyException {
         
         if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
             logger.warn(

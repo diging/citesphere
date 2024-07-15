@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -69,12 +70,15 @@ public class EditItemController {
     public String showPage(Authentication authentication, Model model, CitationForm form,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
-            throws GroupDoesNotExistException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, ZoteroHttpStatusException, DuplicateKeyException {
         ICitation citation;
         try {
             citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         } catch (CannotFindCitationException e) {
             return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
+        } catch (DuplicateKeyException e) {
+//            return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
+            return "redirect:/auth/group/{zoteroGroupId}/items";
         }
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         model.addAttribute("citation", citation);
@@ -127,7 +131,7 @@ public class EditItemController {
             @RequestParam(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
             throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
-            ZoteroHttpStatusException, ZoteroItemCreationFailedException {
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException, DuplicateKeyException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         // load authors and editors before detaching
         citationHelper.updateCitation(citation, form, (IUser) authentication.getPrincipal());
@@ -170,7 +174,7 @@ public class EditItemController {
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
             RedirectAttributes redirectAttrs, @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
-            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, DuplicateKeyException {
         ICitation outdatedCitation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
                 itemId);
         List<String> changedFields = compare(outdatedCitation, form);

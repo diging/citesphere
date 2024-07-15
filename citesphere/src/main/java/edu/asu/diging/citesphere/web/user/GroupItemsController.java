@@ -88,7 +88,12 @@ public class GroupItemsController {
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", groupId);
-        model.addAttribute("group", groupManager.getGroup(user, groupId));
+        try {
+            model.addAttribute("group", groupManager.getGroup(user, groupId));
+        } catch(DuplicateKeyException e) {
+            logger.error("Exception occured", e);
+            return "error/500";
+        }
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sort", sort);
         model.addAttribute("results", results);
