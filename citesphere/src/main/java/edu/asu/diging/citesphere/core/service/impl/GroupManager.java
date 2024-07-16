@@ -41,8 +41,12 @@ public class GroupManager implements IGroupManager {
     @Override
     public ICitationGroup getGroup(IUser user, String groupId) throws DuplicateKeyException {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-        if (groupOptional.isPresent() && groupOptional.get().getUsers().contains(user.getUsername())) {
-            return (ICitationGroup) groupOptional.get();
+        if (groupOptional.isPresent()) {
+            ICitationGroup group = groupOptional.get();
+            if (!group.getUsers().contains(user.getUsername())) {
+                group.getUsers().add(user.getUsername());
+            }
+            return group; 
         }
 
         ICitationGroup group = zoteroManager.getGroup(user, groupId, false);

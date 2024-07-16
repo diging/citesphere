@@ -90,7 +90,7 @@ public class AddItemController {
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create", method = RequestMethod.POST)
     public String create(@ModelAttribute CitationForm form, Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
+            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException, DuplicateKeyException {
         ICitation citation = new Citation();
         List<String> collectionIds = new ArrayList<>();
         if (form.getCollectionId() != null && !form.getCollectionId().trim().isEmpty()) {

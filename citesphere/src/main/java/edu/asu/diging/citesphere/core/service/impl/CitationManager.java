@@ -178,7 +178,8 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public void updateCitation(IUser user, String groupId, ICitation citation)
-            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
+            throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, 
+            ZoteroItemCreationFailedException, DuplicateKeyException {
         long citationVersion = zoteroManager.getGroupItemVersion(user, groupId, citation.getKey());
         Optional<ICitation> storedCitationOptional = citationStore.findById(citation.getKey());
         if (storedCitationOptional.isPresent()) {
@@ -249,13 +250,15 @@ public class CitationManager implements ICitationManager {
             return citation;
         } catch (HttpClientErrorException ex) {
             throw new CannotFindCitationException(ex);
+        } catch(DuplicateKeyException ex) {
+            throw ex;
         }
 
     }
     
     @Override
     public List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
-            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, DuplicateKeyException {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
@@ -278,7 +281,7 @@ public class CitationManager implements ICitationManager {
 
     @Override
     public List<ICitation> updateNotesFromZotero(IUser user, String groupId, String itemKey)
-            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, DuplicateKeyException {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
@@ -379,6 +382,9 @@ public class CitationManager implements ICitationManager {
             }
         } else {
             group = groupOptional.get();
+            if (!group.getUsers().contains(user.getUsername())){
+                group.getUsers().add(user.getUsername());
+            }
         }
 
         if (group == null) {
@@ -389,12 +395,6 @@ public class CitationManager implements ICitationManager {
         CitationResults results = new CitationResults();
         if (isModified) {
             long previousVersion = group.getContentVersion();
-            // first update the group info
-            // if we are using a previously stored group, delete it
-            if (group.getId() != null) {
-                groupRepository.delete((CitationGroup) group);
-                group = zoteroManager.getGroup(user, groupId + "", true);
-            }
             group.setUpdatedOn(OffsetDateTime.now().toString());
             addUserToGroup(group, user);
             group = groupRepository.save((CitationGroup) group);

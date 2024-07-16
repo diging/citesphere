@@ -200,7 +200,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
             citationManager.updateCitation(user, citation.getGroup(),
                     currentCitation);
         } catch (ZoteroConnectionException | CitationIsOutdatedException
-                | ZoteroHttpStatusException | ZoteroItemCreationFailedException e) {
+                | ZoteroHttpStatusException | ZoteroItemCreationFailedException | DuplicateKeyException e) {
             logger.error("Could not update citation.", e);
         }
     }
