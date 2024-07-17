@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -68,7 +67,7 @@ public class ItemsApiController extends V1Controller {
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns, Principal principal)
-            throws GroupDoesNotExistException, DuplicateKeyException {
+            throws GroupDoesNotExistException {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
@@ -90,8 +89,6 @@ public class ItemsApiController extends V1Controller {
         } catch(AccessForbiddenException ex) {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         } catch (ZoteroHttpStatusException e1) {
-            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch(DuplicateKeyException de) {
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

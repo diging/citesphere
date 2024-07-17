@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,7 +52,7 @@ public class UploadFileJobManager implements IUploadFileJobManager {
     public IGilesUpload createGilesJob(IUser user, MultipartFile file, byte[] fileBytes, String groupId, String itemKey)
             throws GroupDoesNotExistException, AccessForbiddenException, CannotFindCitationException,
             ZoteroHttpStatusException, ZoteroConnectionException, CitationIsOutdatedException,
-            ZoteroItemCreationFailedException, DuplicateKeyException {
+            ZoteroItemCreationFailedException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
             throw new GroupDoesNotExistException();

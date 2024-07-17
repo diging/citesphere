@@ -12,7 +12,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -116,7 +115,7 @@ public class AuthorityEntryController {
             @PathVariable(required = false, value = "zoteroGroupId") String zoteroGroupId,
             @RequestParam(defaultValue = "0", required = false, value = "page") int page,
             @RequestParam(defaultValue = "20", required = false, value = "pageSize") int pageSize,
-            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) throws DuplicateKeyException {
+            @RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
         
         if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
             logger.warn(

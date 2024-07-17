@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,54 +28,50 @@ public class ItemController {
 
     @Autowired
     private ICitationManager citationManager;
-    
+
     @Autowired
     private SearchEngine engine;
-    
+
     @Autowired
     private IGroupManager groupManager;
-    
+
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
             @RequestParam(defaultValue = "", required = false, value = "searchTerm") String searchTerm, @RequestParam(defaultValue = "0",required = false, value = "index") String index,
             @RequestParam(defaultValue = "1", required = false, value = "page") int page, @RequestParam(defaultValue = "", value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy,
-            @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException, DuplicateKeyException {
-        try {
-            ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-            model.addAttribute("zoteroGroupId", zoteroGroupId);
-            
-            ICitationGroup group = groupManager.getGroup((IUser)authentication.getPrincipal(), zoteroGroupId);
-            model.addAttribute("group", group);
-            
-            CitationPage citationPage = null;
-            searchTerm = searchTerm.trim();
-            if (searchTerm.isEmpty()) {
-                citationPage = citationManager.getPrevAndNextCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
-                        collectionId, page, sortBy, Integer.valueOf(index), Arrays.asList(conceptIds));
-            } else {
-                citationPage = engine.getPrevAndNextCitation(searchTerm, zoteroGroupId, page - 1, Integer.valueOf(index), 50);
-            }
-            
-            if (citation != null) {
-                List<ICitation> attachments = citationManager.getAttachments((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-                model.addAttribute("attachments", attachments);
-                List<ICitation> notes = citationManager.getNotes((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-                model.addAttribute("notes", notes);
-                model.addAttribute("citation", citation);
-                List<String> fields = new ArrayList<>();
-                citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
-                model.addAttribute("fields", fields);
-                model.addAttribute("adjacentCitations", citationPage);
-                model.addAttribute("searchTerm", searchTerm);
-                model.addAttribute("index", index);
-                model.addAttribute("page", page);
-                model.addAttribute("collectionId", collectionId);
-                model.addAttribute("sortBy", sortBy);
-            }
-            return "auth/group/item";
-        } catch(DuplicateKeyException e) {
-            return "redirect:/auth/group/{zoteroGroupId}/items";
+            @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+        model.addAttribute("zoteroGroupId", zoteroGroupId);
+
+        ICitationGroup group = groupManager.getGroup((IUser)authentication.getPrincipal(), zoteroGroupId);
+        model.addAttribute("group", group);
+
+        CitationPage citationPage = null;
+        searchTerm = searchTerm.trim();
+        if (searchTerm.isEmpty()) {
+            citationPage = citationManager.getPrevAndNextCitation((IUser) authentication.getPrincipal(), zoteroGroupId,
+                    collectionId, page, sortBy, Integer.valueOf(index), Arrays.asList(conceptIds));
+        } else {
+            citationPage = engine.getPrevAndNextCitation(searchTerm, zoteroGroupId, page - 1, Integer.valueOf(index), 50);
         }
+
+        if (citation != null) {
+            List<ICitation> attachments = citationManager.getAttachments((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+            model.addAttribute("attachments", attachments);
+            List<ICitation> notes = citationManager.getNotes((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
+            model.addAttribute("notes", notes);
+            model.addAttribute("citation", citation);
+            List<String> fields = new ArrayList<>();
+            citationManager.getItemTypeFields((IUser)authentication.getPrincipal(), citation.getItemType()).forEach(f -> fields.add(f.getFilename()));
+            model.addAttribute("fields", fields);
+            model.addAttribute("adjacentCitations", citationPage);
+            model.addAttribute("searchTerm", searchTerm);
+            model.addAttribute("index", index);
+            model.addAttribute("page", page);
+            model.addAttribute("collectionId", collectionId);
+            model.addAttribute("sortBy", sortBy);
+        }
+        return "auth/group/item";
     }
 }

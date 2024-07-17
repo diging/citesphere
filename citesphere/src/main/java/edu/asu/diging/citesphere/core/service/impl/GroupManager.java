@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
@@ -39,7 +38,7 @@ public class GroupManager implements IGroupManager {
      * Long)
      */
     @Override
-    public ICitationGroup getGroup(IUser user, String groupId) throws DuplicateKeyException {
+    public ICitationGroup getGroup(IUser user, String groupId) {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (groupOptional.isPresent()) {
             ICitationGroup group = groupOptional.get();

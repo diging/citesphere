@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -90,7 +89,7 @@ public class AddItemController {
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create", method = RequestMethod.POST)
     public String create(@ModelAttribute CitationForm form, Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException, DuplicateKeyException {
+            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
         ICitation citation = new Citation();
         List<String> collectionIds = new ArrayList<>();
         if (form.getCollectionId() != null && !form.getCollectionId().trim().isEmpty()) {

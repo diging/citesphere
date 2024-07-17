@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.search.service.Indexer;
@@ -34,7 +33,7 @@ public class CitationStore implements ICitationStore {
      * @see edu.asu.diging.citesphere.core.service.ICitationStore#save(edu.asu.diging.citesphere.model.bib.ICitation)
      */
     @Override
-    public ICitation save(ICitation citation) throws DuplicateKeyException {
+    public ICitation save(ICitation citation) {
         indexer.indexCitation(citation);
         return citationRepository.save((Citation) citation);
     }

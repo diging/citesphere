@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -78,9 +77,6 @@ public class GroupItemsController {
         } catch(GroupDoesNotExistException e) {
             logger.error("Exception occured", e);
             return "error/404";
-        } catch(DuplicateKeyException e) {
-            logger.error("Exception occured", e);
-            return "error/500";
         }
         
         model.addAttribute("items", results.getCitations());
@@ -88,12 +84,7 @@ public class GroupItemsController {
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", groupId);
-        try {
-            model.addAttribute("group", groupManager.getGroup(user, groupId));
-        } catch(DuplicateKeyException e) {
-            logger.error("Exception occured", e);
-            return "error/500";
-        }
+        model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("collectionId", collectionId);
         model.addAttribute("sort", sort);
         model.addAttribute("results", results);

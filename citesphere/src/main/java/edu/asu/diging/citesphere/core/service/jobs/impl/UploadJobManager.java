@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -111,7 +110,7 @@ public class UploadJobManager implements IUploadJobManager {
     }
 
     @Override
-    public List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes, String groupId) throws GroupDoesNotExistException, DuplicateKeyException {
+    public List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes, String groupId) throws GroupDoesNotExistException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
             throw new GroupDoesNotExistException();
@@ -199,7 +198,7 @@ public class UploadJobManager implements IUploadJobManager {
     }
     
     @Override
-    public List<IUploadJob> getUploadJobs(IUser user, int page) throws DuplicateKeyException {
+    public List<IUploadJob> getUploadJobs(IUser user, int page) {
         List<IUploadJob> results = new ArrayList<>();
         uploadJobRepository.findByUsername(user.getUsername(), PageRequest.of(page, jobPageSize, Sort.by(Direction.DESC, "createdOn", "id"))).forEach(job -> {
             job.setCitationGroupDetail(groupManager.getGroup(user, job.getCitationGroup()));

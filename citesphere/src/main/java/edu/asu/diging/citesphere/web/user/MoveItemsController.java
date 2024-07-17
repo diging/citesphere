@@ -6,7 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,9 +64,6 @@ public class MoveItemsController {
             } catch (CannotFindCitationException e) {
                 logger.error("Cannot find citation.", e);
                 continue;
-            } catch(DuplicateKeyException e) {
-                logger.error("Duplicate key found.", e);
-                continue;
             }
             citationHelper.addCollection(citation, itemsDataDto.getCollectionId(),
                     (IUser) authentication.getPrincipal());
@@ -114,9 +110,6 @@ public class MoveItemsController {
             return null;
         } catch (GroupDoesNotExistException e) {
             logger.error("Group does not exists exception occured while syncing", e);
-            return null;
-        } catch (DuplicateKeyException e) {
-            logger.error("Duplicate Group key exception occured while syncing", e);
             return null;
         }
     }

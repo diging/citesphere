@@ -16,7 +16,6 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -207,7 +206,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         }
     }
 
-    private long retrieveCitations(IUser user, String groupId, List<String> keysToRetrieve) throws ZoteroHttpStatusException, DuplicateKeyException {
+    private long retrieveCitations(IUser user, String groupId, List<String> keysToRetrieve) throws ZoteroHttpStatusException {
         try {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
@@ -235,7 +234,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         return response.getContentVersion();
     }
 
-    private void storeCitation(ICitation citation) throws DuplicateKeyException {
+    private void storeCitation(ICitation citation) {
         Optional<ICitation> optional = citationStore.findById(citation.getKey());
         if (optional.isPresent()) {
             citationStore.delete((Citation) optional.get());

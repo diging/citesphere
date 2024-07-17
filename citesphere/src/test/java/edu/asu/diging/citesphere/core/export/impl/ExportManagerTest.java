@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.reflection.Whitebox;
-import org.springframework.dao.DuplicateKeyException;
 
 import edu.asu.diging.citesphere.core.exceptions.ExportFailedException;
 import edu.asu.diging.citesphere.core.exceptions.ExportTooBigException;
@@ -74,7 +73,7 @@ public class ExportManagerTest {
     private String TASK1_ID = "task1";
     
     @Before
-    public void setUp() throws GroupDoesNotExistException, ZoteroHttpStatusException, DuplicateKeyException {
+    public void setUp() throws GroupDoesNotExistException, ZoteroHttpStatusException {
         MockitoAnnotations.initMocks(this);
         
         user = new User();
@@ -132,7 +131,7 @@ public class ExportManagerTest {
     }
     
     @Test(expected=ExportTooBigException.class)
-    public void test_export_maxExportSize() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException, DuplicateKeyException {
+    public void test_export_maxExportSize() throws GroupDoesNotExistException, ExportTypeNotSupportedException, ExportFailedException, ExportTooBigException, ZoteroHttpStatusException {
         CitationResults results2 = new CitationResults();
         results2.setTotalResults(400);
         String GROUP2 = "GROUP2";

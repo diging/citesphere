@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +34,7 @@ public class DownloadGilesFileController {
             @PathVariable("gilesFileId") String gilesFileId,
             HttpServletResponse response)
             throws GroupDoesNotExistException, CannotFindCitationException,
-            ZoteroHttpStatusException, DuplicateKeyException {
+            ZoteroHttpStatusException {
         IUser user = (IUser) authentication.getPrincipal();
         ICitation citation = citationManager.getCitation(
                 user, zoteroGroupId, itemId);

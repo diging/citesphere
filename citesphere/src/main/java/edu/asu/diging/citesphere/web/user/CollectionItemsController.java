@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +34,7 @@ public class CollectionItemsController {
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort)
-            throws GroupDoesNotExistException, ZoteroHttpStatusException, DuplicateKeyException {
+            throws GroupDoesNotExistException, ZoteroHttpStatusException {
         Integer pageInt = 1;
         try {
             pageInt = new Integer(page);
