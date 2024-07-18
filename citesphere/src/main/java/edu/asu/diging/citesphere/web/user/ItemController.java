@@ -28,13 +28,13 @@ public class ItemController {
 
     @Autowired
     private ICitationManager citationManager;
-
+    
     @Autowired
     private SearchEngine engine;
-
+    
     @Autowired
     private IGroupManager groupManager;
-
+    
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
             @RequestParam(defaultValue = "", required = false, value = "searchTerm") String searchTerm, @RequestParam(defaultValue = "0",required = false, value = "index") String index,
@@ -43,10 +43,10 @@ public class ItemController {
             @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
-
+        
         ICitationGroup group = groupManager.getGroup((IUser)authentication.getPrincipal(), zoteroGroupId);
         model.addAttribute("group", group);
-
+        
         CitationPage citationPage = null;
         searchTerm = searchTerm.trim();
         if (searchTerm.isEmpty()) {
@@ -55,7 +55,7 @@ public class ItemController {
         } else {
             citationPage = engine.getPrevAndNextCitation(searchTerm, zoteroGroupId, page - 1, Integer.valueOf(index), 50);
         }
-
+        
         if (citation != null) {
             List<ICitation> attachments = citationManager.getAttachments((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
             model.addAttribute("attachments", attachments);
