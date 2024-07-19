@@ -203,9 +203,10 @@
 	            var content = '';
 	            results.forEach(function (elem, index) {
 	                content += '<tr>'
-	                content += '<td class="reference"'+ "data-idx="+index+'>' + elem['title'] + '</td>' ;
+	                content += '<td class="reference"'+ 'data-idx='+index+'><div id="search"> </div></td>'  ;
 	                content += '<td style="vertical-align: middle;"><span class="item-reference btn btn-primary" title="Use Reference" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td>';
 	                content += '</tr>';
+	                renderCitation(elem, "#search");
 	            });
 	            $("#citationSearchResult").append(content);
 	            $(".item-reference").click(function() {
@@ -273,13 +274,10 @@
 	    }); 
 	}
 	
-	function showNotification(message, status, time){
-	    $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
+	function showNotification(message, status, time) {
+	    $.notify('<i class="fas fa-exclamation-circle"></i>'+ message, {
 	        type: status,
-	        offset: {
-	            x: 50,
-	            y: 90
-	        },
+	        offset: {x: 50, y: 90},
 	        timer: time,
 	        animate: {
 	            enter: 'animated fadeInRight',
@@ -693,7 +691,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" id="closeReferenceModalBtn">Close</button>
-                    <button type="button" class="btn btn-primary" id="addReferenceButton" disabled>Add <i id="addReferenceSpinner" class="icon-spinner" style="color: white;"></i></button>
+                    <button type="button" class="btn btn-primary" id="addReferenceButton" disabled>Add as Reference<i id="addReferenceSpinner" class="icon-spinner" style="color: white;"></i></button>
                 </div>
             </div>
         </div>
@@ -708,7 +706,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="referenceLabel">Reference Search Result</h4>
+                    <h4 class="modal-title" id="referenceLabel">Citation Search Result</h4>
                 </div>
                 <div class="modal-body">
                     <table class="table table-striped table-bordered table-fixed">
