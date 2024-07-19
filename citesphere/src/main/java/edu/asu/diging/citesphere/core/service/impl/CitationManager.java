@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -242,7 +243,7 @@ public class CitationManager implements ICitationManager {
 
             Optional<ICitation> oldCitation = citationStore.findById(itemKey);
             if (oldCitation.isPresent()) {
-                citationStore.delete(oldCitation.get());
+                citation.setId(oldCitation.get().getId());
             }
             citationStore.save(citation);
             return citation;
@@ -317,8 +318,9 @@ public class CitationManager implements ICitationManager {
             if (groupOptional.isPresent()) {
                 ICitationGroup group = groupOptional.get();
                 if (group.getMetadataVersion() != groupVersions.get(id)) {
-                    groupRepository.delete((CitationGroup) group);
+                    ObjectId groupID = group.getId();
                     group = zoteroManager.getGroup(user, id + "", true);
+                    group.setId(groupID);
                     group.setUpdatedOn(OffsetDateTime.now().toString());
                 }
                 addUserToGroup(group, user);
