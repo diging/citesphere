@@ -50,7 +50,7 @@ public class ItemFactory implements IItemFactory {
         data.setDate(citation.getDateFreetext());
         data.setDateAdded(citation.getDateAdded());
         data.setDateModified(citation.getDateModified());
-        data.setDoi(citation.getDoi());
+        data.setDOI(citation.getDoi());
         data.setIssn(citation.getIssn());
         data.setIssue(citation.getIssue());
         data.setItemType(citation.getItemType().getZoteroKey());
