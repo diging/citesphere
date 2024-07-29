@@ -10,7 +10,10 @@ $(function() {
     $("#uriLoadingFoundAuthor").hide();
     $("#searchAuthorSpinner").hide();
     $("#tr-uriAuthor").hide();
+    $("#tr-importerId").hide();
+    $("#tr-importerName").hide();
     $("#importerId").hide();
+    $("#importerName").hide();
     
     $("#firstNameAuthor").keyup(function(e) {
         allowAuthoritySearch("Author");
@@ -27,6 +30,8 @@ $(function() {
     
     $("#clear").click(function() {
     	$("#tr-uriAuthor").hide();
+    	$("#tr-importerId").hide();
+    	$("#tr-importerName").hide();
     });
 
     $("#searchAuthor").click(function() {
@@ -47,8 +52,9 @@ $(function() {
         name = $(this).closest("div").find(".name").text();
         uri = $(this).closest("div").find(".uri").text();
         importerId = $(this).closest("div").find(".importerId").text();
+        importerName = $(this).closes("div").find(".importerName").text();
     	
-        showPerson(name, null, uri, importerId);
+        showPerson(name, null, uri, importerId, importerName);
         $("#authorCreateAuthority").hide();
         $("#uriLoadingFoundAuthor").popover('hide');
         $("#selectAuthorityModel").modal('hide');
@@ -83,7 +89,7 @@ function allowAuthoritySearch(element) {
 }
 
 /* Function to populate name in modal fetched from uri */
-function showPerson(name, description, uri, importerId) {
+function showPerson(name, description, uri, importerId, importerName) {
 	$("#name").val(name);
 	
 	if (description != undefined && description != ' - ') {
@@ -97,6 +103,12 @@ function showPerson(name, description, uri, importerId) {
 	
 	if (importerId != undefined) {
 	    $("#importerId").val(importerId);
+	}
+	
+	if(importerName != undefined){
+            $("#importerName").val(importerName);
+            $("#importerName").show();
+            $("#tr-importerName").show();
 	}
 }
 
@@ -113,7 +125,8 @@ function getConceptpowerAuthorities(modalType, personType, page) {
         success: function(data) {
             $("#conceptpowerAuthoritySearchResult").empty();
             var content = '';
-
+            var importerId = 'authority.importer.conceptpower';
+            var importerName = /*[[${@environment.getProperty('_importer_name_authority.importer.conceptpower')}]]*/ '';
             if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
                 data['foundAuthorities'].forEach(function(elem) {
                     content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td class="description">';
@@ -122,13 +135,8 @@ function getConceptpowerAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
-
-                    content += '<div class="importerId" style="display: none;">';
-                    if (elem['importerId'] == null) {
-                        content += '</div>';
-                    } else {
-                        content += elem['importerId'] + '</div>';
-                    }
+                    content += '<td style="display: none;" class="importerName">' + importerName + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + importerId + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="conceptpower-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
@@ -154,8 +162,9 @@ function getConceptpowerAuthorities(modalType, personType, page) {
 
                 description = $(this).closest("tr").find(".description").text();
                 importerId = $(this).closest("tr").find(".importerId").text();
+                importerName = $(this).closest("tr").find(".importerName").text()
                 
-                showPerson(name, description, uri, importerId);
+                showPerson(name, description, uri, importerId, importerName);
                 $("#selectAuthorityModel").modal('hide');
                 $("#authorModal").modal('hide');
                 resetPersonCreationModal("Author");
@@ -183,7 +192,8 @@ function getViafAuthorities(modalType, personType, page) {
   		success: function(data) {
   			$("#viafAuthoritySearchResult").empty();
   			var content = '';
-  			
+  			var importerId = 'authority.importer.viaf'; 
+  			var importerName = /*[[${@environment.getProperty('_importer_name_authority.importer.viaf')}]]*/ '';
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
                 data['foundAuthorities'].forEach(function(elem) {
                     content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>';
@@ -192,6 +202,8 @@ function getViafAuthorities(modalType, personType, page) {
                     } else {
                         content += elem['description'] + '</td>';
                     }
+                    content += '<td style="display: none;" class="importerName">' + importerName + '</td>';
+                    content += '<td style="display: none;" class="importerId">' + importerId + '</td>';
                     content += '<td style="vertical-align: middle;"><span class="viaf-authority-entry btn btn-primary" title="Create new managed authority" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td></tr>';
 
                 });
@@ -217,8 +229,9 @@ function getViafAuthorities(modalType, personType, page) {
                 
                 description = $(this).closest("tr").find(".description").text();
                 importerId = $(this).closest("tr").find(".importerId").text();
+                importerName = $(this).closest("tr").find(".importerName").text();
 
-                showPerson(name, description, uri, importerId);
+                showPerson(name, description, uri, importerId, importerName);
                 $("#selectAuthorityModel").modal('hide');
                 $("#authorModal").modal('hide');
                 resetPersonCreationModal("Author");
@@ -393,8 +406,19 @@ function getPersonAuthority(uri, personType) {
         <td><input id="uri" th:field="*{uri}" class="form-control" readonly/></td>
     </tr>
     
-    <input id="importerId" th:field="*{importerId}" class="form-control" />
     
+    <tr id="tr-importerName"> 
+        <td width="20%"><label for="importerName">Import Source</label></td>
+        <td><input id="importerName" th:field="*{importerName}" class="form-control" readonly/></td>
+    </tr>
+    
+    <tr id="tr-importerId"> 
+        <td width="20%"><label for="importerId">Importer Id</label></td>
+        <td><input id="importerId" th:field="*{importerId}" class="form-control" readonly/></td>
+    </tr>
+
+
+
     </table>
     
     <p class="pull-right">

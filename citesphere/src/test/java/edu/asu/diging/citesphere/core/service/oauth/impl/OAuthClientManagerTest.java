@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.user.impl.User;
 
 public class OAuthClientManagerTest {
     
@@ -49,14 +51,18 @@ public class OAuthClientManagerTest {
     
     @Test
     public void test_getClientsDetails() {
+        IUser user = new User();
+        user.setUsername("testUser");
         List<String> clientList = new ArrayList<>();
         clientList.add("Client1");
         List<OAuthClient> clients = new ArrayList<>();
         OAuthClient client1 = new OAuthClient();
         client1.setClientId("Client1");
+        client1.setCreatedBy(user);
         clients.add(client1);
         Mockito.when(clientRepo.findAllById(clientList)).thenReturn(clients);
         Assert.assertEquals(client1, managerToTest.getClientsDetails(clientList).get(0));
+        Assert.assertEquals(user, managerToTest.getClientsDetails(clientList).get(0).getCreatedBy());
     }
     
     @Test
