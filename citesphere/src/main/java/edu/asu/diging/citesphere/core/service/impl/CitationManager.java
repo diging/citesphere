@@ -507,14 +507,14 @@ public class CitationManager implements ICitationManager {
             references = new HashSet<>();
             citation.setReferences(references);
         }
-        if (!citation.getKey().equals(referenceCitationKey)) {
-            IReference newReference = new Reference();
-            newReference.setCitationId(referenceCitationKey);
-            newReference.setReferenceString(reference);
-            references.add(newReference);
-        } else {
+        if (citation.getKey().equals(referenceCitationKey)) {
             throw new SelfCitationException("A citation cannot reference itself.");
         }
+        
+        IReference newReference = new Reference();
+        newReference.setCitationId(referenceCitationKey);
+        newReference.setReferenceString(reference);
+        references.add(newReference);
         ICitation updatedCitation = citationStore.save(citation);
         updateCitation(user, zoteroGroupId, updatedCitation);
         return updatedCitation;
