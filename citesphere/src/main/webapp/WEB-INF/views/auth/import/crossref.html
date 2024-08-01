@@ -8,52 +8,52 @@ $(function() {
 	$("#searchButton").click(function(e) {
 		e.preventDefault();
 		$.ajax({
-            type: 'GET',
-            url: [[@{|/auth/import/crossref/search|}]] + "?page=1&query=" + $("#searchQuery").val(),
-            async: false,
-            success: function(data) {
-            	var container = $("#resultsContainer");
-            	document.getElementById('resultsContainer').innerHTML = '';
-                data.forEach(function(result) {
-                	panel = $('<div class="panel panel-default"></div>');
-                	item = $('<div class="panel-body"></>');
-                	panel.append(item);
-                	var checkbox = $('<input class="reference" data-doi="' + result.DOI + '" type="checkbox" style="margin-right: 7px;" /> ');
-                	item.append(checkbox);
-                	checkbox.click(function() {
-                		updateButton(checkbox);
-                	});
-                	item.append(result.title);
-                	container.append(panel);
-                });
-            }
+			type: 'GET',
+			url: [[@{|/auth/import/crossref/search|}]]+ "?page=1&query=" + $("#searchQuery").val(),
+			async: false,
+			success: function(data) {
+				var container = $("#resultsContainer");
+				document.getElementById('resultsContainer').innerHTML = '';
+				data.forEach(function(result) {
+					panel = $('<div class="panel panel-default"></div>');
+					item = $('<div class="panel-body"></>');
+					panel.append(item);
+					var checkbox = $('<input class="reference" data-doi="' + result.DOI + '" type="checkbox" style="margin-right: 7px;" /> ');
+					item.append(checkbox);
+					checkbox.click(function() {
+						updateButton(checkbox);
+					});
+					item.append(result.title);
+					container.append(panel);
+				});
+			}
         });
 	});
-	
-	$("#importBtn").click(function(e)  {
+
+	$("#importBtn").click(function(e) {
 		e.preventDefault();
 		var group = $("#groupSelect").val()
 		$.ajax({
-            type: 'POST',
-            url: [[@{|/auth/import/crossref|}]],
-            dataType: "json",
-            data: {
-            	[[${_csrf.parameterName}]]: [[${_csrf.token}]],
-            	"groupId": group,
-            	"dois": Array.from(selectedDois.values()),
-            },
-            success: function(data) {
-            	var uploadedFilesList = $("#uploaded-files-list");
-	        	var alert = data;
-	        	if(alert.show_alert && alert.alert_type=="success") {
+			type: 'POST',
+			url: [[@{|/auth/import/crossref|}]],
+			dataType: "json",
+			data: {
+				[[${_csrf.parameterName}]]: [[${_csrf.token}]],
+				"groupId": group,
+				"dois": Array.from(selectedDois.values()),
+			},
+			success: function(data) {
+				var uploadedFilesList = $("#uploaded-files-list");
+				var alert = data;
+				if(alert.show_alert && alert.alert_type == "success") {
 					$("#uploadedAlert").show();
-				} else if (alert.show_alert && alert.alert_type=="danger") {
+				} else if (alert.show_alert && alert.alert_type == "danger") {
 					$("#failMessage").html(alert.alert_msg);
 					$("#failAlert").show();
 				}
-            }
+			}
         });
-        document.getElementById('resultsContainer').innerHTML = '';
+		document.getElementById('resultsContainer').innerHTML = '';
 		selectedDois.clear();
 		$("#importBtn").text("Import Selected");
 	});
