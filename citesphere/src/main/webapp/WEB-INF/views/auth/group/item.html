@@ -5,33 +5,17 @@
 
 <script id="citation-template" type="text/x-handlebars-template">
 		{{#each authors}}
-            {{#if this}}
-                <strong>
-                    {{#if this.lastName}}
-                        {{this.lastName}}
-                    {{/if}}
-                    {{#if this.firstName}}
-                        , {{this.firstName}}
-                    {{/if}}
-                </strong>
-                {{#unless @last}}; {{/unless}}
-            {{/if}}
+            {{#if this}}<strong>{{#if this.lastName}}{{this.lastName}}{{/if}}{{#if this.firstName}}, {{this.firstName}}{{/if}}</strong>{{#unless @last}}; {{/unless}}{{/if}}
         {{/each}}
         
-        {{#if title}}
-            <em>{{title}}</em>
-        {{/if}}
-        
-        {{#if dateFreetext}}
-           ; {{dateFreetext}}
-        {{/if}}
+        {{#if title}}<em>{{title}}</em>{{/if}}{{#if dateFreetext}}; {{dateFreetext}}{{/if}}
 </script>
 
 <script th:inline="javascript">
 //# sourceURL=modal.js
 	$(function() {		
 		$(document).on('click', '.parse-ref-info', function(e) {
-			var clicked = e.target;
+			var clicked = $(e.target).closest('.parse-ref-info');
 			var citationID = $(clicked).attr('data-citation-id');
 			if(citationID != undefined && citationID != "") {
 				zoteroGroupId = $(clicked).attr('data-zotero-group-id') 
