@@ -1,5 +1,10 @@
 package edu.asu.diging.citesphere.api.v1.user;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -7,10 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.core.export.IExportTaskManager;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
@@ -56,8 +57,7 @@ public class JobInfoController extends BaseJobInfoController {
         IJob job = jobManager.findJob(tokenContents.getJobId());
         IZoteroToken zoteroToken = tokenManager.getToken(userManager.findByUsername(job.getUsername()));
         
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node = mapper.createObjectNode();
+        Map<String, Object> node = new HashMap<>();
         node.put("zotero", zoteroToken.getToken());
         node.put("zoteroId", zoteroToken.getUserId());
         node.put("username", job.getUsername());
@@ -71,9 +71,9 @@ public class JobInfoController extends BaseJobInfoController {
             node.put("exportType", exportTask.getExportType().name());
             node.put("taskId", exportTask.getId());
         } else if (job instanceof IImportCrossrefJob) {
-            ArrayNode doisNode = mapper.createArrayNode();
-            ((IImportCrossrefJob)job).getDois().forEach(d -> doisNode.add(d));
-            node.set("dois", doisNode);
+            List<String> doisList = new ArrayList<>();
+            ((IImportCrossrefJob)job).getDois().forEach(d -> doisList.add(d));
+            node.put("dois", doisList);
             node.put("groupId", ((IImportCrossrefJob)job).getCitationGroup());
         }
         
