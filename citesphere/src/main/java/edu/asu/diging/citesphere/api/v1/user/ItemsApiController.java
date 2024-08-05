@@ -59,7 +59,8 @@ public class ItemsApiController extends V1Controller {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @RequestMapping(value = { "/groups/{zoteroGroupId}/items", "/groups/{zoteroGroupId}/collections/{collectionId}/items" }, produces = {MediaType.APPLICATION_JSON_VALUE })
+    @RequestMapping(value = { "/groups/{zoteroGroupId}/items", "/groups/{zoteroGroupId}/collections/{collectionId}/items" },
+            produces = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<String> getCollectionsByGroupId(@RequestHeader HttpHeaders headers,
             @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = false) String collectionId,
@@ -84,7 +85,7 @@ public class ItemsApiController extends V1Controller {
         
         CitationResults results;
         try {
-            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, null);
         } catch(AccessForbiddenException ex) {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         } catch (ZoteroHttpStatusException e1) {

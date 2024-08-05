@@ -10,12 +10,13 @@ import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindClientException;
 import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface IOAuthClientManager {
 
     ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException;
 
-    OAuthCredentials create(String name, String description, List<OAuthScope> scopes, Set<String> grantTypes, String redirectUrl, List<GrantedAuthority> authorities);
+    OAuthCredentials create(String name, String description, List<OAuthScope> scopes, Set<String> grantTypes, String redirectUrl, List<GrantedAuthority> authorities, IUser user);
 
     OAuthClientResultPage getAllClientDetails(Pageable pageable);
 

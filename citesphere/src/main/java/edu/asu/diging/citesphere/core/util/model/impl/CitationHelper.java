@@ -157,6 +157,7 @@ public class CitationHelper implements ICitationHelper {
             for (AffiliationForm affiliationForm : personForm.getAffiliations()) {
                 IAffiliation affiliation = new Affiliation();
                 affiliation.setName(affiliationForm.getName());
+                affiliation.setUri(affiliationForm.getUri());
                 person.getAffiliations().add(affiliation);
             }
         }

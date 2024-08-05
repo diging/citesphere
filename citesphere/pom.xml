@@ -11,21 +11,21 @@
     <properties>
         <org.slf4j-version>1.7.32</org.slf4j-version>
         <org.springframework-version>5.1.5.RELEASE</org.springframework-version>
-        <spring-security-version>5.1.5.RELEASE</spring-security-version>
+        <spring-security-version>5.7.12</spring-security-version>
         <spring-security-oauth2-version>2.4.0.RELEASE</spring-security-oauth2-version>
         <spring-social.version>1.1.6.RELEASE</spring-social.version>
         <spring-elasticsearch.version>3.2.12.RELEASE</spring-elasticsearch.version>
 
-        <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
+        <thymeleaf.version>3.0.13.RELEASE</thymeleaf.version>
 
-        <spring.version>5.2.9.RELEASE</spring.version>
+        <spring.version>5.3.13</spring.version>
         <spring-data.version>Neumann-SR3</spring-data.version>
 
-        <javers.version>5.0.0</javers.version>
+        <javers.version>6.2.3</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
-        <spring-social-zotero.version>0.10</spring-social-zotero.version>
+        <spring-social-zotero.version>0.12</spring-social-zotero.version>
         <citesphere.messages.version>0.4</citesphere.messages.version>
-        <citesphere.model.version>1.12</citesphere.model.version>
+        <citesphere.model.version>1.19</citesphere.model.version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -95,6 +95,10 @@
         <kafka.hosts></kafka.hosts>
         <pullrequest></pullrequest>
         <buildNumber>v42.0.0</buildNumber>
+        
+        <cleanupCycle>86400000</cleanupCycle>
+        <javers.default.author>Sync Process</javers.default.author>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     </properties>
 
@@ -321,10 +325,17 @@
 
         <!-- https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api -->
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>javax.servlet.jsp-api</artifactId>
-            <version>2.3.3</version>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>3.1.1</version>
             <scope>provided</scope>
+        </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api -->
+	<dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
         </dependency>
 
         <!-- Logging -->
@@ -344,17 +355,17 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.11.1</version>
+            <version>2.17.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.11.1</version>
+            <version>2.17.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.11.1</version>
+            <version>2.17.1</version>
         </dependency>
 
         <!-- DataSource (HikariCP) -->
@@ -366,7 +377,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.16</version>
+            <version>8.0.28</version>
         </dependency>
 
         <dependency>
@@ -390,7 +401,7 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.1.0</version>
+            <version>4.1.2</version>
         </dependency>
 
 
@@ -482,7 +493,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>29.0-jre</version>
+            <version>32.0.0-jre</version>
         </dependency>
 
         <!-- Javers -->
@@ -510,6 +521,13 @@
             <artifactId>javers-persistence-sql</artifactId>
             <version>${javers.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.javers/javers-persistence-mongo -->
+        <dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-persistence-mongo</artifactId>
+            <version>${javers.version}</version>
+        </dependency>
+        
 
         <!-- Testing -->
         <!-- https://mvnrepository.com/artifact/junit/junit -->
@@ -532,7 +550,7 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.2</version>
+            <version>2.7.3</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/xalan/serializer -->
         <dependency>
@@ -559,14 +577,14 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.22</version>
+            <version>1.28.3</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka -->
@@ -609,7 +627,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.4.0</version>
                 <configuration>
                     <webResources>
                         <resource>
@@ -622,6 +640,8 @@
                                 <exclude>**/*.woff</exclude>
                                 <exclude>**/*.ttf</exclude>
                                 <exclude>**/*.woff2</exclude>
+                                <exclude>**/*.eot</exclude>
+                                <exclude>**/*.otf</exclude>
                             </excludes>
                         </resource>
 
@@ -633,6 +653,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             <plugin>

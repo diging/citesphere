@@ -2,10 +2,9 @@ package edu.asu.diging.citesphere.core.zotero.impl;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +14,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.social.oauth1.OAuthToken;
 import org.springframework.social.zotero.api.Collection;
 import org.springframework.social.zotero.api.CreatorType;
@@ -25,6 +22,7 @@ import org.springframework.social.zotero.api.FieldInfo;
 import org.springframework.social.zotero.api.Group;
 import org.springframework.social.zotero.api.Item;
 import org.springframework.social.zotero.api.ItemCreationResponse;
+import org.springframework.social.zotero.api.ItemDeletionResponse;
 import org.springframework.social.zotero.api.Zotero;
 import org.springframework.social.zotero.api.ZoteroResponse;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
@@ -39,6 +37,7 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
+import edu.asu.diging.citesphere.core.sync.ExtraData;
 import edu.asu.diging.citesphere.core.zotero.IZoteroConnector;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.user.IUser;
@@ -60,7 +59,7 @@ public class ZoteroConnector implements IZoteroConnector {
 
     @Autowired
     private ZoteroConnectionFactory zoteroFactory;
-
+    
     /*
      * (non-Javadoc)
      * 
@@ -155,6 +154,9 @@ public class ZoteroConnector implements IZoteroConnector {
     // @Cacheable(value="groupVersions", key="#user.username")
     public ZoteroResponse<Group> getGroupsVersions(IUser user) {
         Zotero zotero = getApi(user);
+        if (zotero == null) {
+            return null;
+        }
         return zotero.getGroupsOperations().getGroupsVersions();
     }
 
@@ -169,6 +171,21 @@ public class ZoteroConnector implements IZoteroConnector {
     }
     
     @Override
+    public Item getCitesphereMetaData(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            List<Item> children = zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey);
+            Optional<Item> citesphereMetaData = children.stream()
+                    .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()) && item.getData()
+                            .getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG)))
+                    .findFirst();
+            return citesphereMetaData.orElse(null);
+        } catch (HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
+
+    @Override
     public List<Item> getAttachments(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
         Zotero zotero = getApi(user);
         try {
@@ -180,6 +197,19 @@ public class ZoteroConnector implements IZoteroConnector {
         }
     }
 
+    @Override
+    public List<Item> getNotes(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        try {
+            return zotero.getGroupsOperations().getGroupItemChildren(groupId, itemKey).stream()
+                    .filter(item -> item.getData().getItemType().equals(ItemType.NOTE.getZoteroKey()) && !item.getData()
+                            .getTags().stream().anyMatch(tag -> tag.getTag().equals(ExtraData.CITESPHERE_METADATA_TAG)))
+                    .collect(Collectors.toList());
+        } catch (HttpClientErrorException ex) {
+            throw createException(ex.getStatusCode(), ex);
+        }
+    }
+    
     @Override
     public Item updateItem(IUser user, Item item, String groupId, List<String> collectionIds, List<String> ignoreFields,
             List<String> validCreatorTypes) throws ZoteroConnectionException, ZoteroHttpStatusException {
@@ -195,7 +225,7 @@ public class ZoteroConnector implements IZoteroConnector {
         }
         return getItem(user, groupId, item.getKey());
     }
-    
+  
     /**
      * This method makes a call to Zotero to batch update items and return back
      * items statuses
@@ -318,6 +348,9 @@ public class ZoteroConnector implements IZoteroConnector {
 
     private Zotero getApi(IUser user) {
         IZoteroToken token = tokenManager.getToken(user);
+        if (token == null) {
+            return null;
+        }
         Zotero zotero = zoteroFactory.createConnection(new OAuthToken(token.getToken(), token.getSecret())).getApi();
         zotero.setUserId(token.getUserId());
         return zotero;
@@ -328,5 +361,12 @@ public class ZoteroConnector implements IZoteroConnector {
             return new AccessForbiddenException(cause);
         }
         return new ZoteroHttpStatusException(cause);
+    }
+
+    @Override
+    public Map<ItemDeletionResponse, List<String>> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion)
+            throws ZoteroConnectionException, ZoteroHttpStatusException {
+        Zotero zotero = getApi(user);
+        return zotero.getGroupsOperations().deleteMultipleItems(groupId, citationKeys, citationVersion);        
     }
 }

@@ -72,7 +72,8 @@ public class AuthorityServiceTest {
     private int pageSize;
     private Pageable paging;
     private Long groupId;
-
+    private List<Long> groupIds;
+    private String username;
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -89,6 +90,7 @@ public class AuthorityServiceTest {
         page = 1;
         pageSize = 10;
         paging = PageRequest.of(page, pageSize);
+        username = "user";
     }
 
     private void initAuthorityEntries() {
@@ -133,6 +135,9 @@ public class AuthorityServiceTest {
         entry4.setId("4");
         entry2.setUsername("chandana");
 
+        groupIds = new ArrayList<>();
+        groupIds.add(groupId);
+        
         Optional<ICitationGroup> group_op = Optional.of(group);
         Mockito.when(groupRepository.findFirstByGroupId(new Long(5))).thenReturn(group_op);
     }
@@ -324,7 +329,6 @@ public class AuthorityServiceTest {
         };
 
         Thread.sleep(100);
-        
         Mockito.when(entryRepository.save(entry)).thenAnswer(answer);
 
         IAuthorityEntry actualEntry = managerToTest.createWithUri(entry, user);
@@ -594,4 +598,57 @@ public class AuthorityServiceTest {
         Assert.assertEquals(0, result.getFoundAuthorities().size());
     }
 
+    @Test()
+    public void test_getAll_success() {
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+        entriesAlbert.add(entry2);
+        entriesAlbert.add(entry3);
+        Page<IAuthorityEntry> entries = new PageImpl<>(entriesAlbert);
+        Mockito.when(entryRepository.findByUsernameOrGroupsInOrderByName(username, groupIds, paging)).thenReturn(entries);
+        Page<IAuthorityEntry> searchResult = managerToTest.getAll(user, groupIds, page, pageSize);
+        Assert.assertEquals(2, searchResult.getContent().size());
+    }
+    
+    @Test
+    public void test_getAll_emptyResult() {
+        Mockito.when(entryRepository.findByUsernameOrGroupsInOrderByName(username, groupIds, paging)).thenReturn(new PageImpl<>(new ArrayList<>()));
+        Page<IAuthorityEntry> searchResult = managerToTest.getAll(user, groupIds, page, pageSize);
+        Assert.assertTrue(searchResult.isEmpty());
+    }
+    
+    @Test()
+    public void test_getAuthoritiesByGroup_success() {
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+        entriesAlbert.add(entry2);
+        entriesAlbert.add(entry3);
+        Page<IAuthorityEntry> entries = new PageImpl<>(entriesAlbert);
+        Mockito.when(entryRepository.findByGroupsOrderByName(groupId, paging)).thenReturn(entries);
+        Page<IAuthorityEntry> searchResult = managerToTest.getAuthoritiesByGroup(groupId, page, pageSize);
+        Assert.assertEquals(2, searchResult.getContent().size());
+    }
+    
+    @Test()
+    public void test_getAuthoritiesByGroup_emptyResult() {
+        Mockito.when(entryRepository.findByGroupsOrderByName(groupId, paging)).thenReturn(new PageImpl<>(new ArrayList<>()));
+        Page<IAuthorityEntry> searchResult = managerToTest.getAuthoritiesByGroup(groupId, page, pageSize);
+        Assert.assertTrue(searchResult.isEmpty());
+    }
+    
+    @Test()
+    public void test_getUserSpecificAuthorities_success() {
+        List<IAuthorityEntry> entriesAlbert = new ArrayList<>();
+        entriesAlbert.add(entry2);
+        entriesAlbert.add(entry3);
+        Page<IAuthorityEntry> entries = new PageImpl<>(entriesAlbert);
+        Mockito.when(entryRepository.findByUsernameAndGroupsOrderByName(username, null, paging)).thenReturn(entries);
+        Page<IAuthorityEntry> searchResult = managerToTest.getUserSpecificAuthorities(user, page, pageSize);
+        Assert.assertEquals(2, searchResult.getContent().size());
+    }
+    
+    @Test()
+    public void test_getUserSpecificAuthorities_emptyResult() {
+        Mockito.when(entryRepository.findByUsernameAndGroupsOrderByName(username, null, paging)).thenReturn(new PageImpl<>(new ArrayList<>()));
+        Page<IAuthorityEntry> searchResult = managerToTest.getUserSpecificAuthorities(user, page, pageSize);
+        Assert.assertTrue(searchResult.isEmpty());
+    }
 }

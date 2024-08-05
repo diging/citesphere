@@ -17,6 +17,7 @@ import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.kafka.IKafkaRequestProducer;
 import edu.asu.diging.citesphere.core.repository.jobs.UploadFileJobRepository;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
@@ -52,7 +53,10 @@ public class UploadFileJobManager implements IUploadFileJobManager {
 
     
     @Override
-    public IGilesUpload createGilesJob(IUser user, MultipartFile file, byte[] fileBytes, String groupId, String itemKey) throws GroupDoesNotExistException, AccessForbiddenException, CannotFindCitationException, ZoteroHttpStatusException, ZoteroConnectionException, CitationIsOutdatedException {
+    public IGilesUpload createGilesJob(IUser user, MultipartFile file, byte[] fileBytes, String groupId, String itemKey)
+            throws GroupDoesNotExistException, AccessForbiddenException, CannotFindCitationException,
+            ZoteroHttpStatusException, ZoteroConnectionException, CitationIsOutdatedException,
+            ZoteroItemCreationFailedException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
             throw new GroupDoesNotExistException();
