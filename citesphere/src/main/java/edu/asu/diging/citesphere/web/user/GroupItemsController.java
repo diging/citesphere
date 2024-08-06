@@ -38,16 +38,16 @@ public class GroupItemsController {
 
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
-
+    
     @Value("${_available_item_columns}")
     private String availableColumns;
 
     @Autowired
     private ICitationManager citationManager;
-
+    
     @Autowired
     private ICitationCollectionManager collectionManager;
-
+    
     @Autowired
     private IGroupManager groupManager;
     
@@ -56,7 +56,7 @@ public class GroupItemsController {
 
     @RequestMapping(value= { "/auth/group/{zoteroGroupId}","/auth/group/{zoteroGroupId}/items", "/auth/group/{zoteroGroupId}/collection/{collectionId}/items"})
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
-            @PathVariable(value = "collectionId", required = false) String collectionId,
+            @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
             @RequestParam(required = false, value = "columns") String[] columns,
@@ -74,11 +74,12 @@ public class GroupItemsController {
         } catch(ZoteroHttpStatusException e) {
             logger.error("Exception occured", e);
             return "error/500";
-        } catch (GroupDoesNotExistException e) {
+        } catch(GroupDoesNotExistException e) {
             logger.error("Exception occured", e);
             return "error/404";
         }
 
+        model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
@@ -113,13 +114,12 @@ public class GroupItemsController {
         ICitationCollection collection = null;
         if (collectionId != null) {
             collection = collectionManager.getCollection(user, groupId, collectionId);
-            if (collection != null) {
-                model.addAttribute("collectionName", collection.getName());
+            if(collection != null) {
+                model.addAttribute("collectionName", collection.getName()); 
             }
         }
-        while (collection != null) {
-            breadCrumbs.add(
-                    new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
+        while(collection != null) {
+            breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
             if (collection.getParentCollectionKey() != null) {
                 collection = collectionManager.getCollection(user, groupId, collection.getParentCollectionKey());
             } else {
@@ -129,7 +129,6 @@ public class GroupItemsController {
         breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
         Collections.reverse(breadCrumbs);
         model.addAttribute("breadCrumbs", breadCrumbs);
-
         return "auth/group/items";
     }
 }

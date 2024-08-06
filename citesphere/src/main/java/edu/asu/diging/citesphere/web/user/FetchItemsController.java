@@ -69,7 +69,7 @@ public class FetchItemsController {
         IUser user = (IUser) authentication.getPrincipal();
         CitationResults results;
         try {
-            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort);
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, null);
         } catch (ZoteroHttpStatusException e) {
             logger.error("Zotero status exception occured while fetching items data", e);
             return "error/500";
