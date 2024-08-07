@@ -16,15 +16,46 @@
 <link th:href="@{/resources/bootstrap/grid.css}" rel="stylesheet"/>
 <script th:inline="javascript">
 //# sourceURL=page.js
-
 $(function() {
+	$('#pagination-top').twbsPagination({
+	    totalPages: [(${totalPages})],
+	    startPage: [(${currentPage})],
+	    prev: "«",
+	    next: "»",
+	    visiblePages: 10,
+	    initiateStartPageClick: false,
+	    onPageClick: function (event, page) {
+	        var queryParams = window.location.search;
+	        if (!queryParams) {
+	            queryParams = "?";
+    	        } else {
+    	            var params = new URLSearchParams(queryParams);
+    	            params.delete('page');
+    	            params.delete('searchTerm');
+    	            queryParams = "?" + params.toString();
+    	        }
+            
+	        var currentURL = window.location.href;
+	        if (currentURL.match(/search/)) {
+	            var key = $("#search").val();
+	            if (key != undefined && key != '') {
+	                window.location.href = "search" + queryParams + "&searchTerm=" + key + "&page=" + page;
+	            }
+	        } else {
+	            window.location.href = "items" + queryParams + "&page=" + page;
+	        }
+	    }
+	});
+	
+	$('.collapse').collapse();
+	
 	if(sessionStorage.getItem("collectionsHidden") == "true"){
 		$("#collectionsList").hide()
 	    $("#toggleCollection").attr('class', "icon-arrow-right")
 	    $("#toggleCollection").attr('title', "Show Collections")	    
 	    $("#citationBlock").attr('class', 'col-md-12')
 	}
-
+	
 	$("#toggleCollection").click(function(){
 	    $("#collectionsList").toggle(); 
 	    collectionsHidden = $("#toggleCollection").hasClass("icon-arrow-left")
@@ -34,7 +65,7 @@ $(function() {
 	    $("#toggleCollection").attr('title', collectionsHidden ? "Show Collections":"Hide Collections")
 	    
 	    $("#citationBlock").attr('class', collectionsHidden ? 'col-md-12' : 'col-md-10')
-	  })
+	  });
 	  
 	addEventListeners();
 	getCurrentItemsData("onFirstLoad");
@@ -57,10 +88,10 @@ function showPages(totalPages, currentPage){
 }
 
 function onPageClickFunction(){
-	 var key = $("#search").val();
-     if (key != undefined && key != '') {
+	var key = $("#search").val();
+    if (key != undefined && key != '') {
      	let pageNumber = $(".page-item.active").text();
-         $.ajax({
+        $.ajax({
      		type: "GET",
      		url: "search?searchTerm="+key+"&columns=" + shownColumns+"&page=" + pageNumber,
      		dataType: "json",
@@ -71,9 +102,9 @@ function onPageClickFunction(){
  				showPages(data['totalPages'], data['currentPage']);
      		}
      	});
-      } else {
-         getCurrentItemsData("requestingNewPage");
-     }
+    } else {
+        getCurrentItemsData("requestingNewPage");
+    }
 }
 
 var shownColumns = [];
@@ -110,7 +141,7 @@ function addEventListeners(){
 				addEventListeners();
 				addCheckboxesEventListeners();
 				addMoveItemListeners();
-			 }
+			}
 		});
 		var queryParams = window.location.search;
 		if (queryParams)  {
@@ -178,7 +209,7 @@ function addEventListeners(){
 	$("#searchBtn").click(function() {
         var key = $("#search").val();
         if (key != undefined && key != '') {
-        	getSearchResults(key);
+            window.location.href="search?searchTerm=" + key;
         }
     });
 	
@@ -186,26 +217,11 @@ function addEventListeners(){
         if(e.which == 13) {
         	var key = $("#search").val();
             if (key != undefined && key != '') {
-            	getSearchResults(key);
+                window.location.href="search?searchTerm=" + key;
             }
         }
     });
 	
-	function getSearchResults(key){
-		$.ajax({
-			type: "GET",
-			url: "search?searchTerm="+key+"&columns=" + shownColumns,
-			dataType: "json",
-			success: function (data){
-				rewriteCitationsTable(data);
-				rewriteColumnsList(data);
-				addEventListeners();
-				addCheckboxesEventListeners();
-				addMoveItemListeners();
-				showPages(data['totalPages'], data['currentPage']);
-			 }
-		});
-	}
 	$(function() {
 		$(".delete-link").click(function(event) {
 			var ids = []
@@ -382,7 +398,7 @@ Items in Group <span th:text="${group.name}"></span></br>
 	    <small><a th:href="@{items}"><i class="icon-redo-alt"></i> Reload page</a></small>
 	</div>
 
-<script th:inline="javascript">
+<script>
 //# sourceURL=poll.js
 var syncUrl= "sync/info";
 var currentURL = window.location.href;
@@ -676,15 +692,19 @@ function rewriteColumnsList(data){
 
 <div id="wrapper">
 <div class="col-md-2 sticky" id="collectionsDiv">
-<div>
-<div class="col-md-2 sticky">
 	<div>
 	    <p class="lead" style="display:inline;padding-left:20px">Collections</p>
 	    <big><i class="icon-arrow-left" aria-hidden="true" id="toggleCollection" title="Hide Collections" style="color:#2e6da4;padding-left:5px;cursor:pointer"></i></big>
 	</div> 
 	<ul class="list-group" id="collectionsList">
+	<th:block th:each="collection:${citationCollections}">
+	  <li class="list-group-item collections">
+		  <span class="badge" th:text="${collection.numberOfItems}"/>
+		  <a th:href="@{|/auth/group/${zoteroGroupId}/collection/${collection.key}/items|}"><span th:text="${collection.name}"/></a>
+	  </li>
+	</th:block>
 	</ul>
-</div> 
+</div>
 
 <div class="col-md-10" id="citationBlock">
 
