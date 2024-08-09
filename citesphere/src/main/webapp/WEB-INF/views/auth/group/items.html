@@ -75,7 +75,7 @@ function onPageClickFunction(){
     }
 }
 
-var shownColumns = [];
+var shownColumns = [ /*[# th:each="col : ${columns}"]*/ /*[[${col}]]*/, /*[/]*/ ];
 
 function addEventListeners(){
 	
@@ -187,7 +187,7 @@ function addEventListeners(){
 			$(this).removeData();
 		});
 	});
-});
+};
 
 function filterConcept(searchText) {
 	searchText = searchText.toLowerCase();
@@ -284,6 +284,7 @@ $.ajax({
 	    showNotification("Error while polling delete citations statuses!", "warning", 1000)
 	},
 });
+}
 	
 	function getSearchResults(key){
 		$.ajax({
@@ -304,7 +305,6 @@ $.ajax({
     $('.bib-entry').each(function() {
         $(this).attr("href", $(this).attr("href"));
     });
-}
     
 </script>
 </head>
@@ -404,6 +404,7 @@ $.ajax({
 }
 
 function rewriteCitationsTable(data){
+	$('#table-spinner').show();
 	let groupId = data['zoteroGroupId']
 	let collectionId = data['collectionId']
 	let tablebody = $('<tbody>');
@@ -492,6 +493,7 @@ function rewriteCitationsTable(data){
 	 };
 	 $("#items-table tbody").replaceWith(tablebody);
 	 $("#total-records").text(data['totalResults']);
+	 $("#table-spinner").hide();
 }
 
 function rewriteCollectionsList(data){
@@ -613,7 +615,7 @@ function rewriteColumnsList(data){
 
 </div>
 
-<div id="wrapper">
+<div id="wrapper" style="height: auto;">
 <div class="col-md-2 sticky" id="collectionsDiv">
 	<div>
 	    <p class="lead" style="display:inline;padding-left:20px">Collections</p>
@@ -768,6 +770,10 @@ function rewriteColumnsList(data){
 		 	</td>
 		</tr>
 	</table>
+
+	<div id="table-spinner" style="display: none;">
+		<i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i>
+	</div>
 </div>
 
 <div class="modal fade" id="entry-delete-confirmation" tabindex="-1" role="dialog">
