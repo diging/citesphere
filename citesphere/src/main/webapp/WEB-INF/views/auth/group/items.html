@@ -404,7 +404,6 @@ $.ajax({
 }
 
 function rewriteCitationsTable(data){
-	$('#table-spinner').show();
 	let groupId = data['zoteroGroupId']
 	let collectionId = data['collectionId']
 	let tablebody = $('<tbody>');
@@ -493,7 +492,6 @@ function rewriteCitationsTable(data){
 	 };
 	 $("#items-table tbody").replaceWith(tablebody);
 	 $("#total-records").text(data['totalResults']);
-	 $("#table-spinner").hide();
 }
 
 function rewriteCollectionsList(data){
@@ -770,9 +768,9 @@ function rewriteColumnsList(data){
 		 	</td>
 		</tr>
 	</table>
-
-	<div id="table-spinner" style="display: none;">
-		<i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i>
+	
+	<div id="table-spinner" style="display: block; text-align:center; ">
+		<i class="icon-spinner spinner" style="font-size: 50px;"></i>
 	</div>
 </div>
 
