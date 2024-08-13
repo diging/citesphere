@@ -64,10 +64,13 @@ function onPageClickFunction(){
      		url: "search?searchTerm="+key+"&columns=" + shownColumns+"&page=" + pageNumber,
      		dataType: "json",
      		success: function (data){
+				console.log("onPageClickFunction");
+				$("#table-spinner").show();
      			rewriteCitationsTable(data);
      			rewriteColumnsList(data);
  				addEventListeners();
  				showPages(data['totalPages'], data['currentPage']);
+				$("#table-spinner").hide();
      		}
      	});
     } else {
@@ -104,11 +107,14 @@ function addEventListeners(){
 			url: "items/data?page="+pageNumber+"&columns=" + shownColumns,
 			dataType: "json",
 			success: function (data){
+				console.log("addionalColumns click");
+				$("#table-spinner").show();
 				rewriteCitationsTable(data);
 				rewriteColumnsList(data);
 				addEventListeners();
 				addCheckboxesEventListeners();
 				addMoveItemListeners();
+				$("#table-spinner").hide();
 			}
 		});
 	});
@@ -292,12 +298,15 @@ $.ajax({
 			url: "search?searchTerm="+key+"&columns=" + shownColumns,
 			dataType: "json",
 			success: function (data){
+				console.log(getSearchResults);
+				$("#table-spinner").show();
 				rewriteCitationsTable(data);
 				rewriteColumnsList(data);
 				addEventListeners();
 				addCheckboxesEventListeners();
 				addMoveItemListeners();
 				showPages(data['totalPages'], data['currentPage']);
+				$("#table-spinner").hide();
 			 }
 		});
 	}
@@ -390,6 +399,8 @@ $.ajax({
 	dataType: "json",
 	success: function (data){
 		if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
+			console.log("getCurrentItemsData");
+			$("#table-spinner").show();
 			rewriteCitationsTable(data);
 			rewriteCollectionsList(data);
 			rewriteGroupInfo(data);
@@ -398,6 +409,7 @@ $.ajax({
 			addCheckboxesEventListeners();
 			addMoveItemListeners();
 			showPages(data['totalPages'], data['currentPage']);
+			$("#table-spinner").hide();
 			}
 		}
 });
@@ -423,6 +435,8 @@ function rewriteCitationsTable(data){
 			'<th>'+"Title"+'</th>'+
 			'<th>'+"Date"+'</th>'+
 			'<th>'+"URL"+'</th>'+
+			'<th>'+"Files"+'</th>'+
+			'<th>Details</th>'+
 			'</tr>')
 	for(const c of data['shownColumns']){
 		let header = data['availableColumnsData'].filter(colData => colData.column === c).map(colData => colData.columnLabel)
@@ -430,68 +444,76 @@ function rewriteCitationsTable(data){
 		headerRow.append(shownColumnsHeaders)
 	}
 	
-	 tablebody.append(headerRow);
-	 let i=0;
-	 for (const citationData of data['citationsData']){
-		  let checkboxes = $('<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes"/>&nbsp;</td>')
-		 
-		  let citation = citationData['citation']
-		  let citationIcon =  citationData['citationIcon'] ? citationData['citationIcon'] : "icon-docs"
-		  let citationLabel = citationData['citationLabel'] ? citationData['citationLabel'] : citation.itemType
-		  
-		  let divIconData = $('<div>').append($('<i class="'+citationIcon+'" title="'+citationLabel +'">'+'</i>')).append(citationLabel);
-		  let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
-		  let iconData = $('<td>').append(spanElement);
-		  
-		  let href;
-		  if(collectionId){
-			  href = '"items/'+citation.key+'?index='+i+'&collectionId='+collectionId+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
-		  } else{
-			  href = '"items/'+citation.key+'?index='+i+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
-		  }
-		  
-		  let authors = $('<td data-key='+citation.key+' data-index='+i+'>'+'</td>');
-		  let authorHref = $('<a class="bib-entry" href='+href+'>');
-		  authors.append(authorHref);
-		  
-		  for(const author of citation['authors']){
-			  let authorsData
-			  if(author.firstName){
-				  authorsData = $('<strong style="color: black">' + author.lastName + 
-						  '<span style="color: black">, ' + author.firstName + '</span>'+ '</strong>'+
-						  '<span>'+'; '+'</span>')
-			  }else{
-				  authorsData = $('<strong style="color: black">' + author.lastName + '</strong>'+
-						  '<span>'+'; '+'</span>')
-			  }
-			  authorHref.append(authorsData);
-		  }
-		  authorHref.find("span").last().remove()
-		  
-		  let title = $('<td data-key='+citation.key+' data-index='+i+'>' +'</td>');
-		  title.append($('<a class="bib-entry" href='+href+'>'+ '<em style="color: black">'+ citation.title+'</em>'+'</a>'));
-		  
-		  let date = $('<td data-key='+citation.key+' data-index='+i+'>' +'</td>'); 
-		  date.append($('<a class="bib-entry" style="color: black" href='+href+'>'+ citation.dateFreetext+'</a>'));
-		  
-		  let url = $('<td>');
-		  if(citation.url || citation.url !== ""){
-			 let  urlElement = $('<span>' +'<a href='+citation.url+ 'target=_blank'+ 'title='+citation.url+'>'+'<i class=icon-www></i>'+'</a>' +'</span>');
-			 url.append(urlElement);
-		  }
-		  
-		  let row = $('<tr data-action="draggable" class="items">').append(checkboxes).append(iconData).append(authors).append(title).append(date).append(url);
-		  
-		  for(const column of data['shownColumns']){
-			  let colData = (citation[column])?citation[column]:"";
-			  row.append($('<td "style="max-width:300px;">'+colData+'</td>'))
-		  } 
-		  
-		 tablebody.append(row);
-		 i++;
-	 };
-	 $("#items-table tbody").replaceWith(tablebody);
-	 $("#total-records").text(data['totalResults']);
+	tablebody.append(headerRow);
+	let i=0;
+	for (const citationData of data['citationsData']){
+		let checkboxes = $('<td><input title="Select" type="checkbox" id="checkbox" class="checkboxes"/>&nbsp;</td>')
+		
+		let citation = citationData['citation']
+		let citationIcon =  citationData['citationIcon'] ? citationData['citationIcon'] : "icon-docs"
+		let citationLabel = citationData['citationLabel'] ? citationData['citationLabel'] : citation.itemType
+		
+		let divIconData = $('<div>').append($('<i class="'+citationIcon+'" title="'+citationLabel +'">'+'</i>')).append(citationLabel);
+		let spanElement = $('<span class = "text-warning">'+'</span>').append(divIconData);
+		let iconData = $('<td>').append(spanElement);
+		
+		let href;
+		if(collectionId){
+			href = '"items/'+citation.key+'?index='+i+'&collectionId='+collectionId+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
+		} else{
+			href = '"items/'+citation.key+'?index='+i+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
+		}
+		
+		let authors = $('<td data-key='+citation.key+' data-index='+i+'>'+'</td>');
+		let authorHref = $('<a class="bib-entry" href='+href+'>');
+		authors.append(authorHref);
+		
+		for(const author of citation['authors']){
+			let authorsData
+			if(author.firstName){
+				authorsData = $('<strong style="color: black">' + author.lastName + 
+						'<span style="color: black">, ' + author.firstName + '</span>'+ '</strong>'+
+						'<span>'+'; '+'</span>')
+			}else{
+				authorsData = $('<strong style="color: black">' + author.lastName + '</strong>'+
+						'<span>'+'; '+'</span>')
+			}
+			authorHref.append(authorsData);
+		}
+		authorHref.find("span").last().remove()
+		
+		let title = $('<td data-key='+citation.key+' data-index='+i+'>' +'</td>');
+		title.append($('<a class="bib-entry" href='+href+'>'+ '<em style="color: black">'+ citation.title+'</em>'+'</a>'));
+		
+		let date = $('<td data-key='+citation.key+' data-index='+i+'>' +'</td>'); 
+		date.append($('<a class="bib-entry" style="color: black" href='+href+'>'+ citation.dateFreetext+'</a>'));
+		
+		let url = $('<td>');
+		if(citation.url || citation.url !== ""){
+			let  urlElement = $('<span>' +'<a href='+citation.url+ ' target=_blank title='+citation.url+'>'+'<i class=icon-www></i>'+'</a>' +'</span>');
+			url.append(urlElement);
+		}
+
+		let files = $('<td>');
+		if(citation.gilesUploads && citation.gilesUploads.length != 0) {
+			files.append($('<a class="bib-entry" href=' + href + '> <i class="icon-multiple-doc"></i> </a>'));
+		}
+
+		let details = $('<td>');
+		details.append($('<a class="bib-entry" href='+href +'><i class="icon-arrow-right-alt"></i></a>'));
+		
+		let row = $('<tr data-action="draggable" class="items">').append(checkboxes).append(iconData).append(authors).append(title).append(date).append(url).append(files).append(details);
+		
+		for(const column of data['shownColumns']){
+			let colData = (citation[column])?citation[column]:"";
+			row.append($('<td "style="max-width:300px;">'+colData+'</td>'))
+		} 
+		
+		tablebody.append(row);
+		i++;
+	};
+	$("#items-table tbody").replaceWith(tablebody);
+	$("#total-records").text(data['totalResults']);
 }
 
 function rewriteCollectionsList(data){
