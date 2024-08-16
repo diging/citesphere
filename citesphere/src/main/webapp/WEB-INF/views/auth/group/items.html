@@ -294,12 +294,14 @@ $.ajax({
 			url: "search?searchTerm="+key+"&columns=" + shownColumns,
 			dataType: "json",
 			success: function (data){
+				$("#table-spinner").show();
 				rewriteCitationsTable(data);
 				rewriteColumnsList(data);
 				addEventListeners();
 				addCheckboxesEventListeners();
 				addMoveItemListeners();
 				showPages(data['totalPages'], data['currentPage']);
+				$("#table-spinner").hide();
 			 }
 		});
 	}
@@ -459,8 +461,8 @@ function rewriteCitationsTable(data){
 		let authors = $('<td data-key='+citation.key+' data-index='+i+'>'+'</td>');
 		let authorHref = $('<a class="bib-entry" href='+href+'>');
 		authors.append(authorHref);
-		
-		for(const author of citation['authors']){
+		authorList = citation['authors'].sort((a, b) => a.lastName.localeCompare(b.lastName));
+		for(const author of authorList){
 			let authorsData
 			if(author.firstName){
 				authorsData = $('<strong style="color: black">' + author.lastName + 
