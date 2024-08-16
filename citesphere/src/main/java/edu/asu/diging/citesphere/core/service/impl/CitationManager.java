@@ -502,13 +502,13 @@ public class CitationManager implements ICitationManager {
             String referenceCitationKey, String reference) throws SelfCitationException, 
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, 
             ZoteroItemCreationFailedException {
-        Set<IReference> references = citation.getReferences();
-        if (references == null) {
-            references = new HashSet<>();
-            citation.setReferences(references);
-        }
         if (citation.getKey().equals(referenceCitationKey)) {
             throw new SelfCitationException("A citation cannot reference itself.");
+        }
+        Set<IReference> references = citation.getReferences();
+        if (references == null) {
+            // references = new HashSet<>();
+            citation.setReferences(new HashSet<>());
         }
         
         IReference newReference = new Reference();
