@@ -78,7 +78,7 @@ public class GroupItemsController {
             logger.error("Exception occured", e);
             return "error/404";
         }
-
+        
         model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
