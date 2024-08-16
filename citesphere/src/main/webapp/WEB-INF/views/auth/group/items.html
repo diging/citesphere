@@ -64,7 +64,6 @@ function onPageClickFunction(){
      		url: "search?searchTerm="+key+"&columns=" + shownColumns+"&page=" + pageNumber,
      		dataType: "json",
      		success: function (data){
-				console.log("onPageClickFunction");
 				$("#table-spinner").show();
      			rewriteCitationsTable(data);
      			rewriteColumnsList(data);
@@ -107,14 +106,11 @@ function addEventListeners(){
 			url: "items/data?page="+pageNumber+"&columns=" + shownColumns,
 			dataType: "json",
 			success: function (data){
-				console.log("addionalColumns click");
-				$("#table-spinner").show();
 				rewriteCitationsTable(data);
 				rewriteColumnsList(data);
 				addEventListeners();
 				addCheckboxesEventListeners();
 				addMoveItemListeners();
-				$("#table-spinner").hide();
 			}
 		});
 	});
@@ -298,15 +294,12 @@ $.ajax({
 			url: "search?searchTerm="+key+"&columns=" + shownColumns,
 			dataType: "json",
 			success: function (data){
-				console.log(getSearchResults);
-				$("#table-spinner").show();
 				rewriteCitationsTable(data);
 				rewriteColumnsList(data);
 				addEventListeners();
 				addCheckboxesEventListeners();
 				addMoveItemListeners();
 				showPages(data['totalPages'], data['currentPage']);
-				$("#table-spinner").hide();
 			 }
 		});
 	}
@@ -366,6 +359,7 @@ $.get(syncUrl, pollStatus);
 function pollStatus(){
     $.get(syncUrl, function(data) {
         if(data['status'] == 'PREPARED' || data['status'] == 'STARTED') {
+			$("#table-spinner").show();
         	if (data['total'] == 0) {
         		$("#syncProgress").attr('style', "width:" + "100%");
                 $("#syncProgress").attr('aria-valuenow', 100);
@@ -386,6 +380,7 @@ function pollStatus(){
             $("#syncProgress").attr('aria-valuemax', 100);
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
+			$("#table-spinner").hide();
         }
         getCurrentItemsData("notFirstLoad");
     });
@@ -399,8 +394,6 @@ $.ajax({
 	dataType: "json",
 	success: function (data){
 		if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
-			console.log("getCurrentItemsData");
-			$("#table-spinner").show();
 			rewriteCitationsTable(data);
 			rewriteCollectionsList(data);
 			rewriteGroupInfo(data);
@@ -409,7 +402,6 @@ $.ajax({
 			addCheckboxesEventListeners();
 			addMoveItemListeners();
 			showPages(data['totalPages'], data['currentPage']);
-			$("#table-spinner").hide();
 			}
 		}
 });
@@ -791,7 +783,7 @@ function rewriteColumnsList(data){
 		</tr>
 	</table>
 	
-	<div id="table-spinner" style="display: block; text-align:center; ">
+	<div id="table-spinner" style="display: none; text-align:center; ">
 		<i class="icon-spinner spinner" style="font-size: 50px;"></i>
 	</div>
 </div>
