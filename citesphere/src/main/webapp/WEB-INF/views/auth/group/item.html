@@ -79,8 +79,8 @@
 	}
 
 	$(document).ready(function(){
-		var citation = [[${citation}]];
-		renderCitation(citation, "#citationTitleContainer");
+	    var citation = [[${citation}]];
+	    renderCitation(citation, "#citationTitleContainer");
 		
 	    $("#searchReferenceSpinner").hide();
 	    
@@ -143,7 +143,7 @@
 	        $("#addReferenceSpinner").show();
 	    	document.getElementById('addReferenceSpinner').style.display = 'inline-block';
 
-			var zoteroGroupId = $("#addReferences").data('zotero-group-id');
+		var zoteroGroupId = $("#addReferences").data('zotero-group-id');
 	        var itemId = $("#addReferences").data('item-id');
 	        var reference =  $("#itemReference").text().trim();
 	        var referenceCitationKey =  $("#itemReference").data('citation-key');
@@ -169,7 +169,7 @@
 	    
 	    $("#addReferences").click(function() {
 	        $("#citationReference").val('');
-			$("#itemReference")[0].innerHTML = '';
+		$("#itemReference")[0].innerHTML = '';
 	    });
 	    
 	    $("#referenceModalBody").on('keypress', function(event) {
@@ -200,18 +200,18 @@
 	            }
 	            $("#citationSearchResult").empty();
 	            results.forEach(function (elem, index) {
-		            var content = '';
+		        var content = '';
 	                content += '<tr>'
 	                content += '<td class="reference"'+ "data-idx="+index+' id="search'+index+'">' + '</td>'  ;
 	                content += '<td style="vertical-align: middle;"><span class="item-reference btn btn-primary" title="Use Reference" style="padding: 5px;"><i class="icon-checkmark-alt" style="color: white;"></i></span></td>';
 	                content += '</tr>';
-		            $("#citationSearchResult").append(content);
+		        $("#citationSearchResult").append(content);
 	                renderCitation(elem, "#search"+index);
 	            });
 	            $(".item-reference").click(function() {
 	                var referenceIndex = $(this).closest("tr").find(".reference").attr('data-idx');
 	                var citationItem = results[referenceIndex];
-					renderCitation(citationItem, "#itemReference");
+			renderCitation(citationItem, "#itemReference");
 	                $("#itemReference").attr("data-citation-key", citationItem["key"]);
 	                $("#addReferenceButton").prop('disabled', false);
 	                $("#selectReferenceModal").modal('hide');
@@ -266,23 +266,23 @@
 	        error: function(data) {
 	            showNotification(" Error while updating reference!", "danger");
 	        }, 
-			complete: function() {
-				$("#addReferenceSpinner").hide();
-				$("#referenceModal").modal('hide');
-			}
+		complete: function() {
+		     $("#addReferenceSpinner").hide();
+		     $("#referenceModal").modal('hide');
+		}
 	    }); 
 	}
 	
 	function showNotification(message, status, time) {
-	    $.notify('<i class="fas fa-exclamation-circle"></i>'+ message, {
-	        type: status,
-	        offset: {x: 50, y: 90},
-	        timer: time,
-	        animate: {
-	            enter: 'animated fadeInRight',
-	            exit: 'animated fadeOutRight'
-	        },
-	    });
+		$.notify('<i class="fas fa-exclamation-circle"></i>'+ message, {
+			type: status,
+		        offset: {x: 50, y: 90},
+		        timer: time,
+		        animate: {
+		            enter: 'animated fadeInRight',
+		            exit: 'animated fadeOutRight'
+		        },
+	    	});
 	}
 	
 </script>
