@@ -507,7 +507,7 @@ public class CitationManager implements ICitationManager {
         }
         Set<IReference> references = citation.getReferences();
         if (references == null) {
-            // references = new HashSet<>();
+            references = new HashSet<>();
             citation.setReferences(new HashSet<>());
         }
         
