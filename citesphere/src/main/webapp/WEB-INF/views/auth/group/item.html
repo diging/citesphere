@@ -172,6 +172,13 @@
 			$("#itemReference")[0].innerHTML = '';
 	    });
 	    
+	    $("#referenceModalBody").on('keypress', function(event) {
+	        if (event.key === 'Enter') {
+	            event.preventDefault(); 
+	            document.getElementById('searchReference').click();
+	        }
+	    });
+	    
 	});
 
 	function getReferences(zoteroGroupId, searchTerm) {
@@ -183,6 +190,14 @@
 	        async: false,
 	        success: function(data) {
 	            var results = data["results"];
+	            if(results.length==0) {
+	            	$("#citationSearchTable").empty();
+	            	var content = '<div class="alert warning">'
+	            	content += '<strong>Warning!</strong>'
+	            	content += ' No citations found for the search query. Try other search query.'
+	            	content += '</div>'
+	            	$("#citationSearchTable").append(content)
+	            }
 	            $("#citationSearchResult").empty();
 	            results.forEach(function (elem, index) {
 		            var content = '';
@@ -659,7 +674,7 @@
                     </button>
                     <h4 class="modal-title" id="referenceLabel">Add References</h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" id="referenceModalBody">
                     <div class="form-group">
                         <label for="citationReference">References:</label>
                         <input type="text" class="form-control" id="citationReference" placeholder="Reference">
@@ -692,7 +707,7 @@
                     </button>
                     <h4 class="modal-title" id="referenceLabel">Reference Search Results</h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" id="citationSearchTable">
                     <table class="table table-striped table-bordered table-fixed">
                         <tr>
                             <th>Reference</th>
