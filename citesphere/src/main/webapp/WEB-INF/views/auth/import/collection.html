@@ -36,14 +36,14 @@
 		    	}
 		    	$.ajax({
 					type: "POST",
-					url: "upload?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+					url: "collection?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 					cache       : false,
 			        contentType : false,
 			        processData : false,
 			        enctype: 'multipart/form-data',
 			        data: formData, 
 			        success: function(data) {
-			        	var uploadedFilesList = $("#uploaded-files-list");
+			        	/*var uploadedFilesList = $("#uploaded-files-list");
 			        	var jobs = JSON.parse(data);
 			        	$.each(jobs["jobs"], function(i, obj) {
 			        		if (obj.status == "PREPARED") {
@@ -61,7 +61,7 @@
 				        		uploadedFilesList.append(successBox);
 			        		}
 			        	});
-			        	$("#js-upload-form")[0].reset();
+			        	$("#js-upload-form")[0].reset(); */
 			        }
 				});
 		    }
@@ -99,7 +99,7 @@
 		<div class="container">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<strong>Upload References</strong> <small></small>
+					<strong>Upload Collection</strong> <small></small>
 				</div>
 				<div class="panel-body">
 
@@ -113,10 +113,8 @@
 							th:href="@{jobs}">job list</a> to see the status of your import.
 					</div>
 
-					<div class="alert alert-warning" role="alert">You can upload
-						bibliographical data in JSTOR XML format or Web of Science's
-						tagged fields format. You can also zip several of these files and
-						upload the zip file.</div>
+					<div class="alert alert-warning" role="alert">You can upload zip file with
+						bibliographical data in BibTex format including files.</div>
 
 					<h4>Select files from your computer</h4>
 					<form action="" method="post" enctype="multipart/form-data"
