@@ -19,6 +19,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadCollectionJob;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
@@ -43,7 +47,7 @@ public class ImportCollectionsController {
     }
     
     @RequestMapping(value = "/auth/import/collection", method = RequestMethod.POST)
-    public ResponseEntity<String> uploadFiles(Principal principal, @RequestParam("group") String group,
+    public ResponseEntity<String> uploadCollection(Principal principal, @RequestParam("group") String group,
             @RequestParam("files") MultipartFile[] files) {
 
         User user = null;
@@ -60,7 +64,6 @@ public class ImportCollectionsController {
         for (MultipartFile file : files) {
             try {
                 fileBytes.add(file.getBytes());
-                System.out.println(file.getBytes());
             } catch (IOException e) {
                 logger.error("Could not get file content from request.", e);
                 fileBytes.add(null);
@@ -73,19 +76,18 @@ public class ImportCollectionsController {
             logger.error("Could not create job because group does not exist.", e);
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
         }
-//        
-//        ObjectMapper mapper = new ObjectMapper();
-//        ObjectNode root = mapper.createObjectNode();
-//        ArrayNode filesNode = root.putArray("jobs");
-//        for (IUploadJob job : jobs) {
-//            ObjectNode jobNode = mapper.createObjectNode();
-//            jobNode.put("jobId", job.getId());
-//            jobNode.put("filename", job.getFilename());
-//            jobNode.put("status", job.getStatus().name());
-//            filesNode.add(jobNode);
-//        }
-//        return new ResponseEntity<String>(root.toString(), HttpStatus.OK);
-        return null;
+        
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode root = mapper.createObjectNode();
+        ArrayNode filesNode = root.putArray("jobs");
+        for (IUploadCollectionJob job : jobs) {
+            ObjectNode jobNode = mapper.createObjectNode();
+            jobNode.put("jobId", job.getId());
+            jobNode.put("filename", job.getFilename());
+            jobNode.put("status", job.getStatus().name());
+            filesNode.add(jobNode);
+        }
+        return new ResponseEntity<String>(root.toString(), HttpStatus.OK);
     }
 
     

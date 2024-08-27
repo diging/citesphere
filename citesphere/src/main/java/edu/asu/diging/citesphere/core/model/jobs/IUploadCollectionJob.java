@@ -2,7 +2,7 @@ package edu.asu.diging.citesphere.core.model.jobs;
 
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 
-public interface IUploadCollectionJob {
+public interface IUploadCollectionJob extends IJob {
 
     String getFilename();
 
