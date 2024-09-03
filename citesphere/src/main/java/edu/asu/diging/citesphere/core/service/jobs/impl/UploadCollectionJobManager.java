@@ -129,7 +129,7 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
             uploadCollectionJobRepository.save(job);
             String token = tokenService.generateJobApiToken(job);
             try {
-                kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.REFERENCES_IMPORT_TOPIC);
+                kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.COLLECTION_IMPORT_TOPIC);
             } catch (MessageCreationException e) {
                 logger.error("Could not send Kafka message.", e);
                 job.setStatus(JobStatus.FAILURE);

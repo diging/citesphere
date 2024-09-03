@@ -36,7 +36,7 @@
 		    	}
 		    	$.ajax({
 					type: "POST",
-					url: "collection?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+					url: "/auth/import/collection?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 					cache       : false,
 			        contentType : false,
 			        processData : false,
