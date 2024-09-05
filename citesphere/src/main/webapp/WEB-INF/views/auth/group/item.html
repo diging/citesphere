@@ -190,15 +190,14 @@
 	        async: false,
 	        success: function(data) {
 	            var results = data["results"];
-	            if(results.length==0) {
-	            	$("#citationSearchTable").empty();
-	            	var content = '<div class="alert warning">'
-	            	content += '<strong>Warning!</strong>'
-	            	content += ' No citations found for the search query. Try other search query.'
-	            	content += '</div>'
-	            	$("#citationSearchTable").append(content)
-	            }
 	            $("#citationSearchResult").empty();
+	            if(results.length==0) {
+	            	var content = '';
+	            	content += '<tr><td colspan="2"><div class="alert">'
+	            	content += ' No citations found for the search query. '
+	            	content += '</div></td></tr>'
+	            	$("#citationSearchResult").append(content);
+	            }
 	            results.forEach(function (elem, index) {
 		        var content = '';
 	                content += '<tr>'
