@@ -57,26 +57,26 @@ public class JobInfoController extends BaseJobInfoController {
         IJob job = jobManager.findJob(tokenContents.getJobId());
         IZoteroToken zoteroToken = tokenManager.getToken(userManager.findByUsername(job.getUsername()));
         
-        Map<String, Object> node = new HashMap<>();
-        node.put("zotero", zoteroToken.getToken());
-        node.put("zoteroId", zoteroToken.getUserId());
-        node.put("username", job.getUsername());
+        Map<String, Object> reponse = new HashMap<>();
+        reponse.put("zotero", zoteroToken.getToken());
+        reponse.put("zoteroId", zoteroToken.getUserId());
+        reponse.put("username", job.getUsername());
         // FIXME: ugly, needs better solution
         if (job instanceof IUploadJob) {
-            node.put("groupId", ((IUploadJob)job).getCitationGroup());
+            reponse.put("groupId", ((IUploadJob)job).getCitationGroup());
         } else if (job instanceof IExportJob) {
             IExportTask exportTask = exportTaskManager.get(((IExportJob)job).getTaskId());
-            node.put("groupId", exportTask.getGroupId());
-            node.put("collectionId", exportTask.getCollectionId());
-            node.put("exportType", exportTask.getExportType().name());
-            node.put("taskId", exportTask.getId());
+            reponse.put("groupId", exportTask.getGroupId());
+            reponse.put("collectionId", exportTask.getCollectionId());
+            reponse.put("exportType", exportTask.getExportType().name());
+            reponse.put("taskId", exportTask.getId());
         } else if (job instanceof IImportCrossrefJob) {
             List<String> doisList = new ArrayList<>();
             ((IImportCrossrefJob)job).getDois().forEach(d -> doisList.add(d));
-            node.put("dois", doisList);
-            node.put("groupId", ((IImportCrossrefJob)job).getCitationGroup());
+            reponse.put("dois", doisList);
+            reponse.put("groupId", ((IImportCrossrefJob)job).getCitationGroup());
         }
         
-        return new ResponseEntity<>(node.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(reponse.toString(), HttpStatus.OK);
     }
 }
