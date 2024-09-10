@@ -28,9 +28,9 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadFileJobManager;
+import edu.asu.diging.citesphere.core.util.IGilesUtil;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.user.impl.User;
-import edu.asu.diging.citesphere.core.util.model.IGilesUtil;
 
 @Controller
 public class UploadItemFileController {

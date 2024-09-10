@@ -1,4 +1,4 @@
-package edu.asu.diging.citesphere.core.util.model;
+package edu.asu.diging.citesphere.core.util;
 
 import org.springframework.web.multipart.MultipartFile;
 
