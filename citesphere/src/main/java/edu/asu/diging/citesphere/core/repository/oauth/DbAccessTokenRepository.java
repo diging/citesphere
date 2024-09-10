@@ -25,7 +25,7 @@ public interface DbAccessTokenRepository extends JpaRepository<DbAccessToken, St
  
     Optional<DbAccessToken> findByRefreshToken(String refreshToken);
  
-    Optional<DbAccessToken> findByAuthenticationId(String authenticationId);
+    List<DbAccessToken> findByAuthenticationId(String authenticationId);
    
     void deleteByClientIdAndUsername(String clientId, String username);
  
