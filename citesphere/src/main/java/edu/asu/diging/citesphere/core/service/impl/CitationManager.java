@@ -494,4 +494,11 @@ public class CitationManager implements ICitationManager {
     public void deleteLocalGroupCitations(String groupId) {
         citationStore.deleteCitationByGroupId(groupId);
     }
+
+    @Override
+    public StringBuilder getText(IUser user, String groupId, String key) throws GroupDoesNotExistException,
+            CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

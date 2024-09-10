@@ -12,7 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
@@ -45,8 +48,16 @@ public class AddItemTextController {
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         }
 
-        ICitation item;
-        
+//        ICitation item;
+        StringBuilder itemText = new StringBuilder();
+        try {
+//            item = citationManager.getCitation(user, groupId, itemKey);
+            itemText = citationManager.getText(user, groupId, itemKey);
+        } catch (AccessForbiddenException e) {
+            return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+        } catch (CannotFindCitationException | ZoteroHttpStatusException e) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
         
         return null;
     }
