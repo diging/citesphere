@@ -22,11 +22,11 @@ public class PersonalAccessTokenController {
     @RequestMapping(value = "/auth/personalAccessToken", method = RequestMethod.GET)
     public String getPersonalAccessToken(Authentication authentication, Model model) {
         model.addAttribute("userName", authentication.getName());
-        List<IPersonalAccessToken> listOfPersonalTokens = personalAccessTokenManager
+        List<IPersonalAccessToken> tokens = personalAccessTokenManager
                 .getPersonalAccessTokens(authentication.getName());
-        listOfPersonalTokens.sort(Comparator.comparing(IPersonalAccessToken::getCreatedOn).reversed());
-        model.addAttribute("listOfPersonalTokens", listOfPersonalTokens);
-        model.addAttribute("personalTokensCount", listOfPersonalTokens.size());
+        tokens.sort(Comparator.comparing(IPersonalAccessToken::getCreatedOn).reversed());
+        model.addAttribute("listOfPersonalTokens", tokens);
+        model.addAttribute("personalTokensCount", tokens.size());
         return "auth/personalAccessToken";
     }
 }

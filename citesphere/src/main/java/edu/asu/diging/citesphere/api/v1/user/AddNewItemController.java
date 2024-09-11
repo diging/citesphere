@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.api.v1.user;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
-import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
-import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
@@ -59,12 +58,12 @@ public class AddNewItemController extends V1Controller {
 
     @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST, consumes = {
         MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ICitation> createNewItem(Authentication authentication,
-            @PathVariable("zoteroGroupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles)
+    public ResponseEntity<ICitation> createNewItem(Principal principal,
+            @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             ZoteroItemCreationFailedException {
 
-        IUser user = userManager.findByUsername((String) authentication.getPrincipal());
+        IUser user = userManager.findByUsername(principal.getName());
         if (user == null) {
             return new ResponseEntity<ICitation>(HttpStatus.UNAUTHORIZED);
         }
@@ -79,33 +78,26 @@ public class AddNewItemController extends V1Controller {
         try {
             citation = citationManager.createCitation(user, zoteroGroupId, collectionIds, citation);
         } catch (ZoteroItemCreationFailedException e) {
-            throw new ZoteroItemCreationFailedException();
+            return new ResponseEntity<ICitation>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         if (itemWithGiles.getFiles() != null && itemWithGiles.getFiles().length > 0) {
-            try {
-                List<byte[]> fileBytes = new ArrayList<>();
-                gilesUtil.convertFilesToBytesList(fileBytes, itemWithGiles.getFiles());
-                ObjectMapper mapper = new ObjectMapper();
-                ObjectNode root = mapper.createObjectNode(); 
-                for (int i=0; i<itemWithGiles.getFiles().length; i++) {
-                    IGilesUpload job;
-                    try {
-                        job = jobManager.createGilesJob(user, itemWithGiles.getFiles()[i], fileBytes.get(i), zoteroGroupId,
-                                citation.getKey());
-                    } catch (GroupDoesNotExistException e) {
-                        logger.error("Could not create job because group does not exist.", e);
-                        return new ResponseEntity<ICitation>(HttpStatus.BAD_REQUEST);
-                    }
-
-                    gilesUtil.createJobObjectNode(root, job);
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode root = mapper.createObjectNode(); 
+            for (int i=0; i<itemWithGiles.getFiles().length; i++) {
+                IGilesUpload job;
+                try {
+                    job = jobManager.createGilesJob(user, itemWithGiles.getFiles()[i], itemWithGiles.getFiles()[i].getBytes(), zoteroGroupId,
+                            citation.getKey());
+                } catch (GroupDoesNotExistException e) {
+                    logger.error("Could not create job because group does not exist.", e);
+                    return new ResponseEntity<ICitation>(HttpStatus.BAD_REQUEST);
+                } catch (Exception e) {
+                    logger.error("Could not get file content from request.", e);
+                    return new ResponseEntity<ICitation>(HttpStatus.BAD_REQUEST);
                 }
-            } catch (CannotFindCitationException | CitationIsOutdatedException e) {
-                return new ResponseEntity<ICitation>(HttpStatus.NOT_FOUND);
-            } catch (ZoteroHttpStatusException | ZoteroConnectionException e) {
-                return new ResponseEntity<ICitation>(HttpStatus.INTERNAL_SERVER_ERROR);
-            } catch (ZoteroItemCreationFailedException e) {
-                return new ResponseEntity<ICitation>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+                gilesUtil.createJobObjectNode(root, job);
             }
         }
         return new ResponseEntity<ICitation>(citation, HttpStatus.OK); 

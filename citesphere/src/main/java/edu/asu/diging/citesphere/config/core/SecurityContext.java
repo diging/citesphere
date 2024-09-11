@@ -42,7 +42,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import edu.asu.diging.citesphere.core.repository.oauth.DbAccessTokenRepository;
 import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
-import edu.asu.diging.citesphere.core.service.IPersonalAccessTokenService;
+import edu.asu.diging.citesphere.core.service.IPersonalAccessTokenManager;
 import edu.asu.diging.citesphere.core.service.impl.DbTokenStore;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
 import edu.asu.diging.citesphere.core.service.oauth.impl.OAuthClientManager;
@@ -185,7 +185,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         private static final String RESOURCE_ID = "my_rest_api";
 
         @Autowired
-        private IPersonalAccessTokenService personalAccessTokenService;
+        private IPersonalAccessTokenManager personalAccessTokenManager;
 
         @Override
         public void configure(ResourceServerSecurityConfigurer resources) {
@@ -194,7 +194,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            TokenAuthenticationFilter tokenFilter = new TokenAuthenticationFilter(personalAccessTokenService);
+            TokenAuthenticationFilter tokenFilter = new TokenAuthenticationFilter(personalAccessTokenManager);
 
             http.csrf().disable().authorizeRequests().antMatchers("/api/**").authenticated().and().exceptionHandling()
                     .accessDeniedHandler(new OAuth2AccessDeniedHandler()).and()

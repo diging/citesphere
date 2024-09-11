@@ -7,7 +7,7 @@
 <body>
 	<div layout:fragment="content">
 		<p>
-			<a th:href="@{/auth/savePersonalAccessToken}"
+			<a th:href="@{/auth/personalAccessToken/create}"
 				class="btn btn-primary btn-sm" id="genPersonalToken"><i class="icon-circle-add"></i>
 				&nbsp;Generate New Token</a>
 		</p>
@@ -18,7 +18,7 @@
 			<table class="table table-striped table-bordered">
 				<tr>
 					<th>User</th>
-					<th>Token</th>
+					<!--   <th>Token</th> -->
 					<th>Creation Date</th>
 				</tr>
 
@@ -26,8 +26,8 @@
 					th:each="entry,loop : ${listOfPersonalTokens}">
 					<td th:data-index="${loop.index}"><strong style="color: black">[[${entry.username}]]</strong>
 					</td>
-					<td th:data-index="${loop.index}"><strong style="color: black">[[${entry.token}]]</strong>
-					</td>
+					<!-- <td th:data-index="${loop.index}"><strong style="color: black">[[${entry.token}]]</strong>
+					</td> -->
 					<td th:data-index="${loop.index}"><strong style="color: black">[[${entry.createdOn}]]</strong>
 					</td>
 				</tr>

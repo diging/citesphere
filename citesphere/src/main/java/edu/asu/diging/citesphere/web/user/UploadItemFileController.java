@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,14 @@ public class UploadItemFileController {
         }
 
         List<byte[]> fileBytes = new ArrayList<>();
-        gilesUtil.convertFilesToBytesList(fileBytes, files);
+        for (MultipartFile file : files) {
+            try {
+                fileBytes.add(file.getBytes());
+            } catch (IOException e) {
+                logger.error("Could not get file content from request.", e);
+                fileBytes.add(null);
+            }
+        }
         
         IGilesUpload job;
         try {

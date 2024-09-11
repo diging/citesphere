@@ -13,7 +13,7 @@ public class GeneratePersonalAccessTokenController {
     @Autowired
     private IPersonalAccessTokenManager personalAccessTokenManager;
     
-    @RequestMapping(value = "/auth/savePersonalAccessToken")
+    @RequestMapping(value = "/auth/personalAccessToken/create")
     public String savePersonalAccessToken(Authentication authentication, Model model) {
         model.addAttribute("userName", authentication.getName());
         String tokenGenerated = personalAccessTokenManager.savePersonalAccessToken(authentication.getName());

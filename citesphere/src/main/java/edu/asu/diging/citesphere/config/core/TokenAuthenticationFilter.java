@@ -15,18 +15,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
-import edu.asu.diging.citesphere.core.service.IPersonalAccessTokenService;
+import edu.asu.diging.citesphere.core.service.IPersonalAccessTokenManager;
 
 @Component
 public class TokenAuthenticationFilter extends GenericFilterBean {
 
     private static final String BASIC = "Basic ";
 
-    private final IPersonalAccessTokenService personalAccessTokenService;
+    private final IPersonalAccessTokenManager personalAccessTokenManager;
 
     @Autowired
-    public TokenAuthenticationFilter(IPersonalAccessTokenService personalAccessTokenService) {
-        this.personalAccessTokenService = personalAccessTokenService;
+    public TokenAuthenticationFilter(IPersonalAccessTokenManager personalAccessTokenManager) {
+        this.personalAccessTokenManager = personalAccessTokenManager;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
                 .filter(s -> s.length() > BASIC.length() && s.startsWith(BASIC))
                 .map(s -> s.substring(BASIC.length(), s.length()));
 
-        Optional<Authentication> authentication = personalAccessTokenService.verifyToken(token);
+        Optional<Authentication> authentication = personalAccessTokenManager.verifyToken(token);
         if (authentication.isPresent()) {
             SecurityContextHolder.getContext().setAuthentication(authentication.get());
         }
