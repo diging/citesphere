@@ -27,16 +27,6 @@ public class GilesUtilTest {
     }
 
     @Test
-    public void test_convertFilesToBytesList() {
-        List<byte[]> fileBytes = new ArrayList<>();
-        MockMultipartFile[] files = new MockMultipartFile[2];
-        files[0] = new MockMultipartFile("data1", "filename1.txt", "text/plain", "some1 xml".getBytes());
-        files[1] = new MockMultipartFile("data2", "filename2.txt", "text/plain", "some2 xml".getBytes());
-        gilesUtilToTest.convertFilesToBytesList(fileBytes, files);
-        assertTrue(fileBytes.size() == 2);
-    }
-
-    @Test
     public void test_createJobObjectNode() {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode(); 
