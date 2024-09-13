@@ -102,7 +102,7 @@ public class AddNewItemController extends V1Controller {
                     return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.BAD_REQUEST);
                 } catch (CannotFindCitationException e) {
                     logger.error("Could not find the newly created citation.", e);
-                    return new ResponseEntity<>("Error: Could not find the newly created citation.", HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>("Error: Could not find the newly created citation.", HttpStatus.INTERNAL_SERVER_ERROR);
                 } catch (CitationIsOutdatedException e) {
                     logger.error("Citation outdated. ", e);
                     return new ResponseEntity<>("Error: Citation outdated.", HttpStatus.BAD_REQUEST);
