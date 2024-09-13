@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.api.v1.user;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
+import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
+import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
@@ -69,7 +72,7 @@ public class AddNewItemController extends V1Controller {
         
         if(itemWithGiles.getItemType() == null) {
             logger.error("Missing Item Type");
-            return new ResponseEntity<>("Error: Missing Item Type", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error: Missing Item Type", HttpStatus.BAD_REQUEST);
         
         }
         ICitation citation = new Citation();
@@ -97,9 +100,15 @@ public class AddNewItemController extends V1Controller {
                 } catch (GroupDoesNotExistException e) {
                     logger.error("Could not create job because group does not exist.", e);
                     return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.BAD_REQUEST);
-                } catch (Exception e) {
-                    logger.error("Could not get file content from request.", e);
-                    return new ResponseEntity<>("Error: Could not get file content from request.", HttpStatus.BAD_REQUEST);
+                } catch (CannotFindCitationException e) {
+                    logger.error("Could not find the newly created citation.", e);
+                    return new ResponseEntity<>("Error: Could not find the newly created citation.", HttpStatus.BAD_REQUEST);
+                } catch (CitationIsOutdatedException e) {
+                    logger.error("Citation outdated. ", e);
+                    return new ResponseEntity<>("Error: Citation outdated.", HttpStatus.BAD_REQUEST);
+                } catch (IOException e) {
+                    logger.error("Could not read file from the request. ", e);
+                    return new ResponseEntity<>("Error: Could not read file from the request.", HttpStatus.BAD_REQUEST);
                 }
 
                 gilesUtil.createJobObjectNode(root, job);
