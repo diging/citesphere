@@ -37,12 +37,14 @@ import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
@@ -83,6 +85,9 @@ public class CitationManager implements ICitationManager {
 
     @Autowired
     private IAsyncCitationProcessor asyncCitationProcessor;
+    
+    @Autowired
+    private IGilesConnector gilesConnecter;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
@@ -508,7 +513,28 @@ public class CitationManager implements ICitationManager {
     @Override
     public StringBuilder getText(IUser user, String groupId, String key) throws GroupDoesNotExistException,
             CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException {
-        // TODO Auto-generated method stub
-        return null;
+        ICitation item = getCitation(user, groupId, key);
+        
+        StringBuilder text = new StringBuilder();
+        
+        if(item.getGilesUploads().isEmpty()) {
+            return null;
+        } 
+        
+        for(IGilesUpload gilesUpload: item.getGilesUploads()) {
+            if(gilesUpload.getExtractedText() != null) {
+                try {
+                    text.append(gilesConnecter.getFile(user, gilesUpload.getExtractedText().getId()));
+                } catch(HttpClientErrorException.Unauthorized e) {
+                    logger.error("Unauthorized access when fetching contents of file with ID: "+ gilesUpload.getExtractedText().getId(), e);
+                    throw e;                
+                } catch (HttpClientErrorException e) {
+                    logger.error("HTTP Client error when fetching contents of file with ID: "+ gilesUpload.getExtractedText().getId(), e);
+                    throw e;
+                }
+            }
+        }
+        
+        return text;
     }
 }
