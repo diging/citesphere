@@ -33,6 +33,7 @@ public interface AuthorityImporter {
 
     public static String CONCEPTPOWER = "conceptpower";
     public static String VIAF = "viaf";
+    public static String ISISCB = "isiscb";
 
     boolean isResponsible(String uri);
 
