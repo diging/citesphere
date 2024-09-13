@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -58,14 +57,20 @@ public class AddNewItemController extends V1Controller {
 
     @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST, consumes = {
         MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ICitation> createNewItem(Principal principal,
+    public ResponseEntity<Object> createNewItem(Principal principal,
             @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             ZoteroItemCreationFailedException {
 
         IUser user = userManager.findByUsername(principal.getName());
         if (user == null) {
-            return new ResponseEntity<ICitation>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
+        if(itemWithGiles.getItemType() == null) {
+            logger.error("Missing Item Type");
+            return new ResponseEntity<>("Error: Missing Item Type", HttpStatus.INTERNAL_SERVER_ERROR);
+        
         }
         ICitation citation = new Citation();
         List<String> collectionIds = new ArrayList<>();
@@ -78,7 +83,7 @@ public class AddNewItemController extends V1Controller {
         try {
             citation = citationManager.createCitation(user, zoteroGroupId, collectionIds, citation);
         } catch (ZoteroItemCreationFailedException e) {
-            return new ResponseEntity<ICitation>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error: Zetero Item creation failed. " + e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         if (itemWithGiles.getFiles() != null && itemWithGiles.getFiles().length > 0) {
@@ -91,16 +96,16 @@ public class AddNewItemController extends V1Controller {
                             citation.getKey());
                 } catch (GroupDoesNotExistException e) {
                     logger.error("Could not create job because group does not exist.", e);
-                    return new ResponseEntity<ICitation>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.BAD_REQUEST);
                 } catch (Exception e) {
                     logger.error("Could not get file content from request.", e);
-                    return new ResponseEntity<ICitation>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>("Error: Could not get file content from request.", HttpStatus.BAD_REQUEST);
                 }
 
                 gilesUtil.createJobObjectNode(root, job);
             }
         }
-        return new ResponseEntity<ICitation>(citation, HttpStatus.OK); 
+        return new ResponseEntity<>(citation, HttpStatus.OK); 
     }
 
 }
