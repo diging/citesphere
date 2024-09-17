@@ -8,15 +8,21 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,6 +40,7 @@ import edu.asu.diging.citesphere.core.util.IGilesUtil;
 import edu.asu.diging.citesphere.core.util.model.ICitationHelper;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
+import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
@@ -57,6 +64,25 @@ public class AddNewItemController extends V1Controller {
 
     @Autowired
     private IUploadFileJobManager jobManager;
+    
+    @RestControllerAdvice
+    public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
+            StringBuilder errors = new StringBuilder();
+            ex.getBindingResult().getAllErrors().forEach((error) -> {
+                errors.append(((FieldError) error).getField()).append(": ").append(error.getDefaultMessage()).append(" ");
+            });
+            return new ResponseEntity<>(errors.toString().trim(), HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(ConversionFailedException.class)
+        public ResponseEntity<Object> handleConversionExceptions(ConversionFailedException ex) {
+            String message = "Invalid value for enum type. Please provide a valid value.";
+            return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST, consumes = {
         MediaType.MULTIPART_FORM_DATA_VALUE })
@@ -64,6 +90,8 @@ public class AddNewItemController extends V1Controller {
             @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             ZoteroItemCreationFailedException {
+        
+        System.out.println("========================== start");
 
         IUser user = userManager.findByUsername(principal.getName());
         if (user == null) {
@@ -73,8 +101,16 @@ public class AddNewItemController extends V1Controller {
         if(itemWithGiles.getItemType() == null) {
             logger.error("Missing Item Type");
             return new ResponseEntity<>("Error: Missing Item Type", HttpStatus.BAD_REQUEST);
-        
         }
+        System.out.println("======================= 1");
+        try {
+            ItemType typeKey = itemWithGiles.getItemType();
+        } catch (Exception e) {
+            logger.error("Invalid itemType value: " + itemWithGiles.getItemType(), e);
+            e.printStackTrace();
+            return new ResponseEntity<>("Error: Invalid itemType value. Please provide a valid type.", HttpStatus.BAD_REQUEST);
+        }
+        System.out.println("============================= 2");
         ICitation citation = new Citation();
         List<String> collectionIds = new ArrayList<>();
         if (itemWithGiles.getCollectionId() != null && !itemWithGiles.getCollectionId().trim().isEmpty()) {
@@ -86,7 +122,8 @@ public class AddNewItemController extends V1Controller {
         try {
             citation = citationManager.createCitation(user, zoteroGroupId, collectionIds, citation);
         } catch (ZoteroItemCreationFailedException e) {
-            return new ResponseEntity<>("Error: Zetero Item creation failed. " + e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Zetero Item creation failed. ", e);
+            return new ResponseEntity<>("Error: Zetero Item creation failed. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         if (itemWithGiles.getFiles() != null && itemWithGiles.getFiles().length > 0) {
