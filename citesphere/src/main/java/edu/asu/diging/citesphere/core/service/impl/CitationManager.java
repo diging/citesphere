@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -517,14 +518,14 @@ public class CitationManager implements ICitationManager {
         
         StringBuilder text = new StringBuilder();
         
-        if(item.getGilesUploads().isEmpty()) {
+        if(item.getGilesUploads() == null || item.getGilesUploads().isEmpty()) {
             return null;
         } 
         
         for(IGilesUpload gilesUpload: item.getGilesUploads()) {
             if(gilesUpload.getExtractedText() != null) {
                 try {
-                    text.append(gilesConnecter.getFile(user, gilesUpload.getExtractedText().getId()));
+                    text.append(new String(gilesConnecter.getFile(user, gilesUpload.getExtractedText().getId()), StandardCharsets.UTF_8));
                 } catch(HttpClientErrorException.Unauthorized e) {
                     logger.error("Unauthorized access when fetching contents of file with ID: "+ gilesUpload.getExtractedText().getId(), e);
                     throw e;                
