@@ -1,7 +1,14 @@
 package edu.asu.diging.citesphere.web.forms;
 
+import java.io.IOException;
 import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.model.bib.ItemType;
 
@@ -40,6 +47,8 @@ public class CitationForm {
     private List<ConceptAssignmentForm> conceptTags;
     
     private MultipartFile[] files;
+    
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public String getCollectionId() {
         return collectionId;
@@ -237,12 +246,22 @@ public class CitationForm {
         return authors;
     }
 
+    public void setAuthors(String authors) throws JsonParseException, JsonMappingException, IOException {
+        this.authors = objectMapper.readValue(authors,
+                new TypeReference<List<PersonForm>>() {});;
+    }
+    
     public void setAuthors(List<PersonForm> authors) {
         this.authors = authors;
     }
 
     public List<PersonForm> getEditors() {
         return editors;
+    }
+    
+    public void setEditors(String editors) throws JsonParseException, JsonMappingException, IOException {
+        this.editors = objectMapper.readValue(editors,
+                new TypeReference<List<PersonForm>>() {});;
     }
 
     public void setEditors(List<PersonForm> editors) {
@@ -251,6 +270,11 @@ public class CitationForm {
 
     public List<PersonForm> getOtherCreators() {
         return otherCreators;
+    }
+    
+    public void setOtherCreators(String otherCreators) throws JsonParseException, JsonMappingException, IOException {
+        this.otherCreators = objectMapper.readValue(otherCreators,
+                new TypeReference<List<PersonForm>>() {});;
     }
 
     public void setOtherCreators(List<PersonForm> otherCreators) {

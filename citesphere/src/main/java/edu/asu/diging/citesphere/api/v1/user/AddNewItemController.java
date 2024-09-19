@@ -58,25 +58,6 @@ public class AddNewItemController extends V1Controller {
     @Autowired
     private IUploadFileJobManager jobManager;
     
-//    @RestControllerAdvice
-//    public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-//
-//        @ExceptionHandler(MethodArgumentNotValidException.class)
-//        public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
-//            StringBuilder errors = new StringBuilder();
-//            ex.getBindingResult().getAllErrors().forEach((error) -> {
-//                errors.append(((FieldError) error).getField()).append(": ").append(error.getDefaultMessage()).append(" ");
-//            });
-//            return new ResponseEntity<>(errors.toString().trim(), HttpStatus.BAD_REQUEST);
-//        }
-//
-//        @ExceptionHandler(ConversionFailedException.class)
-//        public ResponseEntity<Object> handleConversionExceptions(ConversionFailedException ex) {
-//            String message = "Invalid value for enum type. Please provide a valid value.";
-//            return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
     @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST, consumes = {
         MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Object> createNewItem(Principal principal,
