@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.api.v1.user;
 
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -13,11 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -37,6 +41,7 @@ import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.web.forms.CitationForm;
+import edu.asu.diging.citesphere.web.forms.PersonForm;
 
 @Controller
 public class AddNewItemController extends V1Controller {
@@ -57,6 +62,52 @@ public class AddNewItemController extends V1Controller {
 
     @Autowired
     private IUploadFileJobManager jobManager;
+    
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(List.class, "authors", new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    List<PersonForm> authors = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
+                    setValue(authors);
+                } catch (IOException e) {
+                    setValue(null);  
+                    logger.error(e.getMessage());
+                    throw new RuntimeException("authors: Error converting String to List<PersonForm>", e);
+                }
+            }
+        });
+        binder.registerCustomEditor(List.class, "editors", new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    List<PersonForm> authors = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
+                    setValue(authors);
+                } catch (IOException e) {
+                    setValue(null);  
+                    logger.error(e.getMessage());
+                    throw new RuntimeException("editors: Error converting String to List<PersonForm>", e);
+                }
+            }
+        });
+        binder.registerCustomEditor(List.class, "otherCreators", new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    List<PersonForm> authors = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
+                    setValue(authors);
+                } catch (IOException e) {
+                    setValue(null);  
+                    logger.error(e.getMessage());
+                    throw new RuntimeException("otherCreators: Error converting String to List<PersonForm>", e);
+                }
+            }
+        });
+    }
     
     @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST, consumes = {
         MediaType.MULTIPART_FORM_DATA_VALUE })

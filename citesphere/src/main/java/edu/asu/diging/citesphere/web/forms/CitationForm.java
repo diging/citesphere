@@ -245,12 +245,7 @@ public class CitationForm {
     public List<PersonForm> getAuthors() {
         return authors;
     }
-
-    public void setAuthors(String authors) throws JsonParseException, JsonMappingException, IOException {
-        this.authors = objectMapper.readValue(authors,
-                new TypeReference<List<PersonForm>>() {});;
-    }
-    
+   
     public void setAuthors(List<PersonForm> authors) {
         this.authors = authors;
     }
@@ -259,11 +254,6 @@ public class CitationForm {
         return editors;
     }
     
-    public void setEditors(String editors) throws JsonParseException, JsonMappingException, IOException {
-        this.editors = objectMapper.readValue(editors,
-                new TypeReference<List<PersonForm>>() {});;
-    }
-
     public void setEditors(List<PersonForm> editors) {
         this.editors = editors;
     }
@@ -272,11 +262,6 @@ public class CitationForm {
         return otherCreators;
     }
     
-    public void setOtherCreators(String otherCreators) throws JsonParseException, JsonMappingException, IOException {
-        this.otherCreators = objectMapper.readValue(otherCreators,
-                new TypeReference<List<PersonForm>>() {});;
-    }
-
     public void setOtherCreators(List<PersonForm> otherCreators) {
         this.otherCreators = otherCreators;
     }
