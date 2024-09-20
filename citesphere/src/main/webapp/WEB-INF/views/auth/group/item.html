@@ -136,6 +136,7 @@
 	    })
 	    
 	    $("#closeReferenceModalBtn").click(function() {
+			$("#addReferenceButton").prop('disabled', true);
 	    	$("#referenceModal").modal('hide');
 	    });	    
 
@@ -153,7 +154,6 @@
 	    $("#searchReference").click(function() {
 	        $("#selectReferenceModal").show()
 	        $("#searchReferenceSpinner").show();
-	        $("#addReferenceButton").prop('disabled', true);
 	        $("#itemReference").val('');
 	        var searchTerm = $("#citationReference").val();
 	        var zoteroGroupId = $("#addReferences").data('zotero-group-id');
