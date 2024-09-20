@@ -57,26 +57,37 @@ public class JobInfoController extends BaseJobInfoController {
         IJob job = jobManager.findJob(tokenContents.getJobId());
         IZoteroToken zoteroToken = tokenManager.getToken(userManager.findByUsername(job.getUsername()));
         
-        Map<String, Object> reponse = new HashMap<>();
-        reponse.put("zotero", zoteroToken.getToken());
-        reponse.put("zoteroId", zoteroToken.getUserId());
-        reponse.put("username", job.getUsername());
+        Map<String, Object> response = new HashMap<>();
+        response.put("zotero", zoteroToken.getToken());
+        response.put("zoteroId", zoteroToken.getUserId());
+        response.put("username", job.getUsername());
         // FIXME: ugly, needs better solution
         if (job instanceof IUploadJob) {
-            reponse.put("groupId", ((IUploadJob)job).getCitationGroup());
+            handleUploadJob(response, (IUploadJob) job);
         } else if (job instanceof IExportJob) {
-            IExportTask exportTask = exportTaskManager.get(((IExportJob)job).getTaskId());
-            reponse.put("groupId", exportTask.getGroupId());
-            reponse.put("collectionId", exportTask.getCollectionId());
-            reponse.put("exportType", exportTask.getExportType().name());
-            reponse.put("taskId", exportTask.getId());
+            handleExportJob(response, (IExportJob) job);
         } else if (job instanceof IImportCrossrefJob) {
-            List<String> doisList = new ArrayList<>();
-            ((IImportCrossrefJob)job).getDois().forEach(d -> doisList.add(d));
-            reponse.put("dois", doisList);
-            reponse.put("groupId", ((IImportCrossrefJob)job).getCitationGroup());
+            handleImportCrossrefJob(response, (IImportCrossrefJob) job);
         }
         
-        return new ResponseEntity<>(reponse.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
+    }
+    
+    private void handleUploadJob(Map<String, Object> response, IUploadJob job) {
+        response.put("groupId", job.getCitationGroup());
+    }
+
+    private void handleExportJob(Map<String, Object> response, IExportJob job) {
+        IExportTask exportTask = exportTaskManager.get(job.getTaskId());
+        response.put("groupId", exportTask.getGroupId());
+        response.put("collectionId", exportTask.getCollectionId());
+        response.put("exportType", exportTask.getExportType().name());
+        response.put("taskId", exportTask.getId());
+    }
+
+    private void handleImportCrossrefJob(Map<String, Object> response, IImportCrossrefJob job) {
+        List<String> doisList = new ArrayList<>(job.getDois());
+        response.put("dois", doisList);
+        response.put("groupId", job.getCitationGroup());
     }
 }
