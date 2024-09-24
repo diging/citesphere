@@ -40,6 +40,7 @@ import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -47,6 +48,7 @@ import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.transfer.impl.Citations;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
@@ -493,5 +495,10 @@ public class CitationManager implements ICitationManager {
     @Override
     public void deleteLocalGroupCitations(String groupId) {
         citationStore.deleteCitationByGroupId(groupId);
+    }
+    
+    @Override
+    public Citations findAuthorityItems(IAuthorityEntry entry) {       
+        return citationDao.findCitationsByPersonUri(entry.getUri());
     }
 }
