@@ -5,6 +5,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,11 +14,14 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Component;
@@ -27,6 +32,10 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 
 @Configuration
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
@@ -96,6 +105,23 @@ public class MongoConfig {
         @Override
         public OffsetDateTime convert(String source) {
             return OffsetDateTime.parse(source);
+        }
+    }
+    
+    @Configuration
+    public static class MongoIndex implements InitializingBean {
+
+        @Autowired
+        private MongoTemplate mongoTemplate;
+
+        @Override
+        public void afterPropertiesSet() throws Exception {
+            IndexOperations citationIndexOps = mongoTemplate.indexOps(Citation.class);
+            citationIndexOps.ensureIndex(new Index().on("key", Sort.Direction.ASC).unique());
+            IndexOperations citationCollectionIndexOps = mongoTemplate.indexOps(CitationCollection.class);
+            citationCollectionIndexOps.ensureIndex(new Index().on("key", Sort.Direction.ASC).unique());
+            IndexOperations citationGorupIndexOps = mongoTemplate.indexOps(CitationGroup.class);
+            citationGorupIndexOps.ensureIndex(new Index().on("groupId", Sort.Direction.ASC).unique());
         }
     }
 }

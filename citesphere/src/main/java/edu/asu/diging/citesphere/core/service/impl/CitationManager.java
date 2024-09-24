@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,15 +181,15 @@ public class CitationManager implements ICitationManager {
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         long citationVersion = zoteroManager.getGroupItemVersion(user, groupId, citation.getKey());
         Optional<ICitation> storedCitationOptional = citationStore.findById(citation.getKey());
+        ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         if (storedCitationOptional.isPresent()) {
             ICitation storedCitation = storedCitationOptional.get();
             if (storedCitation.getVersion() != citationVersion) {
                 throw new CitationIsOutdatedException();
             }
-            citationStore.delete(storedCitation);
+            updatedCitation.setId(storedCitation.getId());
         }
 
-        ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         citationStore.save(updatedCitation);
     }
     
@@ -250,7 +251,7 @@ public class CitationManager implements ICitationManager {
 
             Optional<ICitation> oldCitation = citationStore.findById(itemKey);
             if (oldCitation.isPresent()) {
-                citationStore.delete(oldCitation.get());
+                citation.setId(oldCitation.get().getId());
             }
             citationStore.save(citation);
             return citation;
@@ -325,8 +326,9 @@ public class CitationManager implements ICitationManager {
             if (groupOptional.isPresent()) {
                 ICitationGroup group = groupOptional.get();
                 if (group.getMetadataVersion() != groupVersions.get(id)) {
-                    groupRepository.delete((CitationGroup) group);
+                    ObjectId groupID = group.getId();
                     group = zoteroManager.getGroup(user, id + "", true);
+                    group.setId(groupID);
                     group.setUpdatedOn(OffsetDateTime.now().toString());
                 }
                 addUserToGroup(group, user);
@@ -378,7 +380,7 @@ public class CitationManager implements ICitationManager {
 
         ICitationGroup group = null;
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-        if (!groupOptional.isPresent() || !groupOptional.get().getUsers().contains(user.getUsername())) {
+        if (!groupOptional.isPresent()) {
             group = zoteroManager.getGroup(user, groupId, false);
             if (group != null) {
                 group.getUsers().add(user.getUsername());
@@ -386,6 +388,9 @@ public class CitationManager implements ICitationManager {
             }
         } else {
             group = groupOptional.get();
+            if (!group.getUsers().contains(user.getUsername())){
+                group.getUsers().add(user.getUsername());
+            }
         }
 
         if (group == null) {
@@ -398,13 +403,14 @@ public class CitationManager implements ICitationManager {
             long previousVersion = group.getContentVersion();
             // first update the group info
             // if we are using a previously stored group, delete it
+            ICitationGroup zeteroGroup = null;
             if (group.getId() != null) {
-                groupRepository.delete((CitationGroup) group);
-                group = zoteroManager.getGroup(user, groupId + "", true);
+                zeteroGroup = zoteroManager.getGroup(user, groupId + "", true);
+                zeteroGroup.setId(group.getId());
             }
-            group.setUpdatedOn(OffsetDateTime.now().toString());
-            addUserToGroup(group, user);
-            group = groupRepository.save((CitationGroup) group);
+            zeteroGroup.setUpdatedOn(OffsetDateTime.now().toString());
+            addUserToGroup(zeteroGroup, user);
+            group = groupRepository.save((CitationGroup) zeteroGroup);
 
             // then update content
             results.setNotModified(false);
