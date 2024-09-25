@@ -74,7 +74,7 @@ public class AddNewItemController extends V1Controller {
                     setValue(authors);
                 } catch (IOException e) {
                     setValue(null);  
-                    logger.error(e.getMessage());
+                    logger.error("Could not parse authors", e);
                     throw new RuntimeException("authors: Error converting String to List<PersonForm>", e);
                 }
             }
@@ -84,11 +84,11 @@ public class AddNewItemController extends V1Controller {
             public void setAsText(String text) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
-                    List<PersonForm> authors = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
-                    setValue(authors);
+                    List<PersonForm> editors = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
+                    setValue(editors);
                 } catch (IOException e) {
                     setValue(null);  
-                    logger.error(e.getMessage());
+                    logger.error("Could not parse editors", e);
                     throw new RuntimeException("editors: Error converting String to List<PersonForm>", e);
                 }
             }
@@ -98,11 +98,11 @@ public class AddNewItemController extends V1Controller {
             public void setAsText(String text) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
-                    List<PersonForm> authors = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
-                    setValue(authors);
+                    List<PersonForm> otherCreators = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
+                    setValue(otherCreators);
                 } catch (IOException e) {
                     setValue(null);  
-                    logger.error(e.getMessage());
+                    logger.error("Could not parse otherCreators", e);
                     throw new RuntimeException("otherCreators: Error converting String to List<PersonForm>", e);
                 }
             }
@@ -137,7 +137,7 @@ public class AddNewItemController extends V1Controller {
         try {
             citation = citationManager.createCitation(user, zoteroGroupId, collectionIds, citation);
         } catch (ZoteroItemCreationFailedException e) {
-            logger.error("Zetero Item creation failed. ", e);
+            logger.error("Zotero Item creation failed. ", e);
             return new ResponseEntity<>("Error: Zetero Item creation failed. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

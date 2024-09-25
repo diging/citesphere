@@ -21,9 +21,9 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach(error -> {
+            logger.error("Error in field ", error.getField(), ": ", error);
             errors.put(error.getField(), error.getDefaultMessage());
         });
-        logger.error(errors.toString());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
