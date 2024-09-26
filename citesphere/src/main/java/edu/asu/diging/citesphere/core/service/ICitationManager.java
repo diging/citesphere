@@ -85,7 +85,4 @@ public interface ICitationManager {
     
     void deleteLocalGroupCitations(String groupId);
     
-    StringBuilder getText(IUser user, String groupId, String key) throws GroupDoesNotExistException,
-            CannotFindCitationException, AccessForbiddenException, ZoteroHttpStatusException;
-    
 }

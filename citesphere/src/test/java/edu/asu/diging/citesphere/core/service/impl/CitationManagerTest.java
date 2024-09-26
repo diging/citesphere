@@ -1,17 +1,10 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,9 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.HttpClientErrorException;
 
-import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -33,17 +24,14 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
-import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
-import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
-import edu.asu.diging.citesphere.model.bib.impl.IGilesFile;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
@@ -64,15 +52,6 @@ public class CitationManagerTest {
     @Mock
     private ICitationDao citationDao;
     
-    @Mock
-    private IGilesConnector gilesConnecter;
-    
-    @Mock
-    private IGilesUpload gilesUpload;
-    
-    @Mock
-    private IGilesFile extractedText;
-    
     @InjectMocks
     private CitationManager managerToTest;
     
@@ -91,7 +70,6 @@ public class CitationManagerTest {
     ICitationGroup group;
     private ICitationGroup group1;
     private ICitationGroup group2;
-    private Set<IGilesUpload> gilesSet;
         
     @Before
     public void setUp() throws ZoteroHttpStatusException {
@@ -125,13 +103,6 @@ public class CitationManagerTest {
         group2.setContentVersion(3L);
         Mockito.when(groupRepository.findFirstByGroupId(GROUP2_ID)).thenReturn(Optional.of((CitationGroup)group2));
         
-        gilesSet = new HashSet<>();
-        gilesSet.add(gilesUpload);
-        existingCitation.setGilesUploads(gilesSet);
-        
-        Mockito.when(gilesUpload.getExtractedText()).thenReturn(extractedText);
-        
-//        existingCitation.setGilesUploads(gilesSet);
     }
     
     @Test
@@ -477,36 +448,4 @@ public class CitationManagerTest {
         List<ICitation> response = managerToTest.getNotes(user, GROUP_ID, EXISTING_ID);
         Assert.assertTrue(response.size() == 0);
     }
-       
-    @Test
-    public void test_getText_successfulTextRetrieval() throws Exception {
-        String fileId = "file-id";
-        String fileContent = "sample file content";
-        when(extractedText.getId()).thenReturn(fileId);
-        when(gilesConnecter.getFile(user, fileId)).thenReturn(fileContent.getBytes());
-
-        StringBuilder result = managerToTest.getText(user, GROUP_ID, EXISTING_ID);
-
-        assertNotNull(result);
-        assertEquals(fileContent, result.toString());
-    }
-
-    @Test
-    public void test_getText_noGilesUploads() throws Exception {
-        existingCitation.setGilesUploads(null);
-
-        StringBuilder result = managerToTest.getText(user, GROUP_ID, EXISTING_ID);
-
-        assertNull(result);
-    }
-
-    @Test
-    public void test_getText_emptyGilesUploads() throws Exception {
-        existingCitation.setGilesUploads(new HashSet<>());
-
-        StringBuilder result = managerToTest.getText(user, GROUP_ID, EXISTING_ID);
-
-        assertNull(result);
-    }
-
 }

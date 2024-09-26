@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,9 +70,12 @@ public class ItemTextController extends V1Controller {
         ICitation citation = null;
         try {
             citation = citationManager.getCitation(user, groupId, itemKey);
-        } catch (GroupDoesNotExistException | CannotFindCitationException | ZoteroHttpStatusException e) {
-            // TODO Give proper msgs
-            e.printStackTrace();
+        } catch (GroupDoesNotExistException | CannotFindCitationException e) {
+            logger.error("Could not find the group/citation. ", e);
+            return new ResponseEntity<>("Error: Could not find the group/citation: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (ZoteroHttpStatusException e) {
+            logger.error("Could not retrieve data from Zotero. ", e);
+            return new ResponseEntity<>("Error: Could not retrieve data from Zotero: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         
         ObjectMapper mapper = new ObjectMapper();
@@ -82,8 +86,8 @@ public class ItemTextController extends V1Controller {
                     job = jobManager.createGilesJob(user, files[i], files[i].getBytes(), groupId,
                             citation.getKey());
             } catch (ZoteroHttpStatusException | ZoteroConnectionException | ZoteroItemCreationFailedException e) {
-                // TODO Give proper msgs
-                e.printStackTrace();
+                logger.error("Zotero could not process the file. ", e);
+                return new ResponseEntity<>("Error: Zotero could not process the file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (GroupDoesNotExistException e) {
                 logger.error("Could not create job because group does not exist.", e);
                 return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.BAD_REQUEST);
@@ -96,6 +100,12 @@ public class ItemTextController extends V1Controller {
             } catch (IOException e) {
                 logger.error("Could not read file from the request. ", e);
                 return new ResponseEntity<>("Error: Could not read file from the request.", HttpStatus.BAD_REQUEST);
+            } catch (HttpClientErrorException.Unauthorized e) {
+                logger.error("Unauthorized access while uploading file. ", e);
+                return new ResponseEntity<>("Error: Unauthorized access while uploading file", HttpStatus.UNAUTHORIZED);
+            } catch (HttpClientErrorException e) {
+                logger.error("Giles HTTP Client error when uploading file. ", e);
+                return new ResponseEntity<>("Error: Giles HTTP Client error when uploading file", HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             gilesUtil.createJobObjectNode(root, job);
