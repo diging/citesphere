@@ -38,9 +38,9 @@ import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class ItemTextController extends V1Controller {
-    
+
     private Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     @Autowired
     private ICitationManager citationManager;
 
@@ -49,24 +49,24 @@ public class ItemTextController extends V1Controller {
 
     @Autowired
     private IUserManager userManager;
-    
+
     @Autowired
     private IUploadFileJobManager jobManager;
-    
+
     @Autowired
     private IGilesUtil gilesUtil;
-    
+
     @PostMapping(value = "/groups/{groupId}/items/{item}/text", consumes= {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Object> getItemText(@PathVariable("groupId") String groupId, @PathVariable("item") String itemKey,
             @RequestParam("files") MultipartFile[] files, Principal principal) throws GroupDoesNotExistException {
-        
+
         IUser user = userManager.findByUsername(principal.getName());
 
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        
+
         ICitation citation = null;
         try {
             citation = citationManager.getCitation(user, groupId, itemKey);
@@ -77,14 +77,14 @@ public class ItemTextController extends V1Controller {
             logger.error("Could not retrieve data from Zotero. ", e);
             return new ResponseEntity<>("Error: Could not retrieve data from Zotero: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode(); 
         for (int i=0; i<files.length; i++) {
             IGilesUpload job = null;
             try {
-                    job = jobManager.createGilesJob(user, files[i], files[i].getBytes(), groupId,
-                            citation.getKey());
+                job = jobManager.createGilesJob(user, files[i], files[i].getBytes(), groupId,
+                        citation.getKey());
             } catch (ZoteroHttpStatusException | ZoteroConnectionException | ZoteroItemCreationFailedException e) {
                 logger.error("Zotero could not process the file. ", e);
                 return new ResponseEntity<>("Error: Zotero could not process the file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -110,7 +110,7 @@ public class ItemTextController extends V1Controller {
 
             gilesUtil.createJobObjectNode(root, job);
         }
-        
+
         return new ResponseEntity<>(citation, HttpStatus.OK);
     }
 }
