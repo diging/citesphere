@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,7 +114,8 @@ public class AddNewItemController extends V1Controller {
     @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST, consumes = {
         MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Object> createNewItem(Principal principal,
-            @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles)
+            @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles,
+            @RequestParam(value = "files", required = false) MultipartFile[] files)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             ZoteroItemCreationFailedException {
 
