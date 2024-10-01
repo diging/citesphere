@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
@@ -20,10 +20,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -72,12 +71,16 @@ public class AddNewItemController extends V1Controller {
             public void setAsText(String text) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
+                    objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
                     List<PersonForm> authors = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
+                    authors = authors.stream()
+                            .peek(author -> author.setRole("author"))
+                            .collect(Collectors.toList());                    
                     setValue(authors);
                 } catch (IOException e) {
                     setValue(null);  
                     logger.error("Could not parse authors", e);
-                    throw new RuntimeException("authors: Error converting String to List<PersonForm>", e);
+                    throw new RuntimeException("authors: Error converting String to List<PersonForm>");
                 }
             }
         });
@@ -86,12 +89,16 @@ public class AddNewItemController extends V1Controller {
             public void setAsText(String text) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
+                    objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
                     List<PersonForm> editors = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
+                    editors = editors.stream()
+                            .peek(editor -> editor.setRole("editor"))
+                            .collect(Collectors.toList()); 
                     setValue(editors);
                 } catch (IOException e) {
                     setValue(null);  
                     logger.error("Could not parse editors", e);
-                    throw new RuntimeException("editors: Error converting String to List<PersonForm>", e);
+                    throw new RuntimeException("editors: Error converting String to List<PersonForm>");
                 }
             }
         });
@@ -100,22 +107,21 @@ public class AddNewItemController extends V1Controller {
             public void setAsText(String text) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
+                    objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
                     List<PersonForm> otherCreators = objectMapper.readValue(text, new TypeReference<List<PersonForm>>() {});
                     setValue(otherCreators);
                 } catch (IOException e) {
                     setValue(null);  
                     logger.error("Could not parse otherCreators", e);
-                    throw new RuntimeException("otherCreators: Error converting String to List<PersonForm>", e);
+                    throw new RuntimeException("otherCreators: Error converting String to List<PersonForm>");
                 }
             }
         });
     }
     
-    @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST, consumes = {
-        MediaType.MULTIPART_FORM_DATA_VALUE })
+    @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST)
     public ResponseEntity<Object> createNewItem(Principal principal,
-            @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles,
-            @RequestParam(value = "files", required = false) MultipartFile[] files)
+            @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles)
             throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
             ZoteroItemCreationFailedException {
 

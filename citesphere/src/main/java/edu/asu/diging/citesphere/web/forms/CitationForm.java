@@ -1,14 +1,8 @@
 package edu.asu.diging.citesphere.web.forms;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.model.bib.ItemType;
 
@@ -48,8 +42,6 @@ public class CitationForm {
     
     private MultipartFile[] files;
     
-    private ObjectMapper objectMapper = new ObjectMapper();
-
     public String getCollectionId() {
         return collectionId;
     }
