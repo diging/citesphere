@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -184,6 +185,9 @@ public class AddNewItemController extends V1Controller {
                 } catch (ZoteroItemCreationFailedException e) {
                     logger.error("Zotero Item creation failed ", e);
                     return new ResponseEntity<>("Error: Zotero Item creation failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+                } catch (HttpClientErrorException.Unauthorized e) {
+                    logger.error("Unauthorized to upload files to Giles ", e);
+                    return new ResponseEntity<>("Error: Unauthorized to upload files to Giles.", HttpStatus.UNAUTHORIZED);
                 }
 
                 gilesUtil.createJobObjectNode(root, job);
