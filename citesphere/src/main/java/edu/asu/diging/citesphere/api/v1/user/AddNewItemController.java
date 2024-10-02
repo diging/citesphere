@@ -176,15 +176,9 @@ public class AddNewItemController extends V1Controller {
                 } catch (AccessForbiddenException e) {
                     logger.error("Access Forbidden for uploading files to Giles ", e);
                     return new ResponseEntity<>("Error: Access Forbidden for uploading files to Giles.", HttpStatus.FORBIDDEN);
-                } catch (ZoteroHttpStatusException e) {
-                    logger.error("Zotero HTTP Status Exception occured ", e);
-                    return new ResponseEntity<>("Error: Zotero HTTP Status Exception occured.", HttpStatus.INTERNAL_SERVER_ERROR);
-                } catch (ZoteroConnectionException e) {
-                    logger.error("Zotero connection failed ", e);
-                    return new ResponseEntity<>("Error: Zotero connection failed.", HttpStatus.INTERNAL_SERVER_ERROR);
-                } catch (ZoteroItemCreationFailedException e) {
-                    logger.error("Zotero Item creation failed ", e);
-                    return new ResponseEntity<>("Error: Zotero Item creation failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+                } catch (ZoteroHttpStatusException | ZoteroConnectionException | ZoteroItemCreationFailedException e) {
+                    logger.error("Zotero exception occured ", e);
+                    return new ResponseEntity<>("Error: Zotero Exception occured: "+ e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
                 } catch (HttpClientErrorException.Unauthorized e) {
                     logger.error("Unauthorized to upload files to Giles ", e);
                     return new ResponseEntity<>("Error: Unauthorized to upload files to Giles.", HttpStatus.UNAUTHORIZED);
