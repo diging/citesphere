@@ -65,7 +65,7 @@ public class AddNewItemController extends V1Controller {
 
     @Autowired
     private IUploadFileJobManager jobManager;
-    
+
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(List.class, "authors", new PropertyEditorSupport() {
@@ -120,7 +120,7 @@ public class AddNewItemController extends V1Controller {
             }
         });
     }
-    
+
     @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST)
     public ResponseEntity<Object> createNewItem(Principal principal,
             @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles) {
@@ -129,7 +129,7 @@ public class AddNewItemController extends V1Controller {
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        
+
         if(itemWithGiles.getItemType() == null) {
             logger.error("Missing Item Type");
             return new ResponseEntity<>("Error: Missing Item Type", HttpStatus.BAD_REQUEST);
