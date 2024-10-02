@@ -195,5 +195,4 @@ public class AddNewItemController extends V1Controller {
         }
         return new ResponseEntity<>(citation, HttpStatus.OK); 
     }
-
 }
