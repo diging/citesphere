@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
+import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -121,9 +122,7 @@ public class AddNewItemController extends V1Controller {
     
     @RequestMapping(value = "/groups/{groupId}/items/create", method = RequestMethod.POST)
     public ResponseEntity<Object> createNewItem(Principal principal,
-            @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException,
-            ZoteroItemCreationFailedException {
+            @PathVariable("groupId") String zoteroGroupId, @ModelAttribute CitationForm itemWithGiles) {
 
         IUser user = userManager.findByUsername(principal.getName());
         if (user == null) {
@@ -145,9 +144,12 @@ public class AddNewItemController extends V1Controller {
 
         try {
             citation = citationManager.createCitation(user, zoteroGroupId, collectionIds, citation);
-        } catch (ZoteroItemCreationFailedException e) {
+        } catch (ZoteroItemCreationFailedException | ZoteroConnectionException | ZoteroHttpStatusException e) {
             logger.error("Zotero Item creation failed. ", e);
             return new ResponseEntity<>("Error: Zetero Item creation failed. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (GroupDoesNotExistException e) {
+            logger.error("Group " + zoteroGroupId +" does not exists. ", e);
+            return new ResponseEntity<>("Error: Group " + zoteroGroupId +" does not exists. ", HttpStatus.BAD_REQUEST);
         }
 
         if (itemWithGiles.getFiles() != null && itemWithGiles.getFiles().length > 0) {
@@ -170,6 +172,18 @@ public class AddNewItemController extends V1Controller {
                 } catch (IOException e) {
                     logger.error("Could not read file from the request. ", e);
                     return new ResponseEntity<>("Error: Could not read file from the request.", HttpStatus.BAD_REQUEST);
+                } catch (AccessForbiddenException e) {
+                    logger.error("Access Forbidden for uploading files to Giles ", e);
+                    return new ResponseEntity<>("Error: Access Forbidden for uploading files to Giles.", HttpStatus.FORBIDDEN);
+                } catch (ZoteroHttpStatusException e) {
+                    logger.error("Zotero HTTP Status Exception occured ", e);
+                    return new ResponseEntity<>("Error: Zotero HTTP Status Exception occured.", HttpStatus.INTERNAL_SERVER_ERROR);
+                } catch (ZoteroConnectionException e) {
+                    logger.error("Zotero connection failed ", e);
+                    return new ResponseEntity<>("Error: Zotero connection failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+                } catch (ZoteroItemCreationFailedException e) {
+                    logger.error("Zotero Item creation failed ", e);
+                    return new ResponseEntity<>("Error: Zotero Item creation failed.", HttpStatus.INTERNAL_SERVER_ERROR);
                 }
 
                 gilesUtil.createJobObjectNode(root, job);
