@@ -156,19 +156,16 @@ public class AddNewItemController extends V1Controller {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode root = mapper.createObjectNode(); 
             for (int i=0; i<itemWithGiles.getFiles().length; i++) {
-                IGilesUpload job;
                 try {
-                    job = jobManager.createGilesJob(user, itemWithGiles.getFiles()[i], itemWithGiles.getFiles()[i].getBytes(), zoteroGroupId,
+                    IGilesUpload job = jobManager.createGilesJob(user, itemWithGiles.getFiles()[i], itemWithGiles.getFiles()[i].getBytes(), zoteroGroupId,
                             citation.getKey());
+                    gilesUtil.createJobObjectNode(root, job);
                 } catch (GroupDoesNotExistException e) {
                     logger.error("Could not create job because group does not exist.", e);
                     return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.BAD_REQUEST);
-                } catch (CannotFindCitationException e) {
-                    logger.error("Could not find the newly created citation.", e);
-                    return new ResponseEntity<>("Error: Could not find the newly created citation.", HttpStatus.INTERNAL_SERVER_ERROR);
-                } catch (CitationIsOutdatedException e) {
-                    logger.error("Citation outdated. ", e);
-                    return new ResponseEntity<>("Error: Citation outdated.", HttpStatus.BAD_REQUEST);
+                } catch (CannotFindCitationException | CitationIsOutdatedException e) {
+                    logger.error("Error with newly created citation.", e);
+                    return new ResponseEntity<>("Error: Error with newly created citation." + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
                 } catch (IOException e) {
                     logger.error("Could not read file from the request. ", e);
                     return new ResponseEntity<>("Error: Could not read file from the request.", HttpStatus.BAD_REQUEST);
@@ -179,8 +176,6 @@ public class AddNewItemController extends V1Controller {
                     logger.error("Unauthorized to upload files to Giles ", e);
                     return new ResponseEntity<>("Error: Unauthorized to upload files to Giles.", HttpStatus.UNAUTHORIZED);
                 }
-
-                gilesUtil.createJobObjectNode(root, job);
             }
         }
         return new ResponseEntity<>(citation, HttpStatus.OK); 
