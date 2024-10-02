@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.api.v1.V1Controller;
-import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
@@ -173,9 +172,6 @@ public class AddNewItemController extends V1Controller {
                 } catch (IOException e) {
                     logger.error("Could not read file from the request. ", e);
                     return new ResponseEntity<>("Error: Could not read file from the request.", HttpStatus.BAD_REQUEST);
-                } catch (AccessForbiddenException e) {
-                    logger.error("Access Forbidden for uploading files to Giles ", e);
-                    return new ResponseEntity<>("Error: Access Forbidden for uploading files to Giles.", HttpStatus.FORBIDDEN);
                 } catch (ZoteroHttpStatusException | ZoteroConnectionException | ZoteroItemCreationFailedException e) {
                     logger.error("Zotero exception occured ", e);
                     return new ResponseEntity<>("Error: Zotero Exception occured: "+ e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
