@@ -19,12 +19,12 @@ import edu.asu.diging.citesphere.core.exceptions.FileStorageException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.MessageCreationException;
 import edu.asu.diging.citesphere.core.kafka.IKafkaRequestProducer;
-import edu.asu.diging.citesphere.core.model.jobs.IUploadCollectionJob;
+import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
-import edu.asu.diging.citesphere.core.model.jobs.impl.UploadCollectionJob;
+import edu.asu.diging.citesphere.core.model.jobs.impl.UploadJob;
 import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
-import edu.asu.diging.citesphere.core.repository.jobs.UploadCollectionJobRepository;
+import edu.asu.diging.citesphere.core.repository.jobs.UploadJobRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadCollectionJobManager;
 import edu.asu.diging.citesphere.core.service.jwt.IJwtTokenService;
@@ -43,10 +43,10 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Value("${_job_page_size}")
     private int jobPageSize;
-
-    @Autowired
-    private UploadCollectionJobRepository uploadCollectionJobRepository;
     
+    @Autowired
+    private UploadJobRepository uploadJobRepository;
+   
     @Autowired
     private JobRepository jobsRepository;
 
@@ -63,21 +63,21 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
     private IGroupManager groupManager;
     
     @Override
-    public List<IUploadCollectionJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes,
+    public List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes,
             String groupId) throws GroupDoesNotExistException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
             throw new GroupDoesNotExistException();
         }
         
-        List<IUploadCollectionJob> jobs = new ArrayList<>();
+        List<IUploadJob> jobs = new ArrayList<>();
         int i = 0;
         for (MultipartFile f : files) {
             String filename = f.getOriginalFilename();
             System.out.println(filename);
             
             byte[] bytes = null;
-            UploadCollectionJob job = new UploadCollectionJob();
+            UploadJob job = new UploadJob();
             jobs.add(job);
             job.setFilename(filename);
             job.setCreatedOn(OffsetDateTime.now());
@@ -99,7 +99,7 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
                     job.getPhases().add(new JobPhase(JobStatus.FAILURE, "There is not file content."));
                     continue;
                 }
-                job = uploadCollectionJobRepository.save(job);
+                job = uploadJobRepository.save(job);
                 fileManager.saveFile(user.getUsername(), job.getId(), filename, bytes);
 
                 job.setStatus(JobStatus.PREPARED);
@@ -110,7 +110,7 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
                 continue;
             } finally {
                 i++;
-                uploadCollectionJobRepository.save(job);
+                uploadJobRepository.save(job);
             }
 
             String contentType = null;
@@ -126,7 +126,7 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
 
             job.setContentType(contentType);
             job.setFileSize(f.getSize());
-            uploadCollectionJobRepository.save(job);
+            uploadJobRepository.save(job);
             String token = tokenService.generateJobApiToken(job);
             try {
                 kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.COLLECTION_IMPORT_TOPIC);
@@ -134,7 +134,7 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
                 logger.error("Could not send Kafka message.", e);
                 job.setStatus(JobStatus.FAILURE);
                 job.getPhases().add(new JobPhase(JobStatus.FAILURE, e.getMessage()));
-                uploadCollectionJobRepository.save(job);
+                uploadJobRepository.save(job);
             }
         }
 

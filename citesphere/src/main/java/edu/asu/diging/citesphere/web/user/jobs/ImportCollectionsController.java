@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
-import edu.asu.diging.citesphere.core.model.jobs.IUploadCollectionJob;
+import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadCollectionJobManager;
 import edu.asu.diging.citesphere.user.IUser;
@@ -69,7 +69,7 @@ public class ImportCollectionsController {
                 fileBytes.add(null);
             }
         }
-        List<IUploadCollectionJob> jobs;
+        List<IUploadJob> jobs;
         try {
             jobs = jobManager.createUploadJob(user, files, fileBytes, group);
         } catch (GroupDoesNotExistException e) {
@@ -80,7 +80,7 @@ public class ImportCollectionsController {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode();
         ArrayNode filesNode = root.putArray("jobs");
-        for (IUploadCollectionJob job : jobs) {
+        for (IUploadJob job : jobs) {
             ObjectNode jobNode = mapper.createObjectNode();
             jobNode.put("jobId", job.getId());
             jobNode.put("filename", job.getFilename());
