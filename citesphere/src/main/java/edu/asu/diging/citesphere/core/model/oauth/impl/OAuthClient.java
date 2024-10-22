@@ -50,7 +50,7 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
     private int accessTokenValiditySeconds;
     private int refereshTokenValiditySeconds;
     private boolean autoApprove;
-    @OneToOne(cascade=CascadeType.ALL, targetEntity=User.class)
+
     private IUser createdBy;
     
     @Override
