@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -155,9 +156,9 @@ public class AddNewItemController extends V1Controller {
         if (itemWithGiles.getFiles() != null && itemWithGiles.getFiles().length > 0) {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode root = mapper.createObjectNode(); 
-            for (int i=0; i<itemWithGiles.getFiles().length; i++) {
+            for (MultipartFile file: itemWithGiles.getFiles()) {
                 try {
-                    IGilesUpload job = jobManager.createGilesJob(user, itemWithGiles.getFiles()[i], itemWithGiles.getFiles()[i].getBytes(), zoteroGroupId,
+                    IGilesUpload job = jobManager.createGilesJob(user, file, file.getBytes(), zoteroGroupId,
                             citation.getKey());
                     gilesUtil.createJobObjectNode(root, job);
                 } catch (GroupDoesNotExistException e) {
