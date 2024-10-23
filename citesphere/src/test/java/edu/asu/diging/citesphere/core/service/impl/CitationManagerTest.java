@@ -1,10 +1,16 @@
 package edu.asu.diging.citesphere.core.service.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.bson.types.ObjectId;
 import org.junit.Assert;
@@ -21,6 +27,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.SelfCitationException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
@@ -30,9 +37,11 @@ import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IReference;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.impl.Reference;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
@@ -71,7 +80,13 @@ public class CitationManagerTest {
     ICitationGroup group;
     private ICitationGroup group1;
     private ICitationGroup group2;
-        
+    private ICitation citation;
+    private final String REFERENCE = "reference";
+    private final String CITATION_KEY = "citationKey";
+    private ICitation updatedCitation;
+    private  Set<IReference> references;
+    private IReference reference;
+
     @Before
     public void setUp() throws ZoteroHttpStatusException {
         MockitoAnnotations.initMocks(this);
@@ -104,6 +119,17 @@ public class CitationManagerTest {
         group2.setContentVersion(3L);
         Mockito.when(groupRepository.findFirstByGroupId(GROUP2_ID)).thenReturn(Optional.of((CitationGroup)group2));
         
+        citation = new Citation();
+        citation.setKey(CITATION_KEY);
+        citation.setReferences(new HashSet<>());
+        
+        updatedCitation = new Citation();
+        updatedCitation.setKey(CITATION_KEY);
+        references = new HashSet<>();
+        reference = new Reference();
+        reference.setReferenceString(REFERENCE);
+        references.add(reference);
+        updatedCitation.setReferences(references);
     }
     
     @Test
@@ -448,5 +474,55 @@ public class CitationManagerTest {
         
         List<ICitation> response = managerToTest.getNotes(user, GROUP_ID, EXISTING_ID);
         Assert.assertTrue(response.size() == 0);
+    }
+
+    @Test
+    public void test_addCitationToReferences_citationFound() throws SelfCitationException, ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
+        String referenceCitationKey = "referenceCitationKey";
+        citation.getReferences().add(reference);
+        citation.setVersion(1L);
+        
+        Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, CITATION_KEY)).thenReturn(currentVersion);
+        ICitation updatedCitation = new Citation();
+        updatedCitation.setKey(CITATION_KEY);
+        updatedCitation.setVersion(new Long(2));
+        Mockito.when(zoteroManager.updateCitation(user, GROUP_ID, citation)).thenReturn(updatedCitation);
+        
+        when(citationStore.save(citation)).thenReturn(updatedCitation);
+        when(citationStore.findById(citation.getKey())).thenReturn(Optional.of(citation));
+        doNothing().when(citationStore).delete(any(ICitation.class));
+        
+        when(citationStore.save(citation)).thenReturn(updatedCitation);
+        ICitation result = managerToTest.addCitationToReferences(user, citation, GROUP_ID, referenceCitationKey, REFERENCE);
+        Assert.assertEquals(updatedCitation, result);
+    }
+
+    @Test
+    public void test_addCitationToReferences_nullReferences() throws SelfCitationException, ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
+        String referenceCitationKey = "referenceCitationKey";
+        citation.setReferences(null);
+        citation.setVersion(1L);
+        
+        Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, CITATION_KEY)).thenReturn(currentVersion);
+        ICitation updatedCitation = new Citation();
+        updatedCitation.setKey(CITATION_KEY);
+        updatedCitation.setVersion(new Long(2));
+        Mockito.when(zoteroManager.updateCitation(user, GROUP_ID, citation)).thenReturn(updatedCitation);
+        
+        when(citationStore.save(citation)).thenReturn(updatedCitation);
+        when(citationStore.findById(citation.getKey())).thenReturn(Optional.of(citation));
+        doNothing().when(citationStore).delete(any(ICitation.class));
+
+        ICitation result = managerToTest.addCitationToReferences(user, citation, GROUP_ID, referenceCitationKey, REFERENCE);
+        Assert.assertEquals(updatedCitation, result);
+    }
+
+    @Test(expected = SelfCitationException.class)
+    public void test_addCitationToReferences_selfCitation() throws SelfCitationException, ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
+        String referenceCitationKey = CITATION_KEY;
+        updatedCitation.setReferences(references);
+        
+        when(citationStore.save(citation)).thenReturn(updatedCitation);
+        ICitation result = managerToTest.addCitationToReferences(user, citation, GROUP_ID, referenceCitationKey, REFERENCE);        
     }
 }
