@@ -1,8 +1,6 @@
 package edu.asu.diging.citesphere.api.v1.user;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -15,6 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.core.export.IExportTaskManager;
 import edu.asu.diging.citesphere.core.model.IZoteroToken;
@@ -48,17 +51,17 @@ public class JobInfoController extends BaseJobInfoController {
     @Autowired
     private IExportTaskManager exportTaskManager; 
     
-    private Map<Class<?>, BiConsumer<Map<String, Object>, Object>> jobHandlers = new HashMap<>();
+    private Map<Class<?>, BiConsumer<ObjectNode, Object>> jobHandlers = new HashMap<>();
 
     public JobInfoController() {
         // Map each job class to its respective handling method
-        jobHandlers.put(UploadJob.class, (response, job) -> handleUploadJob(response, (IUploadJob) job));
-        jobHandlers.put(ExportJob.class, (response, job) -> handleExportJob(response, (IExportJob) job));
-        jobHandlers.put(ImportCrossrefJob.class, (response, job) -> handleImportCrossrefJob(response, (IImportCrossrefJob) job));
+        jobHandlers.put(UploadJob.class, (node, job) -> handleUploadJob(node, (IUploadJob) job));
+        jobHandlers.put(ExportJob.class, (node, job) -> handleExportJob(node, (IExportJob) job));
+        jobHandlers.put(ImportCrossrefJob.class, (node, job) -> handleImportCrossrefJob(node, (IImportCrossrefJob) job));
     }
     
     @RequestMapping(value="/job/info")
-    public ResponseEntity<String> getProfile(@RequestHeader HttpHeaders headers) {
+    public ResponseEntity<String> getProfile(@RequestHeader HttpHeaders headers) throws JsonProcessingException {
         ResponseEntity<String> entity = checkForToken(headers);
         if (entity != null) {
             return entity;
@@ -72,37 +75,40 @@ public class JobInfoController extends BaseJobInfoController {
                 
         IJob job = jobManager.findJob(tokenContents.getJobId());
         IZoteroToken zoteroToken = tokenManager.getToken(userManager.findByUsername(job.getUsername()));
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("zotero", zoteroToken.getToken());
-        response.put("zoteroId", zoteroToken.getUserId());
-        response.put("username", job.getUsername());
-        BiConsumer<Map<String, Object>, Object> handler = jobHandlers.get(job.getClass());
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+        node.put("zotero", zoteroToken.getToken());
+        node.put("zoteroId", zoteroToken.getUserId());
+        node.put("username", job.getUsername());
+        BiConsumer<ObjectNode, Object> handler = jobHandlers.get(job.getClass());
         if (handler != null) {
-            handler.accept(response, job);
+            handler.accept(node, job);
         } else {
             logger.error("No handler found for job type: " + job.getClass());
             return new ResponseEntity<>("No handler found for job type: " + job.getClass(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
-        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
-    }
-    
-    private void handleUploadJob(Map<String, Object> response, IUploadJob job) {
-        response.put("groupId", job.getCitationGroup());
+
+        return new ResponseEntity<>(node.toString(), HttpStatus.OK);
     }
 
-    private void handleExportJob(Map<String, Object> response, IExportJob job) {
+    private void handleUploadJob(ObjectNode node, IUploadJob job) {
+        node.put("groupId", job.getCitationGroup());
+    }
+
+    private void handleExportJob(ObjectNode node, IExportJob job) {
         IExportTask exportTask = exportTaskManager.get(job.getTaskId());
-        response.put("groupId", exportTask.getGroupId());
-        response.put("collectionId", exportTask.getCollectionId());
-        response.put("exportType", exportTask.getExportType().name());
-        response.put("taskId", exportTask.getId());
+        node.put("groupId", exportTask.getGroupId());
+        node.put("collectionId", exportTask.getCollectionId());
+        node.put("exportType", exportTask.getExportType().name());
+        node.put("taskId", exportTask.getId());
     }
 
-    private void handleImportCrossrefJob(Map<String, Object> response, IImportCrossrefJob job) {
-        List<String> doisList = new ArrayList<>(job.getDois());
-        response.put("dois", doisList);
-        response.put("groupId", job.getCitationGroup());
+    @SuppressWarnings("deprecation")
+    private void handleImportCrossrefJob(ObjectNode node, IImportCrossrefJob job) {
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode arrayNode = mapper.valueToTree(job.getDois());
+        node.put("dois", arrayNode);
+        node.put("groupId", job.getCitationGroup());
     }
 }
