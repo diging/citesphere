@@ -188,7 +188,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         }
 
         @Override
-        public void configure(HttpSecurity http) throws Exception {
+        public void configure(HttpSecurity http) throws Exception {     
             http.csrf().disable().authorizeRequests().antMatchers("/api/**").authenticated().and().exceptionHandling()
                     .accessDeniedHandler(new OAuth2AccessDeniedHandler());
         }
