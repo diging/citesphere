@@ -383,7 +383,7 @@ public class CitationManager implements ICitationManager {
 
         ICitationGroup group = null;
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-        if (!groupOptional.isPresent()) {
+        if (!groupOptional.isPresent() || !groupOptional.get().getUsers().contains(user.getUsername())) {
             group = zoteroManager.getGroup(user, groupId, false);
             if (group != null) {
                 group.getUsers().add(user.getUsername());
@@ -406,14 +406,14 @@ public class CitationManager implements ICitationManager {
             long previousVersion = group.getContentVersion();
             // first update the group info
             // if we are using a previously stored group, delete it
-            ICitationGroup zeteroGroup = null;
+            ICitationGroup zoteroGroup = null;
             if (group.getId() != null) {
-                zeteroGroup = zoteroManager.getGroup(user, groupId + "", true);
-                zeteroGroup.setId(group.getId());
+                zoteroGroup = zoteroManager.getGroup(user, groupId + "", true);
+                zoteroGroup.setId(group.getId());
             }
-            zeteroGroup.setUpdatedOn(OffsetDateTime.now().toString());
-            addUserToGroup(zeteroGroup, user);
-            group = groupRepository.save((CitationGroup) zeteroGroup);
+            zoteroGroup.setUpdatedOn(OffsetDateTime.now().toString());
+            addUserToGroup(zoteroGroup, user);
+            group = groupRepository.save((CitationGroup) zoteroGroup);
 
             // then update content
             results.setNotModified(false);

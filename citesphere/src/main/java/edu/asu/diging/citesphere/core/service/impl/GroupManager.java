@@ -42,7 +42,7 @@ public class GroupManager implements IGroupManager {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (groupOptional.isPresent() && groupOptional.get().getUsers().contains(user.getUsername())) {
             return (ICitationGroup) groupOptional.get();
-
+        }
         ICitationGroup group = zoteroManager.getGroup(user, groupId, false);
         if (group != null) {
             group.getUsers().add(user.getUsername());
