@@ -45,6 +45,9 @@ public class GroupManager implements IGroupManager {
         }
         ICitationGroup group = zoteroManager.getGroup(user, groupId, false);
         if (group != null) {
+            if (groupOptional.isPresent()) {
+                group.setId(groupOptional.get().getId()); 
+            }
             group.getUsers().add(user.getUsername());
             groupRepository.save((CitationGroup) group);
             return group;

@@ -386,14 +386,14 @@ public class CitationManager implements ICitationManager {
         if (!groupOptional.isPresent() || !groupOptional.get().getUsers().contains(user.getUsername())) {
             group = zoteroManager.getGroup(user, groupId, false);
             if (group != null) {
+                if (groupOptional.isPresent()){
+                    group.setId(groupOptional.get().getId());
+                }
                 group.getUsers().add(user.getUsername());
                 groupRepository.save((CitationGroup) group);
             }
         } else {
             group = groupOptional.get();
-            if (!group.getUsers().contains(user.getUsername())){
-                group.getUsers().add(user.getUsername());
-            }
         }
 
         if (group == null) {
