@@ -27,6 +27,23 @@
 		$(document).ready(function() {
 		    var dropZone = document.getElementById('drop-zone');
 		    var uploadForm = document.getElementById('js-upload-form');
+
+			var groupSelect = document.getElementById('groupSelect');
+			
+			groupSelect.addEventListener("change", function() {
+				console.log(groupSelect.value);
+				$.ajax({
+					type: "GET",
+					url: "/groups/[(${groupId})]/collections",   // not working
+					cache       : false,
+			        contentType : false,
+			        processData : false,
+			        enctype: 'application/json', 
+			        success: function(data) {
+						console.log(data);
+					}
+				});
+			})
 		    
 		    var startUpload = function(files) {
 		    	var formData = new FormData();
@@ -43,7 +60,7 @@
 			        enctype: 'multipart/form-data',
 			        data: formData, 
 			        success: function(data) {
-			        	/*var uploadedFilesList = $("#uploaded-files-list");
+			        	var uploadedFilesList = $("#uploaded-files-list");
 			        	var jobs = JSON.parse(data);
 			        	$.each(jobs["jobs"], function(i, obj) {
 			        		if (obj.status == "PREPARED") {
@@ -61,7 +78,7 @@
 				        		uploadedFilesList.append(successBox);
 			        		}
 			        	});
-			        	$("#js-upload-form")[0].reset(); */
+			        	$("#js-upload-form")[0].reset(); 
 			        }
 				});
 		    }
@@ -121,6 +138,15 @@
 						id="js-upload-form">
 						<div class="form-inline" style="padding-bottom: 20px;">
 							<label>Select Group for Upload: </label> <select id="groupSelect"
+								name="group" class="form-control">
+								<option value="">Please select one</option>
+								<option th:each="citGroup:${groups}"
+									th:value="${citGroup.groupId}">[[${citGroup.name}]]</option>
+							</select>
+						</div>
+
+						<div class="form-inline" style="padding-bottom: 20px;">
+							<label>Select Collection for Upload: </label> <select id="collectionSelect"
 								name="group" class="form-control">
 								<option value="">Please select one</option>
 								<option th:each="citGroup:${groups}"
