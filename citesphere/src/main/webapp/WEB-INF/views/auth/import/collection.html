@@ -32,13 +32,12 @@
 			
 			groupSelect.addEventListener("change", function() {
 				console.log(groupSelect.value);
+				var groupVal = groupSelect.value
 				$.ajax({
+					dataType: "json",
 					type: "GET",
-					url: "/groups/[(${groupId})]/collections",   // not working
-					cache       : false,
-			        contentType : false,
-			        processData : false,
-			        enctype: 'application/json', 
+					url: [[@{|/auth/import/collection/getgroupcollections|}]] + '?groupId=' + groupVal, 
+					async       : false,
 			        success: function(data) {
 						console.log(data);
 					}

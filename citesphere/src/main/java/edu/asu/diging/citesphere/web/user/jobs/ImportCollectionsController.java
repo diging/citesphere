@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,10 +24,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.asu.diging.citesphere.api.v1.model.impl.Collections;
+import edu.asu.diging.citesphere.api.v1.user.JsonUtil;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
+import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
+import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadCollectionJobManager;
+import edu.asu.diging.citesphere.core.user.IUserManager;
+import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
@@ -40,10 +47,45 @@ public class ImportCollectionsController {
     @Autowired
     private ICitationManager citationManager;
     
+    @Autowired
+    private ICitationCollectionManager collectionManager;
+
+    @Autowired
+    private IGroupManager groupManager;
+
+    @Autowired
+    private IUserManager userManager;
+    
+
+    @Autowired
+    private JsonUtil jsonUtil;
+    
     @RequestMapping(value = "/auth/import/collection", method = RequestMethod.GET)
     public String show(Model model, Authentication authentication) {
         model.addAttribute("groups", citationManager.getGroups((IUser)authentication.getPrincipal()));
         return "auth/import/collection";
+    }
+    
+    @RequestMapping(value = "/auth/import/collection/getgroupcollections", method = RequestMethod.GET)
+    public ResponseEntity<Collections> getCollections( @RequestParam("groupId") String groupId, Authentication authentication) {
+        IUser user = (IUser)authentication.getPrincipal();
+
+        ICitationGroup group = groupManager.getGroup(user, groupId);
+        if (group == null) {
+            return new ResponseEntity<Collections>(HttpStatus.NOT_FOUND);
+        }
+
+        Collections collectionResponse = new Collections();
+        collectionResponse.setGroup(jsonUtil.createGroup(group));
+//        collectionResponse.getGroup().setSyncInfo(getSyncInfo(group));
+        try {
+            collectionResponse.setCollections(
+                    collectionManager.getAllCollections(user, groupId, "", "title", new Integer("20")));
+        } catch (NumberFormatException | GroupDoesNotExistException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return new ResponseEntity<Collections>(collectionResponse, HttpStatus.OK);
     }
     
     @RequestMapping(value = "/auth/import/collection", method = RequestMethod.POST)
