@@ -14,6 +14,7 @@ public class UploadJob extends Job implements IUploadJob {
     private long fileSize;
     private String contentType;
     private String citationGroup;
+    private String citationCollection;
     @Transient
     private ICitationGroup citationGroupDetail;
     
@@ -55,6 +56,14 @@ public class UploadJob extends Job implements IUploadJob {
     @Override
     public void setCitationGroup(String citationGroup) {
         this.citationGroup = citationGroup;
+    }
+    @Override
+    public String getCitationCollection() {
+        return citationCollection;
+    }
+    @Override
+    public void setCitationCollection(String citationCollection) {
+        this.citationCollection = citationCollection;
     }
     @Override
     public ICitationGroup getCitationGroupDetail() {

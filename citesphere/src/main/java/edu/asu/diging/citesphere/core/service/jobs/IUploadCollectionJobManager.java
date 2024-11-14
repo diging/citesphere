@@ -10,7 +10,7 @@ import edu.asu.diging.citesphere.user.IUser;
 
 public interface IUploadCollectionJobManager {
     
-    List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes, String groupId) throws GroupDoesNotExistException;
+    List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes, String groupId, String collectionId) throws GroupDoesNotExistException;
 
 
 }

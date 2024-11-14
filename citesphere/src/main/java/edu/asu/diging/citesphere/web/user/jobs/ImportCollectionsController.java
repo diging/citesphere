@@ -80,7 +80,7 @@ public class ImportCollectionsController {
 //        collectionResponse.getGroup().setSyncInfo(getSyncInfo(group));
         try {
             collectionResponse.setCollections(
-                    collectionManager.getAllCollections(user, groupId, "", "title", new Integer("20")));
+                    collectionManager.getAllCollections(user, groupId, null, "title", new Integer("20")));
         } catch (NumberFormatException | GroupDoesNotExistException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -90,7 +90,7 @@ public class ImportCollectionsController {
     
     @RequestMapping(value = "/auth/import/collection", method = RequestMethod.POST)
     public ResponseEntity<String> uploadCollection(Principal principal, @RequestParam("group") String group,
-            @RequestParam("files") MultipartFile[] files) {
+            @RequestParam("collectionId") String collectionId, @RequestParam("files") MultipartFile[] files) {
 
         User user = null;
         if (principal instanceof UsernamePasswordAuthenticationToken) {
@@ -113,7 +113,7 @@ public class ImportCollectionsController {
         }
         List<IUploadJob> jobs;
         try {
-            jobs = jobManager.createUploadJob(user, files, fileBytes, group);
+            jobs = jobManager.createUploadJob(user, files, fileBytes, group, collectionId);
         } catch (GroupDoesNotExistException e) {
             logger.error("Could not create job because group does not exist.", e);
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);

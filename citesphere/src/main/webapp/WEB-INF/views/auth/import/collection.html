@@ -29,6 +29,7 @@
 		    var uploadForm = document.getElementById('js-upload-form');
 
 			var groupSelect = document.getElementById('groupSelect');
+			var collectionSelect = document.getElementById('collectionSelect');
 			
 			groupSelect.addEventListener("change", function() {
 				console.log(groupSelect.value);
@@ -40,6 +41,14 @@
 					async       : false,
 			        success: function(data) {
 						console.log(data);
+						collectionSelect.innerHTML = '';
+
+			            data.collections.forEach(function(collection) {
+			                var option = document.createElement("option");
+			                option.value = collection.id; 
+			                option.text = collection.name; 
+			                collectionSelect.appendChild(option);
+			            });
 					}
 				});
 			})

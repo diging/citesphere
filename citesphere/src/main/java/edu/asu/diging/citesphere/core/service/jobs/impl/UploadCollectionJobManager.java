@@ -64,7 +64,7 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Override
     public List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes,
-            String groupId) throws GroupDoesNotExistException {
+            String groupId, String collectionId) throws GroupDoesNotExistException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
             throw new GroupDoesNotExistException();
@@ -83,6 +83,7 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
             job.setCreatedOn(OffsetDateTime.now());
             job.setUsername(user.getUsername());
             job.setCitationGroup(groupId);
+            job.setCitationCollection(collectionId);
             job.setPhases(new ArrayList<>());
             try {
                 if (fileBytes != null && fileBytes.size() == files.length) {
