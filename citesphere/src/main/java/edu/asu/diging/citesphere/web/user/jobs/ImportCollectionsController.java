@@ -77,12 +77,10 @@ public class ImportCollectionsController {
 
         Collections collectionResponse = new Collections();
         collectionResponse.setGroup(jsonUtil.createGroup(group));
-//        collectionResponse.getGroup().setSyncInfo(getSyncInfo(group));
         try {
             collectionResponse.setCollections(
                     collectionManager.getAllCollections(user, groupId, null, "title", new Integer("20")));
         } catch (NumberFormatException | GroupDoesNotExistException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return new ResponseEntity<Collections>(collectionResponse, HttpStatus.OK);

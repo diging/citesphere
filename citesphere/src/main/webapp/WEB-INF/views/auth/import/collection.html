@@ -32,20 +32,18 @@
 			var collectionSelect = document.getElementById('collectionSelect');
 			
 			groupSelect.addEventListener("change", function() {
-				console.log(groupSelect.value);
 				var groupVal = groupSelect.value
 				$.ajax({
 					dataType: "json",
 					type: "GET",
 					url: [[@{|/auth/import/collection/getgroupcollections|}]] + '?groupId=' + groupVal, 
-					async       : false,
+					async : false,
 			        success: function(data) {
-						console.log(data);
 						collectionSelect.innerHTML = '';
 
 			            data.collections.forEach(function(collection) {
 			                var option = document.createElement("option");
-			                option.value = collection.id; 
+			                option.value = collection.key; 
 			                option.text = collection.name; 
 			                collectionSelect.appendChild(option);
 			            });
@@ -56,6 +54,7 @@
 		    var startUpload = function(files) {
 		    	var formData = new FormData();
 		    	formData.append("group", $("#groupSelect option:selected").val());
+		    	formData.append("collectionId", $("#collectionSelect option:selected").val());
 		    	for (var i = 0; i < files.length; i++) {
 		    		formData.append("files", files[i]);
 		    	}

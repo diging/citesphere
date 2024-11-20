@@ -62,6 +62,7 @@ public class JobInfoController extends BaseJobInfoController {
         // FIXME: ugly, needs better solution
         if (job instanceof IUploadJob) {
             node.put("groupId", ((IUploadJob)job).getCitationGroup());
+            node.put("collectionId", ((IUploadJob)job).getCitationCollection());
         }
         if (job instanceof IExportJob) {
             IExportTask exportTask = exportTaskManager.get(((IExportJob)job).getTaskId());
