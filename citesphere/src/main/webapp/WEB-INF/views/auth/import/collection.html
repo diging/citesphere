@@ -40,6 +40,16 @@
 					async : false,
 			        success: function(data) {
 						collectionSelect.innerHTML = '';
+						
+			            var option = document.createElement("option");
+		                option.value = ''; 
+		                option.text = ''; 
+		                collectionSelect.appendChild(option);
+		                
+		                var option = document.createElement("option");
+		                option.value = 'new'; 
+		                option.text = 'New Collection'; 
+		                collectionSelect.appendChild(option);
 
 			            data.collections.forEach(function(collection) {
 			                var option = document.createElement("option");

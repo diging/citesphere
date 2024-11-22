@@ -99,6 +99,10 @@ public class ImportCollectionsController {
         if (user == null) {
             return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
         }
+        
+        if (collectionId.equals("new")) {
+            // TODO: Add logic to create collection, Add it to spring-social-zotero as well.
+        }
 
         List<byte[]> fileBytes = new ArrayList<>();
         for (MultipartFile file : files) {
