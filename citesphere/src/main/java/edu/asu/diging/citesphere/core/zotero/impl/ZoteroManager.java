@@ -538,4 +538,11 @@ public class ZoteroManager implements IZoteroManager {
             throws ZoteroConnectionException, ZoteroHttpStatusException {
         return zoteroConnector.deleteMultipleItems(user, groupId, citationKeys, citationVersion);
     }
+
+    @Override
+    public ICitationCollection createCitationCollection(IUser user, String groupId, String collectionName,
+            String parentCollection) {
+        Collection collection = zoteroConnector.createCitationCollection(user, groupId, collectionName, parentCollection);
+        return collectionFactory.createCitationCollection(collection);
+    }
 }

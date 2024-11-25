@@ -15,8 +15,10 @@ import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationCollectionRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICollectionMongoDao;
+import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollectionResult;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -106,5 +108,22 @@ public class CitationCollectionManager implements ICitationCollectionManager {
     @Override
     public void deleteLocalGroupCollections(String groupId) {
         collectionRepository.deleteByGroupId(groupId);
+    }
+
+    @Override
+    public ICitationCollection createCollection(IUser user, String groupId, String collectionName, String parentCollection) throws GroupDoesNotExistException {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
+        if (!groupOptional.isPresent()) {
+            throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
+        }
+        if(parentCollection != null) {
+            Optional<ICitationCollection> collectionOptional = collectionRepository.findByKey(parentCollection);
+            if (!collectionOptional.isPresent()) {
+                throw new GroupDoesNotExistException("Collection with id " + parentCollection + " does not exist.");
+            }
+        }
+
+        CitationCollection newCollection = (CitationCollection) zoteroManager.createCitationCollection(user, groupId, collectionName, parentCollection);
+        return collectionRepository.save(newCollection);
     }
 }

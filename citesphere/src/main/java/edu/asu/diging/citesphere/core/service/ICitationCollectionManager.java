@@ -20,5 +20,7 @@ public interface ICitationCollectionManager {
             throws GroupDoesNotExistException;
     
     void deleteLocalGroupCollections(String groupId);
+    
+    ICitationCollection createCollection(IUser user, String groupId, String collectionName, String parentCollection) throws GroupDoesNotExistException;
 
 }
