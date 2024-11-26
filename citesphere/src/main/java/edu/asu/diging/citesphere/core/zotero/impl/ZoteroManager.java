@@ -541,7 +541,7 @@ public class ZoteroManager implements IZoteroManager {
 
     @Override
     public ICitationCollection createCitationCollection(IUser user, String groupId, String collectionName,
-            String parentCollection) {
+            String parentCollection) throws ZoteroItemCreationFailedException, ZoteroConnectionException {
         Collection collection = zoteroConnector.createCitationCollection(user, groupId, collectionName, parentCollection);
         return collectionFactory.createCitationCollection(collection);
     }

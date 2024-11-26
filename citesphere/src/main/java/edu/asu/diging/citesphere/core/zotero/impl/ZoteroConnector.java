@@ -369,4 +369,29 @@ public class ZoteroConnector implements IZoteroConnector {
         Zotero zotero = getApi(user);
         return zotero.getGroupsOperations().deleteMultipleItems(groupId, citationKeys, citationVersion);        
     }
+
+    @Override
+    public Collection createCitationCollection(IUser user, String groupId, String collectionName,
+            String parentCollection) throws ZoteroItemCreationFailedException, ZoteroConnectionException {
+        Zotero zotero = getApi(user);
+        
+        ItemCreationResponse response = zotero.getGroupCollectionsOperations().createCollection(groupId, collectionName, parentCollection);
+        
+        // let's give Zotero a minute to process
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            logger.error("Could not sleep.", e);
+            // well if something goes wrong here, let's just ignore it
+        }
+        
+        Map<String, String> success = response.getSuccess();
+        if (success.isEmpty()) {
+            logger.error("Could not create collection: " + response.getFailed().get("0"));
+            throw new ZoteroItemCreationFailedException(response);
+        }
+
+        // since we only submitted one item, there should only be one in the map
+        return getCitationCollection(user, groupId, success.values().iterator().next());
+    }
 }

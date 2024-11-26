@@ -86,5 +86,5 @@ public interface IZoteroConnector {
     Map<ItemDeletionResponse, List<String>> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
 
     Collection createCitationCollection(IUser user, String groupId, String collectionName,
-            String parentCollection);
+            String parentCollection) throws ZoteroItemCreationFailedException, ZoteroConnectionException;
 }

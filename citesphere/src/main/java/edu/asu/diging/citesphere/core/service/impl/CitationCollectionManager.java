@@ -7,15 +7,16 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationCollectionRepository;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICollectionMongoDao;
-import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationCollection;
@@ -111,7 +112,8 @@ public class CitationCollectionManager implements ICitationCollectionManager {
     }
 
     @Override
-    public ICitationCollection createCollection(IUser user, String groupId, String collectionName, String parentCollection) throws GroupDoesNotExistException {
+    public ICitationCollection createCollection(IUser user, String groupId, String collectionName, String parentCollection) 
+            throws GroupDoesNotExistException, ZoteroItemCreationFailedException, ZoteroConnectionException {
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent()) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
@@ -123,7 +125,7 @@ public class CitationCollectionManager implements ICitationCollectionManager {
             }
         }
 
-        CitationCollection newCollection = (CitationCollection) zoteroManager.createCitationCollection(user, groupId, collectionName, parentCollection);
-        return collectionRepository.save(newCollection);
+        ICitationCollection newCollection = zoteroManager.createCitationCollection(user, groupId, collectionName, parentCollection);
+        return collectionRepository.save((CitationCollection)newCollection);
     }
 }

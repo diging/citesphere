@@ -74,7 +74,6 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
         int i = 0;
         for (MultipartFile f : files) {
             String filename = f.getOriginalFilename();
-            System.out.println(filename);
             
             byte[] bytes = null;
             UploadJob job = new UploadJob();
