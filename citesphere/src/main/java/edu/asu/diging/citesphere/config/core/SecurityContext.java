@@ -43,6 +43,7 @@ import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
 import edu.asu.diging.citesphere.core.service.impl.DbTokenStore;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
+import edu.asu.diging.citesphere.core.service.oauth.InternalTokenManager;
 import edu.asu.diging.citesphere.core.service.oauth.impl.OAuthClientManager;
 
 @Configuration
@@ -65,10 +66,13 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private DbRefreshTokenRepository refreshTokenRepo;
-
+    
+    @Autowired
+    private InternalTokenManager internalTokenManager;
+    
     @Value("${_oauth_token_validity}")
     private int oauthTokenValidity;
-
+    
     @Override
     public void configure(WebSecurity web) throws Exception {
         web
@@ -188,7 +192,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
         }
 
         @Override
-        public void configure(HttpSecurity http) throws Exception {
+        public void configure(HttpSecurity http) throws Exception {     
             http.csrf().disable().authorizeRequests().antMatchers("/api/**").authenticated().and().exceptionHandling()
                     .accessDeniedHandler(new OAuth2AccessDeniedHandler());
         }
@@ -212,11 +216,11 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Bean
     public OAuth2AuthenticationManager oauth2AuthenticationManager() {
-        DefaultTokenServices tokenServices = new DefaultTokenServices();
-        tokenServices.setTokenStore(tokenStore());
+        //DefaultTokenServices tokenServices = new DefaultTokenServices();
+        //tokenServices.setTokenStore(tokenStore());
         OAuth2AuthenticationManager manager = new OAuth2AuthenticationManager();
         manager.setClientDetailsService(clientDetailsService());
-        manager.setTokenServices(tokenServices);
+        manager.setTokenServices(internalTokenManager); //tokenServices);
         return manager;
     }
 

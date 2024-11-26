@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
@@ -29,8 +28,8 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
-import edu.asu.diging.citesphere.core.model.jobs.IUploadFileJob;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadFileJobManager;
+import edu.asu.diging.citesphere.core.util.IGilesUtil;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.user.impl.User;
 
@@ -41,6 +40,9 @@ public class UploadItemFileController {
 
     @Autowired
     private IUploadFileJobManager jobManager;
+    
+    @Autowired
+    private IGilesUtil gilesUtil;
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/{itemId}/files/upload", method = RequestMethod.POST)
     public ResponseEntity<String> uploadFile(Principal principal, @PathVariable String zoteroGroupId,
@@ -65,7 +67,7 @@ public class UploadItemFileController {
                 fileBytes.add(null);
             }
         }
-
+        
         IGilesUpload job;
         try {
             job = jobManager.createGilesJob(user, files[0], fileBytes.get(0), zoteroGroupId, itemId);
@@ -75,11 +77,8 @@ public class UploadItemFileController {
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode root = mapper.createObjectNode();
-        ArrayNode filesNode = root.putArray("jobs");
-        ObjectNode jobNode = mapper.createObjectNode();
-        jobNode.put("jobId", job.getProgressId());
-        filesNode.add(jobNode);
+        ObjectNode root = mapper.createObjectNode(); 
+        gilesUtil.createJobObjectNode(root, job);
 
         return new ResponseEntity<String>(root.toString(), HttpStatus.OK);
     }
