@@ -38,4 +38,6 @@ public interface ICitationStore {
     
     List<ICitation> findByGilesDocumentId(String documentId);
 
+    List<ICitation> findByGilesProgressId(String progressId);
+
 }
