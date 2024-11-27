@@ -216,11 +216,11 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Bean
     public OAuth2AuthenticationManager oauth2AuthenticationManager() {
-        //DefaultTokenServices tokenServices = new DefaultTokenServices();
-        //tokenServices.setTokenStore(tokenStore());
+        DefaultTokenServices tokenServices = new DefaultTokenServices();
+        tokenServices.setTokenStore(tokenStore());
         OAuth2AuthenticationManager manager = new OAuth2AuthenticationManager();
         manager.setClientDetailsService(clientDetailsService());
-        manager.setTokenServices(internalTokenManager); //tokenServices);
+        manager.setTokenServices(tokenServices);
         return manager;
     }
 
