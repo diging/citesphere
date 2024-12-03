@@ -31,9 +31,9 @@ public class CheckAccessController extends V1Controller {
     @Autowired
     private IGroupManager groupManager;
 
-    @RequestMapping(value = { "/files/giles/{documentId}/access/check" }, produces = {
+    @RequestMapping(value = { "/files/giles/{documentId}/access/check", "/files/giles/progress/{progressId}/access/check" }, produces = {
         MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<String> checkAccess(@PathVariable("documentId") String documentId, @RequestParam("username") String username, Principal principal) {
+    public ResponseEntity<String> checkAccess(@PathVariable(value="documentId", required = false) String documentId, @PathVariable(value="progressId", required = false) String progressId, @RequestParam("username") String username, Principal principal) {
         
         List<String> authorities = ((OAuth2Authentication)principal).getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList());
         if (!authorities.contains(Role.TRUSTED_CLIENT.toString())) {
@@ -44,7 +44,14 @@ public class CheckAccessController extends V1Controller {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
             
-        List<ICitation> citations = citationStore.findByGilesDocumentId(documentId);
+        List<ICitation> citations = null;
+        if (documentId != null) {
+            citations = citationStore.findByGilesDocumentId(documentId);
+        } else if (progressId != null) {
+            citations = citationStore.findByGilesProgressId(progressId);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         for (ICitation citation : citations) {
             String groupId = citation.getGroup();
             List<ICitationGroup> groups = groupManager.getGroupInstancesForGroupId(groupId);
