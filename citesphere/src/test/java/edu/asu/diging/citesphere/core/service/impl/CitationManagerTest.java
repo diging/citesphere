@@ -489,7 +489,7 @@ public class CitationManagerTest {
         updatedCitation.setVersion(new Long(2));
        
         when(zoteroManager.updateCitation(Mockito.eq(user), Mockito.eq(GROUP_ID), Mockito.any(ICitation.class)))
-        .thenReturn(updatedCitation);
+            .thenReturn(updatedCitation);
         
         when(citationStore.save(citation)).thenReturn(updatedCitation);
         when(citationStore.findById(citation.getKey())).thenReturn(Optional.of(citation));
@@ -513,7 +513,7 @@ public class CitationManagerTest {
         updatedCitation.setVersion(2L);
 
         when(zoteroManager.updateCitation(Mockito.eq(user), Mockito.eq(GROUP_ID), Mockito.any(ICitation.class)))
-        .thenReturn(updatedCitation);
+            .thenReturn(updatedCitation);
 
         when(citationStore.save(citation)).thenReturn(updatedCitation);
         when(citationStore.findById(citation.getKey())).thenReturn(Optional.of(citation));
