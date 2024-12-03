@@ -56,8 +56,8 @@ public class ItemTextController extends V1Controller {
     @Autowired
     private IGilesUtil gilesUtil;
 
-    @PostMapping(value = "/groups/{groupId}/items/{item}/text", consumes= {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Object> getItemText(@PathVariable("groupId") String groupId, @PathVariable("item") String itemKey,
+    @PostMapping(value = "/groups/{groupId}/items/{item}/file", consumes= {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Object> addItemFile(@PathVariable("groupId") String groupId, @PathVariable("item") String itemKey,
             @RequestParam("files") MultipartFile[] files, Principal principal) throws GroupDoesNotExistException {
 
         IUser user = userManager.findByUsername(principal.getName());
@@ -72,7 +72,7 @@ public class ItemTextController extends V1Controller {
             citation = citationManager.getCitation(user, groupId, itemKey);
         } catch (GroupDoesNotExistException | CannotFindCitationException e) {
             logger.error("Could not find the group/citation. ", e);
-            return new ResponseEntity<>("Error: Could not find the group/citation: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Error: Could not find the group/citation: " + e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (ZoteroHttpStatusException e) {
             logger.error("Could not retrieve data from Zotero. ", e);
             return new ResponseEntity<>("Error: Could not retrieve data from Zotero: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -90,13 +90,13 @@ public class ItemTextController extends V1Controller {
                 return new ResponseEntity<>("Error: Zotero could not process the file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (GroupDoesNotExistException e) {
                 logger.error("Could not create job because group does not exist.", e);
-                return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.NOT_FOUND);
             } catch (CannotFindCitationException e) {
                 logger.error("Could not find the newly created citation.", e);
-                return new ResponseEntity<>("Error: Could not find the newly created citation.", HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>("Error: Could not find the newly created citation.", HttpStatus.NOT_FOUND);
             } catch (CitationIsOutdatedException e) {
                 logger.error("Citation outdated. ", e);
-                return new ResponseEntity<>("Error: Citation outdated.", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Error: Citation outdated.", HttpStatus.CONFLICT);
             } catch (IOException e) {
                 logger.error("Could not read file from the request. ", e);
                 return new ResponseEntity<>("Error: Could not read file from the request.", HttpStatus.BAD_REQUEST);
