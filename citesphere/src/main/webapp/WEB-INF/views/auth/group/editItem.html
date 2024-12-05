@@ -1488,17 +1488,17 @@ function creatorLinkHandler(target) {
 			th:value="${!#strings.isEmpty(form.language)} ? ${form.language} : ${citation.language}" /></td>
 	</tr>
 	
-	<tr th:style="${!#lists.contains(fields, 'doi')}? 'display:none'">
+	<tr th:style="${!#lists.contains(fields, 'DOI')}? 'display:none'">
 	<td>DOI</td>
 		<td>
-			<input ht:name="doi" th:id="doi" type="text" class="form-control" placeholder="DOI" 
+			<input ht:name="doi" th:id="DOI" type="text" class="form-control" placeholder="DOI" 
 			th:value="${!#strings.isEmpty(form.doi)} ? ${form.doi} : ${citation.doi}" /></td>
 	</tr>
 
-	<tr th:style="${!#lists.contains(fields, 'issn')}? 'display:none'">
+	<tr th:style="${!#lists.contains(fields, 'ISSN')}? 'display:none'">
 	<td>ISSN</td>
 		<td>
-			<input th:name="issn" th:id="issn" type="text" class="form-control" placeholder="ISSN" 
+			<input th:name="issn" th:id="ISSN" type="text" class="form-control" placeholder="ISSN" 
 			th:value="${!#strings.isEmpty(form.issn)} ? ${form.issn} : ${citation.issn}" /></td>
 	</tr>
 
