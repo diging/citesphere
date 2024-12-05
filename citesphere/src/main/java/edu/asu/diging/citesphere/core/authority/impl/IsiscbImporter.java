@@ -112,8 +112,8 @@ public class IsiscbImporter extends BaseAuthorityImporter {
     public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
             throws AuthorityServiceConnectionException {
 
-        String url = isiscbURL + isiscbSearchKeyword + this.getIsiscbSearchString(firstName, lastName)
-        + this.getLimitOffsetString(page, pageSize);
+        String url = isiscbURL + isiscbSearchKeyword + this.getIsiscbSearchString(firstName, lastName) 
+            + this.getLimitOffsetString(page, pageSize);
 
         HttpHeaders isisCbHeader = new HttpHeaders();
         isisCbHeader.set("Authorization", "Token " + isisCBtoken);
