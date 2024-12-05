@@ -1,12 +1,8 @@
 package edu.asu.diging.citesphere.core.authority.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.apache.http.client.HttpClient;
@@ -18,14 +14,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import edu.asu.diging.citesphere.core.authority.IImportedAuthority;
 import edu.asu.diging.citesphere.core.exceptions.AuthorityServiceConnectionException;
@@ -73,7 +66,9 @@ public class IsiscbImporter extends BaseAuthorityImporter {
      */
     @Override
     public boolean isResponsible(String source) {
-
+        if (source.equals(ISISCB)) {
+            return true;
+        }
         return false;
     }
 
@@ -101,12 +96,24 @@ public class IsiscbImporter extends BaseAuthorityImporter {
         return ID;
     }
 
+    /**
+     * Searches for authorities in the ISISCB database based on the given parameters.
+     *
+     * @param firstName the first name of the authority to search for (can be null)
+     * @param lastName  the last name of the authority to search for (can be null)
+     * @param page      the current page number for pagination (0-based index)
+     * @param pageSize  the number of results per page
+     * @return an {@link AuthoritySearchResult} containing the list of found authorities 
+     *         and pagination details
+     * @throws AuthorityServiceConnectionException if there is a connection issue or 
+     *         if the service returns an error status
+     */
     @Override
     public AuthoritySearchResult searchAuthorities(String firstName, String lastName, int page, int pageSize)
             throws AuthorityServiceConnectionException {
 
         String url = isiscbURL + isiscbSearchKeyword + this.getIsiscbSearchString(firstName, lastName)
-                + this.getLimitOffsetString(page, pageSize);
+        + this.getLimitOffsetString(page, pageSize);
 
         HttpHeaders isisCbHeader = new HttpHeaders();
         isisCbHeader.set("Authorization", "Token " + isisCBtoken);
@@ -124,7 +131,8 @@ public class IsiscbImporter extends BaseAuthorityImporter {
         AuthoritySearchResult searchResult = new AuthoritySearchResult();
         
         if (response.getStatusCode() != HttpStatus.OK) {
-            throw new AuthorityServiceConnectionException(response.getStatusCode().toString());
+            throw new AuthorityServiceConnectionException("Error" + response.getStatusCode().toString() 
+                    + " " + response.getBody().toString());
         }
         
         IsiscbResponse isiscbEntries = response.getBody();
@@ -144,6 +152,15 @@ public class IsiscbImporter extends BaseAuthorityImporter {
         return searchResult;
     }
 
+    /**
+     * Constructs a search string for ISISCB by combining the first and last name of the Author.
+     *
+     * @param firstName the first name of the individual (can be null)
+     * @param lastName  the last name of the individual (can be null)
+     * @return the constructed search string in the format "firstName+lastName", 
+     *         or just the non-null value if one of the parameters is null.
+     *         Returns {@code null} if both parameters are null.
+     */
     private String getIsiscbSearchString(String firstName, String lastName) {
         String isisCBSearchString;
         if (firstName != null && lastName != null) {

@@ -100,7 +100,7 @@
         <javers.default.author>Sync Process</javers.default.author>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <isiscb.url>http://isiscb-staging-p3-2.us-west-2.elasticbeanstalk.com/rest/</isiscb.url>
+        <isiscb.url></isiscb.url>
         <isiscb.uriString>https://data.isiscb.org/isis/authority/{0}/</isiscb.uriString>
         <isiscb.token></isiscb.token>
 
