@@ -2,7 +2,6 @@ package edu.asu.diging.citesphere.api.v1.user;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
