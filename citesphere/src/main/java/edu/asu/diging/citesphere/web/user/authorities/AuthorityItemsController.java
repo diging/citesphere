@@ -24,8 +24,6 @@ public class AuthorityItemsController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private List<IAuthorityEntry> authorityEntries = new ArrayList();
-
     @Autowired
     private IAuthorityService authorityService;
 
@@ -35,16 +33,15 @@ public class AuthorityItemsController {
 
     @RequestMapping("/auth/authority/items")
     public String showPage(Model model, @RequestParam("uri") String uri, Authentication authentication) {
-        authorityEntries = authorityService.findByUri((IUser) authentication.getPrincipal(), uri);
+        List<IAuthorityEntry> authorityEntries = authorityService.findByUri((IUser) authentication.getPrincipal(), uri);
         
         if(authorityEntries == null || authorityEntries.isEmpty()) {
-            logger.info("No entry found for URI: " + uri);
             model.addAttribute("error", "No entry found for URI: " + uri);
         } else if (authorityEntries.size() > 1) {
             logger.error("Found multiple entries for URI: " + uri);
             model.addAttribute("error", "Found multiple entries for URI: " + uri);
         } else {
-            Citations citations = citationManager.findAuthorityItems(authorityEntries.get(0));
+            Citations citations = citationManager.findAuthorityItems(authorityEntries.get(0), (IUser) authentication.getPrincipal());
             if (citations != null) {
                 model.addAttribute("items", citations.getCitations());
             } else {

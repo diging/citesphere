@@ -88,7 +88,7 @@ public interface ICitationManager {
     
     void deleteLocalGroupCitations(String groupId);
     
-    public Citations findAuthorityItems(IAuthorityEntry entry);
+    public Citations findAuthorityItems(IAuthorityEntry entry, IUser user);
     
     ICitation addCitationToReferences(IUser user, ICitation citation, String zoteroGroupId, String referenceCitationKey, 
             String reference) throws SelfCitationException, ZoteroConnectionException, CitationIsOutdatedException, 

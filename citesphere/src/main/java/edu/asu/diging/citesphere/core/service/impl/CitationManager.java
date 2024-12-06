@@ -10,10 +10,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -510,8 +512,27 @@ public class CitationManager implements ICitationManager {
     }
     
     @Override
-    public Citations findAuthorityItems(IAuthorityEntry entry) {       
-        return citationDao.findCitationsByPersonUri(entry.getUri());
+    public Citations findAuthorityItems(IAuthorityEntry entry, IUser user) {       
+        Citations citations = citationDao.findCitationsByPersonUri(entry.getUri());
+//        if (citations != null) {
+//            List<ICitation> allCitations = citations.getCitations();
+//            System.out.println("citations ==============================="  );
+//            for(ICitation citation: allCitations) {
+//                System.out.println(citation.getKey());
+//            }
+//            List<ICitationGroup> groups = getGroups(user);
+//            Set<ObjectId> groupIds = groups.stream()
+//                    .map(ICitationGroup::getId) 
+//                    .collect(Collectors.toSet());
+//
+//            List<ICitation> filteredCitations = allCitations.stream()
+//                    .filter(citation -> groupIds.contains(citation.getGroup()))
+//                    .collect(Collectors.toList());
+//
+//            citations.setCitations(filteredCitations);
+//        }
+
+        return citations;
     }
 
     @Override
