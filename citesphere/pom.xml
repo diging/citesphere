@@ -24,8 +24,10 @@
         <javers.version>6.2.3</javers.version>
         <spring.kafka.version>2.2.6.RELEASE</spring.kafka.version>
         <spring-social-zotero.version>0.12</spring-social-zotero.version>
-        <citesphere.messages.version>0.4</citesphere.messages.version>
+
+        <citesphere.messages.version>0.5</citesphere.messages.version>
         <citesphere.model.version>1.23</citesphere.model.version>
+        <crossref-connect-version>0.2</crossref-connect-version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
@@ -156,6 +158,11 @@
             <groupId>edu.asu.diging</groupId>
             <artifactId>citesphere-model</artifactId>
             <version>${citesphere.model.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>edu.asu.diging</groupId>
+          <artifactId>crossref-connect</artifactId>
+          <version>${crossref-connect-version}</version>
         </dependency>
 
         <!-- Spring -->

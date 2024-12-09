@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.model.jobs.impl;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -42,7 +43,7 @@ public class Job implements IJob {
     
     @JsonIgnore
     @OneToMany(cascade=CascadeType.ALL)
-    private List<JobPhase> phases;
+    private List<JobPhase> phases = new ArrayList<>();
     
 
     /* (non-Javadoc)
