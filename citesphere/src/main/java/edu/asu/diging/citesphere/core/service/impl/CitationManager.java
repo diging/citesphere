@@ -514,23 +514,20 @@ public class CitationManager implements ICitationManager {
     @Override
     public Citations findAuthorityItems(IAuthorityEntry entry, IUser user) {       
         Citations citations = citationDao.findCitationsByPersonUri(entry.getUri());
-//        if (citations != null) {
-//            List<ICitation> allCitations = citations.getCitations();
-//            System.out.println("citations ==============================="  );
-//            for(ICitation citation: allCitations) {
-//                System.out.println(citation.getKey());
-//            }
-//            List<ICitationGroup> groups = getGroups(user);
-//            Set<ObjectId> groupIds = groups.stream()
-//                    .map(ICitationGroup::getId) 
-//                    .collect(Collectors.toSet());
-//
-//            List<ICitation> filteredCitations = allCitations.stream()
-//                    .filter(citation -> groupIds.contains(citation.getGroup()))
-//                    .collect(Collectors.toList());
-//
-//            citations.setCitations(filteredCitations);
-//        }
+        if (citations != null) {
+            List<ICitation> allCitations = citations.getCitations();
+
+            List<ICitationGroup> groups = getGroups(user);
+            Set<String> groupIds = groups.stream()
+                    .map(group -> group.getKey().toString()) 
+                    .collect(Collectors.toSet());
+            
+            List<ICitation> filteredCitations = allCitations.stream()
+            .filter(citation -> groupIds.contains(citation.getGroup().toString()))
+            .collect(Collectors.toList());
+            
+            citations.setCitations(filteredCitations);
+        }
 
         return citations;
     }
