@@ -521,10 +521,10 @@ public class CitationManager implements ICitationManager {
             Set<String> groupIds = groups.stream()
                     .map(group -> group.getKey().toString()) 
                     .collect(Collectors.toSet());
-            
+
             List<ICitation> filteredCitations = allCitations.stream()
-            .filter(citation -> groupIds.contains(citation.getGroup().toString()))
-            .collect(Collectors.toList());
+                    .filter(citation -> groupIds.contains(citation.getGroup().toString()))
+                    .collect(Collectors.toList());
             
             citations.setCitations(filteredCitations);
         }
