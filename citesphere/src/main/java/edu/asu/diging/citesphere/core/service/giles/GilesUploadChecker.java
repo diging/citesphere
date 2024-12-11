@@ -6,7 +6,7 @@ import edu.asu.diging.citesphere.model.bib.ICitation;
 
 public interface GilesUploadChecker {
 
-    void add(ICitation upload);
+    void add(String uploadKey);
 
     // in milliseconds (60000ms = 1m)
     void checkUploads();

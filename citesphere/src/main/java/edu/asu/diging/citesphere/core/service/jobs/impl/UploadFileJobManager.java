@@ -70,7 +70,7 @@ public class UploadFileJobManager implements IUploadFileJobManager {
             }
             citation.getGilesUploads().add(upload);
             citationManager.updateCitation(user, groupId, citation);
-            uploadChecker.add(citation);
+            uploadChecker.add(citation.getKey());
             return upload;
         }
         

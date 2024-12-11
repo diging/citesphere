@@ -86,9 +86,9 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
      * edu.asu.diging.citesphere.model.bib.ICitation)
      */
     @Override
-    public void add(ICitation upload) {
-        if (!uploadQueue.contains(upload.getKey())) {
-            uploadQueue.add(upload.getKey());
+    public void add(String uploadKey) {
+        if (!uploadQueue.contains(uploadKey)) {
+            uploadQueue.add(uploadKey);
         }
     }
 
