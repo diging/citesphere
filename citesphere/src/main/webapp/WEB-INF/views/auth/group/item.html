@@ -179,13 +179,6 @@
 	        }
 	    });
 	    
-	    // $("#syncGilesUpload").click(function() {
-	    // 	console.log("sync giles");
-		// 	var zoteroGroupId = $("#syncGilesUpload").data('zotero-group-id');
-	    //     var itemId = $("#syncGilesUpload").data('item-id');
-	    // 	syncGilesUpload(zoteroGroupId, itemId);
-	    // })
-	    
 	});
 
 	function getReferences(zoteroGroupId, searchTerm) {
@@ -278,28 +271,6 @@
 		}
 	    }); 
 	}
-
-	// function syncGilesUpload(zoteroGroupId, itemId) {
-	// 	var url = "[(@{|/auth/group/${zoteroGroupId}/items/${itemId}/sync/giles|})]";
-	//     $.ajax({
-	//         dataType: "json",
-	//         type: 'GET',
-	//         url: url,
-	//         async: false,
-	//         success: function(data) {
-	// 			console.log(data)
-	//             // updateCitationReferences(data, zoteroGroupId);
-	//             // var message = "Reference added successfully";
-	//             // showNotification(message, "success", 1000);
-	//         },
-	//         error: function(data) {
-	//             showNotification(" Error while sync !", "danger");
-	//         }, 
-	// 	complete: function() {
-	// 		console.log("complete")
-	// 	}
-	//     }); 
-	// }
 	
 	function showNotification(message, status, time) {
 		$.notify('<i class="fas fa-exclamation-circle"></i>'+ message, {
