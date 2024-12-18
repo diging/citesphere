@@ -544,6 +544,8 @@
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
+	        <a th:href="@{|${citation.key}/sync/giles?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}">
+				<i class="icon-sync" title="Sync Upload Status"></i></a>
 	        </li>
         </ul>
         
