@@ -29,7 +29,7 @@ public class SyncItemController {
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         citationManager.updateCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         uploadChecker.add(itemId);
-        uploadChecker.checkUploads((IUser)authentication.getPrincipal(), zoteroGroupId);
+        uploadChecker.checkUploads();
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }
     
@@ -41,7 +41,7 @@ public class SyncItemController {
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) 
                     throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         uploadChecker.add(itemId);
-        uploadChecker.checkUploads((IUser)authentication.getPrincipal(), zoteroGroupId);
+        uploadChecker.checkUploads();
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }
 }
