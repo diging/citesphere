@@ -23,6 +23,7 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -78,4 +79,16 @@ public class CollectionsApiController extends V1Controller {
         return new ResponseEntity<Collections>(collectionResponse, HttpStatus.OK);
     }
 
+    @RequestMapping(value = {"/groups/{zoteroGroupId}/collections/{collectionId}/info" }, produces = {
+            MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ICitationCollection> getCollectionsInfoByGroupId(@RequestHeader HttpHeaders headers,
+            @PathVariable("zoteroGroupId") String groupId,
+            @PathVariable(value = "collectionId", required = true) String collectionId,
+            Principal principal) {
+
+        IUser user = userManager.findByUsername(principal.getName());
+
+        ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
+        return new ResponseEntity<ICitationCollection>(collection, HttpStatus.OK);
+    }
 }
