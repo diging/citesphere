@@ -79,8 +79,8 @@ public class CollectionsApiController extends V1Controller {
         return new ResponseEntity<Collections>(collectionResponse, HttpStatus.OK);
     }
 
-    @RequestMapping(value = {"/groups/{zoteroGroupId}/collections/{collectionId}/info" }, produces = {
-            MediaType.APPLICATION_JSON_VALUE })
+    @RequestMapping(value = { "/groups/{zoteroGroupId}/collections/{collectionId}/info" }, 
+            produces = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<ICitationCollection> getCollectionsInfoByGroupId(@RequestHeader HttpHeaders headers,
             @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = true) String collectionId,
