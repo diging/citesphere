@@ -70,6 +70,7 @@ public class GilesUploadServiceImpl implements GilesUploadService {
 
         ResponseEntity<UploadResponse> response = restTemplate.postForEntity(gilesBaseurl + uploadEndpoint, requestEntity, UploadResponse.class);
         
+        System.out.println(response.toString() + "=============================");
         IGilesUpload upload = new GilesUpload();
         upload.setProgressId(response.getBody().getId());
         upload.setUploadingUser(user.getUsername());
