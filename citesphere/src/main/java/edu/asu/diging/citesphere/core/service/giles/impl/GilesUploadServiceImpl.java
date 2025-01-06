@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.core.service.giles.impl;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
@@ -10,17 +12,21 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.asu.diging.citesphere.core.service.giles.GilesUploadService;
 import edu.asu.diging.citesphere.core.service.oauth.InternalTokenManager;
+import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.model.bib.impl.GilesUpload;
 import edu.asu.diging.citesphere.user.IUser;
@@ -35,12 +41,18 @@ public class GilesUploadServiceImpl implements GilesUploadService {
     
     @Autowired
     private InternalTokenManager internalTokenManager;
+    
+    @Autowired
+    private IUserManager userManager;
 
     @Value("${giles_baseurl}")
     private String gilesBaseurl;
 
     @Value("${giles_upload_endpoint}")
     private String uploadEndpoint;
+    
+    @Value("${giles_check_endpoint}")
+    private String gilesCheckEndpoint;
 
     @PostConstruct
     public void init() {
@@ -74,12 +86,46 @@ public class GilesUploadServiceImpl implements GilesUploadService {
         IGilesUpload upload = new GilesUpload();
         upload.setProgressId(response.getBody().getId());
         upload.setUploadingUser(user.getUsername());
+        try {
+            TimeUnit.SECONDS.sleep(60);
+        } catch (InterruptedException e) {
+            logger.error("Could not sleep.", e);
+        }
+        getUploadId(response.getBody().getId(), user.getUsername());
+//        upload.set
         return upload;
     }
     
     private String getToken(IUser user) {
         OAuth2AccessToken token = internalTokenManager.getAccessToken(user);
         return token.getValue();
+    }
+    
+    private GilesUpload[] getUploadId(String progressId, String userName) {
+        IUser user = userManager.findByUsername(userName);
+        String token = getToken(user);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(
+                headers);
+
+        ResponseEntity<String> response = null;
+        try {
+            response = restTemplate.exchange(
+                    gilesBaseurl + gilesCheckEndpoint + progressId,
+                    HttpMethod.GET, requestEntity, String.class);
+        } catch (HttpClientErrorException ex) {
+            logger.error("Unable to get response for giles check");
+            ex.printStackTrace();
+            return null;
+        }
+        if (response.getStatusCode() == HttpStatus.ACCEPTED || response.getStatusCode() == HttpStatus.OK) {
+            // Giles is still procoessing
+            System.out.println(response.getBody() + "=====================================");
+            
+        }
+        return null; 
     }
     
     public class MultipartFileResource extends ByteArrayResource {
