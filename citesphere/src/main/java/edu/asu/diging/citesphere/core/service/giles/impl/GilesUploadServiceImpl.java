@@ -1,6 +1,8 @@
 package edu.asu.diging.citesphere.core.service.giles.impl;
 
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -23,6 +25,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.citesphere.core.service.giles.GilesUploadService;
 import edu.asu.diging.citesphere.core.service.oauth.InternalTokenManager;
@@ -86,13 +90,6 @@ public class GilesUploadServiceImpl implements GilesUploadService {
         IGilesUpload upload = new GilesUpload();
         upload.setProgressId(response.getBody().getId());
         upload.setUploadingUser(user.getUsername());
-        try {
-            TimeUnit.SECONDS.sleep(60);
-        } catch (InterruptedException e) {
-            logger.error("Could not sleep.", e);
-        }
-        getUploadId(response.getBody().getId(), user.getUsername());
-//        upload.set
         return upload;
     }
     
@@ -101,7 +98,10 @@ public class GilesUploadServiceImpl implements GilesUploadService {
         return token.getValue();
     }
     
-    private GilesUpload[] getUploadId(String progressId, String userName) {
+    @Override
+    public Set<IGilesUpload> getUploadId(String progressId, String userName) {
+        Set<IGilesUpload> uploadSet = new HashSet<>();
+        
         IUser user = userManager.findByUsername(userName);
         String token = getToken(user);
         
@@ -117,13 +117,26 @@ public class GilesUploadServiceImpl implements GilesUploadService {
                     HttpMethod.GET, requestEntity, String.class);
         } catch (HttpClientErrorException ex) {
             logger.error("Unable to get response for giles check");
-            ex.printStackTrace();
             return null;
         }
         if (response.getStatusCode() == HttpStatus.ACCEPTED || response.getStatusCode() == HttpStatus.OK) {
             // Giles is still procoessing
             System.out.println(response.getBody() + "=====================================");
-            
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = response.getBody();
+            GilesUpload[] uploads = new GilesUpload[0];
+            try {
+                uploads = mapper.readValue(jsonBody, GilesUpload[].class);
+            } catch (IOException e) {
+                logger.error("Could not deserialize response.", e);
+                return null;
+            }
+            for (GilesUpload upload : uploads) {
+                // giles does not return the progress id again, but we need it
+                upload.setProgressId(progressId);
+                uploadSet.add(upload);
+            }
+            return uploadSet;
         }
         return null; 
     }

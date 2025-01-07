@@ -1,8 +1,12 @@
 package edu.asu.diging.citesphere.core.service.giles;
 
+import java.util.Set;
+
 import org.springframework.scheduling.annotation.Scheduled;
 
 import edu.asu.diging.citesphere.model.bib.ICitation;
+import edu.asu.diging.citesphere.model.bib.IGilesUpload;
+import edu.asu.diging.citesphere.user.IUser;
 
 public interface GilesUploadChecker {
 
@@ -10,5 +14,7 @@ public interface GilesUploadChecker {
 
     // in milliseconds (60000ms = 1m)
     void checkUploads();
+
+    void updateCitation(ICitation citation, Set<IGilesUpload> checkedUploads, IUser user, ICitation currentCitation);
 
 }

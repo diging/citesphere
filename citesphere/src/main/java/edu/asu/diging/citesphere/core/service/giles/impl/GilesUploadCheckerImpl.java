@@ -181,6 +181,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
         }
     }
 
+    @Override
     public void updateCitation(ICitation citation, Set<IGilesUpload> checkedUploads,
             IUser user, ICitation currentCitation) {
         for (IGilesUpload upload : checkedUploads) {
