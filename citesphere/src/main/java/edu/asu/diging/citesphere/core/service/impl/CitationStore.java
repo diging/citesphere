@@ -83,4 +83,9 @@ public class CitationStore implements ICitationStore {
     public List<ICitation> findByGilesProgressId(String progressId) {
         return citationRepository.findByGilesUploadsProgressId(progressId);
     }
+
+    @Override
+    public List<ICitation> findByGilesUploadId(String uploadId) {
+        return citationRepository.findByGilesUploadsUploadId(uploadId);
+    }
 }

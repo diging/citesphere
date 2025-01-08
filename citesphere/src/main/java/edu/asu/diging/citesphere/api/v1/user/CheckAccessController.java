@@ -31,9 +31,13 @@ public class CheckAccessController extends V1Controller {
     @Autowired
     private IGroupManager groupManager;
 
-    @RequestMapping(value = { "/files/giles/{documentId}/access/check", "/files/giles/progress/{progressId}/access/check" }, produces = {
+    @RequestMapping(value = { "/files/giles/{documentId}/access/check", "/files/giles/progress/{progressId}/access/check",
+            "/files/giles/upload/{uploadId}/access/check"}, produces = {
         MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<String> checkAccess(@PathVariable(value="documentId", required = false) String documentId, @PathVariable(value="progressId", required = false) String progressId, @RequestParam("username") String username, Principal principal) {
+    public ResponseEntity<String> checkAccess(@PathVariable(value="documentId", required = false) String documentId, 
+            @PathVariable(value="progressId", required = false) String progressId, 
+            @PathVariable(value="uploadId", required = false) String uploadId,
+            @RequestParam("username") String username, Principal principal) {
         
         List<String> authorities = ((OAuth2Authentication)principal).getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList());
         if (!authorities.contains(Role.TRUSTED_CLIENT.toString())) {
@@ -49,6 +53,8 @@ public class CheckAccessController extends V1Controller {
             citations = citationStore.findByGilesDocumentId(documentId);
         } else if (progressId != null) {
             citations = citationStore.findByGilesProgressId(progressId);
+        } else if (uploadId != null) {
+            citations = citationStore.findByGilesUploadId(uploadId);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
