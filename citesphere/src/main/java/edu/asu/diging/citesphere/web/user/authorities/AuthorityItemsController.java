@@ -41,7 +41,7 @@ public class AuthorityItemsController {
             logger.error("Found multiple entries for URI: " + uri);
             model.addAttribute("error", "Found multiple entries for URI: " + uri);
         } else {
-            Citations citations = citationManager.findAuthorityItems(authorityEntries.get(0), (IUser) authentication.getPrincipal());
+            Citations citations = citationManager.findAuthorityCitations(authorityEntries.get(0), (IUser) authentication.getPrincipal());
             if (citations != null) {
                 model.addAttribute("items", citations.getCitations());
             } else {

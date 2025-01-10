@@ -514,6 +514,11 @@ public class CitationManager implements ICitationManager {
     @Override
     public Citations findAuthorityCitations(IAuthorityEntry entry, IUser user) {  
         List<ICitationGroup> groups = getGroups(user);
+        
+        if (groups == null || groups.isEmpty()) {
+            return null;
+        }
+        
         Set<String> groupIds = groups.stream()
                 .map(group -> group.getKey().toString()) 
                 .collect(Collectors.toSet());
