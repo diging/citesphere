@@ -104,7 +104,6 @@ public class JobInfoController extends BaseJobInfoController {
         node.put("taskId", exportTask.getId());
     }
 
-    @SuppressWarnings("deprecation")
     private void handleImportCrossrefJob(ObjectNode node, IImportCrossrefJob job) {
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode arrayNode = mapper.valueToTree(job.getDois());
