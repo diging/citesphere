@@ -140,8 +140,26 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                     // Giles is still procoessing
                     logger.debug("Upload " + upload.getProgressId()
                             + " still being processed.");
-                    checkedUploads.add(upload);
-                    continue;
+//                    checkedUploads.add(upload);
+                    ObjectMapper mapper = new ObjectMapper();
+                    String jsonBody = response.getBody();
+                    GilesCheckUploadResponse processed = new GilesCheckUploadResponse();
+                    try {
+                        processed = mapper.readValue(jsonBody, GilesCheckUploadResponse.class);
+                    } catch (IOException e) {
+                        logger.error("Could not deserialize response.", e);
+//                        upload.setDocumentStatus(GilesStatus.FAILED);
+//                        checkedUploads.add(upload);
+                    }
+//                    for (GilesUpload processedUpload : processed) {
+                    GilesUpload processedUpload = new GilesUpload();
+                        processedUpload.setProgressId(upload.getProgressId());
+                        processedUpload.setUploadId(processed.getUploadId());
+                        processedUpload.setUploadingUser(upload.getUploadingUser());
+                        checkedUploads.add(processedUpload);
+//                    }
+                    needsUpdating = true;
+//                    continue;
                 } else if (response.getStatusCode() == HttpStatus.OK) {
                     logger.debug("Upload " + upload.getProgressId() + " is done.");
                     ObjectMapper mapper = new ObjectMapper();
@@ -181,7 +199,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
         }
     }
 
-    @Override
+//    @Override
     public void updateCitation(ICitation citation, Set<IGilesUpload> checkedUploads,
             IUser user, ICitation currentCitation) {
         for (IGilesUpload upload : checkedUploads) {
