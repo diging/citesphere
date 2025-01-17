@@ -86,7 +86,6 @@ public class GilesUploadServiceImpl implements GilesUploadService {
 
         ResponseEntity<UploadResponse> response = restTemplate.postForEntity(gilesBaseurl + uploadEndpoint, requestEntity, UploadResponse.class);
         
-        System.out.println(response.toString() + "=============================");
         IGilesUpload upload = new GilesUpload();
         upload.setProgressId(response.getBody().getId());
         upload.setUploadingUser(user.getUsername());
@@ -121,7 +120,6 @@ public class GilesUploadServiceImpl implements GilesUploadService {
         }
         if (response.getStatusCode() == HttpStatus.ACCEPTED || response.getStatusCode() == HttpStatus.OK) {
             // Giles is still procoessing
-            System.out.println(response.getBody() + "=====================================");
             ObjectMapper mapper = new ObjectMapper();
             String jsonBody = response.getBody();
             GilesUpload[] uploads = new GilesUpload[0];
