@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -43,9 +44,11 @@ import edu.asu.diging.citesphere.core.repository.oauth.DbRefreshTokenRepository;
 import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
 import edu.asu.diging.citesphere.core.service.impl.DbTokenStore;
 import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
+import edu.asu.diging.citesphere.core.service.oauth.InternalTokenManager;
 import edu.asu.diging.citesphere.core.service.oauth.impl.OAuthClientManager;
 
 @Configuration
+@PropertySource("classpath:config.properties")
 @EnableWebSecurity
 /*
  * Once spring security provides the new oauth2 authentication provider we can
@@ -65,12 +68,16 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private DbRefreshTokenRepository refreshTokenRepo;
-
+    
     @Value("${_oauth_token_validity}")
     private int oauthTokenValidity;
-
+    
+    private OAuthClientManager oauthClientManager;
+    
     @Override
     public void configure(WebSecurity web) throws Exception {
+        // oauthTokenValidity is not yet available when initially created, so we need to set it here
+        oauthClientManager.setAccessTokenValidity(oauthTokenValidity);
         web
                 // Spring Security ignores request to static resources such as CSS or JS
                 // files.
@@ -207,7 +214,8 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Bean
     public ClientDetailsService clientDetailsService() {
-        return new OAuthClientManager(clientRepo, bCryptPasswordEncoder, oauthTokenValidity);
+        oauthClientManager = new OAuthClientManager(clientRepo, bCryptPasswordEncoder, oauthTokenValidity);
+        return oauthClientManager;
     }
 
     @Bean

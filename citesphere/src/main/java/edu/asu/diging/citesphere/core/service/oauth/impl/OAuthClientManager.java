@@ -131,4 +131,8 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         }
         return clients;
     }
+
+    public void setAccessTokenValidity(int accessTokenValidity) {
+        this.accessTokenValidity = accessTokenValidity;
+    }
 }
