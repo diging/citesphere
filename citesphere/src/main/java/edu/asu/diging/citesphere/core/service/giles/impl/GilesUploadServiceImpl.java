@@ -45,18 +45,12 @@ public class GilesUploadServiceImpl implements GilesUploadService {
     
     @Autowired
     private InternalTokenManager internalTokenManager;
-    
-    @Autowired
-    private IUserManager userManager;
 
     @Value("${giles_baseurl}")
     private String gilesBaseurl;
 
     @Value("${giles_upload_endpoint}")
     private String uploadEndpoint;
-    
-    @Value("${giles_check_endpoint}")
-    private String gilesCheckEndpoint;
 
     @PostConstruct
     public void init() {
@@ -95,48 +89,6 @@ public class GilesUploadServiceImpl implements GilesUploadService {
     private String getToken(IUser user) {
         OAuth2AccessToken token = internalTokenManager.getAccessToken(user);
         return token.getValue();
-    }
-    
-    @Override
-    public Set<IGilesUpload> getUploadId(String progressId, String userName) {
-        Set<IGilesUpload> uploadSet = new HashSet<>();
-        
-        IUser user = userManager.findByUsername(userName);
-        String token = getToken(user);
-        
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(
-                headers);
-
-        ResponseEntity<String> response = null;
-        try {
-            response = restTemplate.exchange(
-                    gilesBaseurl + gilesCheckEndpoint + progressId,
-                    HttpMethod.GET, requestEntity, String.class);
-        } catch (HttpClientErrorException ex) {
-            logger.error("Unable to get response for giles check");
-            return null;
-        }
-        if (response.getStatusCode() == HttpStatus.ACCEPTED || response.getStatusCode() == HttpStatus.OK) {
-            // Giles is still procoessing
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonBody = response.getBody();
-            GilesUpload[] uploads = new GilesUpload[0];
-            try {
-                uploads = mapper.readValue(jsonBody, GilesUpload[].class);
-            } catch (IOException e) {
-                logger.error("Could not deserialize response.", e);
-                return null;
-            }
-            for (GilesUpload upload : uploads) {
-                // giles does not return the progress id again, but we need it
-                upload.setProgressId(progressId);
-                uploadSet.add(upload);
-            }
-            return uploadSet;
-        }
-        return null; 
     }
     
     public class MultipartFileResource extends ByteArrayResource {

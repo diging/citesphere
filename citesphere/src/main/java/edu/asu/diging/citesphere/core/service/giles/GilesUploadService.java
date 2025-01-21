@@ -12,5 +12,4 @@ public interface GilesUploadService {
 
     IGilesUpload uploadFile(IUser user, MultipartFile file, byte[] fileBytes);
 
-    Set<IGilesUpload> getUploadId(String progressId, String userName);
 }

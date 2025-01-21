@@ -15,6 +15,4 @@ public interface GilesUploadChecker {
     // in milliseconds (60000ms = 1m)
     void checkUploads();
 
-    void updateCitation(ICitation citation, Set<IGilesUpload> checkedUploads, IUser user, ICitation currentCitation);
-
 }
