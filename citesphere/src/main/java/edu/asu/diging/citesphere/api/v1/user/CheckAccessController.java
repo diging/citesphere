@@ -32,8 +32,7 @@ public class CheckAccessController extends V1Controller {
     private IGroupManager groupManager;
 
     @RequestMapping(value = { "/files/giles/{documentId}/access/check", "/files/giles/progress/{progressId}/access/check",
-        "/files/giles/upload/{uploadId}/access/check"}, produces = {
-                MediaType.APPLICATION_JSON_VALUE })
+        "/files/giles/upload/{uploadId}/access/check"}, produces = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<String> checkAccess(@PathVariable(value="documentId", required = false) String documentId, 
             @PathVariable(value="progressId", required = false) String progressId, 
             @PathVariable(value="uploadId", required = false) String uploadId,
