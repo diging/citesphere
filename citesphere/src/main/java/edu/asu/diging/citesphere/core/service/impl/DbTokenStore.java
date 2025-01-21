@@ -141,9 +141,11 @@ public class DbTokenStore implements TokenStore {
 
     @Override
     public void removeAccessTokenUsingRefreshToken(OAuth2RefreshToken refreshToken) {
-        Optional<DbAccessToken> token = dbAccessTokenRepository.findByRefreshToken(extractTokenKey(refreshToken.getValue()));
-        if(token.isPresent()){
-            dbAccessTokenRepository.delete(token.get());
+        List<DbAccessToken> tokens = dbAccessTokenRepository.findByRefreshToken(extractTokenKey(refreshToken.getValue()));
+        if(!tokens.isEmpty()){
+            for (DbAccessToken token : tokens) {
+                dbAccessTokenRepository.delete(token);
+            }
         }
     }
 
