@@ -151,11 +151,11 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                         checkedUploads.add(upload);
                     }
                     GilesUpload processedUpload = new GilesUpload();
-                        processedUpload.setProgressId(upload.getProgressId());
-                        processedUpload.setUploadId(processed.getUploadId());
-                        processedUpload.setUploadingUser(upload.getUploadingUser());
-                        checkedUploads.add(processedUpload);
-                        needsUpdating = true;
+                    processedUpload.setProgressId(upload.getProgressId());
+                    processedUpload.setUploadId(processed.getUploadId());
+                    processedUpload.setUploadingUser(upload.getUploadingUser());
+                    checkedUploads.add(processedUpload);
+                    needsUpdating = true;
                 } else if (response.getStatusCode() == HttpStatus.OK) {
                     logger.debug("Upload " + upload.getProgressId() + " is done.");
                     ObjectMapper mapper = new ObjectMapper();
