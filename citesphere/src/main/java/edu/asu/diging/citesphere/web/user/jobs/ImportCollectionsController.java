@@ -110,7 +110,7 @@ public class ImportCollectionsController {
         
         if (collectionId.equals("new")) {
             try {
-                ICitationCollection collection = collectionManager.createCollection(user, group, files[0].getOriginalFilename().split(".")[0], null);
+                ICitationCollection collection = collectionManager.createCollection(user, group, files[0].getName(), null);
                 collectionId = collection.getKey();
             } catch (GroupDoesNotExistException e) {
                 logger.error("Could not create job because group does not exist.", e);
