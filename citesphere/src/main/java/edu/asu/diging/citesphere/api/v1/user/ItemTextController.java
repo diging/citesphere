@@ -6,6 +6,7 @@ import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,9 +28,12 @@ import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
+import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadFileJobManager;
+import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
+import edu.asu.diging.citesphere.core.service.jwt.IJobApiTokenContents;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.core.util.IGilesUtil;
 import edu.asu.diging.citesphere.model.bib.ICitation;
@@ -37,7 +42,7 @@ import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
-public class ItemTextController extends V1Controller {
+public class ItemTextController extends BaseJobInfoController {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -52,15 +57,34 @@ public class ItemTextController extends V1Controller {
 
     @Autowired
     private IUploadFileJobManager jobManager;
+    
+    @Autowired
+    private IUploadJobManager uploadJobManager;
 
     @Autowired
     private IGilesUtil gilesUtil;
 
     @PostMapping(value = "/groups/{groupId}/items/{item}/file", consumes= {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Object> addItemFile(@PathVariable("groupId") String groupId, @PathVariable("item") String itemKey,
-            @RequestParam("files") MultipartFile[] files, Principal principal) throws GroupDoesNotExistException {
+            @RequestParam("files") MultipartFile[] files, Principal principal, @RequestHeader HttpHeaders headers) throws GroupDoesNotExistException {
 
         IUser user = userManager.findByUsername(principal.getName());
+        
+        if(user==null) {
+            ResponseEntity<String> entity = checkForToken(headers);
+            if (entity != null) {
+//                return entity;
+            }
+            
+            IJobApiTokenContents tokenContents = getTokenContents(headers);
+            entity = checkTokenValidity(tokenContents);
+            if (entity != null) {
+//                return entity;
+            }
+                    
+            IJob ijob = uploadJobManager.findJob(tokenContents.getJobId());
+            user = userManager.findByUsername(ijob.getUsername());
+        }
 
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
