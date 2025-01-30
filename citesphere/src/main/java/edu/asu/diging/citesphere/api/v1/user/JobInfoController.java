@@ -19,8 +19,10 @@ import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
 import edu.asu.diging.citesphere.core.service.jwt.IJobApiTokenContents;
+import edu.asu.diging.citesphere.core.service.oauth.InternalTokenManager;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.core.zotero.impl.ZoteroTokenManager;
+import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class JobInfoController extends BaseJobInfoController {
@@ -37,6 +39,8 @@ public class JobInfoController extends BaseJobInfoController {
     @Autowired
     private IExportTaskManager exportTaskManager;
     
+    @Autowired
+    private InternalTokenManager internalTokenManager;    
 
     @RequestMapping(value="/job/info")
     public ResponseEntity<String> getProfile(@RequestHeader HttpHeaders headers) {
@@ -63,6 +67,8 @@ public class JobInfoController extends BaseJobInfoController {
         if (job instanceof IUploadJob) {
             node.put("groupId", ((IUploadJob)job).getCitationGroup());
             node.put("collectionId", ((IUploadJob)job).getCitationCollection());
+            IUser user = userManager.findByUsername(job.getUsername());
+            node.put("giles", internalTokenManager.getAccessToken(user).getValue());
         }
         if (job instanceof IExportJob) {
             IExportTask exportTask = exportTaskManager.get(((IExportJob)job).getTaskId());
