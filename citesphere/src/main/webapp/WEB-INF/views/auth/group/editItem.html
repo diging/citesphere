@@ -1491,7 +1491,7 @@ function creatorLinkHandler(target) {
 	<tr th:style="${!#lists.contains(fields, 'DOI')}? 'display:none'">
 	<td>DOI</td>
 		<td>
-			<input ht:name="doi" th:id="DOI" type="text" class="form-control" placeholder="DOI" 
+			<input th:name="doi" th:id="DOI" type="text" class="form-control" placeholder="DOI" 
 			th:value="${!#strings.isEmpty(form.doi)} ? ${form.doi} : ${citation.doi}" /></td>
 	</tr>
 
