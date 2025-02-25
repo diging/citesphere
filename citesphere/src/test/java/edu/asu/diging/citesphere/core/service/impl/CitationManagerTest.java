@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -481,7 +480,6 @@ public class CitationManagerTest {
         String referenceCitationKey = "referenceCitationKey";
         citation.getReferences().add(reference);
         citation.setVersion(1L);
-        citation.setId(new ObjectId("507f1f77bcf86cd799439011"));
         
         when(zoteroManager.getGroupItemVersion(user, GROUP_ID, CITATION_KEY)).thenReturn(currentVersion);
         ICitation updatedCitation = new Citation();
@@ -505,7 +503,6 @@ public class CitationManagerTest {
         String referenceCitationKey = "referenceCitationKey";
         citation.setReferences(null);
         citation.setVersion(1L);
-        citation.setId(new ObjectId("507f1f77bcf86cd799439011"));
         
         when(zoteroManager.getGroupItemVersion(user, GROUP_ID, CITATION_KEY)).thenReturn(1L);
         ICitation updatedCitation = new Citation();
