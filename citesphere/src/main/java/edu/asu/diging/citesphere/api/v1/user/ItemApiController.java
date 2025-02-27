@@ -44,12 +44,12 @@ public class ItemApiController extends V1Controller {
 
     @Autowired
     private IUserManager userManager;
-    
+
     @GetMapping(value = "/groups/{groupId}/items/{item}", produces = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<String> getItem(@PathVariable("groupId") String groupId, @PathVariable("item") String itemKey,
             Principal principal) throws GroupDoesNotExistException {
         IUser user = userManager.findByUsername(principal.getName());
-        
+
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
