@@ -2,20 +2,19 @@ package edu.asu.diging.citesphere.api.v1.user;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,18 +24,15 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
-import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
-import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
-import edu.asu.diging.citesphere.core.service.jwt.IJobApiTokenContents;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
-public class ItemApiController extends BaseJobInfoController {
+public class ItemApiController extends V1Controller {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -49,30 +45,11 @@ public class ItemApiController extends BaseJobInfoController {
     @Autowired
     private IUserManager userManager;
     
-    @Autowired
-    private IUploadJobManager uploadJobManager;
-    
     @GetMapping(value = "/groups/{groupId}/items/{item}", produces = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<String> getItem(@PathVariable("groupId") String groupId, @PathVariable("item") String itemKey,
-            Principal principal, @RequestHeader HttpHeaders headers) throws GroupDoesNotExistException {
+            Principal principal) throws GroupDoesNotExistException {
         IUser user = userManager.findByUsername(principal.getName());
         
-        if(user==null) {
-            ResponseEntity<String> entity = checkForToken(headers);
-            if (entity != null) {
-//                return entity;
-            }
-            
-            IJobApiTokenContents tokenContents = getTokenContents(headers);
-            entity = checkTokenValidity(tokenContents);
-            if (entity != null) {
-//                return entity;
-            }
-                    
-            IJob ijob = uploadJobManager.findJob(tokenContents.getJobId());
-            user = userManager.findByUsername(ijob.getUsername());
-        }
-
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);

@@ -23,7 +23,6 @@ import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.JobPhase;
 import edu.asu.diging.citesphere.core.model.jobs.impl.UploadJob;
-import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.repository.jobs.UploadJobRepository;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadCollectionJobManager;
@@ -46,9 +45,6 @@ private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Autowired
     private UploadJobRepository uploadJobRepository;
-   
-    @Autowired
-    private JobRepository jobsRepository;
 
     @Autowired
     private IFileStorageManager fileManager;
