@@ -38,7 +38,7 @@ import edu.asu.diging.citesphere.user.IUser;
 @PropertySource("classpath:/config.properties")
 public class UploadCollectionJobManager implements IUploadCollectionJobManager {
 
-private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Value("${_job_page_size}")
     private int jobPageSize;
