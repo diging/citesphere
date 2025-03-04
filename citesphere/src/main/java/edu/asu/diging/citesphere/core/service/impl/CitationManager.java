@@ -14,6 +14,9 @@ import java.util.function.BiFunction;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -181,15 +184,15 @@ public class CitationManager implements ICitationManager {
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         long citationVersion = zoteroManager.getGroupItemVersion(user, groupId, citation.getKey());
         Optional<ICitation> storedCitationOptional = citationStore.findById(citation.getKey());
+        ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         if (storedCitationOptional.isPresent()) {
             ICitation storedCitation = storedCitationOptional.get();
             if (storedCitation.getVersion() != citationVersion) {
                 throw new CitationIsOutdatedException();
             }
-            citationStore.delete(storedCitation);
+            updatedCitation.setId(storedCitation.getId());
         }
 
-        ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         citationStore.save(updatedCitation);
     }
     
@@ -251,7 +254,7 @@ public class CitationManager implements ICitationManager {
 
             Optional<ICitation> oldCitation = citationStore.findById(itemKey);
             if (oldCitation.isPresent()) {
-                citationStore.delete(oldCitation.get());
+                citation.setId(oldCitation.get().getId());
             }
             citationStore.save(citation);
             return citation;
@@ -326,8 +329,9 @@ public class CitationManager implements ICitationManager {
             if (groupOptional.isPresent()) {
                 ICitationGroup group = groupOptional.get();
                 if (group.getMetadataVersion() != groupVersions.get(id)) {
-                    groupRepository.delete((CitationGroup) group);
+                    ObjectId groupID = group.getId();
                     group = zoteroManager.getGroup(user, id + "", true);
+                    group.setId(groupID);
                     group.setUpdatedOn(OffsetDateTime.now().toString());
                 }
                 addUserToGroup(group, user);
@@ -382,6 +386,9 @@ public class CitationManager implements ICitationManager {
         if (!groupOptional.isPresent() || !groupOptional.get().getUsers().contains(user.getUsername())) {
             group = zoteroManager.getGroup(user, groupId, false);
             if (group != null) {
+                if (groupOptional.isPresent()){
+                    group.setId(groupOptional.get().getId());
+                }
                 group.getUsers().add(user.getUsername());
                 groupRepository.save((CitationGroup) group);
             }
@@ -399,13 +406,14 @@ public class CitationManager implements ICitationManager {
             long previousVersion = group.getContentVersion();
             // first update the group info
             // if we are using a previously stored group, delete it
+            ICitationGroup zoteroGroup = null;
             if (group.getId() != null) {
-                groupRepository.delete((CitationGroup) group);
-                group = zoteroManager.getGroup(user, groupId + "", true);
+                zoteroGroup = zoteroManager.getGroup(user, groupId + "", true);
+                zoteroGroup.setId(group.getId());
             }
-            group.setUpdatedOn(OffsetDateTime.now().toString());
-            addUserToGroup(group, user);
-            group = groupRepository.save((CitationGroup) group);
+            zoteroGroup.setUpdatedOn(OffsetDateTime.now().toString());
+            addUserToGroup(zoteroGroup, user);
+            group = groupRepository.save((CitationGroup) zoteroGroup);
 
             // then update content
             results.setNotModified(false);
