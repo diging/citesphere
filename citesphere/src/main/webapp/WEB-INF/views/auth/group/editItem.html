@@ -1,7 +1,7 @@
 <html layout:decorate="~{layouts/main}">
 <head>	
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
-<script th:src="@{/resources/authorities/authorities.js}"></script>
+
 <style>
 .popover {
 	min-width: 300px;
@@ -17,15 +17,18 @@
 </style>
 <script th:inline="javascript">
 	$(document).ready(function() {
-		 var csrfParameterName = [[${_csrf.parameterName}]];
-		var csrfToken = [[${_csrf.token}]];
-		var zoteroGroupId = [(${zoteroGroupId})];
-		console.log(zoteroGroupId);
-		console.log(csrfParameterName);
-		console.log(csrfToken);
+		 window.csrfParameterName = [[${_csrf.parameterName}]];
+		 window.csrfToken = [[${_csrf.token}]];
+		 window.zoteroGroupId = [(${zoteroGroupId})];
+		console.log(window.zoteroGroupId);
+		console.log(window.csrfParameterName);
+		console.log(window.csrfToken);
 	});
+</script>
+<script th:src="@{/resources/authorities/authorities.js}"></script>
+<script th:inline="javascript">
 	
-	$(function() {
+$(document).ready(function() {
 		$("#uriLoadingSpinnerAuthor").hide();
 		$("#uriLoadingFailureAuthor").hide();
 		$("#uriLoadingFoundAuthor").hide();
@@ -346,7 +349,6 @@
 	});
 	
 	$(document).ready(function() {
-		console.log("Doc ready");
 		if( [[${citation}]] == null){
 			$("#items").val("${defaultItemType}");
 		}

@@ -346,6 +346,13 @@ var affiliationTemplate = $($.parseHTML('<div class="aff-entry">' +
 // 	});
 // });
 
+
+console.log("Doc ready");
+		console.log(zoteroGroupId);
+		console.log(csrfParameterName);
+		console.log(csrfToken);
+		
+		
 /*Clones the affiliation template, modifies it appropriately and appends it to the given modal type*/
 function addAffiliation(modalType, counter) {
 	modalTypeL = modalType.toLowerCase();
@@ -785,7 +792,7 @@ function getPersonAuthority(uri, personType) {
 function getUserAuthorities(modalType, personType, page) {
 	var firstName = $("#firstName"+personType).val();
 	var lastName = $("#lastName"+personType).val();
-	console.log("getUserAuthorities")
+	console.log("getUserAuthorities " + zoteroGroupId +" " + firstName + " " + csrfParameterName + " " + csrfToken);
 	if (lastName === undefined) {
 	    lastName = "";
 	}
@@ -795,9 +802,12 @@ function getUserAuthorities(modalType, personType, page) {
   		dataType: "json",
   		type: 'GET',
   		url: url ,
+  		headers: {
+        [csrfParameterName] : csrfToken
+    	},
   		async: false,
   		success: function(data) {
-			
+			console.log(data);
   			$("#userAuthoritySearchResult").empty();
   			var content = '';
   			
@@ -846,6 +856,7 @@ function getUserAuthorities(modalType, personType, page) {
 		 	
         },
     	error: function(data){
+			console.log(data);
     		$('#userAuthoritySearchResult').parents('table').hide()
     		$("#userAuthoritiesError").show();	
     	}
