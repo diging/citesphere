@@ -12,8 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.HttpClientErrorException;
 
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
@@ -39,7 +38,7 @@ public class GilesDocumentController {
         Optional<IGilesUpload> uploadOptional = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null).filter(g -> g.getUploadedFile().getId().equals(fileId)).findFirst();
         if (!uploadOptional.isPresent()) {
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
-            return "error/404";
+            return "redirect:/error/404";
         }
         
         IGilesUpload upload = uploadOptional.get();
@@ -47,9 +46,9 @@ public class GilesDocumentController {
         
         try {
             content = gilesConnector.getFile((IUser)authentication.getPrincipal(), fileId);
-        } catch (ResourceAccessException ex) {
-            logger.error("This file is not available. Maybe you uploaded it with a different Citesphere instance?");
-            return "error/404";
+        } catch (HttpClientErrorException.NotFound ex) {
+            logger.error("This file is not available. Maybe you uploaded it with a different Citesphere instance?", ex);
+            return "redirect:/error/gilesDocumentError";
         }
         
         response.setContentType(upload.getUploadedFile().getContentType());
