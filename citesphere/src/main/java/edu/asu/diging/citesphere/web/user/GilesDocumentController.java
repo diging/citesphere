@@ -38,7 +38,7 @@ public class GilesDocumentController {
         Optional<IGilesUpload> uploadOptional = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null).filter(g -> g.getUploadedFile().getId().equals(fileId)).findFirst();
         if (!uploadOptional.isPresent()) {
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
-            return "redirect:/error/404";
+            return "error/404";
         }
         
         IGilesUpload upload = uploadOptional.get();
@@ -48,7 +48,7 @@ public class GilesDocumentController {
             content = gilesConnector.getFile((IUser)authentication.getPrincipal(), fileId);
         } catch (HttpClientErrorException.NotFound ex) {
             logger.error("This file is not available. Maybe you uploaded it with a different Citesphere instance?", ex);
-            return "redirect:/error/gilesDocumentError";
+            return "error/gilesDocumentError";
         }
         
         response.setContentType(upload.getUploadedFile().getContentType());
