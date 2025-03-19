@@ -145,9 +145,11 @@ public class AddNewItemController extends V1Controller {
 
         try {
             citation = citationManager.createCitation(user, zoteroGroupId, collectionIds, citation);
-        } catch (ZoteroItemCreationFailedException | ZoteroConnectionException | ZoteroHttpStatusException e) {
+        } catch (ZoteroItemCreationFailedException | ZoteroHttpStatusException e) {
             logger.error("Zotero Item creation failed. ", e);
             return new ResponseEntity<>("Error: Zetero Item creation failed. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ZoteroConnectionException e) {
+            //TODO: add error logging
         } catch (GroupDoesNotExistException e) {
             logger.error("Group " + zoteroGroupId +" does not exists. ", e);
             return new ResponseEntity<>("Error: Group " + zoteroGroupId +" does not exists. ", HttpStatus.BAD_REQUEST);
@@ -170,9 +172,11 @@ public class AddNewItemController extends V1Controller {
                 } catch (IOException e) {
                     logger.error("Could not read file from the request. ", e);
                     return new ResponseEntity<>("Error: Could not read file from the request.", HttpStatus.BAD_REQUEST);
-                } catch (ZoteroHttpStatusException | ZoteroConnectionException | ZoteroItemCreationFailedException e) {
+                } catch (ZoteroHttpStatusException | ZoteroItemCreationFailedException e) {
                     logger.error("Zotero exception occured ", e);
                     return new ResponseEntity<>("Error: Zotero Exception occured: "+ e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                } catch (ZoteroConnectionException e) {
+                    //TODO: add error logging
                 } catch (HttpClientErrorException.Unauthorized e) {
                     logger.error("Unauthorized to upload files to Giles ", e);
                     return new ResponseEntity<>("Error: Unauthorized to upload files to Giles.", HttpStatus.UNAUTHORIZED);

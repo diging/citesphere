@@ -126,7 +126,7 @@ public class EditItemController {
             @RequestParam(defaultValue = "1", required = false, value = "page") int page,
             @RequestParam(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
-            throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
+            throws GroupDoesNotExistException, CannotFindCitationException,
             ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         // load authors and editors before detaching
@@ -161,6 +161,8 @@ public class EditItemController {
             model.addAttribute("collectionId", collectionId);
             model.addAttribute("sortBy", sortBy);
             return "auth/group/editConflict";
+        } catch (ZoteroConnectionException e) {
+            //TODO: add error logging
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }
