@@ -149,7 +149,7 @@ public class AddNewItemController extends V1Controller {
             logger.error("Zotero Item creation failed. ", e);
             return new ResponseEntity<>("Error: Zetero Item creation failed. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (ZoteroConnectionException e) {
-            //TODO: add error logging
+            return new ResponseEntity<>("Error: Zetero Item creation failed. Please check Zoetro Key Permissions. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (GroupDoesNotExistException e) {
             logger.error("Group " + zoteroGroupId +" does not exists. ", e);
             return new ResponseEntity<>("Error: Group " + zoteroGroupId +" does not exists. ", HttpStatus.BAD_REQUEST);
@@ -176,7 +176,7 @@ public class AddNewItemController extends V1Controller {
                     logger.error("Zotero exception occured ", e);
                     return new ResponseEntity<>("Error: Zotero Exception occured: "+ e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
                 } catch (ZoteroConnectionException e) {
-                    //TODO: add error logging
+                    return new ResponseEntity<>("Error: Zetero Item creation failed. Please check Zoetro Key Permissions. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
                 } catch (HttpClientErrorException.Unauthorized e) {
                     logger.error("Unauthorized to upload files to Giles ", e);
                     return new ResponseEntity<>("Error: Unauthorized to upload files to Giles.", HttpStatus.UNAUTHORIZED);

@@ -162,7 +162,13 @@ public class EditItemController {
             model.addAttribute("sortBy", sortBy);
             return "auth/group/editConflict";
         } catch (ZoteroConnectionException e) {
-            //TODO: add error logging
+            model.addAttribute("form", form);
+            model.addAttribute("zoteroGroupId", zoteroGroupId);
+            model.addAttribute("show_alert", true);
+            model.addAttribute("alert_type", "danger");
+            String msg = "Sorry, item updation failed. Please check the Zotero Key permissions.";
+            model.addAttribute("alert_msg", msg);
+            return "auth/group/editItem";
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }

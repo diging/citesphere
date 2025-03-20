@@ -89,7 +89,7 @@ public class AddItemController {
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create", method = RequestMethod.POST)
     public String create(@ModelAttribute CitationForm form, Authentication authentication, Model model,
             @PathVariable("zoteroGroupId") String zoteroGroupId)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
+            throws GroupDoesNotExistException, ZoteroHttpStatusException {
         ICitation citation = new Citation();
         List<String> collectionIds = new ArrayList<>();
         if (form.getCollectionId() != null && !form.getCollectionId().trim().isEmpty()) {
@@ -108,6 +108,14 @@ public class AddItemController {
             String msg = e.getResponse().getFailed().get("0") != null
                     ? e.getResponse().getFailed().get("0").getMessage()
                     : "Sorry, item creation failed.";
+            model.addAttribute("alert_msg", msg);
+            return "auth/group/editItem";
+        } catch (ZoteroConnectionException e) {
+            model.addAttribute("form", form);
+            model.addAttribute("zoteroGroupId", zoteroGroupId);
+            model.addAttribute("show_alert", true);
+            model.addAttribute("alert_type", "danger");
+            String msg = "Sorry, item creation failed. Please check the Zotero Key permissions.";
             model.addAttribute("alert_msg", msg);
             return "auth/group/editItem";
         }

@@ -36,10 +36,13 @@ public class RevertCitationController {
             citationVersionManager.revertCitationVersion((IUser) authentication.getPrincipal(), zoteroGroupId, itemId,
                     version);
             return "redirect:/auth/group/" + zoteroGroupId + "/items/" + itemId;
-        } catch (GroupDoesNotExistException | ZoteroConnectionException | CitationIsOutdatedException
+        } catch (GroupDoesNotExistException | CitationIsOutdatedException
                 | ZoteroHttpStatusException | CannotFindCitationVersionException | CannotFindCitationException | ZoteroItemCreationFailedException e) {
             logger.error("Error while restoring citation version", e);
             return "error/404";
+        } catch (ZoteroConnectionException e) {
+            logger.error("Error while restoring citation version. Please check the Zotero Key permissions", e);
+            return "error/500";
         }
 
     }
