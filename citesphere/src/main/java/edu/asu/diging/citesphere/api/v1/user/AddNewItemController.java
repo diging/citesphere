@@ -150,9 +150,9 @@ public class AddNewItemController extends V1Controller {
                 ObjectMapper mapper = new ObjectMapper();
                 ObjectNode root = mapper.createObjectNode(); 
                 for (MultipartFile file: itemWithGiles.getFiles()) {
-                        IGilesUpload job = jobManager.createGilesJob(user, file, file.getBytes(), zoteroGroupId,
-                                citation.getKey());
-                        gilesUtil.createJobObjectNode(root, job);
+                    IGilesUpload job = jobManager.createGilesJob(user, file, file.getBytes(), zoteroGroupId,
+                            citation.getKey());
+                    gilesUtil.createJobObjectNode(root, job);
                 }
             }
         } catch (GroupDoesNotExistException e) {
