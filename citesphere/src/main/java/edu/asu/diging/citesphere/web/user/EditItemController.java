@@ -125,7 +125,8 @@ public class EditItemController {
             @RequestParam(required = false, value = "index") String index,
             @RequestParam(defaultValue = "1", required = false, value = "page") int page,
             @RequestParam(value = "collectionId", required = false) String collectionId,
-            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy,
+            RedirectAttributes redirectAttributes)
             throws GroupDoesNotExistException, CannotFindCitationException,
             ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
@@ -162,13 +163,12 @@ public class EditItemController {
             model.addAttribute("sortBy", sortBy);
             return "auth/group/editConflict";
         } catch (ZoteroConnectionException e) {
-            model.addAttribute("form", form);
-            model.addAttribute("zoteroGroupId", zoteroGroupId);
-            model.addAttribute("show_alert", true);
-            model.addAttribute("alert_type", "danger");
-            String msg = "Sorry, item updation failed. Please check the Zotero Key permissions.";
-            model.addAttribute("alert_msg", msg);
-            return "auth/group/editItem";
+            redirectAttributes.addFlashAttribute("form", form);
+            redirectAttributes.addFlashAttribute("zoteroGroupId", zoteroGroupId);
+            redirectAttributes.addFlashAttribute("show_alert", true);
+            redirectAttributes.addFlashAttribute("alert_type", "danger");
+            redirectAttributes.addFlashAttribute("alert_msg", "Sorry, item updation failed. Please check the Zotero Key permissions.");
+            return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}/edit?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }
