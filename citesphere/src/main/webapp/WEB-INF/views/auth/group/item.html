@@ -111,7 +111,10 @@
 	            success: function(data) {
 	                document.getElementById('uploadFileInput').value = '';
 	                $("#uploadFileModal").modal('hide');
-	            }
+	            },
+		        error: function(data) {
+		            showNotification(" Error while attempting to upload files!", "danger", 10000);
+		        }
 	        });
   
 	    });
