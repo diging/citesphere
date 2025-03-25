@@ -103,6 +103,7 @@
         <isiscb.url></isiscb.url>
         <isiscb.uriString>https://data.isiscb.org/isis/authority/{0}/</isiscb.uriString>
         <isiscb.token></isiscb.token>
+        <isiscb.disable.ssl.verification>false</isiscb.disable.ssl.verification>
 
     </properties>
 

@@ -1,13 +1,19 @@
 package edu.asu.diging.citesphere.core.authority.impl;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLContext;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.TrustStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -43,18 +49,35 @@ public class IsiscbImporter extends BaseAuthorityImporter {
     
     @Value("${_isiscb_token}")
     private String isisCBtoken;
+    
+    @Value("${_isiscb_disable_ssl_verification}")
+    private boolean disableSslVerification;
 
     private RestTemplate restTemplate;
-
+    
     @PostConstruct
-    private void postConstruct() {
-
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        HttpClient httpClient = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
-        factory.setHttpClient(httpClient);
-
-        restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(factory);
+    private void postConstruct() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+        if(disableSslVerification) {
+            TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+    
+            SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+                            .loadTrustMaterial(null, acceptingTrustStrategy)
+                            .build();
+    
+            SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+    
+            CloseableHttpClient httpClient = HttpClients.custom()
+                            .setSSLSocketFactory(csf)
+                            .build();
+    
+            HttpComponentsClientHttpRequestFactory requestFactory =
+                            new HttpComponentsClientHttpRequestFactory();
+    
+            requestFactory.setHttpClient(httpClient);
+            restTemplate = new RestTemplate(requestFactory);
+        } else {
+            restTemplate = new RestTemplate();
+        }
     }
 
     /*
