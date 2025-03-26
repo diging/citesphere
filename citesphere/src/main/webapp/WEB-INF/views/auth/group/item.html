@@ -112,9 +112,9 @@
 	                document.getElementById('uploadFileInput').value = '';
 	                $("#uploadFileModal").modal('hide');
 	            },
-		        error: function(data) {
+	            error: function(data) {
 		        	$("#uploadFileModal").modal('hide');
-		            showNotification(" Error while attempting to upload files!", "danger", 10000);
+		            showNotification(" Error while attempting to upload files!", "danger");
 		        }
 	        });
   
@@ -276,16 +276,16 @@
 	    }); 
 	}
 	
-	function showNotification(message, status, time) {
+	function showNotification(message, status, time=0) {
 		$.notify('<i class="fas fa-exclamation-circle"></i>'+ message, {
 			type: status,
-		        offset: {x: 50, y: 90},
-		        timer: time,
-		        animate: {
-		            enter: 'animated fadeInRight',
-		            exit: 'animated fadeOutRight'
-		        },
-	    	});
+		    offset: {x: 50, y: 90},
+ 		    timer: time,
+		    animate: {
+		    	enter: 'animated fadeInRight',
+		        exit: 'animated fadeOutRight'
+		    },
+	    });
 	}
 	
 </script>
