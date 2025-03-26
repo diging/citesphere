@@ -110,7 +110,10 @@
 	            data: formData, 
 	            success: function(data) {
 	                document.getElementById('uploadFileInput').value = '';
-	                $("#uploadFileModal").modal('hide');
+	        		showSuccessLoader();
+	                setTimeout(function(){
+		            	$("#uploadFileModal").modal('hide');
+		            }, 2000);
 	            }
 	        });
   
@@ -283,6 +286,27 @@
 		        },
 	    	});
 	}
+	
+	function showSuccessLoader() {
+	    const loader = document.createElement('div');
+	    loader.classList.add('loader');
+	    
+	    loader.style.border = '6px solid #f3f3f3';
+	    loader.style.borderTop = '6px solid #3498db';
+	    loader.style.borderRadius = '50%';
+	    loader.style.width = '30px';
+	    loader.style.height = '30px';
+	    loader.style.animation = 'spin 2s linear infinite';
+	    loader.style.display = 'inline-block';
+
+	    const message = document.createElement('p');
+	    message.textContent = 'upload started...';
+	    message.style.display = 'inline-block';
+
+		const uploadFileBody = document.getElementById('uploadFileBody');
+		uploadFileBody.append(loader);
+		uploadFileBody.append(message);
+    }
 	
 </script>
 </head>
@@ -640,9 +664,9 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title">Upload File</h4>
           </div>
-          <div class="modal-body">
-            <label>Choose file to upload</label>
-            <input type="file" id="uploadFileInput">
+          <div class="modal-body" id="uploadFileBody">
+            <label style="display: block;">Choose file to upload</label>
+            <input type="file" id="uploadFileInput" style="display: inline-block;">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
