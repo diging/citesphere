@@ -32,7 +32,8 @@ public class AuthorityItemsController {
 
 
     @RequestMapping("/auth/authority/items")
-    public String showPage(Model model, @RequestParam("uri") String uri, Authentication authentication) {
+    public String showPage(Model model, @RequestParam("uri") String uri, 
+            @RequestParam("name") String name, Authentication authentication) {
         List<IAuthorityEntry> authorityEntries = authorityService.findByUri((IUser) authentication.getPrincipal(), uri);
         
         if(authorityEntries == null || authorityEntries.isEmpty()) {
@@ -43,6 +44,7 @@ public class AuthorityItemsController {
         } else {
             Citations citations = citationManager.findAuthorityCitations(authorityEntries.get(0), (IUser) authentication.getPrincipal());
             if (citations != null) {
+                model.addAttribute("name", name);
                 model.addAttribute("items", citations.getCitations());
             } else {
                 model.addAttribute("items", new ArrayList<ICitation>());
