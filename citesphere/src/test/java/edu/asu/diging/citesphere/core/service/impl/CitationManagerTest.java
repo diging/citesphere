@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -482,11 +481,13 @@ public class CitationManagerTest {
         citation.getReferences().add(reference);
         citation.setVersion(1L);
         
-        Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, CITATION_KEY)).thenReturn(currentVersion);
+        when(zoteroManager.getGroupItemVersion(user, GROUP_ID, CITATION_KEY)).thenReturn(currentVersion);
         ICitation updatedCitation = new Citation();
         updatedCitation.setKey(CITATION_KEY);
         updatedCitation.setVersion(new Long(2));
-        Mockito.when(zoteroManager.updateCitation(user, GROUP_ID, citation)).thenReturn(updatedCitation);
+       
+        when(zoteroManager.updateCitation(Mockito.eq(user), Mockito.eq(GROUP_ID), Mockito.any(ICitation.class)))
+            .thenReturn(updatedCitation);
         
         when(citationStore.save(citation)).thenReturn(updatedCitation);
         when(citationStore.findById(citation.getKey())).thenReturn(Optional.of(citation));
@@ -503,12 +504,14 @@ public class CitationManagerTest {
         citation.setReferences(null);
         citation.setVersion(1L);
         
-        Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, CITATION_KEY)).thenReturn(currentVersion);
+        when(zoteroManager.getGroupItemVersion(user, GROUP_ID, CITATION_KEY)).thenReturn(1L);
         ICitation updatedCitation = new Citation();
         updatedCitation.setKey(CITATION_KEY);
-        updatedCitation.setVersion(new Long(2));
-        Mockito.when(zoteroManager.updateCitation(user, GROUP_ID, citation)).thenReturn(updatedCitation);
-        
+        updatedCitation.setVersion(2L);
+
+        when(zoteroManager.updateCitation(Mockito.eq(user), Mockito.eq(GROUP_ID), Mockito.any(ICitation.class)))
+            .thenReturn(updatedCitation);
+
         when(citationStore.save(citation)).thenReturn(updatedCitation);
         when(citationStore.findById(citation.getKey())).thenReturn(Optional.of(citation));
         doNothing().when(citationStore).delete(any(ICitation.class));
