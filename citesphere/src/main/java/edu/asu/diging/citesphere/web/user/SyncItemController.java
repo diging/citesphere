@@ -28,7 +28,7 @@ public class SyncItemController {
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId, @RequestParam(required = false, value = "index") String index, @RequestParam(defaultValue = "1", required = false, value = "page") int page,@RequestParam(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         citationManager.updateCitationFromZotero((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
-        uploadChecker.checkUploadStatus(itemId);
+        uploadChecker.checkUploadStatus(itemId, (IUser)authentication.getPrincipal());
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }
     
@@ -39,7 +39,7 @@ public class SyncItemController {
             @RequestParam(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) 
                     throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
-        uploadChecker.checkUploadStatus(itemId);
+        uploadChecker.checkUploadStatus(itemId, (IUser)authentication.getPrincipal());
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }
 }

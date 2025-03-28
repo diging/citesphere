@@ -1,5 +1,7 @@
 package edu.asu.diging.citesphere.core.service.giles;
 
+import edu.asu.diging.citesphere.user.IUser;
+
 public interface GilesUploadChecker {
 
     void add(String uploadKey);
@@ -7,6 +9,6 @@ public interface GilesUploadChecker {
     // in milliseconds (60000ms = 1m)
     void checkUploads();
 
-    void checkUploadStatus(String citationKey);
+    void checkUploadStatus(String citationKey, IUser user);
 
 }

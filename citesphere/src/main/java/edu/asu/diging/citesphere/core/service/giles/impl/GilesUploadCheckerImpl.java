@@ -104,16 +104,15 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
     @Scheduled(fixedDelay = 60000)
     public void checkUploads() {
         for (String citationKey : uploadQueue) {
-            checkUploadStatus(citationKey);
+            checkUploadStatus(citationKey, null);
         }
     }
     
     @Override
-    public void checkUploadStatus(String citationKey) {
+    public void checkUploadStatus(String citationKey, IUser user) {
         ICitation citation = citationManager.getCitation(citationKey);
         Set<IGilesUpload> checkedUploads = new HashSet<>();
         boolean needsUpdating = false;
-        IUser user = null;
         for (IGilesUpload upload : citation.getGilesUploads()) {
             if (upload.getUploadingUser() == null
                     || Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
@@ -122,8 +121,10 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                 // or the upload has been processed
                 continue;
             }
-
-            user = userManager.findByUsername(upload.getUploadingUser());
+            
+            if(user == null) {
+                user = userManager.findByUsername(upload.getUploadingUser());
+            }
             String token = internalTokenManager.getAccessToken(user).getValue();
 
             HttpHeaders headers = new HttpHeaders();
