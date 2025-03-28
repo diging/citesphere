@@ -44,12 +44,12 @@ public class AuthorityItemsController {
         } else {
             Citations citations = citationManager.findAuthorityCitations(authorityEntries.get(0), (IUser) authentication.getPrincipal());
             if (citations != null) {
-                model.addAttribute("name", name);
                 model.addAttribute("items", citations.getCitations());
             } else {
-                model.addAttribute("items", new ArrayList<ICitation>());
+                model.addAttribute("error", "This authority is not used for any citations.");
             }
         }
+        model.addAttribute("authName", name.trim());
         return "auth/authorities/showItemsByName";
     }
 }
