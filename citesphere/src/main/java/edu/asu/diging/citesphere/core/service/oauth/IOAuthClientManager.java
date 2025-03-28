@@ -16,7 +16,7 @@ public interface IOAuthClientManager {
 
     ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException;
 
-    OAuthCredentials create(String name, String description, List<OAuthScope> scopes, Set<String> grantTypes, String redirectUrl, List<GrantedAuthority> authorities);
+    OAuthCredentials create(String name, String description, List<OAuthScope> scopes, Set<String> grantTypes, String redirectUrl, List<GrantedAuthority> authorities, IUser user);
 
     OAuthClientResultPage getAllClientDetails(Pageable pageable);
 
