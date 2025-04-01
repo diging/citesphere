@@ -149,7 +149,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         if (clientOptional.isPresent()) {
             OAuthClient client = clientOptional.get();
             if (client.getIsUserAccessToken()) {
-                IUser user = userManager.findByUsername(client.getCreatedByUsername());
+                IUser user = client.getCreatedBy();
                 OAuth2AccessToken accessToken = createAccessToken(client.getClientId(), user);
                 client.setClientSecret(bCryptPasswordEncoder.encode(accessToken.getValue()));
                 OAuthClient storeClient = clientRepo.save(client);
@@ -194,7 +194,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         client.setAuthorities(authorities);
         client.setScope(new HashSet<>());
         client.getScope().add(OAuthScope.READ.getScope());
-        client.setCreatedByUsername(user.getUsername());
+        client.setCreatedBy(user);
         client.setIsUserAccessToken(true);
         OAuthClient storeClient = clientRepo.save(client);
         OAuth2AccessToken accessToken = createAccessToken(storeClient.getClientId(), user);
@@ -238,6 +238,8 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
                 throw new IllegalStateException("UTF-8 encoding not available.  Fatal (should be in the JDK).");
             }
         }
+    }
+    
     public void setAccessTokenValidity(int accessTokenValidity) {
         this.accessTokenValidity = accessTokenValidity;
     }
