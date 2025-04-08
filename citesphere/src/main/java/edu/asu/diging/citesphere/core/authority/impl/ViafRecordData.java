@@ -15,11 +15,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class ViafRecordData {
 
-    @JsonProperty("ns3:nameType")
     private String nameType;
-    @JsonProperty("ns3:mainHeadings")
     private MainHeadings mainHeadings;
-    @JsonProperty("ns3:Document")
+    @JsonProperty("Document")
     private Map<String, Object> document;
     
     public String getNameType() {
@@ -49,7 +47,6 @@ public class ViafRecordData {
     static public class MainHeadings {
         
         @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-        @JsonProperty("ns3:data")
         private List<Data> data;
 
         public List<Data> getData() {
@@ -62,7 +59,6 @@ public class ViafRecordData {
     }
     
     static public class Data {
-        @JsonProperty("ns3:text")
         private String text;
 
         public String getText() {

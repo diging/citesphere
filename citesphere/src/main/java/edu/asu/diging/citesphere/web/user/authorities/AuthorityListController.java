@@ -117,12 +117,20 @@ public class AuthorityListController {
     
     @RequestMapping("/auth/authority/list/{source}")
     public String getAuthoritiesForSource(Model model, Authentication authentication,
-            @PathVariable("source") String source) {
+            @PathVariable("source") String source, @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
     	System.out.println(source);
+    	Integer pageInt = 1;
+        try {
+            pageInt = new Integer(page);
+        } catch (NumberFormatException ex) {
+            logger.error("Trying to access invalid page number: ", ex);
+        }
+        pageInt = (pageInt - 1) < 0 ? 0 : pageInt - 1;
     	IUser user = (IUser) authentication.getPrincipal();
         List<ICitationGroup> userGroups = citationManager.getGroups(user);
-        List<IAuthorityEntry> authorities = authorityService.getAll(user,
-                userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()));
+        Page<IAuthorityEntry> authoritiesPage = authorityService.getAll(user,
+                userGroups.stream().map(group -> group.getGroupId()).collect(Collectors.toList()),pageInt, authorityPageSize);
+        List<IAuthorityEntry> authorities = authoritiesPage.getContent();
         model.addAttribute("importedAuthoritySources", authorities.stream()
                 .map(authorityEntry -> authorityEntry.getImporterId()).distinct().collect(Collectors.toList()));
         model.addAttribute("authorities",
@@ -130,6 +138,9 @@ public class AuthorityListController {
         model.addAttribute("groups", userGroups);
         model.addAttribute("displayBy", "source-" + source);
         model.addAttribute("username", user.getUsername());
+        model.addAttribute("total", authoritiesPage.getTotalElements());
+        model.addAttribute("totalPages", authoritiesPage.getTotalPages() > 0 ? authoritiesPage.getTotalPages() : 1);
+        model.addAttribute("currentPage", page);
         return "auth/authorities/list";
     }
 }
