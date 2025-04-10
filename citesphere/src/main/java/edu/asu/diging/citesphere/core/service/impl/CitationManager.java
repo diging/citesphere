@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,8 +16,6 @@ import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -47,6 +46,7 @@ import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IPerson;
 import edu.asu.diging.citesphere.model.bib.IReference;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
@@ -93,11 +93,36 @@ public class CitationManager implements ICitationManager {
     @PostConstruct
     public void init() {
         sortFunctions = new HashMap<>();
-        sortFunctions.put("title", ((o1, o2) -> {
-            String o1Title = o1 != null && o1.getTitle() != null ? o1.getTitle() : "";
-            String o2Title = o2 != null && o2.getTitle() != null ? o2.getTitle() : "";
-            return o1Title.toLowerCase().compareTo(o2Title.toLowerCase());
-        }));
+
+        sortFunctions.put("title", (o1, o2) -> {
+            String t1 = Optional.ofNullable(o1).map(ICitation::getTitle).orElse("").toLowerCase();
+            String t2 = Optional.ofNullable(o2).map(ICitation::getTitle).orElse("").toLowerCase();
+            return t1.compareTo(t2);
+        });
+     // Author (first author's last name)
+        sortFunctions.put("author", (o1, o2) -> {
+            String a1 = o1 != null && o1.getAuthors() != null
+                    ? o1.getAuthors().stream().findFirst().map(IPerson::getLastName).orElse("")
+                    : "";
+            String a2 = o2 != null && o2.getAuthors() != null
+                    ? o2.getAuthors().stream().findFirst().map(IPerson::getLastName).orElse("")
+                    : "";
+            return a1.compareToIgnoreCase(a2);
+        });
+
+        // Date (dateFreetext)
+        sortFunctions.put("date", (o1, o2) -> {
+            Integer d1 = Integer.parseInt(Optional.ofNullable(o1).map(ICitation::getDateFreetext).orElse(null));
+            Integer d2 = Integer.parseInt(Optional.ofNullable(o2).map(ICitation::getDateFreetext).orElse(null));
+            return d1.compareTo(d2);
+        });
+
+        // URL
+        sortFunctions.put("url", (o1, o2) -> {
+            String u1 = Optional.ofNullable(o1).map(ICitation::getUrl).orElse("").toLowerCase();
+            String u2 = Optional.ofNullable(o2).map(ICitation::getUrl).orElse("").toLowerCase();
+            return u1.compareTo(u2);
+        });
     }
 
     @Override
@@ -442,6 +467,11 @@ public class CitationManager implements ICitationManager {
             } else {
                 total = citations.size();
             }
+        }
+        BiFunction<ICitation, ICitation, Integer> sorter = sortFunctions.get(sortBy);
+        if (sorter != null) {
+            Comparator<ICitation> comparator = sorter::apply;
+            citations.sort(comparator);
         }
         results.setCitations(citations != null ? citations : new ArrayList<>());
         results.setTotalResults(total);
