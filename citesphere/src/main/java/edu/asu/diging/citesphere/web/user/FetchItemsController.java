@@ -58,7 +58,7 @@ public class FetchItemsController {
     public @ResponseBody String show(Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sort,
             @RequestParam(required = false, value = "columns") String[] columns) {
         Integer pageInt = 1;
         try {

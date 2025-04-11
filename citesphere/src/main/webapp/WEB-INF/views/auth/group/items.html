@@ -550,6 +550,23 @@ function rewriteColumnsList(data){
   $("#addionalColumns").replaceWith(columnsList);
 }
 
+function onSortChange(sortBy) {
+    const sortLabelMap = {
+        title: "Title",
+        type: "Type",
+        author: "Author",
+        date: "Date",
+        url: "URL"
+    };
+
+    const label = sortLabelMap[sortBy] || sortBy;
+    document.getElementById("sortLabel").textContent = "Sort by: " + label;
+
+    const params = new URLSearchParams(window.location.search);
+    params.set("sortBy", sortBy);
+    window.location.search = params.toString();
+}
+
 </script>
 </div>
 
@@ -648,7 +665,7 @@ function rewriteColumnsList(data){
 <div class="col-md-10" id="citationBlock">
 
 	<div>
-	    <div th:if="${!param.keySet().contains('searchTerm')}" class="dropdown pull-left">
+	    <div th:if="${!param.keySet().contains('searchTerm')}" class="dropdown pull-left"  style="margin-right: 10px;">
 	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 	            Filter by Concept
 	            <span class="caret"></span>
@@ -665,6 +682,20 @@ function rewriteColumnsList(data){
 	            </tbody>
 	        </ul>
 	    </div>
+	    
+	    <div class="dropdown pull-left">
+		    <button class="btn btn-default dropdown-toggle" type="button" id="sortDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		        <span id="sortLabel">Sort by</span>
+		        <span class="caret"></span>
+		    </button>
+		    <ul class="dropdown-menu" aria-labelledby="sortDropdownMenu">
+		    	<li><a  onclick="onSortChange('title')">Title</a></li>
+		    	<li><a  onclick="onSortChange('type')">Type</a></li>
+		        <li><a  onclick="onSortChange('author')">Author</a></li>
+		        <li><a  onclick="onSortChange('date')">Date</a></li>
+		        <li><a  onclick="onSortChange('url')">URL</a></li>
+		    </ul>
+		</div>
         
 	    <div class="dropdown pull-right" style="padding-bottom: 10px;">
 	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

@@ -65,7 +65,7 @@ public class ItemsApiController extends V1Controller {
             @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sort,
             @RequestParam(required = false, value = "columns") String[] columns, Principal principal)
             throws GroupDoesNotExistException {
         Integer pageInt = 1;

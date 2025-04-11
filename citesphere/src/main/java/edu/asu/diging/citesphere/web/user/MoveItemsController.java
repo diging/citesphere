@@ -98,10 +98,11 @@ public class MoveItemsController {
     })
     public @ResponseBody Sync startSync(Authentication authentication,
             @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("targetCollectionId") String collectionId,
-            @RequestParam(defaultValue = "1", required = false, value = "page") String page) {
+            @RequestParam(defaultValue = "1", required = false, value = "page") String page,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy) {
         try {
             citationManager.getGroupItems((IUser) authentication.getPrincipal(), zoteroGroupId, collectionId,
-                    new Integer(page), null, null);
+                    new Integer(page), sortBy, null);
             Sync sync = new Sync();
             sync.setStatus("sync-started");
             return sync;

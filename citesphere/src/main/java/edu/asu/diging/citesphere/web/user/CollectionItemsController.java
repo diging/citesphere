@@ -33,7 +33,7 @@ public class CollectionItemsController {
 
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort)
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sort)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
         Integer pageInt = 1;
         try {

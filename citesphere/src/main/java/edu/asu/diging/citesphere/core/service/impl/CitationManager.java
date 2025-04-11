@@ -99,6 +99,18 @@ public class CitationManager implements ICitationManager {
             String t2 = Optional.ofNullable(o2).map(ICitation::getTitle).orElse("").toLowerCase();
             return t1.compareTo(t2);
         });
+        
+        sortFunctions.put("type", (o1, o2) -> {
+            String s1 = Optional.ofNullable(o1)
+                .map(ICitation::getItemType)
+                .map(Enum::name)
+                .orElse("");
+            String s2 = Optional.ofNullable(o2)
+                .map(ICitation::getItemType)
+                .map(Enum::name)
+                .orElse("");
+            return s1.compareToIgnoreCase(s2);
+        });
      // Author (first author's last name)
         sortFunctions.put("author", (o1, o2) -> {
             String a1 = o1 != null && o1.getAuthors() != null
