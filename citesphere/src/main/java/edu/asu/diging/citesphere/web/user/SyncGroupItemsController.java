@@ -22,7 +22,7 @@ public class SyncGroupItemsController {
             @PathVariable("zoteroGroupId") String zoteroGroupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sort,
             @RequestParam(required = false, value = "columns") String columns) throws GroupDoesNotExistException {
         if (page == null || page.trim().isEmpty()) {
             page = "1";

@@ -90,7 +90,7 @@ public class GroupItemsController {
         model.addAttribute("results", results);
         // more than 200 really don't make sense here, this needs to be changed
         try {
-            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
+            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, sortBy, 200));
         } catch(GroupDoesNotExistException e) {
             logger.error("Exception occured", e);
             return "error/404";

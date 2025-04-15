@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.impl;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,13 +94,13 @@ public class CitationManager implements ICitationManager {
     @PostConstruct
     public void init() {
         sortFunctions = new HashMap<>();
-
+        // Title
         sortFunctions.put("title", (o1, o2) -> {
             String t1 = Optional.ofNullable(o1).map(ICitation::getTitle).orElse("").toLowerCase();
             String t2 = Optional.ofNullable(o2).map(ICitation::getTitle).orElse("").toLowerCase();
             return t1.compareTo(t2);
         });
-        
+        // Type
         sortFunctions.put("type", (o1, o2) -> {
             String s1 = Optional.ofNullable(o1)
                 .map(ICitation::getItemType)
@@ -111,29 +112,49 @@ public class CitationManager implements ICitationManager {
                 .orElse("");
             return s1.compareToIgnoreCase(s2);
         });
-     // Author (first author's last name)
+        // Author 
         sortFunctions.put("author", (o1, o2) -> {
-            String a1 = o1 != null && o1.getAuthors() != null
-                    ? o1.getAuthors().stream().findFirst().map(IPerson::getLastName).orElse("")
-                    : "";
-            String a2 = o2 != null && o2.getAuthors() != null
-                    ? o2.getAuthors().stream().findFirst().map(IPerson::getLastName).orElse("")
-                    : "";
-            return a1.compareToIgnoreCase(a2);
+            List<IPerson> authors1 = o1 != null && o1.getAuthors() != null
+                    ? new ArrayList<>(o1.getAuthors())
+                    : Collections.emptyList();
+            List<IPerson> authors2 = o2 != null && o2.getAuthors() != null
+                    ? new ArrayList<>(o2.getAuthors())
+                    : Collections.emptyList();
+
+            int minSize = Math.min(authors1.size(), authors2.size());
+
+            for (int i = 0; i < minSize; i++) {
+                IPerson p1 = authors1.get(i);
+                IPerson p2 = authors2.get(i);
+                if(p1!=null && p2!=null) {
+                    String ln1 = p1.getLastName() != null ? p1.getLastName().replaceAll("\\s+", " ").trim() : "";
+                    String ln2 = p2.getLastName() != null ? p2.getLastName().replaceAll("\\s+", " ").trim() : "";
+    
+                    int cmp = ln1.compareToIgnoreCase(ln2);
+                    if (cmp != 0) return cmp;
+    
+                    String fn1 = p1.getFirstName() != null ? p1.getFirstName().replaceAll("\\s+", " ").trim() : "";
+                    String fn2 = p2.getFirstName() != null ? p2.getFirstName().replaceAll("\\s+", " ").trim() : "";
+    
+                    cmp = fn1.compareToIgnoreCase(fn2);
+                    if (cmp != 0) return cmp;
+                }
+            }
+            return Integer.compare(authors1.size(), authors2.size());
         });
 
         // Date (dateFreetext)
         sortFunctions.put("date", (o1, o2) -> {
-            Integer d1 = Integer.parseInt(Optional.ofNullable(o1).map(ICitation::getDateFreetext).orElse(null));
-            Integer d2 = Integer.parseInt(Optional.ofNullable(o2).map(ICitation::getDateFreetext).orElse(null));
-            return d1.compareTo(d2);
+            String d1 = Optional.ofNullable(o1).map(ICitation::getDateFreetext).orElse("");
+            String d2 = Optional.ofNullable(o2).map(ICitation::getDateFreetext).orElse("");
+            return d1.compareToIgnoreCase(d2);
         });
 
         // URL
         sortFunctions.put("url", (o1, o2) -> {
             String u1 = Optional.ofNullable(o1).map(ICitation::getUrl).orElse("").toLowerCase();
             String u2 = Optional.ofNullable(o2).map(ICitation::getUrl).orElse("").toLowerCase();
-            return u1.compareTo(u2);
+            return u1.compareToIgnoreCase(u2);
         });
     }
 

@@ -93,7 +93,7 @@ public class FetchItemsController {
 
         try {
             itemsData.setCitationCollections(
-                    collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
+                    collectionManager.getAllCollections(user, groupId, collectionId, sort, 200));
         } catch (GroupDoesNotExistException e) {
             logger.error("Group does not exist exception occured while fecting items data", e);
             return "error/404";
