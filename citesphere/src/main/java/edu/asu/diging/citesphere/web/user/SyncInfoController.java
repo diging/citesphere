@@ -1,10 +1,14 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.asu.diging.citesphere.config.core.InMemoryAppender;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
 
@@ -25,7 +29,12 @@ public class SyncInfoController {
             info.total = job.getTotal();
             info.current = job.getCurrent();
             info.status = job.getStatus() != null ? job.getStatus().name() : "";
-        }
+            info.logs =  InMemoryAppender.getEvents().stream()
+                    .map(ev -> ev.getTimeMillis() + " [" + ev.getThreadName() + "] " 
+                            + ev.getLevel() + " " + ev.getLoggerName() 
+                            + " - " + ev.getMessage().getFormattedMessage())
+                .collect(Collectors.toList());
+            }
 
         return info;
     }
@@ -35,5 +44,6 @@ public class SyncInfoController {
         public long total;
         public long current;
         public String status;
+        List<String> logs;
     }
 }

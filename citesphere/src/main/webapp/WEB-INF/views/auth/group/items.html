@@ -337,7 +337,7 @@ Items in Group <span th:text="${group.name}"></span></br>
 </h2>
 <div class="pull-right">
 	<div class="progress" style="width: 200px">
-	  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">  
+	  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%" onclick="getlogs()">  
 	  <span id="syncText">Up to date</span></div>
 	</div>
 	<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
@@ -360,6 +360,7 @@ $.get(syncUrl, pollStatus);
 
 function pollStatus(){
     $.get(syncUrl, function(data) {
+    	console.log(data);
         if(data['status'] == 'PREPARED' || data['status'] == 'STARTED') {
 			$("#table-spinner").show();
         	if (data['total'] == 0) {
@@ -386,6 +387,15 @@ function pollStatus(){
         }
         getCurrentItemsData("notFirstLoad");
     });
+}
+
+function getlogs() {
+	if($("#syncText").text() != "Up to date") {
+		console.log("logs....")
+		$('#sync-logs').modal("show");
+	}
+	console.log("up to date")
+	$('#sync-logs').modal("show");
 }
 
 function getCurrentItemsData(parameter){
@@ -824,6 +834,23 @@ function rewriteColumnsList(data){
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="sync-logs" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		  <h4 class="modal-title">Sync Logs</h4>
+		</div>
+		<div class="modal-body">
+		  <p>Please select at least 1 entry!</p>
+		</div>
+		<!-- <div class="modal-footer">
+		  <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+		</div> -->
+	  </div>
+	</div>
+  </div>
 
 </div>
 <script >
