@@ -375,6 +375,11 @@ function pollStatus(){
                 $("#syncProgress").attr('aria-valuemax', data['total']);
                 $("#syncProgress").addClass("progress-bar-striped active");
                 $("#syncText").text(Math.round(percent) + "% synced");
+                const $logsList = $('#logs-list');
+                $logsList.empty();
+                data['logs'].forEach(log => {
+                  $('<li>').text(log).appendTo($logsList);
+                });
         	}
         	setTimeout(pollStatus,1000);
         } else {
@@ -384,17 +389,17 @@ function pollStatus(){
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
 			$("#table-spinner").hide();
+			const $logsList = $('#logs-list');
+			  $logsList.empty();
+			  data['logs'].forEach(log => {
+			    $('<li>').text(log).appendTo($logsList);
+			  });
         }
         getCurrentItemsData("notFirstLoad");
     });
 }
 
 function getlogs() {
-	if($("#syncText").text() != "Up to date") {
-		console.log("logs....")
-		$('#sync-logs').modal("show");
-	}
-	console.log("up to date")
 	$('#sync-logs').modal("show");
 }
 

@@ -18,23 +18,30 @@ public class LoggingConfig {
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
         
-//        Filter javersFilter = LoggerNameFilter.createFilter(
-//                "org.javers.core.Javers",
-//                Filter.Result.ACCEPT,
-//                Filter.Result.DENY
-//            );
+        InMemoryAppender appender = InMemoryAppender.createAppender("InMemoryAppender", null);
+        appender.start();
+        config.addAppender(appender);
+        
+        Appender console = config.getAppender("Console");
         
         LoggerConfig javersLogger = config.getLoggerConfig("org.javers.core.Javers");
         if (!"org.javers.core.Javers".equals(javersLogger.getName())) {
             javersLogger = new LoggerConfig("org.javers.core.Javers", Level.INFO, false);
             config.addLogger("org.javers.core.Javers", javersLogger);
         }
+        
+        javersLogger.addAppender(appender, Level.INFO, null);
+        javersLogger.addAppender(console, Level.INFO, null);
+        
+        String asyncHandlerName = "org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler";
+        LoggerConfig asyncLogger = config.getLoggerConfig(asyncHandlerName);
+        if (!asyncLogger.getName().equals(asyncHandlerName)) {
+            asyncLogger = new LoggerConfig(asyncHandlerName, Level.INFO, false);
+            config.addLogger(asyncHandlerName, asyncLogger);
+        }
+        asyncLogger.addAppender(appender, Level.INFO, null);
+        asyncLogger.addAppender(console, Level.INFO, null);
 
-        InMemoryAppender appender = InMemoryAppender.createAppender("InMemoryAppender", null);
-        appender.start();
-        config.addAppender(appender);
-        // attach to root logger at INFO level
-        config.getRootLogger().addAppender(appender, Level.INFO, null);
         ctx.updateLoggers();
 
         return appender;

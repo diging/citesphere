@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,12 +30,17 @@ public class SyncInfoController {
             info.total = job.getTotal();
             info.current = job.getCurrent();
             info.status = job.getStatus() != null ? job.getStatus().name() : "";
-            info.logs =  InMemoryAppender.getEvents().stream()
-                    .map(ev -> ev.getTimeMillis() + " [" + ev.getThreadName() + "] " 
-                            + ev.getLevel() + " " + ev.getLoggerName() 
-                            + " - " + ev.getMessage().getFormattedMessage())
-                .collect(Collectors.toList());
+            if(info.logs == null || (info.status == "PENDING")) {
+                info.logs = new ArrayList<String>();
             }
+            info.logs.addAll(InMemoryAppender.getEvents().stream()
+                    .map(ev -> 
+//                            ev.getTimeMillis() + " [" + ev.getThreadName() + "] " +
+                            ev.getLevel() + " " + ev.getLoggerName() 
+                            + " - " + ev.getMessage().getFormattedMessage())
+                    .collect(Collectors.toList()));
+//            System.out.println(info.logs + "==========================");
+        }
 
         return info;
     }
@@ -44,6 +50,6 @@ public class SyncInfoController {
         public long total;
         public long current;
         public String status;
-        List<String> logs;
+        public List<String> logs;
     }
 }
