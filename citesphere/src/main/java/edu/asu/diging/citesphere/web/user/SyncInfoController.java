@@ -35,11 +35,9 @@ public class SyncInfoController {
             }
             info.logs.addAll(InMemoryAppender.getEvents().stream()
                     .map(ev -> 
-//                            ev.getTimeMillis() + " [" + ev.getThreadName() + "] " +
                             ev.getLevel() + " " + ev.getLoggerName() 
                             + " - " + ev.getMessage().getFormattedMessage())
                     .collect(Collectors.toList()));
-//            System.out.println(info.logs + "==========================");
         }
 
         return info;

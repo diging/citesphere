@@ -360,7 +360,6 @@ $.get(syncUrl, pollStatus);
 
 function pollStatus(){
     $.get(syncUrl, function(data) {
-    	console.log(data);
         if(data['status'] == 'PREPARED' || data['status'] == 'STARTED') {
 			$("#table-spinner").show();
         	if (data['total'] == 0) {
@@ -377,9 +376,26 @@ function pollStatus(){
                 $("#syncText").text(Math.round(percent) + "% synced");
                 const $logsList = $('#logs-list');
                 $logsList.empty();
-                data['logs'].forEach(log => {
-                  $('<li>').text(log).appendTo($logsList);
-                });
+                if(data['logs'].length == 0) {
+                	$('<li>').text("No sync logs").appendTo($logsList);
+                } else {
+	                data['logs'].forEach(log => {
+						const parts = log.split(' ', 2);
+						const level = parts[0] || '';
+						const message = log.substring(level.length).trim();
+						
+						const $li = $('<li>');
+						const $strong = $('<strong>').text(level);
+						
+						if (level === 'ERROR') {
+						   $strong.addClass('text-danger');
+						}
+						
+						$li.append($strong).append(' ').append(document.createTextNode(message));
+						
+						$logsList.append($li);
+	                });
+                }
         	}
         	setTimeout(pollStatus,1000);
         } else {
@@ -391,9 +407,26 @@ function pollStatus(){
 			$("#table-spinner").hide();
 			const $logsList = $('#logs-list');
 			  $logsList.empty();
-			  data['logs'].forEach(log => {
-			    $('<li>').text(log).appendTo($logsList);
-			  });
+			  if(data['logs'].length == 0) {
+              	$('<li>').text("No sync logs").appendTo($logsList);
+              } else {
+	                data['logs'].forEach(log => {
+	                  	const parts = log.split(' ', 2);
+	                    const level = parts[0] || '';
+	                    const message = log.substring(level.length).trim();
+	
+	                    const $li = $('<li>');
+	                    const $strong = $('<strong>').text(level);
+
+		                if (level === 'ERROR') {
+		                   $strong.addClass('text-danger');
+		                }
+
+		                $li.append($strong).append(' ').append(document.createTextNode(message));
+	
+	                	$logsList.append($li);
+	                });
+              }
         }
         getCurrentItemsData("notFirstLoad");
     });
@@ -848,11 +881,18 @@ function rewriteColumnsList(data){
 		  <h4 class="modal-title">Sync Logs</h4>
 		</div>
 		<div class="modal-body">
-		  <p>Please select at least 1 entry!</p>
+		  <div 
+		    id="sync-logs-body" 
+		    class="border bg-light rounded p-3 overflow-auto" 
+		    style="max-height: 300px; overflow-y: auto;" >
+		    <ul 
+		      id="logs-list" 
+		      class="list-unstyled text-monospace mb-0"></ul>
+		  </div>
 		</div>
-		<!-- <div class="modal-footer">
-		  <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
-		</div> -->
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		</div>
 	  </div>
 	</div>
   </div>
