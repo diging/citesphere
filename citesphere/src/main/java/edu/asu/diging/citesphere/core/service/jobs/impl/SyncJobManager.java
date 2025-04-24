@@ -89,4 +89,19 @@ public class SyncJobManager implements ISyncJobManager {
             jobRepo.save(job);
         }
     }
+
+    @Override
+    public void deleteJob(String jobId) {
+        Optional<GroupSyncJob> jobOptional = jobRepo.findById(jobId);
+        if (jobOptional.isPresent()) {
+            GroupSyncJob job = currentJobs.get(jobOptional.get().getGroupId());
+            if (job == null) {
+                job = jobOptional.get();
+            }
+//            job.setStatus(JobStatus.CANCELED);
+            job.setFinishedOn(OffsetDateTime.now());
+            jobRepo.delete(job);
+        }
+        
+    }
 }

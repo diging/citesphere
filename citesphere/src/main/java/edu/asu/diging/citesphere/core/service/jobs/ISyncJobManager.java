@@ -19,4 +19,6 @@ public interface ISyncJobManager {
 
     void cancelJob(String jobId);
 
+    void deleteJob(String jobId);
+
 }
