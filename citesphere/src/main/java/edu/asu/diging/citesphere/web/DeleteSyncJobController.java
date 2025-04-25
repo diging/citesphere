@@ -13,8 +13,8 @@ public class DeleteSyncJobController {
     @Autowired
     private ISyncJobManager syncManager;
 
-    @RequestMapping(value = "/auth/jobs/sync/{jobId}/delete", method=RequestMethod.DELETE)
-    public String cancel(@PathVariable String jobId) {
+    @RequestMapping(value = "/auth/jobs/sync/{jobId}/delete", method=RequestMethod.POST)
+    public String delete(@PathVariable String jobId) {
         syncManager.deleteJob(jobId);        
         return "redirect:/auth/jobs/sync/list";
     }
