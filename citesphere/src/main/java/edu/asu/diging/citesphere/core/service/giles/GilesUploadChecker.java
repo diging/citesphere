@@ -11,4 +11,6 @@ public interface GilesUploadChecker {
 
     void checkUploadStatus(String citationKey, IUser user);
 
+    void checkFileUploadStatus(String itemId, IUser principal, String fileId);
+
 }
