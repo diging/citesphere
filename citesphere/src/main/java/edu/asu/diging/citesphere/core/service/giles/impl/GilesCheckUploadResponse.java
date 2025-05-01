@@ -1,5 +1,8 @@
 package edu.asu.diging.citesphere.core.service.giles.impl;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GilesCheckUploadResponse {
 
     private String msg;

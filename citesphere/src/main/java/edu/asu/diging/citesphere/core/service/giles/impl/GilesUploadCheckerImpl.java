@@ -149,6 +149,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                         logger.error("Could not deserialize response.", e);
                         upload.setDocumentStatus(GilesStatus.FAILED);
                         checkedUploads.add(upload);
+                        continue;
                     }
                     GilesUpload processedUpload = new GilesUpload();
                     processedUpload.setProgressId(upload.getProgressId());
@@ -167,6 +168,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                         logger.error("Could not deserialize response.", e);
                         upload.setDocumentStatus(GilesStatus.FAILED);
                         checkedUploads.add(upload);
+                        continue;
                     }
                     for (GilesUpload processedUpload : processed) {
                         // giles does not return the progress id again, but we need it
