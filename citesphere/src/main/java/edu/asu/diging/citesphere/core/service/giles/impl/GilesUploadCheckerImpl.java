@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.giles.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Queue;
@@ -124,17 +125,14 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
     public void checkUploadStatus(String citationKey, IUser user) {
         ICitation citation = citationManager.getCitation(citationKey);
         Set<IGilesUpload> checkedUploads = new HashSet<>();
-        boolean needsUpdating = false;
         for (IGilesUpload upload : citation.getGilesUploads()) {
-            ============
+            checkedUploads.addAll(getFileStatus(upload, user));
         }
 
         ICitation currentCitation = getCurrentCitation(citation, user);
         
-        if (needsUpdating) {
-            if (currentCitation != null) {
-                updateCitation(citation, checkedUploads, user, currentCitation);
-            }
+        if (currentCitation != null) {
+            updateCitation(citation, checkedUploads, user, currentCitation);
         }
 
         int unfinishedUplaods = currentCitation.getGilesUploads().stream()
@@ -185,13 +183,14 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
         return null;
     }
     
-    private IGilesUpload getFileStatus(IGilesUpload upload, IUser user) {
+    private Set<IGilesUpload> getFileStatus(IGilesUpload upload, IUser user) {
+        Set<IGilesUpload> checkedUploads = new HashSet<>();
         if (upload.getUploadingUser() == null
                 || Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
                         .contains(upload.getDocumentStatus())) {
             // in case something went wrong with the user
             // or the upload has been processed
-            continue;
+            return null;
         }
         
         if(user == null) {
@@ -212,15 +211,13 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
         } catch (HttpClientErrorException ex) {
             upload.setDocumentStatus(GilesStatus.FAILED);
             checkedUploads.add(upload);
-            needsUpdating = true;
-            continue;
+            return checkedUploads;
         }
         if (response.getStatusCode() == HttpStatus.ACCEPTED) {
             // Giles is still procoessing
             logger.debug("Upload " + upload.getProgressId()
                     + " still being processed.");
             checkedUploads.add(upload);
-            continue;
         } else if (response.getStatusCode() == HttpStatus.OK) {
             logger.debug("Upload " + upload.getProgressId() + " is done.");
             ObjectMapper mapper = new ObjectMapper();
@@ -232,19 +229,43 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                 logger.error("Could not deserialize response.", e);
                 upload.setDocumentStatus(GilesStatus.FAILED);
                 checkedUploads.add(upload);
+                return checkedUploads;
             }
             for (GilesUpload processedUpload : processed) {
                 // giles does not return the progress id again, but we need it
                 processedUpload.setProgressId(upload.getProgressId());
                 checkedUploads.add(processedUpload);
             }
-            needsUpdating = true;
         }
+        return checkedUploads;
     }
 
     @Override
-    public void checkFileUploadStatus(String itemId, IUser principal, String fileId) {
-        // TODO Auto-generated method stub
+    public void checkFileUploadStatus(String citationKey, IUser user, String processId) {
+        ICitation citation = citationManager.getCitation(citationKey);
+        Set<IGilesUpload> checkedUploads = new HashSet<>();
+        if (citation == null || citation.getGilesUploads() == null) {
+            return;
+        }
+        
+        Optional<IGilesUpload> upload = Optional.ofNullable(citation)
+                .map(ICitation::getGilesUploads)
+                .orElseGet(Collections::emptySet)
+                .stream()
+                .filter(u -> processId.equals(u.getProgressId()))
+                .findFirst();
+        
+        if(upload.isPresent()) {
+            checkedUploads.addAll(getFileStatus(upload.get(), user));
+        } else {
+            return;
+        }
+        
+        ICitation currentCitation = getCurrentCitation(citation, user);
+        
+        if (currentCitation != null) {
+            updateCitation(citation, checkedUploads, user, currentCitation);
+        }
         
     }
 }
