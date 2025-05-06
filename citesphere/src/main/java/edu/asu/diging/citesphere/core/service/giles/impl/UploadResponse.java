@@ -27,5 +27,5 @@ class UploadResponse {
 
     public void setDocumentIds(String documentIds) {
         this.documentIds = documentIds;
-    }  
+    }
 }

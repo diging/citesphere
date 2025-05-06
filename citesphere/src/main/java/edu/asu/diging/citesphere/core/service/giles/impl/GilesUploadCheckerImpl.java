@@ -142,38 +142,36 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                             + " still being processed.");
                     ObjectMapper mapper = new ObjectMapper();
                     String jsonBody = response.getBody();
-                    GilesCheckUploadResponse processed = new GilesCheckUploadResponse();
                     try {
-                        processed = mapper.readValue(jsonBody, GilesCheckUploadResponse.class);
+                        GilesCheckUploadResponse processed = mapper.readValue(jsonBody, GilesCheckUploadResponse.class);
+                        GilesUpload processedUpload = new GilesUpload();
+                        processedUpload.setProgressId(upload.getProgressId());
+                        processedUpload.setUploadId(processed.getUploadId());
+                        processedUpload.setUploadingUser(upload.getUploadingUser());
+                        checkedUploads.add(processedUpload);
+                        needsUpdating = true;
                     } catch (IOException e) {
                         logger.error("Could not deserialize response.", e);
                         upload.setDocumentStatus(GilesStatus.FAILED);
                         checkedUploads.add(upload);
                         continue;
                     }
-                    GilesUpload processedUpload = new GilesUpload();
-                    processedUpload.setProgressId(upload.getProgressId());
-                    processedUpload.setUploadId(processed.getUploadId());
-                    processedUpload.setUploadingUser(upload.getUploadingUser());
-                    checkedUploads.add(processedUpload);
-                    needsUpdating = true;
                 } else if (response.getStatusCode() == HttpStatus.OK) {
                     logger.debug("Upload " + upload.getProgressId() + " is done.");
                     ObjectMapper mapper = new ObjectMapper();
                     String jsonBody = response.getBody();
-                    GilesUpload[] processed = new GilesUpload[0];
                     try {
-                        processed = mapper.readValue(jsonBody, GilesUpload[].class);
+                        GilesUpload[] processed = mapper.readValue(jsonBody, GilesUpload[].class);
+                        for (GilesUpload processedUpload : processed) {
+                            // giles does not return the progress id again, but we need it
+                            processedUpload.setProgressId(upload.getProgressId());
+                            checkedUploads.add(processedUpload);
+                        }
                     } catch (IOException e) {
                         logger.error("Could not deserialize response.", e);
                         upload.setDocumentStatus(GilesStatus.FAILED);
                         checkedUploads.add(upload);
                         continue;
-                    }
-                    for (GilesUpload processedUpload : processed) {
-                        // giles does not return the progress id again, but we need it
-                        processedUpload.setProgressId(upload.getProgressId());
-                        checkedUploads.add(processedUpload);
                     }
                     needsUpdating = true;
                 }
