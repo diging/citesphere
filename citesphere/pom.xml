@@ -26,7 +26,7 @@
         <spring-social-zotero.version>0.13</spring-social-zotero.version>
 
         <citesphere.messages.version>0.5</citesphere.messages.version>
-        <citesphere.model.version>1.24</citesphere.model.version>
+        <citesphere.model.version>1.25</citesphere.model.version>
         <crossref-connect-version>0.2</crossref-connect-version>
 
         <admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
@@ -344,7 +344,7 @@
         </dependency>
         
         <!-- https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api -->
-	<dependency>
+		<dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
             <version>1.3.2</version>

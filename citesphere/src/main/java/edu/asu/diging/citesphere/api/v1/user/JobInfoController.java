@@ -61,7 +61,7 @@ public class JobInfoController extends BaseJobInfoController {
     }
     
     @RequestMapping(value="/job/info")
-    public ResponseEntity<String> getProfile(@RequestHeader HttpHeaders headers) throws JsonProcessingException {
+    public ResponseEntity<String> getProfile(@RequestHeader HttpHeaders headers) {
         ResponseEntity<String> entity = checkForToken(headers);
         if (entity != null) {
             return entity;
