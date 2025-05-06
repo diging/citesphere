@@ -9,7 +9,7 @@ public interface GilesUploadChecker {
     // in milliseconds (60000ms = 1m)
     void checkUploads();
 
-    void checkUploadStatus(String citationKey, IUser user);
+    void checkUploadStatus(String citationKey);
 
     void checkFileUploadStatus(String itemId, IUser principal, String fileId);
 
