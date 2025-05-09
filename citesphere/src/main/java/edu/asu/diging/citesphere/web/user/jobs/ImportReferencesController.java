@@ -27,6 +27,7 @@ import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
+import edu.asu.diging.citesphere.messages.KafkaTopics;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
@@ -72,7 +73,7 @@ public class ImportReferencesController {
         }
         List<IUploadJob> jobs;
         try {
-            jobs = jobManager.createUploadJob(user, files, fileBytes, group);
+            jobs = jobManager.createUploadJob(user, files, fileBytes, group, null, KafkaTopics.REFERENCES_IMPORT_TOPIC);
         } catch (GroupDoesNotExistException e) {
             logger.error("Could not create job because group does not exist.", e);
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);

@@ -30,6 +30,9 @@
 
 			var groupSelect = document.getElementById('groupSelect');
 			var collectionSelect = document.getElementById('collectionSelect');
+			var newCollectionDiv = document.getElementById('newCollectionDiv');
+			var newCollectionName = document.getElementById('newCollectionName');
+			newCollectionDiv.style.display = 'none';
 			
 			groupSelect.addEventListener("change", function() {
 				var groupVal = groupSelect.value
@@ -60,11 +63,30 @@
 					}
 				});
 			})
+			
+			collectionSelect.addEventListener('change', function(){
+			    if (collectionSelect.value === 'new') {
+			      	newCollectionDiv.style.display = ''; 
+					newCollectionName.disabled = false;
+					newCollectionName.name= 'group';
+					collectionSelect.removeAttribute('name');
+			    }
+			    else {
+					newCollectionDiv.style.display = 'none';
+					newCollectionName.disabled = true;
+					newCollectionName.removeAttribute('name'); 
+					collectionSelect.name = 'group';
+			    }
+			});
 		    
 		    var startUpload = function(files) {
 		    	var formData = new FormData();
 		    	formData.append("group", $("#groupSelect option:selected").val());
-		    	formData.append("collectionId", $("#collectionSelect option:selected").val());
+		    	var collectionVal = $("#collectionSelect option:selected").val();
+		    	if(collectionVal == 'new') {
+		    		collectionVal = 'new-' + $('#newCollectionName').val();
+		    	}
+		    	formData.append("collectionId", collectionVal);
 		    	for (var i = 0; i < files.length; i++) {
 		    		formData.append("files", files[i]);
 		    	}
@@ -170,7 +192,13 @@
 									th:value="${citGroup.groupId}">[[${citGroup.name}]]</option>
 							</select>
 						</div>
-
+						
+						<div id="newCollectionDiv" class="form-inline" style="padding-bottom: 20px;">
+						    <label for="newCollectionName">New Collection Name:</label>
+						    <input type="text" id="newCollectionName"
+						           class="form-control" placeholder="Enter new collection name">
+						</div>
+						
 						<div class="form-inline">
 							<div class="form-group">
 								<input type="file" name="files[]" id="js-upload-files" multiple>
@@ -195,5 +223,7 @@
 		</div>
 		<!-- /container -->
 	</div>
+	
+	
 </body>
 </html>

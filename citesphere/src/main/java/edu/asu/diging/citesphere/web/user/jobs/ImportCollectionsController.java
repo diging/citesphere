@@ -24,17 +24,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import edu.asu.diging.citesphere.api.v1.model.impl.Collections;
-import edu.asu.diging.citesphere.api.v1.user.JsonUtil;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
-import edu.asu.diging.citesphere.core.service.IGroupManager;
-import edu.asu.diging.citesphere.core.service.jobs.IUploadCollectionJobManager;
+import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
+import edu.asu.diging.citesphere.messages.KafkaTopics;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
-import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
@@ -43,45 +40,18 @@ public class ImportCollectionsController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Autowired
-    private IUploadCollectionJobManager jobManager;
+    private IUploadJobManager jobManager;
     
     @Autowired
     private ICitationManager citationManager;
     
     @Autowired
     private ICitationCollectionManager collectionManager;
-
-    @Autowired
-    private IGroupManager groupManager;
-
-    @Autowired
-    private JsonUtil jsonUtil;
     
     @RequestMapping(value = "/auth/import/collection", method = RequestMethod.GET)
     public String show(Model model, Authentication authentication) {
         model.addAttribute("groups", citationManager.getGroups((IUser)authentication.getPrincipal()));
         return "auth/import/collection";
-    }
-    
-    @RequestMapping(value = "/auth/import/collection/getgroupcollections", method = RequestMethod.GET)
-    public ResponseEntity<Collections> getCollections( @RequestParam("groupId") String groupId, Authentication authentication) {
-        IUser user = (IUser)authentication.getPrincipal();
-
-        ICitationGroup group = groupManager.getGroup(user, groupId);
-        if (group == null) {
-            return new ResponseEntity<Collections>(HttpStatus.NOT_FOUND);
-        }
-
-        Collections collectionResponse = new Collections();
-        collectionResponse.setGroup(jsonUtil.createGroup(group));
-        try {
-            collectionResponse.setCollections(
-                    collectionManager.getAllCollections(user, groupId, null, "title", 20));
-        } catch (GroupDoesNotExistException e) {
-            logger.error("Could not create job because group does not exist.", e);
-            return new ResponseEntity<Collections>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<Collections>(collectionResponse, HttpStatus.OK);
     }
     
     @RequestMapping(value = "/auth/import/collection", method = RequestMethod.POST)
@@ -108,9 +78,9 @@ public class ImportCollectionsController {
             }
         }
         
-        if (collectionId.equals("new")) {
+        if (collectionId.startsWith("new-")) {
             try {
-                ICitationCollection collection = collectionManager.createCollection(user, group, files[0].getName(), null);
+                ICitationCollection collection = collectionManager.createCollection(user, group, collectionId.split("-")[1], null);
                 collectionId = collection.getKey();
             } catch (GroupDoesNotExistException e) {
                 logger.error("Could not create job because group does not exist.", e);
@@ -126,7 +96,7 @@ public class ImportCollectionsController {
 
         List<IUploadJob> jobs;
         try {
-            jobs = jobManager.createUploadJob(user, files, fileBytes, group, collectionId);
+            jobs = jobManager.createUploadJob(user, files, fileBytes, group, collectionId, KafkaTopics.COLLECTION_IMPORT_TOPIC);
         } catch (GroupDoesNotExistException e) {
             logger.error("Could not create job because group does not exist.", e);
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);

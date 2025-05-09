@@ -82,6 +82,17 @@ public interface IZoteroManager {
         
     Map<ItemDeletionResponse, List<String>> deleteMultipleItems(IUser user, String groupId, List<String> citationKeys, Long citationVersion) throws ZoteroConnectionException, ZoteroHttpStatusException;
     
+    /**
+     * Creates a new citation collection in the specified Zotero group and returns it as an {@link ICitationCollection} domain object.
+     *
+     * @param user              the {@link IUser} on whose behalf the collection is being created (used for authentication)
+     * @param groupId           the identifier of the Zotero group in which to create the collection
+     * @param collectionName    the human-readable name for the new collection
+     * @param parentCollection  the identifier of an existing parent collection under which to nest the new collection, or {@code null} to create a top-level collection                     
+     * @return                  a fully initialized {@link ICitationCollection} representing the newly created collection
+     * @throws ZoteroItemCreationFailedException if Zotero rejects the creation request (e.g. duplicate key)                                          
+     * @throws ZoteroConnectionException         if there is a network or API connectivity error when talking to Zotero                                          
+     */
     ICitationCollection createCitationCollection(IUser user, String groupId, String collectionName, String parentCollection) throws ZoteroItemCreationFailedException, ZoteroConnectionException;
 
 }

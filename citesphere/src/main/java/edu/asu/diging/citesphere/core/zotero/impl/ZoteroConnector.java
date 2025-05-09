@@ -391,7 +391,7 @@ public class ZoteroConnector implements IZoteroConnector {
             throw new ZoteroItemCreationFailedException(response);
         }
 
-        // since we only submitted one item, there should only be one in the map
+        // since we only submitted one collection, there should only be one in the map
         return getCitationCollection(user, groupId, success.values().iterator().next());
     }
 }
