@@ -99,6 +99,7 @@
 	        for (var i = 0; i < uploadFiles.length; i++) {
 	            formData.append("files", uploadFiles[i]);
 	        }
+	        showLoader();
 	        
 	        $.ajax({
 	            type: "POST",
@@ -110,7 +111,6 @@
 	            data: formData, 
 	            success: function(data) {
 	                document.getElementById('uploadFileInput').value = '';
-	        		showSuccessLoader();
 	                setTimeout(function(){
 		            	$("#uploadFileModal").modal('hide');
 		            	location.reload();
@@ -288,10 +288,9 @@
 	    	});
 	}
 	
-	function showSuccessLoader() {
+	function showLoader() {
 	    const loader = document.createElement('div');
 	    loader.classList.add('loader');
-	    
 	    loader.style.border = '6px solid #f3f3f3';
 	    loader.style.borderTop = '6px solid #3498db';
 	    loader.style.borderRadius = '50%';
@@ -299,14 +298,19 @@
 	    loader.style.height = '30px';
 	    loader.style.animation = 'spin 2s linear infinite';
 	    loader.style.display = 'inline-block';
+	    loader.style.float = 'left';
 
 	    const message = document.createElement('p');
+	    message.classList.add('message');
 	    message.textContent = 'upload started...';
 	    message.style.display = 'inline-block';
+	    message.style.margin = '10px 0px 10px 0px';
+	    message.style.paddingLeft = '15px';
+	    message.style.float = 'left';
 
-		const uploadFileBody = document.getElementById('uploadFileBody');
-		uploadFileBody.append(loader);
-		uploadFileBody.append(message);
+		const uploadFileFooter = document.getElementById('uploadFileFooter');
+		uploadFileFooter.prepend(message);
+		uploadFileFooter.prepend(loader);
     }
 	
 </script>
@@ -669,7 +673,7 @@
             <label style="display: block;">Choose file to upload</label>
             <input type="file" id="uploadFileInput" style="display: inline-block;">
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" id="uploadFileFooter">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button id="uploadFileBtn" type="button" class="btn btn-primary">Upload</button>
           </div>
