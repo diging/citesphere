@@ -142,8 +142,16 @@
         <put-attribute name="content" value="/WEB-INF/views/error/403.jsp" />    
     </definition>
     
+    <definition name="error/404" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/error/404.jsp" />    
+    </definition>
+    
     <definition name="error/500" extends="base.definition">
         <put-attribute name="content" value="/WEB-INF/views/error/500.jsp" />    
+    </definition>
+    
+    <definition name="error/gilesDocumentError" extends="base.definition">
+        <put-attribute name="content" value="/WEB-INF/views/error/gilesDocumentError.jsp" />    
     </definition>
 	
 </tiles-definitions>
