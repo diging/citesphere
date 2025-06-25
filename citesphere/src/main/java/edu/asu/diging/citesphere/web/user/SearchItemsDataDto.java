@@ -15,6 +15,7 @@ public class SearchItemsDataDto {
     private long totalResults;
     private int currentPage;
     private String zoteroGroupId;
+    private String collectionId;
     private ICitationGroup group;
     private String sort;
     private List<CitationsDto> citationsData;
@@ -67,6 +68,14 @@ public class SearchItemsDataDto {
 
     public void setZoteroGroupId(String zoteroGroupId) {
         this.zoteroGroupId = zoteroGroupId;
+    }
+
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
     }
 
     public ICitationGroup getGroup() {
