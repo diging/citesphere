@@ -120,7 +120,7 @@ public class SearchController {
     }
     
     @RequestMapping(value = {"/auth/group/{zoteroGroupId}/collection/{collectionId}/search"})
-    public String searchCollection(@PathVariable String zoteroGroupId,
+    public @ResponseBody String searchCollection(@PathVariable String zoteroGroupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
             @RequestParam(defaultValue = "0", required = false, value = "page") String page,
@@ -149,36 +149,35 @@ public class SearchController {
         
         ResultPage citations = engine.search(searchTerm, zoteroGroupId, collectionId, pageInt-1, 50);
         
-        model.addAttribute("searchTerm", searchTerm);
-        model.addAttribute("items", citations.getResults());
-        model.addAttribute("totalPages", Math.max(1, citations.getTotalPages()));
-        model.addAttribute("total", citations.getTotalResults());
-        model.addAttribute("currentPage", pageInt);
-        model.addAttribute("zoteroGroupId", zoteroGroupId);
-        model.addAttribute("collectionId", collectionId);
-        model.addAttribute("group", groupManager.getGroup(user, zoteroGroupId));
-        model.addAttribute("sort", sort);
+        SearchItemsDataDto searchItemsData = new SearchItemsDataDto();
+        searchItemsData.setSearchTerm(searchTerm);
+        searchItemsData.setCurrentPage(pageInt);
+        searchItemsData.setCitationsData(citations.getResults().stream().map(c -> new CitationsDto(c,
+                env.getProperty(c.getItemType() + "_label"), env.getProperty(c.getItemType() + "_icon")))
+                .collect(Collectors.toList()));
+        searchItemsData.setTotalPages(Math.max(1, citations.getTotalPages()));
+        searchItemsData.setZoteroGroupId(zoteroGroupId);
+        searchItemsData.setCollectionId(collectionId);
+        searchItemsData.setSort(sort);
+        searchItemsData.setTotalResults(citations.getTotalResults());
+        searchItemsData.setGroup(group);
 
-        List<String> allowedColumns = Arrays.asList(availableColumns.split(","));
+        List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));
         List<String> shownColumns = new ArrayList<>();
         if (columns != null && columns.length > 0) {
             for (String column : columns) {
-                if (allowedColumns.contains(column)) {
+                if (availableColumnsList.contains(column)) {
                     shownColumns.add(column);
                 }
             }
         }
-        model.addAttribute("columns", shownColumns);
-        model.addAttribute("availableColumns", allowedColumns);
-        ICitationCollection collection = null;
-        if (collectionId != null) {
-            collection = collectionManager.getCollection(user, zoteroGroupId, collectionId);
-            if(collection != null) {
-                model.addAttribute("collectionName", collection.getName()); 
-            }
-        }
-        model.addAttribute("breadCrumbs", getBreadCrumbs(collection, group, user, zoteroGroupId));
-        return "auth/group/items";
+        searchItemsData.setShownColumns(shownColumns);
+        searchItemsData.setAvailableColumnsData(availableColumnsList.stream()
+                .map(c -> new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_" + c)))
+                .collect(Collectors.toList()));
+
+        Gson gson = new Gson();
+        return gson.toJson(searchItemsData, SearchItemsDataDto.class);
     }
     
     private List<BreadCrumb> getBreadCrumbs(ICitationCollection collection, ICitationGroup group, IUser user, String zoteroGroupId) {
