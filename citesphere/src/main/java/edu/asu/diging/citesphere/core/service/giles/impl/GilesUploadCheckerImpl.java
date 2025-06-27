@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.core.service.giles.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Queue;
@@ -86,9 +87,9 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
      * edu.asu.diging.citesphere.model.bib.ICitation)
      */
     @Override
-    public void add(ICitation upload) {
-        if (!uploadQueue.contains(upload.getKey())) {
-            uploadQueue.add(upload.getKey());
+    public void add(String uploadKey) {
+        if (!uploadQueue.contains(uploadKey)) {
+            uploadQueue.add(uploadKey);
         }
     }
 
@@ -104,94 +105,56 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
     @Scheduled(fixedDelay = 60000)
     public void checkUploads() {
         for (String citationKey : uploadQueue) {
-            ICitation citation = citationManager.getCitation(citationKey);
-            Set<IGilesUpload> checkedUploads = new HashSet<>();
-            boolean needsUpdating = false;
-            IUser user = null;
-            for (IGilesUpload upload : citation.getGilesUploads()) {
-                if (upload.getUploadingUser() == null
-                        || Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
-                                .contains(upload.getDocumentStatus())) {
-                    // in case something went wrong with the user
-                    // or the upload has been processed
-                    continue;
-                }
-
-                user = userManager.findByUsername(upload.getUploadingUser());
-                String token = internalTokenManager.getAccessToken(user).getValue();
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.setBearerAuth(token);
-                HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(
-                        headers);
-
-                ResponseEntity<String> response;
-                try {
-                    response = restTemplate.exchange(
-                            gilesBaseurl + gilesCheckEndpoint + upload.getProgressId(),
-                            HttpMethod.GET, requestEntity, String.class);
-                } catch (HttpClientErrorException ex) {
-                    upload.setDocumentStatus(GilesStatus.FAILED);
-                    checkedUploads.add(upload);
-                    needsUpdating = true;
-                    continue;
-                }
-                if (response.getStatusCode() == HttpStatus.ACCEPTED) {
-                    // Giles is still procoessing
-                    logger.debug("Upload " + upload.getProgressId()
-                            + " still being processed.");
-                    ObjectMapper mapper = new ObjectMapper();
-                    String jsonBody = response.getBody();
-                    try {
-                        GilesCheckUploadResponse processed = mapper.readValue(jsonBody, GilesCheckUploadResponse.class);
-                        GilesUpload processedUpload = new GilesUpload();
-                        processedUpload.setProgressId(upload.getProgressId());
-                        processedUpload.setUploadId(processed.getUploadId());
-                        processedUpload.setUploadingUser(upload.getUploadingUser());
-                        checkedUploads.add(processedUpload);
-                        needsUpdating = true;
-                    } catch (IOException e) {
-                        logger.error("Could not deserialize response.", e);
-                        upload.setDocumentStatus(GilesStatus.FAILED);
-                        checkedUploads.add(upload);
-                        continue;
-                    }
-                } else if (response.getStatusCode() == HttpStatus.OK) {
-                    logger.debug("Upload " + upload.getProgressId() + " is done.");
-                    ObjectMapper mapper = new ObjectMapper();
-                    String jsonBody = response.getBody();
-                    try {
-                        GilesUpload[] processed = mapper.readValue(jsonBody, GilesUpload[].class);
-                        for (GilesUpload processedUpload : processed) {
-                            // giles does not return the progress id again, but we need it
-                            processedUpload.setProgressId(upload.getProgressId());
-                            checkedUploads.add(processedUpload);
-                        }
-                    } catch (IOException e) {
-                        logger.error("Could not deserialize response.", e);
-                        upload.setDocumentStatus(GilesStatus.FAILED);
-                        checkedUploads.add(upload);
-                        continue;
-                    }
-                    needsUpdating = true;
-                }
+            checkUploadStatus(citationKey);
+        }
+    }
+    
+    /**
+     * Checks the upload status of all Giles uploads associated with the given citation
+     * and user. For each upload that is still in progress, it queries the Giles service
+     * to retrieve its current status. Depending on the response, uploads may be marked
+     * as COMPLETE, FAILED, or left in progress. If any uploads have updated statuses,
+     * the citation is updated accordingly and, once all uploads are finished, the citation
+     * is removed from the upload queue.
+     *
+     * @param citationKey the unique key identifying the citation whose uploads are being checked
+     * @param user        the user owning the uploads; if null, the uploading user for each
+     *                    upload is looked up via {@link IUserManager#findByUsername(String)}
+     */
+    @Override
+    public void checkUploadStatus(String citationKey) {
+        ICitation citation = citationManager.getCitation(citationKey);
+        Set<IGilesUpload> checkedUploads = new HashSet<>();
+        
+        IUser user = null;
+        
+        for (IGilesUpload upload : citation.getGilesUploads()) {
+            if (upload.getUploadingUser() == null
+                    || Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
+                            .contains(upload.getDocumentStatus())) {
+                // in case something went wrong with the user
+                // or the upload has been processed
+                continue;
             }
 
-            ICitation currentCitation = getCurrentCitation(citation, user);
-            
-            if (needsUpdating) {
-                if (currentCitation != null) {
-                    updateCitation(citation, checkedUploads, user, currentCitation);
-                }
-            }
+            user = userManager.findByUsername(upload.getUploadingUser());
+            checkedUploads.addAll(getFileStatus(upload, user));
+        }
 
-            int unfinishedUplaods = currentCitation.getGilesUploads().stream()
-                    .filter(u -> !Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
-                            .contains(u.getDocumentStatus()))
-                    .collect(Collectors.toList()).size();
-            if (unfinishedUplaods == 0) {
-                uploadQueue.remove(citation.getKey());
-            }
+        ICitation currentCitation = getCurrentCitation(citation, user);
+        
+        if (currentCitation == null) {
+            logger.error("Current Citation is null.");
+            return;
+        }
+        
+        updateCitation(citation, checkedUploads, user, currentCitation);
+        int unfinishedUplaods = currentCitation.getGilesUploads().stream()
+                .filter(u -> !Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
+                        .contains(u.getDocumentStatus()))
+                .collect(Collectors.toList()).size();
+        if (unfinishedUplaods == 0) {
+            uploadQueue.remove(citation.getKey());
         }
     }
 
@@ -232,5 +195,92 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
             logger.error("Could not get citation.", e);
         }
         return null;
+    }
+    
+    private Set<IGilesUpload> getFileStatus(IGilesUpload upload, IUser user) {
+        Set<IGilesUpload> checkedUploads = new HashSet<>();        
+        String token = internalTokenManager.getAccessToken(user).getValue();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(
+                headers);
+
+        ResponseEntity<String> response;
+        try {
+            response = restTemplate.exchange(
+                    gilesBaseurl + gilesCheckEndpoint + upload.getProgressId(),
+                    HttpMethod.GET, requestEntity, String.class);
+        } catch (HttpClientErrorException ex) {
+            upload.setDocumentStatus(GilesStatus.FAILED);
+            checkedUploads.add(upload);
+            return checkedUploads;
+        }
+        if (response.getStatusCode() == HttpStatus.ACCEPTED) {
+            // Giles is still procoessing
+            logger.debug("Upload " + upload.getProgressId()
+                    + " still being processed.");
+            checkedUploads.add(upload);
+        } else if (response.getStatusCode() == HttpStatus.OK) {
+            logger.debug("Upload " + upload.getProgressId() + " is done.");
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = response.getBody();
+            try {
+                GilesUpload[] processed = mapper.readValue(jsonBody, GilesUpload[].class);
+                for (GilesUpload processedUpload : processed) {
+                    // giles does not return the progress id again, but we need it
+                    processedUpload.setProgressId(upload.getProgressId());
+                    checkedUploads.add(processedUpload);
+                }
+            } catch (IOException e) {
+                logger.error("Could not deserialize response.", e);
+                upload.setDocumentStatus(GilesStatus.FAILED);
+                checkedUploads.add(upload);
+                return checkedUploads;
+            }
+        }
+        return checkedUploads;
+    }
+
+    /**
+     * Checks the upload status of a single file (identified by {@code processId})
+     * associated with the given citation.
+     *
+     * @param citationKey the unique key identifying the citation whose file upload is being checked
+     * @param user        the user who initiated the upload; used for authentication when querying status
+     * @param processId   the progress ID of the specific file upload to check
+     */
+    @Override
+    public void checkFileUploadStatus(String citationKey, IUser user, String processId) {
+        ICitation citation = citationManager.getCitation(citationKey);
+        Set<IGilesUpload> checkedUploads = new HashSet<>();
+        if (citation == null || citation.getGilesUploads() == null) {
+            return;
+        }
+        
+        Optional<IGilesUpload> upload = Optional.ofNullable(citation)
+                .map(ICitation::getGilesUploads)
+                .orElseGet(Collections::emptySet)
+                .stream()
+                .filter(u -> processId.equals(u.getProgressId()))
+                .findFirst();
+        
+        if(upload.isPresent()) {
+            if (Arrays.asList(GilesStatus.COMPLETE, GilesStatus.FAILED)
+                            .contains(upload.get().getDocumentStatus())) {
+                // in case something went wrong with the user
+                // or the upload has been processed
+                return;
+            }
+            checkedUploads.addAll(getFileStatus(upload.get(), user));
+        } else {
+            return;
+        }
+        
+        ICitation currentCitation = getCurrentCitation(citation, user);
+        
+        if (currentCitation != null) {
+            updateCitation(citation, checkedUploads, user, currentCitation);
+        }        
     }
 }
