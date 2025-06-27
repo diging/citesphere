@@ -179,19 +179,4 @@ public class SearchController {
         Gson gson = new Gson();
         return gson.toJson(searchItemsData, SearchItemsDataDto.class);
     }
-    
-    private List<BreadCrumb> getBreadCrumbs(ICitationCollection collection, ICitationGroup group, IUser user, String zoteroGroupId) {
-        List<BreadCrumb> breadCrumbs = new ArrayList<>();
-        while(collection != null) {
-            breadCrumbs.add(new BreadCrumb(collection.getName(), BreadCrumbType.COLLECTION, collection.getKey(), collection));
-            if (collection.getParentCollectionKey() != null) {
-                collection = collectionManager.getCollection(user, zoteroGroupId, collection.getParentCollectionKey());
-            } else {
-                collection = null;
-            }
-        }
-        breadCrumbs.add(new BreadCrumb(group.getName(), BreadCrumbType.GROUP, group.getGroupId() + "", group));
-        Collections.reverse(breadCrumbs);
-        return breadCrumbs;
-    }
 }
