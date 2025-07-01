@@ -213,7 +213,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                     HttpMethod.GET, requestEntity, String.class);
         } catch (HttpClientErrorException ex) {
             upload.setDocumentStatus(GilesStatus.FAILED);
-            checkedUploads.add(upload);
+            checkedUploads.add(upload); //check if needsupdating needed here
             return checkedUploads;
         }
         if (response.getStatusCode() == HttpStatus.ACCEPTED) {
