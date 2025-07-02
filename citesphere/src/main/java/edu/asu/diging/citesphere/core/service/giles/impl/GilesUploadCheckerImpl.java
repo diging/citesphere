@@ -217,9 +217,26 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
             return checkedUploads;
         }
         if (response.getStatusCode() == HttpStatus.ACCEPTED) {
-            // Giles is still procoessing
-            logger.debug("Upload " + upload.getProgressId()
-                    + " still being processed.");
+            // Giles is still processing - check if we can get upload ID from in-progress response
+            logger.debug("Upload " + upload.getProgressId() + " still being processed.");
+            
+            // Try to parse as GilesCheckUploadResponse to extract upload ID if available
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = response.getBody();
+            try {
+                GilesCheckUploadResponse checkResponse = mapper.readValue(jsonBody, GilesCheckUploadResponse.class);
+                if (checkResponse.getUploadId() != null && !checkResponse.getUploadId().trim().isEmpty()) {
+                    // Upload ID is available even during processing - store it
+                    if (upload.getUploadId() == null || upload.getUploadId().trim().isEmpty()) {
+                        logger.debug("Setting upload ID " + checkResponse.getUploadId() + " for progress ID " + upload.getProgressId());
+                        upload.setUploadId(checkResponse.getUploadId());
+                    }
+                }
+            } catch (IOException e) {
+                // If parsing as GilesCheckUploadResponse fails, that's okay - just continue
+                logger.debug("Could not parse in-progress response as GilesCheckUploadResponse, continuing without upload ID extraction.");
+            }
+            
             checkedUploads.add(upload);
         } else if (response.getStatusCode() == HttpStatus.OK) {
             logger.debug("Upload " + upload.getProgressId() + " is done.");
@@ -230,6 +247,17 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                 for (GilesUpload processedUpload : processed) {
                     // giles does not return the progress id again, but we need it
                     processedUpload.setProgressId(upload.getProgressId());
+                    
+                    // Store the upload ID if it's available from Giles
+                    // This enables access checking via upload ID for completed uploads
+                    if (processedUpload.getUploadId() != null && !processedUpload.getUploadId().trim().isEmpty()) {
+                        logger.debug("Storing upload ID " + processedUpload.getUploadId() + " for progress ID " + upload.getProgressId());
+                    } else if (upload.getUploadId() != null && !upload.getUploadId().trim().isEmpty()) {
+                        // If the completed upload doesn't have upload ID but our tracking upload does, preserve it
+                        logger.debug("Preserving upload ID " + upload.getUploadId() + " for completed upload " + upload.getProgressId());
+                        processedUpload.setUploadId(upload.getUploadId());
+                    }
+                    
                     checkedUploads.add(processedUpload);
                 }
             } catch (IOException e) {
