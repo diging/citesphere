@@ -233,8 +233,7 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                     }
                 }
             } catch (IOException e) {
-                // If parsing as GilesCheckUploadResponse fails, that's okay - just continue
-                logger.debug("Could not parse in-progress response as GilesCheckUploadResponse, continuing without upload ID extraction.");
+                logger.debug("Could not parse in-progress response as GilesCheckUploadResponse, continuing without upload ID extraction.", e);
             }
             
             checkedUploads.add(upload);
