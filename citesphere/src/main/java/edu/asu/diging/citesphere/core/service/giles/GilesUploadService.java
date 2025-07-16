@@ -1,6 +1,5 @@
 package edu.asu.diging.citesphere.core.service.giles;
 
-
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;

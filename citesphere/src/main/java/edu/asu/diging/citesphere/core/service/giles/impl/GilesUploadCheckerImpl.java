@@ -227,7 +227,6 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
             try {
                 GilesCheckUploadResponse checkResponse = mapper.readValue(jsonBody, GilesCheckUploadResponse.class);
                 if (checkResponse.getUploadId() != null && !checkResponse.getUploadId().trim().isEmpty()) {
-                    // Upload ID is available even during processing - store it
                     if (upload.getUploadId() == null || upload.getUploadId().trim().isEmpty()) {
                         upload.setUploadId(checkResponse.getUploadId());
                     }
