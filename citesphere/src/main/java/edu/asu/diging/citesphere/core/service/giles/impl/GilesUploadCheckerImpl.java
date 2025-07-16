@@ -213,12 +213,13 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                     HttpMethod.GET, requestEntity, String.class);
         } catch (HttpClientErrorException ex) {
             upload.setDocumentStatus(GilesStatus.FAILED);
-            checkedUploads.add(upload); //check if needsupdating needed here
+            checkedUploads.add(upload);
             return checkedUploads;
         }
         if (response.getStatusCode() == HttpStatus.ACCEPTED) {
-            // Giles is still processing - check if we can get upload ID from in-progress response
-            logger.debug("Upload " + upload.getProgressId() + " still being processed.");
+            // Giles is still procoessing
+            logger.debug("Upload " + upload.getProgressId()
+                    + " still being processed.");
             
             // Try to parse as GilesCheckUploadResponse to extract upload ID if available
             ObjectMapper mapper = new ObjectMapper();
@@ -228,7 +229,6 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                 if (checkResponse.getUploadId() != null && !checkResponse.getUploadId().trim().isEmpty()) {
                     // Upload ID is available even during processing - store it
                     if (upload.getUploadId() == null || upload.getUploadId().trim().isEmpty()) {
-                        logger.debug("Setting upload ID " + checkResponse.getUploadId() + " for progress ID " + upload.getProgressId());
                         upload.setUploadId(checkResponse.getUploadId());
                     }
                 }
@@ -246,17 +246,6 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
                 for (GilesUpload processedUpload : processed) {
                     // giles does not return the progress id again, but we need it
                     processedUpload.setProgressId(upload.getProgressId());
-                    
-                    // Store the upload ID if it's available from Giles
-                    // This enables access checking via upload ID for completed uploads
-                    if (processedUpload.getUploadId() != null && !processedUpload.getUploadId().trim().isEmpty()) {
-                        logger.debug("Storing upload ID " + processedUpload.getUploadId() + " for progress ID " + upload.getProgressId());
-                    } else if (upload.getUploadId() != null && !upload.getUploadId().trim().isEmpty()) {
-                        // If the completed upload doesn't have upload ID but our tracking upload does, preserve it
-                        logger.debug("Preserving upload ID " + upload.getUploadId() + " for completed upload " + upload.getProgressId());
-                        processedUpload.setUploadId(upload.getUploadId());
-                    }
-                    
                     checkedUploads.add(processedUpload);
                 }
             } catch (IOException e) {

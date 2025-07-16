@@ -41,5 +41,4 @@ public interface ICitationStore {
     List<ICitation> findByGilesProgressId(String progressId);
 
     List<ICitation> findByGilesUploadId(String uploadId);
-
 }
