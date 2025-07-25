@@ -39,6 +39,9 @@ import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
+import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
+import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
@@ -85,6 +88,9 @@ public class CitationManager implements ICitationManager {
 
     @Autowired
     private IAsyncCitationProcessor asyncCitationProcessor;
+
+    @Autowired
+    private ISyncJobManager syncJobManager;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
@@ -390,6 +396,8 @@ public class CitationManager implements ICitationManager {
 
         boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
         CitationResults results = new CitationResults();
+        boolean syncStarted = false;
+        
         if (isModified) {
             long previousVersion = group.getContentVersion();
             // first update the group info
@@ -406,12 +414,33 @@ public class CitationManager implements ICitationManager {
             results.setNotModified(false);
             Future<String> future = asyncCitationProcessor.sync(user, group.getGroupId() + "", previousVersion, collectionId);
             futureMap.put(groupId, future);
+            syncStarted = true;
         } else {
             results.setNotModified(true);
         }
 
         List<ICitation> citations = null;
         long total = 0;
+        
+        // If sync was started, check its status before querying database
+        if (syncStarted) {
+            // Check sync job status to handle cancellation gracefully
+            GroupSyncJob syncJob = syncJobManager.getMostRecentJob(groupId);
+            if (syncJob != null && (syncJob.getStatus() == JobStatus.CANCELED || syncJob.getStatus() == JobStatus.FAILURE)) {
+                logger.warn("Sync was cancelled or failed for group " + groupId + ", falling back to Zotero direct fetch");
+                // Fallback: get items directly from Zotero for this page
+                try {
+                    CitationResults zoteroResults = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getContentVersion());
+                    results.setCitations(zoteroResults.getCitations());
+                    results.setTotalResults(zoteroResults.getTotalResults());
+                    return results;
+                } catch (ZoteroHttpStatusException e) {
+                    logger.error("Failed to fetch from Zotero as fallback", e);
+                    // Continue with database query as last resort
+                }
+            }
+        }
+        
         if (collectionId != null && !collectionId.trim().isEmpty()) {
             citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds);
             ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
