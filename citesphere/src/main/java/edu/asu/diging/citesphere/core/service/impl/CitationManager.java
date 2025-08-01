@@ -423,23 +423,23 @@ public class CitationManager implements ICitationManager {
         long total = 0;
         
         // If sync was started, check its status before querying database
-        if (syncStarted) {
-            // Check sync job status to handle cancellation gracefully
-            GroupSyncJob syncJob = syncJobManager.getMostRecentJob(groupId);
-            if (syncJob != null && (syncJob.getStatus() == JobStatus.CANCELED || syncJob.getStatus() == JobStatus.FAILURE)) {
-                logger.warn("Sync was cancelled or failed for group " + groupId + ", falling back to Zotero direct fetch");
-                // Fallback: get items directly from Zotero for this page
-                try {
-                    CitationResults zoteroResults = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getContentVersion());
-                    results.setCitations(zoteroResults.getCitations());
-                    results.setTotalResults(zoteroResults.getTotalResults());
-                    return results;
-                } catch (ZoteroHttpStatusException e) {
-                    logger.error("Failed to fetch from Zotero as fallback", e);
-                    // Continue with database query as last resort
-                }
-            }
-        }
+        // if (syncStarted) {
+        //     // Check sync job status to handle cancellation gracefully
+        //     GroupSyncJob syncJob = syncJobManager.getMostRecentJob(groupId);
+        //     if (syncJob != null && (syncJob.getStatus() == JobStatus.CANCELED || syncJob.getStatus() == JobStatus.FAILURE)) {
+        //         logger.warn("Sync was cancelled or failed for group " + groupId + ", falling back to Zotero direct fetch");
+        //         // Fallback: get items directly from Zotero for this page
+        //         try {
+        //             CitationResults zoteroResults = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getContentVersion());
+        //             results.setCitations(zoteroResults.getCitations());
+        //             results.setTotalResults(zoteroResults.getTotalResults());
+        //             return results;
+        //         } catch (ZoteroHttpStatusException e) {
+        //             logger.error("Failed to fetch from Zotero as fallback", e);
+        //             // Continue with database query as last resort
+        //         }
+        //     }
+        // }
         
         if (collectionId != null && !collectionId.trim().isEmpty()) {
             citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds);
