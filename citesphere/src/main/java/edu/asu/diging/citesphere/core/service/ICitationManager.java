@@ -14,15 +14,18 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.SelfCitationException;
 import edu.asu.diging.citesphere.core.exceptions.SyncInProgressException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.impl.CitationPage;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.transfer.impl.Citations;
 import edu.asu.diging.citesphere.user.IUser;
 
 public interface ICitationManager {
@@ -90,4 +93,11 @@ public interface ICitationManager {
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException;
     
+
+    Citations findAuthorityCitations(IAuthorityEntry entry, IUser user);
+    
+    ICitation addCitationToReferences(IUser user, ICitation citation, String zoteroGroupId, String referenceCitationKey, 
+            String reference) throws SelfCitationException, ZoteroConnectionException, CitationIsOutdatedException, 
+            ZoteroHttpStatusException, ZoteroItemCreationFailedException;
+
 }
