@@ -551,24 +551,37 @@ public class CitationManager implements ICitationManager {
     
     private HttpStatus initiateReprocessing(IUser user, String documentId, ICitation citation) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
         ResponseEntity<String> reprocessingResponse = gilesConnector.reprocessDocument(user, documentId);
-        if (reprocessingResponse.getStatusCode().equals(HttpStatus.OK)) {
-            IGilesUpload reprocessedUpload = new GilesUpload();
-            String responseBody = reprocessingResponse.getBody();
-            ObjectMapper objectMapper = new ObjectMapper();
-            String progressId = null;
-            try {
-                JsonNode jsonNode = objectMapper.readTree(responseBody);
-                progressId = jsonNode.get("id").asText();
-            } catch (IOException e) {
-                logger.error("Could not deserialize response.", e);
-            }
-            reprocessedUpload.setUploadingUser(user.getUsername());
-            reprocessedUpload.setProgressId(progressId);
-            Set<IGilesUpload> checkedUploads = new HashSet<>();
-            checkedUploads.add(reprocessedUpload);
-            updateReprocessedUpload(checkedUploads, user, citation, documentId);
-            gilesUploadChecker.add(citation);
+        
+        if (!reprocessingResponse.getStatusCode().equals(HttpStatus.OK)) {
+            logger.error("Document reprocessing failed for document {}. Server returned status: {}", documentId, reprocessingResponse.getStatusCode());
+            return reprocessingResponse.getStatusCode();
         }
+        IGilesUpload reprocessedUpload = new GilesUpload();
+        String responseBody = reprocessingResponse.getBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String progressId = null;
+        try {
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            if (jsonNode != null && jsonNode.has("id")) {
+                progressId = jsonNode.get("id").asText();
+            }
+        } catch (IOException e) {
+            logger.error("Could not deserialize response for document {}. This means reprocessing cannot continue properly.", documentId, e);
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        
+        // If we couldn't get a valid progress ID, don't continue with the rest
+        if (progressId == null || progressId.trim().isEmpty()) {
+            logger.error("Could not extract valid progress ID for document {}. Reprocessing cannot continue.", documentId);
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        
+        reprocessedUpload.setUploadingUser(user.getUsername());
+        reprocessedUpload.setProgressId(progressId);
+        Set<IGilesUpload> checkedUploads = new HashSet<>();
+        checkedUploads.add(reprocessedUpload);
+        updateReprocessedUpload(checkedUploads, user, citation, documentId);
+        gilesUploadChecker.add(citation.getKey());
         return reprocessingResponse.getStatusCode();
     }
     

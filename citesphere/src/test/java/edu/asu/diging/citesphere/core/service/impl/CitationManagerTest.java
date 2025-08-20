@@ -522,7 +522,8 @@ public class CitationManagerTest {
         ResponseEntity<String> response = new ResponseEntity<>(responseBody, HttpStatus.OK);
         Mockito.when(gilesConnector.reprocessDocument(user, documentId)).thenReturn(response);
         managerToTest.reprocessFile(user, GROUP_ID, EXISTING_ID, documentId);
-        Mockito.verify(gilesUploadChecker).add(existingCitation);
+        Mockito.verify(gilesUploadChecker).add(existingCitation.getKey());
+    }
 
     @Test
     public void test_addCitationToReferences_citationFound() throws SelfCitationException, ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
