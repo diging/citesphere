@@ -30,6 +30,7 @@ import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.TokenRequest;
 import org.springframework.security.oauth2.provider.implicit.ImplicitTokenRequest;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,7 @@ import edu.asu.diging.citesphere.user.IUser;
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
 @SuppressWarnings("deprecation")
 @Transactional
-public class InternalTokenManagerImpl implements InternalTokenManager {
+public class InternalTokenManagerImpl extends DefaultTokenServices implements InternalTokenManager {
     
     @Value("${_oauth_token_validity}")
     private int tokenValidity;
@@ -60,6 +61,7 @@ public class InternalTokenManagerImpl implements InternalTokenManager {
     @PostConstruct
     public void init() {
         this.requestFactory = new DefaultOAuth2RequestFactory(clientDetailsService);
+        this.setTokenStore(tokenStore);
     }
     
     /* (non-Javadoc)
@@ -88,7 +90,6 @@ public class InternalTokenManagerImpl implements InternalTokenManager {
         
         OAuth2Authentication authentication = getOAuth2Authentication(clientDetailsService.loadClientByClientId(citesphereClientId), implicitRequest, user);
         tokenStore.storeAccessToken(token, authentication);
-        System.out.println(extractTokenKey(token.getValue()));
         return token;
     }
     
