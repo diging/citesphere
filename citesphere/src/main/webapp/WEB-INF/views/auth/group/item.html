@@ -138,7 +138,7 @@
 	    $(".view-link").click(function() {
 	    	var item = $(this).parent();
 	        var modalName = 'viewUpload';
-	        /* showFiles(modalName, item); */
+	        showFiles(modalName, item);
 	        $("#"+modalName.toLowerCase()+"Modal").modal('show');
 		});
 	    $('.note-info').each(function() {
@@ -294,7 +294,7 @@
 	    	});
 	}
 	
-	/* function showFiles(modalName, item) {
+	function showFiles(modalName, item) {
 		
 		var uploadItem = $(item);
 		var modalNameLCase = modalName.toLowerCase();
@@ -336,7 +336,7 @@
                pageCount = pageCount+1;
            })
        }) 
-	} */
+	}
 	
 </script>
 </head>
