@@ -1,16 +1,10 @@
 package edu.asu.diging.citesphere.web.user;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.stream.Collectors;
-import java.io.InputStream;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +15,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.google.common.base.Supplier;
-
-import java.util.stream.Stream;
-
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
-import edu.asu.diging.citesphere.model.bib.GilesStatus;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
-import edu.asu.diging.citesphere.model.bib.impl.GilesPage;
-import edu.asu.diging.citesphere.model.bib.impl.IGilesFile;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
@@ -41,37 +28,45 @@ public class GilesDocumentController {
     
     @Autowired
     private IGilesConnector gilesConnector;
+    
+    @Autowired
+    private ICitationManager citationManager;
 
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/giles/{fileId}")
-    public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication, Model model) {
+    public String get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication, Model model) {
         
-        IUser user = (IUser) authentication.getPrincipal();
+        ICitation citation = citationManager.getCitation(itemId);
+        Optional<IGilesUpload> uploadOptional = citation.getGilesUploads().stream()
+                .filter(u -> u.getUploadedFile() != null)
+                .filter(g -> g.getUploadedFile().getId().equals(fileId))
+                .findFirst();
+        
+        if (!uploadOptional.isPresent()) {
+            response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
+            return "error/404";
+        }
+        
+        IGilesUpload upload = uploadOptional.get();
+        byte[] content = null;
         
         try {
-            // Get file content from Giles
-            byte[] fileContent = gilesConnector.getFile(user, fileId);
-            
-            if (fileContent == null || fileContent.length == 0) {
-                response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
-                return;
-            }
-            
-            // Create input stream from byte array
-            InputStream is = new ByteArrayInputStream(fileContent);
-            
-            // Set response headers - we'll use a generic filename since we don't have metadata readily available
-            response.setHeader("Content-disposition", "attachment; filename=giles_file_" + fileId);
-            
-            // Copy file content to response
-            IOUtils.copy(is, response.getOutputStream());
-            response.flushBuffer();
-            
-        } catch (HttpClientErrorException e) {
-            logger.error("Error retrieving file from Giles with fileId: {}", fileId, e);
-            response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
-        } catch (IOException e) {
-            logger.error("Error writing file to output stream. FileId was '{}'", fileId, e);
-            response.setStatus(org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            content = gilesConnector.getFile((IUser)authentication.getPrincipal(), fileId);
+        } catch (HttpClientErrorException.NotFound ex) {
+            logger.error("This file is not available. Maybe you uploaded it with a different Citesphere instance?", ex);
+            return "error/gilesDocumentError";
         }
+        
+        response.setContentType(upload.getUploadedFile().getContentType());
+        response.setHeader("Content-disposition", "filename=\"" + upload.getUploadedFile().getFilename() + "\""); 
+        try {
+            if (content != null) {
+                response.setContentLength(content.length);
+                response.getOutputStream().write(content);
+                response.getOutputStream().close();
+            }
+        } catch (IOException e) {
+            logger.error("Could not write file.", e);
+        }
+        return null;
     }
 }
