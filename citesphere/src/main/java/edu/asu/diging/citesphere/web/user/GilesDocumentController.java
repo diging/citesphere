@@ -1,13 +1,16 @@
 package edu.asu.diging.citesphere.web.user;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
+import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,20 +41,37 @@ public class GilesDocumentController {
     
     @Autowired
     private IGilesConnector gilesConnector;
-    
-    @Autowired
-    private ICitationManager citationManager;
 
     @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}/giles/{fileId}")
     public void get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication, Model model) {
         
-        String contentType = null;
-        String fileName = null;
-        ICitation citation = citationManager.getCitation(itemId);
-        List<IGilesUpload> uploadOptionalList = citation.getGilesUploads().stream().filter(u -> u.getUploadedFile() != null && u.getDocumentStatus().equals(GilesStatus.COMPLETE)).collect(Collectors.toList());
-        if(uploadOptionalList.size()==0 || contentType==null){
+        IUser user = (IUser) authentication.getPrincipal();
+        
+        try {
+            // Get file content from Giles
+            byte[] fileContent = gilesConnector.getFile(user, fileId);
+            
+            if (fileContent == null || fileContent.length == 0) {
+                response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
+                return;
+            }
+            
+            // Create input stream from byte array
+            InputStream is = new ByteArrayInputStream(fileContent);
+            
+            // Set response headers - we'll use a generic filename since we don't have metadata readily available
+            response.setHeader("Content-disposition", "attachment; filename=giles_file_" + fileId);
+            
+            // Copy file content to response
+            IOUtils.copy(is, response.getOutputStream());
+            response.flushBuffer();
+            
+        } catch (HttpClientErrorException e) {
+            logger.error("Error retrieving file from Giles with fileId: {}", fileId, e);
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
+        } catch (IOException e) {
+            logger.error("Error writing file to output stream. FileId was '{}'", fileId, e);
+            response.setStatus(org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
-        model.addAttribute("uploadOptionalList", uploadOptionalList);
     }
 }
