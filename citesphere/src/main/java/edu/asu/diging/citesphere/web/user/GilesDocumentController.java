@@ -1,7 +1,6 @@
 package edu.asu.diging.citesphere.web.user;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,17 +35,17 @@ public class GilesDocumentController {
     public String get(HttpServletResponse response, @PathVariable String itemId, @PathVariable String fileId, Authentication authentication, Model model) {
         
         ICitation citation = citationManager.getCitation(itemId);
-        Optional<IGilesUpload> uploadOptional = citation.getGilesUploads().stream()
-                .filter(u -> u.getUploadedFile() != null)
-                .filter(g -> g.getUploadedFile().getId().equals(fileId))
-                .findFirst();
-        
-        if (!uploadOptional.isPresent()) {
+        if (citation == null) {
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
             return "error/404";
         }
         
-        IGilesUpload upload = uploadOptional.get();
+        // Find the upload that contains this file
+        IGilesUpload upload = findUploadByFileId(citation, fileId);
+        if (upload == null) {
+            response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
+            return "error/404";
+        }
         byte[] content = null;
         
         try {
@@ -55,9 +54,10 @@ public class GilesDocumentController {
             logger.error("This file is not available. Maybe you uploaded it with a different Citesphere instance?", ex);
             return "error/gilesDocumentError";
         }
+        String filename = getFilename(upload, fileId);
         
         response.setContentType(upload.getUploadedFile().getContentType());
-        response.setHeader("Content-disposition", "filename=\"" + upload.getUploadedFile().getFilename() + "\""); 
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
         try {
             if (content != null) {
                 response.setContentLength(content.length);
@@ -68,5 +68,83 @@ public class GilesDocumentController {
             logger.error("Could not write file.", e);
         }
         return null;
+    }
+    
+    private IGilesUpload findUploadByFileId(ICitation citation, String fileId) {
+        for (IGilesUpload upload : citation.getGilesUploads()) {
+            if (isFileInUpload(upload, fileId)) {
+                return upload;
+            }
+        }
+        return null;
+    }
+    
+    private boolean isFileInUpload(IGilesUpload upload, String fileId) {
+        // Check main uploaded file
+        if (upload.getUploadedFile() != null && fileId.equals(upload.getUploadedFile().getId())) {
+            return true;
+        }
+        
+        // Check extracted text
+        if (upload.getExtractedText() != null && fileId.equals(upload.getExtractedText().getId())) {
+            return true;
+        }
+        
+        // Check page files
+        if (upload.getPages() != null) {
+            for (var page : upload.getPages()) {
+                if ((page.getImage() != null && fileId.equals(page.getImage().getId())) ||
+                    (page.getText() != null && fileId.equals(page.getText().getId())) ||
+                    (page.getOcr() != null && fileId.equals(page.getOcr().getId()))) {
+                    return true;
+                }
+                
+                if (page.getAdditionalFiles() != null) {
+                    for (var additionalFile : page.getAdditionalFiles()) {
+                        if (additionalFile != null && fileId.equals(additionalFile.getId())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    private String getFilename(IGilesUpload upload, String fileId) {
+        // Check main uploaded file
+        if (upload.getUploadedFile() != null && fileId.equals(upload.getUploadedFile().getId())) {
+            return upload.getUploadedFile().getFilename();
+        }
+        
+        // Check extracted text
+        if (upload.getExtractedText() != null && fileId.equals(upload.getExtractedText().getId())) {
+            return upload.getExtractedText().getFilename();
+        }
+        
+        // Check page files
+        if (upload.getPages() != null) {
+            for (var page : upload.getPages()) {
+                if (page.getImage() != null && fileId.equals(page.getImage().getId())) {
+                    return page.getImage().getFilename();
+                }
+                if (page.getText() != null && fileId.equals(page.getText().getId())) {
+                    return page.getText().getFilename();
+                }
+                if (page.getOcr() != null && fileId.equals(page.getOcr().getId())) {
+                    return page.getOcr().getFilename();
+                }
+                
+                if (page.getAdditionalFiles() != null) {
+                    for (var additionalFile : page.getAdditionalFiles()) {
+                        if (additionalFile != null && fileId.equals(additionalFile.getId())) {
+                            return additionalFile.getFilename();
+                        }
+                    }
+                }
+            }
+        }
+        
+        return "download"; // fallback filename
     }
 }
