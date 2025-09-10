@@ -58,8 +58,9 @@ public class SearchController {
     @Autowired
     private Environment env;
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search" })
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search", "/auth/group/{zoteroGroupId}/collection/{collectionId}/search" })
     public @ResponseBody String search(@PathVariable String zoteroGroupId,
+            @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
             @RequestParam(defaultValue = "0", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
@@ -74,81 +75,30 @@ public class SearchController {
         }
 
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
-            return "redirect:/auth/group/" + zoteroGroupId + "/items";
-        }
-
-        Integer pageInt = 1;
-        try {
-            pageInt = new Integer(page);
-        } catch (NumberFormatException ex) {
-            logger.warn("Trying to access invalid page number: " + page);
-        }
-
-        pageInt = pageInt > 0 ? pageInt : 1;
-
-        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt - 1, 50);
-
-        SearchItemsDataDto searchItemsData = new SearchItemsDataDto();
-        searchItemsData.setSearchTerm(searchTerm);
-        searchItemsData.setCurrentPage(pageInt);
-        searchItemsData.setCitationsData(citations.getResults().stream().map(c -> new CitationsDto(c,
-                env.getProperty(c.getItemType() + "_label"), env.getProperty(c.getItemType() + "_icon")))
-                .collect(Collectors.toList()));
-        searchItemsData.setTotalPages(Math.max(1, citations.getTotalPages()));
-        searchItemsData.setZoteroGroupId(zoteroGroupId);
-        searchItemsData.setSort(sort);
-        searchItemsData.setTotalResults(citations.getTotalResults());
-        searchItemsData.setGroup(group);
-
-        List<String> availableColumnsList = Arrays.asList(availableColumns.split(","));
-        List<String> shownColumns = new ArrayList<>();
-        if (columns != null && columns.length > 0) {
-            for (String column : columns) {
-                if (availableColumnsList.contains(column)) {
-                    shownColumns.add(column);
-                }
+            String redirectUrl = "/auth/group/" + zoteroGroupId;
+            if (collectionId != null) {
+                redirectUrl += "/collection/" + collectionId;
             }
-        }
-        searchItemsData.setShownColumns(shownColumns);
-        searchItemsData.setAvailableColumnsData(availableColumnsList.stream()
-                .map(c -> new AvailableColumnsDataDto(c, env.getProperty("_item_attribute_label_" + c)))
-                .collect(Collectors.toList()));
-
-        Gson gson = new Gson();
-
-        return gson.toJson(searchItemsData, SearchItemsDataDto.class);
-    }
-    
-    @RequestMapping(value = {"/auth/group/{zoteroGroupId}/collection/{collectionId}/search"})
-    public @ResponseBody String searchCollection(@PathVariable String zoteroGroupId,
-            @PathVariable(value="collectionId", required=false) String collectionId,
-            @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
-            @RequestParam(defaultValue = "0", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
-            @RequestParam(required = false, value = "columns") String[] columns, Authentication authentication) {
-        IUser user = (IUser) authentication.getPrincipal();
-        ICitationGroup group = groupManager.getGroup(user, zoteroGroupId);
-
-        if (group == null) {
-            logger.error("User " + user.getUsername() + " does not have access to group " + zoteroGroupId);
-            return "error/403";
+            redirectUrl += "/items";
+            return "redirect:" + redirectUrl;
         }
 
-        if (searchTerm == null || searchTerm.trim().isEmpty()) {
-            return "redirect:/auth/group/" + zoteroGroupId + "/collection/" + collectionId + "/items";
-        }
-        
         Integer pageInt = 1;
         try {
-            pageInt = new Integer(page);
+            pageInt = Integer.valueOf(page);
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
         }
-        
+
         pageInt = pageInt > 0 ? pageInt : 1;
-        
-        ResultPage citations = engine.search(searchTerm, zoteroGroupId, collectionId, pageInt-1, 50);
-        
+
+        ResultPage citations;
+        if (collectionId != null) {
+            citations = engine.search(searchTerm, zoteroGroupId, collectionId, pageInt - 1, 50);
+        } else {
+            citations = engine.search(searchTerm, zoteroGroupId, pageInt - 1, 50);
+        }
+
         SearchItemsDataDto searchItemsData = new SearchItemsDataDto();
         searchItemsData.setSearchTerm(searchTerm);
         searchItemsData.setCurrentPage(pageInt);
@@ -157,7 +107,9 @@ public class SearchController {
                 .collect(Collectors.toList()));
         searchItemsData.setTotalPages(Math.max(1, citations.getTotalPages()));
         searchItemsData.setZoteroGroupId(zoteroGroupId);
-        searchItemsData.setCollectionId(collectionId);
+        if (collectionId != null) {
+            searchItemsData.setCollectionId(collectionId);
+        }
         searchItemsData.setSort(sort);
         searchItemsData.setTotalResults(citations.getTotalResults());
         searchItemsData.setGroup(group);
