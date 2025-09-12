@@ -570,7 +570,6 @@ public class CitationManager implements ICitationManager {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
         
-        // If we couldn't get a valid progress ID, don't continue with the rest
         if (progressId == null || progressId.trim().isEmpty()) {
             logger.error("Could not extract valid progress ID for document {}. Reprocessing cannot continue.", documentId);
             return HttpStatus.INTERNAL_SERVER_ERROR;
