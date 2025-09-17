@@ -597,7 +597,7 @@
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
 	        <button th:id="|reprocess-file-btn-${index.index}|" type="button" th:data-upload-file="${upload.documentId}" class="fa fa-redo fa-xs reprocess-file"></button>
 	        <a th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}" 
-	        	th:href="@{|${citation.key}/sync/giles/${upload.progressId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}">
+	        	th:href="@{|${citation.key}/sync/giles/${upload.progressId}?index=${index.index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}">
 				<i class="icon-sync" title="Sync Upload Status"></i></a>
 	        </li>
         </ul>
