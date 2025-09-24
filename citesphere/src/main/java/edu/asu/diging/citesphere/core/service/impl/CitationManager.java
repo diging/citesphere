@@ -539,13 +539,40 @@ public class CitationManager implements ICitationManager {
     public HttpStatus reprocessFile(IUser user, String zoteroGroupId, String itemId, String documentId)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
             ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        
+        if (documentId == null || documentId.trim().isEmpty()) {
+            logger.warn("Cannot reprocess file: documentId is null or empty for citation {}", itemId);
+            return HttpStatus.BAD_REQUEST;
+        }
+        
         ICitation citation = getCitation(user, zoteroGroupId, itemId);
         List<IGilesUpload> uploadsToReprocess = citation.getGilesUploads().stream()
-        .filter(upload -> upload.getDocumentId() != null && upload.getDocumentId().equals(documentId)).collect(Collectors.toList());
+            .filter(upload -> upload.getDocumentId() != null && upload.getDocumentId().equals(documentId))
+            .collect(Collectors.toList());
+            
+        if (uploadsToReprocess.isEmpty()) {
+            logger.warn("No uploads found for document ID {} in citation {}", documentId, itemId);
+            return HttpStatus.NOT_FOUND;
+        }
+        
+        boolean canReprocess = uploadsToReprocess.stream()
+            .anyMatch(upload -> gilesUploadChecker.canReprocess(upload, user));
+            
+        if (!canReprocess) {
+            logger.warn("Upload for document ID {} in citation {} cannot be reprocessed (still processing)", documentId, itemId);
+            return HttpStatus.CONFLICT;
+        }
+        
         HttpStatus reprocessingStatus = null;
         for(IGilesUpload upload : uploadsToReprocess) {
             reprocessingStatus = initiateReprocessing(user, documentId, citation);
         }
+        
+        if (reprocessingStatus == null) {
+            logger.error("Reprocessing returned null status for document {} in citation {}", documentId, itemId);
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        
         return reprocessingStatus;
     }
     
