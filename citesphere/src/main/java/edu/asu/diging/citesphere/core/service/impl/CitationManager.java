@@ -612,7 +612,7 @@ public class CitationManager implements ICitationManager {
     }
     
     private void updateReprocessedUpload(Set<IGilesUpload> checkedUploads, IUser user, ICitation citation, String documentId) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
-        ICitation currentCitation =getCitation(user, citation.getGroup(), citation.getKey());;
+        ICitation currentCitation =getCitation(user, citation.getGroup(), citation.getKey());
         if (currentCitation != null) {
             for (IGilesUpload upload : checkedUploads) {
                 Optional<IGilesUpload> oldUpload = currentCitation
