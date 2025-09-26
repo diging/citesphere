@@ -292,7 +292,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     private void storeCitation(ICitation citation) {
         Optional<ICitation> optional = citationStore.findById(citation.getKey());
         if (optional.isPresent()) {
-            citationStore.delete((Citation) optional.get());
+            citation.setId(optional.get().getId());           
         }
 
         citationStore.save((Citation) citation);
@@ -312,7 +312,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
     private void storeCitationCollection(ICitationCollection collection) {
         Optional<ICitationCollection> optional = collectionRepo.findByKey(collection.getKey());
         if (optional.isPresent()) {
-            collectionRepo.delete((CitationCollection) optional.get());
+            collection.setId(optional.get().getId());
         }
         collectionRepo.save((CitationCollection) collection);
     }

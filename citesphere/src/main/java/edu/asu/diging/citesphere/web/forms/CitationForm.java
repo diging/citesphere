@@ -2,6 +2,8 @@ package edu.asu.diging.citesphere.web.forms;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import edu.asu.diging.citesphere.model.bib.ItemType;
 
 public class CitationForm {
@@ -37,7 +39,9 @@ public class CitationForm {
     private List<PersonForm> otherCreators;
 
     private List<ConceptAssignmentForm> conceptTags;
-
+    
+    private MultipartFile[] files;
+    
     public String getCollectionId() {
         return collectionId;
     }
@@ -233,7 +237,7 @@ public class CitationForm {
     public List<PersonForm> getAuthors() {
         return authors;
     }
-
+   
     public void setAuthors(List<PersonForm> authors) {
         this.authors = authors;
     }
@@ -241,7 +245,7 @@ public class CitationForm {
     public List<PersonForm> getEditors() {
         return editors;
     }
-
+    
     public void setEditors(List<PersonForm> editors) {
         this.editors = editors;
     }
@@ -249,7 +253,7 @@ public class CitationForm {
     public List<PersonForm> getOtherCreators() {
         return otherCreators;
     }
-
+    
     public void setOtherCreators(List<PersonForm> otherCreators) {
         this.otherCreators = otherCreators;
     }
@@ -260,5 +264,13 @@ public class CitationForm {
 
     public void setConceptTags(List<ConceptAssignmentForm> conceptTags) {
         this.conceptTags = conceptTags;
+    }
+    
+    public MultipartFile[] getFiles() {
+        return files;
+    }
+
+    public void setFiles(MultipartFile[] files) {
+        this.files = files;
     }
 }

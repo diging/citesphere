@@ -3,17 +3,21 @@ package edu.asu.diging.citesphere.core.service.impl;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,7 @@ import edu.asu.diging.citesphere.core.exceptions.AccessForbiddenException;
 import edu.asu.diging.citesphere.core.exceptions.CannotFindCitationException;
 import edu.asu.diging.citesphere.core.exceptions.CitationIsOutdatedException;
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.SelfCitationException;
 import edu.asu.diging.citesphere.core.exceptions.SyncInProgressException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
@@ -39,27 +44,26 @@ import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
-import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
-import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
-import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IReference;
 import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.transfer.impl.Citations;
+import edu.asu.diging.citesphere.model.bib.impl.Reference;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Service
 @PropertySource("classpath:/config.properties")
 @Transactional
 public class CitationManager implements ICitationManager {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
@@ -88,9 +92,6 @@ public class CitationManager implements ICitationManager {
 
     @Autowired
     private IAsyncCitationProcessor asyncCitationProcessor;
-
-    @Autowired
-    private ISyncJobManager syncJobManager;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
 
@@ -186,19 +187,19 @@ public class CitationManager implements ICitationManager {
     }
 
     @Override
-    public void updateCitation(IUser user, String groupId, ICitation citation)
+    public void updateCitation(IUser user, String groupId, ICitation citation) 
             throws ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         long citationVersion = zoteroManager.getGroupItemVersion(user, groupId, citation.getKey());
         Optional<ICitation> storedCitationOptional = citationStore.findById(citation.getKey());
+        ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         if (storedCitationOptional.isPresent()) {
             ICitation storedCitation = storedCitationOptional.get();
             if (storedCitation.getVersion() != citationVersion) {
                 throw new CitationIsOutdatedException();
             }
-            citationStore.delete(storedCitation);
+            updatedCitation.setId(storedCitation.getId());
         }
 
-        ICitation updatedCitation = zoteroManager.updateCitation(user, groupId, citation);
         citationStore.save(updatedCitation);
     }
     
@@ -213,22 +214,30 @@ public class CitationManager implements ICitationManager {
     public ICitation createCitation(IUser user, String groupId, List<String> collectionIds, ICitation citation)
             throws ZoteroConnectionException, ZoteroItemCreationFailedException, GroupDoesNotExistException,
             ZoteroHttpStatusException {
-        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
-        if (!groupOptional.isPresent()) {
+        List<ICitationGroup> citationGroups = groupRepository.findByGroupId(new Long(groupId));
+        if (citationGroups.size()==0) {
             throw new GroupDoesNotExistException("Group with id " + groupId + " does not exist.");
         }
 
         ICitation newCitation = zoteroManager.createCitation(user, groupId, collectionIds, citation);
-        return citationStore.save(newCitation);
-
+        citationStore.save(newCitation);
+        
         // mark group outdated, so it'll be updated on the next loading
-//        ICitationGroup group = groupOptional.get();
-//        group.setLastLocallyModifiedOn(OffsetDateTime.now().toString());
-//        groupRepository.save((CitationGroup) group);
-
-//        return newCitation;
+        updateCitationGroup(user, groupId);
+        return newCitation;
     }
 
+    private void updateCitationGroup(IUser user, String groupId) {
+        Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(Long.parseLong(groupId));
+        if (groupOptional.isPresent()) {
+            ICitationGroup citationGroup = groupOptional.get();
+            ICitationGroup group = zoteroManager.getGroup(user, groupId + "", true);
+            citationGroup.setLastLocallyModifiedOn(OffsetDateTime.now().toString());
+            citationGroup.setNumItems(group.getNumItems()); 
+            groupRepository.save((CitationGroup) citationGroup);
+        }
+    }
+    
     @Override
     public ICitation updateCitationFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
@@ -252,7 +261,7 @@ public class CitationManager implements ICitationManager {
 
             Optional<ICitation> oldCitation = citationStore.findById(itemKey);
             if (oldCitation.isPresent()) {
-                citationStore.delete(oldCitation.get());
+                citation.setId(oldCitation.get().getId());
             }
             citationStore.save(citation);
             return citation;
@@ -261,7 +270,7 @@ public class CitationManager implements ICitationManager {
         }
 
     }
-    
+
     @Override
     public List<ICitation> updateAttachmentsFromZotero(IUser user, String groupId, String itemKey)
             throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
@@ -327,8 +336,9 @@ public class CitationManager implements ICitationManager {
             if (groupOptional.isPresent()) {
                 ICitationGroup group = groupOptional.get();
                 if (group.getMetadataVersion() != groupVersions.get(id)) {
-                    groupRepository.delete((CitationGroup) group);
+                    ObjectId groupID = group.getId();
                     group = zoteroManager.getGroup(user, id + "", true);
+                    group.setId(groupID);
                     group.setUpdatedOn(OffsetDateTime.now().toString());
                 }
                 addUserToGroup(group, user);
@@ -383,6 +393,9 @@ public class CitationManager implements ICitationManager {
         if (!groupOptional.isPresent() || !groupOptional.get().getUsers().contains(user.getUsername())) {
             group = zoteroManager.getGroup(user, groupId, false);
             if (group != null) {
+                if (groupOptional.isPresent()){
+                    group.setId(groupOptional.get().getId());
+                }
                 group.getUsers().add(user.getUsername());
                 groupRepository.save((CitationGroup) group);
             }
@@ -396,51 +409,29 @@ public class CitationManager implements ICitationManager {
 
         boolean isModified = zoteroManager.isGroupModified(user, groupId, group.getContentVersion());
         CitationResults results = new CitationResults();
-        boolean syncStarted = false;
-        
         if (isModified) {
             long previousVersion = group.getContentVersion();
             // first update the group info
             // if we are using a previously stored group, delete it
+            ICitationGroup zoteroGroup = null;
             if (group.getId() != null) {
-                groupRepository.delete((CitationGroup) group);
-                group = zoteroManager.getGroup(user, groupId + "", true);
+                zoteroGroup = zoteroManager.getGroup(user, groupId + "", true);
+                zoteroGroup.setId(group.getId());
             }
-            group.setUpdatedOn(OffsetDateTime.now().toString());
-            addUserToGroup(group, user);
-            group = groupRepository.save((CitationGroup) group);
+            zoteroGroup.setUpdatedOn(OffsetDateTime.now().toString());
+            addUserToGroup(zoteroGroup, user);
+            group = groupRepository.save((CitationGroup) zoteroGroup);
 
             // then update content
             results.setNotModified(false);
             Future<String> future = asyncCitationProcessor.sync(user, group.getGroupId() + "", previousVersion, collectionId);
             futureMap.put(groupId, future);
-            syncStarted = true;
         } else {
             results.setNotModified(true);
         }
 
         List<ICitation> citations = null;
         long total = 0;
-        
-        // If sync was started, check its status before querying database
-        // if (syncStarted) {
-        //     // Check sync job status to handle cancellation gracefully
-        //     GroupSyncJob syncJob = syncJobManager.getMostRecentJob(groupId);
-        //     if (syncJob != null && (syncJob.getStatus() == JobStatus.CANCELED || syncJob.getStatus() == JobStatus.FAILURE)) {
-        //         logger.warn("Sync was cancelled or failed for group " + groupId + ", falling back to Zotero direct fetch");
-        //         // Fallback: get items directly from Zotero for this page
-        //         try {
-        //             CitationResults zoteroResults = zoteroManager.getGroupItems(user, groupId, page, sortBy, group.getContentVersion());
-        //             results.setCitations(zoteroResults.getCitations());
-        //             results.setTotalResults(zoteroResults.getTotalResults());
-        //             return results;
-        //         } catch (ZoteroHttpStatusException e) {
-        //             logger.error("Failed to fetch from Zotero as fallback", e);
-        //             // Continue with database query as last resort
-        //         }
-        //     }
-        // }
-        
         if (collectionId != null && !collectionId.trim().isEmpty()) {
             citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds);
             ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
@@ -450,10 +441,12 @@ public class CitationManager implements ICitationManager {
                 total = citations.size();
             }
         } else {
-            citations = (List<ICitation>) citationDao.findCitations(groupId,
-                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds);
+            citations = (List<ICitation>) citationDao.findCitations(groupId, (page - 1) * zoteroPageSize,
+                    zoteroPageSize, false, conceptIds);
             if (groupOptional.isPresent()) {
-                total = groupOptional.get().getNumItems();
+                updateCitationGroup(user, groupId);
+                
+                total = groupRepository.findFirstByGroupId(new Long(groupId)).get().getNumItems();
             } else {
                 total = citations.size();
             }
@@ -524,7 +517,8 @@ public class CitationManager implements ICitationManager {
                 result.setPrevIndex(String.valueOf(index - 1));
                 result.setPrevPage(String.valueOf(page));
             } else if (index == 0 && page > 1) {
-                CitationResults prevPageCitationResults = getGroupItems(user, groupId, collectionId, page - 1, sortBy, conceptIds);
+                CitationResults prevPageCitationResults = getGroupItems(user, groupId, collectionId, page - 1, sortBy,
+                        conceptIds);
                 int pageSize = prevPageCitationResults.getCitations().size();
                 result.setPrev(prevPageCitationResults.getCitations().get(pageSize - 1).getKey());
                 result.setPrevIndex(String.valueOf(pageSize - 1));
@@ -538,4 +532,45 @@ public class CitationManager implements ICitationManager {
     public void deleteLocalGroupCitations(String groupId) {
         citationStore.deleteCitationByGroupId(groupId);
     }
+    
+    @Override
+    public Citations findAuthorityCitations(IAuthorityEntry entry, IUser user) {  
+        List<ICitationGroup> groups = getGroups(user);
+        
+        if (groups == null || groups.isEmpty()) {
+            return null;
+        }
+        
+        Set<String> groupIds = groups.stream()
+                .map(group -> group.getKey().toString()) 
+                .collect(Collectors.toSet());
+        
+        Citations citations = citationDao.findCitationsByPersonUri(entry.getUri(), groupIds);
+
+        return citations;
+    }
+
+    @Override
+    public ICitation addCitationToReferences(IUser user, ICitation citation, String zoteroGroupId, 
+            String referenceCitationKey, String reference) throws SelfCitationException, 
+            ZoteroConnectionException, CitationIsOutdatedException, ZoteroHttpStatusException, 
+            ZoteroItemCreationFailedException {
+        if (citation.getKey().equals(referenceCitationKey)) {
+            throw new SelfCitationException("A citation cannot reference itself.");
+        }
+        Set<IReference> references = citation.getReferences();
+        if (references == null) {
+            references = new HashSet<>();
+            citation.setReferences(new HashSet<>());
+        }
+        
+        IReference newReference = new Reference();
+        newReference.setCitationId(referenceCitationKey);
+        newReference.setReferenceString(reference);
+        references.add(newReference);
+        ICitation updatedCitation = citationStore.save(citation);
+        updateCitation(user, zoteroGroupId, updatedCitation);
+        return updatedCitation;
+    }
+
 }
