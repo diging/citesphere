@@ -408,7 +408,7 @@ public class CitationManager implements ICitationManager {
         List<ICitation> citations = null;
         long total = 0;
         if (collectionId != null && !collectionId.trim().isEmpty()) {
-            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds, itemType);
+            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (long)((page - 1) * zoteroPageSize), zoteroPageSize, conceptIds);
             ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
             if (collection != null) {
                 total = collection.getNumberOfItems();
@@ -417,13 +417,21 @@ public class CitationManager implements ICitationManager {
             }
         } else {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
-                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds, itemType);
+                (long)((page - 1) * zoteroPageSize), zoteroPageSize, false, conceptIds);
             if (groupOptional.isPresent()) {
                 total = groupOptional.get().getNumItems();
             } else {
                 total = citations.size();
             }
         }
+        
+        if (itemType != null && !itemType.trim().isEmpty() && citations != null) {
+            citations = citations.stream()
+                .filter(citation -> itemType.equals(citation.getItemType().name()))
+                .collect(java.util.stream.Collectors.toList());
+            total = citations.size();
+        }
+        
         results.setCitations(citations != null ? citations : new ArrayList<>());
         results.setTotalResults(total);
         return results;
