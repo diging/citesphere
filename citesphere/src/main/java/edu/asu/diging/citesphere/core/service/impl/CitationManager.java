@@ -407,8 +407,12 @@ public class CitationManager implements ICitationManager {
 
         List<ICitation> citations = null;
         long total = 0;
+        ItemType parsedItemType = null;
+        if (itemType != null && !itemType.trim().isEmpty()) {
+            parsedItemType = ItemType.valueOf(itemType);
+        }
         if (collectionId != null && !collectionId.trim().isEmpty()) {
-            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds, itemType);
+            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds, parsedItemType);
             ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
             if (collection != null) {
                 total = collection.getNumberOfItems();
@@ -417,7 +421,7 @@ public class CitationManager implements ICitationManager {
             }
         } else {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
-                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds, itemType);
+                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds, parsedItemType);
             if (groupOptional.isPresent()) {
                 total = groupOptional.get().getNumItems();
             } else {
