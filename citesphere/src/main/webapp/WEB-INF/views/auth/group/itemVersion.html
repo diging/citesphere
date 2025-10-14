@@ -250,8 +250,11 @@
         <ul class="list-group" >
             <li class="list-group-item" th:each="upload:${citation.gilesUploads}">
                 <i class="icon-giles"></i>
-                <span th:if="${upload.uploadedFile?.filename}">
+                <span th:if="${upload.uploadedFile?.filename != null and upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}">
                 <a th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}">[[${upload.uploadedFile?.filename}]]</a>
+                </span>
+                <span th:if="${upload.uploadedFile?.filename != null and upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}">
+                [[${upload.uploadedFile?.filename}]]
                 </span>
                 <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
                 File is being processed... ([[${upload.progressId}]])
