@@ -28,6 +28,8 @@
 					<th>Authors</th>
 					<th>Title</th>
 					<th>Date</th>
+					<th>Group</th>
+					<th>Collection</th>
 					<th>URL</th>
 					<th>Files</th>
 				</tr>
@@ -93,6 +95,8 @@
 						th:href="@{|/auth/group/${entry.group}/items/${entry.key}?index=${loop.index}|}">
 							[[${entry.dateFreetext}]] </a>
 					</td>
+					<td>[[${groupNames[entry.key]}]]</td>
+					<td>[[${collectionNames[entry.key]}]]</td>
 					<td><span th:if="${!#strings.isEmpty(entry.url)}"> <a
 							href="${entry.url}" target="_blank" th:title="${entry.url} "><i
 								class="icon-www"></i></a>
