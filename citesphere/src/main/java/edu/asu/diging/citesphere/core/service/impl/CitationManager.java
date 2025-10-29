@@ -384,6 +384,11 @@ public class CitationManager implements ICitationManager {
     public CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds, String itemType)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
 
+        ItemType citationItemType = null;
+        if (itemType != null && !itemType.trim().isEmpty()) {
+            citationItemType = ItemType.valueOf(itemType);
+        }
+
         ICitationGroup group = null;
         Optional<ICitationGroup> groupOptional = groupRepository.findFirstByGroupId(new Long(groupId));
         if (!groupOptional.isPresent() || !groupOptional.get().getUsers().contains(user.getUsername())) {
@@ -428,7 +433,7 @@ public class CitationManager implements ICitationManager {
         List<ICitation> citations = null;
         long total = 0;
         if (collectionId != null && !collectionId.trim().isEmpty()) {
-            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds, itemType);
+            citations = (List<ICitation>) citationDao.findCitationsInCollection(groupId, collectionId, (page - 1) * zoteroPageSize, zoteroPageSize, conceptIds, citationItemType);
             ICitationCollection collection = collectionManager.getCollection(user, groupId, collectionId);
             if (collection != null) {
                 total = collection.getNumberOfItems();
@@ -437,7 +442,7 @@ public class CitationManager implements ICitationManager {
             }
         } else {
             citations = (List<ICitation>) citationDao.findCitations(groupId,
-                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds, itemType);
+                (page - 1) * zoteroPageSize, zoteroPageSize, false, conceptIds, citationItemType);
             if (groupOptional.isPresent()) {
                 updateCitationGroup(user, groupId);
                 
