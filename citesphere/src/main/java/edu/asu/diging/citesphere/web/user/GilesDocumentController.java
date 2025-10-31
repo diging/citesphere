@@ -40,12 +40,13 @@ public class GilesDocumentController {
             return "error/404";
         }
         
-        // Find the upload that contains this file
-        IGilesUpload upload = findUploadByFileId(citation, fileId);
-        if (upload == null) {
+        // Find the upload and file info
+        FileInfo fileInfo = findFileInfo(citation, fileId);
+        if (fileInfo == null) {
             response.setStatus(org.apache.http.HttpStatus.SC_NOT_FOUND);
             return "error/404";
         }
+        
         byte[] content = null;
         
         try {
@@ -54,10 +55,9 @@ public class GilesDocumentController {
             logger.error("This file is not available. Maybe you uploaded it with a different Citesphere instance?", ex);
             return "error/gilesDocumentError";
         }
-        String filename = getFilename(upload, fileId);
         
-        response.setContentType(upload.getUploadedFile().getContentType());
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+        response.setContentType(fileInfo.contentType);
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileInfo.filename + "\"");
         try {
             if (content != null) {
                 response.setContentLength(content.length);
@@ -70,81 +70,61 @@ public class GilesDocumentController {
         return null;
     }
     
-    private IGilesUpload findUploadByFileId(ICitation citation, String fileId) {
+    private FileInfo findFileInfo(ICitation citation, String fileId) {
         for (IGilesUpload upload : citation.getGilesUploads()) {
-            if (isFileInUpload(upload, fileId)) {
-                return upload;
+            FileInfo fileInfo = getFileInfo(upload, fileId);
+            if (fileInfo != null) {
+                return fileInfo;
             }
         }
         return null;
     }
     
-    private boolean isFileInUpload(IGilesUpload upload, String fileId) {
+    private FileInfo getFileInfo(IGilesUpload upload, String fileId) {
         // Check main uploaded file
         if (upload.getUploadedFile() != null && fileId.equals(upload.getUploadedFile().getId())) {
-            return true;
+            return new FileInfo(upload.getUploadedFile().getFilename(), upload.getUploadedFile().getContentType());
         }
         
         // Check extracted text
         if (upload.getExtractedText() != null && fileId.equals(upload.getExtractedText().getId())) {
-            return true;
-        }
-        
-        // Check page files
-        if (upload.getPages() != null) {
-            for (var page : upload.getPages()) {
-                if ((page.getImage() != null && fileId.equals(page.getImage().getId())) ||
-                    (page.getText() != null && fileId.equals(page.getText().getId())) ||
-                    (page.getOcr() != null && fileId.equals(page.getOcr().getId()))) {
-                    return true;
-                }
-                
-                if (page.getAdditionalFiles() != null) {
-                    for (var additionalFile : page.getAdditionalFiles()) {
-                        if (additionalFile != null && fileId.equals(additionalFile.getId())) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    
-    private String getFilename(IGilesUpload upload, String fileId) {
-        // Check main uploaded file
-        if (upload.getUploadedFile() != null && fileId.equals(upload.getUploadedFile().getId())) {
-            return upload.getUploadedFile().getFilename();
-        }
-        
-        // Check extracted text
-        if (upload.getExtractedText() != null && fileId.equals(upload.getExtractedText().getId())) {
-            return upload.getExtractedText().getFilename();
+            return new FileInfo(upload.getExtractedText().getFilename(), upload.getExtractedText().getContentType());
         }
         
         // Check page files
         if (upload.getPages() != null) {
             for (var page : upload.getPages()) {
                 if (page.getImage() != null && fileId.equals(page.getImage().getId())) {
-                    return page.getImage().getFilename();
+                    return new FileInfo(page.getImage().getFilename(), page.getImage().getContentType());
                 }
                 if (page.getText() != null && fileId.equals(page.getText().getId())) {
-                    return page.getText().getFilename();
+                    return new FileInfo(page.getText().getFilename(), page.getText().getContentType());
                 }
                 if (page.getOcr() != null && fileId.equals(page.getOcr().getId())) {
-                    return page.getOcr().getFilename();
+                    return new FileInfo(page.getOcr().getFilename(), page.getOcr().getContentType());
                 }
                 
                 if (page.getAdditionalFiles() != null) {
                     for (var additionalFile : page.getAdditionalFiles()) {
                         if (additionalFile != null && fileId.equals(additionalFile.getId())) {
-                            return additionalFile.getFilename();
+                            return new FileInfo(additionalFile.getFilename(), additionalFile.getContentType());
                         }
                     }
                 }
             }
         }
         
-        return "download"; // fallback filename
+        return null;
+    }
+    
+    private static class FileInfo {
+        final String filename;
+        final String contentType;
+        
+        FileInfo(String filename, String contentType) {
+            this.filename = filename != null ? filename : "download";
+            this.contentType = contentType;
+        }
     }
 }
+
