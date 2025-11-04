@@ -18,6 +18,8 @@ import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.IGilesUpload;
+import edu.asu.diging.citesphere.model.bib.impl.GilesFile;
+import edu.asu.diging.citesphere.model.bib.impl.GilesPage;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
@@ -93,7 +95,7 @@ public class GilesDocumentController {
         
         // Check page files
         if (upload.getPages() != null) {
-            for (var page : upload.getPages()) {
+            for (GilesPage page : upload.getPages()) {
                 if (page.getImage() != null && fileId.equals(page.getImage().getId())) {
                     return new FileInfo(page.getImage().getFilename(), page.getImage().getContentType());
                 }
@@ -105,7 +107,7 @@ public class GilesDocumentController {
                 }
                 
                 if (page.getAdditionalFiles() != null) {
-                    for (var additionalFile : page.getAdditionalFiles()) {
+                    for (GilesFile additionalFile : page.getAdditionalFiles()) {
                         if (additionalFile != null && fileId.equals(additionalFile.getId())) {
                             return new FileInfo(additionalFile.getFilename(), additionalFile.getContentType());
                         }
@@ -127,4 +129,6 @@ public class GilesDocumentController {
         }
     }
 }
+
+
 
