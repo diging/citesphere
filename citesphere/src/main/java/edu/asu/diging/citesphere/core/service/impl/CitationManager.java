@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -44,6 +45,7 @@ import edu.asu.diging.citesphere.core.service.IGroupManager;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
+import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
@@ -52,6 +54,7 @@ import edu.asu.diging.citesphere.model.bib.ItemType;
 import edu.asu.diging.citesphere.model.bib.impl.BibField;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
 import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.transfer.impl.Citations;
 import edu.asu.diging.citesphere.model.bib.impl.Reference;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -513,6 +516,23 @@ public class CitationManager implements ICitationManager {
     @Override
     public void deleteLocalGroupCitations(String groupId) {
         citationStore.deleteCitationByGroupId(groupId);
+    }
+    
+    @Override
+    public Citations findAuthorityCitations(IAuthorityEntry entry, IUser user) {  
+        List<ICitationGroup> groups = getGroups(user);
+        
+        if (groups == null || groups.isEmpty()) {
+            return null;
+        }
+        
+        Set<String> groupIds = groups.stream()
+                .map(group -> group.getKey().toString()) 
+                .collect(Collectors.toSet());
+        
+        Citations citations = citationDao.findCitationsByPersonUri(entry.getUri(), groupIds);
+
+        return citations;
     }
 
     @Override
