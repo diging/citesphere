@@ -37,8 +37,10 @@ $(function() {
 </tr>
     <tr th:each="job:${jobs}"> 
         <td>[[${job.id}]]</td>
-        <td><span class="label label-default">
-                <a th:href="@{|/auth/group/${job.groupId}/items|}" style="color: #ffffff">[[${job.groupId}]] </a> 
+        <td>
+            <span class="label label-default">
+                <a th:href="@{|/auth/group/${job.groupId}/items|}" style="color: #ffffff"
+                        th:text="${job.groupName} ?: ${job.groupId}">[[${job.groupId}]]</a> 
             </span>
         </td>
         <td>[[${job.status}]]</td>
