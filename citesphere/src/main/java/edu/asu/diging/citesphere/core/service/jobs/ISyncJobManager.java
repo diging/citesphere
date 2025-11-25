@@ -13,9 +13,9 @@ public interface ISyncJobManager {
 
     GroupSyncJob getMostRecentJob(String groupId);
 
-    List<GroupSyncJob> getJobs(IUser user, Pageable page);
+    List<GroupSyncJob> getJobs(IUser user, Pageable page, String groupId);
 
-    long getJobsCount(IUser user);
+    long getJobsCount(IUser user, String groupId);
 
     void cancelJob(String jobId);
 

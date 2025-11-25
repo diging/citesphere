@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
@@ -62,26 +63,39 @@ public class SyncJobManager implements ISyncJobManager {
     }
     
     @Override
-    public List<GroupSyncJob> getJobs(IUser user, Pageable page) {
+    public List<GroupSyncJob> getJobs(IUser user, Pageable page, String groupId) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
         if (groups == null || groups.isEmpty()) {
             return Collections.emptyList();
         }
         Map<String, String> groupNames = groups.stream().collect(
                 Collectors.toMap(g -> g.getGroupId() + "", ICitationGroup::getName, (existing, replacement) -> existing));
-        List<GroupSyncJob> jobs = jobRepo.findByGroupIdIn(
-                groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList()), page);
+        List<String> groupIds = groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList());
+        if (StringUtils.hasText(groupId)) {
+            if (!groupIds.contains(groupId)) {
+                return Collections.emptyList();
+            }
+            groupIds = Collections.singletonList(groupId);
+        }
+        List<GroupSyncJob> jobs = jobRepo.findByGroupIdIn(groupIds, page);
         jobs.forEach(job -> job.setGroupName(groupNames.get(job.getGroupId())));
         return jobs;
     }
     
     @Override
-    public long getJobsCount(IUser user) {
+    public long getJobsCount(IUser user, String groupId) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
         if (groups == null) {
             return -1;
         }
-        return jobRepo.countByGroupIdIn(groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList()));
+        List<String> groupIds = groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList());
+        if (StringUtils.hasText(groupId)) {
+            if (!groupIds.contains(groupId)) {
+                return 0;
+            }
+            groupIds = Collections.singletonList(groupId);
+        }
+        return jobRepo.countByGroupIdIn(groupIds);
     }
     
     @Override
