@@ -4,15 +4,28 @@
 <script th:inline="javascript">
 //# sourceURL=page.js
 $(function() {
+    var selectedGroup = /*[[${selectedGroupId}]]*/ "";
+    var totalPages = Number(/*[[${total}]]*/ 1) || 1;
+    var currentPage = Number(/*[[${page}]]*/ 1) || 1;
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
+    }
     $('#pagination-top').twbsPagination({
-        totalPages: [(${total})],
-        startPage: [(${page})],
+        totalPages: totalPages,
+        startPage: currentPage,
         prev: "«",
         next: "»",
         visiblePages: 10,
         initiateStartPageClick: false,
         onPageClick: function (event, page) {
-            window.location.href = "[(@{|/auth/jobs/sync/list|})]?page=" + (page - 1);
+            var pageParam = "?page=" + (page - 1);
+            if (selectedGroup && selectedGroup.trim().length > 0) {
+                pageParam = "?groupId=" + encodeURIComponent(selectedGroup) + "&page=" + (page - 1);
+            }
+            window.location.href = /*[[@{/auth/jobs/sync/list}]]*/ "" + pageParam;
         }
     });
 });
@@ -23,7 +36,24 @@ $(function() {
 <div layout:fragment="content">
 <h1>Jobs</h1>
 
-<ul id="pagination-top" class="pagination-sm"></ul>
+<div style="margin-bottom: 15px;">
+    <div class="dropdown pull-left">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span th:text="${selectedGroupName}">Group</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <li><a th:href="@{/auth/jobs/sync/list}">All groups</a></li>
+            <li role="separator" class="divider"></li>
+            <li th:each="group : ${groups}">
+                <a th:href="@{|/auth/jobs/sync/list?groupId=${group.groupId}|}"
+                   th:text="${#strings.isEmpty(group.name) ? group.groupId : group.name}">Group Name</a>
+            </li>
+        </ul>
+    </div>
+    <ul id="pagination-top" class="pagination-sm pull-left" style="margin-left: 15px; margin-top: 0;"></ul>
+    <div class="clearfix"></div>
+</div>
 
 <table class="table table-striped">
 <tr>
