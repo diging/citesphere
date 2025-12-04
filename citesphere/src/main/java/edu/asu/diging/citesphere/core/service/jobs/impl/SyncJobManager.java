@@ -63,7 +63,7 @@ public class SyncJobManager implements ISyncJobManager {
     }
     
     @Override
-    public List<GroupSyncJob> getJobs(IUser user, Pageable page, String groupId) {
+    public List<GroupSyncJob> getJobs(IUser user, Pageable page, String groupId, String status) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
         if (groups == null || groups.isEmpty()) {
             return Collections.emptyList();
@@ -77,13 +77,23 @@ public class SyncJobManager implements ISyncJobManager {
             }
             groupIds = Collections.singletonList(groupId);
         }
-        List<GroupSyncJob> jobs = jobRepo.findByGroupIdIn(groupIds, page);
+        List<GroupSyncJob> jobs;
+        if (StringUtils.hasText(status)) {
+            try {
+                JobStatus jobStatus = JobStatus.valueOf(status.toUpperCase());
+                jobs = jobRepo.findByGroupIdInAndStatus(groupIds, jobStatus, page);
+            } catch (IllegalArgumentException e) {
+                return Collections.emptyList();
+            }
+        } else {
+            jobs = jobRepo.findByGroupIdIn(groupIds, page);
+        }
         jobs.forEach(job -> job.setGroupName(groupNames.get(job.getGroupId())));
         return jobs;
     }
     
     @Override
-    public long getJobsCount(IUser user, String groupId) {
+    public long getJobsCount(IUser user, String groupId, String status) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
         if (groups == null) {
             return -1;
@@ -94,6 +104,14 @@ public class SyncJobManager implements ISyncJobManager {
                 return 0;
             }
             groupIds = Collections.singletonList(groupId);
+        }
+        if (StringUtils.hasText(status)) {
+            try {
+                JobStatus jobStatus = JobStatus.valueOf(status.toUpperCase());
+                return jobRepo.countByGroupIdInAndStatus(groupIds, jobStatus);
+            } catch (IllegalArgumentException e) {
+                return 0;
+            }
         }
         return jobRepo.countByGroupIdIn(groupIds);
     }
