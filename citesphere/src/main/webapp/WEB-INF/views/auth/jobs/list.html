@@ -5,8 +5,10 @@
 //# sourceURL=page.js
 $(function() {
     var selectedGroup = /*[[${selectedGroupId}]]*/ "";
+    var selectedStatus = /*[[${selectedStatus}]]*/ "";
     var totalPages = Number(/*[[${total}]]*/ 1) || 1;
     var currentPage = Number(/*[[${page}]]*/ 1) || 1;
+    var baseUrl = /*[[@{/auth/jobs/sync/list}]]*/ "";
     if (currentPage > totalPages) {
         currentPage = totalPages;
     }
@@ -21,11 +23,15 @@ $(function() {
         visiblePages: 10,
         initiateStartPageClick: false,
         onPageClick: function (event, page) {
-            var pageParam = "?page=" + (page - 1);
+            var params = [];
+            params.push("page=" + (page - 1));
             if (selectedGroup && selectedGroup.trim().length > 0) {
-                pageParam = "?groupId=" + encodeURIComponent(selectedGroup) + "&page=" + (page - 1);
+                params.push("groupId=" + encodeURIComponent(selectedGroup));
             }
-            window.location.href = /*[[@{/auth/jobs/sync/list}]]*/ "" + pageParam;
+            if (selectedStatus && selectedStatus.trim().length > 0) {
+                params.push("status=" + encodeURIComponent(selectedStatus));
+            }
+            window.location.href = baseUrl + "?" + params.join("&");
         }
     });
 });
@@ -43,17 +49,32 @@ $(function() {
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <li><a th:href="@{/auth/jobs/sync/list}">All groups</a></li>
+            <li><a th:href="@{|/auth/jobs/sync/list${selectedStatus != null and selectedStatus != '' ? '?status=' + selectedStatus : ''}|}">All groups</a></li>
             <li role="separator" class="divider"></li>
             <li th:each="group : ${groups}">
-                <a th:href="@{|/auth/jobs/sync/list?groupId=${group.groupId}|}"
+                <a th:href="@{|/auth/jobs/sync/list?groupId=${group.groupId}${selectedStatus != null and selectedStatus != '' ? '&status=' + selectedStatus : ''}|}"
                    th:text="${#strings.isEmpty(group.name) ? group.groupId : group.name}">Group Name</a>
             </li>
         </ul>
     </div>
-    <ul id="pagination-top" class="pagination-sm pull-left" style="margin-left: 15px; margin-top: 0;"></ul>
+    <div class="dropdown pull-left" style="margin-left: 10px;">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span th:text="${selectedStatusName}">Status</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            <li><a th:href="@{|/auth/jobs/sync/list${selectedGroupId != null and selectedGroupId != '' ? '?groupId=' + selectedGroupId : ''}|}">All statuses</a></li>
+            <li role="separator" class="divider"></li>
+            <li th:each="status : ${statuses}">
+                <a th:href="@{|/auth/jobs/sync/list?status=${status}${selectedGroupId != null and selectedGroupId != '' ? '&groupId=' + selectedGroupId : ''}|}"
+                   th:text="${status}">Status</a>
+            </li>
+        </ul>
+    </div>
     <div class="clearfix"></div>
 </div>
+
+<ul id="pagination-top" class="pagination-sm"></ul>
 
 <table class="table table-striped">
 <tr>
