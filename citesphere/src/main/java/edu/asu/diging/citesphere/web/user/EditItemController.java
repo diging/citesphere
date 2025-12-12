@@ -125,8 +125,9 @@ public class EditItemController {
             @RequestParam(required = false, value = "index") String index,
             @RequestParam(defaultValue = "1", required = false, value = "page") int page,
             @RequestParam(value = "collectionId", required = false) String collectionId,
-            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy)
-            throws ZoteroConnectionException, GroupDoesNotExistException, CannotFindCitationException,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy,
+            RedirectAttributes redirectAttributes)
+            throws GroupDoesNotExistException, CannotFindCitationException,
             ZoteroHttpStatusException, ZoteroItemCreationFailedException {
         ICitation citation = citationManager.getCitation((IUser) authentication.getPrincipal(), zoteroGroupId, itemId);
         // load authors and editors before detaching
@@ -161,6 +162,13 @@ public class EditItemController {
             model.addAttribute("collectionId", collectionId);
             model.addAttribute("sortBy", sortBy);
             return "auth/group/editConflict";
+        } catch (ZoteroConnectionException e) {
+            redirectAttributes.addFlashAttribute("form", form);
+            redirectAttributes.addFlashAttribute("zoteroGroupId", zoteroGroupId);
+            redirectAttributes.addFlashAttribute("show_alert", true);
+            redirectAttributes.addFlashAttribute("alert_type", "danger");
+            redirectAttributes.addFlashAttribute("alert_msg", "Sorry, item updation failed. Please check the Zotero Key permissions.");
+            return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}/edit?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
         }
         return "redirect:/auth/group/{zoteroGroupId}/items/{itemId}?index=" + index +"&page="+page +"&sortBy="+sortBy +"&collectionId="+collectionId;
     }

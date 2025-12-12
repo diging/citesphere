@@ -85,9 +85,11 @@ public class ItemTextController extends V1Controller {
             try {
                 job = jobManager.createGilesJob(user, files[i], files[i].getBytes(), groupId,
                         citation.getKey());
-            } catch (ZoteroHttpStatusException | ZoteroConnectionException | ZoteroItemCreationFailedException e) {
+            } catch (ZoteroHttpStatusException | ZoteroItemCreationFailedException e) {
                 logger.error("Zotero could not process the file. ", e);
                 return new ResponseEntity<>("Error: Zotero could not process the file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (ZoteroConnectionException e) {
+                return new ResponseEntity<>("Error: Could not add file to citation. Please check Zoetro Key Permissions. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (GroupDoesNotExistException e) {
                 logger.error("Could not create job because group does not exist.", e);
                 return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.NOT_FOUND);

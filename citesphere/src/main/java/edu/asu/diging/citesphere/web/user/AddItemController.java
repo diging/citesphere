@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
@@ -88,8 +89,8 @@ public class AddItemController {
 
     @RequestMapping(value = "/auth/group/{zoteroGroupId}/items/create", method = RequestMethod.POST)
     public String create(@ModelAttribute CitationForm form, Authentication authentication, Model model,
-            @PathVariable("zoteroGroupId") String zoteroGroupId)
-            throws ZoteroConnectionException, GroupDoesNotExistException, ZoteroHttpStatusException {
+            @PathVariable("zoteroGroupId") String zoteroGroupId, RedirectAttributes redirectAttributes)
+            throws GroupDoesNotExistException, ZoteroHttpStatusException {
         ICitation citation = new Citation();
         List<String> collectionIds = new ArrayList<>();
         if (form.getCollectionId() != null && !form.getCollectionId().trim().isEmpty()) {
@@ -110,6 +111,14 @@ public class AddItemController {
                     : "Sorry, item creation failed.";
             model.addAttribute("alert_msg", msg);
             return "auth/group/editItem";
+        } catch (ZoteroConnectionException e) {
+            redirectAttributes.addFlashAttribute("form", form);
+            redirectAttributes.addFlashAttribute("zoteroGroupId", zoteroGroupId);
+            redirectAttributes.addFlashAttribute("show_alert", true);
+            redirectAttributes.addFlashAttribute("alert_type", "danger");
+            String msg = "Sorry, item creation failed. Please check the Zotero Key permissions.";
+            redirectAttributes.addFlashAttribute("alert_msg", msg);
+            return "redirect:/auth/group/{zoteroGroupId}/items/create";
         }
 
         return "redirect:/auth/group/{zoteroGroupId}/items/" + citation.getKey();

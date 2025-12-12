@@ -48,7 +48,7 @@ public class UploadItemFileController {
     public ResponseEntity<String> uploadFile(Principal principal, @PathVariable String zoteroGroupId,
             @PathVariable String itemId, @RequestParam("files") MultipartFile[] files)
             throws AccessForbiddenException, CannotFindCitationException, ZoteroHttpStatusException,
-            ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+            CitationIsOutdatedException, ZoteroItemCreationFailedException {
         User user = null;
         if (principal instanceof UsernamePasswordAuthenticationToken) {
             user = (User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
@@ -68,12 +68,15 @@ public class UploadItemFileController {
             }
         }
         
-        IGilesUpload job;
+        IGilesUpload job = null;
         try {
             job = jobManager.createGilesJob(user, files[0], fileBytes.get(0), zoteroGroupId, itemId);
         } catch (GroupDoesNotExistException e) {
             logger.error("Could not create job because group does not exist.", e);
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+        } catch (ZoteroConnectionException e) {
+            logger.error("Could not create job. Please check Zotero Key permissions. ", e);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         ObjectMapper mapper = new ObjectMapper();

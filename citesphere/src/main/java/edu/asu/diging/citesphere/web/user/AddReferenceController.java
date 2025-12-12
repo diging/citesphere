@@ -53,7 +53,7 @@ public class AddReferenceController {
             logger.error("Zotero threw exception.", e);
             return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (ZoteroConnectionException e) {
-            logger.error("Zotero connection failed.", e);
+            logger.error("Zotero connection failed. Please check Zotero Key permissions. ", e);
             return new ResponseEntity<>("{\"error\": \"" + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (CitationIsOutdatedException e) {
             logger.error("Citation is outdated.", e);

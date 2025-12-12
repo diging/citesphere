@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.zotero.connect.ZoteroConnectionFactory;
+import edu.asu.diging.citesphere.core.zotero.custom.CustomZoteroConnectionFactory;
 
 @Configuration
 @PropertySource("classpath:/config.properties")
@@ -18,7 +19,9 @@ public class ZoteroConfig {
 
     
     @Bean
-    public ZoteroConnectionFactory zoteroConnectionFactory() {
-        return new ZoteroConnectionFactory(zoteroKey, zoteroSecret);
+    public CustomZoteroConnectionFactory zoteroConnectionFactory(
+            @Value("${_zotero_client_key}") String zoteroKey,
+            @Value("${_zotero_client_secret}") String zoteroSecret) {
+        return new CustomZoteroConnectionFactory(zoteroKey, zoteroSecret);
     }    
 }

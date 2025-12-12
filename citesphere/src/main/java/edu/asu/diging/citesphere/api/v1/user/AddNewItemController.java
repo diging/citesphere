@@ -145,39 +145,33 @@ public class AddNewItemController extends V1Controller {
 
         try {
             citation = citationManager.createCitation(user, zoteroGroupId, collectionIds, citation);
-        } catch (ZoteroItemCreationFailedException | ZoteroConnectionException | ZoteroHttpStatusException e) {
-            logger.error("Zotero Item creation failed. ", e);
-            return new ResponseEntity<>("Error: Zetero Item creation failed. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (GroupDoesNotExistException e) {
-            logger.error("Group " + zoteroGroupId +" does not exists. ", e);
-            return new ResponseEntity<>("Error: Group " + zoteroGroupId +" does not exists. ", HttpStatus.BAD_REQUEST);
-        }
-
-        if (itemWithGiles.getFiles() != null && itemWithGiles.getFiles().length > 0) {
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectNode root = mapper.createObjectNode(); 
-            for (MultipartFile file: itemWithGiles.getFiles()) {
-                try {
+            
+            if (itemWithGiles.getFiles() != null && itemWithGiles.getFiles().length > 0) {
+                ObjectMapper mapper = new ObjectMapper();
+                ObjectNode root = mapper.createObjectNode(); 
+                for (MultipartFile file: itemWithGiles.getFiles()) {
                     IGilesUpload job = jobManager.createGilesJob(user, file, file.getBytes(), zoteroGroupId,
                             citation.getKey());
                     gilesUtil.createJobObjectNode(root, job);
-                } catch (GroupDoesNotExistException e) {
-                    logger.error("Could not create job because group does not exist.", e);
-                    return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.BAD_REQUEST);
-                } catch (CannotFindCitationException | CitationIsOutdatedException e) {
-                    logger.error("Error with newly created citation.", e);
-                    return new ResponseEntity<>("Error: Error with newly created citation." + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-                } catch (IOException e) {
-                    logger.error("Could not read file from the request. ", e);
-                    return new ResponseEntity<>("Error: Could not read file from the request.", HttpStatus.BAD_REQUEST);
-                } catch (ZoteroHttpStatusException | ZoteroConnectionException | ZoteroItemCreationFailedException e) {
-                    logger.error("Zotero exception occured ", e);
-                    return new ResponseEntity<>("Error: Zotero Exception occured: "+ e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-                } catch (HttpClientErrorException.Unauthorized e) {
-                    logger.error("Unauthorized to upload files to Giles ", e);
-                    return new ResponseEntity<>("Error: Unauthorized to upload files to Giles.", HttpStatus.UNAUTHORIZED);
                 }
             }
+        } catch (GroupDoesNotExistException e) {
+            logger.error("Could not create job because group does not exist.", e);
+            return new ResponseEntity<>("Error: Could not create job because group does not exist.", HttpStatus.BAD_REQUEST);
+        } catch (CannotFindCitationException | CitationIsOutdatedException e) {
+            logger.error("Error with newly created citation.", e);
+            return new ResponseEntity<>("Error: Error with newly created citation." + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            logger.error("Could not read file from the request. ", e);
+            return new ResponseEntity<>("Error: Could not read file from the request.", HttpStatus.BAD_REQUEST);
+        } catch (ZoteroHttpStatusException | ZoteroItemCreationFailedException e) {
+            logger.error("Zotero exception occured ", e);
+            return new ResponseEntity<>("Error: Zotero Exception occured: "+ e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ZoteroConnectionException e) {
+            return new ResponseEntity<>("Error: Zetero Item creation failed. Please check Zoetro Key Permissions. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (HttpClientErrorException.Unauthorized e) {
+            logger.error("Unauthorized to upload files to Giles ", e);
+            return new ResponseEntity<>("Error: Unauthorized to upload files to Giles.", HttpStatus.UNAUTHORIZED);
         }
         return new ResponseEntity<>(citation, HttpStatus.OK); 
     }
