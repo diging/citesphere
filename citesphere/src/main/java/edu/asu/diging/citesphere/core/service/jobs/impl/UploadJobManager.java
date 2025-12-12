@@ -110,7 +110,8 @@ public class UploadJobManager implements IUploadJobManager {
     }
 
     @Override
-    public List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes, String groupId) throws GroupDoesNotExistException {
+    public List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes, 
+            String groupId, String collectionId, String kafkaMessage) throws GroupDoesNotExistException {
         ICitationGroup group = groupManager.getGroup(user, groupId);
         if (group == null) {
             throw new GroupDoesNotExistException();
@@ -128,6 +129,7 @@ public class UploadJobManager implements IUploadJobManager {
             job.setCreatedOn(OffsetDateTime.now());
             job.setUsername(user.getUsername());
             job.setCitationGroup(groupId);
+            job.setCitationCollection(collectionId);
             job.setPhases(new ArrayList<>());
             try {
                 if (fileBytes != null && fileBytes.size() == files.length) {
@@ -174,7 +176,7 @@ public class UploadJobManager implements IUploadJobManager {
             uploadJobRepository.save(job);
             String token = tokenService.generateJobApiToken(job);
             try {
-                kafkaProducer.sendRequest(new KafkaJobMessage(token), KafkaTopics.REFERENCES_IMPORT_TOPIC);
+                kafkaProducer.sendRequest(new KafkaJobMessage(token), kafkaMessage);
             } catch (MessageCreationException e) {
                 logger.error("Could not send Kafka message.", e);
                 job.setStatus(JobStatus.FAILURE);

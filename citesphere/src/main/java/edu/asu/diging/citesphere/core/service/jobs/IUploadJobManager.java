@@ -13,7 +13,8 @@ public interface IUploadJobManager {
 
     IUploadJob findUploadJob(String id);
 
-    List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes, String groupId) throws GroupDoesNotExistException;
+    List<IUploadJob> createUploadJob(IUser user, MultipartFile[] files, List<byte[]> fileBytes, 
+            String groupId, String collectionId, String kafkaMessage) throws GroupDoesNotExistException;
 
     byte[] getUploadedFile(IUploadJob job);
 

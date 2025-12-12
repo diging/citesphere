@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,16 +25,18 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
+import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.model.jobs.IUploadJob;
+import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.jobs.IUploadJobManager;
 import edu.asu.diging.citesphere.messages.KafkaTopics;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
 @Controller
-public class ImportReferencesController {
-
+public class ImportCollectionsController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
     @Autowired
@@ -42,15 +45,18 @@ public class ImportReferencesController {
     @Autowired
     private ICitationManager citationManager;
     
-    @RequestMapping(value = "/auth/import/upload", method = RequestMethod.GET)
+    @Autowired
+    private ICitationCollectionManager collectionManager;
+    
+    @RequestMapping(value = "/auth/import/collection", method = RequestMethod.GET)
     public String show(Model model, Authentication authentication) {
         model.addAttribute("groups", citationManager.getGroups((IUser)authentication.getPrincipal()));
-        return "auth/import/upload";
+        return "auth/import/collection";
     }
-
-    @RequestMapping(value = "/auth/import/upload", method = RequestMethod.POST)
-    public ResponseEntity<String> uploadFiles(Principal principal, @RequestParam("group") String group,
-            @RequestParam("files") MultipartFile[] files) {
+    
+    @RequestMapping(value = "/auth/import/collection", method = RequestMethod.POST)
+    public ResponseEntity<String> uploadCollection(Principal principal, @RequestParam("group") String group,
+            @RequestParam("collectionId") String collectionId, @RequestParam("files") MultipartFile[] files) {
 
         User user = null;
         if (principal instanceof UsernamePasswordAuthenticationToken) {
@@ -61,19 +67,36 @@ public class ImportReferencesController {
         if (user == null) {
             return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
         }
-
+        
         List<byte[]> fileBytes = new ArrayList<>();
         for (MultipartFile file : files) {
             try {
                 fileBytes.add(file.getBytes());
             } catch (IOException e) {
                 logger.error("Could not get file content from request.", e);
-                fileBytes.add(null);
+                return new ResponseEntity<String>("Could not get file content from request.", HttpStatus.BAD_REQUEST);
             }
         }
+        
+        if (collectionId.startsWith("new-")) {
+            try {
+                ICitationCollection collection = collectionManager.createCollection(user, group, collectionId.split("-")[1], null);
+                collectionId = collection.getKey();
+            } catch (GroupDoesNotExistException e) {
+                logger.error("Could not create job because group does not exist.", e);
+                return new ResponseEntity<String>("Could not create job because group does not exist", HttpStatus.BAD_REQUEST);
+            } catch (ZoteroItemCreationFailedException e) {
+                logger.error("Zotero new collection creation failed.", e);
+                return new ResponseEntity<String>("Zotero new collection creation failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (ZoteroConnectionException e) {
+                logger.error("Zotero connection failed.", e);
+                return new ResponseEntity<String>("Zotero connection failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
         List<IUploadJob> jobs;
         try {
-            jobs = jobManager.createUploadJob(user, files, fileBytes, group, null, KafkaTopics.REFERENCES_IMPORT_TOPIC);
+            jobs = jobManager.createUploadJob(user, files, fileBytes, group, collectionId, KafkaTopics.COLLECTION_IMPORT_TOPIC);
         } catch (GroupDoesNotExistException e) {
             logger.error("Could not create job because group does not exist.", e);
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
@@ -92,4 +115,5 @@ public class ImportReferencesController {
         return new ResponseEntity<String>(root.toString(), HttpStatus.OK);
     }
 
+    
 }
