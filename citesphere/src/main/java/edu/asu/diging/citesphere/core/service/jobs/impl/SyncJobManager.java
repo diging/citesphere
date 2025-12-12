@@ -8,12 +8,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.GroupSyncJobRepository;
@@ -88,5 +88,16 @@ public class SyncJobManager implements ISyncJobManager {
             job.setFinishedOn(OffsetDateTime.now());
             jobRepo.save(job);
         }
+    }
+    
+    @Override
+    @Transactional
+    public long pruneJobs(IUser user, OffsetDateTime before) {
+        List<ICitationGroup> groups = citationManager.getGroups(user);
+        if (groups == null || groups.isEmpty()) {
+            return 0;
+        }
+        List<String> groupIds = groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList());
+        return jobRepo.deleteByGroupIdInAndCreatedOnBefore(groupIds, before);
     }
 }
