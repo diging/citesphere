@@ -70,13 +70,16 @@ $(function() {
 });
 
 function getAuthorityUrl(displayAuthoritiesVal) {
- 	if (displayAuthoritiesVal === 'all') {
- 		return [[@{/auth/authority/list}]];
- 	} else if (displayAuthoritiesVal === 'userSpecific') {
- 		return [[@{/auth/authority/user/list}]];
- 	} else {
+    if (displayAuthoritiesVal === 'all') {
+        return [[@{/auth/authority/list}]];
+    } else if (displayAuthoritiesVal === 'userSpecific') {
+ 	    return [[@{/auth/authority/user/list}]];
+    } else if (displayAuthoritiesVal.startsWith('source')) {
+ 	    var source = displayAuthoritiesVal.split("-")[1];
+ 	   return [[@{/auth/authority/list/}]] + source;
+    } else {
  		return [[@{/auth/authority/}]] + displayAuthoritiesVal + "/list";
- 	}
+    }
 }
 
 </script>
@@ -95,7 +98,10 @@ function getAuthorityUrl(displayAuthoritiesVal) {
 	<option th:selected="${#strings.equals(displayBy, 'userSpecific')}" value="userSpecific">[[${username}]]</option>
 	<span th:each="groupDetail:${groups}">
 		<option th:selected="${#strings.equals(displayBy, groupDetail.groupId)}" th:value="${groupDetail.groupId}">Group - [[${groupDetail.name}]]</option>
-	</span>  
+	</span>
+	<span th:each="source:${importedAuthoritySources}">
+        <option th:selected="${#strings.equals(displayBy, 'source-' + source)}" th:value="${'source-' + source}">Source - [[${@environment.getProperty('_importer_name_' + source)}]]</option>
+    </span>      
 </select><br><br> 
 
 <ul id="pagination-top" class="pagination-sm"></ul>	
