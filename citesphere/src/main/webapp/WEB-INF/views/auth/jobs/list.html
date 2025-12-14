@@ -34,6 +34,7 @@ $(function() {
 <th>Finished On</th>
 <th></th>
 <th></th>
+<th></th>
 </tr>
     <tr th:each="job:${jobs}"> 
         <td>[[${job.id}]]</td>
@@ -56,6 +57,14 @@ $(function() {
                     th:action="@{|/auth/jobs/sync/${job.id}/cancel|}" method="POST">
 	            <button style="margin: -10px;" class="btn-link" title="Mark job as canceled">
 	               <i style="color: #303540; font-size: 14px" class="icon-stop-circle" ></i>
+	            </button>
+            </form>
+        </td>
+        <td>
+            <form th:if="${#strings.equals(job.status,'DONE') or #strings.equals(job.status,'CANCELED')}" 
+                    th:action="@{|/auth/jobs/sync/${job.id}/delete|}" th:method="DELETE">
+	            <button type="submit" style="margin: -10px;" class="btn-link" title="Mark job as deleted">
+	               <i style="color: #303540; font-size: 14px" class="icon-trash" ></i>
 	            </button>
             </form>
         </td>
