@@ -347,7 +347,7 @@ Items in Group <span th:text="${group.name}"></span></br>
 </h2>
 <div class="pull-right">
 	<div class="progress" style="width: 200px">
-	  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">  
+	  <div id="syncProgress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%" onclick="getlogs()">  
 	  <span id="syncText">Up to date</span></div>
 	</div>
 	<div style="text-align: right;margin-top: -20px;margin-bottom: 20px;">
@@ -384,6 +384,28 @@ function pollStatus(){
                 $("#syncProgress").attr('aria-valuemax', data['total']);
                 $("#syncProgress").addClass("progress-bar-striped active");
                 $("#syncText").text(Math.round(percent) + "% synced");
+                const $logsList = $('#logs-list');
+                $logsList.empty();
+                if(data['logs'].length == 0) {
+                	$('<li>').text("No sync logs").appendTo($logsList);
+                } else {
+	                data['logs'].forEach(log => {
+						const parts = log.split(' ', 2);
+						const level = parts[0] || '';
+						const message = log.substring(level.length).trim();
+						
+						const $li = $('<li>');
+						const $strong = $('<strong>').text(level);
+						
+						if (level === 'ERROR') {
+						   $strong.addClass('text-danger');
+						}
+						
+						$li.append($strong).append(' ').append(document.createTextNode(message));
+						
+						$logsList.append($li);
+	                });
+                }
         	}
         	setTimeout(pollStatus,1000);
         } else {
@@ -393,9 +415,35 @@ function pollStatus(){
             $("#syncProgress").removeClass("progress-bar-striped active");
             $("#syncText").text("Up to date");
 			$("#table-spinner").hide();
+			const $logsList = $('#logs-list');
+			  $logsList.empty();
+			  if(data['logs'].length == 0) {
+              	$('<li>').text("No sync logs").appendTo($logsList);
+              } else {
+	                data['logs'].forEach(log => {
+	                  	const parts = log.split(' ', 2);
+	                    const level = parts[0] || '';
+	                    const message = log.substring(level.length).trim();
+	
+	                    const $li = $('<li>');
+	                    const $strong = $('<strong>').text(level);
+
+		                if (level === 'ERROR') {
+		                   $strong.addClass('text-danger');
+		                }
+
+		                $li.append($strong).append(' ').append(document.createTextNode(message));
+	
+	                	$logsList.append($li);
+	                });
+              }
         }
         getCurrentItemsData("notFirstLoad");
     });
+}
+
+function getlogs() {
+	$('#sync-logs').modal("show");
 }
 
 function getCurrentItemsData(parameter){
@@ -834,6 +882,30 @@ function rewriteColumnsList(data){
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="sync-logs" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		  <h4 class="modal-title">Sync Logs</h4>
+		</div>
+		<div class="modal-body">
+		  <div 
+		    id="sync-logs-body" 
+		    class="border bg-light rounded p-3 overflow-auto" 
+		    style="max-height: 300px; overflow-y: auto;" >
+		    <ul 
+		      id="logs-list" 
+		      class="list-unstyled text-monospace mb-0"></ul>
+		  </div>
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
 
 </div>
 <script >
