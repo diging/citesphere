@@ -68,6 +68,31 @@ public class SyncJobManager implements ISyncJobManager {
     }
     
     @Override
+    public List<GroupSyncJob> getJobs(IUser user, JobStatus status, Pageable page) {
+        List<ICitationGroup> groups = citationManager.getGroups(user);
+        return jobRepo.findByGroupIdInAndStatus(groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList()), status, page); 
+    }
+    
+    @Override
+    public List<GroupSyncJob> getJobs(String groupId, Pageable page) {
+        return jobRepo.findByGroupId(groupId, page); 
+    }
+    
+    @Override
+    public List<GroupSyncJob> getJobs(String groupId, JobStatus status, Pageable page) {
+        return jobRepo.findByGroupIdAndStatus(groupId, status, page); 
+    }
+    
+    @Override
+    public List<GroupSyncJob> getJobs(IUser user, String groupId, JobStatus jobStatus, Pageable page) {
+        if (groupId.equals("All")) {
+            return jobStatus == null ? getJobs(user, page) : getJobs(user, jobStatus, page);
+        } else {
+            return jobStatus == null ? getJobs(groupId, page) : getJobs(groupId, jobStatus, page);
+        }
+    }
+    
+    @Override
     public long getJobsCount(IUser user) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
         if (groups == null) {
@@ -89,4 +114,5 @@ public class SyncJobManager implements ISyncJobManager {
             jobRepo.save(job);
         }
     }
+
 }

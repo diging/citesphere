@@ -15,6 +15,24 @@ $(function() {
             window.location.href = "[(@{|/auth/jobs/sync/list|})]?page=" + (page - 1);
         }
     });
+    
+ 	$("#jobStatus").change(function () {
+		var groupId = $("#findgroupId").val();
+		var jobStatus = $("#jobStatus").val();
+	    if ($("#jobStatus").val() === 'All') {
+	    	window.location.href = [[@{/auth/jobs/sync/list}]];
+	    } else {
+	    	window.location.href = [[@{/auth/jobs/sync/list}]] + "?jobStatus=" + jobStatus + "&groupId=" + groupId;
+	    }
+	}); 
+ 	
+	$("#findBygroupIdBtn").click(function() {
+		var groupId = $("#findgroupId").val();
+		var jobStatus = $("#jobStatus").val();
+		if (groupId != undefined && groupId != '') {
+			window.location.href = [[@{/auth/jobs/sync/list}]] + "?jobStatus=" + jobStatus + "&groupId=" + groupId;
+		} 
+	});
 });
 </script>
 </head>
@@ -22,6 +40,22 @@ $(function() {
 <body>
 <div layout:fragment="content">
 <h1>Jobs</h1>
+
+<div class="input-group">
+    <input type="text" id="findgroupId" name="findgroupId" class="form-control" placeholder="Find by group id"/>
+    <div class="input-group-addon" id="findBygroupIdBtn" style="cursor: pointer;"><i class="icon-search"></i></div>
+</div>
+<br>
+
+<label for="jobStatus">Job Status</label>
+<select class="form-control" id="jobStatus" name="jobStatus" >
+	<span >
+		<option th:selected="${#strings.equals(jobStatus, 'All')}">All</option>
+		<span th:each="status:${T(edu.asu.diging.citesphere.core.model.jobs.JobStatus).values()}">
+			<option th:selected="${#strings.equals(jobStatus, status)}" th:value="${status}" th:text="${status}">[[${status]]</option>
+		</span>
+	</span>  
+</select><br>
 
 <ul id="pagination-top" class="pagination-sm"></ul>
 

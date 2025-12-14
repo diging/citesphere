@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
+import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.user.IUser;
 
@@ -14,7 +15,15 @@ public interface ISyncJobManager {
     GroupSyncJob getMostRecentJob(String groupId);
 
     List<GroupSyncJob> getJobs(IUser user, Pageable page);
-
+    
+    List<GroupSyncJob> getJobs(IUser user, JobStatus status, Pageable page);
+    
+    List<GroupSyncJob> getJobs(String groupId, Pageable page);
+    
+    List<GroupSyncJob> getJobs(String groupId, JobStatus status, Pageable page);
+    
+    List<GroupSyncJob> getJobs(IUser user, String groupId, JobStatus jobStatus, Pageable page);
+    
     long getJobsCount(IUser user);
 
     void cancelJob(String jobId);
