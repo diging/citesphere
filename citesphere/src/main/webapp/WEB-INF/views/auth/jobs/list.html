@@ -4,15 +4,34 @@
 <script th:inline="javascript">
 //# sourceURL=page.js
 $(function() {
+    var selectedGroup = /*[[${selectedGroupId}]]*/ "";
+    var selectedStatus = /*[[${selectedStatus}]]*/ "";
+    var totalPages = Number(/*[[${total}]]*/ 1) || 1;
+    var currentPage = Number(/*[[${page}]]*/ 1) || 1;
+    var baseUrl = /*[[@{/auth/jobs/sync/list}]]*/ "";
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
+    }
     $('#pagination-top').twbsPagination({
-        totalPages: [(${total})],
-        startPage: [(${page})],
+        totalPages: totalPages,
+        startPage: currentPage,
         prev: "«",
         next: "»",
         visiblePages: 10,
         initiateStartPageClick: false,
         onPageClick: function (event, page) {
-            window.location.href = "[(@{|/auth/jobs/sync/list|})]?page=" + (page - 1);
+            var params = [];
+            params.push("page=" + (page - 1));
+            if (selectedGroup && selectedGroup.trim().length > 0) {
+                params.push("groupId=" + encodeURIComponent(selectedGroup));
+            }
+            if (selectedStatus && selectedStatus.trim().length > 0) {
+                params.push("status=" + encodeURIComponent(selectedStatus));
+            }
+            window.location.href = baseUrl + "?" + params.join("&");
         }
     });
 });
@@ -22,6 +41,38 @@ $(function() {
 <body>
 <div layout:fragment="content">
 <h1>Jobs</h1>
+
+<div style="margin-bottom: 15px;">
+    <div class="dropdown pull-left">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span th:text="${selectedGroupName}">Group</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <li><a th:href="@{|/auth/jobs/sync/list${selectedStatus != null and selectedStatus != '' ? '?status=' + selectedStatus : ''}|}">All groups</a></li>
+            <li role="separator" class="divider"></li>
+            <li th:each="group : ${groups}">
+                <a th:href="@{|/auth/jobs/sync/list?groupId=${group.groupId}${selectedStatus != null and selectedStatus != '' ? '&status=' + selectedStatus : ''}|}"
+                   th:text="${#strings.isEmpty(group.name) ? group.groupId : group.name}">Group Name</a>
+            </li>
+        </ul>
+    </div>
+    <div class="dropdown pull-left" style="margin-left: 10px;">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span th:text="${selectedStatusName}">Status</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            <li><a th:href="@{|/auth/jobs/sync/list${selectedGroupId != null and selectedGroupId != '' ? '?groupId=' + selectedGroupId : ''}|}">All statuses</a></li>
+            <li role="separator" class="divider"></li>
+            <li th:each="status : ${statuses}">
+                <a th:href="@{|/auth/jobs/sync/list?status=${status}${selectedGroupId != null and selectedGroupId != '' ? '&groupId=' + selectedGroupId : ''}|}"
+                   th:text="${status}">Status</a>
+            </li>
+        </ul>
+    </div>
+    <div class="clearfix"></div>
+</div>
 
 <ul id="pagination-top" class="pagination-sm"></ul>
 
@@ -37,8 +88,10 @@ $(function() {
 </tr>
     <tr th:each="job:${jobs}"> 
         <td>[[${job.id}]]</td>
-        <td><span class="label label-default">
-                <a th:href="@{|/auth/group/${job.groupId}/items|}" style="color: #ffffff">[[${job.groupId}]] </a> 
+        <td>
+            <span class="label label-default">
+                <a th:href="@{|/auth/group/${job.groupId}/items|}" style="color: #ffffff"
+                        th:text="${job.groupName} ?: ${job.groupId}">[[${job.groupId}]]</a> 
             </span>
         </td>
         <td>[[${job.status}]]</td>

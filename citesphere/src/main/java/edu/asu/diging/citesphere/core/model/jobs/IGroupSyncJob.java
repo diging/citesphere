@@ -19,5 +19,9 @@ public interface IGroupSyncJob {
     void setFinishedOn(OffsetDateTime finishedOn);
 
     OffsetDateTime getFinishedOn();
+    
+    String getGroupName();
+    
+    void setGroupName(String groupName);
 
 }

@@ -3,6 +3,7 @@ package edu.asu.diging.citesphere.core.model.jobs.impl;
 import java.time.OffsetDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 import edu.asu.diging.citesphere.core.model.jobs.IGroupSyncJob;
 
@@ -13,6 +14,8 @@ public class GroupSyncJob extends Job implements IGroupSyncJob {
     private long total;
     private long current;
     private OffsetDateTime finishedOn;
+    @Transient
+    private String groupName;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.model.jobs.impl.IGroupSyncJob#getGroupId()
@@ -64,4 +67,14 @@ public class GroupSyncJob extends Job implements IGroupSyncJob {
     public void setFinishedOn(OffsetDateTime finishedOn) {
         this.finishedOn = finishedOn;
     }  
+    
+    @Override
+    public String getGroupName() {
+        return groupName;
+    }
+    
+    @Override
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
 }

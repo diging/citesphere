@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.service.jobs.impl;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,8 +13,8 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import edu.asu.diging.citesphere.core.model.jobs.IJob;
 import edu.asu.diging.citesphere.core.model.jobs.JobStatus;
 import edu.asu.diging.citesphere.core.model.jobs.impl.GroupSyncJob;
 import edu.asu.diging.citesphere.core.repository.jobs.GroupSyncJobRepository;
@@ -62,18 +63,57 @@ public class SyncJobManager implements ISyncJobManager {
     }
     
     @Override
-    public List<GroupSyncJob> getJobs(IUser user, Pageable page) {
+    public List<GroupSyncJob> getJobs(IUser user, Pageable page, String groupId, String status) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
-        return jobRepo.findByGroupIdIn(groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList()), page);
+        if (groups == null || groups.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<String, String> groupNames = groups.stream().collect(
+                Collectors.toMap(g -> g.getGroupId() + "", ICitationGroup::getName, (existing, replacement) -> existing));
+        List<String> groupIds = groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList());
+        if (StringUtils.hasText(groupId)) {
+            if (!groupIds.contains(groupId)) {
+                return Collections.emptyList();
+            }
+            groupIds = Collections.singletonList(groupId);
+        }
+        List<GroupSyncJob> jobs;
+        if (StringUtils.hasText(status)) {
+            try {
+                JobStatus jobStatus = JobStatus.valueOf(status.toUpperCase());
+                jobs = jobRepo.findByGroupIdInAndStatus(groupIds, jobStatus, page);
+            } catch (IllegalArgumentException e) {
+                return Collections.emptyList();
+            }
+        } else {
+            jobs = jobRepo.findByGroupIdIn(groupIds, page);
+        }
+        jobs.forEach(job -> job.setGroupName(groupNames.get(job.getGroupId())));
+        return jobs;
     }
     
     @Override
-    public long getJobsCount(IUser user) {
+    public long getJobsCount(IUser user, String groupId, String status) {
         List<ICitationGroup> groups = citationManager.getGroups(user);
         if (groups == null) {
             return -1;
         }
-        return jobRepo.countByGroupIdIn(groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList()));
+        List<String> groupIds = groups.stream().map(g -> g.getGroupId() + "").collect(Collectors.toList());
+        if (StringUtils.hasText(groupId)) {
+            if (!groupIds.contains(groupId)) {
+                return 0;
+            }
+            groupIds = Collections.singletonList(groupId);
+        }
+        if (StringUtils.hasText(status)) {
+            try {
+                JobStatus jobStatus = JobStatus.valueOf(status.toUpperCase());
+                return jobRepo.countByGroupIdInAndStatus(groupIds, jobStatus);
+            } catch (IllegalArgumentException e) {
+                return 0;
+            }
+        }
+        return jobRepo.countByGroupIdIn(groupIds);
     }
     
     @Override
