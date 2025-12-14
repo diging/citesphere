@@ -63,7 +63,7 @@ public class SearchController {
             @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
             @RequestParam(defaultValue = "0", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sort,
             @RequestParam(required = false, value = "columns") String[] columns, Authentication authentication) {
 
         IUser user = (IUser) authentication.getPrincipal();

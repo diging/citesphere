@@ -58,7 +58,7 @@ public class FetchItemsController {
     public @ResponseBody String show(Authentication authentication, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sort,
             @RequestParam(required = false, value = "columns") String[] columns) {
         Integer pageInt = 1;
         try {
@@ -93,7 +93,7 @@ public class FetchItemsController {
 
         try {
             itemsData.setCitationCollections(
-                    collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
+                    collectionManager.getAllCollections(user, groupId, collectionId, sort, 200));
         } catch (GroupDoesNotExistException e) {
             logger.error("Group does not exist exception occured while fecting items data", e);
             return "error/404";

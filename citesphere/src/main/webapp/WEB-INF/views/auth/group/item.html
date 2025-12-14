@@ -345,7 +345,7 @@
 <div layout:fragment="content">
 	<ol class="breadcrumb">
 		<li><a th:href="@{/}">Home</a></li>
-		<li><a th:href="@{|/auth/group/${zoteroGroupId}/items|}">[[${group.name}]]</a></li>
+		<li><a th:href="@{|/auth/group/${zoteroGroupId}/items?page=${page}&sortBy=${sortBy}|}">[[${group.name}]]</a></li>
 		<li class="active">[[${citation.key}]]</li>
 	</ol>
 	

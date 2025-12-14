@@ -33,7 +33,7 @@ public class CollectionItemsController {
 
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort)
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sort)
             throws GroupDoesNotExistException, ZoteroHttpStatusException {
         Integer pageInt = 1;
         try {
@@ -49,7 +49,7 @@ public class CollectionItemsController {
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
         model.addAttribute("currentPage", pageInt);
         model.addAttribute("zoteroGroupId", groupId);
-        model.addAttribute("citationCollections", collectionManager.getCitationCollections(user, groupId, null, pageInt, "title").getCitationCollections());
+        model.addAttribute("citationCollections", collectionManager.getCitationCollections(user, groupId, null, pageInt, sort).getCitationCollections());
 
         return "auth/group/items";
     }

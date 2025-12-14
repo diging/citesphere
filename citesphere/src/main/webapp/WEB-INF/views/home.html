@@ -86,7 +86,7 @@ $(function() {
 		<tbody th:each="group: ${groups}">
 			<div class="panel panel-default">
 				<div class="panel-body">
-					<a th:href="@{'/auth/group/' + ${group.groupId} + '/items'}"><span th:text="${group.name}"/>
+					<a th:href="@{'/auth/group/' + ${group.groupId} + '/items?page=&sortBy='}"><span th:text="${group.name}"/>
 					(<span th:text="${group.numItems}"/>)</a>
 					<a class="delete-link" style="float: right;" href="" th:data-group-id="${group.groupId}"><i class="fas fa-trash-alt" ></i></button>
 					</a>

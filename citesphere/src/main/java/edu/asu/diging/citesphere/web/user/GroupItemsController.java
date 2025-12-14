@@ -58,7 +58,7 @@ public class GroupItemsController {
     public String show(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String groupId,
             @PathVariable(value="collectionId", required=false) String collectionId,
             @RequestParam(defaultValue = "1", required = false, value = "page") String page,
-            @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
+            @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy,
             @RequestParam(required = false, value = "columns") String[] columns,
             @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) {
         Integer pageInt = 1;
@@ -70,7 +70,7 @@ public class GroupItemsController {
         IUser user = (IUser) authentication.getPrincipal();
         CitationResults results;
         try {
-            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sort, Arrays.asList(conceptIds));
+            results = citationManager.getGroupItems(user, groupId, collectionId, pageInt, sortBy, Arrays.asList(conceptIds));
         } catch(ZoteroHttpStatusException e) {
             logger.error("Exception occured", e);
             return "error/500";
@@ -86,11 +86,11 @@ public class GroupItemsController {
         model.addAttribute("zoteroGroupId", groupId);
         model.addAttribute("group", groupManager.getGroup(user, groupId));
         model.addAttribute("collectionId", collectionId);
-        model.addAttribute("sort", sort);
+        model.addAttribute("sortBy", sortBy);
         model.addAttribute("results", results);
         // more than 200 really don't make sense here, this needs to be changed
         try {
-            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, "title", 200));
+            model.addAttribute("citationCollections", collectionManager.getAllCollections(user, groupId, collectionId, sortBy, 200));
         } catch(GroupDoesNotExistException e) {
             logger.error("Exception occured", e);
             return "error/404";

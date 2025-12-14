@@ -101,9 +101,12 @@ function addEventListeners(){
 		}
 		
 		let pageNumber = $(".page-item.active").text();
+		var queryParams = window.location.search;
+	    var params = new URLSearchParams(queryParams);
+		let sortBy = params.get("sortBy");
 		$.ajax({
 			type: "GET",
-			url: "items/data?page="+pageNumber+"&columns=" + shownColumns,
+			url: "items/data?page="+pageNumber+"&columns=" + shownColumns+"&sortBy=" + sortBy,
 			dataType: "json",
 			success: function (data){
 				rewriteCitationsTable(data);
@@ -214,6 +217,24 @@ function filterConcept(searchText) {
 
 $(document).ready(function() {
     var queryParams = window.location.search;
+
+    const sortLabelMap = {
+            title: "Title",
+            type: "Type",
+            author: "Author",
+            date: "Date",
+            url: "URL"
+        };
+        
+    if (queryParams)  {
+        var params = new URLSearchParams(queryParams);
+        sortBy = params.get("sortBy");
+    } else {
+    	sortBy = title;
+    }
+    const label = sortLabelMap[sortBy] || sortLabelMap[title];
+    document.getElementById("sortLabel").textContent = "Sort by: " + label;
+    
     if (queryParams)  {
         var params = new URLSearchParams(queryParams);
         params.delete('page');
@@ -328,9 +349,9 @@ $.ajax({
 <li><a th:href="@{/}">Home</a></li>
 <th:block th:each="crumb: ${breadCrumbs}">
 	<li th:switch="${crumb.type}"> 
-	  <a th:case="GROUP" th:href="@{|/auth/group/${crumb.objectId}/items|}">[[${crumb.label}]]</a>
-	  <a th:case="COLLECTION" th:href="@{|/auth/group/${zoteroGroupId}/collection/${crumb.objectId}/items|}">[[${crumb.label}]]</a>
-	  <a th:case="*" th:href="@{|/auth/group/${zoteroGroupId}/items|}">[[${crumb.label}]]</a> 
+	  <a th:case="GROUP" th:href="@{|/auth/group/${crumb.objectId}/items?page=${currentPage}&sortBy=${sortBy}|}">[[${crumb.label}]]</a>
+	  <a th:case="COLLECTION" th:href="@{|/auth/group/${zoteroGroupId}/collection/${crumb.objectId}/items?page=${currentPage}&sortBy=${sortBy}|}">[[${crumb.label}]]</a>
+	  <a th:case="*" th:href="@{|/auth/group/${zoteroGroupId}/items?page=${currentPage}&sortBy=${sortBy}|}">[[${crumb.label}]]</a> 
 	</li>
 </th:block>
 </ol>
@@ -400,9 +421,13 @@ function pollStatus(){
 
 function getCurrentItemsData(parameter){
 let pageNumber = $(".page-item.active").text();
+var queryParams = window.location.search;
+var params = new URLSearchParams(queryParams);
+let sortBy = params.get("sortBy");
+
 $.ajax({
 	type: "GET",
-	url: "items/data?page="+pageNumber+"&columns=" + shownColumns,
+	url: "items/data?page="+pageNumber+"&columns=" + shownColumns+"&sortBy=" + sortBy,
 	dataType: "json",
 	success: function (data){
 		if(parameter === "onFirstLoad" || (!data['notModified'] && parameter === "notFirstLoad") || parameter === "requestingNewPage"){
@@ -463,9 +488,9 @@ function rewriteCitationsTable(data){
 		
 		let href;
 		if(collectionId){
-			href = '"items/'+citation.key+'?index='+i+'&collectionId='+collectionId+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
+			href = '"items/'+citation.key+'?index='+i+'&collectionId='+collectionId+'&page='+data['currentPage']+'&sortBy='+data['sortBy']+'"'
 		} else{
-			href = '"items/'+citation.key+'?index='+i+'&page='+data['currentPage']+'&sortBy='+data['sort']+'"'
+			href = '"items/'+citation.key+'?index='+i+'&page='+data['currentPage']+'&sortBy='+data['sortBy']+'"'
 		}
 		
 		let authors = $('<td data-key='+citation.key+' data-index='+i+'>'+'</td>');
@@ -525,9 +550,12 @@ function rewriteCollectionsList(data){
 	for(const collection of data['citationCollections']){
 		let list = $('<li class="list-group-item collections">'+'</li>');
 		list.append($('<span class="badge">'+'</span>').text(collection.numberOfItems));
-		let collectionURL = window.location.href +"/../collection/"+collection.key+"/items";
+	    const currentUrl = new URL(window.location.href);
+	    const basePath = currentUrl.pathname;
+	    const queryString = currentUrl.search;
+		let collectionURL = basePath +"/../collection/"+collection.key+"/items" + queryString;
 		if((window.location.href).match(/collection/)){
-			collectionURL = window.location.href +"/../../"+collection.key+"/items";
+			collectionURL = window.location.href +"/../../"+collection.key+"/items" + queryString;
 		}
 		list.append($('<a href= '+collectionURL+'>'+'</a>').append($('<span/>').text(collection.name)));
 		unOrderedList.append(list);
@@ -558,6 +586,28 @@ function rewriteColumnsList(data){
 	  columnsList.append(columnHTML)
   }
   $("#addionalColumns").replaceWith(columnsList);
+}
+
+function onSortChange(sortBy) {
+    const sortLabelMap = {
+        title: "Title",
+        type: "Type",
+        author: "Author",
+        date: "Date",
+        url: "URL"
+    };
+
+    const label = sortLabelMap[sortBy] || sortBy;
+    document.getElementById("sortLabel").textContent = "Sort by: " + label;
+    
+    var queryParams = window.location.search;
+    if (queryParams)  {
+        var params = new URLSearchParams(queryParams);
+        params.set("sortBy", sortBy);
+        queryParams = params.toString();
+    }
+    window.location.search = queryParams.toString();
+    
 }
 
 </script>
@@ -612,11 +662,11 @@ function rewriteColumnsList(data){
 
 
 <div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} != null">
-  <a th:href="@{|items/sync?page=${currentPage}&sort=${sort}&columns=${#strings.listJoin(columns,',')}|}"><big><i
+  <a th:href="@{|items/sync?page=${currentPage}&sortBy=${sortBy}&columns=${#strings.listJoin(columns,',')}|}"><big><i
 		class="icon-sync" title="Sync Page"></i></big></a>
 </div>
 <div class="pull-right" style="margin-top:25px;margin-left:12px;" th:if="${collectionId} == null">
-  <a th:href="@{|items/sync?page=${currentPage}&sort=${sort}&columns=${#strings.listJoin(columns,',')}|}"><big><i
+  <a th:href="@{|items/sync?page=${currentPage}&sortBy=${sortBy}&columns=${#strings.listJoin(columns,',')}|}"><big><i
 		class="icon-sync" title="Sync Page"></i></big></a>
 </div>
 <div class="pull-right" style="margin-top: 20px;">
@@ -649,7 +699,7 @@ function rewriteColumnsList(data){
 	<th:block th:each="collection:${citationCollections}">
 	  <li class="list-group-item collections">
 		  <span class="badge" th:text="${collection.numberOfItems}"/>
-		  <a th:href="@{|/auth/group/${zoteroGroupId}/collection/${collection.key}/items|}"><span th:text="${collection.name}"/></a>
+		  <a th:href="@{|/auth/group/${zoteroGroupId}/collection/${collection.key}/items?page=${currentPage}&sortBy=${sortBy}|}"><span th:text="${collection.name}"/></a>
 	  </li>
 	</th:block>
 	</ul>
@@ -658,7 +708,7 @@ function rewriteColumnsList(data){
 <div class="col-md-10" id="citationBlock">
 
 	<div>
-	    <div th:if="${!param.keySet().contains('searchTerm')}" class="dropdown pull-left">
+	    <div th:if="${!param.keySet().contains('searchTerm')}" class="dropdown pull-left"  style="margin-right: 10px;">
 	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 	            Filter by Concept
 	            <span class="caret"></span>
@@ -675,6 +725,20 @@ function rewriteColumnsList(data){
 	            </tbody>
 	        </ul>
 	    </div>
+	    
+	    <div class="dropdown pull-left">
+		    <button class="btn btn-default dropdown-toggle" type="button" id="sortDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		        <span id="sortLabel">Sort by</span>
+		        <span class="caret"></span>
+		    </button>
+		    <ul class="dropdown-menu" aria-labelledby="sortDropdownMenu">
+		    	<li><a onclick="onSortChange('title')">Title</a></li>
+		    	<li><a onclick="onSortChange('type')">Type</a></li>
+		        <li><a onclick="onSortChange('author')">Author</a></li>
+		        <li><a onclick="onSortChange('date')">Date</a></li>
+		        <li><a onclick="onSortChange('url')">URL</a></li>
+		    </ul>
+		</div>
         
 	    <div class="dropdown pull-right" style="padding-bottom: 10px;">
 	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -728,41 +792,41 @@ function rewriteColumnsList(data){
 			  </span>
 			</td>
 			<td th:data-index="${loop.index}">
-			    <a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sortBy}|}">
 			        <th:block th:each="author,status : ${entry.authors}">
 			            <strong style="color: black">[[${author.lastName}]]<span style="color: black" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
 			        </th:block>
 			    </a>
-			    <a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sortBy}|}">
 			        <th:block th:each="author,status : ${entry.authors}">
 			            <strong style="color: black">[[${author.lastName}]]<span style="color: black" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
 			        </th:block>
 			    </a>
-			    <a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sortBy}|}">
 			        <th:block th:each="author,status : ${entry.authors}">
 			            <strong style="color: black">[[${author.lastName}]]<span style="color: black" th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong><span th:if="${!status.last}">; </span>
 			        </th:block>
 			    </a>
 		 	</td>
 		 	<td th:data-index="${loop.index}">
-			    <a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sortBy}|}">
 			        <em style="color: black">[[${entry.title}]]</em>
 			    </a>
-			    <a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sortBy}|}">
 			        <em style="color: black">[[${entry.title}]]</em>
 			    </a>
-			    <a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sortBy}|}">
 			        <em style="color: black">[[${entry.title}]]</em>
 			    </a>
 		 	</td>
 		 	<td th:data-index="${loop.index}">
-			    <a class="bib-entry" style="color: black" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" style="color: black" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sortBy}|}">
 			        [[${entry.dateFreetext}]]
 			    </a>
-			    <a class="bib-entry" style="color: black" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" style="color: black" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sortBy}|}">
 			        [[${entry.dateFreetext}]]
 			    </a>
-			    <a class="bib-entry" style="color: black" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" style="color: black" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sortBy}|}">
 			        [[${entry.dateFreetext}]]
 			    </a>
 		 	</td>
@@ -773,19 +837,19 @@ function rewriteColumnsList(data){
 		 	</td>
 			<td>
 				<span th:if="${!#sets.isEmpty(entry.gilesUploads)}">
-				<a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+				<a class="bib-entry" th:if="${!#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sortBy}|}">
 					<i class="icon-multiple-doc"></i>
 				</a>
-				<a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+				<a class="bib-entry" th:if="${!#strings.isEmpty(searchTerm)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?searchTerm=${searchTerm}&index=${loop.index}&page=${currentPage}&sortBy=${sortBy}|}">
 					<i class="icon-multiple-doc"></i>
 				</a>
-				<a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sort}|}">
+				<a class="bib-entry" th:unless="${!#strings.isEmpty(searchTerm) or !#strings.isEmpty(collectionId)}" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&page=${currentPage}&sortBy=${sortBy}|}">
 					<i class="icon-multiple-doc"></i>
 				</a>
 				</span>
 			</td>
 			<td>
-			    <a class="bib-entry" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sort}|}">
+			    <a class="bib-entry" th:href="@{|/auth/group/${zoteroGroupId}/items/${entry.key}?index=${loop.index}&collectionId=${collectionId}&page=${currentPage}&sortBy=${sortBy}|}">
 			        <i class="icon-arrow-right-alt"></i>
 			    </a>
 			</td>    
