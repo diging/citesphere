@@ -15,4 +15,6 @@ public interface GroupSyncJobRepository extends PagingAndSortingRepository<Group
     public List<GroupSyncJob> findByGroupIdIn(List<String> groupIds, Pageable page);
     
     public long countByGroupIdIn(List<String> groupIds);
+    
+    public long deleteByGroupIdInAndCreatedOnBefore(List<String> groupIds, java.time.OffsetDateTime threshold);
 }

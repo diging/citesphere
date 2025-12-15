@@ -1,6 +1,7 @@
 package edu.asu.diging.citesphere.core.service.jobs;
 
 import java.util.List;
+import java.time.OffsetDateTime;
 
 import org.springframework.data.domain.Pageable;
 
@@ -18,5 +19,7 @@ public interface ISyncJobManager {
     long getJobsCount(IUser user);
 
     void cancelJob(String jobId);
+    
+    long pruneJobs(IUser user, OffsetDateTime before);
 
 }

@@ -4,16 +4,46 @@
 <script th:inline="javascript">
 //# sourceURL=page.js
 $(function() {
-    $('#pagination-top').twbsPagination({
-        totalPages: [(${total})],
-        startPage: [(${page})],
-        prev: "«",
-        next: "»",
-        visiblePages: 10,
-        initiateStartPageClick: false,
-        onPageClick: function (event, page) {
-            window.location.href = "[(@{|/auth/jobs/sync/list|})]?page=" + (page - 1);
+    var totalPages = [(${total})];
+    var startPage = [(${page})];
+    if (totalPages > 0 && startPage > 0 && startPage <= totalPages) {
+        $('#pagination-top').twbsPagination({
+            totalPages: totalPages,
+            startPage: startPage,
+            prev: "«",
+            next: "»",
+            visiblePages: 10,
+            initiateStartPageClick: false,
+            onPageClick: function (event, page) {
+                window.location.href = "[(@{|/auth/jobs/sync/list|})]?page=" + (page - 1);
+            }
+        });
+    }
+    
+    $('#openPruneModal').on('click', function() {
+        $('#pruneModal').modal('show');
+    });
+    
+    $('#pruneForm').on('submit', function(e) {
+        var date = $('#pruneDate').val();
+        if (!date) {
+            e.preventDefault();
+            alert('Please select a date.');
+            return;
         }
+        e.preventDefault();
+        $('#confirmDate').text(date);
+        $('#pruneModal').modal('hide');
+        $('#confirmDeleteModal').modal('show');
+    });
+
+    $('#confirmDelete').on('click', function() {
+        $('#pruneForm')[0].submit();
+    });
+
+    $('#cancelConfirm').on('click', function() {
+        $('#confirmDeleteModal').modal('hide');
+        $('#pruneModal').modal('show');
     });
 });
 </script>
@@ -21,7 +51,63 @@ $(function() {
 
 <body>
 <div layout:fragment="content">
-<h1>Jobs</h1>
+<div class="row" style="margin-bottom: 15px;">
+    <div class="col-md-6">
+        <h1 style="margin: 0;">Jobs</h1>
+    </div>
+    <div class="col-md-6 text-right" style="padding-top: 10px;">
+        <button id="openPruneModal" class="btn btn-danger btn-sm">Prune Jobs</button>
+    </div>
+</div>
+
+<div class="modal fade" id="pruneModal" tabindex="-1" role="dialog" aria-labelledby="pruneModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="pruneForm" th:action="@{/auth/jobs/sync/prune}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="pruneModalLabel">Prune jobs</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="pruneDate">Delete jobs created on or before</label>
+            <input type="date" id="pruneDate" name="pruneDate" class="form-control" required />
+          </div>
+          <div class="alert alert-warning" role="alert">
+            This will permanently delete all jobs up to and including the selected date. This cannot be undone.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Delete jobs</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <h4 class="modal-title">Confirm Deletion</h4>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger">
+          <strong>Warning!</strong> This is an irreversible action. All jobs up to and including
+          <span id="confirmDate"></span> will be permanently deleted.
+        </div>
+        <p>Are you sure you want to continue?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="cancelConfirm">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">Delete Jobs</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <ul id="pagination-top" class="pagination-sm"></ul>
 
