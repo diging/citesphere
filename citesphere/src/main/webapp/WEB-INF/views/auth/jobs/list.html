@@ -28,13 +28,22 @@ $(function() {
         var date = $('#pruneDate').val();
         if (!date) {
             e.preventDefault();
-            alert('Please select a date to prune jobs.');
+            alert('Please select a date.');
             return;
         }
-        var message = 'This will delete all jobs up to and including ' + date + '. This cannot be undone. Continue?';
-        if (!confirm(message)) {
-            e.preventDefault();
-        }
+        e.preventDefault();
+        $('#confirmDate').text(date);
+        $('#pruneModal').modal('hide');
+        $('#confirmDeleteModal').modal('show');
+    });
+
+    $('#confirmDelete').on('click', function() {
+        $('#pruneForm')[0].submit();
+    });
+
+    $('#cancelConfirm').on('click', function() {
+        $('#confirmDeleteModal').modal('hide');
+        $('#pruneModal').modal('show');
     });
 });
 </script>
@@ -42,11 +51,12 @@ $(function() {
 
 <body>
 <div layout:fragment="content">
-<h1>Jobs</h1>
-
 <div class="row" style="margin-bottom: 15px;">
-    <div class="col-md-12">
-        <button id="openPruneModal" class="btn btn-danger btn-sm">Prune jobs</button>
+    <div class="col-md-6">
+        <h1 style="margin: 0;">Jobs</h1>
+    </div>
+    <div class="col-md-6 text-right" style="padding-top: 10px;">
+        <button id="openPruneModal" class="btn btn-danger btn-sm">Prune Jobs</button>
     </div>
 </div>
 
@@ -73,6 +83,28 @@ $(function() {
           <button type="submit" class="btn btn-danger">Delete jobs</button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <h4 class="modal-title">Confirm Deletion</h4>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger">
+          <strong>Warning!</strong> This is an irreversible action. All jobs up to and including
+          <span id="confirmDate"></span> will be permanently deleted.
+        </div>
+        <p>Are you sure you want to continue?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="cancelConfirm">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">Delete Jobs</button>
+      </div>
     </div>
   </div>
 </div>
