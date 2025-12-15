@@ -1,11 +1,9 @@
 package edu.asu.diging.citesphere.core.service.giles.impl;
 
-import java.util.List;
-
 class UploadResponse {
     private String id;
     private String checkUrl;
-    private List<String> documentIds;
+    private String documentIds;
 
     public String getId() {
         return id;
@@ -23,11 +21,11 @@ class UploadResponse {
         this.checkUrl = checkUrl;
     }
 
-    public List<String> getDocumentIds() {
+    public String getDocumentIds() {
         return documentIds;
     }
 
-    public void setDocumentIds(List<String> documentIds) {
+    public void setDocumentIds(String documentIds) {
         this.documentIds = documentIds;
     }
 }
