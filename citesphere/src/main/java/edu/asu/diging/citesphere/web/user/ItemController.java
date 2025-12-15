@@ -35,12 +35,17 @@ public class ItemController {
     @Autowired
     private IGroupManager groupManager;
     
-    @RequestMapping(value="/auth/group/{zoteroGroupId}/items/{itemId}")
+    @RequestMapping(value={
+        "/auth/group/{zoteroGroupId}/items/{itemId}",
+        "/auth/group/{zoteroGroupId}/collection/{collectionId}/items/{itemId}"
+    })
     public String getItem(Authentication authentication, Model model, @PathVariable("zoteroGroupId") String zoteroGroupId, @PathVariable("itemId") String itemId,
+            @PathVariable(value="collectionId", required=false) String collectionIdPath,
             @RequestParam(defaultValue = "", required = false, value = "searchTerm") String searchTerm, @RequestParam(defaultValue = "0",required = false, value = "index") String index,
-            @RequestParam(defaultValue = "1", required = false, value = "page") int page, @RequestParam(defaultValue = "", value="collectionId", required=false) String collectionId,
+            @RequestParam(defaultValue = "1", required = false, value = "page") int page, @RequestParam(defaultValue = "", value="collectionId", required=false) String collectionIdParam,
             @RequestParam(defaultValue = "title", required = false, value = "sortBy") String sortBy,
             @RequestParam(required = false, defaultValue = "", value = "conceptIds") String[] conceptIds) throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException {
+        String collectionId = collectionIdPath != null ? collectionIdPath : collectionIdParam;
         ICitation citation = citationManager.getCitation((IUser)authentication.getPrincipal(), zoteroGroupId, itemId);
         model.addAttribute("zoteroGroupId", zoteroGroupId);
         
