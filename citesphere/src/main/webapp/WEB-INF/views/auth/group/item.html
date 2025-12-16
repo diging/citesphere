@@ -1,5 +1,10 @@
 <html layout:decorate="~{layouts/main}">
 <head>
+<style>
+#viewUploadBody  {
+  padding-left: 30px;
+}
+</style>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
 
@@ -130,7 +135,12 @@
 	    $('.btn-nav').each(function() {
 	    	$(this).attr("href", $(this).attr("href") + "&" + queryParams);
 	    })
-	    
+	    $(".view-link").click(function() {
+	    	var item = $(this).parent();
+	        var modalName = 'viewUpload';
+	        showFiles(modalName, item);
+	        $("#"+modalName.toLowerCase()+"Modal").modal('show');
+		});
 	    $('.note-info').each(function() {
 	    	$(this).text(truncateNote($(this).attr('data-note-text')));
 	    })
@@ -282,6 +292,50 @@
 		            exit: 'animated fadeOutRight'
 		        },
 	    	});
+	}
+	
+	function showFiles(modalName, item) {
+		
+		var uploadItem = $(item);
+		var modalNameLCase = modalName.toLowerCase();
+
+	    $('#page-title, #page-list').remove();
+		
+		$("#uploadedFileName").attr('href', uploadItem.attr("upload-href"));
+		$("#uploadedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-uploadedFile-filename"));
+		
+		$("#extractedFileName").attr('href', uploadItem.attr("extractedText-href"));
+		$("#extractedFileName").text(uploadItem.attr("data-"+modalNameLCase+"-extractedText-filename"));
+		
+		$('.modal-body ul').append('<li id="page-title"><p style="margin-bottom:0;">Pages: </p></li>');
+		var pageCount=1
+		$('.modal-body ul').append('<ul id="page-list"></ul>');
+		
+		$(uploadItem).children().each(function() {
+			
+           if($(this).attr('class')=="page-item"){
+               $('#page-list').append('<li><p style="margin : 0; padding-top:0;">Page '+pageCount+': </p></li>');
+           }
+           $(this).children().each(function() {
+                pageItems = "page-items"+pageCount
+                $('#page-list').append('<ul id = "'+pageItems+'"></ul>');
+           		$('#page-items'+pageCount).append('<li><p style="margin-bottom:0;">Image: <a href="'+ $(this).attr("image-href")+'">'+$(this).attr("data-"+modalNameLCase+"-image-filename")+'</a></p></li>');
+           		$('#page-items'+pageCount).append('<li><p style="margin : 0; padding-top:0;">Text: <a href="'+ $(this).attr("pageText-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageText-filename")+'</a></p></li>');
+           		$('#page-items'+pageCount).append('<li><p style="margin-bottom:0;">OCR Result: <a href="'+ $(this).attr("pageOcr-href")+'">'+$(this).attr("data-"+modalNameLCase+"-pageOcr-filename")+'</a></p></li>');
+           		$('#page-items'+pageCount).append('<li><p style="margin : 0; padding-top:0;">Additional Files: </p></li>');
+           		
+           		var additionalFilesCount = 1;
+           		additionalItems = "additional-list"+pageCount
+           		$('#page-items'+pageCount).append('<ul id="'+additionalItems+'"></ul>')
+           		$(this).children().each(function() {
+           			$(this).children().each(function() {
+           				$('#additional-list'+pageCount).append('<li><p style="margin-bottom:0;">Additional Files '+additionalFilesCount+': <a href="'+ $(this).attr("additionalFiles-href")+'">'+$(this).attr("data-"+modalNameLCase+"-additionalFiles-filename")+'</a></p></li>');
+                   })
+                   additionalFilesCount += 1;
+               })
+               pageCount = pageCount+1;
+           })
+       }) 
 	}
 	
 </script>
@@ -533,10 +587,27 @@
         <h3 style="margin-top: 0">Files</h3>
         
         <ul class="list-group" >
-	        <li class="list-group-item" th:each="upload:${citation.gilesUploads}">
+	        <li class="list-group-item" th:each="upload, status:${citation.gilesUploads}">
 	        <i class="icon-giles"></i>
+	        
 	        <span th:if="${upload.uploadedFile?.filename}">
-	        <a th:href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}">[[${upload.uploadedFile?.filename}]]</a>
+	        	<span th:id="|upload${status.index}|" class="upload-item" th:data-viewupload-uploadId="${upload.uploadId}" th:upload-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.uploadedFile?.id}|}" th:data-viewupload-uploadedFile-filename="${upload.uploadedFile?.filename}" th:extractedText-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${upload.extractedText?.id}|}" th:data-viewupload-extractedText-filename="${upload.extractedText?.filename}" >
+	        	
+	        	<th:block th:each="pages, status:${upload.pages}">
+				   <span class="page-item">
+				       <span th:id="|pages${status.index}|" class="page-item" th:data-viewupload-uploadId="${upload.uploadId}" th:image-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${pages.image?.id}|}" th:data-viewupload-image-filename="${pages.image?.filename}" th:pageText-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${pages.text?.id}|}" th:data-viewupload-pageText-filename="${pages.text?.filename}" th:pageOcr-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${pages.ocr?.id}|}" th:data-viewupload-pageOcr-filename="${pages.ocr?.filename}" >
+					 			
+				        <th:block th:each="additionalFiles, status:${pages.additionalFiles}">
+                        <span class="additional-item" th:if="${additionalFiles?.filename}">
+                             <span th:id="|additionalFiles${status.index}|" class="additional-item" th:data-viewupload-uploadId="${upload.uploadId}" th:additionalFiles-href="@{|/auth/group/${zoteroGroupId}/items/${citation.key}/giles/${additionalFiles?.id}|}" th:data-viewupload-additionalFiles-filename="${additionalFiles?.filename}" >
+					 	     </span>
+                        </span>
+                        </th:block>
+                        </span>
+                        </span> 
+                </th:block>
+                <a class="view-link">[[${upload.uploadedFile?.filename}]]</a>
+	        </span>
 	        </span>
 	        <span th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}">
 	        File is being processed... ([[${upload.progressId}]])
@@ -544,9 +615,41 @@
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
+	        <a th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}" 
+	        	th:href="@{|${citation.key}/sync/giles/${upload.progressId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}">
+				<i class="icon-sync" title="Sync Upload Status"></i></a>
 	        </li>
         </ul>
-        
+
+	    <div class="modal fade" id="viewuploadModal" 
+			tabIndex="-1" role="dialog"
+			aria-labelledby="viewUploadModal" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+            <div class="modal-content" id="viewUploadContent">
+               <div class="modal-header">
+                   <h4 class="modal-title" id="viewUploadModal">Files uploaded to and extracted by Giles
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    </h4>
+                </div>
+                <div class="modal-body" id="viewUploadBody">
+                  <ul class="list-group" >
+                  	 <li><p style="margin-bottom:0;"> Upload File: 
+                     <a id="uploadedFileName"> </a>
+                     </p></li>
+                     <li><p style="margin : 0; padding-top:0;"> Extracted Text: 
+                     <a id="extractedFileName"> </a>
+                     </p></li>
+                   </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"> Close </button>
+                </div>
+            </div>
+       </div>
+    </div>
+
         <h3>Notes</h3>
         
         <ul class="list-group">
