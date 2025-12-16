@@ -15,22 +15,39 @@
 	color: #337ab7;
 }
 </style>
+<script th:src="@{/resources/authorities/authority-search.js}"></script>
 <script th:inline="javascript">
+	// Configure authority search
+	CitesphereAuthority.Config.setZoteroGroupId([(${zoteroGroupId})]);
+	CitesphereAuthority.Config.setCsrfToken([[${_csrf.token}]]);
+	CitesphereAuthority.Config.setCsrfParameterName([[${_csrf.parameterName}]]);
+	CitesphereAuthority.Config.setEndpoint('user', /*[[@{|/auth/authority/${zoteroGroupId}/find/authorities/user|}]]*/ '');
+	CitesphereAuthority.Config.setEndpoint('group', /*[[@{|/auth/authority/${zoteroGroupId}/find/authorities/group|}]]*/ '');
+	CitesphereAuthority.Config.setEndpoint('viaf', /*[[@{|/auth/authority/${zoteroGroupId}/find/authorities/viaf|}]]*/ '');
+	CitesphereAuthority.Config.setEndpoint('conceptpower', /*[[@{|/auth/authority/${zoteroGroupId}/find/authorities/conceptpower|}]]*/ '');
+
+	// Keep global variables for backward compatibility
+	window.csrfParameterName = [[${_csrf.parameterName}]];
+	window.csrfToken = [[${_csrf.token}]];
+	window.zoteroGroupId = [(${zoteroGroupId})];
+
 	$(document).ready(function() {
-		window.csrfParameterName = [[${_csrf.parameterName}]];
-		window.csrfToken = [[${_csrf.token}]];
-		window.zoteroGroupId = [(${zoteroGroupId})];
 		if( [[${citation}]] == null){
 			$("#items").val("${defaultItemType}");
 		}
-		loadFields();
+
+		// Initialize the EditItemHandler
+		var editItemHandler = new CitesphereAuthority.EditItemHandler({
+			sources: ['user', 'group', 'viaf', 'conceptpower']
+		});
+		editItemHandler.init();
+		editItemHandler.loadFields();
+
 		$('#items').on("change", function(e){
-			loadFields();
+			editItemHandler.loadFields();
 		});
 	});
-
 </script>
-<script th:src="@{/resources/authorities/authorities.js}"></script>
 
 </head>
 <body>
