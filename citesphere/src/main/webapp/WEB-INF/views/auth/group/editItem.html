@@ -55,10 +55,10 @@
 	<ol class="breadcrumb">
 		<li><a th:href="@{/}">Home</a></li>
 		<li><a th:href="@{|/auth/group/${zoteroGroupId}/items|}">Group</a></li>
-		<li class="active">[[${citation.key}]]</li>
+		<li class="active" th:text="${citation != null ? citation.key : 'New Item'}">New Item</li>
 	</ol>
 	
-	<h2>
+	<h2 th:if="${citation != null}">
 		<th:block th:each="author,status : ${citation.authors}">
 			<strong>[[${author.lastName}]]<span th:if="${!#strings.isEmpty(author.firstName)}">, [[${author.firstName}]]</span></strong>
 			<span th:if="${!status.last}">; </span>
@@ -72,6 +72,7 @@
 	 	  [[(${citation.dateFreetext})]]
 	 	</span>
 	</h2>
+	<h2 th:if="${citation == null}">New Item</h2>
 
 	<div class="modal fade" id="messageModal" tabindex="-1" role="dialog">
 		<div class="modal-dialog">
@@ -81,13 +82,13 @@
 		</div>
 	</div>
 	
-	<form action="#" th:action="${!#strings.isEmpty(citation.key)} ? 
+	<form action="#" th:action="${citation != null and !#strings.isEmpty(citation.key)} ?
 								@{|/auth/group/${zoteroGroupId}/items/${citation.key}/edit?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|} :
-								@{|/auth/group/${zoteroGroupId}/items/create|}" 
+								@{|/auth/group/${zoteroGroupId}/items/create|}"
 				th:object="${form}" method="POST" id="editForm">
 				
 		<table class="table table-striped">
-			<tr th:if = "${#strings.isEmpty(citation.key)}">
+			<tr th:if = "${citation == null or #strings.isEmpty(citation.key)}">
 				<td width="20%">Collection</td>
 				<td>
 					<select class="form-control" th:field="*{collectionId}" >
@@ -99,10 +100,10 @@
 				</td>
 			</tr>
 			
-			<tr th:style="${#strings.isEmpty(citation.key)}? 'display:none' " >
+			<tr th:style="${citation == null or #strings.isEmpty(citation.key)}? 'display:none' : ''" >
 				<td width="20%">Item Key</td>
-				<td>[[${citation.key}]]</td>
-				<input type="hidden" th:name="key" th:id="key" th:value="${citation.key}"/>
+				<td th:text="${citation != null ? citation.key : ''}"></td>
+				<input type="hidden" th:name="key" th:id="key" th:value="${citation != null ? citation.key : ''}"/>
 			</tr>
 			
 			<tr>
