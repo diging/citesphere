@@ -131,6 +131,16 @@ public class ZoteroManager implements IZoteroManager {
     }
     
     @Override
+    public List<ICitation> getGroupItemNotes(IUser user, String groupId, String itemKey) throws ZoteroHttpStatusException {
+        List<Item> notesResponse = zoteroConnector.getNotes(user, groupId, itemKey);
+        List<ICitation> notes = new ArrayList<>();
+        notesResponse.forEach(note -> {
+            notes.add(citationFactory.createCitation(note, null));
+        });
+        return notes;
+    }
+    
+    @Override
     public ZoteroGroupItemsResponse getGroupItemsByKey(IUser user, String groupId, List<String> itemKeys,
             boolean includeTrashed) throws ZoteroHttpStatusException {
         ZoteroResponse<Item> response = zoteroConnector.getGroupItemsByKey(user, groupId, itemKeys, includeTrashed);

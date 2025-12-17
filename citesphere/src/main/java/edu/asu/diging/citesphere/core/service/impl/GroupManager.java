@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import edu.asu.diging.citesphere.core.exceptions.GroupDoesNotExistException;
 import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.ICitationManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
@@ -44,9 +43,11 @@ public class GroupManager implements IGroupManager {
         if (groupOptional.isPresent() && groupOptional.get().getUsers().contains(user.getUsername())) {
             return (ICitationGroup) groupOptional.get();
         }
-
         ICitationGroup group = zoteroManager.getGroup(user, groupId, false);
         if (group != null) {
+            if (groupOptional.isPresent()) {
+                group.setId(groupOptional.get().getId()); 
+            }
             group.getUsers().add(user.getUsername());
             groupRepository.save((CitationGroup) group);
             return group;

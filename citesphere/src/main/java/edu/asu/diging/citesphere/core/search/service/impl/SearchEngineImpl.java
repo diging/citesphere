@@ -52,12 +52,47 @@ public class SearchEngineImpl implements SearchEngine {
      */
     @Override
     public ResultPage search(String searchTerm, String groupId, int page, int pageSize) {
+        return performSearch(searchTerm, groupId, null, page, pageSize);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * This method searches in the title and creators name field for references that are
+     * not deleted in a collection within a group.
+     * 
+     */
+    @Override
+    public ResultPage search(String searchTerm, String groupId, String collectionId, int page, int pageSize) {
+        return performSearch(searchTerm, groupId, collectionId, page, pageSize);
+    }
+
+    /**
+     * Common search implementation that handles both collection-specific and general searches.
+     * 
+     * @param searchTerm the term to search for in title and creators.name fields
+     * @param groupId the group ID to filter by
+     * @param collectionId the collection ID to filter by (optional, can be null)
+     * @param page the page number for pagination
+     * @param pageSize the number of results per page
+     * @return ResultPage containing the search results
+     */
+    private ResultPage performSearch(String searchTerm, String groupId, String collectionId, int page, int pageSize) {
         BoolQueryBuilder orFieldsBuilder = QueryBuilders.boolQuery()
                 .should(QueryBuilders.queryStringQuery(searchTerm).field("title").field("creators.name"));
         BoolQueryBuilder boolBuilder = QueryBuilders.boolQuery();
-        boolBuilder.must(orFieldsBuilder).must(QueryBuilders.matchQuery("deleted", false)).must(QueryBuilders.matchQuery("group", groupId));
-        NativeSearchQueryBuilder b = new NativeSearchQueryBuilder().withQuery(boolBuilder).withPageable(PageRequest.of(page, pageSize));
-
+        boolBuilder.must(orFieldsBuilder)
+                  .must(QueryBuilders.matchQuery("deleted", false))
+                  .must(QueryBuilders.matchQuery("group", groupId));
+        
+        if (collectionId != null) {
+            boolBuilder.must(QueryBuilders.matchQuery("collections", collectionId));
+        }
+        
+        NativeSearchQueryBuilder b = new NativeSearchQueryBuilder()
+                .withQuery(boolBuilder)
+                .withPageable(PageRequest.of(page, pageSize));
+        
         AggregatedPage<Reference> results = template.queryForPage(b.build(), Reference.class);
         List<ICitation> foundCitations = new ArrayList<ICitation>();
         results.get().forEach(r -> {
