@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.http.HttpStatus;
 import org.springframework.social.zotero.api.ZoteroUpdateItemsStatuses;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 
@@ -88,6 +89,11 @@ public interface ICitationManager {
     
     void deleteLocalGroupCitations(String groupId);
     
+    HttpStatus reprocessFile(IUser user, String zoteroGroupId, String itemId, String documentId)
+            throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+            ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException;
+    
+
     Citations findAuthorityCitations(IAuthorityEntry entry, IUser user);
     
     ICitation addCitationToReferences(IUser user, ICitation citation, String zoteroGroupId, String referenceCitationKey, 

@@ -27,6 +27,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.social.zotero.exception.ZoteroConnectionException;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -38,12 +40,19 @@ import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
 import edu.asu.diging.citesphere.core.exceptions.ZoteroItemCreationFailedException;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.core.service.giles.GilesUploadChecker;
+import edu.asu.diging.citesphere.core.service.giles.IGilesConnector;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.data.bib.CitationGroupRepository;
 import edu.asu.diging.citesphere.data.bib.ICitationDao;
 import edu.asu.diging.citesphere.model.authority.IAuthorityEntry;
 import edu.asu.diging.citesphere.model.bib.ICitation;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
+import edu.asu.diging.citesphere.model.bib.IGilesUpload;
+import edu.asu.diging.citesphere.model.bib.impl.Citation;
+import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
+import edu.asu.diging.citesphere.model.bib.impl.CitationResults;
+import edu.asu.diging.citesphere.model.bib.impl.GilesUpload;
 import edu.asu.diging.citesphere.model.bib.IReference;
 import edu.asu.diging.citesphere.model.bib.impl.Citation;
 import edu.asu.diging.citesphere.model.bib.impl.CitationGroup;
@@ -70,6 +79,12 @@ public class CitationManagerTest {
     @Mock
     private ICitationDao citationDao;
     
+    @Mock
+    private IGilesConnector gilesConnector;
+    
+    @Mock
+    private GilesUploadChecker gilesUploadChecker;
+
     @Mock
     private IAuthorityEntry authorityEntry;
     
@@ -485,6 +500,71 @@ public class CitationManagerTest {
         
         List<ICitation> response = managerToTest.getNotes(user, GROUP_ID, EXISTING_ID);
         Assert.assertTrue(response.size() == 0);
+    }
+    
+    @Test
+    public void test_reprocessFile() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+        ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        String documentId = "43";
+        Set<IGilesUpload> gilesUploads = new HashSet<>();
+        IGilesUpload gilesUpload = new GilesUpload();
+        gilesUpload.setDocumentId(documentId);
+        gilesUpload.setProgressId("PROG12345");
+        gilesUploads.add(gilesUpload);
+        Mockito.when(zoteroManager.getGroupItemVersion(user, GROUP_ID, EXISTING_ID)).thenReturn(currentVersion);
+        existingCitation.setKey(EXISTING_ID);
+        existingCitation.setVersion(currentVersion);
+        existingCitation.setGroup(GROUP_ID);
+        existingCitation.setGilesUploads(gilesUploads);
+        Mockito.when(groupManager.getGroup(Mockito.any(IUser.class), Mockito.anyString())).thenReturn(group);
+        Mockito.when(zoteroManager.updateCitation(user, GROUP_ID, existingCitation)).thenReturn(existingCitation);
+        Mockito.when(citationStore.findById(EXISTING_ID)).thenReturn(Optional.of(existingCitation));
+        
+        Mockito.when(gilesUploadChecker.canReprocess(Mockito.any(IGilesUpload.class), Mockito.any(IUser.class))).thenReturn(true);
+        
+        String responseBody = "{\"checkUrl\": \"http://localhost:8085/giles/api/v2/files/upload/check/PROG12345\", \"id\": \"PROG12345\"}}";
+        ResponseEntity<String> response = new ResponseEntity<>(responseBody, HttpStatus.OK);
+        Mockito.when(gilesConnector.reprocessDocument(user, documentId)).thenReturn(response);
+        
+        HttpStatus result = managerToTest.reprocessFile(user, GROUP_ID, EXISTING_ID, documentId);
+        
+        Mockito.verify(gilesUploadChecker).canReprocess(Mockito.any(IGilesUpload.class), Mockito.any(IUser.class));
+        Assert.assertEquals(HttpStatus.OK, result);
+    }
+    
+    @Test
+    public void test_reprocessFile_nullDocumentId() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+        ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        HttpStatus result = managerToTest.reprocessFile(user, GROUP_ID, EXISTING_ID, null);
+        Assert.assertEquals(HttpStatus.BAD_REQUEST, result);
+    }
+    
+    @Test
+    public void test_reprocessFile_emptyDocumentId() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+        ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        HttpStatus result = managerToTest.reprocessFile(user, GROUP_ID, EXISTING_ID, "");
+        Assert.assertEquals(HttpStatus.BAD_REQUEST, result);
+    }
+    
+    @Test
+    public void test_reprocessFile_cannotReprocess() throws GroupDoesNotExistException, CannotFindCitationException, ZoteroHttpStatusException,
+        ZoteroConnectionException, CitationIsOutdatedException, ZoteroItemCreationFailedException {
+        String documentId = "43";
+        Set<IGilesUpload> gilesUploads = new HashSet<>();
+        IGilesUpload gilesUpload = new GilesUpload();
+        gilesUpload.setDocumentId(documentId);
+        gilesUpload.setProgressId("PROG12345");
+        gilesUploads.add(gilesUpload);
+        existingCitation.setKey(EXISTING_ID);
+        existingCitation.setGilesUploads(gilesUploads);
+        Mockito.when(citationStore.findById(EXISTING_ID)).thenReturn(Optional.of(existingCitation));
+        
+        Mockito.when(gilesUploadChecker.canReprocess(Mockito.any(IGilesUpload.class), Mockito.any(IUser.class))).thenReturn(false);
+        
+        HttpStatus result = managerToTest.reprocessFile(user, GROUP_ID, EXISTING_ID, documentId);
+        
+        Assert.assertEquals(HttpStatus.CONFLICT, result);
+        Mockito.verify(gilesUploadChecker).canReprocess(Mockito.any(IGilesUpload.class), Mockito.any(IUser.class));
     }
 
     @Test

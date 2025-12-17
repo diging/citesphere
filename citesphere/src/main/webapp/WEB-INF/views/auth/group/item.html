@@ -6,6 +6,9 @@
 }
 </style>
 <script th:src="@{/resources/notify/bootstrap-notify.min.js}"></script>
+<link th:href="@{/resources/notify/animate.css}" rel="stylesheet"/>
+<link th:href="@{/resources/bootstrap/css/word-wrap.css}" type="text/css"
+	rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
 
 <script id="citation-template" type="text/x-handlebars-template">
@@ -121,6 +124,40 @@
   
 	    });
 	    
+	    $("#reprocess-file-button").click(function(e) {
+			e.preventDefault();
+			var fileId = $(this).data("upload-file");
+			$('body').append('<div id="reprocessFileDiv" class="modal-backdrop" style="opacity:0.5"><i class="icon-spinner spinner" style="position:fixed; top:50%; left:50%"></i></div>');
+			$.ajax({
+				'type': "POST",
+				'url': "[(@{|/auth/group/${zoteroGroupId}/file/reprocess|})]",
+				'data': {
+					"documentId": fileId,
+					[[${_csrf.parameterName}]]:[[${_csrf.token}]],
+					"itemId": [[${itemId}]]
+					
+				},
+				'success': function(data) {
+					$("#reprocessFileDiv").remove();
+					showNotification("File submitted successfully for reprocessing! ", "success", 10000);
+					location.reload();
+				},
+				'error': function(data) {
+					$("#reprocessFileDiv").remove();
+					showNotification("Error while reprocessing the file!", "danger", 10000)
+				}
+			});
+			$('#file-reprocess-confirmation').modal("hide");
+			event.preventDefault();
+			$(this).removeData();
+	    });
+
+
+		$(".reprocess-file").click(function(e) {
+			$("#reprocess-file-button").attr("data-upload-file", $(this).data("upload-file"));
+			$('#file-reprocess-confirmation').modal("show");
+		});
+	    
 	    var queryParams = window.location.search;
 	    if(queryParams)  {
 	        var params = new URLSearchParams(queryParams);
@@ -145,6 +182,20 @@
 	    	$(this).text(truncateNote($(this).attr('data-note-text')));
 	    })
 	    
+	    function showNotification(message, status, time){
+			$.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
+				type: status,
+				offset: {
+					x: 50,
+					y: 90
+				},
+				timer: time,
+				animate: {
+					enter: 'animated fadeInRight',
+					exit: 'animated fadeOutRight'
+				},
+			});
+		}
 	    $("#closeReferenceModalBtn").click(function() {
 			$("#addReferenceButton").prop('disabled', true);
 	    	$("#referenceModal").modal('hide');
@@ -587,7 +638,7 @@
         <h3 style="margin-top: 0">Files</h3>
         
         <ul class="list-group" >
-	        <li class="list-group-item" th:each="upload, status:${citation.gilesUploads}">
+	        <li class="list-group-item word-wrap" th:each="upload, status:${citation.gilesUploads}">
 	        <i class="icon-giles"></i>
 	        
 	        <span th:if="${upload.uploadedFile?.filename}">
@@ -615,8 +666,9 @@
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).FAILED}" class="label label-danger">Failed [[${upload.progressId}]]</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW}" class="label label-default">In Queue</span>
 	        <span th:if="${upload.documentStatus == T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED}" class="label label-default">Processing</span>
+	        <button th:id="|reprocess-file-btn-${status.index}|" type="button" th:data-upload-file="${upload.documentId}" class="fa fa-redo fa-xs reprocess-file"></button>
 	        <a th:unless="${upload.documentStatus != null && (upload.documentStatus != T(edu.asu.diging.citesphere.model.bib.GilesStatus).SUBMITTED || T(edu.asu.diging.citesphere.model.bib.GilesStatus).NEW)}" 
-	        	th:href="@{|${citation.key}/sync/giles/${upload.progressId}?index=${index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}">
+	        	th:href="@{|${citation.key}/sync/giles/${upload.progressId}?index=${status.index}&page=${page}&sortBy=${sortBy}&collectionId=${collectionId}|}">
 				<i class="icon-sync" title="Sync Upload Status"></i></a>
 	        </li>
         </ul>
@@ -765,6 +817,24 @@
         </div>
       </div>
     </div>
+    
+    <div class="modal fade" id="file-reprocess-confirmation" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			  <h4 class="modal-title">Reprocess File</h4>
+			</div>
+			<div class="modal-body">
+			  <p>Are you sure you want to reprocess this file?</p>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-default" data-dismiss="modal">No, cancel!</button>
+			  <button id="reprocess-file-button" data-upload-file="" type="button" class="btn btn-primary">Yes, reprocess!</button>
+			</div>
+		  </div>
+		</div>
+	</div>
 
     <!-- Reference Modal -->
     <div class="modal fade" id="referenceModal" tabindex="-1" role="dialog" aria-labelledby="referenceLabel">

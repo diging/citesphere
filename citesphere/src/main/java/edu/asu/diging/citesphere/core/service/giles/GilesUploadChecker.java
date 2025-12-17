@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.service.giles;
 
+import edu.asu.diging.citesphere.model.bib.IGilesUpload;
 import edu.asu.diging.citesphere.user.IUser;
 
 public interface GilesUploadChecker {
@@ -12,5 +13,7 @@ public interface GilesUploadChecker {
     void checkUploadStatus(String citationKey);
 
     void checkFileUploadStatus(String itemId, IUser principal, String fileId);
+    
+    boolean canReprocess(IGilesUpload upload, IUser user);
 
 }

@@ -298,4 +298,33 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
             updateCitation(citation, checkedUploads, user, currentCitation);
         }        
     }
+    
+    /**
+     * Check if an upload can be reprocessed based on Giles API v2 status
+     * @param upload The upload to check
+     * @param user The user making the request
+     * @return true if upload can be reprocessed, false otherwise
+     */
+    public boolean canReprocess(IGilesUpload upload, IUser user) {
+        if (upload.getProgressId() == null) {
+            return false;
+        }
+        
+        String token = internalTokenManager.getAccessToken(user).getValue();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(headers);
+        
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                gilesBaseurl + gilesCheckEndpoint + upload.getProgressId(),
+                HttpMethod.GET, requestEntity, String.class);
+                
+            return response.getStatusCode() == HttpStatus.OK;
+            
+        } catch (HttpClientErrorException ex) {
+            return ex.getStatusCode() == HttpStatus.NOT_FOUND || 
+                   ex.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
 }
