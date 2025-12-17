@@ -2,6 +2,7 @@ package edu.asu.diging.citesphere.web.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,9 +24,13 @@ import com.google.gson.Gson;
 
 import edu.asu.diging.citesphere.core.search.service.SearchEngine;
 import edu.asu.diging.citesphere.core.search.service.impl.ResultPage;
+import edu.asu.diging.citesphere.core.service.ICitationCollectionManager;
 import edu.asu.diging.citesphere.core.service.IGroupManager;
+import edu.asu.diging.citesphere.model.bib.ICitationCollection;
 import edu.asu.diging.citesphere.model.bib.ICitationGroup;
 import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.web.BreadCrumb;
+import edu.asu.diging.citesphere.web.BreadCrumbType;
 
 @Controller
 @PropertySource("classpath:/config.properties")
@@ -40,6 +45,9 @@ public class SearchController {
 
     @Autowired
     private IGroupManager groupManager;
+    
+    @Autowired
+    private ICitationCollectionManager collectionManager;
 
     @Value("${_zotero_page_size}")
     private Integer zoteroPageSize;
@@ -50,8 +58,9 @@ public class SearchController {
     @Autowired
     private Environment env;
 
-    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search" })
+    @RequestMapping(value = { "/auth/group/{zoteroGroupId}/search", "/auth/group/{zoteroGroupId}/collection/{collectionId}/search" })
     public @ResponseBody String search(@PathVariable String zoteroGroupId,
+            @PathVariable(value = "collectionId", required = false) String collectionId,
             @RequestParam(value = "searchTerm", required = false) String searchTerm, Model model,
             @RequestParam(defaultValue = "0", required = false, value = "page") String page,
             @RequestParam(defaultValue = "title", required = false, value = "sort") String sort,
@@ -62,23 +71,33 @@ public class SearchController {
 
         if (group == null) {
             logger.error("User " + user.getUsername() + " does not have access to group " + zoteroGroupId);
-            return "error/404";
+            return "error/403";
         }
 
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
-            return "redirect:/auth/group/" + zoteroGroupId + "/items";
+            String redirectUrl = "/auth/group/" + zoteroGroupId;
+            if (collectionId != null) {
+                redirectUrl += "/collection/" + collectionId;
+            }
+            redirectUrl += "/items";
+            return "redirect:" + redirectUrl;
         }
 
         Integer pageInt = 1;
         try {
-            pageInt = new Integer(page);
+            pageInt = Integer.valueOf(page);
         } catch (NumberFormatException ex) {
             logger.warn("Trying to access invalid page number: " + page);
         }
 
         pageInt = pageInt > 0 ? pageInt : 1;
 
-        ResultPage citations = engine.search(searchTerm, zoteroGroupId, pageInt - 1, 50);
+        ResultPage citations;
+        if (collectionId != null) {
+            citations = engine.search(searchTerm, zoteroGroupId, collectionId, pageInt - 1, 50);
+        } else {
+            citations = engine.search(searchTerm, zoteroGroupId, pageInt - 1, 50);
+        }
 
         SearchItemsDataDto searchItemsData = new SearchItemsDataDto();
         searchItemsData.setSearchTerm(searchTerm);
@@ -88,6 +107,9 @@ public class SearchController {
                 .collect(Collectors.toList()));
         searchItemsData.setTotalPages(Math.max(1, citations.getTotalPages()));
         searchItemsData.setZoteroGroupId(zoteroGroupId);
+        if (collectionId != null) {
+            searchItemsData.setCollectionId(collectionId);
+        }
         searchItemsData.setSort(sort);
         searchItemsData.setTotalResults(citations.getTotalResults());
         searchItemsData.setGroup(group);
@@ -107,7 +129,6 @@ public class SearchController {
                 .collect(Collectors.toList()));
 
         Gson gson = new Gson();
-
         return gson.toJson(searchItemsData, SearchItemsDataDto.class);
     }
 }

@@ -220,6 +220,21 @@ public class GilesUploadCheckerImpl implements GilesUploadChecker {
             // Giles is still procoessing
             logger.debug("Upload " + upload.getProgressId()
                     + " still being processed.");
+            
+            // Try to parse as GilesCheckUploadResponse to extract upload ID if available
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = response.getBody();
+            try {
+                GilesCheckUploadResponse checkResponse = mapper.readValue(jsonBody, GilesCheckUploadResponse.class);
+                if (checkResponse.getUploadId() != null && !checkResponse.getUploadId().trim().isEmpty()) {
+                    if (upload.getUploadId() == null || upload.getUploadId().trim().isEmpty()) {
+                        upload.setUploadId(checkResponse.getUploadId());
+                    }
+                }
+            } catch (IOException e) {
+                logger.debug("Could not parse in-progress response as GilesCheckUploadResponse, continuing without upload ID extraction.", e);
+            }
+            
             checkedUploads.add(upload);
         } else if (response.getStatusCode() == HttpStatus.OK) {
             logger.debug("Upload " + upload.getProgressId() + " is done.");
