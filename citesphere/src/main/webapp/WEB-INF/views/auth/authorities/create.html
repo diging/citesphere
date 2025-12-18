@@ -45,29 +45,35 @@ $(function() {
     });
 
     $("#searchAuthor").click(function() {
-    	$('#selectAuthorityModel').modal('show');
+        $("#searchAuthorSpinner").show();
+        $('#selectAuthorityModel').modal('show');
         $("#authoritySpinner").show();
         $("#overlay").show();
-        
+
         $("#selectAuthorityModel").on('shown.bs.modal', function(e) {
       	  e.preventDefault();
       	  $("#overlay").hide();
       	  $("#authoritySpinner").hide();
+      	  $("#searchAuthorSpinner").hide();
         })
-		
+
         $("#conceptpowerAuthoritySearchResult").empty();
         $("#viafAuthoritySearchResult").empty();
-		
+        $("#isisCBAuthoritySearchResult").empty();
+
         $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
             $('#selectAuthorityModel a:first').tab('show');
         })
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         $('#viafAuthority-pagination-top').twbsPagination('destroy');
         $('#isisCBAuthority-pagination-top').twbsPagination('destroy');
-        getViafAuthorities('Author', 'Author', 0)
-        getConceptpowerAuthorities('Author', 'Author', 0)
-        getIsisCBAuthorities('Author', 'Author', 0)
-        $("#searchAuthorSpinner").hide();
+
+        // Use setTimeout to allow UI to render spinner before blocking AJAX calls
+        setTimeout(function() {
+            getViafAuthorities('Author', 'Author', 0)
+            getConceptpowerAuthorities('Author', 'Author', 0)
+            getIsisCBAuthorities('Author', 'Author', 0)
+        }, 50);
     });
     
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {

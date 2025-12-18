@@ -429,11 +429,15 @@ function searchAuthorities(modalType, personType) {
   $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
   $('#viafAuthority-pagination-top').twbsPagination('destroy');
   $('#isisCBAuthority-pagination-top').twbsPagination('destroy');
-  getUserAuthorities(modalType, personType, 0)
-  getViafAuthorities(modalType, personType, 0)
-  getGroupAuthorities(modalType, personType, 0)
-  getconceptpowerAuthorities(modalType, personType, 0)
-  getIsisCBAuthorities(modalType, personType, 0)
+
+  // Use setTimeout to allow UI to render spinner before blocking AJAX calls
+  setTimeout(function() {
+    getUserAuthorities(modalType, personType, 0)
+    getViafAuthorities(modalType, personType, 0)
+    getGroupAuthorities(modalType, personType, 0)
+    getconceptpowerAuthorities(modalType, personType, 0)
+    getIsisCBAuthorities(modalType, personType, 0)
+  }, 50);
 }
 
 function allowSearchAndAdd(element){
