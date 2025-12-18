@@ -13,6 +13,14 @@
 	cursor: pointer; 
 	color: #337ab7;
 }
+#overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10;
+  opacity: 0.5;
+}
 </style>
 <script th:inline="javascript">
 
@@ -107,7 +115,7 @@ $(function() {
     });
 		
     $("#lastNameCreator").keyup(function(e){
-    	allowSearchAndAdd("Creator");
+      allowSearchAndAdd("Creator");
     });
 	
     $(document).on("click", ".remove-aff", function() {
@@ -121,7 +129,7 @@ $(function() {
     $("#searchEditor").click(function() {
         searchAuthorities('Editor', 'Editor');
     });
-	
+  
     $("#searchCreator").click(function() {
         searchAuthorities('Creator', 'Creator');
     }); 
@@ -395,22 +403,41 @@ function addAffiliation(modalType, counter) {
 }
 
 function searchAuthorities(modalType, personType) {
-	$("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
-	    $('#selectAuthorityModel a:first').tab('show');
-	})  
-	$("#search"+modalType+"Spinner").show();
-	$('#userAuthority-pagination-top').twbsPagination('destroy');
-	$('#groupAuthority-pagination-top').twbsPagination('destroy');
-	$('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
-	$('#viafAuthority-pagination-top').twbsPagination('destroy');
-	$('#isisCBAuthority-pagination-top').twbsPagination('destroy');
-	
-	getUserAuthorities(modalType, personType, 0)
-	getViafAuthorities(modalType, personType, 0)
-	getGroupAuthorities(modalType, personType, 0)
-	getconceptpowerAuthorities(modalType, personType, 0)
-	getIsisCBAuthorities(modalType, personType, 0)
-	$("#search"+modalType+"Spinner").hide();
+  $("#search"+modalType+"Spinner").show();
+  $('#selectAuthorityModel').modal('show');
+  $("#authoritySpinner").show();
+  $("#overlay").show();
+  $("#selectAuthorityModel").on('shown.bs.modal', function(e) {
+	  e.preventDefault();
+	  $("#overlay").hide();
+	  $("#authoritySpinner").hide();
+	  $("#search"+modalType+"Spinner").hide();
+  })
+
+  $("#userAuthoritySearchResult").empty();
+  $("#groupAuthoritySearchResult").empty();
+  $("#conceptpowerAuthoritySearchResult").empty();
+  $("#viafAuthoritySearchResult").empty();
+  $("#isisCBAuthoritySearchResult").empty();
+
+  $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
+	  $('#selectAuthorityModel a:first').tab('show');
+  })
+
+  $('#userAuthority-pagination-top').twbsPagination('destroy');
+  $('#groupAuthority-pagination-top').twbsPagination('destroy');
+  $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
+  $('#viafAuthority-pagination-top').twbsPagination('destroy');
+  $('#isisCBAuthority-pagination-top').twbsPagination('destroy');
+
+  // Use setTimeout to allow UI to render spinner before blocking AJAX calls
+  setTimeout(function() {
+    getUserAuthorities(modalType, personType, 0)
+    getViafAuthorities(modalType, personType, 0)
+    getGroupAuthorities(modalType, personType, 0)
+    getconceptpowerAuthorities(modalType, personType, 0)
+    getIsisCBAuthorities(modalType, personType, 0)
+  }, 50);
 }
 
 function allowSearchAndAdd(element){
@@ -808,7 +835,6 @@ function getUserAuthorities(modalType, personType, page) {
 			
   			$("#userAuthoritySearchResult").empty();
   			var content = '';
-  			
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {
   					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
@@ -832,9 +858,7 @@ function getUserAuthorities(modalType, personType, page) {
   				    	   getUserAuthorities(modalType, personType, page-1)
   				    }
   				});
-  			}  		
-  			
-		
+  			}
 		$("#userAuthoritySearchResult").append(content);
 		$(".user-authority-entry").click(function() {
 			name = $(this).closest("tr").find(".name").text();
@@ -902,9 +926,7 @@ function getGroupAuthorities(modalType, personType, page) {
   				    	getGroupAuthorities(modalType, personType, page-1)
   				    }
   				});
-  			}  		
-  			
-		
+  			}
 		$("#groupAuthoritySearchResult").append(content);
 		$(".group-authority-entry").click(function() {
 			name = $(this).closest("tr").find(".name").text();
@@ -945,11 +967,11 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   		type: 'GET',
   		url: url ,
   		async: false,
-  		success: function(data) {
+  		success: function(data) {	
   			$('#cp-groupName').text(data['groupName']);
   			$("#conceptpowerAuthoritySearchResult").empty();
+  			
   			var content = '';
-  				
   			if (data['foundAuthorities'] != null && data['foundAuthorities'].length > 0) {
   				data['foundAuthorities'].forEach(function(elem) {	
   					content += '<tr> <td class="name">' + elem['name'] + '</td> <td class="uri">' + elem['uri'] + '</td> <td>' ;
@@ -976,8 +998,8 @@ function getconceptpowerAuthorities(modalType, personType, page) {
   				});
   				
   			}
-  			
-		$("#conceptpowerAuthoritySearchResult").append(content); 	
+  		
+		$("#conceptpowerAuthoritySearchResult").append(content);
 		$(".conceptpower-authority-entry").click(function() {
 			name = $(this).closest("tr").find(".name").text();
 			uri = $(this).closest("tr").find(".uri").text();
@@ -1012,10 +1034,10 @@ function getconceptpowerAuthorities(modalType, personType, page) {
 		});	
 		
         },
-	error: function(data){
-		$('#conceptpowerAuthoritySearchResult').parents('table').hide()
-		$("#conceptpowerAuthoritiesError").show();	
-	}
+        error: function(data){
+            $('#conceptpowerAuthoritySearchResult').parents('table').hide()
+            $("#conceptpowerAuthoritiesError").show();	
+        }
 	
 	});
 }
@@ -1102,10 +1124,10 @@ function getViafAuthorities(modalType, personType, page) {
 		});	
 		
         },
-	error: function(data){
-		$('#viafAuthoritySearchResult').parents('table').hide()
-		$("#viafAuthoritiesError").show();	
-	}
+        error: function(data){
+            $('#viafAuthoritySearchResult').parents('table').hide()
+            $("#viafAuthoritiesError").show();	
+        }
 	
 	});
 }
@@ -1676,10 +1698,11 @@ function creatorLinkHandler(target) {
 		    <label for="lastNameAuthor">Last Name:</label>
 		    <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
 		  </div>
-		  <button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" data-client-id="Author" id="searchAuthor"
-						style="margin-left: 80%" disabled>Search Author 
-						<i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
-		  </button>
+        
+		  <button class="btn btn-primary search" data-target="#selectAuthorityModel" data-client-id="Author" id="searchAuthor"
+						style="margin-left: 80%" disabled>Search Author
+						<i id="searchAuthorSpinner" class="icon-spinner" style="color: white"></i>
+			</button>
 		  <div class="form-group">
 		    <label for="uriAuthor">URI:</label>
 		    <div class="input-group">
@@ -1728,7 +1751,7 @@ function creatorLinkHandler(target) {
 		  </div>
 		  
 		  <div>
-			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" id="searchEditor" data-client-id="Editor"
+			<button class="btn btn-primary search" data-target="#selectAuthorityModel" id="searchEditor" data-client-id="Editor"
 						style="margin-left: 80%" disabled>Search Editor 
 						<i id="searchEditorSpinner"class="icon-spinner" style="color: white"></i>
 			</button>
@@ -1783,7 +1806,7 @@ function creatorLinkHandler(target) {
 		    <input type="text" class="form-control" id="lastNameCreator" placeholder="Last Name">
 		  </div>
 		  <div>
-			<button class="btn btn-primary search" data-toggle="modal" data-target="#selectAuthorityModel" id="searchCreator" data-client-id="Creator"
+			<button class="btn btn-primary search" data-target="#selectAuthorityModel" id="searchCreator" data-client-id="Creator"
 				style="margin-left: 80%" disabled> Search Creator 
 				<i id="searchCreatorSpinner" class="icon-spinner rotating" style="color: white"></i>
 			</button>
@@ -1821,8 +1844,13 @@ function creatorLinkHandler(target) {
 <!-- 		  Search and Select Authority Modal -->
 <div id="selectAuthorityModel" class="modal fade" tabindex="-1"
 	role="dialog" aria-labelledby="selectAuthorityLabel">
+	
 	<div class="modal-dialog" style="width: 1000px" role="document">
-		<div class="modal-content">
+		<div class="modal-content" style="display: grid; align-items: center;">
+			<div id="overlay"></div>
+			<div id="authoritySpinner" class="loader icon-spinner" style="font-size: 50px; color:#337ab7; z-index: 10;
+					position: absolute; justify-self: center;" role="status">
+			</div>
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
@@ -1928,7 +1956,6 @@ function creatorLinkHandler(target) {
                             </table>
                         </div>
                         
-					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default"

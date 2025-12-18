@@ -2,6 +2,16 @@
 
 <head>
 <script th:src="@{/resources/paginator/jquery.twbsPagination.min.js}"></script>
+<style>
+#overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10;
+  opacity: 0.5;
+}
+</style>
 <script th:inline="javascript">
 $(function() {
 
@@ -35,19 +45,37 @@ $(function() {
     });
 
     $("#searchAuthor").click(function() {
+        $("#searchAuthorSpinner").show();
+        $('#selectAuthorityModel').modal('show');
+        $("#authoritySpinner").show();
+        $("#overlay").show();
+
+        $("#selectAuthorityModel").on('shown.bs.modal', function(e) {
+      	  e.preventDefault();
+      	  $("#overlay").hide();
+      	  $("#authoritySpinner").hide();
+      	  $("#searchAuthorSpinner").hide();
+        })
+
+        $("#conceptpowerAuthoritySearchResult").empty();
+        $("#viafAuthoritySearchResult").empty();
+        $("#isisCBAuthoritySearchResult").empty();
+
         $("#selectAuthorityModel").on('hidden.bs.modal', function(e) {
             $('#selectAuthorityModel a:first').tab('show');
         })
-        $("#searchAuthorSpinner").show();
         $('#conceptpowerAuthority-pagination-top').twbsPagination('destroy');
         $('#viafAuthority-pagination-top').twbsPagination('destroy');
         $('#isisCBAuthority-pagination-top').twbsPagination('destroy');
-        getViafAuthorities('Author', 'Author', 0)
-        getConceptpowerAuthorities('Author', 'Author', 0)
-        getIsisCBAuthorities('Author', 'Author', 0)
-        $("#searchAuthorSpinner").hide();
-    });
 
+        // Use setTimeout to allow UI to render spinner before blocking AJAX calls
+        setTimeout(function() {
+            getViafAuthorities('Author', 'Author', 0)
+            getConceptpowerAuthorities('Author', 'Author', 0)
+            getIsisCBAuthorities('Author', 'Author', 0)
+        }, 50);
+    });
+    
     $("#authorIconContainer").on('click', ".popover #authorCreateAuthority", function() {
         name = $(this).closest("div").find(".name").text();
         uri = $(this).closest("div").find(".uri").text();
@@ -221,7 +249,7 @@ function getViafAuthorities(modalType, personType, page) {
                 });
 
             }
-
+  			
             $("#viafAuthoritySearchResult").append(content);
             $(".viaf-authority-entry").click(function() {
                 name = $(this).closest("tr").find(".name").text();
@@ -446,7 +474,7 @@ function getPersonAuthority(uri, personType) {
             <label for="lastNameAuthor">Last Name:</label>
             <input type="text" class="form-control" id="lastNameAuthor" placeholder="Last Name">
           </div>
-          <button class="btn btn-primary" data-toggle="modal" data-target="#selectAuthorityModel" id="searchAuthor"
+          <button class="btn btn-primary" data-target="#selectAuthorityModel" id="searchAuthor"
                         style="margin-left: 80%" disabled>Search Author 
                         <i id="searchAuthorSpinner"class="icon-spinner" style="color: white"></i>
           </button>
@@ -474,7 +502,12 @@ function getPersonAuthority(uri, personType) {
 <div id="selectAuthorityModel" class="modal fade" tabindex="-1"
     role="dialog" aria-labelledby="selectAuthorityLabel">
     <div class="modal-dialog" style="width: 1000px" role="document">
-        <div class="modal-content">
+        <div class="modal-content" style="display: grid; align-items: center;">
+        
+	        <div id="overlay"></div>
+			<div id="authoritySpinner" class="loader icon-spinner" style="font-size: 50px; color:#337ab7; z-index: 10;
+						position: absolute; justify-self: center;" role="status">
+			</div>
             
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -527,6 +560,7 @@ function getPersonAuthority(uri, personType) {
                                 <tbody id="viafAuthoritySearchResult">
                                 </tbody>
                             </table>
+                            
                         </div>
 
                         <div role="tabpanel" class="tab-pane" id="isisCBAuthoritiesTabContent">
