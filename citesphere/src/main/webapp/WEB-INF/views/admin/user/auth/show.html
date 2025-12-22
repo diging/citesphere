@@ -85,10 +85,10 @@ $(function() {
 	<th/>
 
 </tr>
-<tr th:id="'tr-'+${client.clientId}" th:each="client : ${clientList}">
-	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/user/auth/accessTokens/'+ ${client.clientId}}"><span th:text="${client.clientId}"/></a></td>
-	<td class="client-entry" th:data-id="${client.clientId}"> <a th:href="@{'/admin/user/auth/accessTokens/'+ ${client.clientId}}"><span th:text="${client.name}"/></a></td>
-	<td><a class="delete-link" href="" th:data-client-id="${client.clientId}"><i class="icon-trash-alt"></i></button></td>
+<tr th:id="'tr-'+${token.id}" th:each="token : ${tokenList}">
+	<td class="client-entry" th:data-id="${token.id}"> <a th:href="@{'/admin/user/auth/accessTokens/'+ ${token.id}}"><span th:text="${token.id}"/></a></td>
+	<td class="client-entry" th:data-id="${token.id}"> <a th:href="@{'/admin/user/auth/accessTokens/'+ ${token.id}}"><span th:text="${token.name}"/></a></td>
+	<td><a class="delete-link" href="" th:data-client-id="${token.id}"><i class="icon-trash-alt"></i></button></td>
 </tr>
 </table>
 <div class="modal fade" id="client-delete-confirmation" tabindex="-1" role="dialog">

@@ -9,25 +9,25 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import edu.asu.diging.citesphere.core.service.oauth.IOAuthClientManager;
-import edu.asu.diging.citesphere.core.service.oauth.UserAccessTokenResultPage;
+import edu.asu.diging.citesphere.core.service.oauth.IPersonalAccessTokenManager;
+import edu.asu.diging.citesphere.core.service.oauth.PersonalAccessTokenResultPage;
 import edu.asu.diging.citesphere.core.user.IUserManager;
 import edu.asu.diging.citesphere.user.IUser;
 
 @Controller
 public class ShowAccessTokensController {
-    
+
     @Autowired
     private IUserManager userManager;
-    
+
     @Autowired
-    private IOAuthClientManager clientManager;
-    
+    private IPersonalAccessTokenManager tokenManager;
+
     @RequestMapping(value="/admin/user/auth/accessTokens", method=RequestMethod.GET)
     public String showAllApps(Model model, Pageable pageable, Principal principal) {
         IUser user = userManager.findByUsername(principal.getName());
-        UserAccessTokenResultPage result = clientManager.getAllUserAccessTokenDetails(pageable, user);
-        model.addAttribute("clientList", result.getClientList());
+        PersonalAccessTokenResultPage result = tokenManager.getTokensForUser(user, pageable);
+        model.addAttribute("tokenList", result.getTokens());
         model.addAttribute("currentPage", pageable.getPageNumber()+1);
         model.addAttribute("totalPages", result.getTotalPages());
         return "admin/user/auth/show";
