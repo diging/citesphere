@@ -152,7 +152,6 @@ public class PersonalAccessTokenManager implements IPersonalAccessTokenManager {
     /**
      * Gets or creates the personal access token OAuthClient for a user.
      * Each user has exactly one PersonalAccessTokenOAuthClient that is used for all their personal access tokens.
-     * The subclass type (discriminator value) identifies this as a PAT client - no boolean flag needed.
      */
     private PersonalAccessTokenOAuthClient getOrCreatePATClientForUser(IUser user) {
         Optional<PersonalAccessTokenOAuthClient> existingClient = patClientRepo.findByCreatedByUsername(

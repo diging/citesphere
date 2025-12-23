@@ -5,8 +5,7 @@ import javax.persistence.Entity;
 
 /**
  * Subclass of OAuthClient specifically for personal access tokens.
- * The type itself identifies PAT clients - no additional fields needed.
- * JPA uses the discriminator column (DTYPE) to distinguish this type from regular OAuthClients.
+ * The type itself identifies PAT clients
  */
 @Entity
 @DiscriminatorValue("PAT")
