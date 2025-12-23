@@ -16,15 +16,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
-import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import edu.asu.diging.citesphere.core.exceptions.CannotFindTokenException;
 import edu.asu.diging.citesphere.core.model.oauth.IPersonalAccessToken;
 import edu.asu.diging.citesphere.core.model.oauth.impl.DbAccessToken;
-import edu.asu.diging.citesphere.core.model.oauth.impl.OAuthClient;
+import edu.asu.diging.citesphere.core.model.oauth.impl.PersonalAccessTokenOAuthClient;
 import edu.asu.diging.citesphere.core.repository.oauth.DbAccessTokenRepository;
-import edu.asu.diging.citesphere.core.repository.oauth.OAuthClientRepository;
+import edu.asu.diging.citesphere.core.repository.oauth.PersonalAccessTokenOAuthClientRepository;
 import edu.asu.diging.citesphere.core.service.oauth.PersonalAccessTokenCredentials;
 import edu.asu.diging.citesphere.core.service.oauth.PersonalAccessTokenResultPage;
 import edu.asu.diging.citesphere.user.IUser;
@@ -33,19 +31,13 @@ import edu.asu.diging.citesphere.user.impl.User;
 public class PersonalAccessTokenManagerTest {
 
     @Mock
-    private OAuthClientRepository clientRepo;
+    private PersonalAccessTokenOAuthClientRepository patClientRepo;
 
     @Mock
     private DbAccessTokenRepository accessTokenRepo;
 
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Mock
-    private TokenStore tokenStore;
-
-    @Mock
-    private ClientDetailsService clientDetailsService;
 
     @InjectMocks
     private PersonalAccessTokenManager managerToTest;
