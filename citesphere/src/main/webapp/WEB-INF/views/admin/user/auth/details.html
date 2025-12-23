@@ -15,7 +15,7 @@ $(function() {
 			'url': url + "?[(${_csrf.parameterName})]=[(${_csrf.token})]",
 			'type': "POST",
 			'success': function(response){
-				 $('#secretKey').text(response.secret);
+				 $('#secretKey').text(response.tokenValue);
 				 $.notify('<i class="icon-checkmark-alt"></i> New token successfully generated!', {
 						type: 'success',
 						offset: {
