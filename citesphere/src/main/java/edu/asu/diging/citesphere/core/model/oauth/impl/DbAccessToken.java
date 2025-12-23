@@ -1,11 +1,15 @@
 package edu.asu.diging.citesphere.core.model.oauth.impl;
 
+import java.time.OffsetDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+
+import edu.asu.diging.citesphere.core.model.oauth.IPersonalAccessToken;
 
 /**
  * Modeled after:
@@ -14,8 +18,8 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
  *
  */
 @Entity
-public class DbAccessToken {
- 
+public class DbAccessToken implements IPersonalAccessToken {
+
     @Id
     private String id;
     private String tokenId;
@@ -28,12 +32,15 @@ public class DbAccessToken {
     private String authentication;
     @Lob
     private String refreshToken;
- 
- 
+
+    private String name;
+    private OffsetDateTime createdAt;
+    private boolean personalAccessToken;
+
     public OAuth2Authentication getAuthentication() {
         return SerializableObjectConverter.deserialize(authentication);
     }
- 
+
     public void setAuthentication(OAuth2Authentication authentication) {
         this.authentication = SerializableObjectConverter.serialize(authentication);
     }
@@ -97,5 +104,34 @@ public class DbAccessToken {
     public void setAuthentication(String authentication) {
         this.authentication = authentication;
     }
- 
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    @Override
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public boolean isPersonalAccessToken() {
+        return personalAccessToken;
+    }
+
+    @Override
+    public void setPersonalAccessToken(boolean personalAccessToken) {
+        this.personalAccessToken = personalAccessToken;
+    }
 }

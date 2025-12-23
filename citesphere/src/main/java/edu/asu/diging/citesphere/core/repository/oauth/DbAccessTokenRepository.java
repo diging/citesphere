@@ -3,6 +3,8 @@ package edu.asu.diging.citesphere.core.repository.oauth;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import edu.asu.diging.citesphere.core.model.oauth.impl.DbAccessToken;
@@ -28,5 +30,8 @@ public interface DbAccessTokenRepository extends JpaRepository<DbAccessToken, St
     List<DbAccessToken> findByAuthenticationId(String authenticationId);
    
     void deleteByClientIdAndUsername(String clientId, String username);
- 
+
+    Page<DbAccessToken> findByUsernameAndPersonalAccessToken(String username, boolean isPersonalAccessToken, Pageable pageable);
+
+    Optional<DbAccessToken> findByIdAndUsername(String id, String username);
 }

@@ -11,9 +11,6 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
@@ -35,11 +32,11 @@ import edu.asu.diging.citesphere.user.IUser;
 public class OAuthClientManager implements ClientDetailsService, IOAuthClientManager {
 
     private OAuthClientRepository clientRepo;
-    
+
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    
+
     private int accessTokenValidity;
-       
+
     public OAuthClientManager(OAuthClientRepository repo, BCryptPasswordEncoder bCryptPasswordEncoder, int accessTokenValidity) {
         this.clientRepo = repo;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -59,10 +56,10 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
                 // load authorities, ugly but best I can come up with right now
             }
             return details;
-        } 
+        }
         throw new InvalidClientException("Client with id " + clientId + " does not exist.");
     }
-    
+
     /* (non-Javadoc)
      * @see edu.asu.diging.citesphere.core.service.oauth.impl.IOAuthClientManager#store(org.springframework.security.oauth2.provider.ClientDetails)
      */
@@ -85,7 +82,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         OAuthClient storeClient = clientRepo.save(client);
         return new OAuthCredentials(storeClient.getClientId(), clientSecret);
     }
-    
+
     @Override
     public OAuthClientResultPage getAllClientDetails(Pageable pageable) {
         List<IOAuthClient> clientList = new ArrayList<>();
@@ -95,21 +92,21 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         result.setClientList(clientList);
         result.setTotalPages(oAuthClients.getTotalPages());
         return result;
-        
+
     }
-    
+
     @Override
     public List<OAuthClient> getAllApps() {
         return clientRepo.findAll();
     }
-    
+
     @Override
     public void deleteClient(String clientId) {
         if(clientId != null) {
             clientRepo.deleteById(clientId);
         }
     }
-    
+
     @Override
     public OAuthCredentials updateClientSecret(String clientId) throws CannotFindClientException {
         Optional<OAuthClient> clientOptional = clientRepo.findById(clientId);
@@ -122,7 +119,7 @@ public class OAuthClientManager implements ClientDetailsService, IOAuthClientMan
         }
         throw new CannotFindClientException("Client with id " + clientId + " does not exist.");
     }
-    
+
     @Override
     public List<OAuthClient> getClientsDetails(List<String> clientList){
         List<OAuthClient> clients = new ArrayList<>();

@@ -5,10 +5,15 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -21,6 +26,9 @@ import edu.asu.diging.citesphere.user.IUser;
 import edu.asu.diging.citesphere.user.impl.User;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("OAUTH")
 public class OAuthClient implements IOAuthClient, ClientDetails {
 
     /**
@@ -50,6 +58,7 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
     private int accessTokenValiditySeconds;
     private int refereshTokenValiditySeconds;
     private boolean autoApprove;
+
     @OneToOne(targetEntity=User.class)
     private IUser createdBy;
     
@@ -199,7 +208,6 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
         this.autoApprove = autoApprove;
     }
 
-    @Override
     public IUser getCreatedBy() {
         return this.createdBy;
     }
