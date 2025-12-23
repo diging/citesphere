@@ -1,4 +1,4 @@
- citesphere/src/main/java/edu/asu/diging/citesphere/core/model/oauth/IOAuthClient.javapackage edu.asu.diging.citesphere.core.repository.oauth;
+package edu.asu.diging.citesphere.core.repository.oauth;
 
 import java.util.Optional;
 
