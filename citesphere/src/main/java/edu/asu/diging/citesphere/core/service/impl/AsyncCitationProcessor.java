@@ -28,6 +28,7 @@ import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
+import edu.asu.diging.citesphere.core.service.jobs.impl.JobStatusChecker;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
@@ -64,7 +65,10 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
     @Autowired
     private ISyncJobManager jobManager;
-    
+
+    @Autowired
+    private JobStatusChecker jobStatusChecker;
+
     private List<JobStatus> inactiveJobStatuses;
     
     @PostConstruct
@@ -103,7 +107,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         jobRepo.save(job);
         jobManager.addJob(job);
 
-        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
@@ -125,26 +129,26 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         jobRepo.save(job);
 
         AtomicInteger counter = new AtomicInteger();
-        
-        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
         syncCitations(user, groupId, job, versions, counter);
 
-        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
         syncCollections(user, groupId, job, collectionVersions, groupVersion, counter);
 
-        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
         removeDeletedItems(deletedElements, job);
 
-        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
@@ -158,7 +162,7 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             groupRepo.save((CitationGroup) group.get());
         }
 
-        if(checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
             return new AsyncResult<String>(job.getId());
         }
 
@@ -169,8 +173,12 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         return new AsyncResult<String>(job.getId());
     }
 
-    private boolean checkIfThreadIsInterruptedAndCancelJob(GroupSyncJob job, String groupId) {
-        if(Thread.currentThread().isInterrupted()) {
+    private boolean checkIfJobShouldBeCanceled(GroupSyncJob job, String groupId) {
+        // Check both thread interruption AND database status
+        boolean threadInterrupted = Thread.currentThread().isInterrupted();
+        boolean jobCancelled = jobStatusChecker.isJobCancelled(job.getId());
+
+        if (threadInterrupted || jobCancelled) {
             setJobToCanceledState(job, groupId);
             return true;
         }
@@ -188,8 +196,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             AtomicInteger counter) throws ZoteroHttpStatusException {
         List<String> keysToRetrieve = new ArrayList<>();
         for (String key : versions.keySet()) {
-        	
-            if (checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+
+            if (checkIfJobShouldBeCanceled(job, groupId)) {
                 return;
             }
         	
@@ -224,8 +232,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         keys.addAll(versions.keySet());
         
         for (String key : keys) {
-        	
-            if (checkIfThreadIsInterruptedAndCancelJob(job, groupId)) {
+
+            if (checkIfJobShouldBeCanceled(job, groupId)) {
                 return; // Ensure we stop processing if the job is cancelled
             }
         	
@@ -266,7 +274,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
-            logger.error("Could not wait.", e);
+            Thread.currentThread().interrupt();
+            logger.warn("Interrupted during citation retrieval for group {}", groupId);
         }
         logger.debug("Retrieving: " + keysToRetrieve);
         ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, groupId,
@@ -281,7 +290,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
-            logger.error("Could not wait.", e);
+            Thread.currentThread().interrupt();
+            logger.warn("Interrupted during collection retrieval for group {}", groupId);
         }
         ZoteroCollectionsResponse response = zoteroManager.getCollectionsByKey(user, groupId,
                 keysToRetrieve);
