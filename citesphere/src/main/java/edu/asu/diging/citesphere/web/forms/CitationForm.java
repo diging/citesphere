@@ -273,4 +273,14 @@ public class CitationForm {
     public void setFiles(MultipartFile[] files) {
         this.files = files;
     }
+
+    private String sameAsText; // Textarea input, newline-separated URLs
+
+    public String getSameAsText() {
+        return sameAsText;
+    }
+
+    public void setSameAsText(String sameAsText) {
+        this.sameAsText = sameAsText;
+    }
 }

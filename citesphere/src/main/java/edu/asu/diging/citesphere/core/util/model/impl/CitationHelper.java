@@ -1,10 +1,12 @@
 package edu.asu.diging.citesphere.core.util.model.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -120,6 +122,17 @@ public class CitationHelper implements ICitationHelper {
                     citation.getConceptTags().add(tag);
                 }
             }
+        }
+
+        // Parse sameAsText from textarea into List<String>
+        if (form.getSameAsText() != null && !form.getSameAsText().trim().isEmpty()) {
+            List<String> sameAsList = Arrays.stream(form.getSameAsText().split("\n"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+            citation.setSameAs(sameAsList);
+        } else {
+            citation.setSameAs(new ArrayList<>());
         }
     }
     

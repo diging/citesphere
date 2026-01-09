@@ -545,10 +545,12 @@
 				<span th:each="tag:${citation.conceptTags}" class="badge">[[${tag.conceptName}]] | [[${tag.typeName}]]</span>
 			</td>
 		</tr>
-		<tr>
+		<tr th:if="${citation.sameAs != null and !citation.sameAs.isEmpty()}">
 			<td>Same As</td>
-			<td> 
-				<p th:each="resourceUrl:${citation.sameAs}">[[${resourceUrl}]]</p>
+			<td>
+				<span th:each="url:${citation.sameAs}">
+					<a th:href="${url}" th:text="${url}" target="_blank"></a><br/>
+				</span>
 			</td>
 		</tr>
 		<tr>
