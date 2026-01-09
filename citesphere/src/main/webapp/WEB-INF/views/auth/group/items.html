@@ -118,7 +118,12 @@ function addEventListeners(){
 	$("#findByItemKeyBtn").click(function() {
 		var key = $("#findItemKey").val();
 		if (key != undefined && key != '') {
-			window.location.href="items/" + key;
+			var itemUrl = "items/" + key;
+			var currentURL = window.location.href;
+			if(currentURL.match(/collection/)){
+				itemUrl = "../../items/" + key;
+			}
+			window.location.href = itemUrl;
 		}
 	});
 	
@@ -126,7 +131,12 @@ function addEventListeners(){
 	    if(e.which == 13) {
 	    	var key = $("#findItemKey").val();
 	        if (key != undefined && key != '') {
-	            window.location.href="items/" + key;
+	        	var itemUrl = "items/" + key;
+	        	var currentURL = window.location.href;
+	        	if(currentURL.match(/collection/)){
+	        		itemUrl = "../../items/" + key;
+	        	}
+	            window.location.href = itemUrl;
 	        }
 	    }
 	});
