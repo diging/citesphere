@@ -118,7 +118,7 @@ public class SyncJobManager implements ISyncJobManager {
             return;
         }
 
-        // Update database first (source of truth), then invalidate cache, then interrupt thread
+        // Update database first, then invalidate cache, then interrupt thread
         job.setStatus(JobStatus.CANCELED);
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
