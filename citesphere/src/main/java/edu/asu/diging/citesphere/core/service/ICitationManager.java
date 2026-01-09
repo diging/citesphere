@@ -29,6 +29,8 @@ import edu.asu.diging.citesphere.user.IUser;
 
 public interface ICitationManager {
 
+    boolean cancel(String groupId);
+
     List<ICitationGroup> getGroups(IUser user);
 
     CitationResults getGroupItems(IUser user, String groupId, String collectionId, int page, String sortBy, List<String> conceptIds)

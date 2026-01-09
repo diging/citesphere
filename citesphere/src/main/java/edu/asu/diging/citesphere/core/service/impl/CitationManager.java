@@ -7,8 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -92,6 +94,8 @@ public class CitationManager implements ICitationManager {
     private IAsyncCitationProcessor asyncCitationProcessor;
 
     private Map<String, BiFunction<ICitation, ICitation, Integer>> sortFunctions;
+
+    Map<String, Future<String>> futureMap = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -420,7 +424,8 @@ public class CitationManager implements ICitationManager {
 
             // then update content
             results.setNotModified(false);
-            asyncCitationProcessor.sync(user, group.getGroupId() + "", previousVersion, collectionId);
+            Future<String> future = asyncCitationProcessor.sync(user, group.getGroupId() + "", previousVersion, collectionId);
+            futureMap.put(groupId, future);
         } else {
             results.setNotModified(true);
         }
@@ -450,6 +455,16 @@ public class CitationManager implements ICitationManager {
         results.setTotalResults(total);
         return results;
 
+    }
+
+    @Override
+    public boolean cancel(String groupId) {
+        Future<String> future = futureMap.get(groupId);
+        if (future != null) {
+            futureMap.remove(groupId);
+            return future.cancel(true);
+        }
+        return false;
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.citesphere.core.exceptions.ZoteroHttpStatusException;
@@ -26,6 +28,7 @@ import edu.asu.diging.citesphere.core.repository.jobs.JobRepository;
 import edu.asu.diging.citesphere.core.service.IAsyncCitationProcessor;
 import edu.asu.diging.citesphere.core.service.ICitationStore;
 import edu.asu.diging.citesphere.core.service.jobs.ISyncJobManager;
+import edu.asu.diging.citesphere.core.service.jobs.impl.JobStatusChecker;
 import edu.asu.diging.citesphere.core.zotero.DeletedZoteroElements;
 import edu.asu.diging.citesphere.core.zotero.IZoteroManager;
 import edu.asu.diging.citesphere.core.zotero.ZoteroCollectionsResponse;
@@ -62,7 +65,10 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
 
     @Autowired
     private ISyncJobManager jobManager;
-    
+
+    @Autowired
+    private JobStatusChecker jobStatusChecker;
+
     private List<JobStatus> inactiveJobStatuses;
     
     @PostConstruct
@@ -83,14 +89,14 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
      */
     @Override
     @Async
-    public void sync(IUser user, String groupId, long contentVersion, String collectionId) throws ZoteroHttpStatusException {
+    public Future<String> sync(IUser user, String groupId, long contentVersion, String collectionId) throws ZoteroHttpStatusException {
         GroupSyncJob prevJob = jobManager.getMostRecentJob(groupId + "");
         // it's un-intuitive to test for not inactive statuses here, but it's more likely we'll add
-        // more activate job statuses than inactive ones, so it's less error prone to use the list that
+        // more active job statuses than inactive ones, so it's less error prone to use the list that
         // is less likely to change.
         if (prevJob != null &&  !inactiveJobStatuses.contains(prevJob.getStatus())) {
             // there is already a job running, let's not start another one
-            return;
+            return new AsyncResult<String>(null);
         }
 
         logger.info("Starting sync for " + groupId);
@@ -100,6 +106,10 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         job.setStatus(JobStatus.PREPARED);
         jobRepo.save(job);
         jobManager.addJob(job);
+
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
+            return new AsyncResult<String>(job.getId());
+        }
 
         // we'll retrieve the latest group version first in case there are more changes
         // in between
@@ -119,22 +129,65 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         jobRepo.save(job);
 
         AtomicInteger counter = new AtomicInteger();
+
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
+            return new AsyncResult<String>(job.getId());
+        }
+
         syncCitations(user, groupId, job, versions, counter);
+
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
+            return new AsyncResult<String>(job.getId());
+        }
+
         syncCollections(user, groupId, job, collectionVersions, groupVersion, counter);
+
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
+            return new AsyncResult<String>(job.getId());
+        }
 
         removeDeletedItems(deletedElements, job);
 
-        
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
+            return new AsyncResult<String>(job.getId());
+        }
+
         // while this thread has been running, the group might have been updated by another thread
         // so, we have to make sure there is no group with the same group id but other object id
         // or we'll end up with two groups with the same group id.
         Optional<ICitationGroup> group = groupRepo.findFirstByGroupId(new Long(groupId));
+
         if (group.isPresent()) {
             group.get().setContentVersion(groupVersion);
             groupRepo.save((CitationGroup) group.get());
         }
 
+        if(checkIfJobShouldBeCanceled(job, groupId)) {
+            return new AsyncResult<String>(job.getId());
+        }
+
         job.setStatus(JobStatus.DONE);
+        job.setFinishedOn(OffsetDateTime.now());
+        jobRepo.save(job);
+
+        return new AsyncResult<String>(job.getId());
+    }
+
+    private boolean checkIfJobShouldBeCanceled(GroupSyncJob job, String groupId) {
+        // Check both thread interruption AND database status
+        boolean threadInterrupted = Thread.currentThread().isInterrupted();
+        boolean jobCancelled = jobStatusChecker.isJobCancelled(job.getId());
+
+        if (threadInterrupted || jobCancelled) {
+            setJobToCanceledState(job, groupId);
+            return true;
+        }
+        return false;
+    }
+
+    private void setJobToCanceledState(GroupSyncJob job, String groupId) {
+        logger.info("Aborting sync for " + groupId);
+        job.setStatus(JobStatus.CANCELED);
         job.setFinishedOn(OffsetDateTime.now());
         jobRepo.save(job);
     }
@@ -143,6 +196,11 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             AtomicInteger counter) throws ZoteroHttpStatusException {
         List<String> keysToRetrieve = new ArrayList<>();
         for (String key : versions.keySet()) {
+
+            if (checkIfJobShouldBeCanceled(job, groupId)) {
+                return;
+            }
+        	
             Optional<ICitation> citation = citationStore.findById(key);
 
             if (citation.isPresent()) {
@@ -174,6 +232,11 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
         keys.addAll(versions.keySet());
         
         for (String key : keys) {
+
+            if (checkIfJobShouldBeCanceled(job, groupId)) {
+                return; // Ensure we stop processing if the job is cancelled
+            }
+        	
             ICitationCollection collection = collectionRepo.findByKeyAndGroupId(key, groupId);
             if (collection == null || (versions.containsKey(key) && collection.getVersion() != versions.get(key))
                     || collection.getContentVersion() != groupVersion) {
@@ -211,7 +274,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
-            logger.error("Could not wait.", e);
+            Thread.currentThread().interrupt();
+            logger.warn("Interrupted during citation retrieval for group {}", groupId);
         }
         logger.debug("Retrieving: " + keysToRetrieve);
         ZoteroGroupItemsResponse retrievedCitations = zoteroManager.getGroupItemsByKey(user, groupId,
@@ -226,7 +290,8 @@ public class AsyncCitationProcessor implements IAsyncCitationProcessor {
             // wait 1 second to not send too many requests to Zotero
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
-            logger.error("Could not wait.", e);
+            Thread.currentThread().interrupt();
+            logger.warn("Interrupted during collection retrieval for group {}", groupId);
         }
         ZoteroCollectionsResponse response = zoteroManager.getCollectionsByKey(user, groupId,
                 keysToRetrieve);
