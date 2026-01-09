@@ -148,6 +148,9 @@
 .icon-arrow-right:before {
   content: "\e906";
 }
+.icon-arrow-right-alt:before {
+  content: "\e906";
+}
 .icon-arrow-up:before {
   content: "\e907";
 }

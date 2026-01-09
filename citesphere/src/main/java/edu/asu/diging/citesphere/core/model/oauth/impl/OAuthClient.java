@@ -4,10 +4,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -15,6 +17,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
 import edu.asu.diging.citesphere.core.model.oauth.IOAuthClient;
+import edu.asu.diging.citesphere.user.IUser;
+import edu.asu.diging.citesphere.user.impl.User;
 
 @Entity
 public class OAuthClient implements IOAuthClient, ClientDetails {
@@ -46,7 +50,9 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
     private int accessTokenValiditySeconds;
     private int refereshTokenValiditySeconds;
     private boolean autoApprove;
-
+    @OneToOne(targetEntity=User.class)
+    private IUser createdBy;
+    
     @Override
     public String getClientId() {
         return clientId;
@@ -191,5 +197,15 @@ public class OAuthClient implements IOAuthClient, ClientDetails {
     @Override
     public void setAutoApprove(boolean autoApprove) {
         this.autoApprove = autoApprove;
+    }
+
+    @Override
+    public IUser getCreatedBy() {
+        return this.createdBy;
+    }
+
+    @Override
+    public void setCreatedBy(IUser user) {
+        this.createdBy = user;
     }
 }
