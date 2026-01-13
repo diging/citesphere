@@ -1,5 +1,6 @@
 package edu.asu.diging.citesphere.core.factory.zotero.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import edu.asu.diging.citesphere.model.bib.ICitationConceptTag;
@@ -27,6 +28,8 @@ public class ExtraDataObject {
     private Set<IReference> references;
     
     private Set<IGilesUpload> gilesUploads;
+    
+    private List<String> sameAs;
 
     public Set<ICreator> getOtherCreators() {
         return otherCreators;
@@ -74,6 +77,14 @@ public class ExtraDataObject {
 
     public void setGilesUploads(Set<IGilesUpload> gilesUploads) {
         this.gilesUploads = gilesUploads;
+    }
+    
+    public List<String> getSameAs() {
+        return sameAs;
+    }
+
+    public void setSameAs(List<String> sameAs) {
+        this.sameAs = sameAs;
     }
 
 }

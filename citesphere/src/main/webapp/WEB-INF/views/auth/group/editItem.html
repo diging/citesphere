@@ -1624,8 +1624,18 @@ function creatorLinkHandler(target) {
 	<tr th:style="${!#lists.contains(fields, 'rights')}? 'display:none'">
 	<td>Rights</td>
 		<td>
-			<input th:name="rights" th:id="rights" type="text" class="form-control" placeholder="Rights" 
+			<input th:name="rights" th:id="rights" type="text" class="form-control" placeholder="Rights"
 			th:value="${!#strings.isEmpty(form.rights)} ? ${form.rights} : ${citation.rights}" /></td>
+	</tr>
+
+	<tr>
+		<td>Same As URLs<br/><small class="text-muted">(one per line)</small></td>
+		<td>
+			<textarea th:name="sameAsText" th:id="sameAsText" class="form-control" rows="4"
+				placeholder="Enter URLs to equivalent resources (VIAF, IsisCB, etc.)"
+				th:text="${citation.sameAs != null ? #strings.listJoin(citation.sameAs, '&#10;') : ''}"></textarea>
+			<small class="form-text text-muted">Enter URLs to other resources that represent the same publication</small>
+		</td>
 	</tr>
 
 	<tr>
