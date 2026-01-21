@@ -674,7 +674,19 @@ function rewriteColumnsList(data){
 	                </li>
 	            </tbody>
 	        </ul>
-	    </div>
+        </div>
+        
+        <span class="dropdown pull-left" style= "margin-left:30px;margin-top:-20px;">
+   		    <label for="itemType"></label> 
+			<select class="form-control" id="itemType" name="itemType" >
+				<span >
+					<option th:selected="${#strings.equals(itemType, 'All')}" th:value="All">Filter by Type</option>
+					<span th:each="citationType:${T(edu.asu.diging.citesphere.model.bib.ItemType).values()}">
+						<option th:selected="${#strings.equals(itemType, citationType)}" th:value="${citationType}" th:text="${citationType}">[[${citationType}]]</option>
+					</span>
+				</span> 
+			</select> 
+        </span>
         
 	    <div class="dropdown pull-right" style="padding-bottom: 10px;">
 	        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -1023,7 +1035,11 @@ $.notify('<i class="fas fa-exclamation-circle"></i>'+message, {
 	},
 });
 }
-		
+
+$("#itemType").change(function () {
+	var itemType = $("#itemType").val();
+	window.location.href = "?itemType=" + itemType;
+});
 </script>
 </div>
 </body>

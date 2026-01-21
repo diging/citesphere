@@ -43,7 +43,7 @@ public class CollectionItemsController {
         }
 
         IUser user = (IUser) authentication.getPrincipal();
-        CitationResults results = citationManager.getGroupItems(user, groupId, null, pageInt, sort, null);
+        CitationResults results = citationManager.getGroupItems(user, groupId, null, pageInt, sort, null, null);
         model.addAttribute("items", results.getCitations());
         model.addAttribute("total", results.getTotalResults());
         model.addAttribute("totalPages", Math.ceil(new Float(results.getTotalResults()) / new Float(zoteroPageSize)));
